@@ -13,13 +13,10 @@ global $SETTINGS;
 $SETTINGS['general']['application_name'] = 'magnolia';
 $SETTINGS['general']['instance_name'] = $SETTINGS['general']['application_name'];
 $SETTINGS['general']['version'] = '2.2';
-$SETTINGS['general']['build'] = '';
+$SETTINGS['general']['build'] = 'c8ff09c';
 
 // the location of magnolia internal path
 $SETTINGS['path']['APPLICATION'] = str_replace( '/settings.ini.php', '', __FILE__ );
-
-// always leave as false when running as production server
-$SETTINGS['general']['development_mode'] = false;
 
 // Magnolia does not use VOIP
 $SETTINGS['voip']['enabled'] = false;
