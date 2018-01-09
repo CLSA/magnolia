@@ -21,5 +21,3 @@ DELIMITER ;
 
 CALL upgrade_application_number();
 DROP PROCEDURE IF EXISTS upgrade_application_number;
-
-SELECT "PLEASE NOTE: If this is the initial installation be sure to also run initial_install.sql" AS "";
