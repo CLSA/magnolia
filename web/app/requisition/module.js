@@ -101,7 +101,23 @@ define( function() {
     'CnHttpFactory',
     function( CnHttpFactory ) {
       var object = function( parentModel ) {
+        var self = this;
         this.parentModel = parentModel;
+
+        CnHttpFactory.instance( {
+          path: 'qnaire_type',
+          data: { select: { column: [ 'section', 'rank', 'category', 'name', 'note', 'replacements' ] } }
+        } ).query().then( function( response ) {
+          self.qnaireList = response.data.map( qnaire => ( {
+            section: qnaire.section,
+            rank: qnaire.rank,
+            category: qnaire.category,
+            name: qnaire.name,
+            note: qnaire.note,
+            comprehensive_replacement: qnaire.replacements.split('|')[0],
+            tracking_replacement: qnaire.replacements.split('|')[1]
+          } ) );
+        } );
       };
       return { instance: function( parentModel ) { return new object( parentModel ); } };
     }

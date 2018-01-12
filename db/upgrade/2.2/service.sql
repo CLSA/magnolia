@@ -99,4 +99,6 @@ INSERT INTO service ( subject, method, resource, restricted ) VALUES
 ( 'physical', 'GET', 0, 0 ),
 ( 'physical', 'GET', 1, 1 ),
 ( 'qnaire', 'GET', 0, 0 ),
-( 'qnaire', 'GET', 1, 1 );
+( 'qnaire', 'GET', 1, 1 ),
+( 'qnaire_type', 'GET', 0, 0 ),
+( 'qnaire_type', 'GET', 1, 1 );

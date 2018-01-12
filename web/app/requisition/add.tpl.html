@@ -622,6 +622,20 @@
                   </tr>
                 </thead>
                 <tbody>
+                  <tr ng-repeat="qnaire in model.addModel.qnaireList">
+                    <td>
+                      {{ qnaire.name }}
+                      <sup ng-if="qnaire.note" uib-tooltip="{{ qnaire.note }}" tooltip-popup-delay="0">NOTE</sup>
+                    </td>
+                    <td ng-if="qnaire.tracking_replacement">{{ qnaire.tracking_replacement }}</td>
+                    <td ng-if="!qnaire.tracking_replacement">
+                      <input type="checkbox"></input>
+                    </td>
+                    <td ng-if="qnaire.comprehensive_replacement">{{ qnaire.comprehensive_replacement }}</td>
+                    <td ng-if="!qnaire.comprehensive_replacement">
+                      <input type="checkbox"></input>
+                    </td>
+                  </tr>
                 </tbody>
               </table>
             </div>

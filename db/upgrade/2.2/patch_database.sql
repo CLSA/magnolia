@@ -17,6 +17,7 @@ SOURCE requisition.sql
 SOURCE coapplicant.sql
 SOURCE keyword.sql
 SOURCE reference.sql
+SOURCE qnaire_type.sql
 SOURCE qnaire.sql
 SOURCE physical.sql
 SOURCE biomarker.sql
