@@ -1,32 +1,26 @@
 define( function() {
   'use strict';
 
-  try { var module = cenozoApp.module( 'requisition', true ); } catch( err ) { console.warn( err ); return; }
+  try { var module = cenozoApp.module( 'keyword', true ); } catch( err ) { console.warn( err ); return; }
   angular.extend( module, {
     identifier: {},
     name: {
-      singular: 'requisition',
-      plural: 'requisitions',
-      possessive: 'requisition\'s',
-      pluralPossessive: 'requisitions\''
+      singular: 'keyword',
+      plural: 'keywords',
+      possessive: 'keyword\'s',
+      pluralPossessive: 'keywords\''
     },
     columnList: {
-      identifier: {
-        title: 'Identifier'
-      },
-      user_full_name: {
+      user: {
         title: 'Applicant',
+        name: 'user.full_name'
       },
-      start_date: {
-        title: 'Start Date',
-        type: 'date'
-      },
-      duration: {
-        title: 'Duration'
+      identifier: {
+        title: 'Name'
       }
     },
     defaultOrder: {
-      column: 'requisition.identifier',
+      column: 'keyword.name',
       reverse: false
     }
   } );
@@ -48,67 +42,61 @@ define( function() {
   } );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnRequisitionAdd', [
-    'CnRequisitionModelFactory',
-    function( CnRequisitionModelFactory ) {
+  cenozo.providers.directive( 'cnKeywordAdd', [
+    'CnKeywordModelFactory',
+    function( CnKeywordModelFactory ) {
       return {
         templateUrl: module.getFileUrl( 'add.tpl.html' ),
         restrict: 'E',
         scope: { model: '=?' },
         controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnRequisitionModelFactory.root;
-          $scope.tab = 'instructions';
-          $scope.part1Tab = 'applicant';
-          $scope.part2Tab = 'qnaire';
-          $scope.ethics = '';
+          if( angular.isUndefined( $scope.model ) ) $scope.model = CnKeywordModelFactory.root;
         }
       };
     }
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnRequisitionList', [
-    'CnRequisitionModelFactory',
-    function( CnRequisitionModelFactory ) {
+  cenozo.providers.directive( 'cnKeywordList', [
+    'CnKeywordModelFactory',
+    function( CnKeywordModelFactory ) {
       return {
         templateUrl: module.getFileUrl( 'list.tpl.html' ),
         restrict: 'E',
         scope: { model: '=?' },
         controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnRequisitionModelFactory.root;
+          if( angular.isUndefined( $scope.model ) ) $scope.model = CnKeywordModelFactory.root;
         }
       };
     }
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnRequisitionView', [
-    'CnRequisitionModelFactory',
-    function( CnRequisitionModelFactory ) {
+  cenozo.providers.directive( 'cnKeywordView', [
+    'CnKeywordModelFactory',
+    function( CnKeywordModelFactory ) {
       return {
         templateUrl: module.getFileUrl( 'view.tpl.html' ),
         restrict: 'E',
         scope: { model: '=?' },
         controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnRequisitionModelFactory.root;
+          if( angular.isUndefined( $scope.model ) ) $scope.model = CnKeywordModelFactory.root;
         }
       };
     }
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnRequisitionAddFactory', [
-    'CnHttpFactory',
-    function( CnHttpFactory ) {
-      var object = function( parentModel ) {
-        this.parentModel = parentModel;
-      };
+  cenozo.providers.factory( 'CnKeywordAddFactory', [
+    'CnBaseAddFactory',
+    function( CnBaseAddFactory ) {
+      var object = function( parentModel ) { CnBaseAddFactory.construct( this, parentModel ); };
       return { instance: function( parentModel ) { return new object( parentModel ); } };
     }
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnRequisitionListFactory', [
+  cenozo.providers.factory( 'CnKeywordListFactory', [
     'CnBaseListFactory',
     function( CnBaseListFactory ) {
       var object = function( parentModel ) { CnBaseListFactory.construct( this, parentModel ); };
@@ -117,7 +105,7 @@ define( function() {
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnRequisitionViewFactory', [
+  cenozo.providers.factory( 'CnKeywordViewFactory', [
     'CnBaseViewFactory',
     function( CnBaseViewFactory ) {
       var object = function( parentModel, root ) { CnBaseViewFactory.construct( this, parentModel, root ); };
@@ -126,17 +114,17 @@ define( function() {
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnRequisitionModelFactory', [
+  cenozo.providers.factory( 'CnKeywordModelFactory', [
     'CnBaseModelFactory',
-    'CnRequisitionAddFactory', 'CnRequisitionListFactory', 'CnRequisitionViewFactory',
+    'CnKeywordAddFactory', 'CnKeywordListFactory', 'CnKeywordViewFactory',
     function( CnBaseModelFactory,
-              CnRequisitionAddFactory, CnRequisitionListFactory, CnRequisitionViewFactory ) {
+              CnKeywordAddFactory, CnKeywordListFactory, CnKeywordViewFactory ) {
       var object = function( root ) {
         var self = this;
         CnBaseModelFactory.construct( this, module );
-        this.addModel = CnRequisitionAddFactory.instance( this );
-        this.listModel = CnRequisitionListFactory.instance( this );
-        this.viewModel = CnRequisitionViewFactory.instance( this, root );
+        this.addModel = CnKeywordAddFactory.instance( this );
+        this.listModel = CnKeywordListFactory.instance( this );
+        this.viewModel = CnKeywordViewFactory.instance( this, root );
       };
 
       return {

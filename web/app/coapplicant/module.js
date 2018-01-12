@@ -1,32 +1,26 @@
 define( function() {
   'use strict';
 
-  try { var module = cenozoApp.module( 'requisition', true ); } catch( err ) { console.warn( err ); return; }
+  try { var module = cenozoApp.module( 'coapplicant', true ); } catch( err ) { console.warn( err ); return; }
   angular.extend( module, {
     identifier: {},
     name: {
-      singular: 'requisition',
-      plural: 'requisitions',
-      possessive: 'requisition\'s',
-      pluralPossessive: 'requisitions\''
+      singular: 'co-applicant',
+      plural: 'co-applicants',
+      possessive: 'co-applicant\'s',
+      pluralPossessive: 'co-applicants\''
     },
     columnList: {
-      identifier: {
-        title: 'Identifier'
-      },
-      user_full_name: {
+      user: {
         title: 'Applicant',
+        name: 'user.full_name'
       },
-      start_date: {
-        title: 'Start Date',
-        type: 'date'
-      },
-      duration: {
-        title: 'Duration'
+      identifier: {
+        title: 'Name'
       }
     },
     defaultOrder: {
-      column: 'requisition.identifier',
+      column: 'coapplicant.name',
       reverse: false
     }
   } );
@@ -48,67 +42,61 @@ define( function() {
   } );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnRequisitionAdd', [
-    'CnRequisitionModelFactory',
-    function( CnRequisitionModelFactory ) {
+  cenozo.providers.directive( 'cnCoapplicantAdd', [
+    'CnCoapplicantModelFactory',
+    function( CnCoapplicantModelFactory ) {
       return {
         templateUrl: module.getFileUrl( 'add.tpl.html' ),
         restrict: 'E',
         scope: { model: '=?' },
         controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnRequisitionModelFactory.root;
-          $scope.tab = 'instructions';
-          $scope.part1Tab = 'applicant';
-          $scope.part2Tab = 'qnaire';
-          $scope.ethics = '';
+          if( angular.isUndefined( $scope.model ) ) $scope.model = CnCoapplicantModelFactory.root;
         }
       };
     }
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnRequisitionList', [
-    'CnRequisitionModelFactory',
-    function( CnRequisitionModelFactory ) {
+  cenozo.providers.directive( 'cnCoapplicantList', [
+    'CnCoapplicantModelFactory',
+    function( CnCoapplicantModelFactory ) {
       return {
         templateUrl: module.getFileUrl( 'list.tpl.html' ),
         restrict: 'E',
         scope: { model: '=?' },
         controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnRequisitionModelFactory.root;
+          if( angular.isUndefined( $scope.model ) ) $scope.model = CnCoapplicantModelFactory.root;
         }
       };
     }
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnRequisitionView', [
-    'CnRequisitionModelFactory',
-    function( CnRequisitionModelFactory ) {
+  cenozo.providers.directive( 'cnCoapplicantView', [
+    'CnCoapplicantModelFactory',
+    function( CnCoapplicantModelFactory ) {
       return {
         templateUrl: module.getFileUrl( 'view.tpl.html' ),
         restrict: 'E',
         scope: { model: '=?' },
         controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnRequisitionModelFactory.root;
+          if( angular.isUndefined( $scope.model ) ) $scope.model = CnCoapplicantModelFactory.root;
         }
       };
     }
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnRequisitionAddFactory', [
-    'CnHttpFactory',
-    function( CnHttpFactory ) {
-      var object = function( parentModel ) {
-        this.parentModel = parentModel;
-      };
+  cenozo.providers.factory( 'CnCoapplicantAddFactory', [
+    'CnBaseAddFactory',
+    function( CnBaseAddFactory ) {
+      var object = function( parentModel ) { CnBaseAddFactory.construct( this, parentModel ); };
       return { instance: function( parentModel ) { return new object( parentModel ); } };
     }
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnRequisitionListFactory', [
+  cenozo.providers.factory( 'CnCoapplicantListFactory', [
     'CnBaseListFactory',
     function( CnBaseListFactory ) {
       var object = function( parentModel ) { CnBaseListFactory.construct( this, parentModel ); };
@@ -117,7 +105,7 @@ define( function() {
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnRequisitionViewFactory', [
+  cenozo.providers.factory( 'CnCoapplicantViewFactory', [
     'CnBaseViewFactory',
     function( CnBaseViewFactory ) {
       var object = function( parentModel, root ) { CnBaseViewFactory.construct( this, parentModel, root ); };
@@ -126,17 +114,17 @@ define( function() {
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnRequisitionModelFactory', [
+  cenozo.providers.factory( 'CnCoapplicantModelFactory', [
     'CnBaseModelFactory',
-    'CnRequisitionAddFactory', 'CnRequisitionListFactory', 'CnRequisitionViewFactory',
+    'CnCoapplicantAddFactory', 'CnCoapplicantListFactory', 'CnCoapplicantViewFactory',
     function( CnBaseModelFactory,
-              CnRequisitionAddFactory, CnRequisitionListFactory, CnRequisitionViewFactory ) {
+              CnCoapplicantAddFactory, CnCoapplicantListFactory, CnCoapplicantViewFactory ) {
       var object = function( root ) {
         var self = this;
         CnBaseModelFactory.construct( this, module );
-        this.addModel = CnRequisitionAddFactory.instance( this );
-        this.listModel = CnRequisitionListFactory.instance( this );
-        this.viewModel = CnRequisitionViewFactory.instance( this, root );
+        this.addModel = CnCoapplicantAddFactory.instance( this );
+        this.listModel = CnCoapplicantListFactory.instance( this );
+        this.viewModel = CnCoapplicantViewFactory.instance( this, root );
       };
 
       return {

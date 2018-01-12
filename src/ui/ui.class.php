@@ -21,6 +21,8 @@ class ui extends \cenozo\ui\ui
   {
     parent::build_listitem_list();
 
+    $this->add_listitem( 'Requisitions', 'requisition' );
+
     $this->remove_listitem( 'Availability Types' );
     $this->remove_listitem( 'Consent Types' );
     $this->remove_listitem( 'Event Types' );
