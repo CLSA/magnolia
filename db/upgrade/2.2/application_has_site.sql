@@ -9,7 +9,7 @@ CREATE PROCEDURE patch_application_has_site()
     SET @sql = CONCAT(
       "SELECT COUNT(*) INTO @total ",
       "FROM ", @cenozo, ".application_has_site ",
-      "JOIN ", @cenozo, ".application ON application_has_site.application_id = application_id ",
+      "JOIN ", @cenozo, ".application ON application_has_site.application_id = application.id ",
       "WHERE application.name = 'magnolia'"
     );
     PREPARE statement FROM @sql;

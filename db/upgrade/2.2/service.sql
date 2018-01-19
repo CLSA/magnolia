@@ -29,6 +29,8 @@ INSERT INTO service ( subject, method, resource, restricted ) VALUES
 ( 'application_type', 'GET', 1, 0 ),
 ( 'cohort', 'GET', 0, 0 ),
 ( 'failed_login', 'GET', 0, 1 ),
+( 'language', 'GET', 0, 0 ),
+( 'language', 'GET', 1, 0 ),
 ( 'overview', 'GET', 0, 0 ),
 ( 'overview', 'GET', 1, 0 ),
 ( 'report', 'DELETE', 1, 1 ),

@@ -57,6 +57,7 @@ define( function() {
         scope: { model: '=?' },
         controller: function( $scope ) {
           if( angular.isUndefined( $scope.model ) ) $scope.model = CnRequisitionModelFactory.root;
+          $scope.language = 'english';
           $scope.tab = 'instructions';
           $scope.part1Tab = 'applicant';
           $scope.part2Tab = 'qnaire';
@@ -104,6 +105,7 @@ define( function() {
         var self = this;
         this.parentModel = parentModel;
 
+        this.qnaire = [];
         CnHttpFactory.instance( {
           path: 'qnaire_type',
           data: { select: { column: [ 'section', 'rank', 'category', 'name', 'note', 'replacements' ] } }
@@ -116,6 +118,20 @@ define( function() {
             note: qnaire.note,
             comprehensive_replacement: qnaire.replacements.split('|')[0],
             tracking_replacement: qnaire.replacements.split('|')[1]
+          } ) );
+        } );
+
+        this.physical = [];
+
+        this.biomarker = [];
+        CnHttpFactory.instance( {
+          path: 'biomarker',
+          data: { select: { column: [ 'rank', 'name', 'note' ] } }
+        } ).query().then( function( response ) {
+          self.biomarkerList = response.data.map( biomarker => ( {
+            rank: biomarker.rank,
+            name: biomarker.name,
+            note: biomarker.note
           } ) );
         } );
       };

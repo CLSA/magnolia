@@ -1,6 +1,13 @@
 <div class="utility-view rounded">
   <div class="container-fluid bg-primary rounded-top">
-    <h4>Data and Biospecimen Request Application</h4>
+    <h4>
+      <button class="btn btn-menu btn-header btn-info pull-right"
+              style="margin-top:-4px;"
+              ng-click="language = 'english'==language ? 'french' : 'english'">
+        {{ 'english'==language ? 'Version Française' : 'English Version' }}
+      </button>
+      {{ 'english'==language ? 'Data and Biospecimen Request Application' : 'Demande d’accès aux données et aux échantillons' }}
+    </h4>
   </div>
   <div class="container-fluid" style="margin-top: 1em;">
     <ul class="nav nav-tabs nav-justified">
@@ -643,16 +650,85 @@
         </div>
         <div ng-if="'physical'==part2Tab" class="panel panel-default" style="border-top-left-radius: 0px;">
           <div class="panel-body">
+            <div class="form-horizontal">
+              <div class="form-group">
+                <label for="physical" class="col-sm-9 control-label">
+                  Please check if you are requesting physical assessments data from the CLSA BASELINE
+                  data collection
+                </label>
+                <div class="col-sm-3">
+                  <input id="physical" class="form-control" ng-model="physical" type="checkbox"></input>
+                </div>
+              </div>
+              <table class="table table-striped rounded" ng-if="physical">
+                <thead class="bg-info">
+                  <tr>
+                    <td>Physical Assessment</td>
+                    <td>Subcategory</td>
+                    <td>Data</td>
+                    <td>Image</td>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr ng-repeat="physical in model.addModel.physicalList">
+                    <td>
+                      {{ physical.name }}
+                      <sup ng-if="physical.note" uib-tooltip="{{ physical.note }}" tooltip-popup-delay="0">NOTE</sup>
+                    </td>
+                    <td ng-if="physical.data_replacement">{{ physical.data_replacement }}</td>
+                    <td ng-if="!physical.data_replacement">
+                      <input type="checkbox"></input>
+                    </td>
+                    <td ng-if="physical.image_replacement">{{ physical.image_replacement }}</td>
+                    <td ng-if="!physical.image_replacement">
+                      <input type="checkbox"></input>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
         <div ng-if="'biomarker'==part2Tab" class="panel panel-default" style="border-top-left-radius: 0px;">
           <div class="panel-body">
+            <div class="form-horizontal">
+              <div class="form-group">
+                <label for="biomarker" class="col-sm-9 control-label">
+                  Please check if you are requesting biomarkers measured in blood data from the CLSA BASELINE
+                  data collection
+                </label>
+                <div class="col-sm-3">
+                  <input id="biomarker" class="form-control" ng-model="biomarker" type="checkbox"></input>
+                </div>
+              </div>
+              <table class="table table-striped rounded" ng-if="biomarker">
+                <thead class="bg-info">
+                  <tr>
+                    <td>Hematology Report (N=30,000)</td>
+                    <td>Data</td>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr ng-repeat="biomarker in model.addModel.biomarkerList">
+                    <td>
+                      {{ biomarker.name }}
+                      <sup ng-if="biomarker.note" uib-tooltip="{{ biomarker.note }}" tooltip-popup-delay="0">NOTE</sup>
+                    </td>
+                    <td><input type="checkbox"></input></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
     </div>
     <div ng-if="'part3'==tab" class="panel panel-default" style="border-top-left-radius: 0px;">
       <div class="panel-body" style="padding-bottom: 0px;">
+        <h4 style="margin-top: 0; margin-bottom: 1em;">Application Part 3 of 3: Biospecimen Access</h4>
+        <p class="text-primary">
+          Biospecimen access is not yet available.
+        </p>
       </div>
     </div>
   </div>
