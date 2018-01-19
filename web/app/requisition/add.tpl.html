@@ -3,166 +3,154 @@
     <h4>
       <button class="btn btn-menu btn-header btn-info pull-right"
               style="margin-top:-4px;"
-              ng-click="language = 'english'==language ? 'french' : 'english'">
-        {{ 'english'==language ? 'Version Française' : 'English Version' }}
+              ng-click="language = 'en'==language ? 'fr' : 'en'">
+        {{ 'en'==language ? 'Version Française' : 'English Version' }}
       </button>
-      {{ 'english'==language ? 'Data and Biospecimen Request Application' : 'Demande d’accès aux données et aux échantillons' }}
+      <span ng-bind-html="t( 'heading' )"></span>
     </h4>
   </div>
   <div class="container-fluid" style="margin-top: 1em;">
     <ul class="nav nav-tabs nav-justified">
-      <li ng-class="{'active':'instructions'==tab}"><a ng-click="tab='instructions'">Instructions</a></li>
-      <li ng-class="{'active':'part1'==tab}"><a ng-click="tab='part1'">Part 1</a></li>
-      <li ng-class="{'active':'part2'==tab}"><a ng-click="tab='part2'">Part 2</a></li>
-      <li ng-class="{'active':'part3'==tab}"><a ng-click="tab='part3'">Part 3</a></li>
+      <li ng-class="{'active':'instructions'==tab}">
+        <a ng-click="tab='instructions'" ng-bind-html="t( 'instructions.tab' )"></a>
+      </li>
+      <li ng-class="{'active':'part1'==tab}">
+        <a ng-click="tab='part1'" ng-bind-html="t( 'part1.tab' )"></a>
+      </li>
+      <li ng-class="{'active':'part2'==tab}">
+        <a ng-click="tab='part2'" ng-bind-html="t( 'part2.tab' )"></a>
+      </li>
+      <li ng-class="{'active':'part3'==tab}">
+        <a ng-click="tab='part3'" ng-bind-html="t( 'part3.tab' )"></a>
+      </li>
     </ul>
     <div ng-if="'instructions'==tab" class="panel panel-default" style="border-top-left-radius: 0px;">
       <div class="panel-body" style="padding-bottom: 0px;">
-        <h4>Instructions for completing an application</h4>
+        <h4 ng-bind-html="t( 'instructions.title' )"></h4>
         <ul class="list-group">
-          <li class="list-group-item">
-            Please consult the CLSA website for instructions, and policies and procedures for CLSA data and
-            biospecimen access: <a href="www.clsa-elcv.ca" target="clsa-website">www.clsa-elcv.ca</a> (Data
-            Access).
-            Applicants are also encouraged to review the pertinent sections of the relevant CLSA protocol(s),
-            Data Collection Tools and Physical Assessments in advance of completing the application.
-            Additional information on the variables in the CLSA dataset is on the CLSA Data Preview Portal.
-          </li>
-          <li class="list-group-item">
-            Consult us for any questions regarding your application at
-            <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.
-          </li>
-          <li class="list-group-item">
-            The application is composed of 3 parts. Part 1: General Project Information; Part 2: Data Checklist;
-            Part 3: Biospecimen Checklist.
-          </li>
-          <li class="list-group-item">
-            Please ensure that you have completed all of the sections of the application form that are relevant
-            to your application. Incomplete applications may result in processing delays or refusal of your
-            application.
-          </li>
+          <li class="list-group-item" ng-bind-html="t( 'instructions.text1' )"></li>
+          <li class="list-group-item" ng-bind-html="t( 'instructions.text2' )"></li>
+          <li class="list-group-item" ng-bind-html="t( 'instructions.text3' )"></li>
+          <li class="list-group-item" ng-bind-html="t( 'instructions.text4' )"></li>
         </ul>
       </div>
     </div>
     <div ng-if="'part1'==tab" class="panel panel-default" style="border-top-left-radius: 0px;">
       <div class="panel-body" style="padding-bottom: 0px;">
-        <h4 style="margin-top: 0; margin-bottom: 1em;">Application Part 1 of 3: General Project Information</h4>
+        <h4 style="margin-top: 0; margin-bottom: 1em;" ng-bind-html="t( 'part1.title' )"></h4>
         <ul class="nav nav-tabs">
-          <li ng-class="{'active':'applicant'==part1Tab}">
-            <a ng-click="part1Tab='applicant'">A1. Applicant</a>
+          <li ng-class="{'active':'a1' == part1Tab}">
+            <a ng-click="part1Tab='a1'" ng-bind-html="t( 'part1.a1.tab' )"></a>
           </li>
-          <li ng-class="{'active':'team'==part1Tab}">
-            <a ng-click="part1Tab='team'">A2. Project Team</a>
+          <li ng-class="{'active':'a2' == part1Tab}">
+            <a ng-click="part1Tab='a2'" ng-bind-html="t( 'part1.a2.tab' )"></a>
           </li>
-          <li ng-class="{'active':'timeline'==part1Tab}">
-            <a ng-click="part1Tab='timeline'">A3. Timeline</a>
+          <li ng-class="{'active':'a3' == part1Tab}">
+            <a ng-click="part1Tab='a3'" ng-bind-html="t( 'part1.a3.tab' )"></a>
           </li>
-          <li ng-class="{'active':'description'==part1Tab}">
-            <a ng-click="part1Tab='description'">A4. Description</a>
+          <li ng-class="{'active':'a4' == part1Tab}">
+            <a ng-click="part1Tab='a4'" ng-bind-html="t( 'part1.a4.tab' )"></a>
           </li>
-          <li ng-class="{'active':'review'==part1Tab}">
-            <a ng-click="part1Tab='review'">A5. Scientific Review</a>
+          <li ng-class="{'active':'a5' == part1Tab}">
+            <a ng-click="part1Tab='a5'" ng-bind-html="t( 'part1.a5.tab' )"></a>
           </li>
-          <li ng-class="{'active':'ethics'==part1Tab}">
-            <a ng-click="part1Tab='ethics'">A6. Ethics</a>
+          <li ng-class="{'active':'a6' == part1Tab}">
+            <a ng-click="part1Tab='a6'" ng-bind-html="t( 'part1.a6.tab' )"></a>
           </li>
-          <li ng-class="{'active':'waiver'==part1Tab}">
-            <a ng-click="part1Tab='waiver'">A7. Fee Waiver</a>
+          <li ng-class="{'active':'a7' == part1Tab}">
+            <a ng-click="part1Tab='a7'" ng-bind-html="t( 'part1.a7.tab' )"></a>
           </li>
         </ul>
-        <div ng-if="'applicant'==part1Tab" class="panel panel-default" style="border-top-left-radius: 0px;">
+        <div ng-if="'a1'==part1Tab" class="panel panel-default" style="border-top-left-radius: 0px;">
           <div class="panel-body">
-            <p class="text-primary">
-              <strong>Primary Applicant / Demandeur principal:</strong>
-              The primary applicant will be the contact person for the CLSA Access Agreement as well as for
-              the data release and any relevant updates.
-            </p> 
-            <p class="text-primary">
-              For <strong>Graduate student</strong> (MSc, PhD) applications, the primary applicant must be the
-              supervisor and the student must be clearly identified.
-              Postdoctoral Fellows are permitted to apply as a primary applicant, but the application must be
-              co-signed by their supervisor (see sections A7).
-              If requesting a Fee Waiver, the Postdoctoral Fellow must be listed as the primary applicant.
-            </p> 
+            <p class="text-primary" ng-bind-html="t( 'part1.a1.text1' )"></p>
+            <p class="text-primary" ng-bind-html="t( 'part1.a1.text2' )"></p>
             <hr/>
             <div class="form-horizontal">
               <div class="form-group">
-                <label for="name" class="col-sm-3 control-label">Name</label>
+                <label for="name" class="col-sm-3 control-label"
+                       ng-bind-html="t( 'part1.a1.name' )"></label>
                 <div class="col-sm-9">
                   <input id="name" class="form-control" type="text"></input>
                 </div>
               </div>
               <div class="form-group">
-                <label for="position" class="col-sm-3 control-label">Position</label>
+                <label for="position" class="col-sm-3 control-label"
+                       ng-bind-html="t( 'part1.a1.position' )"></label>
                 <div class="col-sm-9">
                   <input id="position" class="form-control" type="text"></input>
                 </div>
               </div>
               <div class="form-group">
-                <label for="affiliation" class="col-sm-3 control-label">Affiliation</label>
+                <label for="affiliation" class="col-sm-3 control-label"
+                       ng-bind-html="t( 'part1.a1.affiliation' )"></label>
                 <div class="col-sm-9">
                   <input id="affiliation" class="form-control" type="text"></input>
                 </div>
               </div>
               <div class="form-group">
-                <label for="address" class="col-sm-3 control-label">Mailing Address</label>
+                <label for="address" class="col-sm-3 control-label"
+                       ng-bind-html="t( 'part1.a1.address' )"></label>
                 <div class="col-sm-9">
                   <textarea id="address" cn-elastic class="form-control" type="text"></textarea>
                 </div>
               </div>
               <div class="form-group">
-                <label for="phone" class="col-sm-3 control-label">Phone</label>
+                <label for="phone" class="col-sm-3 control-label"
+                       ng-bind-html="t( 'part1.a1.phone' )"></label>
                 <div class="col-sm-9">
                   <input id="phone" class="form-control" type="text"></input>
                 </div>
               </div>
               <div class="form-group">
-                <label for="email" class="col-sm-3 control-label">E-mail</label>
+                <label for="email" class="col-sm-3 control-label"
+                       ng-bind-html="t( 'part1.a1.email' )"></label>
                 <div class="col-sm-9">
                   <input id="email" class="form-control" type="email"></input>
                 </div>
               </div>
             </div>
             <hr/>
-            <p class="text-primary">
-              <strong>
-                Complete this section if this is a Graduate student or Postdoctoral Fellow application (if
-                Fellow is not the primary applicant)
-              </strong>
-            </p>
+            <p class="text-primary" ng-bind-html="t( 'part1.a1.text3' )"></p>
             <div class="form-horizontal">
               <div class="form-group">
-                <label for="graduate_name" class="col-sm-3 control-label">Name</label>
+                <label for="graduate_name" class="col-sm-3 control-label"
+                       ng-bind-html="t( 'part1.a1.graduate_name' )"></label>
                 <div class="col-sm-9">
                   <input id="graduate_name" class="form-control" type="text"></input>
                 </div>
               </div>
               <div class="form-group">
-                <label for="graduate_position" class="col-sm-3 control-label">Degree and Program of Study</label>
+                <label for="graduate_position" class="col-sm-3 control-label"
+                       ng-bind-html="t( 'part1.a1.graduate_program' )"></label>
                 <div class="col-sm-9">
                   <input id="graduate_position" class="form-control" type="text"></input>
                 </div>
               </div>
               <div class="form-group">
-                <label for="graduate_affiliation" class="col-sm-3 control-label">Institution of Enrollment</label>
+                <label for="graduate_affiliation" class="col-sm-3 control-label"
+                       ng-bind-html="t( 'part1.a1.graduate_affiliation' )"></label>
                 <div class="col-sm-9">
                   <input id="graduate_affiliation" class="form-control" type="text"></input>
                 </div>
               </div>
               <div class="form-group">
-                <label for="graduate_address" class="col-sm-3 control-label">Current Mailing Address</label>
+                <label for="graduate_address" class="col-sm-3 control-label"
+                       ng-bind-html="t( 'part1.a1.graduate_address' )"></label>
                 <div class="col-sm-9">
                   <textarea id="graduate_address" cn-elastic class="form-control" type="text"></textarea>
                 </div>
               </div>
               <div class="form-group">
-                <label for="graduate_phone" class="col-sm-3 control-label">Phone</label>
+                <label for="graduate_phone" class="col-sm-3 control-label"
+                       ng-bind-html="t( 'part1.a1.graduate_phone' )"></label>
                 <div class="col-sm-9">
                   <input id="graduate_phone" class="form-control" type="text"></input>
                 </div>
               </div>
               <div class="form-group">
-                <label for="graduate_email" class="col-sm-3 control-label">E-mail</label>
+                <label for="graduate_email" class="col-sm-3 control-label"
+                       ng-bind-html="t( 'part1.a1.graduate_email' )"></label>
                 <div class="col-sm-9">
                   <input id="graduate_email" class="form-control" type="email"></input>
                 </div>
@@ -170,26 +158,20 @@
             </div>
           </div>
         </div>
-        <div ng-if="'team'==part1Tab" class="panel panel-default" style="border-top-left-radius: 0px;">
+        <div ng-if="'a2'==part1Tab" class="panel panel-default" style="border-top-left-radius: 0px;">
           <div class="panel-body">
-            <p class="text-primary">
-              All Co-Applicants and Other Personnel must be listed in the table below.
-              Please note that changes to the project team, including change of Primary Applicant and addition
-              or removal of Co-Applicants and Support Personnel <strong>require an amendment</strong>.
-              To request an Amendment Form, please email
-              <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.
-            </p>
+            <p class="text-primary" ng-bind-html="t( 'part1.a2.text' )"></p>
             <div class="panel panel-default">
               <div class="panel-body">
                 <table class="table table-striped rounded">
                   <thead class="bg-info">
                     <tr>
-                      <td>Name</td>
-                      <td>Position</td>
-                      <td>Affiliation</td>
-                      <td>E-mail</td>
-                      <td>Role on Project</td>
-                      <td>Requires Access</td>
+                      <td ng-bind-html="t( 'part1.a2.name' )"></td>
+                      <td ng-bind-html="t( 'part1.a2.position' )"></td>
+                      <td ng-bind-html="t( 'part1.a2.affiliation' )"></td>
+                      <td ng-bind-html="t( 'part1.a2.email' )"></td>
+                      <td ng-bind-html="t( 'part1.a2.role' )"></td>
+                      <td ng-bind-html="t( 'part1.a2.access' )"></td>
                       <td></td>
                     </tr>
                   </thead>
@@ -202,7 +184,7 @@
                       <td>Co-Applicant</td>
                       <td>Yes</td>
                       <td>
-                        <button class="btn btn-xs btn-danger" uib-tooltip="Remove Co-Applicant">
+                        <button class="btn btn-xs btn-danger" uib-tooltip="{{ t( 'misc.remove' ) }}">
                           <i class="glyphicon glyphicon-remove"></i>
                         </button>
                       </td>
@@ -215,7 +197,7 @@
                       <td>Statistician</td>
                       <td>Yes</td>
                       <td>
-                        <button class="btn btn-xs btn-danger" uib-tooltip="Remove Co-Applicant">
+                        <button class="btn btn-xs btn-danger" uib-tooltip="{{ t( 'misc.remove' ) }}">
                           <i class="glyphicon glyphicon-remove"></i>
                         </button>
                       </td>
@@ -226,68 +208,70 @@
             </div>
             <div class="form-horizontal">
               <div class="form-group">
-                <label for="coapplicant_name" class="col-sm-3 control-label">Name</label>
+                <label for="coapplicant_name" class="col-sm-3 control-label"
+                       ng-bind-html="t( 'part1.a2.name' )"></label>
                 <div class="col-sm-9">
                   <input id="coapplicant_name" class="form-control" type="text"></input>
                 </div>
               </div>
               <div class="form-group">
-                <label for="coapplicant_position" class="col-sm-3 control-label">Position</label>
+                <label for="coapplicant_position" class="col-sm-3 control-label"
+                       ng-bind-html="t( 'part1.a2.position' )"></label>
                 <div class="col-sm-9">
                   <input id="coapplicant_position" class="form-control" type="text"></input>
                 </div>
               </div>
               <div class="form-group">
-                <label for="coapplicant_affiliation" class="col-sm-3 control-label">Affiliation</label>
+                <label for="coapplicant_affiliation" class="col-sm-3 control-label"
+                       ng-bind-html="t( 'part1.a2.affiliation' )"></label>
                 <div class="col-sm-9">
                   <input id="coapplicant_affiliation" class="form-control" type="text"></input>
                 </div>
               </div>
               <div class="form-group">
-                <label for="coapplicant_email" class="col-sm-3 control-label">E-mail</label>
+                <label for="coapplicant_email" class="col-sm-3 control-label"
+                       ng-bind-html="t( 'part1.a2.email' )"></label>
                 <div class="col-sm-9">
                   <input id="coapplicant_email" class="form-control" type="email"></input>
                 </div>
               </div>
               <div class="form-group">
-                <label for="coapplicant_role" class="col-sm-3 control-label">Role on Project</label>
+                <label for="coapplicant_role" class="col-sm-3 control-label"
+                       ng-bind-html="t( 'part1.a2.role' )"></label>
                 <div class="col-sm-9">
                   <input id="coapplicant_role" class="form-control" type="text"></input>
                 </div>
               </div>
               <div class="form-group">
-                <label for="coapplicant_access" class="col-sm-3 control-label">Requires Access to Data</label>
+                <label for="coapplicant_access" class="col-sm-3 control-label"
+                       ng-bind-html="t( 'part1.a2.access' )"></label>
                 <div class="col-sm-9">
                   <select id="coapplicant_access" class="form-control">
-                    <option>(choose one)</option>
-                    <option>Yes</option>
-                    <option>No</option>
+                    <option ng-bind-html="t( 'misc.choose' )"></option>
+                    <option ng-bind-html="t( 'misc.yes' )"></option>
+                    <option ng-bind-html="t( 'misc.no' )"></option>
                   </select>
                 </div>
               </div>
-              <button class="btn btn-primary pull-right">Add Co-Applicant</button>
+              <button class="btn btn-primary pull-right" ng-bind-html="t( 'misc.add' )"></button>
             </div>
           </div>
         </div>
-        <div ng-if="'timeline'==part1Tab" class="panel panel-default" style="border-top-left-radius: 0px;">
+        <div ng-if="'a3'==part1Tab" class="panel panel-default" style="border-top-left-radius: 0px;">
           <div class="panel-body">
-            <p class="text-primary">
-              What is the anticipated time frame for this proposed project?
-              In planning for your project, please consider in your time frame at least five (5) months from
-              the application submission deadline to the time you receive your dataset.
-            </p>
+            <p class="text-primary" ng-bind-html="t( 'part1.a3.text' )"></p>
             <hr/>
             <div class="form-horizontal">
               <div class="form-group">
-                <label for="start_date" class="col-sm-3 control-label">
-                  Anticipated <strong>start</strong> date
-                </label>
+                <label for="start_date" class="col-sm-3 control-label"
+                       ng-bind-html="t( 'part1.a3.start' )"></label>
                 <div class="col-sm-9">
                   <input id="start_date" class="form-control" type="text"></input>
                 </div>
               </div>
               <div class="form-group">
-                <label for="duration" class="col-sm-3 control-label">Proposed project duration</label>
+                <label for="duration" class="col-sm-3 control-label"
+                       ng-bind-html="t( 'part1.a3.duration' )"></label>
                 <div class="col-sm-9">
                   <input id="duration" class="form-control" type="text"></input>
                 </div>
@@ -295,97 +279,75 @@
             </div>
           </div>
         </div>
-        <div ng-if="'description'==part1Tab" class="panel panel-default" style="border-top-left-radius: 0px;">
+        <div ng-if="'a4'==part1Tab" class="panel panel-default" style="border-top-left-radius: 0px;">
           <div class="panel-body">
-            <p class="text-primary">
-              Please adhere to word count and page limits.
-            </p>
+            <p class="text-primary" ng-bind-html="t( 'part1.a4.text1' )"></p>
             <hr/>
             <div class="form-horizontal">
               <div class="form-group">
-                <label for="title" class="col-sm-3 control-label">Project Title</label>
+                <label for="title" class="col-sm-3 control-label" ng-bind-html="t( 'part1.a4.title' )"></label>
                 <div class="col-sm-9">
                   <input id="title" class="form-control" type="text"></input>
                 </div>
               </div>
               <div class="form-group">
-                <label for="title" class="col-sm-3 control-label">Keywords</label>
+                <label for="title" class="col-sm-3 control-label" ng-bind-html="t( 'part1.a4.keywords' )"></label>
                 <div class="col-sm-9">
-                  <p class="text-primary">
-                    Please provide 3-5 keywords describing your project.
-                  </p>
+                  <p class="text-primary" ng-bind-html="t( 'part1.a4.keywordsText' )"></p>
                   <input id="title" class="form-control" type="text"></input>
                 </div>
               </div>
               <div class="form-group">
                 <label for="lay_summary" class="col-sm-3 control-label">
-                  Lay Summary<br/>
-                  (word count: 123)
+                  <span ng-bind-html="t( 'part1.a4.laySummary' )"></span><br/>
+                  (<span ng-bind-html="t( 'misc.wordCount' )"></span>: 123)
                 </label>
                 <div class="col-sm-9">
-                  <p class="text-primary">
-                    Please provide a lay language summary of your project (maximum 150 words) suitable for
-                    posting on the CLSA website if your application is approved.
-                    Please ensure that the lay summary provides a stand-alone, informative description of
-                    your project.
-                  </p>
+                  <p class="text-primary" ng-bind-html="t( 'part1.a4.laySummaryText' )"></p>
                   <textarea id="lay_summary" cn-elastic class="form-control"></textarea>
                 </div>
               </div>
               <hr/>
-              <p class="text-primary">
-                Please provide a description of the proposed project.
-                The proposal should be informative and specific and no more than 3 pages.
-                No additional pages or appendices allowed.
-                Non-compliant applications will be returned.
-              </p>
+              <p class="text-primary" ng-bind-html="t( 'part1.a4.text2' )"></p>
               <div class="form-group">
-                <label for="background" class="col-sm-3 control-label">Background and Study Relevance</label>
+                <label for="background" class="col-sm-3 control-label"
+                       ng-bind-html="t( 'part1.a4.background' )"></label>
                 <div class="col-sm-9">
                   <textarea id="background" cn-elastic class="form-control"></textarea>
                 </div>
               </div>
               <div class="form-group">
-                <label for="objectives" class="col-sm-3 control-label">Study Objectives and/or Hypotheses</label>
+                <label for="objectives" class="col-sm-3 control-label"
+                       ng-bind-html="t( 'part1.a4.objectives' )"></label>
                 <div class="col-sm-9">
                   <textarea id="objectives" cn-elastic class="form-control"></textarea>
                 </div>
               </div>
               <div class="form-group">
-                <label for="methodology" class="col-sm-3 control-label">Study Design and Methodology</label>
+                <label for="methodology" class="col-sm-3 control-label"
+                       ng-bind-html="t( 'part1.a4.design' )"></label>
                 <div class="col-sm-9">
-                  <p class="text-primary">
-                    The study design and methodology including an overview of the variables and/or
-                    biospecimens requested for the project.
-                    In no more than half a page, describe the inclusion and exclusion criteria for
-                    participants to be included in your study (e.g., age, sex, etc.).
-                  </p>
+                  <p class="text-primary" ng-bind-html="t( 'part1.a4.designText' )"></p>
                   <textarea id="methodology" cn-elastic class="form-control"></textarea>
                 </div>
               </div>
               <div class="form-group">
-                <label for="analysis" class="col-sm-3 control-label">Data Analysis</label>
+                <label for="analysis" class="col-sm-3 control-label"
+                       ng-bind-html="t( 'part1.a4.analysis' )"></label>
                 <div class="col-sm-9">
-                  <p class="text-primary">
-                    Brief description of the data analysis proposed (this section should include
-                    justification for the sample size requested).
-                    Requests for small subsets of the study participants must be justified.
-                  </p>
+                  <p class="text-primary" ng-bind-html="t( 'part1.a4.analysisText' )"></p>
                   <textarea id="analysis" cn-elastic class="form-control"></textarea>
                 </div>
               </div>
               <hr/>
-              <p class="text-primary">
-                Please include a list of the most relevant references (must fit within the allotted space
-                on this page only).
-              </p>
+              <p class="text-primary" ng-bind-html="t( 'part1.a4.text3' )"></p>
               <div class="panel panel-default">
                 <div class="panel-body">
                   <table class="table table-striped rounded">
                     <thead class="bg-info">
                       <tr>
-                        <td>Number</td>
-                        <td>Reference</td>
+                        <td ng-bind-html="t( 'part1.a4.number' )"></td>
+                        <td ng-bind-html="t( 'part1.a4.reference' )"></td>
                         <td></td>
                       </tr>
                     </thead>
@@ -396,7 +358,7 @@
                           New Canadian physical activity guidelines. Tremblay, MS and al., et. Appl Physiol Nutr Metab, 2011, Vol. 36, 
                         </td>
                         <td>
-                          <button class="btn btn-xs btn-danger" uib-tooltip="Remove Reference">
+                          <button class="btn btn-xs btn-danger" uib-tooltip="{{ t( 'misc.remove' ) }}">
                             <i class="glyphicon glyphicon-remove"></i>
                           </button>
                         </td>
@@ -407,7 +369,7 @@
                           Physical activity in US: adults compliance with the Physical Activity Guidelines for Americans. Tucker, J and al., et. 4, Am J Prev Med, 2011, Vol. 40, pp. 454-61.
                         </td>
                         <td>
-                          <button class="btn btn-xs btn-danger" uib-tooltip="Remove Reference">
+                          <button class="btn btn-xs btn-danger" uib-tooltip="{{ t( 'misc.remove' ) }}">
                             <i class="glyphicon glyphicon-remove"></i>
                           </button>
                         </td>
@@ -418,7 +380,7 @@
                           World Health Organization. WHO global recommendation on physical activity for health. [Online] 2010. http://www.who.int/dietphysicalactivity/factsheet_reccommendations/en 
                         </td>
                         <td>
-                          <button class="btn btn-xs btn-danger" uib-tooltip="Remove Reference">
+                          <button class="btn btn-xs btn-danger" uib-tooltip="{{ t( 'misc.remove' ) }}">
                             <i class="glyphicon glyphicon-remove"></i>
                           </button>
                         </td>
@@ -429,7 +391,7 @@
                           A systematic review of the evidence for Canada's Physical Activity Guidelines for Adults. Warburton, D and al., et. 1, Int J Behav Nutr Phys Act, 2010, Vol. 7, p. 39
                         </td>
                         <td>
-                          <button class="btn btn-xs btn-danger" uib-tooltip="Remove Reference">
+                          <button class="btn btn-xs btn-danger" uib-tooltip="{{ t( 'misc.remove' ) }}">
                             <i class="glyphicon glyphicon-remove"></i>
                           </button>
                         </td>
@@ -440,7 +402,7 @@
                           Physical activity and fuctional limitations in older adults: a systematic review related to Canada's Physical Activity Guidelines. Paterson, D and al., et. 1, Int J Behav Nutr Phys Act, 2010, Vol. 7, p. 38.
                         </td>
                         <td>
-                          <button class="btn btn-xs btn-danger" uib-tooltip="Remove Reference">
+                          <button class="btn btn-xs btn-danger" uib-tooltip="{{ t( 'misc.remove' ) }}">
                             <i class="glyphicon glyphicon-remove"></i>
                           </button>
                         </td>
@@ -451,7 +413,7 @@
                           Cardiovascular benefits and risks across the physical activity continuum. Eijsvigels, T and al., et. 5, Curr Opin Cardiol, 2016, Vol. 31, pp. 566-71.
                         </td>
                         <td>
-                          <button class="btn btn-xs btn-danger" uib-tooltip="Remove Reference">
+                          <button class="btn btn-xs btn-danger" uib-tooltip="{{ t( 'misc.remove' ) }}">
                             <i class="glyphicon glyphicon-remove"></i>
                           </button>
                         </td>
@@ -462,7 +424,7 @@
                           Sitting time and mortality from all causes , cardiovascular disease, and cancer. Katzmarzyk, P and al., et. 5, Med Sci Sport Exerc, 2009, Vol. 41, pp. 998-1005.
                         </td>
                         <td>
-                          <button class="btn btn-xs btn-danger" uib-tooltip="Remove Reference">
+                          <button class="btn btn-xs btn-danger" uib-tooltip="{{ t( 'misc.remove' ) }}">
                             <i class="glyphicon glyphicon-remove"></i>
                           </button>
                         </td>
@@ -473,7 +435,7 @@
                           Leisure time spent sitting in relation to total mortality in a prospective chort of US adults. Patel, A and al., et. 4, Am J Epidemiol, 2010, Vol. 172,
                         </td>
                         <td>
-                          <button class="btn btn-xs btn-danger" uib-tooltip="Remove Reference">
+                          <button class="btn btn-xs btn-danger" uib-tooltip="{{ t( 'misc.remove' ) }}">
                             <i class="glyphicon glyphicon-remove"></i>
                           </button>
                         </td>
@@ -483,46 +445,43 @@
                 </div>
               </div>
               <div>
-                <label for="reference" class="col-sm-2 control-label">Reference</label>
+                <label for="reference" class="col-sm-2 control-label"
+                       ng-bind-html="t( 'part1.a4.reference' )"></label>
                 <div class="col-sm-8">
                   <input id="reference" class="form-control" type="text"></input>
                 </div>
-                <button class="btn btn-primary col-sm-2">Add Reference</button>
+                <button class="btn btn-primary col-sm-2" ng-bind-html="t( 'misc.add' )"></button>
               </div>
             </div>
           </div>
         </div>
-        <div ng-if="'review'==part1Tab" class="panel panel-default" style="border-top-left-radius: 0px;">
+        <div ng-if="'a5'==part1Tab" class="panel panel-default" style="border-top-left-radius: 0px;">
           <div class="panel-body">
-            <p class="text-primary">
-              Evidence of peer reviewed funding will be considered evidence of scientific review.
-              If there are no plans to submit an application for financial support for this project please
-              provide evidence of peer review (e.g. internal departmental review, thesis protocol defense,
-              etc.) if available.
-              If no evidence of scientific peer review is provided with this application then the project
-              will undergo scientific review by the DSAC.
-            </p>
+            <p class="text-primary" ng-bind-html="t( 'part1.a5.text' )"></p>
             <hr/>
             <div class="form-horizontal">
               <div class="form-group">
-                <label for="funding" class="col-sm-3 control-label">Peer Reviewed Funding</label>
+                <label for="funding" class="col-sm-3 control-label"
+                       ng-bind-html="t( 'part1.a5.funding' )"></label>
                 <div class="col-sm-9">
                   <select id="funding" class="form-control">
-                    <option>(choose one)</option>
-                    <option>Yes</option>
-                    <option>No</option>
-                    <option>Requested</option>
+                    <option ng-bind-html="t( 'misc.choose' )"></option>
+                    <option ng-bind-html="t( 'misc.yes' )"></option>
+                    <option ng-bind-html="t( 'misc.no' )"></option>
+                    <option ng-bind-html="t( 'misc.requested' )"></option>
                   </select>
                 </div>
               </div>
               <div class="form-group">
-                <label for="funding_agency" class="col-sm-3 control-label">Funding Agency</label>
+                <label for="funding_agency" class="col-sm-3 control-label"
+                       ng-bind-html="t( 'part1.a5.agency' )"></label>
                 <div class="col-sm-9">
                   <input id="funding_agency" class="form-control" type="text"></input>
                 </div>
               </div>
               <div class="form-group">
-                <label for="grant_number" class="col-sm-3 control-label">Grant Number</label>
+                <label for="grant_number" class="col-sm-3 control-label"
+                       ng-bind-html="t( 'part1.a5.grant' )"></label>
                 <div class="col-sm-9">
                   <input id="grant_number" class="form-control" type="text"></input>
                 </div>
@@ -530,39 +489,32 @@
             </div>
           </div>
         </div>
-        <div ng-if="'ethics'==part1Tab" class="panel panel-default" style="border-top-left-radius: 0px;">
+        <div ng-if="'a6'==part1Tab" class="panel panel-default" style="border-top-left-radius: 0px;">
           <div class="panel-body">
-            <p class="text-primary">
-              Please note that ethics approval is NOT required at the time of this application, but
-              <strong>
-                no data or biospecimens will be released until proof of ethics approval has been
-                received by the CLSA.
-              </strong>
-            </p>
+            <p class="text-primary" ng-bind-html="t( 'part1.a6.text' )"></p>
             <hr/>
             <div class="form-horizontal">
               <div class="form-group">
-                <label for="ethics" class="col-sm-4 control-label">
-                  Has this project received ethics approval?
-                </label>
+                <label for="ethics" class="col-sm-4 control-label"
+                       ng-bind-html="t( 'part1.a6.approval' )"></label>
                 <div class="col-sm-8">
                   <select id="ethics" class="form-control" ng-model="ethics">
-                    <option value="">(choose one)</option>
-                    <option value="yes">Yes</option>
-                    <option value="no">No</option>
+                    <option value="" ng-bind-html="t( 'misc.choose' )"></option>
+                    <option value="yes" ng-bind-html="t( 'misc.yes' )"></option>
+                    <option value="no" ng-bind-html="t( 'misc.no' )"></option>
                   </select>
                 </div>
               </div>
               <div class="form-group" ng-if="'yes'==ethics">
-                <label for="ethics_date" class="col-sm-4 control-label">
-                  Digital copy of ethics approval letter
-                </label>
+                <label for="ethics_date" class="col-sm-4 control-label"
+                       ng-bind-html="t( 'part1.a6.letter' )"></label>
                 <div class="col-sm-8">
                   <input id="ethics_date" class="form-control" type="text"></input>
                 </div>
               </div>
               <div class="form-group" ng-if="'no'==ethics">
-                <label for="ethics_date" class="col-sm-4 control-label">Expected date of response</label>
+                <label for="ethics_date" class="col-sm-4 control-label"
+                       ng-bind-html="t( 'part1.a6.response' )"></label>
                 <div class="col-sm-8">
                   <input id="ethics_date" class="form-control" type="text"></input>
                 </div>
@@ -570,23 +522,19 @@
             </div>
           </div>
         </div>
-        <div ng-if="'waiver'==part1Tab" class="panel panel-default" style="border-top-left-radius: 0px;">
+        <div ng-if="'a7'==part1Tab" class="panel panel-default" style="border-top-left-radius: 0px;">
           <div class="panel-body">
-            <p class="text-primary">
-              In order to be eligible for the Fee Waiver for Graduate students, the application must clearly
-              indicate that the proposed project forms part of a thesis (see section A1).
-              In order to be eligible for the Fee Waiver for Postdoctoral Fellows, the Fellow must be the
-              primary applicant and the supervisor must sign section A8.
-            </p>
+            <p class="text-primary" ng-bind-html="t( 'part1.a7.text' )"></p>
             <hr/>
             <div class="form-horizontal">
               <div class="form-group">
-                <label for="waiver" class="col-sm-3 control-label">Fee Waiver type</label>
+                <label for="waiver" class="col-sm-3 control-label"
+                       ng-bind-html="t( 'part1.a7.type' )"></label>
                 <div class="col-sm-9">
                   <select id="waiver" class="form-control">
-                    <option>None</option>
-                    <option>Fee Waiver for Graduate student (MSc or PhD) for thesis only</option>
-                    <option>Fee Waiver for Postdoctoral Fellow (limit 1 waiver for postdoctoral studies)</option>
+                    <option ng-bind-html="t( 'part1.a7.none' )"></option>
+                    <option ng-bind-html="t( 'part1.a7.graduate' )"></option>
+                    <option ng-bind-html="t( 'part1.a7.postdoc' )"></option>
                   </select>
                 </div>
               </div>
@@ -597,25 +545,37 @@
     </div>
     <div ng-if="'part2'==tab" class="panel panel-default" style="border-top-left-radius: 0px;">
       <div class="panel-body" style="padding-bottom: 0px;">
-        <h4 style="margin-top: 0; margin-bottom: 1em;">Application Part 1 of 3: General Project Information</h4>
+        <h4 style="margin-top: 0; margin-bottom: 1em;" ng-bind-html="t( 'part2.title' )"></h4>
         <ul class="nav nav-tabs">
-          <li ng-class="{'active':'qnaire'==part2Tab}">
-            <a ng-click="part2Tab='qnaire'">Section A: Questionnaires</a>
+          <li ng-class="{'active':'notes'==part2Tab}">
+            <a ng-click="part2Tab='notes'" ng-bind-html="t( 'part2.notes.tab' )"></a>
           </li>
-          <li ng-class="{'active':'physical'==part2Tab}">
-            <a ng-click="part2Tab='physical'">Section B: Physical Assessments</a>
+          <li ng-class="{'active':'a'==part2Tab}">
+            <a ng-click="part2Tab='a'" ng-bind-html="t( 'part2.a.tab' )"></a>
           </li>
-          <li ng-class="{'active':'biomarker'==part2Tab}">
-            <a ng-click="part2Tab='biomarker'">Section C: Biomarkers measured in blood</a>
+          <li ng-class="{'active':'b'==part2Tab}">
+            <a ng-click="part2Tab='b'" ng-bind-html="t( 'part2.b.tab' )"></a>
+          </li>
+          <li ng-class="{'active':'c'==part2Tab}">
+            <a ng-click="part2Tab='c'" ng-bind-html="t( 'part2.c.tab' )"></a>
           </li>
         </ul>
-        <div ng-if="'qnaire'==part2Tab" class="panel panel-default" style="border-top-left-radius: 0px;">
+        <div ng-if="'notes'==part2Tab" class="panel panel-default" style="border-top-left-radius: 0px;">
+          <div class="panel-body" style="padding-bottom: 0px;">
+            <ul class="list-group">
+              <li class="list-group-item" ng-bind-html="t( 'part2.notes.text1' )"></li>
+              <li class="list-group-item" ng-bind-html="t( 'part2.notes.text2' )"></li>
+              <li class="list-group-item" ng-bind-html="t( 'part2.notes.text3' )"></li>
+              <li class="list-group-item" ng-bind-html="t( 'part2.notes.text4' )"></li>
+            </ul>
+          </div>
+        </div>
+        <div ng-if="'a'==part2Tab" class="panel panel-default" style="border-top-left-radius: 0px;">
           <div class="panel-body">
             <div class="form-horizontal">
               <div class="form-group">
-                <label for="qnaire" class="col-sm-9 control-label">
-                  Please check if you are requesting questionnaire data from the CLSA BASELINE data collection
-                </label>
+                <label for="qnaire" class="col-sm-9 control-label"
+                       ng-bind-html="t( 'part2.a.question' )"></label>
                 <div class="col-sm-3">
                   <input id="qnaire" class="form-control" ng-model="qnaire" type="checkbox"></input>
                 </div>
@@ -623,16 +583,16 @@
               <table class="table table-striped rounded" ng-if="qnaire">
                 <thead class="bg-info">
                   <tr>
-                    <td>Interview Module</td>
-                    <td>Tracking<br/>(Telephone Interview)</td>
-                    <td>Comprehensive<br/>(Face-to-face Interview - In-home or DCS visit)</td>
+                    <td ng-bind-html="t( 'part2.a.module' )"></td>
+                    <td ng-bind-html="t( 'part2.a.tracking' )"></td>
+                    <td ng-bind-html="t( 'part2.a.comprehensive' )"></td>
                   </tr>
                 </thead>
                 <tbody>
                   <tr ng-repeat="qnaire in model.addModel.qnaireList">
                     <td>
                       {{ qnaire.name }}
-                      <sup ng-if="qnaire.note" uib-tooltip="{{ qnaire.note }}" tooltip-popup-delay="0">NOTE</sup>
+                      <sup ng-if="qnaire.note" uib-tooltip="{{ qnaire.note }}" tooltip-popup-delay="0">***</sup>
                     </td>
                     <td ng-if="qnaire.tracking_replacement">{{ qnaire.tracking_replacement }}</td>
                     <td ng-if="!qnaire.tracking_replacement">
@@ -645,17 +605,20 @@
                   </tr>
                 </tbody>
               </table>
+              <div class="spacer" ng-if="qnaire">
+                <label for="qnaire_comments" class="control-label"
+                       ng-bind-html="t( 'misc.comments' )"></label>
+                <textarea id="qnaire_comments" cn-elastic class="form-control" type="text"></textarea>
+              </div>
             </div>
           </div>
         </div>
-        <div ng-if="'physical'==part2Tab" class="panel panel-default" style="border-top-left-radius: 0px;">
+        <div ng-if="'b'==part2Tab" class="panel panel-default" style="border-top-left-radius: 0px;">
           <div class="panel-body">
             <div class="form-horizontal">
               <div class="form-group">
-                <label for="physical" class="col-sm-9 control-label">
-                  Please check if you are requesting physical assessments data from the CLSA BASELINE
-                  data collection
-                </label>
+                <label for="physical" class="col-sm-9 control-label"
+                       ng-bind-html="t( 'part2.b.question' )"></label>
                 <div class="col-sm-3">
                   <input id="physical" class="form-control" ng-model="physical" type="checkbox"></input>
                 </div>
@@ -663,17 +626,17 @@
               <table class="table table-striped rounded" ng-if="physical">
                 <thead class="bg-info">
                   <tr>
-                    <td>Physical Assessment</td>
-                    <td>Subcategory</td>
-                    <td>Data</td>
-                    <td>Image</td>
+                    <td ng-bind-html="t( 'part2.b.physical' )"></td>
+                    <td ng-bind-html="t( 'part2.b.subcategory' )"></td>
+                    <td ng-bind-html="t( 'part2.b.data' )"></td>
+                    <td ng-bind-html="t( 'part2.b.image' )"></td>
                   </tr>
                 </thead>
                 <tbody>
                   <tr ng-repeat="physical in model.addModel.physicalList">
                     <td>
                       {{ physical.name }}
-                      <sup ng-if="physical.note" uib-tooltip="{{ physical.note }}" tooltip-popup-delay="0">NOTE</sup>
+                      <sup ng-if="physical.note" uib-tooltip="{{ physical.note }}" tooltip-popup-delay="0">***</sup>
                     </td>
                     <td ng-if="physical.data_replacement">{{ physical.data_replacement }}</td>
                     <td ng-if="!physical.data_replacement">
@@ -686,17 +649,20 @@
                   </tr>
                 </tbody>
               </table>
+              <div class="spacer" ng-if="physical">
+                <label for="physical_comments" class="control-label"
+                       ng-bind-html="t( 'misc.comments' )"></label>
+                <textarea id="physical_comments" cn-elastic class="form-control" type="text"></textarea>
+              </div>
             </div>
           </div>
         </div>
-        <div ng-if="'biomarker'==part2Tab" class="panel panel-default" style="border-top-left-radius: 0px;">
+        <div ng-if="'c'==part2Tab" class="panel panel-default" style="border-top-left-radius: 0px;">
           <div class="panel-body">
             <div class="form-horizontal">
               <div class="form-group">
-                <label for="biomarker" class="col-sm-9 control-label">
-                  Please check if you are requesting biomarkers measured in blood data from the CLSA BASELINE
-                  data collection
-                </label>
+                <label for="biomarker" class="col-sm-9 control-label"
+                       ng-bind-html="t( 'part2.c.question' )"></label>
                 <div class="col-sm-3">
                   <input id="biomarker" class="form-control" ng-model="biomarker" type="checkbox"></input>
                 </div>
@@ -704,20 +670,25 @@
               <table class="table table-striped rounded" ng-if="biomarker">
                 <thead class="bg-info">
                   <tr>
-                    <td>Hematology Report (N=30,000)</td>
-                    <td>Data</td>
+                    <td ng-bind-html="t( 'part2.c.hematology' )"></td>
+                    <td ng-bind-html="t( 'part2.c.data' )"></td>
                   </tr>
                 </thead>
                 <tbody>
                   <tr ng-repeat="biomarker in model.addModel.biomarkerList">
                     <td>
                       {{ biomarker.name }}
-                      <sup ng-if="biomarker.note" uib-tooltip="{{ biomarker.note }}" tooltip-popup-delay="0">NOTE</sup>
+                      <sup ng-if="biomarker.note" uib-tooltip="{{ biomarker.note }}" tooltip-popup-delay="0">***</sup>
                     </td>
                     <td><input type="checkbox"></input></td>
                   </tr>
                 </tbody>
               </table>
+              <div class="spacer" ng-if="biomarker">
+                <label for="biomarker_comments" class="control-label"
+                       ng-bind-html="t( 'misc.comments' )"></label>
+                <textarea id="biomarker_comments" cn-elastic class="form-control" type="text"></textarea>
+              </div>
             </div>
           </div>
         </div>
@@ -725,10 +696,8 @@
     </div>
     <div ng-if="'part3'==tab" class="panel panel-default" style="border-top-left-radius: 0px;">
       <div class="panel-body" style="padding-bottom: 0px;">
-        <h4 style="margin-top: 0; margin-bottom: 1em;">Application Part 3 of 3: Biospecimen Access</h4>
-        <p class="text-primary">
-          Biospecimen access is not yet available.
-        </p>
+        <h4 style="margin-top: 0; margin-bottom: 1em;" ng-bind-html="t( 'part3.title' )"></h4>
+        <p class="text-primary" ng-bind-html="t( 'part3.text' )"></p>
       </div>
     </div>
   </div>
