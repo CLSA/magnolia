@@ -291,51 +291,79 @@
                 </div>
               </div>
               <div class="form-group">
-                <label for="title" class="col-sm-3 control-label" ng-bind-html="t( 'part1.a4.keywords' )"></label>
+                <label for="title"
+                       class="col-sm-3 control-label"
+                       uib-tooltip-html="t( 'part1.a4.keywordsText' )"
+                       tooltip-placement="right"
+                       tooltip-popup-delay="100"
+                       ng-bind-html="t( 'part1.a4.keywords' )+'<sup>***</sup>'"></label>
                 <div class="col-sm-9">
-                  <p class="text-primary" ng-bind-html="t( 'part1.a4.keywordsText' )"></p>
                   <input id="title" class="form-control" type="text"></input>
                 </div>
               </div>
               <div class="form-group">
-                <label for="lay_summary" class="col-sm-3 control-label">
-                  <span ng-bind-html="t( 'part1.a4.laySummary' )"></span><br/>
+                <label for="lay_summary"
+                       class="col-sm-3 control-label"
+                       uib-tooltip-html="t( 'part1.a4.laySummaryText' )"
+                       tooltip-placement="right"
+                       tooltip-popup-delay="100">
+                  <span ng-bind-html="t( 'part1.a4.laySummary' )+'<sup>***</sup>'"></span><br/>
                   (<span ng-bind-html="t( 'misc.wordCount' )"></span>: 123)
                 </label>
                 <div class="col-sm-9">
-                  <p class="text-primary" ng-bind-html="t( 'part1.a4.laySummaryText' )"></p>
                   <textarea id="lay_summary" cn-elastic class="form-control"></textarea>
                 </div>
               </div>
               <hr/>
               <p class="text-primary" ng-bind-html="t( 'part1.a4.text2' )"></p>
               <div class="form-group">
-                <label for="background" class="col-sm-3 control-label"
-                       ng-bind-html="t( 'part1.a4.background' )"></label>
+                <label for="wordCount" class="col-sm-3 control-label"
+                       ng-bind-html="t( 'misc.wordCount' )"></label>
+                <div class="col-sm-9">
+                  <p class="form-text text-primary">60</p>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="background" class="col-sm-3 control-label">
+                  <span ng-bind-html="t( 'part1.a4.background' )"></span><br/>
+                  (<span ng-bind-html="t( 'misc.wordCount' )"></span>: 10)
+                </label>
                 <div class="col-sm-9">
                   <textarea id="background" cn-elastic class="form-control"></textarea>
                 </div>
               </div>
               <div class="form-group">
-                <label for="objectives" class="col-sm-3 control-label"
-                       ng-bind-html="t( 'part1.a4.objectives' )"></label>
+                <label for="objectives" class="col-sm-3 control-label">
+                  <span ng-bind-html="t( 'part1.a4.objectives' )"></span><br/>
+                  (<span ng-bind-html="t( 'misc.wordCount' )"></span>: 20)
+                </label>
                 <div class="col-sm-9">
                   <textarea id="objectives" cn-elastic class="form-control"></textarea>
                 </div>
               </div>
               <div class="form-group">
-                <label for="methodology" class="col-sm-3 control-label"
-                       ng-bind-html="t( 'part1.a4.design' )"></label>
+                <label for="methodology"
+                       class="col-sm-3 control-label"
+                       uib-tooltip-html="t( 'part1.a4.designText' )"
+                       tooltip-placement="right"
+                       tooltip-popup-delay="100">
+                  <span ng-bind-html="t( 'part1.a4.design' )+'<sup>***</sup>'"></span><br/>
+                  (<span ng-bind-html="t( 'misc.wordCount' )"></span>: 30)
+                </label>
                 <div class="col-sm-9">
-                  <p class="text-primary" ng-bind-html="t( 'part1.a4.designText' )"></p>
                   <textarea id="methodology" cn-elastic class="form-control"></textarea>
                 </div>
               </div>
               <div class="form-group">
-                <label for="analysis" class="col-sm-3 control-label"
-                       ng-bind-html="t( 'part1.a4.analysis' )"></label>
+                <label for="analysis"
+                       class="col-sm-3 control-label"
+                       uib-tooltip-html="t( 'part1.a4.analysisText' )"
+                       tooltip-placement="right"
+                       tooltip-popup-delay="100">
+                  <span ng-bind-html="t( 'part1.a4.analysis' )+'<sup>***</sup>'"></span><br/>
+                  (<span ng-bind-html="t( 'misc.wordCount' )"></span>: 0)
+                </label>
                 <div class="col-sm-9">
-                  <p class="text-primary" ng-bind-html="t( 'part1.a4.analysisText' )"></p>
                   <textarea id="analysis" cn-elastic class="form-control"></textarea>
                 </div>
               </div>
@@ -591,8 +619,10 @@
                 <tbody>
                   <tr ng-repeat="qnaire in model.addModel.qnaireList">
                     <td>
-                      {{ qnaire.name }}
-                      <sup ng-if="qnaire.note" uib-tooltip="{{ qnaire.note }}" tooltip-popup-delay="0">***</sup>
+                      <span uib-tooltip-html="qnaire.note" tooltip-popup-delay="100">
+                        {{ qnaire.name }}
+                        <sup ng-if="qnaire.note">***</sup>
+                      </span>
                     </td>
                     <td ng-if="qnaire.tracking_replacement">{{ qnaire.tracking_replacement }}</td>
                     <td ng-if="!qnaire.tracking_replacement">
@@ -635,8 +665,10 @@
                 <tbody>
                   <tr ng-repeat="physical in model.addModel.physicalList">
                     <td>
-                      {{ physical.name }}
-                      <sup ng-if="physical.note" uib-tooltip="{{ physical.note }}" tooltip-popup-delay="0">***</sup>
+                      <span uib-tooltip="{{ physical.note }}" tooltip-popup-delay="100">
+                        {{ physical.name }}
+                        <sup ng-if="physical.note">***</sup>
+                      </span>
                     </td>
                     <td ng-if="physical.data_replacement">{{ physical.data_replacement }}</td>
                     <td ng-if="!physical.data_replacement">
@@ -677,8 +709,10 @@
                 <tbody>
                   <tr ng-repeat="biomarker in model.addModel.biomarkerList">
                     <td>
-                      {{ biomarker.name }}
-                      <sup ng-if="biomarker.note" uib-tooltip="{{ biomarker.note }}" tooltip-popup-delay="0">***</sup>
+                      <span uib-tooltip="{{ biomarker.note }}" tooltip-popup-delay="100">
+                        {{ biomarker.name }}
+                        <sup ng-if="biomarker.note">***</sup>
+                      </span>
                     </td>
                     <td><input type="checkbox"></input></td>
                   </tr>
