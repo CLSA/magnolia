@@ -6,7 +6,7 @@
  * @filesource
  */
 
-namespace magnolia\service\physical;
+namespace magnolia\service\data_option_parent;
 use cenozo\lib, cenozo\log, magnolia\util;
 
 /**

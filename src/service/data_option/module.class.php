@@ -6,7 +6,7 @@
  * @filesource
  */
 
-namespace magnolia\service\qnaire;
+namespace magnolia\service\data_option;
 use cenozo\lib, cenozo\log, magnolia\util;
 
 /**

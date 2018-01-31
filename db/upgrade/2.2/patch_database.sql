@@ -17,13 +17,10 @@ SOURCE requisition.sql
 SOURCE coapplicant.sql
 SOURCE keyword.sql
 SOURCE reference.sql
-SOURCE qnaire_type.sql
-SOURCE qnaire.sql
-SOURCE physical.sql
-SOURCE biomarker.sql
-SOURCE requisition_has_qnaire.sql
-SOURCE requisition_has_physical.sql
-SOURCE requisition_has_biomarker.sql
+SOURCE data_option_parent.sql
+SOURCE data_option_subcategory.sql
+SOURCE data_option.sql
+SOURCE requisition_has_data_option.sql
 
 SOURCE update_version_number.sql
 

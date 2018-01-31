@@ -76,8 +76,12 @@ INSERT INTO service ( subject, method, resource, restricted ) VALUES
 ( 'user', 'POST', 0, 1 ),
 
 -- application services
-( 'biomarker', 'GET', 0, 0 ),
-( 'biomarker', 'GET', 1, 1 ),
+( 'data_option', 'GET', 0, 0 ),
+( 'data_option', 'GET', 1, 1 ),
+( 'data_option_subcategory', 'GET', 0, 0 ),
+( 'data_option_subcategory', 'GET', 1, 1 ),
+( 'data_option_parent', 'GET', 0, 0 ),
+( 'data_option_parent', 'GET', 1, 1 ),
 ( 'coapplicant', 'DELETE', 1, 1 ),
 ( 'coapplicant', 'GET', 0, 0 ),
 ( 'coapplicant', 'GET', 1, 1 ),
@@ -97,10 +101,4 @@ INSERT INTO service ( subject, method, resource, restricted ) VALUES
 ( 'requisition', 'GET', 0, 0 ),
 ( 'requisition', 'GET', 1, 1 ),
 ( 'requisition', 'PATCH', 1, 1 ),
-( 'requisition', 'POST', 0, 1 ),
-( 'physical', 'GET', 0, 0 ),
-( 'physical', 'GET', 1, 1 ),
-( 'qnaire', 'GET', 0, 0 ),
-( 'qnaire', 'GET', 1, 1 ),
-( 'qnaire_type', 'GET', 0, 0 ),
-( 'qnaire_type', 'GET', 1, 1 );
+( 'requisition', 'POST', 0, 1 );

@@ -163,7 +163,7 @@
             <p class="text-primary" ng-bind-html="t( 'part1.a2.text' )"></p>
             <div class="panel panel-default">
               <div class="panel-body">
-                <table class="table table-striped rounded">
+                <table class="table">
                   <thead class="bg-info">
                     <tr>
                       <td ng-bind-html="t( 'part1.a2.name' )"></td>
@@ -296,7 +296,7 @@
                        uib-tooltip-html="t( 'part1.a4.keywordsText' )"
                        tooltip-placement="right"
                        tooltip-popup-delay="100"
-                       ng-bind-html="t( 'part1.a4.keywords' )+'<sup>***</sup>'"></label>
+                       ng-bind-html="t( 'part1.a4.keywords' )+'<sup>?</sup>'"></label>
                 <div class="col-sm-9">
                   <input id="title" class="form-control" type="text"></input>
                 </div>
@@ -307,7 +307,7 @@
                        uib-tooltip-html="t( 'part1.a4.laySummaryText' )"
                        tooltip-placement="right"
                        tooltip-popup-delay="100">
-                  <span ng-bind-html="t( 'part1.a4.laySummary' )+'<sup>***</sup>'"></span><br/>
+                  <span ng-bind-html="t( 'part1.a4.laySummary' )+'<sup>?</sup>'"></span><br/>
                   (<span ng-bind-html="t( 'misc.wordCount' )"></span>: 123)
                 </label>
                 <div class="col-sm-9">
@@ -347,7 +347,7 @@
                        uib-tooltip-html="t( 'part1.a4.designText' )"
                        tooltip-placement="right"
                        tooltip-popup-delay="100">
-                  <span ng-bind-html="t( 'part1.a4.design' )+'<sup>***</sup>'"></span><br/>
+                  <span ng-bind-html="t( 'part1.a4.design' )+'<sup>?</sup>'"></span><br/>
                   (<span ng-bind-html="t( 'misc.wordCount' )"></span>: 30)
                 </label>
                 <div class="col-sm-9">
@@ -360,7 +360,7 @@
                        uib-tooltip-html="t( 'part1.a4.analysisText' )"
                        tooltip-placement="right"
                        tooltip-popup-delay="100">
-                  <span ng-bind-html="t( 'part1.a4.analysis' )+'<sup>***</sup>'"></span><br/>
+                  <span ng-bind-html="t( 'part1.a4.analysis' )+'<sup>?</sup>'"></span><br/>
                   (<span ng-bind-html="t( 'misc.wordCount' )"></span>: 0)
                 </label>
                 <div class="col-sm-9">
@@ -371,7 +371,7 @@
               <p class="text-primary" ng-bind-html="t( 'part1.a4.text3' )"></p>
               <div class="panel panel-default">
                 <div class="panel-body">
-                  <table class="table table-striped rounded">
+                  <table class="table">
                     <thead class="bg-info">
                       <tr>
                         <td ng-bind-html="t( 'part1.a4.number' )"></td>
@@ -602,43 +602,90 @@
           <div class="panel-body">
             <div class="form-horizontal">
               <div class="form-group">
-                <label for="qnaire" class="col-sm-9 control-label"
+                <label for="baseline" class="col-sm-9 control-label"
                        ng-bind-html="t( 'part2.a.question' )"></label>
                 <div class="col-sm-3">
-                  <input id="qnaire" class="form-control" ng-model="qnaire" type="checkbox"></input>
+                  <input id="baseline" class="form-control" ng-model="baseline" type="checkbox"></input>
                 </div>
               </div>
-              <table class="table table-striped rounded" ng-if="qnaire">
-                <thead class="bg-info">
-                  <tr>
-                    <td ng-bind-html="t( 'part2.a.module' )"></td>
-                    <td ng-bind-html="t( 'part2.a.tracking' )"></td>
-                    <td ng-bind-html="t( 'part2.a.comprehensive' )"></td>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr ng-repeat="qnaire in model.addModel.qnaireList">
-                    <td>
-                      <span uib-tooltip-html="qnaire.note" tooltip-popup-delay="100">
-                        {{ qnaire.name }}
-                        <sup ng-if="qnaire.note">***</sup>
-                      </span>
-                    </td>
-                    <td ng-if="qnaire.tracking_replacement">{{ qnaire.tracking_replacement }}</td>
-                    <td ng-if="!qnaire.tracking_replacement">
-                      <input type="checkbox"></input>
-                    </td>
-                    <td ng-if="qnaire.comprehensive_replacement">{{ qnaire.comprehensive_replacement }}</td>
-                    <td ng-if="!qnaire.comprehensive_replacement">
-                      <input type="checkbox"></input>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-              <div class="spacer" ng-if="qnaire">
-                <label for="qnaire_comments" class="control-label"
-                       ng-bind-html="t( 'misc.comments' )"></label>
-                <textarea id="qnaire_comments" cn-elastic class="form-control" type="text"></textarea>
+              <div ng-show="baseline">
+                <table class="table">
+                  <thead class="bg-info">
+                    <tr>
+                      <td ng-bind-html="t( 'part2.a.module' )"></td>
+                      <td ng-bind-html="t( 'part2.a.comprehensive' )"></td>
+                      <td ng-bind-html="t( 'part2.a.tracking' )"></td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr ng-repeat="dataOptionCat in model.addModel.dataOptionList.baseline">
+                      <td ng-if="dataOptionCat.parent"
+                          colspan="3" class="text-left" ng-class="{ '': dataOptionCat.parentId }">
+                        <h4 uib-tooltip-html="dataOptionCat.note[language]" tooltip-popup-delay="100">
+                          {{ dataOptionCat.name[language] }}
+                          <sup ng-if="dataOptionCat.note[language]">?</sup>
+                        </h4>
+                      </td>
+                      <td ng-if="!dataOptionCat.parent"
+                          class="text-right"
+                          ng-class="{ 'active': dataOptionCat.parentId }">
+                        <span uib-tooltip-html="dataOptionCat.note[language]" tooltip-popup-delay="100">
+                          {{ dataOptionCat.name[language] }}
+                          <sup ng-if="dataOptionCat.note[language]">?</sup>
+                        </span>
+                      </td>
+                      <td ng-repeat="dataOption in dataOptionCat.typeList"
+                          ng-class="{ 'active': dataOptionCat.parentId }">
+                        <span ng-if="dataOption.replacement[language]">
+                          {{ dataOption.replacement[language]" }}
+                        </span>
+                        <input ng-if="!dataOption.replacement[language]" type="checkbox"></input>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <hr/>
+                <h4 class="text-center" ng-bind-html="t( 'part2.a.mcq' )"></h4>
+                <table class="table">
+                  <thead class="bg-info">
+                    <tr>
+                      <td ng-bind-html="t( 'part2.a.module' )"></td>
+                      <td ng-bind-html="t( 'part2.a.comprehensive' )"></td>
+                      <td ng-bind-html="t( 'part2.a.tracking' )"></td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr ng-repeat="dataOptionCat in model.addModel.dataOptionList.mcq">
+                      <td ng-if="dataOptionCat.parent"
+                          colspan="3" class="text-left" ng-class="{ '': dataOptionCat.parentId }">
+                        <h4 uib-tooltip-html="dataOptionCat.note[language]" tooltip-popup-delay="100">
+                          {{ dataOptionCat.name[language] }}
+                          <sup ng-if="dataOptionCat.note[language]">?</sup>
+                        </h4>
+                      </td>
+                      <td ng-if="!dataOptionCat.parent"
+                          class="text-right"
+                          ng-class="{ 'active': dataOptionCat.parentId }">
+                        <span uib-tooltip-html="dataOptionCat.note[language]" tooltip-popup-delay="100">
+                          {{ dataOptionCat.name[language] }}
+                          <sup ng-if="dataOptionCat.note[language]">?</sup>
+                        </span>
+                      </td>
+                      <td ng-repeat="dataOption in dataOptionCat.typeList"
+                          ng-class="{ 'active': dataOptionCat.parentId }">
+                        <span ng-if="dataOption.replacement[language]">
+                          {{ dataOption.replacement[language]" }}
+                        </span>
+                        <input ng-if="!dataOption.replacement[language]" type="checkbox"></input>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div class="spacer">
+                  <label for="baseline_comments" class="control-label"
+                         ng-bind-html="t( 'misc.comments' )"></label>
+                  <textarea id="baseline_comments" cn-elastic class="form-control" type="text"></textarea>
+                </div>
               </div>
             </div>
           </div>
@@ -653,38 +700,47 @@
                   <input id="physical" class="form-control" ng-model="physical" type="checkbox"></input>
                 </div>
               </div>
-              <table class="table table-striped rounded" ng-if="physical">
-                <thead class="bg-info">
-                  <tr>
-                    <td ng-bind-html="t( 'part2.b.physical' )"></td>
-                    <td ng-bind-html="t( 'part2.b.subcategory' )"></td>
-                    <td ng-bind-html="t( 'part2.b.data' )"></td>
-                    <td ng-bind-html="t( 'part2.b.image' )"></td>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr ng-repeat="physical in model.addModel.physicalList">
-                    <td>
-                      <span uib-tooltip="{{ physical.note }}" tooltip-popup-delay="100">
-                        {{ physical.name }}
-                        <sup ng-if="physical.note">***</sup>
-                      </span>
-                    </td>
-                    <td ng-if="physical.data_replacement">{{ physical.data_replacement }}</td>
-                    <td ng-if="!physical.data_replacement">
-                      <input type="checkbox"></input>
-                    </td>
-                    <td ng-if="physical.image_replacement">{{ physical.image_replacement }}</td>
-                    <td ng-if="!physical.image_replacement">
-                      <input type="checkbox"></input>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-              <div class="spacer" ng-if="physical">
-                <label for="physical_comments" class="control-label"
-                       ng-bind-html="t( 'misc.comments' )"></label>
-                <textarea id="physical_comments" cn-elastic class="form-control" type="text"></textarea>
+              <div ng-show="physical">
+                <table class="table">
+                  <thead class="bg-info">
+                    <tr>
+                      <td ng-bind-html="t( 'part2.b.physical' )"></td>
+                      <td ng-bind-html="t( 'part2.b.data' )"></td>
+                      <td ng-bind-html="t( 'part2.b.image' )"></td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr ng-repeat="dataOptionCat in model.addModel.dataOptionList.physical">
+                      <td ng-if="dataOptionCat.parent"
+                          colspan="3" class="text-left" ng-class="{ '': dataOptionCat.parentId }">
+                        <h4 uib-tooltip-html="dataOptionCat.note[language]" tooltip-popup-delay="100">
+                          {{ dataOptionCat.name[language] }}
+                          <sup ng-if="dataOptionCat.note[language]">?</sup>
+                        </h4>
+                      </td>
+                      <td ng-if="!dataOptionCat.parent"
+                          class="text-right"
+                          ng-class="{ 'active': dataOptionCat.parentId }">
+                        <span uib-tooltip-html="dataOptionCat.note[language]" tooltip-popup-delay="100">
+                          {{ dataOptionCat.name[language] }}
+                          <sup ng-if="dataOptionCat.note[language]">?</sup>
+                        </span>
+                      </td>
+                      <td ng-repeat="dataOption in dataOptionCat.typeList"
+                          ng-class="{ 'active': dataOptionCat.parentId }">
+                        <span ng-if="dataOption.replacement[language]">
+                          {{ dataOption.replacement[language]" }}
+                        </span>
+                        <input ng-if="!dataOption.replacement[language]" type="checkbox"></input>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div class="spacer">
+                  <label for="physical_comments" class="control-label"
+                         ng-bind-html="t( 'misc.comments' )"></label>
+                  <textarea id="physical_comments" cn-elastic class="form-control" type="text"></textarea>
+                </div>
               </div>
             </div>
           </div>
@@ -699,29 +755,44 @@
                   <input id="biomarker" class="form-control" ng-model="biomarker" type="checkbox"></input>
                 </div>
               </div>
-              <table class="table table-striped rounded" ng-if="biomarker">
-                <thead class="bg-info">
-                  <tr>
-                    <td ng-bind-html="t( 'part2.c.hematology' )"></td>
-                    <td ng-bind-html="t( 'part2.c.data' )"></td>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr ng-repeat="biomarker in model.addModel.biomarkerList">
-                    <td>
-                      <span uib-tooltip="{{ biomarker.note }}" tooltip-popup-delay="100">
-                        {{ biomarker.name }}
-                        <sup ng-if="biomarker.note">***</sup>
-                      </span>
-                    </td>
-                    <td><input type="checkbox"></input></td>
-                  </tr>
-                </tbody>
-              </table>
-              <div class="spacer" ng-if="biomarker">
-                <label for="biomarker_comments" class="control-label"
-                       ng-bind-html="t( 'misc.comments' )"></label>
-                <textarea id="biomarker_comments" cn-elastic class="form-control" type="text"></textarea>
+              <div ng-show="biomarker">
+                <table class="table">
+                  <thead class="bg-info">
+                    <tr>
+                      <td ng-bind-html="t( 'part2.c.hematology' )"></td>
+                      <td ng-bind-html="t( 'part2.c.data' )"></td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr ng-repeat="dataOptionCat in model.addModel.dataOptionList.biomarker">
+                      <td ng-if="dataOptionCat.parent"
+                          colspan="3" class="text-left" ng-class="{ '': dataOptionCat.parentId }">
+                        <h4 uib-tooltip-html="dataOptionCat.note[language]" tooltip-popup-delay="100">
+                          {{ dataOptionCat.name[language] }}
+                          <sup ng-if="dataOptionCat.note[language]">?</sup>
+                        </h4>
+                      </td>
+                      <td ng-if="!dataOptionCat.parent" ng-class="{ 'active': dataOptionCat.parentId }">
+                        <span uib-tooltip-html="dataOptionCat.note[language]" tooltip-popup-delay="100">
+                          {{ dataOptionCat.name[language] }}
+                          <sup ng-if="dataOptionCat.note[language]">?</sup>
+                        </span>
+                      </td>
+                      <td ng-repeat="dataOption in dataOptionCat.typeList"
+                          ng-class="{ 'active': dataOptionCat.parentId }">
+                        <span ng-if="dataOption.replacement[language]">
+                          {{ dataOption.replacement[language]" }}
+                        </span>
+                        <input ng-if="!dataOption.replacement[language]" type="checkbox"></input>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div class="spacer">
+                  <label for="biomarker_comments" class="control-label"
+                         ng-bind-html="t( 'misc.comments' )"></label>
+                  <textarea id="biomarker_comments" cn-elastic class="form-control" type="text"></textarea>
+                </div>
               </div>
             </div>
           </div>

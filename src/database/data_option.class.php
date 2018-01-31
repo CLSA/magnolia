@@ -1,6 +1,6 @@
 <?php
 /**
- * biomarker.class.php
+ * data_option.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
  * @filesource
@@ -10,6 +10,6 @@ namespace magnolia\database;
 use cenozo\lib, cenozo\log, magnolia\util;
 
 /**
- * biomarker: record
+ * data_option: record
  */
-class biomarker extends \cenozo\database\record {}
+class data_option extends \cenozo\database\record {}

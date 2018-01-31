@@ -1,6 +1,6 @@
 <?php
 /**
- * qnaire_type.class.php
+ * data_option_subcategory.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
  * @filesource
@@ -10,6 +10,6 @@ namespace magnolia\database;
 use cenozo\lib, cenozo\log, magnolia\util;
 
 /**
- * qnaire_type: record
+ * data_option_subcategory: record
  */
-class qnaire_type extends \cenozo\database\record {}
+class data_option_subcategory extends \cenozo\database\record {}

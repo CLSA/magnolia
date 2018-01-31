@@ -280,6 +280,7 @@ define( function() {
                   en: 'Please check if you are requesting questionnaire data from the CLSA BASELINE data collection',
                   fr: 'Veuillez vérifier si vous demandez des données de questionnaire à partir de la collecte INITIALE de données de l’ÉLCV'
                 },
+                mcq: { en: 'Maintaining Contact Interview', fr: 'Entrevue de mi-parcours' },
                 module: { en: 'Interview Module', fr: 'Module de l’entrevue' },
                 tracking: {
                   en: 'Tracking<br/>(Telephone Interview)',
@@ -297,7 +298,6 @@ define( function() {
                   fr: 'Veuillez vérifier si vous demandez des données de examens physiques à partir de la collecte INITIALE de données de l’ÉLCV'
                 },
                 physical: { en: 'Physical Assessment', fr: 'Examen physique' },
-                subcategory: { en: 'Subcategory', fr: 'Sous-catégorie' },
                 data: { en: 'Data', fr: 'Données' },
                 image: { en: 'Image', fr: 'Image' }
               },
@@ -376,34 +376,106 @@ define( function() {
         var self = this;
         this.parentModel = parentModel;
 
-        this.qnaire = [];
-        CnHttpFactory.instance( {
-          path: 'qnaire_type',
-          data: { select: { column: [ 'section', 'rank', 'category', 'name', 'note', 'replacements' ] } }
-        } ).query().then( function( response ) {
-          self.qnaireList = response.data.map( qnaire => ( {
-            section: qnaire.section,
-            rank: qnaire.rank,
-            category: qnaire.category,
-            name: qnaire.name,
-            note: qnaire.note,
-            comprehensive_replacement: qnaire.replacements.split('|')[0],
-            tracking_replacement: qnaire.replacements.split('|')[1]
-          } ) );
-        } );
+        this.dataOptionParentList = [];
+        this.dataOptionList = [];
 
-        this.physical = [];
-
-        this.biomarker = [];
         CnHttpFactory.instance( {
-          path: 'biomarker',
-          data: { select: { column: [ 'rank', 'name', 'note' ] } }
+          path: 'data_option_parent',
+          data: {
+            select: { column: [ 'id', 'name_en', 'name_fr', 'note_en', 'note_fr' ] },
+            modifier: { limit: 1000000 }
+          }
         } ).query().then( function( response ) {
-          self.biomarkerList = response.data.map( biomarker => ( {
-            rank: biomarker.rank,
-            name: biomarker.name,
-            note: biomarker.note
-          } ) );
+          response.data.forEach( function( dataOptionParent ) {
+            self.dataOptionParentList.push( {
+              id: null,
+              parentId: dataOptionParent.id,
+              name: { en: dataOptionParent.name_en, fr: dataOptionParent.name_fr },
+              note: { en: dataOptionParent.note_en, fr: dataOptionParent.note_fr },
+              parent: true
+            } );
+          } );
+
+          CnHttpFactory.instance( {
+            path: 'data_option_subcategory',
+            data: {
+              select: { column: [
+                'type', 'name_en', 'name_fr', 'note_en', 'note_fr', {
+                  column: 'data_option_parent_id',
+                  alias: 'parentId'
+                }, {
+                  table: 'data_option',
+                  column: 'type',
+                  alias: 'option_type'
+                }, {
+                  table: 'data_option',
+                  column: 'replacement_en'
+                }, {
+                  table: 'data_option',
+                  column: 'replacement_fr'
+                }
+              ] },
+              modifier: {
+                join: [ {
+                  table: 'data_option',
+                  onleft: 'data_option_subcategory.id',
+                  onright: 'data_option.data_option_subcategory_id'
+                } ],
+                order: [ 'data_option_subcategory.type', 'data_option_subcategory.rank' ],
+                limit: 1000000
+              }
+            }
+          } ).query().then( function( response ) {
+            var currentType = null;
+            var currentId = null;
+            var currentParentId = null;
+            response.data.forEach( function( dataOption ) {
+              var type = dataOption.type;
+              if( currentType != type ) {
+                // insert the new dataOption type if it doesn't already exist
+                if( angular.isUndefined( self.dataOptionList[type] ) ) self.dataOptionList[type] = [];
+                currentType = type;
+              }
+
+              if( currentParentId != dataOption.parentId ) {
+                // insert the parent
+                if( null != dataOption.parentId ) {
+                  self.dataOptionList[type].push(
+                    self.dataOptionParentList.findByProperty( 'parentId', dataOption.parentId )
+                  );
+                } else {
+                  self.dataOptionList[type].push( {
+                    id: null,
+                    parentId: null,
+                    name: { en: '', fr: '' },
+                    note: { en: null, fr: null },
+                    parent: true
+                  } );
+                }
+                currentParentId = dataOption.parentId;
+              }
+
+              if( currentId != dataOption.id ) {
+                // insert the data option subcategory
+                self.dataOptionList[type].push( {
+                  id: dataOption.id,
+                  parentId: dataOption.parentId,
+                  name: { en: dataOption.name_en, fr: dataOption.name_fr },
+                  note: { en: dataOption.note_en, fr: dataOption.note_fr },
+                  typeList: {},
+                  parent: false
+                } );
+                currentId = dataOption.id;
+              }
+
+              // insert the data option
+              self.dataOptionList[type].findByProperty( 'id', dataOption.id ).typeList[dataOption.option_type] = {
+                replacement: { en: dataOption.replacement_en, fr: dataOption.replacement_fr }
+              };
+
+            } );
+              console.log( self.dataOptionList );
+          } );
         } );
       };
       return { instance: function( parentModel ) { return new object( parentModel ); } };

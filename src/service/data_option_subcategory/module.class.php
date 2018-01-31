@@ -6,7 +6,7 @@
  * @filesource
  */
 
-namespace magnolia\service\biomarker;
+namespace magnolia\service\data_option_subcategory;
 use cenozo\lib, cenozo\log, magnolia\util;
 
 /**
