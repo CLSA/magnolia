@@ -63,6 +63,44 @@ define( function() {
           $scope.part2Tab = 'notes';
           $scope.ethics = '';
 
+          $scope.referenceList = [ {
+            rank: 1,
+            text: 'New Canadian physical activity guidelines. Tremblay, MS and al., et. Appl Physiol Nutr Metab, 2011, Vol. 36'
+          }, {
+            rank: 2,
+            text: 'Physical activity in US: adults compliance with the Physical Activity Guidelines for Americans. Tucker, J and al., et. 4, Am J Prev Med, 2011, Vol. 40, pp. 454-61'
+          }, {
+            rank: 3,
+            text: 'World Health Organization. WHO global recommendation on physical activity for health. [Online] 2010. http://www.who.int/dietphysicalactivity/factsheet_reccommendations/en'
+          }, {
+            rank: 4,
+            text: 'A systematic review of the evidence for Canada\'s Physical Activity Guidelines for Adults. Warburton, D and al., et. 1, Int J Behav Nutr Phys Act, 2010, Vol. 7, p. 39'
+          }, {
+            rank: 5,
+            text: 'Physical activity and fuctional limitations in older adults: a systematic review related to Canada\'s Physical Activity Guidelines. Paterson, D and al., et. 1, Int J Behav Nutr Phys Act, 2010, Vol. 7, p. 38'
+          }, {
+            rank: 6,
+            text: 'Cardiovascular benefits and risks across the physical activity continuum. Eijsvigels, T and al., et. 5, Curr Opin Cardiol, 2016, Vol. 31, pp. 566-71'
+          }, {
+            rank: 7,
+            text: 'Sitting time and mortality from all causes , cardiovascular disease, and cancer. Katzmarzyk, P and al., et. 5, Med Sci Sport Exerc, 2009, Vol. 41, pp. 998-1005'
+          }, {
+            rank: 8,
+            text: 'Leisure time spent sitting in relation to total mortality in a prospective chort of US adults. Patel, A and al., et. 4, Am J Epidemiol, 2010, Vol. 172'
+          } ];
+
+          // TODO: this doesn't actually work right, need to debug and fix
+          $scope.setReferenceRank = function( oldRank, newRank ) {
+            if( oldRank != newRank ) {
+              $scope.referenceList.forEach( function( ref ) {
+                if( oldRank <= ref.rank && ref.rank <= newRank ) {
+                  if( ref.rank == oldRank ) ref.rank = newRank;
+                  else ref.rank += ( newRank > oldRank ? -1 : 1 );
+                }
+              } );
+            }
+          };
+
           $scope.t = function( address ) {
             var addressParts = address.split('.');
             var response = null;
@@ -232,6 +270,7 @@ define( function() {
                   en: 'Digital copy of ethics approval letter',
                   fr: 'Copie numérique de la lettre d’approbation éthique'
                 },
+                expiration: { en: 'Expiration date of approval', fr: 'TRANSLATION REQUIRED' },
                 response: { en: 'Expected date of response', fr: 'Date approximative de la réponse' }
               },
               a7: {
@@ -474,7 +513,6 @@ define( function() {
               };
 
             } );
-              console.log( self.dataOptionList );
           } );
         } );
       };

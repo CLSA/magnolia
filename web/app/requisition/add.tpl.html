@@ -163,7 +163,7 @@
             <p class="text-primary" ng-bind-html="t( 'part1.a2.text' )"></p>
             <div class="panel panel-default">
               <div class="panel-body">
-                <table class="table">
+                <table class="table table-striped">
                   <thead class="bg-info">
                     <tr>
                       <td ng-bind-html="t( 'part1.a2.name' )"></td>
@@ -371,7 +371,7 @@
               <p class="text-primary" ng-bind-html="t( 'part1.a4.text3' )"></p>
               <div class="panel panel-default">
                 <div class="panel-body">
-                  <table class="table">
+                  <table class="table table-striped">
                     <thead class="bg-info">
                       <tr>
                         <td ng-bind-html="t( 'part1.a4.number' )"></td>
@@ -380,88 +380,23 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <tr>
-                        <td>1</td>
-                        <td class="text-left">
-                          New Canadian physical activity guidelines. Tremblay, MS and al., et. Appl Physiol Nutr Metab, 2011, Vol. 36, 
-                        </td>
+                      <tr ng-repeat="reference in referenceList | orderBy: 'rank'">
                         <td>
-                          <button class="btn btn-xs btn-danger" uib-tooltip="{{ t( 'misc.remove' ) }}">
-                            <i class="glyphicon glyphicon-remove"></i>
-                          </button>
+                          <div class="btn-group">
+                            <button class="btn btn-info dropdown-toggle"
+                                    data-toggle="dropdown"
+                                    type="button"> 
+                              {{ reference.rank }}
+                            </button>
+                            <ul class="dropdown-menu" role="menu">
+                              <li ng-repeat="r in referenceList | orderBy: 'rank'"
+                                  ng-class="{ 'active': r.rank == reference.rank }">
+                                <a href="#" ng-click="setReferenceRank( reference.rank, r.rank )">{{ r.rank }}</a>
+                              </li>
+                            </ul>
+                          </div>
                         </td>
-                      </tr>
-                      <tr>
-                        <td>2</td>
-                        <td class="text-left">
-                          Physical activity in US: adults compliance with the Physical Activity Guidelines for Americans. Tucker, J and al., et. 4, Am J Prev Med, 2011, Vol. 40, pp. 454-61.
-                        </td>
-                        <td>
-                          <button class="btn btn-xs btn-danger" uib-tooltip="{{ t( 'misc.remove' ) }}">
-                            <i class="glyphicon glyphicon-remove"></i>
-                          </button>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>3</td>
-                        <td class="text-left">
-                          World Health Organization. WHO global recommendation on physical activity for health. [Online] 2010. http://www.who.int/dietphysicalactivity/factsheet_reccommendations/en 
-                        </td>
-                        <td>
-                          <button class="btn btn-xs btn-danger" uib-tooltip="{{ t( 'misc.remove' ) }}">
-                            <i class="glyphicon glyphicon-remove"></i>
-                          </button>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>4</td>
-                        <td class="text-left">
-                          A systematic review of the evidence for Canada's Physical Activity Guidelines for Adults. Warburton, D and al., et. 1, Int J Behav Nutr Phys Act, 2010, Vol. 7, p. 39
-                        </td>
-                        <td>
-                          <button class="btn btn-xs btn-danger" uib-tooltip="{{ t( 'misc.remove' ) }}">
-                            <i class="glyphicon glyphicon-remove"></i>
-                          </button>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>5</td>
-                        <td class="text-left">
-                          Physical activity and fuctional limitations in older adults: a systematic review related to Canada's Physical Activity Guidelines. Paterson, D and al., et. 1, Int J Behav Nutr Phys Act, 2010, Vol. 7, p. 38.
-                        </td>
-                        <td>
-                          <button class="btn btn-xs btn-danger" uib-tooltip="{{ t( 'misc.remove' ) }}">
-                            <i class="glyphicon glyphicon-remove"></i>
-                          </button>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>6</td>
-                        <td class="text-left">
-                          Cardiovascular benefits and risks across the physical activity continuum. Eijsvigels, T and al., et. 5, Curr Opin Cardiol, 2016, Vol. 31, pp. 566-71.
-                        </td>
-                        <td>
-                          <button class="btn btn-xs btn-danger" uib-tooltip="{{ t( 'misc.remove' ) }}">
-                            <i class="glyphicon glyphicon-remove"></i>
-                          </button>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>7</td>
-                        <td class="text-left">
-                          Sitting time and mortality from all causes , cardiovascular disease, and cancer. Katzmarzyk, P and al., et. 5, Med Sci Sport Exerc, 2009, Vol. 41, pp. 998-1005.
-                        </td>
-                        <td>
-                          <button class="btn btn-xs btn-danger" uib-tooltip="{{ t( 'misc.remove' ) }}">
-                            <i class="glyphicon glyphicon-remove"></i>
-                          </button>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>8</td>
-                        <td class="text-left">
-                          Leisure time spent sitting in relation to total mortality in a prospective chort of US adults. Patel, A and al., et. 4, Am J Epidemiol, 2010, Vol. 172,
-                        </td>
+                        <td class="text-left">{{ reference.text }}</td>
                         <td>
                           <button class="btn btn-xs btn-danger" uib-tooltip="{{ t( 'misc.remove' ) }}">
                             <i class="glyphicon glyphicon-remove"></i>
@@ -540,6 +475,13 @@
                   <input id="ethics_date" class="form-control" type="text"></input>
                 </div>
               </div>
+              <div class="form-group" ng-if="'yes'==ethics">
+                <label for="ethics_date" class="col-sm-4 control-label"
+                       ng-bind-html="t( 'part1.a6.expiration' )"></label>
+                <div class="col-sm-8">
+                  <input id="ethics_date" class="form-control" type="text"></input>
+                </div>
+              </div>
               <div class="form-group" ng-if="'no'==ethics">
                 <label for="ethics_date" class="col-sm-4 control-label"
                        ng-bind-html="t( 'part1.a6.response' )"></label>
@@ -608,7 +550,7 @@
                   <input id="baseline" class="form-control" ng-model="baseline" type="checkbox"></input>
                 </div>
               </div>
-              <div ng-show="baseline">
+              <div ng-if="baseline">
                 <table class="table">
                   <thead class="bg-info">
                     <tr>
@@ -700,7 +642,7 @@
                   <input id="physical" class="form-control" ng-model="physical" type="checkbox"></input>
                 </div>
               </div>
-              <div ng-show="physical">
+              <div ng-if="physical">
                 <table class="table">
                   <thead class="bg-info">
                     <tr>
@@ -755,7 +697,7 @@
                   <input id="biomarker" class="form-control" ng-model="biomarker" type="checkbox"></input>
                 </div>
               </div>
-              <div ng-show="biomarker">
+              <div ng-if="biomarker">
                 <table class="table">
                   <thead class="bg-info">
                     <tr>
