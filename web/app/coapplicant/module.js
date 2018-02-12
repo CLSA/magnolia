@@ -11,34 +11,26 @@ define( function() {
       pluralPossessive: 'co-applicants\''
     },
     columnList: {
-      user: {
-        title: 'Applicant',
-        name: 'user.full_name'
-      },
-      identifier: {
-        title: 'Name'
-      }
+      name: { title: 'Name' },
+      position: { title: 'Position' },
+      affliation: { title: 'Affiliation' },
+      email: { title: 'E-mail' },
+      role: { title: 'Role' },
+      access: { title: 'Access', type: 'boolean' }
     },
     defaultOrder: {
-      column: 'coapplicant.name',
+      column: 'coapplicant.id',
       reverse: false
     }
   } );
 
   module.addInputGroup( '', {
-    name: {
-      title: 'Applicant',
-      type: 'lookup-typeahead',
-      typeahead: {
-        table: 'user',
-        select: 'CONCAT( user.first_name, " ", user.last_name, " (", user.name, ")" )',
-        where: [ 'user.first_name', 'user.last_name', 'user.name' ]
-      }
-    },
-    identifier: {
-      title: 'Identifier',
-      type: 'string'
-    }
+    name: { title: 'Name', type: 'string' },
+    position: { title: 'Position', type: 'string' },
+    affliation: { title: 'Affiliation', type: 'string' },
+    email: { title: 'E-mail', type: 'string' },
+    role: { title: 'Role', type: 'string' },
+    access: { title: 'Access', type: 'boolean', type: 'boolean' }
   } );
 
   /* ######################################################################################################## */

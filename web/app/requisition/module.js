@@ -1,4 +1,6 @@
-define( function() {
+define( [ 'coapplicant' ].reduce( function( list, name ) {
+  return list.concat( cenozoApp.module( name ).getRequiredFiles() );
+}, [] ), function() {
   'use strict';
 
   try { var module = cenozoApp.module( 'requisition', true ); } catch( err ) { console.warn( err ); return; }
@@ -44,24 +46,85 @@ define( function() {
     identifier: {
       title: 'Identifier',
       type: 'string'
-    }
+    },
+    name: { type: 'string' },
+    position: { type: 'string' },
+    affiliation: { type: 'string' },
+    address: { type: 'string' },
+    phone: { type: 'string' },
+    email: { type: 'string' },
+    graduate_name: { type: 'string' },
+    graduate_program: { type: 'string' },
+    graduate_institution: { type: 'string' },
+    graduate_address: { type: 'string' },
+    graduate_phone: { type: 'string' },
+    graduate_email: { type: 'string' },
+    start_date: { type: 'date' },
+    duration: { type: 'string' },
+    title: { type: 'string' },
+    lay_summary: { type: 'string' },
+    background: { type: 'text' },
+    objectives: { type: 'text' },
+    methodology: { type: 'text' },
+    analysis: { type: 'text' },
+    funding: { type: 'enum' },
+    funding_agency: { type: 'string' },
+    grant_number: { type: 'string' },
+    ethics: { type: 'boolean' },
+    ethics_date: { type: 'date' },
+    waiver: { type: 'enum' },
+    qnaire_comment: { type: 'text' },
+    physical_comment: { type: 'text' },
+    biomarker_comment: { type: 'text' }
   } );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnRequisitionAdd', [
+  cenozo.providers.directive( 'cnRequisitionList', [
     'CnRequisitionModelFactory',
     function( CnRequisitionModelFactory ) {
       return {
-        templateUrl: module.getFileUrl( 'add.tpl.html' ),
+        templateUrl: module.getFileUrl( 'list.tpl.html' ),
         restrict: 'E',
         scope: { model: '=?' },
         controller: function( $scope ) {
           if( angular.isUndefined( $scope.model ) ) $scope.model = CnRequisitionModelFactory.root;
-          $scope.language = 'en';
-          $scope.tab = 'instructions';
-          $scope.part1Tab = 'a1';
-          $scope.part2Tab = 'notes';
-          $scope.ethics = '';
+        }
+      };
+    }
+  ] );
+
+  /* ######################################################################################################## */
+  cenozo.providers.directive( 'cnRequisitionView', [
+    'CnRequisitionModelFactory', 'cnRecordViewDirective',
+    function( CnRequisitionModelFactory, cnRecordViewDirective ) {
+      // used to piggy-back on the basic view controller's functionality (but not used in the DOM)
+      var cnRecordView = cnRecordViewDirective[0];
+
+      return {
+        templateUrl: module.getFileUrl( 'view.tpl.html' ),
+        restrict: 'E',
+        scope: { model: '=?' },
+        link: function( scope, element, attrs ) { cnRecordView.link( scope, element, attrs ); },
+        controller: function( $scope ) {
+          if( angular.isUndefined( $scope.model ) ) $scope.model = CnRequisitionModelFactory.root;
+          cnRecordView.controller[1]( $scope );
+          $scope.coapplicantRecord = {};
+          $scope.coapplicantModel = {
+            // TODO: create an actial coapplicant model & directives and embed
+          };
+          $scope.addCoapplicant = function() {
+            console.log( $scope.coapplicantRecord );
+          };
+
+          $scope.removeCoapplicant = function( id ) {
+            /*
+            TODO: move this to a service
+            return CnHttpFactory.instance( {
+                path: self.parentModel.getServiceResourcePath() + '/coapplicant/' + id
+            } ).delete();
+            */
+          };
+
 
           $scope.referenceList = [ {
             rank: 1,
@@ -117,7 +180,7 @@ define( function() {
             }
 
             if( !response ) response = { en: 'ERROR', fr: 'ERREUR' };
-            return response[$scope.language];
+            return response[$scope.model.viewModel.language];
           };
 
           var text = {
@@ -176,7 +239,7 @@ define( function() {
                 },
                 graduate_name: { en: 'Name', fr: 'Nom' },
                 graduate_program: { en: 'Degree and Program of Study', fr: 'Grade et programme d’étude' },
-                graduate_affiliation: { en: 'Institution of Enrollment', fr: 'Établissement d’étude' },
+                graduate_institution: { en: 'Institution of Enrollment', fr: 'Établissement d’étude' },
                 graduate_address: { en: 'Current Mailing Address', fr: 'Adresse de correspondance actuelle' },
                 graduate_phone: { en: 'Phone', fr: 'Téléphone' },
                 graduate_email: { en: 'E-mail', fr: 'Courriel' }
@@ -200,7 +263,7 @@ define( function() {
                   en: 'What is the anticipated time frame for this proposed project? In planning for your project, please consider in your time frame at least five (5) months from the application submission deadline to the time you receive your dataset.',
                   fr: 'Quel est l’échéancier prévu du projet proposé? Lors de la planification de votre projet, veuillez prévoir au moins cinq (5) mois à compter de la date limite de soumission de votre candidature pour recevoir votre ensemble de données.'
                 },
-                start: { en: 'Anticipated <u>start</u> date', fr: 'Date prévue de <u>début</u>' },
+                start_date: { en: 'Anticipated start date', fr: 'Date prévue de début' },
                 duration: { en: 'Proposed project duration', fr: 'Durée proposée du projet' }
               },
               a4: {
@@ -211,12 +274,12 @@ define( function() {
                 },
                 title: { en: 'Project Title', fr: 'Titre du projet' },
                 keywords: { en: 'Keywords', fr: 'Mots clés' },
-                keywordsText: {
+                keywords_text: {
                   en: 'Please provide 3-5 keywords describing your project.',
                   fr: 'Veuillez fournir 3 à 5 mots clés décrivant votre projet.'
                 },
-                laySummary: { en: 'Lay Summary', fr: 'Résumé non scientifique' },
-                laySummaryText: {
+                lay_summary: { en: 'Lay Summary', fr: 'Résumé non scientifique' },
+                lay_summary_text: {
                   en: 'Please provide a lay language summary of your project (<strong>maximum 150 words</strong>) suitable for posting on the CLSA website if your application is approved. Please ensure that the lay summary provides a stand-alone, informative description of your project.',
                   fr: 'Veuillez fournir un résumé non scientifique de votre projet (<strong>150 mots maximum</strong>) pouvant être publié sur le site Web de l’ÉLCV si votre demande est approuvée. Assurez-vous de fournir un résumé détaillé et complet de votre projet.'
                 },
@@ -230,12 +293,12 @@ define( function() {
                   fr: 'Objectifs et/ou hypothèses de l’étude'
                 },
                 design: { en: 'The Study Design and Methodology', fr: 'Modèle d’étude et méthodologie' },
-                designText: {
+                design_text: {
                   en: 'The study design and methodology including an overview of the variables and/or biospecimens requested for the project. In no more than half a page, describe the inclusion and exclusion criteria for participants to be included in your study (e.g., age, sex, etc.).',
                   fr: 'Modèle d’étude et méthodologie comprenant un survol de la liste de variables et/ou échantillons demandés. Sans dépasser une demi-page, décrivez les critères d’inclusion et d’exclusion des participants qui seront inclus dans votre étude (p. ex. âge, sexe, etc.).'
                 },
                 analysis: { en: 'Data Analysis', fr: 'Analyse de données' },
-                analysisText: {
+                analysis_text: {
                   en: 'Brief description of the data analysis proposed (this section should include justification for the sample size requested). Requests for small subsets of the study participants must be justified.',
                   fr: 'Brève description de l’analyse de données proposée (cette section devrait inclure la justification de la taille d’échantillon demandée). Les demandes de petits sous-groupes de participants doivent être justifiées.'
                 },
@@ -253,8 +316,8 @@ define( function() {
                   fr: 'Les documents attestant l’attribution du financement seront considérés comme une preuve d’évaluation par les pairs. Si vous ne planifiez pas demander de l’aide financière pour ce projet, veuillez fournir la preuve qu’une évaluation par les pairs a été réalisée (p. ex. évaluation départementale, défense du protocole de thèse, etc.) si disponible. Si aucune preuve d’évaluation scientifique par les pairs n’est soumise avec la demande, le DSAC procédera à l’évaluation scientifique du projet.'
                 },
                 funding: { en: 'Peer Reviewed Funding', fr: 'Financement évalué par les pairs' },
-                agency: { en: 'Funding agency', fr: 'L’Organisme de financement' },
-                grant: { en: 'Grant Number', fr: 'Numéro de la subvention' }
+                funding_agency: { en: 'Funding agency', fr: 'L’Organisme de financement' },
+                grant_number: { en: 'Grant Number', fr: 'Numéro de la subvention' }
               },
               a6: {
                 tab: { en: 'A6. Ethics', fr: 'A6. Éthique' },
@@ -262,7 +325,7 @@ define( function() {
                   en: 'Please note that ethics approval is NOT required at the time of this application, but <strong>no data or biospecimens will be released until proof of ethics approval has been received by the CLSA.</strong>',
                   fr: 'Notez que l’approbation éthique n’est PAS requise à cette étape de la demande, mais <strong>aucune donnée ou aucun échantillon ne seront transmis avant que l’ÉLCV ait reçu une preuve d’approbation éthique.</strong>'
                 },
-                approval: {
+                ethics: {
                   en: 'Has this project received ethics approval?',
                   fr: 'Ce projet a-t-il reçu une approbation éthique?'
                 },
@@ -279,16 +342,7 @@ define( function() {
                   en: 'In order to be eligible for the Fee Waiver for Graduate students, the application must clearly indicate that the proposed project forms part of a thesis (see section A1). In order to be eligible for the Fee Waiver for Postdoctoral Fellows, the Fellow must be the primary applicant and the supervisor must sign the application.',
                   fr: 'Pour que les étudiants des cycles supérieurs soient admissibles à l’exonération des frais, la demande doit indiquer clairement que le projet proposé s’inscrit dans une thèse (voir la section A1). Pour que les boursiers postdoctoraux soient admissibles à l’exonération des frais, le boursier doit être le demandeur principal et le superviseur doit signer la demande.'
                 },
-                type: { en: 'Fee Waiver Type', fr: 'Type d’exemption de frais' },
-                none: { en: 'none', fr: 'aucun' },
-                graduate: {
-                  en: 'Fee Waiver for Graduate student (MSc or PhD) for thesis only',
-                  fr: 'Exonération pour un étudiant des cycles supérieurs (M. Sc. ou Ph. D.) pour la thèse seulement'
-                },
-                postdoc: {
-                  en: 'Fee Waiver for Postdoctoral Fellow (limit 1 waiver for postdoctoral studies)',
-                  fr: 'Exonération pour un boursier postdoctoral (limite d’une exonération pour les études postdoctorales)'
-                }
+                waiver: { en: 'Fee Waiver Type', fr: 'Type d’exemption de frais' }
               }
             },
             part2: {
@@ -364,159 +418,12 @@ define( function() {
             misc: {
               add: { en: 'Add', fr: 'Ajouter' },
               remove: { en: 'Remove', fr: 'Supprimer' },
-              choose: { en: '(choose)', fr: '(choisir)' },
-              yes: { en: 'Yes', fr: 'Oui' },
-              no: { en: 'No', fr: 'Non' },
-              requested: { en: 'Requested', fr: 'Demandé' },
               wordCount: { en: 'word count', fr: 'nombre de mots' },
               comments: { en: 'Comments', fr: 'Commentaires' }
             }
           };
         }
       };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnRequisitionList', [
-    'CnRequisitionModelFactory',
-    function( CnRequisitionModelFactory ) {
-      return {
-        templateUrl: module.getFileUrl( 'list.tpl.html' ),
-        restrict: 'E',
-        scope: { model: '=?' },
-        controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnRequisitionModelFactory.root;
-        }
-      };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnRequisitionView', [
-    'CnRequisitionModelFactory',
-    function( CnRequisitionModelFactory ) {
-      return {
-        templateUrl: module.getFileUrl( 'view.tpl.html' ),
-        restrict: 'E',
-        scope: { model: '=?' },
-        controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnRequisitionModelFactory.root;
-        }
-      };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnRequisitionAddFactory', [
-    'CnHttpFactory',
-    function( CnHttpFactory ) {
-      var object = function( parentModel ) {
-        var self = this;
-        this.parentModel = parentModel;
-
-        this.dataOptionParentList = [];
-        this.dataOptionList = [];
-
-        CnHttpFactory.instance( {
-          path: 'data_option_parent',
-          data: {
-            select: { column: [ 'id', 'name_en', 'name_fr', 'note_en', 'note_fr' ] },
-            modifier: { limit: 1000000 }
-          }
-        } ).query().then( function( response ) {
-          response.data.forEach( function( dataOptionParent ) {
-            self.dataOptionParentList.push( {
-              id: null,
-              parentId: dataOptionParent.id,
-              name: { en: dataOptionParent.name_en, fr: dataOptionParent.name_fr },
-              note: { en: dataOptionParent.note_en, fr: dataOptionParent.note_fr },
-              parent: true
-            } );
-          } );
-
-          CnHttpFactory.instance( {
-            path: 'data_option_subcategory',
-            data: {
-              select: { column: [
-                'type', 'name_en', 'name_fr', 'note_en', 'note_fr', {
-                  column: 'data_option_parent_id',
-                  alias: 'parentId'
-                }, {
-                  table: 'data_option',
-                  column: 'type',
-                  alias: 'option_type'
-                }, {
-                  table: 'data_option',
-                  column: 'replacement_en'
-                }, {
-                  table: 'data_option',
-                  column: 'replacement_fr'
-                }
-              ] },
-              modifier: {
-                join: [ {
-                  table: 'data_option',
-                  onleft: 'data_option_subcategory.id',
-                  onright: 'data_option.data_option_subcategory_id'
-                } ],
-                order: [ 'data_option_subcategory.type', 'data_option_subcategory.rank' ],
-                limit: 1000000
-              }
-            }
-          } ).query().then( function( response ) {
-            var currentType = null;
-            var currentId = null;
-            var currentParentId = null;
-            response.data.forEach( function( dataOption ) {
-              var type = dataOption.type;
-              if( currentType != type ) {
-                // insert the new dataOption type if it doesn't already exist
-                if( angular.isUndefined( self.dataOptionList[type] ) ) self.dataOptionList[type] = [];
-                currentType = type;
-              }
-
-              if( currentParentId != dataOption.parentId ) {
-                // insert the parent
-                if( null != dataOption.parentId ) {
-                  self.dataOptionList[type].push(
-                    self.dataOptionParentList.findByProperty( 'parentId', dataOption.parentId )
-                  );
-                } else {
-                  self.dataOptionList[type].push( {
-                    id: null,
-                    parentId: null,
-                    name: { en: '', fr: '' },
-                    note: { en: null, fr: null },
-                    parent: true
-                  } );
-                }
-                currentParentId = dataOption.parentId;
-              }
-
-              if( currentId != dataOption.id ) {
-                // insert the data option subcategory
-                self.dataOptionList[type].push( {
-                  id: dataOption.id,
-                  parentId: dataOption.parentId,
-                  name: { en: dataOption.name_en, fr: dataOption.name_fr },
-                  note: { en: dataOption.note_en, fr: dataOption.note_fr },
-                  typeList: {},
-                  parent: false
-                } );
-                currentId = dataOption.id;
-              }
-
-              // insert the data option
-              self.dataOptionList[type].findByProperty( 'id', dataOption.id ).typeList[dataOption.option_type] = {
-                replacement: { en: dataOption.replacement_en, fr: dataOption.replacement_fr }
-              };
-
-            } );
-          } );
-        } );
-      };
-      return { instance: function( parentModel ) { return new object( parentModel ); } };
     }
   ] );
 
@@ -531,25 +438,235 @@ define( function() {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnRequisitionViewFactory', [
-    'CnBaseViewFactory',
-    function( CnBaseViewFactory ) {
-      var object = function( parentModel, root ) { CnBaseViewFactory.construct( this, parentModel, root ); };
+    'CnBaseViewFactory', 'CnCoapplicantModelFactory', 'CnHttpFactory', '$state', '$q',
+    function( CnBaseViewFactory, CnCoapplicantModelFactory, CnHttpFactory, $state, $q ) {
+      var object = function( parentModel, root ) {
+        var self = this;
+        CnBaseViewFactory.construct( this, parentModel, root );
+        this.coapplicantModel = CnCoapplicantModelFactory.instance();
+
+        // setup language and tab state parameters
+        this.toggleLanguage = function() {
+          this.setLanguage( 'en' == this.language ? 'fr' : 'en' );
+        };
+
+        this.setLanguage = function( language, transition ) {
+          if( angular.isUndefined( transition ) ) transition = true;
+          language = 'fr' == language ? 'fr' : 'en';
+          this.language = language;
+          $state.params.lang = language;
+          if( transition ) $state.transitionTo( $state.current, $state.params, { reload: false, notify: false } );
+        };
+
+        this.setTab = function( index, tab, transition ) {
+          if( angular.isUndefined( transition ) ) transition = true;
+          if( !( 0 <= index && index <= 2 ) ) index = 0;
+          if( 0 == index && 0 > ['instructions','part1','part2','part3'].indexOf( tab ) ) tab = 'instructions';
+          else if( 1 == index && 0 > ['a1','a2','a3','a4','a5','a6','a7'].indexOf( tab ) ) tab = 'a1';
+          else if( 2 == index && 0 > ['notes','a','b','c'].indexOf( tab ) ) tab = 'notes';
+          this.tab[index] = tab;
+          $state.params['t'+index] = tab;
+          if( transition ) $state.transitionTo( $state.current, $state.params, { reload: false, notify: false } );
+        };
+
+        this.language = null;
+        this.setLanguage( $state.params.lang, false );
+
+        this.tab = [];
+        this.setTab( 0, $state.params.t0, false );
+        this.setTab( 1, $state.params.t1, false );
+        this.setTab( 2, $state.params.t2, false );
+
+        this.onView = function( force ) {
+          return $q.all( [
+            this.$$onView( force ),
+
+            // get coapplicants
+            CnHttpFactory.instance( {
+              path: self.parentModel.getServiceResourcePath() + '/coapplicant',
+              data: { select: { column: [ 'id', 'name', 'position', 'affiliation', 'email', 'role', 'access' ] } }
+            } ).query().then( function( response ) {
+              self.coapplicantList = response.data;
+            } )
+          ] );
+        }
+      };
       return { instance: function( parentModel, root ) { return new object( parentModel, root ); } };
     }
   ] );
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnRequisitionModelFactory', [
-    'CnBaseModelFactory',
-    'CnRequisitionAddFactory', 'CnRequisitionListFactory', 'CnRequisitionViewFactory',
-    function( CnBaseModelFactory,
-              CnRequisitionAddFactory, CnRequisitionListFactory, CnRequisitionViewFactory ) {
+    'CnBaseModelFactory', 'CnRequisitionListFactory', 'CnRequisitionViewFactory',
+    'CnHttpFactory', 'CnSession', '$q',
+    function( CnBaseModelFactory, CnRequisitionListFactory, CnRequisitionViewFactory,
+              CnHttpFactory, CnSession, $q ) {
       var object = function( root ) {
         var self = this;
         CnBaseModelFactory.construct( this, module );
-        this.addModel = CnRequisitionAddFactory.instance( this );
         this.listModel = CnRequisitionListFactory.instance( this );
         this.viewModel = CnRequisitionViewFactory.instance( this, root );
+
+        // make the input list more accessible 
+        this.inputList = module.inputGroupList[0].inputList;
+
+        // override transitionToAddState
+        this.transitionToAddState = function() {
+          // immediately get a new requisition and view it (no add state required)
+          return CnHttpFactory.instance( {
+            path: 'requisition',
+            data: { user_id: CnSession.user.id }
+          } ).post().then( function ( response ) { 
+            // immediately view the new requisition
+            return self.transitionToViewState( { getIdentifier: function() { return response.data; } } );
+          } )
+        };
+
+        this.dataOptionParentList = [];
+        this.dataOptionList = [];
+
+        this.getMetadata = function() {
+          return $q.all( [
+            self.$$getMetadata().then( function() {
+              // create coapplicant access enum
+              self.metadata.accessEnumList = {
+                en: [ {value:undefined,name:'(choose)'}, {value:true,name:'Yes'}, {value:false,name:'No'} ],
+                fr: [ {value:undefined,name:'(choisir)'}, {value:true,name:'Oui'}, {value:false,name:'Non'} ]
+              };
+
+              // create ethics enum
+              self.metadata.columnList.ethics.enumList = {
+                en: [ {value:'',name:'(choose)'}, {value:true,name:'Yes'}, {value:false,name:'No'} ],
+                fr: [ {value:'',name:'(choisir)'}, {value:true,name:'Oui'}, {value:false,name:'Non'} ]
+              };
+
+              // translate funding enum
+              self.metadata.columnList.funding.enumList = {
+                en: self.metadata.columnList.funding.enumList,
+                fr: angular.copy( self.metadata.columnList.funding.enumList )
+              };
+              self.metadata.columnList.funding.enumList.fr[0].name = 'oui';
+              self.metadata.columnList.funding.enumList.fr[1].name = 'non';
+              self.metadata.columnList.funding.enumList.fr[2].name = 'demandé';
+
+              // translate waiver enum
+              self.metadata.columnList.waiver.enumList.unshift( { value: '', name: 'none' } );
+              self.metadata.columnList.waiver.enumList = {
+                en: self.metadata.columnList.waiver.enumList,
+                fr: angular.copy( self.metadata.columnList.waiver.enumList )
+              };
+              self.metadata.columnList.waiver.enumList.en[1].name =
+                 'Fee Waiver for Graduate student (MSc or PhD) for thesis only';
+              self.metadata.columnList.waiver.enumList.en[2].name =
+                 'Fee Waiver for Postdoctoral Fellow (limit 1 waiver for postdoctoral studies)';
+              self.metadata.columnList.waiver.enumList.fr[0].name = 'aucun';
+              self.metadata.columnList.waiver.enumList.fr[1].name =
+                'Exonération pour un étudiant des cycles supérieurs (M. Sc. ou Ph. D.) pour la thèse seulement';
+              self.metadata.columnList.waiver.enumList.fr[2].name =
+                'Exonération pour un boursier postdoctoral ' +
+                '(limite d’une exonération pour les études postdoctorales)';
+            } ),
+
+            CnHttpFactory.instance( {
+              path: 'data_option_parent',
+              data: {
+                select: { column: [ 'id', 'name_en', 'name_fr', 'note_en', 'note_fr' ] },
+                modifier: { limit: 1000000 }
+              }
+            } ).query().then( function( response ) {
+              response.data.forEach( function( dataOptionParent ) {
+                self.dataOptionParentList.push( {
+                  id: null,
+                  parentId: dataOptionParent.id,
+                  name: { en: dataOptionParent.name_en, fr: dataOptionParent.name_fr },
+                  note: { en: dataOptionParent.note_en, fr: dataOptionParent.note_fr },
+                  parent: true
+                } );
+              } );
+
+              return CnHttpFactory.instance( {
+                path: 'data_option_subcategory',
+                data: {
+                  select: { column: [
+                    'type', 'name_en', 'name_fr', 'note_en', 'note_fr', {
+                      column: 'data_option_parent_id',
+                      alias: 'parentId'
+                    }, {
+                      table: 'data_option',
+                      column: 'type',
+                      alias: 'option_type'
+                    }, {
+                      table: 'data_option',
+                      column: 'replacement_en'
+                    }, {
+                      table: 'data_option',
+                      column: 'replacement_fr'
+                    }
+                  ] },
+                  modifier: {
+                    join: [ {
+                      table: 'data_option',
+                      onleft: 'data_option_subcategory.id',
+                      onright: 'data_option.data_option_subcategory_id'
+                    } ],
+                    order: [ 'data_option_subcategory.type', 'data_option_subcategory.rank' ],
+                    limit: 1000000
+                  }
+                }
+              } ).query().then( function( response ) {
+                var currentType = null;
+                var currentId = null;
+                var currentParentId = null;
+                response.data.forEach( function( dataOption ) {
+                  var type = dataOption.type;
+                  if( currentType != type ) {
+                    // insert the new dataOption type if it doesn't already exist
+                    if( angular.isUndefined( self.dataOptionList[type] ) ) self.dataOptionList[type] = [];
+                    currentType = type;
+                  }
+
+                  if( currentParentId != dataOption.parentId ) {
+                    // insert the parent
+                    if( null != dataOption.parentId ) {
+                      self.dataOptionList[type].push(
+                        self.dataOptionParentList.findByProperty( 'parentId', dataOption.parentId )
+                      );
+                    } else {
+                      self.dataOptionList[type].push( {
+                        id: null,
+                        parentId: null,
+                        name: { en: '', fr: '' },
+                        note: { en: null, fr: null },
+                        parent: true
+                      } );
+                    }
+                    currentParentId = dataOption.parentId;
+                  }
+
+                  if( currentId != dataOption.id ) {
+                    // insert the data option subcategory
+                    self.dataOptionList[type].push( {
+                      id: dataOption.id,
+                      parentId: dataOption.parentId,
+                      name: { en: dataOption.name_en, fr: dataOption.name_fr },
+                      note: { en: dataOption.note_en, fr: dataOption.note_fr },
+                      typeList: {},
+                      parent: false
+                    } );
+                    currentId = dataOption.id;
+                  }
+
+                  // insert the data option
+                  self.dataOptionList[type]
+                      .findByProperty( 'id', dataOption.id )
+                      .typeList[dataOption.option_type] = {
+                    replacement: { en: dataOption.replacement_en, fr: dataOption.replacement_fr }
+                  };
+                } );
+              } );
+            } )
+          ] );
+        };
       };
 
       return {
