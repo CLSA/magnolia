@@ -1,0 +1,60 @@
+<?php
+/**
+ * get.class.php
+ * 
+ * @author Patrick Emond <emondpd@mcmaster.ca>
+ */
+
+namespace magnolia\service\requisition;
+use cenozo\lib, cenozo\log, magnolia\util;
+
+class get extends \cenozo\service\downloadable
+{
+  /**
+   * Replace parent method
+   * 
+   * When the client calls for a file we return the requisition's ethics letter
+   */
+  protected function get_downloadable_mime_type_list()
+  {
+    return array( 'image/jpeg' );
+  }
+
+  /**
+   * Replace parent method
+   * 
+   * When the client calls for a file we return the requisition's ethics letter
+   */
+  protected function get_downloadable_public_name()
+  {
+    return sprintf( '%s.jpg', $this->get_leaf_record()->id );
+  }
+
+  /**
+   * Replace parent method
+   * 
+   * When the client calls for a file we return the requisition's ethics letter
+   */
+  protected function get_downloadable_file_path()
+  {
+    return sprintf( '%s/%s.jpg', ETHICS_LETTER_PATH, $this->get_leaf_record()->id );
+  }
+
+  /**
+   * Extend parent method
+   */
+  public function execute()
+  {
+    if( $this->get_argument( 'letter', false ) )
+    {
+      $data = NULL;
+      $db_requisition = $this->get_leaf_record();
+      if( !is_null( $db_requisition ) && file_exists( $this->get_downloadable_file_path() ) )
+        $this->set_data( stat( $this->get_downloadable_file_path() )['size'] );
+    }
+    else
+    {
+      parent::execute();
+    }
+  }
+}

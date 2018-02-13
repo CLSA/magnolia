@@ -11,34 +11,18 @@ define( function() {
       pluralPossessive: 'references\''
     },
     columnList: {
-      user: {
-        title: 'Applicant',
-        name: 'user.full_name'
-      },
-      identifier: {
-        title: 'Name'
-      }
+      rank: { title: 'Rank', type: 'rank' },
+      reference: { title: 'Rank' }
     },
     defaultOrder: {
-      column: 'reference.name',
+      column: 'reference.rank',
       reverse: false
     }
   } );
 
   module.addInputGroup( '', {
-    name: {
-      title: 'Applicant',
-      type: 'lookup-typeahead',
-      typeahead: {
-        table: 'user',
-        select: 'CONCAT( user.first_name, " ", user.last_name, " (", user.name, ")" )',
-        where: [ 'user.first_name', 'user.last_name', 'user.name' ]
-      }
-    },
-    identifier: {
-      title: 'Identifier',
-      type: 'string'
-    }
+    rank: { title: 'Rank', type: 'rank' },
+    reference: { title: 'Rank', type: 'string' }
   } );
 
   /* ######################################################################################################## */

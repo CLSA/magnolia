@@ -54,7 +54,7 @@ CREATE PROCEDURE patch_role_has_service()
       "FROM ", @cenozo, ".role, service ",
       "WHERE role.name = 'applicant' ",
       "AND service.restricted = 1 ",
-      "AND service.subject = 'requisition'" );
+      "AND service.subject IN( 'coapplicant', 'reference', 'requisition' )" );
     PREPARE statement FROM @sql;
     EXECUTE statement;
     DEALLOCATE PREPARE statement;

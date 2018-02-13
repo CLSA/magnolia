@@ -17,3 +17,9 @@ $SETTINGS['path']['LOG_FILE'] = $SETTINGS['path']['APPLICATION'].'/log';
 // database settings (the driver, server and prefixes are set in the framework's settings)
 $SETTINGS['db']['username'] = 'put your database username here';
 $SETTINGS['db']['password'] = 'put your database password here';
+
+// the minimum number of months from the present day that a new requiesition's start date can be
+$SETTINGS['general']['new_requisition_delay'] = 5;
+
+// the location of uploaded ethics letter (defaults to magnolia/doc/ethics_letter)
+$SETTINGS['path']['ETHICS_LETTER'] = '/path/to/deployment/reports';

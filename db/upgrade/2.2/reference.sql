@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS reference (
   PRIMARY KEY (id),
   INDEX fk_requisition_id (requisition_id ASC),
   UNIQUE INDEX uq_requisition_id_rank (requisition_id ASC, rank ASC),
+  UNIQUE INDEX uq_requisition_id_reference (requisition_id ASC, reference ASC),
   CONSTRAINT fk_reference_requisition_id
     FOREIGN KEY (requisition_id)
     REFERENCES requisition (id)

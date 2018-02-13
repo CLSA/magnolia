@@ -1,4 +1,4 @@
-define( [ 'coapplicant' ].reduce( function( list, name ) {
+define( [ 'coapplicant', 'keyword', 'reference' ].reduce( function( list, name ) {
   return list.concat( cenozoApp.module( name ).getRequiredFiles() );
 }, [] ), function() {
   'use strict';
@@ -95,8 +95,8 @@ define( [ 'coapplicant' ].reduce( function( list, name ) {
 
   /* ######################################################################################################## */
   cenozo.providers.directive( 'cnRequisitionView', [
-    'CnRequisitionModelFactory', 'cnRecordViewDirective',
-    function( CnRequisitionModelFactory, cnRecordViewDirective ) {
+    'CnRequisitionModelFactory', 'cnRecordViewDirective', '$q',
+    function( CnRequisitionModelFactory, cnRecordViewDirective, $q ) {
       // used to piggy-back on the basic view controller's functionality (but not used in the DOM)
       var cnRecordView = cnRecordViewDirective[0];
 
@@ -104,64 +104,101 @@ define( [ 'coapplicant' ].reduce( function( list, name ) {
         templateUrl: module.getFileUrl( 'view.tpl.html' ),
         restrict: 'E',
         scope: { model: '=?' },
-        link: function( scope, element, attrs ) { cnRecordView.link( scope, element, attrs ); },
+        link: function( scope, element, attrs ) {
+          cnRecordView.link( scope, element, attrs );
+          scope.isAddingCoapplicant = false;
+          scope.isDeletingCoapplicant = [];
+          scope.isAddingReference = false;
+          scope.isDeletingReference = [];
+          scope.minStartDate = moment().add( 5, 'months' );
+
+          scope.$watch( 'model.viewModel.record.background', function( text ) {
+            scope.model.viewModel.wordCount.background = text ? text.split( ' ' ).length : 0;
+          } );
+          scope.$watch( 'model.viewModel.record.objectives', function( text ) {
+            scope.model.viewModel.wordCount.objectives = text ? text.split( ' ' ).length : 0;
+          } );
+          scope.$watch( 'model.viewModel.record.design', function( text ) {
+            scope.model.viewModel.wordCount.design = text ? text.split( ' ' ).length : 0;
+          } );
+          scope.$watch( 'model.viewModel.record.analysis', function( text ) {
+            scope.model.viewModel.wordCount.analysis = text ? text.split( ' ' ).length : 0;
+          } );
+        },
         controller: function( $scope ) {
           if( angular.isUndefined( $scope.model ) ) $scope.model = CnRequisitionModelFactory.root;
           cnRecordView.controller[1]( $scope );
+
+          // coapplicant resources
+          var addModel = $scope.model.viewModel.coapplicantModel.addModel;
           $scope.coapplicantRecord = {};
-          $scope.coapplicantModel = {
-            // TODO: create an actial coapplicant model & directives and embed
-          };
+          addModel.onNew( $scope.coapplicantRecord );
+          
           $scope.addCoapplicant = function() {
-            console.log( $scope.coapplicantRecord );
+            if( $scope.model.viewModel.coapplicantModel.getAddEnabled() ) {
+              var form = cenozo.getScopeByQuerySelector( '[name=part1a2Form]' ).part1a2Form;
+              if( !form.$valid ) {
+                // dirty all inputs so we can find the problem
+                cenozo.forEachFormElement( 'part1a2Form', function( element ) { element.$dirty = true; } );
+              } else {
+                $scope.isAddingCoapplicant = true;
+                addModel.onAdd( $scope.coapplicantRecord ).then( function( response ) {
+                  form.$setPristine();
+                  return $q.all( [
+                    addModel.onNew( $scope.coapplicantRecord ),
+                    $scope.model.viewModel.getCoapplicantList()
+                  ] );
+                } ).finally( function() { $scope.isAddingCoapplicant = false; } );
+              }
+            }
           };
 
           $scope.removeCoapplicant = function( id ) {
-            /*
-            TODO: move this to a service
-            return CnHttpFactory.instance( {
-                path: self.parentModel.getServiceResourcePath() + '/coapplicant/' + id
-            } ).delete();
-            */
-          };
-
-
-          $scope.referenceList = [ {
-            rank: 1,
-            text: 'New Canadian physical activity guidelines. Tremblay, MS and al., et. Appl Physiol Nutr Metab, 2011, Vol. 36'
-          }, {
-            rank: 2,
-            text: 'Physical activity in US: adults compliance with the Physical Activity Guidelines for Americans. Tucker, J and al., et. 4, Am J Prev Med, 2011, Vol. 40, pp. 454-61'
-          }, {
-            rank: 3,
-            text: 'World Health Organization. WHO global recommendation on physical activity for health. [Online] 2010. http://www.who.int/dietphysicalactivity/factsheet_reccommendations/en'
-          }, {
-            rank: 4,
-            text: 'A systematic review of the evidence for Canada\'s Physical Activity Guidelines for Adults. Warburton, D and al., et. 1, Int J Behav Nutr Phys Act, 2010, Vol. 7, p. 39'
-          }, {
-            rank: 5,
-            text: 'Physical activity and fuctional limitations in older adults: a systematic review related to Canada\'s Physical Activity Guidelines. Paterson, D and al., et. 1, Int J Behav Nutr Phys Act, 2010, Vol. 7, p. 38'
-          }, {
-            rank: 6,
-            text: 'Cardiovascular benefits and risks across the physical activity continuum. Eijsvigels, T and al., et. 5, Curr Opin Cardiol, 2016, Vol. 31, pp. 566-71'
-          }, {
-            rank: 7,
-            text: 'Sitting time and mortality from all causes , cardiovascular disease, and cancer. Katzmarzyk, P and al., et. 5, Med Sci Sport Exerc, 2009, Vol. 41, pp. 998-1005'
-          }, {
-            rank: 8,
-            text: 'Leisure time spent sitting in relation to total mortality in a prospective chort of US adults. Patel, A and al., et. 4, Am J Epidemiol, 2010, Vol. 172'
-          } ];
-
-          // TODO: this doesn't actually work right, need to debug and fix
-          $scope.setReferenceRank = function( oldRank, newRank ) {
-            if( oldRank != newRank ) {
-              $scope.referenceList.forEach( function( ref ) {
-                if( oldRank <= ref.rank && ref.rank <= newRank ) {
-                  if( ref.rank == oldRank ) ref.rank = newRank;
-                  else ref.rank += ( newRank > oldRank ? -1 : 1 );
-                }
+            if( $scope.model.viewModel.coapplicantModel.getDeleteEnabled() ) {
+              if( 0 > $scope.isDeletingCoapplicant.indexOf( id ) ) $scope.isDeletingCoapplicant.push( id );
+              var index = $scope.isDeletingCoapplicant.indexOf( id );
+              $scope.model.viewModel.removeCoapplicant( id ).finally( function() {
+                if( 0 <= index ) $scope.isDeletingCoapplicant.splice( index, 1 );
               } );
             }
+          };
+
+          // reference resources
+          var addModel = $scope.model.viewModel.referenceModel.addModel;
+          $scope.referenceRecord = {};
+          addModel.onNew( $scope.referenceRecord );
+
+          $scope.addReference = function() {
+            if( $scope.model.viewModel.referenceModel.getAddEnabled() ) {
+              var form = cenozo.getScopeByQuerySelector( '[name=part1a4Form]' ).part1a4Form;
+              if( !form.$valid ) {
+                // dirty all inputs so we can find the problem
+                cenozo.forEachFormElement( 'part1a4Form', function( element ) { element.$dirty = true; } );
+              } else {
+                $scope.isAddingReference = true;
+                addModel.onAdd( $scope.referenceRecord ).then( function( response ) {
+                  form.$setPristine();
+                  return $q.all( [
+                    addModel.onNew( $scope.referenceRecord ),
+                    $scope.model.viewModel.getReferenceList()
+                  ] );
+                } ).finally( function() { $scope.isAddingReference = false; } );
+              }
+            }
+          };
+
+          $scope.removeReference = function( id ) {
+            if( $scope.model.viewModel.referenceModel.getDeleteEnabled() ) {
+              if( 0 > $scope.isDeletingReference.indexOf( id ) ) $scope.isDeletingReference.push( id );
+              var index = $scope.isDeletingReference.indexOf( id );
+              $scope.model.viewModel.removeReference( id ).finally( function() {
+                if( 0 <= index ) $scope.isDeletingReference.splice( index, 1 );
+              } );
+            }
+          };
+
+          $scope.setReferenceRank = function( id, rank ) {
+            $scope.model.viewModel.setReferenceRank( id, rank );
           };
 
           $scope.t = function( address ) {
@@ -255,7 +292,8 @@ define( [ 'coapplicant' ].reduce( function( list, name ) {
                 affiliation: { en: 'Affiliation', fr: 'Organisme d’appartenance' },
                 email: { en: 'E-mail', fr: 'Courriel' },
                 role: { en: 'Role', fr: 'Rôle' },
-                access: { en: 'Requires Access to Data', fr: 'Doit avoir accès aux données' }
+                access: { en: 'Requires Access to Data', fr: 'Doit avoir accès aux données' },
+                addCoapplicant: { en: 'Add Co-Applicant', fr: 'Ajouter codemandeurs' }
               },
               a3: {
                 tab: { en: 'A3. Timeline', fr: 'A3. Échéancier' },
@@ -307,7 +345,8 @@ define( [ 'coapplicant' ].reduce( function( list, name ) {
                   fr: 'Veuillez présenter une liste des références les plus pertinentes'
                 },
                 number: { en: 'Number', fr: 'Numéro' },
-                reference: { en: 'Reference', fr: 'Référence' }
+                reference: { en: 'Reference', fr: 'Référence' },
+                addReference: { en: 'Add Reference', fr: 'Ajouter référence' }
               },
               a5: {
                 tab: { en: 'A5. Scientific Review', fr: 'A5. Évaluation scientifique' },
@@ -333,7 +372,7 @@ define( [ 'coapplicant' ].reduce( function( list, name ) {
                   en: 'Digital copy of ethics approval letter',
                   fr: 'Copie numérique de la lettre d’approbation éthique'
                 },
-                expiration: { en: 'Expiration date of approval', fr: 'TRANSLATION REQUIRED' },
+                expiration: { en: 'Expiration date of approval', fr: 'Date limite d\'autorisation' },
                 response: { en: 'Expected date of response', fr: 'Date approximative de la réponse' }
               },
               a7: {
@@ -416,10 +455,14 @@ define( [ 'coapplicant' ].reduce( function( list, name ) {
               }
             },
             misc: {
-              add: { en: 'Add', fr: 'Ajouter' },
               remove: { en: 'Remove', fr: 'Supprimer' },
+              words: { en: 'words', fr: 'mots' },
               wordCount: { en: 'word count', fr: 'nombre de mots' },
-              comments: { en: 'Comments', fr: 'Commentaires' }
+              comments: { en: 'Comments', fr: 'Commentaires' },
+              clickToDownload: { en: 'click to download', fr: 'TRANSLATION REQUIRED' },
+              upload: { en: 'upload', fr: 'TRANSLATION REQUIRED' },
+              uploaded: { en: 'uploaded', fr: 'TRANSLATION REQUIRED' },
+              fileSize: { en: 'file size', fr: 'TRANSLATION REQUIRED' }
             }
           };
         }
@@ -438,12 +481,16 @@ define( [ 'coapplicant' ].reduce( function( list, name ) {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnRequisitionViewFactory', [
-    'CnBaseViewFactory', 'CnCoapplicantModelFactory', 'CnHttpFactory', '$state', '$q',
-    function( CnBaseViewFactory, CnCoapplicantModelFactory, CnHttpFactory, $state, $q ) {
+    'CnBaseViewFactory', 'CnCoapplicantModelFactory', 'CnReferenceModelFactory', 'CnHttpFactory', '$state', '$q',
+    function( CnBaseViewFactory, CnCoapplicantModelFactory, CnReferenceModelFactory, CnHttpFactory, $state, $q ) {
       var object = function( parentModel, root ) {
         var self = this;
         CnBaseViewFactory.construct( this, parentModel, root );
         this.coapplicantModel = CnCoapplicantModelFactory.instance();
+        this.coapplicantModel.metadata.getPromise(); // needed to get the coapplicant's metadata
+        this.referenceModel = CnReferenceModelFactory.instance();
+        this.referenceModel.metadata.getPromise(); // needed to get the reference's metadata
+        this.wordCount = { background: 0, objectives: 0, design: 0, analysis: 0 };
 
         // setup language and tab state parameters
         this.toggleLanguage = function() {
@@ -455,7 +502,7 @@ define( [ 'coapplicant' ].reduce( function( list, name ) {
           language = 'fr' == language ? 'fr' : 'en';
           this.language = language;
           $state.params.lang = language;
-          if( transition ) $state.transitionTo( $state.current, $state.params, { reload: false, notify: false } );
+          if( transition ) this.parentModel.reloadState( false, false, 'replace' );
         };
 
         this.setTab = function( index, tab, transition ) {
@@ -466,7 +513,7 @@ define( [ 'coapplicant' ].reduce( function( list, name ) {
           else if( 2 == index && 0 > ['notes','a','b','c'].indexOf( tab ) ) tab = 'notes';
           this.tab[index] = tab;
           $state.params['t'+index] = tab;
-          if( transition ) $state.transitionTo( $state.current, $state.params, { reload: false, notify: false } );
+          if( transition ) this.parentModel.reloadState( false, false, 'replace' );
         };
 
         this.language = null;
@@ -477,17 +524,84 @@ define( [ 'coapplicant' ].reduce( function( list, name ) {
         this.setTab( 1, $state.params.t1, false );
         this.setTab( 2, $state.params.t2, false );
 
+        this.getCoapplicantList = function() {
+          return CnHttpFactory.instance( {
+            path: self.parentModel.getServiceResourcePath() + '/coapplicant',
+            data: {
+              select: { column: [ 'id', 'name', 'position', 'affiliation', 'email', 'role', 'access' ] },
+              modifier: { order: 'id', limit: 1000000 }
+            }
+          } ).query().then( function( response ) {
+            self.coapplicantList = response.data;
+          } );
+        }
+
+        this.removeCoapplicant = function( id ) {
+          return CnHttpFactory.instance( {
+            path: self.parentModel.getServiceResourcePath() + '/coapplicant/' + id
+          } ).delete().then( function() {
+            return self.getCoapplicantList();
+          } );
+        }
+
+        this.getReferenceList = function() {
+          return CnHttpFactory.instance( {
+            path: self.parentModel.getServiceResourcePath() + '/reference',
+            data: {
+              select: { column: [ 'id', 'rank', 'reference' ] },
+              modifier: { order: 'rank', limit: 1000000 }
+            }
+          } ).query().then( function( response ) {
+            self.referenceList = response.data;
+          } );
+        }
+
+        this.setReferenceRank = function( id, rank ) {
+          return CnHttpFactory.instance( {
+            path: self.parentModel.getServiceResourcePath() + '/reference/' + id,
+            data: { rank: rank }
+          } ).patch().then( function() {
+            return self.getReferenceList();
+          } );
+        }
+
+        this.removeReference = function( id ) {
+          return CnHttpFactory.instance( {
+            path: self.parentModel.getServiceResourcePath() + '/reference/' + id
+          } ).delete().then( function() {
+            return self.getReferenceList();
+          } );
+        }
+
+        this.getEthicsLetter = function() {
+          return CnHttpFactory.instance( {
+            path: self.parentModel.getServiceResourcePath() + '?letter=1'
+          } ).get().then( function( response ) {
+            self.record.ethicsLetterSize = response.data;
+          } );
+        };
+
+        this.downloadEthicsLetter = function() {
+          return CnHttpFactory.instance( {
+            path: self.parentModel.getServiceResourcePath(),
+            format: 'pdf'
+          } ).file();
+        };
+
+        this.getWordCount = function() {
+          return this.wordCount.background +
+                 this.wordCount.objectives +
+                 this.wordCount.design +
+                 this.wordCount.analysis;
+        };
+
         this.onView = function( force ) {
           return $q.all( [
-            this.$$onView( force ),
-
-            // get coapplicants
-            CnHttpFactory.instance( {
-              path: self.parentModel.getServiceResourcePath() + '/coapplicant',
-              data: { select: { column: [ 'id', 'name', 'position', 'affiliation', 'email', 'role', 'access' ] } }
-            } ).query().then( function( response ) {
-              self.coapplicantList = response.data;
-            } )
+            this.$$onView( force ).then( function() {
+              return self.getEthicsLetter();
+            } ),
+            this.getCoapplicantList(),
+            this.getReferenceList()
           ] );
         }
       };
@@ -530,8 +644,8 @@ define( [ 'coapplicant' ].reduce( function( list, name ) {
             self.$$getMetadata().then( function() {
               // create coapplicant access enum
               self.metadata.accessEnumList = {
-                en: [ {value:undefined,name:'(choose)'}, {value:true,name:'Yes'}, {value:false,name:'No'} ],
-                fr: [ {value:undefined,name:'(choisir)'}, {value:true,name:'Oui'}, {value:false,name:'Non'} ]
+                en: [ { value: true, name: 'Yes' }, { value: false, name: 'No' } ],
+                fr: [ { value: true, name: 'Oui' }, { value: false, name: 'Non' } ]
               };
 
               // create ethics enum

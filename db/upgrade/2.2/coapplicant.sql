@@ -10,9 +10,10 @@ CREATE TABLE IF NOT EXISTS coapplicant (
   affiliation VARCHAR(255) NOT NULL,
   email VARCHAR(127) NOT NULL,
   role VARCHAR(45) NOT NULL,
-  access TINYINT(1) NOT NULL,
+  access TINYINT(1) NOT NULL DEFAULT 1,
   PRIMARY KEY (id),
   INDEX fk_requisition_id (requisition_id ASC),
+  UNIQUE INDEX uq_requisition_id_name (requisition_id ASC, name ASC),
   CONSTRAINT fk_coapplicant_requisition_id
     FOREIGN KEY (requisition_id)
     REFERENCES requisition (id)
