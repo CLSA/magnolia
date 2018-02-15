@@ -119,8 +119,8 @@ define( [ 'coapplicant', 'keyword', 'reference' ].reduce( function( list, name )
           scope.$watch( 'model.viewModel.record.objectives', function( text ) {
             scope.model.viewModel.wordCount.objectives = text ? text.split( ' ' ).length : 0;
           } );
-          scope.$watch( 'model.viewModel.record.design', function( text ) {
-            scope.model.viewModel.wordCount.design = text ? text.split( ' ' ).length : 0;
+          scope.$watch( 'model.viewModel.record.methodology', function( text ) {
+            scope.model.viewModel.wordCount.methodology = text ? text.split( ' ' ).length : 0;
           } );
           scope.$watch( 'model.viewModel.record.analysis', function( text ) {
             scope.model.viewModel.wordCount.analysis = text ? text.split( ' ' ).length : 0;
@@ -331,8 +331,8 @@ define( [ 'coapplicant', 'keyword', 'reference' ].reduce( function( list, name )
                   en: 'Study Objectives and/or Hypotheses',
                   fr: 'Objectifs et/ou hypothèses de l’étude'
                 },
-                design: { en: 'The Study Design and Methodology', fr: 'Modèle d’étude et méthodologie' },
-                design_text: {
+                methodology: { en: 'The Study Design and Methodology', fr: 'Modèle d’étude et méthodologie' },
+                methodology_text: {
                   en: 'The study design and methodology including an overview of the variables and/or biospecimens requested for the project. In no more than half a page, describe the inclusion and exclusion criteria for participants to be included in your study (e.g., age, sex, etc.).',
                   fr: 'Modèle d’étude et méthodologie comprenant un survol de la liste de variables et/ou échantillons demandés. Sans dépasser une demi-page, décrivez les critères d’inclusion et d’exclusion des participants qui seront inclus dans votre étude (p. ex. âge, sexe, etc.).'
                 },
@@ -491,7 +491,7 @@ define( [ 'coapplicant', 'keyword', 'reference' ].reduce( function( list, name )
         this.coapplicantModel.metadata.getPromise(); // needed to get the coapplicant's metadata
         this.referenceModel = CnReferenceModelFactory.instance();
         this.referenceModel.metadata.getPromise(); // needed to get the reference's metadata
-        this.wordCount = { background: 0, objectives: 0, design: 0, analysis: 0 };
+        this.wordCount = { background: 0, objectives: 0, methodology: 0, analysis: 0 };
         this.uploadingEthicsFile = false;
 
         // setup language and tab state parameters
@@ -622,7 +622,7 @@ define( [ 'coapplicant', 'keyword', 'reference' ].reduce( function( list, name )
         this.getWordCount = function() {
           return this.wordCount.background +
                  this.wordCount.objectives +
-                 this.wordCount.design +
+                 this.wordCount.methodology +
                  this.wordCount.analysis;
         };
 
