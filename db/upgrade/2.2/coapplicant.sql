@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS coapplicant (
   update_timestamp TIMESTAMP NOT NULL,
   create_timestamp TIMESTAMP NOT NULL,
   requisition_id INT UNSIGNED NOT NULL,
-  name VARCHAR(255) NOT NULL,
+  name VARCHAR(63) NOT NULL,
   position VARCHAR(255) NOT NULL,
   affiliation VARCHAR(255) NOT NULL,
   email VARCHAR(127) NOT NULL,
