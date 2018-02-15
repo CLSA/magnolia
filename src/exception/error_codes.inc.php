@@ -45,6 +45,8 @@ define( 'VOIP_MAGNOLIA_BASE_ERRNO',       990000 );
 /**
  * "runtime" error codes
  */
+define( 'RUNTIME__MAGNOLIA_SERVICE_REQUISITION_PATCH__EXECUTE__ERRNO',
+        RUNTIME_MAGNOLIA_BASE_ERRNO + 1 );
 
 /**
  * "system" error codes

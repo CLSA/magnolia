@@ -554,22 +554,31 @@
                     <div class="col-sm-9">
                       <div class="input-group" ng-if="isComplete">
                         <div class="form-text">
-                          <span class="horizontal-spacer" ng-if="0 < model.viewModel.record.ethicsLetterSize">
+                          <span class="horizontal-spacer" ng-if="0 < model.viewModel.record.ethicsFileSize">
                             <a href="#"
-                               ng-click="model.viewModel.downloadEthicsLetter()"
-                               ng-bind-html="t( 'misc.clickToDownload' )"></a>
+                               ng-click="model.viewModel.downloadEthicsFile()"
+                               ng-bind-html="model.viewModel.record.ethics_filename"></a>
                           </span>
-                          <span class="horizontal-spacer" ng-if="0 < model.viewModel.record.ethicsLetterSize">
+                          <span class="horizontal-spacer" ng-if="0 < model.viewModel.record.ethicsFileSize">
                             <strong ng-bind-html="t( 'misc.fileSize' )+':'"></strong>
-                            {{ model.viewModel.record.ethicsLetterSize | cnSize }}
+                            {{ model.viewModel.record.ethicsFileSize | cnSize }}
                           </span>
                           <button class="btn btn-default"
-                                  ng-class="{ 'pull-right':0 < model.viewModel.record.ethicsLetterSize }"
-                                  ng-click="0 < model.viewModel.record.ethicsLetterSize ?
-                                    removeLetter() : uploadLetter()"
-                                  ng-bind-html="0 < model.viewModel.record.ethicsLetterSize ?
-                                    t( 'misc.remove' ) : t( 'misc.upload' )">
+                                  ng-if="0 < model.viewModel.record.ethicsFileSize"
+                                  ng-class="{ 'pull-right':0 < model.viewModel.record.ethicsFileSize }"
+                                  ng-click="model.viewModel.removeEthicsFile()"
+                                  ng-bind-html="t( 'misc.remove' )">
                           </button>
+                          <label class="btn btn-default"
+                                 ng-disabled="model.viewModel.uploadingEthicsFile"
+                                 ng-if="!model.viewModel.record.ethicsFileSize">
+                            {{ model.viewModel.uploadingEthicsFile ?
+                               t( 'misc.uploading' ) : t( 'misc.upload' ) }}...
+                            <input type="file"
+                                   ng-model="model.viewModel.ethicsFile"
+                                   cn-upload="model.viewModel.uploadEthicsFile()"
+                                   style="display:none;"></input>
+                          </label>
                         </div>
                       </div>
                     </div>

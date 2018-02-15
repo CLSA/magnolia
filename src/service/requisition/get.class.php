@@ -17,7 +17,7 @@ class get extends \cenozo\service\downloadable
    */
   protected function get_downloadable_mime_type_list()
   {
-    return array( 'image/jpeg' );
+    return array( 'application/octet-stream' );
   }
 
   /**
@@ -27,7 +27,7 @@ class get extends \cenozo\service\downloadable
    */
   protected function get_downloadable_public_name()
   {
-    return sprintf( '%s.jpg', $this->get_leaf_record()->id );
+    return $this->get_leaf_record()->ethics_filename;
   }
 
   /**
@@ -37,7 +37,7 @@ class get extends \cenozo\service\downloadable
    */
   protected function get_downloadable_file_path()
   {
-    return sprintf( '%s/%s.jpg', ETHICS_LETTER_PATH, $this->get_leaf_record()->id );
+    return sprintf( '%s/%s', ETHICS_LETTER_PATH, $this->get_leaf_record()->id );
   }
 
   /**

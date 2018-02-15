@@ -72,6 +72,7 @@ define( [ 'coapplicant', 'keyword', 'reference' ].reduce( function( list, name )
     grant_number: { type: 'string' },
     ethics: { type: 'boolean' },
     ethics_date: { type: 'date' },
+    ethics_filename: { type: 'string' },
     waiver: { type: 'enum' },
     qnaire_comment: { type: 'text' },
     physical_comment: { type: 'text' },
@@ -459,10 +460,10 @@ define( [ 'coapplicant', 'keyword', 'reference' ].reduce( function( list, name )
               words: { en: 'words', fr: 'mots' },
               wordCount: { en: 'word count', fr: 'nombre de mots' },
               comments: { en: 'Comments', fr: 'Commentaires' },
-              clickToDownload: { en: 'click to download', fr: 'TRANSLATION REQUIRED' },
-              upload: { en: 'upload', fr: 'TRANSLATION REQUIRED' },
-              uploaded: { en: 'uploaded', fr: 'TRANSLATION REQUIRED' },
-              fileSize: { en: 'file size', fr: 'TRANSLATION REQUIRED' }
+              upload: { en: 'upload', fr: 'téléverser' },
+              uploaded: { en: 'uploaded', fr: 'téléversé' },
+              uploading: { en: 'uploading', fr: 'téléversement' },
+              fileSize: { en: 'file size', fr: 'taille du fichier' }
             }
           };
         }
@@ -491,6 +492,7 @@ define( [ 'coapplicant', 'keyword', 'reference' ].reduce( function( list, name )
         this.referenceModel = CnReferenceModelFactory.instance();
         this.referenceModel.metadata.getPromise(); // needed to get the reference's metadata
         this.wordCount = { background: 0, objectives: 0, design: 0, analysis: 0 };
+        this.uploadingEthicsFile = false;
 
         // setup language and tab state parameters
         this.toggleLanguage = function() {
@@ -526,7 +528,7 @@ define( [ 'coapplicant', 'keyword', 'reference' ].reduce( function( list, name )
 
         this.getCoapplicantList = function() {
           return CnHttpFactory.instance( {
-            path: self.parentModel.getServiceResourcePath() + '/coapplicant',
+            path: this.parentModel.getServiceResourcePath() + '/coapplicant',
             data: {
               select: { column: [ 'id', 'name', 'position', 'affiliation', 'email', 'role', 'access' ] },
               modifier: { order: 'id', limit: 1000000 }
@@ -538,7 +540,7 @@ define( [ 'coapplicant', 'keyword', 'reference' ].reduce( function( list, name )
 
         this.removeCoapplicant = function( id ) {
           return CnHttpFactory.instance( {
-            path: self.parentModel.getServiceResourcePath() + '/coapplicant/' + id
+            path: this.parentModel.getServiceResourcePath() + '/coapplicant/' + id
           } ).delete().then( function() {
             return self.getCoapplicantList();
           } );
@@ -546,7 +548,7 @@ define( [ 'coapplicant', 'keyword', 'reference' ].reduce( function( list, name )
 
         this.getReferenceList = function() {
           return CnHttpFactory.instance( {
-            path: self.parentModel.getServiceResourcePath() + '/reference',
+            path: this.parentModel.getServiceResourcePath() + '/reference',
             data: {
               select: { column: [ 'id', 'rank', 'reference' ] },
               modifier: { order: 'rank', limit: 1000000 }
@@ -558,7 +560,7 @@ define( [ 'coapplicant', 'keyword', 'reference' ].reduce( function( list, name )
 
         this.setReferenceRank = function( id, rank ) {
           return CnHttpFactory.instance( {
-            path: self.parentModel.getServiceResourcePath() + '/reference/' + id,
+            path: this.parentModel.getServiceResourcePath() + '/reference/' + id,
             data: { rank: rank }
           } ).patch().then( function() {
             return self.getReferenceList();
@@ -567,25 +569,54 @@ define( [ 'coapplicant', 'keyword', 'reference' ].reduce( function( list, name )
 
         this.removeReference = function( id ) {
           return CnHttpFactory.instance( {
-            path: self.parentModel.getServiceResourcePath() + '/reference/' + id
+            path: this.parentModel.getServiceResourcePath() + '/reference/' + id
           } ).delete().then( function() {
             return self.getReferenceList();
           } );
         }
 
-        this.getEthicsLetter = function() {
+        this.updateEthicsFileSize = function() {
           return CnHttpFactory.instance( {
-            path: self.parentModel.getServiceResourcePath() + '?letter=1'
+            path: this.parentModel.getServiceResourcePath() + '?letter=1'
           } ).get().then( function( response ) {
-            self.record.ethicsLetterSize = response.data;
+            self.record.ethicsFileSize = response.data;
           } );
         };
 
-        this.downloadEthicsLetter = function() {
+        this.downloadEthicsFile = function() {
           return CnHttpFactory.instance( {
-            path: self.parentModel.getServiceResourcePath(),
-            format: 'pdf'
+            path: this.parentModel.getServiceResourcePath(),
+            format: 'unknown'
           } ).file();
+        };
+
+        this.removeEthicsFile = function() {
+          return this.onPatch( { ethics_filename: null } ).then( function() {
+            return self.updateEthicsFileSize();
+          } );
+        };
+
+        this.uploadEthicsFile = function() {
+          this.uploadingEthicsFile = true;
+          var data = new FormData();
+          data.append( 'file', this.ethicsFile );
+          var fileDetails = data.get( 'file' );
+
+          // update the filename
+          return CnHttpFactory.instance( {
+            path: this.parentModel.getServiceResourcePath(),
+            data: { ethics_filename: fileDetails.name }
+          } ).patch().then( function() {
+            self.record.ethics_filename = fileDetails.name;
+
+            // upload the file
+            return CnHttpFactory.instance( {
+              path: self.parentModel.getServiceResourcePath(),
+              data: self.ethicsFile,
+              format: 'unknown'
+            } ).patch()
+          } ).then( function() { return self.updateEthicsFileSize(); } )
+             .finally( function() { self.uploadingEthicsFile = false; } );
         };
 
         this.getWordCount = function() {
@@ -597,9 +628,7 @@ define( [ 'coapplicant', 'keyword', 'reference' ].reduce( function( list, name )
 
         this.onView = function( force ) {
           return $q.all( [
-            this.$$onView( force ).then( function() {
-              return self.getEthicsLetter();
-            } ),
+            this.$$onView( force ).then( function() { return self.updateEthicsFileSize(); } ),
             this.getCoapplicantList(),
             this.getReferenceList()
           ] );

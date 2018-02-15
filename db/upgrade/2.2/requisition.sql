@@ -40,6 +40,7 @@ CREATE PROCEDURE patch_requisition()
         "grant_number VARCHAR(45) NULL, ",
         "ethics TINYINT(1) NULL, ",
         "ethics_date DATE NULL, ",
+        "ethics_filename VARCHAR(255) NULL, ",
         "waiver ENUM('graduate','postdoc') NULL, ",
         "qnaire_comment TEXT NULL, ",
         "physical_comment TEXT NULL, ",
