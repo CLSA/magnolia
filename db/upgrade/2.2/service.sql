@@ -77,11 +77,11 @@ INSERT INTO service ( subject, method, resource, restricted ) VALUES
 
 -- application services
 ( 'data_option', 'GET', 0, 0 ),
-( 'data_option', 'GET', 1, 1 ),
+( 'data_option', 'GET', 1, 0 ),
 ( 'data_option_subcategory', 'GET', 0, 0 ),
-( 'data_option_subcategory', 'GET', 1, 1 ),
+( 'data_option_subcategory', 'GET', 1, 0 ),
 ( 'data_option_parent', 'GET', 0, 0 ),
-( 'data_option_parent', 'GET', 1, 1 ),
+( 'data_option_parent', 'GET', 1, 0 ),
 ( 'coapplicant', 'DELETE', 1, 1 ),
 ( 'coapplicant', 'GET', 0, 0 ),
 ( 'coapplicant', 'GET', 1, 0 ),

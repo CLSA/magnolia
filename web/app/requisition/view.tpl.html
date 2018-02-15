@@ -649,18 +649,17 @@
               <form name="part2aForm" novalidate><fieldset ng-disabled="!isComplete">
                 <div class="form-horizontal">
                   <div class="form-group">
-                    <label for="baseline" class="col-sm-9 control-label"
+                    <label for="qnaire" class="col-sm-9 control-label"
                            ng-bind-html="t( 'part2.a.question' )"></label>
                     <div class="col-sm-3">
-                      <input
-                        id="baseline"
-                        ng-model="model.viewModel.record.baseline"
-                        class="form-control"
-                        ng-model="baseline"
-                        type="checkbox"></input>
+                      <input id="qnaire"
+                             ng-model="model.viewModel.record.qnaire"
+                             ng-change="model.viewModel.onPatch( { qnaire: model.viewModel.record.qnaire } )"
+                             class="form-control"
+                             type="checkbox"></input>
                     </div>
                   </div>
-                  <div ng-if="baseline">
+                  <div ng-if="isComplete && model.viewModel.record.qnaire">
                     <table class="table">
                       <thead class="bg-info">
                         <tr>
@@ -691,9 +690,13 @@
                           <td ng-repeat="dataOption in dataOptionCat.typeList"
                               ng-class="{ 'active': dataOptionCat.parentId }">
                             <span ng-if="dataOption.replacement[model.viewModel.language]">
-                              {{ dataOption.replacement[model.viewModel.language]" }}
+                              {{ dataOption.replacement[model.viewModel.language] }}
                             </span>
-                            <input ng-if="!dataOption.replacement[model.viewModel.language]" type="checkbox">
+                            <input id="{{ 'dataOption' + dataOption.id }}"
+                                   ng-if="!dataOption.replacement[model.viewModel.language]"
+                                   ng-model="model.viewModel.dataOptionValueList[dataOption.id]"
+                                   ng-change="model.viewModel.setDataOptionValue( dataOption.id )"
+                                   type="checkbox">
                             </input>
                           </td>
                         </tr>
@@ -731,9 +734,13 @@
                           <td ng-repeat="dataOption in dataOptionCat.typeList"
                               ng-class="{ 'active': dataOptionCat.parentId }">
                             <span ng-if="dataOption.replacement[model.viewModel.language]">
-                              {{ dataOption.replacement[model.viewModel.language]" }}
+                              {{ dataOption.replacement[model.viewModel.language] }}
                             </span>
-                            <input ng-if="!dataOption.replacement[model.viewModel.language]" type="checkbox">
+                            <input id="{{ 'dataOption' + dataOption.id }}"
+                                   ng-if="!dataOption.replacement[model.viewModel.language]"
+                                   ng-model="model.viewModel.dataOptionValueList[dataOption.id]"
+                                   ng-change="model.viewModel.setDataOptionValue( dataOption.id )"
+                                   type="checkbox">
                             </input>
                           </td>
                         </tr>
@@ -764,15 +771,14 @@
                     <label for="physical" class="col-sm-9 control-label"
                            ng-bind-html="t( 'part2.b.question' )"></label>
                     <div class="col-sm-3">
-                      <input
-                        id="physical"
-                        ng-model="model.viewModel.record.physical"
-                        class="form-control"
-                        ng-model="physical"
-                        type="checkbox"></input>
+                      <input id="physical"
+                             ng-model="model.viewModel.record.physical"
+                             ng-change="model.viewModel.onPatch( { physical: model.viewModel.record.physical } )"
+                             class="form-control"
+                             type="checkbox"></input>
                     </div>
                   </div>
-                  <div ng-if="physical">
+                  <div ng-if="isComplete && model.viewModel.record.physical">
                     <table class="table">
                       <thead class="bg-info">
                         <tr>
@@ -803,9 +809,13 @@
                           <td ng-repeat="dataOption in dataOptionCat.typeList"
                               ng-class="{ 'active': dataOptionCat.parentId }">
                             <span ng-if="dataOption.replacement[model.viewModel.language]">
-                              {{ dataOption.replacement[model.viewModel.language]" }}
+                              {{ dataOption.replacement[model.viewModel.language] }}
                             </span>
-                            <input ng-if="!dataOption.replacement[model.viewModel.language]" type="checkbox">
+                            <input id="{{ 'dataOption' + dataOption.id }}"
+                                   ng-if="!dataOption.replacement[model.viewModel.language]"
+                                   ng-model="model.viewModel.dataOptionValueList[dataOption.id]"
+                                   ng-change="model.viewModel.setDataOptionValue( dataOption.id )"
+                                   type="checkbox">
                             </input>
                           </td>
                         </tr>
@@ -836,15 +846,14 @@
                     <label for="biomarker" class="col-sm-9 control-label"
                            ng-bind-html="t( 'part2.c.question' )"></label>
                     <div class="col-sm-3">
-                      <input
-                        id="biomarker"
-                        ng-model="model.viewModel.record.biomarker"
-                        class="form-control"
-                        ng-model="biomarker"
-                        type="checkbox"></input>
+                      <input id="biomarker"
+                             ng-model="model.viewModel.record.biomarker"
+                             ng-change="model.viewModel.onPatch( { biomarker: model.viewModel.record.biomarker } )"
+                             class="form-control"
+                             type="checkbox"></input>
                     </div>
                   </div>
-                  <div ng-if="biomarker">
+                  <div ng-if="isComplete && model.viewModel.record.biomarker">
                     <table class="table">
                       <thead class="bg-info">
                         <tr>
@@ -872,9 +881,13 @@
                           <td ng-repeat="dataOption in dataOptionCat.typeList"
                               ng-class="{ 'active': dataOptionCat.parentId }">
                             <span ng-if="dataOption.replacement[model.viewModel.language]">
-                              {{ dataOption.replacement[model.viewModel.language]" }}
+                              {{ dataOption.replacement[model.viewModel.language] }}
                             </span>
-                            <input ng-if="!dataOption.replacement[model.viewModel.language]" type="checkbox">
+                            <input id="{{ 'dataOption' + dataOption.id }}"
+                                   ng-if="!dataOption.replacement[model.viewModel.language]"
+                                   ng-model="model.viewModel.dataOptionValueList[dataOption.id]"
+                                   ng-change="model.viewModel.setDataOptionValue( dataOption.id )"
+                                   type="checkbox">
                             </input>
                           </td>
                         </tr>

@@ -74,8 +74,11 @@ define( [ 'coapplicant', 'keyword', 'reference' ].reduce( function( list, name )
     ethics_date: { type: 'date' },
     ethics_filename: { type: 'string' },
     waiver: { type: 'enum' },
+    qnaire: { type: 'boolean' },
     qnaire_comment: { type: 'text' },
+    physical: { type: 'boolean' },
     physical_comment: { type: 'text' },
+    biomarker: { type: 'boolean' },
     biomarker_comment: { type: 'text' }
   } );
 
@@ -482,15 +485,20 @@ define( [ 'coapplicant', 'keyword', 'reference' ].reduce( function( list, name )
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnRequisitionViewFactory', [
-    'CnBaseViewFactory', 'CnCoapplicantModelFactory', 'CnReferenceModelFactory', 'CnHttpFactory', '$state', '$q',
-    function( CnBaseViewFactory, CnCoapplicantModelFactory, CnReferenceModelFactory, CnHttpFactory, $state, $q ) {
+    'CnBaseViewFactory', 'CnCoapplicantModelFactory', 'CnReferenceModelFactory',
+    'CnHttpFactory', 'CnModalMessageFactory', '$state', '$q',
+    function( CnBaseViewFactory, CnCoapplicantModelFactory, CnReferenceModelFactory,
+              CnHttpFactory, CnModalMessageFactory, $state, $q ) {
       var object = function( parentModel, root ) {
         var self = this;
         CnBaseViewFactory.construct( this, parentModel, root );
         this.coapplicantModel = CnCoapplicantModelFactory.instance();
         this.coapplicantModel.metadata.getPromise(); // needed to get the coapplicant's metadata
+        this.coapplicantList = [];
         this.referenceModel = CnReferenceModelFactory.instance();
         this.referenceModel.metadata.getPromise(); // needed to get the reference's metadata
+        this.referenceList = [];
+        this.dataOptionValueList = [];
         this.wordCount = { background: 0, objectives: 0, methodology: 0, analysis: 0 };
         this.uploadingEthicsFile = false;
 
@@ -626,11 +634,48 @@ define( [ 'coapplicant', 'keyword', 'reference' ].reduce( function( list, name )
                  this.wordCount.analysis;
         };
 
+        this.getDataOptionValueList = function() {
+          self.dataOptionValueList = [];
+          return CnHttpFactory.instance( {
+            path: 'data_option',
+            data: { select: { column: [ { column: 'MAX(id)', alias: 'maxId', table_prefix: false } ] } }
+          } ).get().then( function( response ) {
+            for( var i = 0; i <= response.data[0].maxId; i++ ) self.dataOptionValueList[i] = false;
+          } ).then( function() {
+            return CnHttpFactory.instance( {
+              path: self.parentModel.getServiceResourcePath() + '/data_option',
+              data: { select: { column: [ 'id' ] } }
+            } ).query().then( function( response ) {
+              response.data.forEach( function( dataOption ) { self.dataOptionValueList[dataOption.id] = true; } );
+            } );
+          } );
+        }
+
+        this.setDataOptionValue = function( dataOptionId ) {
+          var add = this.dataOptionValueList[dataOptionId];
+
+          var http = CnHttpFactory.instance( {
+            path: this.parentModel.getServiceResourcePath() + '/data_option' + ( add ? '' : '/' + dataOptionId ),
+            data: add ? { add: dataOptionId } : undefined,
+            onError: function( response ) {
+              // 409 means the data option has already been added
+              // 404 means the data option has already been deleted
+              var ignoreCode = add ? 409 : 404;
+              if( ignoreCode != response.status ) {
+                self.dataOptionValueList[dataOptionId] = !self.dataOptionValueList[dataOptionId];
+                CnModalMessageFactory.httpError( response );
+              }
+            }
+          } );
+          return add ? http.post() : http.delete();
+        };
+
         this.onView = function( force ) {
           return $q.all( [
             this.$$onView( force ).then( function() { return self.updateEthicsFileSize(); } ),
             this.getCoapplicantList(),
-            this.getReferenceList()
+            this.getReferenceList(),
+            this.getDataOptionValueList()
           ] );
         }
       };
@@ -732,6 +777,13 @@ define( [ 'coapplicant', 'keyword', 'reference' ].reduce( function( list, name )
                 data: {
                   select: { column: [
                     'type', 'name_en', 'name_fr', 'note_en', 'note_fr', {
+                      column: 'id',
+                      alias: 'catId'
+                    }, {
+                      table: 'data_option',
+                      column: 'id',
+                      alias: 'optionId'
+                    }, {
                       column: 'data_option_parent_id',
                       alias: 'parentId'
                     }, {
@@ -758,7 +810,7 @@ define( [ 'coapplicant', 'keyword', 'reference' ].reduce( function( list, name )
                 }
               } ).query().then( function( response ) {
                 var currentType = null;
-                var currentId = null;
+                var currentCatId = null;
                 var currentParentId = null;
                 response.data.forEach( function( dataOption ) {
                   var type = dataOption.type;
@@ -786,23 +838,24 @@ define( [ 'coapplicant', 'keyword', 'reference' ].reduce( function( list, name )
                     currentParentId = dataOption.parentId;
                   }
 
-                  if( currentId != dataOption.id ) {
+                  if( currentCatId != dataOption.catId ) {
                     // insert the data option subcategory
                     self.dataOptionList[type].push( {
-                      id: dataOption.id,
+                      catId: dataOption.catId,
                       parentId: dataOption.parentId,
                       name: { en: dataOption.name_en, fr: dataOption.name_fr },
                       note: { en: dataOption.note_en, fr: dataOption.note_fr },
                       typeList: {},
                       parent: false
                     } );
-                    currentId = dataOption.id;
+                    currentCatId = dataOption.catId;
                   }
 
                   // insert the data option
                   self.dataOptionList[type]
-                      .findByProperty( 'id', dataOption.id )
+                      .findByProperty( 'catId', dataOption.catId )
                       .typeList[dataOption.option_type] = {
+                    id: dataOption.optionId,
                     replacement: { en: dataOption.replacement_en, fr: dataOption.replacement_fr }
                   };
                 } );

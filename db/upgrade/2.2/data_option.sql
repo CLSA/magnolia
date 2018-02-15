@@ -33,7 +33,7 @@ SET replacement_en = "See Section B: Physical Assessments (WGT, HGT)",
     replacement_fr = "Voir Section B : évaluations physiques (WGT, HGT)"
 WHERE data_option.type = "comprehensive"
 AND data_option_subcategory.type = "baseline"
-AND data_option_subcategory.name_en = "Height and Weight";
+AND data_option_subcategory.name_en = "Height and Weight (HWT)";
 
 UPDATE data_option
 JOIN data_option_subcategory ON data_option.data_option_subcategory_id = data_option_subcategory.id
@@ -42,29 +42,29 @@ SET replacement_en = "Not applicable",
 WHERE data_option.type = "tracking"
 AND data_option_subcategory.type = "baseline"
 AND data_option_subcategory.name_en IN(
-  "Nutrition: Short Diet Questionnaire",
-  "Medications",
-  "Life Space Index",
-  "Sleep",
-  "Time-Based",
-  "Event-Based",
-  "Stroop - Victoria Version",
-  "Controlled Oral Word Association",
-  "Choice Reaction Time",
-  "Diabetes",
-  "Stroke/Cerebrovascular Event",
-  "Traumatic Brain Injury",
-  "Hypo and Hyperthyroidism",
-  "Hypertension",
-  "Ischemic Heart Disease",
-  "WHO Rose Questionnaire",
-  "Osteoarthritis of the Hand",
-  "Osteoarthritis of the Hip",
-  "Osteoarthritis of the Knee",
-  "Musculoskeletal: Other",
-  "Osteoporosis",
-  "Neuro-psychiatric",
-  "Chronic Airflow Obstruction"
+  "Nutrition: Short Diet Questionnaire (NUT)",
+  "Medications (MEDI)",
+  "Life Space Index (LSI)",
+  "Sleep (SLE)",
+  "Time-Based (TMT)",
+  "Event-Based (PMT)",
+  "Stroop - Victoria Version (STP)",
+  "Controlled Oral Word Association (FAS)",
+  "Choice Reaction Time (CRT)",
+  "Diabetes (DIA)",
+  "Stroke/Cerebrovascular Event (STR)",
+  "Traumatic Brain Injury (TBI)",
+  "Hypo and Hyperthyroidism (HYP)",
+  "Hypertension (HBP)",
+  "Ischemic Heart Disease (IHD)",
+  "WHO Rose Questionnaire (ROS)",
+  "Osteoarthritis of the Hand (OSA)",
+  "Osteoarthritis of the Hip (OSH)",
+  "Osteoarthritis of the Knee (OSK)",
+  "Musculoskeletal: Other (OAR)",
+  "Osteoporosis (OST)",
+  "Neuro-psychiatric (DPR)",
+  "Chronic Airflow Obstruction (CAO)"
 );
 
 UPDATE data_option
@@ -73,7 +73,7 @@ SET replacement_en = "Refer to Maintaining Contact Interview",
     replacement_fr = "Voir l’entrevue de mi-parcours"
 WHERE data_option.type = "tracking"
 AND data_option_subcategory.type = "baseline"
-AND data_option_subcategory.name_en = "Parkinsonism";
+AND data_option_subcategory.name_en = "Parkinsonism (PKD)";
 
 UPDATE data_option
 JOIN data_option_subcategory ON data_option.data_option_subcategory_id = data_option_subcategory.id
@@ -81,7 +81,7 @@ SET replacement_en = "Not yet available",
     replacement_fr = "Pas encore disponible"
 WHERE data_option.type = "comprehensive"
 AND data_option_subcategory.type = "baseline"
-AND data_option_subcategory.name_en = "Medications";
+AND data_option_subcategory.name_en = "Medications (MEDI)";
 
 
 INSERT IGNORE INTO data_option( data_option_subcategory_id, type, replacement_en, replacement_fr )
@@ -100,9 +100,9 @@ SET replacement_en = "Not applicable",
 WHERE data_option.type = "tracking"
 AND data_option_subcategory.type = "mcq"
 AND data_option_subcategory.name_en IN (
-  "Snoring",
-  "Psychological Distress",
-  "Personality Traits"
+  "Snoring (SNO)",
+  "Psychological Distress (K10)",
+  "Personality Traits (PER)"
 );
 
 UPDATE data_option
@@ -111,7 +111,7 @@ SET replacement_en = "See Parkinsonism module above",
     replacement_fr = "Voir le module sur le Parkinsonisme ci-dessus"
 WHERE data_option.type = "comprehensive"
 AND data_option_subcategory.type = "mcq"
-AND data_option_subcategory.name_en = "Parkinsonism";
+AND data_option_subcategory.name_en = "Parkinsonism (PKD)";
 
 UPDATE data_option
 JOIN data_option_subcategory ON data_option.data_option_subcategory_id = data_option_subcategory.id
@@ -119,7 +119,7 @@ SET replacement_en = "Not applicable",
     replacement_fr = "Ne s’applique pas"
 WHERE data_option.type = "comprehensive"
 AND data_option_subcategory.type = "mcq"
-AND data_option_subcategory.name_en = "Medication Use";
+AND data_option_subcategory.name_en = "Medication Use (MED)";
 
 
 INSERT IGNORE INTO data_option( data_option_subcategory_id, type, replacement_en, replacement_fr )
@@ -135,7 +135,7 @@ UPDATE data_option
 JOIN data_option_subcategory ON data_option.data_option_subcategory_id = data_option_subcategory.id
 SET replacement_en = "Not applicable",
     replacement_fr = "Ne s’applique pas"
-WHERE data_option.type = "comprehensive"
+WHERE data_option.type = "image"
 AND data_option_subcategory.type = "physical"
 AND data_option_subcategory.name_en IN(
   "Full Questionnaire",
@@ -163,17 +163,17 @@ UPDATE data_option
 JOIN data_option_subcategory ON data_option.data_option_subcategory_id = data_option_subcategory.id
 SET replacement_en = "Not yet available",
     replacement_fr = "Pas encore disponible"
-WHERE data_option.type = "comprehensive"
+WHERE data_option.type = "image"
 AND data_option_subcategory.type = "physical"
 AND data_option_subcategory.name_en IN(
-  "Carotid Intima"
-  "Plaque"
-  "Whole Body"
-  "Body Parts"
-  "Dual Hip"
-  "Forearm"
-  "IVA Lateral Bone"
-  "Aortic Calcification"
+  "Carotid Intima",
+  "Plaque",
+  "Whole Body",
+  "Body Parts",
+  "Dual Hip",
+  "Forearm",
+  "IVA Lateral Bone",
+  "Aortic Calcification",
   "Retinal Scan (RS)"
 );
 
@@ -181,29 +181,14 @@ UPDATE data_option
 JOIN data_option_subcategory ON data_option.data_option_subcategory_id = data_option_subcategory.id
 SET replacement_en = "Not applicable",
     replacement_fr = "Ne s’applique pas"
-WHERE data_option.type = "tracking"
+WHERE data_option.type = "data"
 AND data_option_subcategory.type = "physical"
 AND data_option_subcategory.name_en IN(
-  "Plaque"
-  "IVA Lateral Bone"
-  "Aortic Calcification"
+  "Plaque",
+  "IVA Lateral Bone",
+  "Aortic Calcification",
   "Retinal Scan (RS)"
 );
-
-UPDATE data_option
-JOIN data_option_subcategory ON data_option.data_option_subcategory_id = data_option_subcategory.id
-SET replacement_en = "",
-    replacement_fr = ""
-WHERE data_option.type = ""
-AND data_option_subcategory.name_en = "";
-
-UPDATE data_option
-JOIN data_option_subcategory ON data_option.data_option_subcategory_id = data_option_subcategory.id
-SET replacement_en = "",
-    replacement_fr = ""
-WHERE data_option.type = ""
-AND data_option_subcategory.name_en = "";
-
 
 INSERT IGNORE INTO data_option( data_option_subcategory_id, type, replacement_en, replacement_fr )
 SELECT data_option_subcategory.id, "data", NULL, NULL
