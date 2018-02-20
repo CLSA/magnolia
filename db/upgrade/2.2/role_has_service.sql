@@ -42,7 +42,8 @@ CREATE PROCEDURE patch_role_has_service()
       "FROM ", @cenozo, ".role, service ",
       "WHERE role.name = 'administrator' ",
       "AND service.restricted = 1 ",
-      "AND NOT( service.subject = 'requisition' AND service.method = 'POST' )" );
+      "AND NOT( service.subject = 'progress_report' AND service.method = 'POST' ) ",
+      "AND NOT( service.subject = 'production' AND service.method = 'POST' )" );
     PREPARE statement FROM @sql;
     EXECUTE statement;
     DEALLOCATE PREPARE statement;
@@ -54,19 +55,18 @@ CREATE PROCEDURE patch_role_has_service()
       "FROM ", @cenozo, ".role, service ",
       "WHERE role.name = 'applicant' ",
       "AND service.restricted = 1 ",
-      "AND service.subject IN( 'coapplicant', 'reference', 'requisition' )" );
+      "AND service.subject IN( 'coapplicant', 'progress_report', 'production', 'reference', 'requisition' )" );
     PREPARE statement FROM @sql;
     EXECUTE statement;
     DEALLOCATE PREPARE statement;
 
-    -- reviewer
     SET @sql = CONCAT(
       "INSERT INTO role_has_service( role_id, service_id ) ",
       "SELECT role.id, service.id ",
       "FROM ", @cenozo, ".role, service ",
       "WHERE role.name = 'reviewer' ",
       "AND service.restricted = 1 ",
-      "AND service.subject = 'requisition'" );
+      "AND service.subject = 'TODO'" );
     PREPARE statement FROM @sql;
     EXECUTE statement;
     DEALLOCATE PREPARE statement;

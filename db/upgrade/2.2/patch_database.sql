@@ -22,6 +22,9 @@ SOURCE data_option_parent.sql
 SOURCE data_option_subcategory.sql
 SOURCE data_option.sql
 SOURCE requisition_has_data_option.sql
+SOURCE progress_report.sql
+SOURCE production_type.sql
+SOURCE production.sql
 
 SOURCE update_version_number.sql
 

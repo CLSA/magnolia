@@ -21,8 +21,11 @@ class ui extends \cenozo\ui\ui
   {
     parent::build_module_list();
     $module = $this->get_module( 'requisition' );
-    if( !is_null( $module ) && $module->has_action( 'view' ) )
-      $module->add_action( 'view', '/{identifier}?{lang}&{t0}&{t1}&{t2}' );
+    if( !is_null( $module ) )
+    {
+      if( $module->has_action( 'view' ) ) $module->add_action( 'view', '/{identifier}?{lang}&{t0}&{t1}&{t2}' );
+      $module->add_child( 'progress_report' );
+    }
   }
 
   /**
