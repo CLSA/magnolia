@@ -19,6 +19,8 @@ class requisition extends \cenozo\database\record
    */
   public function save()
   {
+    // generate a random identifier if none exists
+    if( is_null( $this->identifier ) ) $this->identifier = 'T'.rand( 10000, 99999 );
     parent::save();
 
     // if we're changing the ethics_filename to null then delete the ethics_letter file

@@ -42,6 +42,7 @@ CREATE PROCEDURE patch_role_has_service()
       "FROM ", @cenozo, ".role, service ",
       "WHERE role.name = 'administrator' ",
       "AND service.restricted = 1 ",
+      "AND NOT( service.subject = 'requisition' AND service.method = 'POST' ) ",
       "AND NOT( service.subject = 'progress_report' AND service.method = 'POST' ) ",
       "AND NOT( service.subject = 'production' AND service.method = 'POST' )" );
     PREPARE statement FROM @sql;

@@ -3,7 +3,12 @@ define( function() {
 
   try { var module = cenozoApp.module( 'reference', true ); } catch( err ) { console.warn( err ); return; }
   angular.extend( module, {
-    identifier: {},
+    identifier: {
+      parent: {
+        subject: 'requisition',
+        column: 'identifier'
+      }
+    },
     name: {
       singular: 'reference',
       plural: 'references',

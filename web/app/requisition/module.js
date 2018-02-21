@@ -5,7 +5,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
   try { var module = cenozoApp.module( 'requisition', true ); } catch( err ) { console.warn( err ); return; }
   angular.extend( module, {
-    identifier: {},
+    identifier: { column: 'identifier' },
     name: {
       singular: 'requisition',
       plural: 'requisitions',
@@ -34,19 +34,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
   } );
 
   module.addInputGroup( '', {
-    name: {
-      title: 'Applicant',
-      type: 'lookup-typeahead',
-      typeahead: {
-        table: 'user',
-        select: 'CONCAT( user.first_name, " ", user.last_name, " (", user.name, ")" )',
-        where: [ 'user.first_name', 'user.last_name', 'user.name' ]
-      }
-    },
-    identifier: {
-      title: 'Identifier',
-      type: 'string'
-    },
+    language: { type: 'string', column: 'language.code' },
+    identifier: { type: 'string' },
     name: { type: 'string' },
     position: { type: 'string' },
     affiliation: { type: 'string' },
@@ -206,26 +195,11 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             $scope.model.viewModel.setReferenceRank( id, rank );
           };
 
-          $scope.t = function( address ) {
-            var addressParts = address.split('.');
-            var response = null;
-            if( 1 == addressParts.length ) {
-              response = text[addressParts[0]];
-            } else if( 2 == addressParts.length ) {
-              response = text[addressParts[0]][addressParts[1]];
-            } else if( 3 == addressParts.length ) {
-              response = text[addressParts[0]][addressParts[1]][addressParts[2]];
-            } else if( 4 == addressParts.length ) {
-              response = text[addressParts[0]][addressParts[1]][addressParts[2]][addressParts[3]];
-            } else if( 5 == addressParts.length ) {
-              response = text[addressParts[0]][addressParts[1]][addressParts[2]][addressParts[3]][addressParts[4]];
-            }
-
-            if( !response ) response = { en: 'ERROR', fr: 'ERREUR' };
-            return response[$scope.model.viewModel.language];
+          $scope.t = function( value ) {
+            return cenozoApp.translate( lookupData, value, $scope.model.viewModel.record.language );
           };
 
-          var text = {
+          var lookupData = {
             heading: {
               en: 'Data and Biospecimen Request Application',
               fr: 'Demande d’accès aux données et aux échantillons'
@@ -487,9 +461,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnRequisitionViewFactory', [
     'CnBaseViewFactory', 'CnCoapplicantModelFactory', 'CnReferenceModelFactory',
-    'CnHttpFactory', 'CnModalMessageFactory', '$state', '$q',
+    'CnHttpFactory', 'CnModalMessageFactory', '$q',
     function( CnBaseViewFactory, CnCoapplicantModelFactory, CnReferenceModelFactory,
-              CnHttpFactory, CnModalMessageFactory, $state, $q ) {
+              CnHttpFactory, CnModalMessageFactory, $q ) {
       var object = function( parentModel, root ) {
         var self = this;
         CnBaseViewFactory.construct( this, parentModel, root );
@@ -505,15 +479,11 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
         // setup language and tab state parameters
         this.toggleLanguage = function() {
-          this.setLanguage( 'en' == this.language ? 'fr' : 'en' );
-        };
-
-        this.setLanguage = function( language, transition ) {
-          if( angular.isUndefined( transition ) ) transition = true;
-          language = 'fr' == language ? 'fr' : 'en';
-          this.language = language;
-          $state.params.lang = language;
-          if( transition ) this.parentModel.reloadState( false, false, 'replace' );
+          this.record.language = 'en' == this.record.language ? 'fr' : 'en';
+          return CnHttpFactory.instance( {
+            path: this.parentModel.getServiceResourcePath(),
+            data: { language: this.record.language }
+          } ).patch();
         };
 
         this.setTab = function( index, tab, transition ) {
@@ -523,17 +493,14 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           else if( 1 == index && 0 > ['a1','a2','a3','a4','a5','a6','a7'].indexOf( tab ) ) tab = 'a1';
           else if( 2 == index && 0 > ['notes','a','b','c'].indexOf( tab ) ) tab = 'notes';
           this.tab[index] = tab;
-          $state.params['t'+index] = tab;
+          this.parentModel.setQueryParameter( 't'+index, tab );
           if( transition ) this.parentModel.reloadState( false, false, 'replace' );
         };
 
-        this.language = null;
-        this.setLanguage( $state.params.lang, false );
-
         this.tab = [];
-        this.setTab( 0, $state.params.t0, false );
-        this.setTab( 1, $state.params.t1, false );
-        this.setTab( 2, $state.params.t2, false );
+        this.setTab( 0, this.parentModel.getQueryParameter( 't0' ), false );
+        this.setTab( 1, this.parentModel.getQueryParameter( 't1' ), false );
+        this.setTab( 2, this.parentModel.getQueryParameter( 't2' ), false );
 
         this.getCoapplicantList = function() {
           return CnHttpFactory.instance( {

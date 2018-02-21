@@ -1,4 +1,43 @@
-<cn-record-view model="model"></cn-record-view>
+<div class="utility-view rounded">
+  <div class="container-fluid bg-primary rounded-top">
+    <h4>
+      <button class="btn btn-menu btn-header btn-info pull-right"
+              style="margin-top:-4px;"
+              ng-click="model.viewModel.toggleLanguage()">
+        {{ 'en'==model.viewModel.record.language ? 'Version Française' : 'English Version' }}
+      </button>
+      <span ng-bind-html="t( 'heading' )"></span>
+    </h4>
+  </div>
+  <div class="container-fluid" style="margin-top: 1em;">
+    <ul class="nav nav-tabs nav-justified">
+      <li ng-class="{'active':'instructions'==model.viewModel.tab}">
+        <a ng-click="model.viewModel.setTab('instructions')" ng-bind-html="t( 'instructions.tab' )"></a>
+      </li>
+      <li ng-class="{'active':'a1'==model.viewModel.tab}">
+        <a ng-click="model.viewModel.setTab('a1')" ng-bind-html="t( 'a1.tab' )"></a>
+      </li>
+    </ul>
+    <div ng-if="'instructions'==model.viewModel.tab"
+         class="panel panel-default"
+         style="border-top-left-radius: 0px;">
+      <div class="panel-body" style="padding-bottom: 0px;">
+        <h4 ng-bind-html="t( 'instructions.title' )"></h4>
+        <ul class="list-group">
+          <li class="list-group-item" ng-bind-html="t( 'instructions.text1' )"></li>
+          <li class="list-group-item" ng-bind-html="t( 'instructions.text2' )"></li>
+          <li class="list-group-item" ng-bind-html="t( 'instructions.text3' )"></li>
+        </ul>
+      </div>
+    </div>
+    <div ng-if="'a1'==model.viewModel.tab"
+         class="panel panel-default"
+         style="border-top-left-radius: 0px;">
+      <div class="panel-body">
+      </div>
+    </div>
+  </div>
+</div>
 <div class="vertical-spacer" ng-repeat="child in model.module.children">
   <cn-record-list ng-if="model.viewModel[child.subject.camel+'Model']"
                   model="model.viewModel[child.subject.camel+'Model']"></cn-record-list>

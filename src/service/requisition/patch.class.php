@@ -13,6 +13,25 @@ class patch extends \cenozo\service\patch
   /**
    * Extend parent method
    */
+  public function get_file_as_array()
+  {
+    $patch_array = parent::get_file_as_array();
+
+    // convert column "language" to language_id
+    if( array_key_exists( 'language', $patch_array ) )
+    {
+      $language_class_name = lib::get_class_name( 'database\language' );
+      $patch_array['language_id'] =
+        $language_class_name::get_unique_record( 'code', $patch_array['language'] )->id;
+      unset( $patch_array['language'] );
+    }
+
+    return $patch_array;
+  }
+
+  /**
+   * Extend parent method
+   */
   public function execute()
   {
     parent::execute();

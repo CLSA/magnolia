@@ -1,930 +1,929 @@
-<div class="utility-view rounded">
+<div class="utility-view rounded" style="padding-bottom: 2em;" ng-if="!isComplete">
+  <cn-loading></cn-loading>
+</div>
+<div class="utility-view rounded" ng-if="isComplete">
   <div class="container-fluid bg-primary rounded-top">
     <h4>
       <button class="btn btn-menu btn-header btn-info pull-right"
               style="margin-top:-4px;"
               ng-click="model.viewModel.toggleLanguage()">
-        {{ 'en'==model.viewModel.language ? 'Version Française' : 'English Version' }}
+        {{ 'en'==model.viewModel.record.language ? 'Version Française' : 'English Version' }}
       </button>
-      <span ng-bind-html="t( 'heading' )"></span>
+      <span ng-bind-html="t( 'heading' ) + ' - ' + model.viewModel.record.identifier"></span>
     </h4>
   </div>
-  <div class="container-fluid" style="margin-top: 1em;">
-      <ul class="nav nav-tabs nav-justified">
-        <li ng-class="{'active':'instructions'==model.viewModel.tab[0]}">
-          <a ng-click="model.viewModel.setTab(0,'instructions')" ng-bind-html="t( 'instructions.tab' )"></a>
-        </li>
-        <li ng-class="{'active':'part1'==model.viewModel.tab[0]}">
-          <a ng-click="model.viewModel.setTab(0,'part1')" ng-bind-html="t( 'part1.tab' )"></a>
-        </li>
-        <li ng-class="{'active':'part2'==model.viewModel.tab[0]}">
-          <a ng-click="model.viewModel.setTab(0,'part2')" ng-bind-html="t( 'part2.tab' )"></a>
-        </li>
-        <li ng-class="{'active':'part3'==model.viewModel.tab[0]}">
-          <a ng-click="model.viewModel.setTab(0,'part3')" ng-bind-html="t( 'part3.tab' )"></a>
-        </li>
-      </ul>
-      <div ng-if="'instructions'==model.viewModel.tab[0]"
-           class="panel panel-default"
-           style="border-top-left-radius: 0px;">
-        <div class="panel-body" style="padding-bottom: 0px;">
-          <h4 ng-bind-html="t( 'instructions.title' )"></h4>
-          <ul class="list-group">
-            <li class="list-group-item" ng-bind-html="t( 'instructions.text1' )"></li>
-            <li class="list-group-item" ng-bind-html="t( 'instructions.text2' )"></li>
-            <li class="list-group-item" ng-bind-html="t( 'instructions.text3' )"></li>
-            <li class="list-group-item" ng-bind-html="t( 'instructions.text4' )"></li>
-          </ul>
-        </div>
+  <div class="container-fluid" style="padding-top: 1em;">
+    <ul class="nav nav-tabs nav-justified">
+      <li ng-class="{'active':'instructions'==model.viewModel.tab[0]}">
+        <a ng-click="model.viewModel.setTab(0,'instructions')" ng-bind-html="t( 'instructions.tab' )"></a>
+      </li>
+      <li ng-class="{'active':'part1'==model.viewModel.tab[0]}">
+        <a ng-click="model.viewModel.setTab(0,'part1')" ng-bind-html="t( 'part1.tab' )"></a>
+      </li>
+      <li ng-class="{'active':'part2'==model.viewModel.tab[0]}">
+        <a ng-click="model.viewModel.setTab(0,'part2')" ng-bind-html="t( 'part2.tab' )"></a>
+      </li>
+      <li ng-class="{'active':'part3'==model.viewModel.tab[0]}">
+        <a ng-click="model.viewModel.setTab(0,'part3')" ng-bind-html="t( 'part3.tab' )"></a>
+      </li>
+    </ul>
+    <div ng-if="'instructions'==model.viewModel.tab[0]"
+         class="panel panel-default"
+         style="border-top-left-radius: 0px;">
+      <div class="panel-body" style="padding-bottom: 0px;">
+        <h4 ng-bind-html="t( 'instructions.title' )"></h4>
+        <ul class="list-group">
+          <li class="list-group-item" ng-bind-html="t( 'instructions.text1' )"></li>
+          <li class="list-group-item" ng-bind-html="t( 'instructions.text2' )"></li>
+          <li class="list-group-item" ng-bind-html="t( 'instructions.text3' )"></li>
+          <li class="list-group-item" ng-bind-html="t( 'instructions.text4' )"></li>
+        </ul>
       </div>
-      <div ng-if="'part1'==model.viewModel.tab[0]"
-           class="panel panel-default"
-           style="border-top-left-radius: 0px;">
-        <div class="panel-body" style="padding-bottom: 0px;">
-          <h4 style="margin-top: 0; margin-bottom: 1em;" ng-bind-html="t( 'part1.title' )"></h4>
-          <ul class="nav nav-tabs">
-            <li ng-class="{'active':'a1' == model.viewModel.tab[1]}">
-              <a ng-click="model.viewModel.setTab(1,'a1')" ng-bind-html="t( 'part1.a1.tab' )"></a>
-            </li>
-            <li ng-class="{'active':'a2' == model.viewModel.tab[1]}">
-              <a ng-click="model.viewModel.setTab(1,'a2')" ng-bind-html="t( 'part1.a2.tab' )"></a>
-            </li>
-            <li ng-class="{'active':'a3' == model.viewModel.tab[1]}">
-              <a ng-click="model.viewModel.setTab(1,'a3')" ng-bind-html="t( 'part1.a3.tab' )"></a>
-            </li>
-            <li ng-class="{'active':'a4' == model.viewModel.tab[1]}">
-              <a ng-click="model.viewModel.setTab(1,'a4')" ng-bind-html="t( 'part1.a4.tab' )"></a>
-            </li>
-            <li ng-class="{'active':'a5' == model.viewModel.tab[1]}">
-              <a ng-click="model.viewModel.setTab(1,'a5')" ng-bind-html="t( 'part1.a5.tab' )"></a>
-            </li>
-            <li ng-class="{'active':'a6' == model.viewModel.tab[1]}">
-              <a ng-click="model.viewModel.setTab(1,'a6')" ng-bind-html="t( 'part1.a6.tab' )"></a>
-            </li>
-            <li ng-class="{'active':'a7' == model.viewModel.tab[1]}">
-              <a ng-click="model.viewModel.setTab(1,'a7')" ng-bind-html="t( 'part1.a7.tab' )"></a>
-            </li>
-          </ul>
-          <div ng-if="'a1'==model.viewModel.tab[1]"
-               class="panel panel-default"
-               style="border-top-left-radius: 0px;">
-            <div class="panel-body">
-              <p class="text-primary" ng-bind-html="t( 'part1.a1.text1' )"></p>
-              <p class="text-primary" ng-bind-html="t( 'part1.a1.text2' )"></p>
+    </div>
+    <div ng-if="'part1'==model.viewModel.tab[0]"
+         class="panel panel-default"
+         style="border-top-left-radius: 0px;">
+      <div class="panel-body" style="padding-bottom: 0px;">
+        <h4 style="margin-top: 0; margin-bottom: 1em;" ng-bind-html="t( 'part1.title' )"></h4>
+        <ul class="nav nav-tabs">
+          <li ng-class="{'active':'a1' == model.viewModel.tab[1]}">
+            <a ng-click="model.viewModel.setTab(1,'a1')" ng-bind-html="t( 'part1.a1.tab' )"></a>
+          </li>
+          <li ng-class="{'active':'a2' == model.viewModel.tab[1]}">
+            <a ng-click="model.viewModel.setTab(1,'a2')" ng-bind-html="t( 'part1.a2.tab' )"></a>
+          </li>
+          <li ng-class="{'active':'a3' == model.viewModel.tab[1]}">
+            <a ng-click="model.viewModel.setTab(1,'a3')" ng-bind-html="t( 'part1.a3.tab' )"></a>
+          </li>
+          <li ng-class="{'active':'a4' == model.viewModel.tab[1]}">
+            <a ng-click="model.viewModel.setTab(1,'a4')" ng-bind-html="t( 'part1.a4.tab' )"></a>
+          </li>
+          <li ng-class="{'active':'a5' == model.viewModel.tab[1]}">
+            <a ng-click="model.viewModel.setTab(1,'a5')" ng-bind-html="t( 'part1.a5.tab' )"></a>
+          </li>
+          <li ng-class="{'active':'a6' == model.viewModel.tab[1]}">
+            <a ng-click="model.viewModel.setTab(1,'a6')" ng-bind-html="t( 'part1.a6.tab' )"></a>
+          </li>
+          <li ng-class="{'active':'a7' == model.viewModel.tab[1]}">
+            <a ng-click="model.viewModel.setTab(1,'a7')" ng-bind-html="t( 'part1.a7.tab' )"></a>
+          </li>
+        </ul>
+        <div ng-if="'a1'==model.viewModel.tab[1]"
+             class="panel panel-default"
+             style="border-top-left-radius: 0px;">
+          <div class="panel-body">
+            <p class="text-primary" ng-bind-html="t( 'part1.a1.text1' )"></p>
+            <p class="text-primary" ng-bind-html="t( 'part1.a1.text2' )"></p>
+            <hr/>
+            <form name="part1a1Form" novalidate>
+              <div class="form-horizontal">
+                <cn-view-input
+                  input="{
+                    key: 'name',
+                    title: t( 'part1.a1.name' ),
+                    type: model.inputList.name.type
+                  }"
+                  model="model"
+                  state="$state">
+                </cn-view-input>
+                <cn-view-input
+                  input="{
+                    key: 'position',
+                    title: t( 'part1.a1.position' ),
+                    type: model.inputList.position.type
+                  }"
+                  model="model"
+                  state="$state">
+                </cn-view-input>
+                <cn-view-input
+                  input="{
+                    key: 'affiliation',
+                    title: t( 'part1.a1.affiliation' ),
+                    type: model.inputList.affiliation.type
+                  }"
+                  model="model"
+                  state="$state">
+                </cn-view-input>
+                <cn-view-input
+                  input="{
+                    key: 'address',
+                    title: t( 'part1.a1.address' ),
+                    type: model.inputList.address.type
+                  }"
+                  model="model"
+                  state="$state">
+                </cn-view-input>
+                <cn-view-input
+                  input="{
+                    key: 'phone',
+                    title: t( 'part1.a1.phone' ),
+                    type: model.inputList.phone.type
+                  }"
+                  model="model"
+                  state="$state">
+                </cn-view-input>
+                <cn-view-input
+                  input="{
+                    key: 'email',
+                    title: t( 'part1.a1.email' ),
+                    type: model.inputList.email.type
+                  }"
+                  model="model"
+                  state="$state">
+                </cn-view-input>
+              </div>
               <hr/>
-              <form name="part1a1Form" novalidate><fieldset ng-disabled="!isComplete">
-                <div class="form-horizontal">
-                  <cn-view-input
-                    input="{
-                      key: 'name',
-                      title: t( 'part1.a1.name' ),
-                      type: model.inputList.name.type
-                    }"
-                    model="model"
-                    state="$state">
-                  </cn-view-input>
-                  <cn-view-input
-                    input="{
-                      key: 'position',
-                      title: t( 'part1.a1.position' ),
-                      type: model.inputList.position.type
-                    }"
-                    model="model"
-                    state="$state">
-                  </cn-view-input>
-                  <cn-view-input
-                    input="{
-                      key: 'affiliation',
-                      title: t( 'part1.a1.affiliation' ),
-                      type: model.inputList.affiliation.type
-                    }"
-                    model="model"
-                    state="$state">
-                  </cn-view-input>
-                  <cn-view-input
-                    input="{
-                      key: 'address',
-                      title: t( 'part1.a1.address' ),
-                      type: model.inputList.address.type
-                    }"
-                    model="model"
-                    state="$state">
-                  </cn-view-input>
-                  <cn-view-input
-                    input="{
-                      key: 'phone',
-                      title: t( 'part1.a1.phone' ),
-                      type: model.inputList.phone.type
-                    }"
-                    model="model"
-                    state="$state">
-                  </cn-view-input>
-                  <cn-view-input
-                    input="{
-                      key: 'email',
-                      title: t( 'part1.a1.email' ),
-                      type: model.inputList.email.type
-                    }"
-                    model="model"
-                    state="$state">
-                  </cn-view-input>
-                </div>
-                <hr/>
-                <p class="text-primary" ng-bind-html="t( 'part1.a1.text3' )"></p>
-                <div class="form-horizontal">
-                  <cn-view-input
-                    input="{
-                      key: 'graduate_name',
-                      title: t( 'part1.a1.graduate_name' ),
-                      type: model.inputList.graduate_name.type
-                    }"
-                    model="model"
-                    state="$state">
-                  </cn-view-input>
-                  <cn-view-input
-                    input="{
-                      key: 'graduate_program',
-                      title: t( 'part1.a1.graduate_program' ),
-                      type: model.inputList.graduate_program.type
-                    }"
-                    model="model"
-                    state="$state">
-                  </cn-view-input>
-                  <cn-view-input
-                    input="{
-                      key: 'graduate_institution',
-                      title: t( 'part1.a1.graduate_institution' ),
-                      type: 'string'
-                    }"
-                    model="model"
-                    state="$state">
-                  </cn-view-input>
-                  <cn-view-input
-                    input="{
-                      key: 'graduate_address',
-                      title: t( 'part1.a1.graduate_address' ),
-                      type: model.inputList.graduate_address.type
-                    }"
-                    model="model"
-                    state="$state">
-                  </cn-view-input>
-                  <cn-view-input
-                    input="{
-                      key: 'graduate_phone',
-                      title: t( 'part1.a1.graduate_phone' ),
-                      type: model.inputList.graduate_phone.type
-                    }"
-                    model="model"
-                    state="$state">
-                  </cn-view-input>
-                  <cn-view-input
-                    input="{
-                      key: 'graduate_email',
-                      title: t( 'part1.a1.graduate_email' ),
-                      type: model.inputList.graduate_email.type
-                    }"
-                    model="model"
-                    state="$state">
-                  </cn-view-input>
-                </div>
-              </fieldset></form>
-            </div>
+              <p class="text-primary" ng-bind-html="t( 'part1.a1.text3' )"></p>
+              <div class="form-horizontal">
+                <cn-view-input
+                  input="{
+                    key: 'graduate_name',
+                    title: t( 'part1.a1.graduate_name' ),
+                    type: model.inputList.graduate_name.type
+                  }"
+                  model="model"
+                  state="$state">
+                </cn-view-input>
+                <cn-view-input
+                  input="{
+                    key: 'graduate_program',
+                    title: t( 'part1.a1.graduate_program' ),
+                    type: model.inputList.graduate_program.type
+                  }"
+                  model="model"
+                  state="$state">
+                </cn-view-input>
+                <cn-view-input
+                  input="{
+                    key: 'graduate_institution',
+                    title: t( 'part1.a1.graduate_institution' ),
+                    type: 'string'
+                  }"
+                  model="model"
+                  state="$state">
+                </cn-view-input>
+                <cn-view-input
+                  input="{
+                    key: 'graduate_address',
+                    title: t( 'part1.a1.graduate_address' ),
+                    type: model.inputList.graduate_address.type
+                  }"
+                  model="model"
+                  state="$state">
+                </cn-view-input>
+                <cn-view-input
+                  input="{
+                    key: 'graduate_phone',
+                    title: t( 'part1.a1.graduate_phone' ),
+                    type: model.inputList.graduate_phone.type
+                  }"
+                  model="model"
+                  state="$state">
+                </cn-view-input>
+                <cn-view-input
+                  input="{
+                    key: 'graduate_email',
+                    title: t( 'part1.a1.graduate_email' ),
+                    type: model.inputList.graduate_email.type
+                  }"
+                  model="model"
+                  state="$state">
+                </cn-view-input>
+              </div>
+            </form>
           </div>
-          <div ng-if="'a2'==model.viewModel.tab[1]"
-               class="panel panel-default"
-               style="border-top-left-radius: 0px;">
-            <div class="panel-body">
-              <p class="text-primary" ng-bind-html="t( 'part1.a2.text' )"></p>
-              <div class="panel panel-default" ng-if="0 < model.viewModel.coapplicantList.length">
-                <div class="panel-body">
-                  <table class="table table-striped">
-                    <thead class="bg-info">
-                      <tr>
-                        <td ng-bind-html="t( 'part1.a2.name' )"></td>
-                        <td ng-bind-html="t( 'part1.a2.position' )"></td>
-                        <td ng-bind-html="t( 'part1.a2.affiliation' )"></td>
-                        <td ng-bind-html="t( 'part1.a2.email' )"></td>
-                        <td ng-bind-html="t( 'part1.a2.role' )"></td>
-                        <td ng-bind-html="t( 'part1.a2.access' )"></td>
-                        <td></td>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr ng-repeat="coapplicant in model.viewModel.coapplicantList">
-                        <td>{{ coapplicant.name }}</td>
-                        <td>{{ coapplicant.position }}</td>
-                        <td>{{ coapplicant.affiliation }}</td>
-                        <td>{{ coapplicant.email }}</td>
-                        <td>{{ coapplicant.role }}</td>
-                        <td>{{ coapplicant.access ? 'Yes' : 'No' }}</td>
-                        <td>
-                          <button class="btn btn-xs btn-danger"
-                                  ng-disabled="0 <= isDeletingCoapplicant.indexOf( coapplicant.id )"
-                                  ng-click="removeCoapplicant( coapplicant.id )"
-                                  uib-tooltip-html="t( 'misc.remove' )">
-                            <i class="glyphicon glyphicon-remove"></i>
-                          </button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
+        </div>
+        <div ng-if="'a2'==model.viewModel.tab[1]"
+             class="panel panel-default"
+             style="border-top-left-radius: 0px;">
+          <div class="panel-body">
+            <p class="text-primary" ng-bind-html="t( 'part1.a2.text' )"></p>
+            <div class="panel panel-default" ng-if="0 < model.viewModel.coapplicantList.length">
+              <div class="panel-body">
+                <table class="table table-striped">
+                  <thead class="bg-info">
+                    <tr>
+                      <td ng-bind-html="t( 'part1.a2.name' )"></td>
+                      <td ng-bind-html="t( 'part1.a2.position' )"></td>
+                      <td ng-bind-html="t( 'part1.a2.affiliation' )"></td>
+                      <td ng-bind-html="t( 'part1.a2.email' )"></td>
+                      <td ng-bind-html="t( 'part1.a2.role' )"></td>
+                      <td ng-bind-html="t( 'part1.a2.access' )"></td>
+                      <td></td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr ng-repeat="coapplicant in model.viewModel.coapplicantList">
+                      <td>{{ coapplicant.name }}</td>
+                      <td>{{ coapplicant.position }}</td>
+                      <td>{{ coapplicant.affiliation }}</td>
+                      <td>{{ coapplicant.email }}</td>
+                      <td>{{ coapplicant.role }}</td>
+                      <td>{{ coapplicant.access ? 'Yes' : 'No' }}</td>
+                      <td>
+                        <button class="btn btn-xs btn-danger"
+                                ng-disabled="0 <= isDeletingCoapplicant.indexOf( coapplicant.id )"
+                                ng-click="removeCoapplicant( coapplicant.id )"
+                                uib-tooltip-html="t( 'misc.remove' )">
+                          <i class="glyphicon glyphicon-remove"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <form name="part1a2Form" novalidate>
+              <div class="form-horizontal">
+                <cn-add-input
+                  input="{ key: 'name', title: t( 'part1.a2.name' ), type: 'string' }"
+                  record="coapplicantRecord"
+                  model="model.viewModel.coapplicantModel"
+                  first="true"
+                  state="$state">
+                </cn-add-input>
+                <cn-add-input
+                  input="{ key: 'position', title: t( 'part1.a2.position' ), type: 'string' }"
+                  record="coapplicantRecord"
+                  model="model.viewModel.coapplicantModel"
+                  first="false"
+                  state="$state">
+                </cn-add-input>
+                <cn-add-input
+                  input="{ key: 'affiliation', title: t( 'part1.a2.affiliation' ), type: 'string' }"
+                  record="coapplicantRecord"
+                  model="model.viewModel.coapplicantModel"
+                  first="false"
+                  state="$state">
+                </cn-add-input>
+                <cn-add-input
+                  input="{ key: 'email', title: t( 'part1.a2.email' ), type: 'string' }"
+                  record="coapplicantRecord"
+                  model="model.viewModel.coapplicantModel"
+                  first="false"
+                  state="$state">
+                </cn-add-input>
+                <cn-add-input
+                  input="{ key: 'role', title: t( 'part1.a2.role' ), type: 'string' }"
+                  record="coapplicantRecord"
+                  model="model.viewModel.coapplicantModel"
+                  first="false"
+                  state="$state">
+                </cn-add-input>
+                <cn-add-input
+                  input="{
+                    key: 'access',
+                    title: t( 'part1.a2.access' ),
+                    type: 'boolean',
+                    enumList: model.metadata.accessEnumList[model.viewModel.record.language]
+                  }"
+                  record="coapplicantRecord"
+                  model="model.viewModel.coapplicantModel"
+                  first="false"
+                  state="$state">
+                </cn-add-input>
+                <button class="btn btn-primary pull-right"
+                        ng-disabled="isAddingCoapplicant"
+                        ng-click="addCoapplicant()"
+                        ng-bind-html="t( 'part1.a2.addCoapplicant' )"></button>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div ng-if="'a3'==model.viewModel.tab[1]"
+             class="panel panel-default"
+             style="border-top-left-radius: 0px;">
+          <div class="panel-body">
+            <p class="text-primary" ng-bind-html="t( 'part1.a3.text' )"></p>
+            <hr/>
+            <form name="part1a3Form" novalidate>
+              <div class="form-horizontal">
+                <cn-view-input
+                  input="{
+                    key: 'start_date',
+                    title: t( 'part1.a3.start_date' ),
+                    type: model.inputList.start_date.type,
+                    min: minStartDate
+                  }"
+                  model="model"
+                  state="$state">
+                </cn-view-input>
+                <cn-view-input
+                  input="{
+                    key: 'duration',
+                    title: t( 'part1.a3.duration' ),
+                    type: model.inputList.duration.type
+                  }"
+                  model="model"
+                  state="$state">
+                </cn-view-input>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div ng-if="'a4'==model.viewModel.tab[1]"
+             class="panel panel-default"
+             style="border-top-left-radius: 0px;">
+          <div class="panel-body">
+            <p class="text-primary" ng-bind-html="t( 'part1.a4.text1' )"></p>
+            <hr/>
+            <form name="part1a4Form" novalidate>
+              <div class="form-horizontal">
+                <cn-view-input
+                  input="{
+                    key: 'title',
+                    title: t( 'part1.a4.title' ),
+                    type: model.inputList.title.type
+                  }"
+                  model="model"
+                  state="$state">
+                </cn-view-input>
+                <cn-view-input
+                  input="{
+                    key: 'keywords',
+                    title: t( 'part1.a4.keywords' )+'<sup>?</sup>',
+                    type: 'string',
+                    help: t( 'part1.a4.keywords_text' )
+                  }"
+                  model="model"
+                  state="$state">
+                </cn-view-input>
+                <cn-view-input
+                  input="{
+                    key: 'lay_summary',
+                    title: t( 'part1.a4.lay_summary' )+'<sup>?</sup>',
+                    type: 'text',
+                    help: t( 'part1.a4.lay_summary_text' )
+                  }"
+                  model="model"
+                  state="$state">
+                </cn-view-input>
+                <hr/>
+                <p class="text-primary" ng-bind-html="t( 'part1.a4.text2' )"></p>
+                <div class="form-group">
+                  <label for="wordCount" class="col-sm-3 control-label"
+                         ng-bind-html="t( 'misc.wordCount' )"></label>
+                  <div class="col-sm-9">
+                    <p class="form-text text-primary">{{ model.viewModel.getWordCount() }}</p>
+                  </div>
+                </div>
+                <cn-view-input
+                  input="{
+                    key: 'background',
+                    title: t( 'part1.a4.background' ) + '<br><span class=text-info>(' +
+                           model.viewModel.wordCount.background + ' ' + t( 'misc.words' ) + ')</span>',
+                    type: model.inputList.background.type
+                  }"
+                  model="model"
+                  state="$state">
+                </cn-view-input>
+                <cn-view-input
+                  input="{
+                    key: 'objectives',
+                    title: t( 'part1.a4.objectives' ) + '<br><span class=text-info>(' +
+                           model.viewModel.wordCount.objectives + ' ' + t( 'misc.words' ) + ')</span>',
+                    type: model.inputList.objectives.type
+                  }"
+                  model="model"
+                  state="$state">
+                </cn-view-input>
+                <cn-view-input
+                  input="{
+                    key: 'methodology',
+                    title: t( 'part1.a4.methodology' )+'<sup>?</sup>' + '<br><span class=text-info>(' +
+                           model.viewModel.wordCount.methodology + ' ' + t( 'misc.words' ) + ')</span>',
+                    type: 'text',
+                    help: t( 'part1.a4.methodology_text' )
+                  }"
+                  model="model"
+                  state="$state">
+                </cn-view-input>
+                <cn-view-input
+                  input="{
+                    key: 'analysis',
+                    title: t( 'part1.a4.analysis' )+'<sup>?</sup>' + '<br><span class=text-info>(' +
+                           model.viewModel.wordCount.analysis + ' ' + t( 'misc.words' ) + ')</span>',
+                    type: 'text',
+                    help: t( 'part1.a4.analysis_text' )
+                  }"
+                  model="model"
+                  state="$state">
+                </cn-view-input>
+                <hr/>
+                <p class="text-primary" ng-bind-html="t( 'part1.a4.text3' )"></p>
+                <div class="panel panel-default" ng-if="0 < model.viewModel.referenceList.length">
+                  <div class="panel-body">
+                    <table class="table table-striped">
+                      <thead class="bg-info">
+                        <tr>
+                          <td ng-bind-html="t( 'part1.a4.number' )"></td>
+                          <td ng-bind-html="t( 'part1.a4.reference' )"></td>
+                          <td></td>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr ng-repeat="reference in model.viewModel.referenceList | orderBy: 'rank'">
+                          <td>
+                            <div class="btn-group">
+                              <button class="btn btn-info dropdown-toggle"
+                                      data-toggle="dropdown"
+                                      type="button"> 
+                                {{ reference.rank }}
+                              </button>
+                              <ul class="dropdown-menu" role="menu">
+                                <li ng-repeat="r in model.viewModel.referenceList | orderBy: 'rank'"
+                                    ng-class="{ 'active': r.rank == reference.rank }">
+                                  <a href="#" ng-click="setReferenceRank( reference.id, r.rank )">
+                                    {{ r.rank }}
+                                  </a>
+                                </li>
+                              </ul>
+                            </div>
+                          </td>
+                          <td class="text-left">{{ reference.reference }}</td>
+                          <td>
+                            <button class="btn btn-xs btn-danger"
+                                    ng-disabled="0 <= isDeletingReference.indexOf( reference.id )"
+                                    ng-click="removeReference( reference.id )"
+                                    uib-tooltip-html="t( 'misc.remove' )">
+                              <i class="glyphicon glyphicon-remove"></i>
+                            </button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div>
+                  <cn-add-input
+                    class="col-sm-10"
+                    input="{ key: 'reference', title: t( 'part1.a4.reference' ), type: 'string' }"
+                    record="referenceRecord"
+                    model="model.viewModel.referenceModel"
+                    first="false"
+                    state="$state">
+                  </cn-add-input>
+                  <button class="btn btn-primary col-sm-2"
+                          ng-disabled="isAddingReference"
+                          ng-click="addReference()"
+                          ng-bind-html="t( 'part1.a4.addReference' )"></button>
                 </div>
               </div>
-              <form name="part1a2Form" novalidate><fieldset ng-disabled="!isComplete">
-                <div class="form-horizontal">
-                  <cn-add-input
-                    input="{ key: 'name', title: t( 'part1.a2.name' ), type: 'string' }"
-                    record="coapplicantRecord"
-                    model="model.viewModel.coapplicantModel"
-                    first="true"
-                    state="$state">
-                  </cn-add-input>
-                  <cn-add-input
-                    input="{ key: 'position', title: t( 'part1.a2.position' ), type: 'string' }"
-                    record="coapplicantRecord"
-                    model="model.viewModel.coapplicantModel"
-                    first="false"
-                    state="$state">
-                  </cn-add-input>
-                  <cn-add-input
-                    input="{ key: 'affiliation', title: t( 'part1.a2.affiliation' ), type: 'string' }"
-                    record="coapplicantRecord"
-                    model="model.viewModel.coapplicantModel"
-                    first="false"
-                    state="$state">
-                  </cn-add-input>
-                  <cn-add-input
-                    input="{ key: 'email', title: t( 'part1.a2.email' ), type: 'string' }"
-                    record="coapplicantRecord"
-                    model="model.viewModel.coapplicantModel"
-                    first="false"
-                    state="$state">
-                  </cn-add-input>
-                  <cn-add-input
-                    input="{ key: 'role', title: t( 'part1.a2.role' ), type: 'string' }"
-                    record="coapplicantRecord"
-                    model="model.viewModel.coapplicantModel"
-                    first="false"
-                    state="$state">
-                  </cn-add-input>
-                  <cn-add-input
-                    input="{
-                      key: 'access',
-                      title: t( 'part1.a2.access' ),
-                      type: 'boolean',
-                      enumList: model.metadata.accessEnumList[model.viewModel.language]
-                    }"
-                    record="coapplicantRecord"
-                    model="model.viewModel.coapplicantModel"
-                    first="false"
-                    state="$state">
-                  </cn-add-input>
-                  <button class="btn btn-primary pull-right"
-                          ng-disabled="isAddingCoapplicant"
-                          ng-click="addCoapplicant()"
-                          ng-bind-html="t( 'part1.a2.addCoapplicant' )"></button>
-                </div>
-              </fieldset></form>
-            </div>
+            </form>
           </div>
-          <div ng-if="'a3'==model.viewModel.tab[1]"
-               class="panel panel-default"
-               style="border-top-left-radius: 0px;">
-            <div class="panel-body">
-              <p class="text-primary" ng-bind-html="t( 'part1.a3.text' )"></p>
-              <hr/>
-              <form name="part1a3Form" novalidate><fieldset ng-disabled="!isComplete">
-                <div class="form-horizontal">
-                  <cn-view-input
-                    input="{
-                      key: 'start_date',
-                      title: t( 'part1.a3.start_date' ),
-                      type: model.inputList.start_date.type,
-                      min: minStartDate
-                    }"
-                    model="model"
-                    state="$state">
-                  </cn-view-input>
-                  <cn-view-input
-                    input="{
-                      key: 'duration',
-                      title: t( 'part1.a3.duration' ),
-                      type: model.inputList.duration.type
-                    }"
-                    model="model"
-                    state="$state">
-                  </cn-view-input>
-                </div>
-              </fieldset></form>
-            </div>
+        </div>
+        <div ng-if="'a5'==model.viewModel.tab[1]"
+             class="panel panel-default"
+             style="border-top-left-radius: 0px;">
+          <div class="panel-body">
+            <p class="text-primary" ng-bind-html="t( 'part1.a5.text' )"></p>
+            <hr/>
+            <form name="part1a5Form" novalidate>
+              <div class="form-horizontal">
+                <cn-view-input
+                  input="{
+                    key: 'funding',
+                    title: t( 'part1.a5.funding' ),
+                    type: 'enum',
+                    enumList: model.metadata.columnList.funding.enumList[model.viewModel.record.language]
+                  }"
+                  model="model"
+                  state="$state">
+                </cn-view-input>
+                <cn-view-input
+                  input="{
+                    key: 'funding_agency',
+                    title: t( 'part1.a5.funding_agency' ),
+                    type: model.inputList.funding_agency.type
+                  }"
+                  ng-if="'no' != model.viewModel.record.funding"
+                  model="model"
+                  state="$state">
+                </cn-view-input>
+                <cn-view-input
+                  input="{
+                    key: 'grant_number',
+                    title: t( 'part1.a5.grant_number' ),
+                    type: model.inputList.grant_number.type
+                  }"
+                  ng-if="'no' != model.viewModel.record.funding"
+                  model="model"
+                  state="$state">
+                </cn-view-input>
+              </div>
+            </form>
           </div>
-          <div ng-if="'a4'==model.viewModel.tab[1]"
-               class="panel panel-default"
-               style="border-top-left-radius: 0px;">
-            <div class="panel-body">
-              <p class="text-primary" ng-bind-html="t( 'part1.a4.text1' )"></p>
-              <hr/>
-              <form name="part1a4Form" novalidate><fieldset ng-disabled="!isComplete">
-                <div class="form-horizontal">
-                  <cn-view-input
-                    input="{
-                      key: 'title',
-                      title: t( 'part1.a4.title' ),
-                      type: model.inputList.title.type
-                    }"
-                    model="model"
-                    state="$state">
-                  </cn-view-input>
-                  <cn-view-input
-                    input="{
-                      key: 'keywords',
-                      title: t( 'part1.a4.keywords' )+'<sup>?</sup>',
-                      type: 'string',
-                      help: t( 'part1.a4.keywords_text' )
-                    }"
-                    model="model"
-                    state="$state">
-                  </cn-view-input>
-                  <cn-view-input
-                    input="{
-                      key: 'lay_summary',
-                      title: t( 'part1.a4.lay_summary' )+'<sup>?</sup>',
-                      type: 'text',
-                      help: t( 'part1.a4.lay_summary_text' )
-                    }"
-                    model="model"
-                    state="$state">
-                  </cn-view-input>
-                  <hr/>
-                  <p class="text-primary" ng-bind-html="t( 'part1.a4.text2' )"></p>
-                  <div class="form-group">
-                    <label for="wordCount" class="col-sm-3 control-label"
-                           ng-bind-html="t( 'misc.wordCount' )"></label>
-                    <div class="col-sm-9">
-                      <p class="form-text text-primary">{{ model.viewModel.getWordCount() }}</p>
-                    </div>
-                  </div>
-                  <cn-view-input
-                    input="{
-                      key: 'background',
-                      title: t( 'part1.a4.background' ) + '<br><span class=text-info>(' +
-                             model.viewModel.wordCount.background + ' ' + t( 'misc.words' ) + ')</span>',
-                      type: model.inputList.background.type
-                    }"
-                    model="model"
-                    state="$state">
-                  </cn-view-input>
-                  <cn-view-input
-                    input="{
-                      key: 'objectives',
-                      title: t( 'part1.a4.objectives' ) + '<br><span class=text-info>(' +
-                             model.viewModel.wordCount.objectives + ' ' + t( 'misc.words' ) + ')</span>',
-                      type: model.inputList.objectives.type
-                    }"
-                    model="model"
-                    state="$state">
-                  </cn-view-input>
-                  <cn-view-input
-                    input="{
-                      key: 'methodology',
-                      title: t( 'part1.a4.methodology' )+'<sup>?</sup>' + '<br><span class=text-info>(' +
-                             model.viewModel.wordCount.methodology + ' ' + t( 'misc.words' ) + ')</span>',
-                      type: 'text',
-                      help: t( 'part1.a4.methodology_text' )
-                    }"
-                    model="model"
-                    state="$state">
-                  </cn-view-input>
-                  <cn-view-input
-                    input="{
-                      key: 'analysis',
-                      title: t( 'part1.a4.analysis' )+'<sup>?</sup>' + '<br><span class=text-info>(' +
-                             model.viewModel.wordCount.analysis + ' ' + t( 'misc.words' ) + ')</span>',
-                      type: 'text',
-                      help: t( 'part1.a4.analysis_text' )
-                    }"
-                    model="model"
-                    state="$state">
-                  </cn-view-input>
-                  <hr/>
-                  <p class="text-primary" ng-bind-html="t( 'part1.a4.text3' )"></p>
-                  <div class="panel panel-default" ng-if="0 < model.viewModel.referenceList.length">
-                    <div class="panel-body">
-                      <table class="table table-striped">
-                        <thead class="bg-info">
-                          <tr>
-                            <td ng-bind-html="t( 'part1.a4.number' )"></td>
-                            <td ng-bind-html="t( 'part1.a4.reference' )"></td>
-                            <td></td>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr ng-repeat="reference in model.viewModel.referenceList | orderBy: 'rank'">
-                            <td>
-                              <div class="btn-group">
-                                <button class="btn btn-info dropdown-toggle"
-                                        data-toggle="dropdown"
-                                        type="button"> 
-                                  {{ reference.rank }}
-                                </button>
-                                <ul class="dropdown-menu" role="menu">
-                                  <li ng-repeat="r in model.viewModel.referenceList | orderBy: 'rank'"
-                                      ng-class="{ 'active': r.rank == reference.rank }">
-                                    <a href="#" ng-click="setReferenceRank( reference.id, r.rank )">
-                                      {{ r.rank }}
-                                    </a>
-                                  </li>
-                                </ul>
-                              </div>
-                            </td>
-                            <td class="text-left">{{ reference.reference }}</td>
-                            <td>
-                              <button class="btn btn-xs btn-danger"
-                                      ng-disabled="0 <= isDeletingReference.indexOf( reference.id )"
-                                      ng-click="removeReference( reference.id )"
-                                      uib-tooltip-html="t( 'misc.remove' )">
-                                <i class="glyphicon glyphicon-remove"></i>
-                              </button>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                  <div>
-                    <cn-add-input
-                      class="col-sm-10"
-                      input="{ key: 'reference', title: t( 'part1.a4.reference' ), type: 'string' }"
-                      record="referenceRecord"
-                      model="model.viewModel.referenceModel"
-                      first="false"
-                      state="$state">
-                    </cn-add-input>
-                    <button class="btn btn-primary col-sm-2"
-                            ng-disabled="isAddingReference"
-                            ng-click="addReference()"
-                            ng-bind-html="t( 'part1.a4.addReference' )"></button>
-                  </div>
-                </div>
-              </fieldset></form>
-            </div>
-          </div>
-          <div ng-if="'a5'==model.viewModel.tab[1]"
-               class="panel panel-default"
-               style="border-top-left-radius: 0px;">
-            <div class="panel-body">
-              <p class="text-primary" ng-bind-html="t( 'part1.a5.text' )"></p>
-              <hr/>
-              <form name="part1a5Form" novalidate><fieldset ng-disabled="!isComplete">
-                <div class="form-horizontal">
-                  <cn-view-input
-                    input="{
-                      key: 'funding',
-                      title: t( 'part1.a5.funding' ),
-                      type: 'enum',
-                      enumList: model.metadata.columnList.funding.enumList[model.viewModel.language]
-                    }"
-                    model="model"
-                    state="$state">
-                  </cn-view-input>
-                  <cn-view-input
-                    input="{
-                      key: 'funding_agency',
-                      title: t( 'part1.a5.funding_agency' ),
-                      type: model.inputList.funding_agency.type
-                    }"
-                    ng-if="'no' != model.viewModel.record.funding"
-                    model="model"
-                    state="$state">
-                  </cn-view-input>
-                  <cn-view-input
-                    input="{
-                      key: 'grant_number',
-                      title: t( 'part1.a5.grant_number' ),
-                      type: model.inputList.grant_number.type
-                    }"
-                    ng-if="'no' != model.viewModel.record.funding"
-                    model="model"
-                    state="$state">
-                  </cn-view-input>
-                </div>
-              </fieldset></form>
-            </div>
-          </div>
-          <div ng-if="'a6'==model.viewModel.tab[1]"
-               class="panel panel-default"
-               style="border-top-left-radius: 0px;">
-            <div class="panel-body">
-              <p class="text-primary" ng-bind-html="t( 'part1.a6.text' )"></p>
-              <hr/>
-              <form name="part1a6Form" novalidate><fieldset ng-disabled="!isComplete">
-                <div class="form-horizontal">
-                  <cn-view-input
-                    input="{
-                      key: 'ethics',
-                      title: t( 'part1.a6.ethics' ),
-                      type: model.inputList.ethics.type,
-                      enumList: model.metadata.columnList.ethics.enumList[model.viewModel.language]
-                    }"
-                    model="model"
-                    state="$state">
-                  </cn-view-input>
-                  <cn-view-input
-                    ng-if="true === model.viewModel.record.ethics"
-                    input="{
-                      key: 'ethics_date',
-                      title: t( 'part1.a6.expiration' ),
-                      type: model.inputList.ethics_date.type
-                    }"
-                    model="model"
-                    state="$state">
-                  </cn-view-input>
-                  <cn-view-input
-                    ng-if="false === model.viewModel.record.ethics"
-                    input="{
-                      key: 'ethics_date',
-                      title: t( 'part1.a6.response' ),
-                      type: model.inputList.ethics_date.type
-                    }"
-                    model="model"
-                    state="$state">
-                  </cn-view-input>
-                  <div class="form-group">
-                    <label class="col-sm-3 control-label" ng-bind-html="t( 'part1.a6.letter' )"></label>
-                    <div class="col-sm-9">
-                      <div class="input-group" ng-if="isComplete">
-                        <div class="form-text">
-                          <span class="horizontal-spacer" ng-if="0 < model.viewModel.record.ethicsFileSize">
-                            <a href="#"
-                               ng-click="model.viewModel.downloadEthicsFile()"
-                               ng-bind-html="model.viewModel.record.ethics_filename"></a>
-                          </span>
-                          <span class="horizontal-spacer" ng-if="0 < model.viewModel.record.ethicsFileSize">
-                            <strong ng-bind-html="t( 'misc.fileSize' )+':'"></strong>
-                            {{ model.viewModel.record.ethicsFileSize | cnSize }}
-                          </span>
-                          <button class="btn btn-default"
-                                  ng-if="0 < model.viewModel.record.ethicsFileSize"
-                                  ng-class="{ 'pull-right':0 < model.viewModel.record.ethicsFileSize }"
-                                  ng-click="model.viewModel.removeEthicsFile()"
-                                  ng-bind-html="t( 'misc.remove' )">
-                          </button>
-                          <label class="btn btn-default"
-                                 ng-disabled="model.viewModel.uploadingEthicsFile"
-                                 ng-if="!model.viewModel.record.ethicsFileSize">
-                            {{ model.viewModel.uploadingEthicsFile ?
-                               t( 'misc.uploading' ) : t( 'misc.upload' ) }}...
-                            <input type="file"
-                                   ng-model="model.viewModel.ethicsFile"
-                                   cn-upload="model.viewModel.uploadEthicsFile()"
-                                   style="display:none;"></input>
-                          </label>
-                        </div>
+        </div>
+        <div ng-if="'a6'==model.viewModel.tab[1]"
+             class="panel panel-default"
+             style="border-top-left-radius: 0px;">
+          <div class="panel-body">
+            <p class="text-primary" ng-bind-html="t( 'part1.a6.text' )"></p>
+            <hr/>
+            <form name="part1a6Form" novalidate>
+              <div class="form-horizontal">
+                <cn-view-input
+                  input="{
+                    key: 'ethics',
+                    title: t( 'part1.a6.ethics' ),
+                    type: model.inputList.ethics.type,
+                    enumList: model.metadata.columnList.ethics.enumList[model.viewModel.record.language]
+                  }"
+                  model="model"
+                  state="$state">
+                </cn-view-input>
+                <cn-view-input
+                  ng-if="true === model.viewModel.record.ethics"
+                  input="{
+                    key: 'ethics_date',
+                    title: t( 'part1.a6.expiration' ),
+                    type: model.inputList.ethics_date.type
+                  }"
+                  model="model"
+                  state="$state">
+                </cn-view-input>
+                <cn-view-input
+                  ng-if="false === model.viewModel.record.ethics"
+                  input="{
+                    key: 'ethics_date',
+                    title: t( 'part1.a6.response' ),
+                    type: model.inputList.ethics_date.type
+                  }"
+                  model="model"
+                  state="$state">
+                </cn-view-input>
+                <div class="form-group">
+                  <label class="col-sm-3 control-label" ng-bind-html="t( 'part1.a6.letter' )"></label>
+                  <div class="col-sm-9">
+                    <div class="input-group">
+                      <div class="form-text">
+                        <span class="horizontal-spacer" ng-if="0 < model.viewModel.record.ethicsFileSize">
+                          <a href="#"
+                             ng-click="model.viewModel.downloadEthicsFile()"
+                             ng-bind-html="model.viewModel.record.ethics_filename"></a>
+                        </span>
+                        <span class="horizontal-spacer" ng-if="0 < model.viewModel.record.ethicsFileSize">
+                          <strong ng-bind-html="t( 'misc.fileSize' )+':'"></strong>
+                          {{ model.viewModel.record.ethicsFileSize | cnSize }}
+                        </span>
+                        <button class="btn btn-default"
+                                ng-if="0 < model.viewModel.record.ethicsFileSize"
+                                ng-class="{ 'pull-right':0 < model.viewModel.record.ethicsFileSize }"
+                                ng-click="model.viewModel.removeEthicsFile()"
+                                ng-bind-html="t( 'misc.remove' )">
+                        </button>
+                        <label class="btn btn-default"
+                               ng-disabled="model.viewModel.uploadingEthicsFile"
+                               ng-if="!model.viewModel.record.ethicsFileSize">
+                          {{ model.viewModel.uploadingEthicsFile ?
+                             t( 'misc.uploading' ) : t( 'misc.upload' ) }}...
+                          <input type="file"
+                                 ng-model="model.viewModel.ethicsFile"
+                                 cn-upload="model.viewModel.uploadEthicsFile()"
+                                 style="display:none;"></input>
+                        </label>
                       </div>
                     </div>
                   </div>
                 </div>
-              </fieldset></form>
-            </div>
+              </div>
+            </form>
           </div>
-          <div ng-if="'a7'==model.viewModel.tab[1]"
-               class="panel panel-default"
-               style="border-top-left-radius: 0px;">
-            <div class="panel-body">
-              <p class="text-primary" ng-bind-html="t( 'part1.a7.text' )"></p>
-              <hr/>
-              <form name="part1a7Form" novalidate><fieldset ng-disabled="!isComplete">
-                <div class="form-horizontal">
-                  <cn-view-input
-                    input="{
-                      key: 'waiver',
-                      title: t( 'part1.a7.waiver' ),
-                      type: 'enum',
-                      enumList: model.metadata.columnList.waiver.enumList[model.viewModel.language]
-                    }"
-                    model="model"
-                    state="$state">
-                  </cn-view-input>
-                </div>
-              </fieldset></form>
-            </div>
+        </div>
+        <div ng-if="'a7'==model.viewModel.tab[1]"
+             class="panel panel-default"
+             style="border-top-left-radius: 0px;">
+          <div class="panel-body">
+            <p class="text-primary" ng-bind-html="t( 'part1.a7.text' )"></p>
+            <hr/>
+            <form name="part1a7Form" novalidate>
+              <div class="form-horizontal">
+                <cn-view-input
+                  input="{
+                    key: 'waiver',
+                    title: t( 'part1.a7.waiver' ),
+                    type: 'enum',
+                    enumList: model.metadata.columnList.waiver.enumList[model.viewModel.record.language]
+                  }"
+                  model="model"
+                  state="$state">
+                </cn-view-input>
+              </div>
+            </form>
           </div>
         </div>
       </div>
-      <div ng-if="'part2'==model.viewModel.tab[0]"
-           class="panel panel-default"
-           style="border-top-left-radius: 0px;">
-        <div class="panel-body" style="padding-bottom: 0px;">
-          <h4 style="margin-top: 0; margin-bottom: 1em;" ng-bind-html="t( 'part2.title' )"></h4>
-          <ul class="nav nav-tabs">
-            <li ng-class="{'active':'notes'==model.viewModel.tab[2]}">
-              <a ng-click="model.viewModel.setTab(2,'notes')" ng-bind-html="t( 'part2.notes.tab' )"></a>
-            </li>
-            <li ng-class="{'active':'a'==model.viewModel.tab[2]}">
-              <a ng-click="model.viewModel.setTab(2,'a')" ng-bind-html="t( 'part2.a.tab' )"></a>
-            </li>
-            <li ng-class="{'active':'b'==model.viewModel.tab[2]}">
-              <a ng-click="model.viewModel.setTab(2,'b')" ng-bind-html="t( 'part2.b.tab' )"></a>
-            </li>
-            <li ng-class="{'active':'c'==model.viewModel.tab[2]}">
-              <a ng-click="model.viewModel.setTab(2,'c')" ng-bind-html="t( 'part2.c.tab' )"></a>
-            </li>
-          </ul>
-          <div ng-if="'notes'==model.viewModel.tab[2]"
-               class="panel panel-default"
-               style="border-top-left-radius: 0px;">
-            <div class="panel-body" style="padding-bottom: 0px;">
-              <ul class="list-group">
-                <li class="list-group-item" ng-bind-html="t( 'part2.notes.text1' )"></li>
-                <li class="list-group-item" ng-bind-html="t( 'part2.notes.text2' )"></li>
-                <li class="list-group-item" ng-bind-html="t( 'part2.notes.text3' )"></li>
-                <li class="list-group-item" ng-bind-html="t( 'part2.notes.text4' )"></li>
-              </ul>
-            </div>
+    </div>
+    <div ng-if="'part2'==model.viewModel.tab[0]"
+         class="panel panel-default"
+         style="border-top-left-radius: 0px;">
+      <div class="panel-body" style="padding-bottom: 0px;">
+        <h4 style="margin-top: 0; margin-bottom: 1em;" ng-bind-html="t( 'part2.title' )"></h4>
+        <ul class="nav nav-tabs">
+          <li ng-class="{'active':'notes'==model.viewModel.tab[2]}">
+            <a ng-click="model.viewModel.setTab(2,'notes')" ng-bind-html="t( 'part2.notes.tab' )"></a>
+          </li>
+          <li ng-class="{'active':'a'==model.viewModel.tab[2]}">
+            <a ng-click="model.viewModel.setTab(2,'a')" ng-bind-html="t( 'part2.a.tab' )"></a>
+          </li>
+          <li ng-class="{'active':'b'==model.viewModel.tab[2]}">
+            <a ng-click="model.viewModel.setTab(2,'b')" ng-bind-html="t( 'part2.b.tab' )"></a>
+          </li>
+          <li ng-class="{'active':'c'==model.viewModel.tab[2]}">
+            <a ng-click="model.viewModel.setTab(2,'c')" ng-bind-html="t( 'part2.c.tab' )"></a>
+          </li>
+        </ul>
+        <div ng-if="'notes'==model.viewModel.tab[2]"
+             class="panel panel-default"
+             style="border-top-left-radius: 0px;">
+          <div class="panel-body" style="padding-bottom: 0px;">
+            <ul class="list-group">
+              <li class="list-group-item" ng-bind-html="t( 'part2.notes.text1' )"></li>
+              <li class="list-group-item" ng-bind-html="t( 'part2.notes.text2' )"></li>
+              <li class="list-group-item" ng-bind-html="t( 'part2.notes.text3' )"></li>
+              <li class="list-group-item" ng-bind-html="t( 'part2.notes.text4' )"></li>
+            </ul>
           </div>
-          <div ng-if="'a'==model.viewModel.tab[2]"
-               class="panel panel-default"
-               style="border-top-left-radius: 0px;">
-            <div class="panel-body">
-              <form name="part2aForm" novalidate><fieldset ng-disabled="!isComplete">
-                <div class="form-horizontal">
-                  <div class="form-group">
-                    <label for="qnaire" class="col-sm-9 control-label"
-                           ng-bind-html="t( 'part2.a.question' )"></label>
-                    <div class="col-sm-3">
-                      <input id="qnaire"
-                             ng-model="model.viewModel.record.qnaire"
-                             ng-change="model.viewModel.onPatch( { qnaire: model.viewModel.record.qnaire } )"
-                             class="form-control"
-                             type="checkbox"></input>
-                    </div>
-                  </div>
-                  <div ng-if="isComplete && model.viewModel.record.qnaire">
-                    <table class="table">
-                      <thead class="bg-info">
-                        <tr>
-                          <td ng-bind-html="t( 'part2.a.module' )"></td>
-                          <td ng-bind-html="t( 'part2.a.comprehensive' )"></td>
-                          <td ng-bind-html="t( 'part2.a.tracking' )"></td>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr ng-repeat="dataOptionCat in model.dataOptionList.baseline">
-                          <td ng-if="dataOptionCat.parent"
-                              colspan="3" class="text-left" ng-class="{ '': dataOptionCat.parentId }">
-                            <h4 uib-tooltip-html="dataOptionCat.note[model.viewModel.language]"
-                                tooltip-popup-delay="100">
-                              {{ dataOptionCat.name[model.viewModel.language] }}
-                              <sup ng-if="dataOptionCat.note[model.viewModel.language]">?</sup>
-                            </h4>
-                          </td>
-                          <td ng-if="!dataOptionCat.parent"
-                              class="text-right"
-                              ng-class="{ 'active': dataOptionCat.parentId }">
-                            <span uib-tooltip-html="dataOptionCat.note[model.viewModel.language]"
-                                  tooltip-popup-delay="100">
-                              {{ dataOptionCat.name[model.viewModel.language] }}
-                              <sup ng-if="dataOptionCat.note[model.viewModel.language]">?</sup>
-                            </span>
-                          </td>
-                          <td ng-repeat="dataOption in dataOptionCat.typeList"
-                              ng-class="{ 'active': dataOptionCat.parentId }">
-                            <span ng-if="dataOption.replacement[model.viewModel.language]">
-                              {{ dataOption.replacement[model.viewModel.language] }}
-                            </span>
-                            <input id="{{ 'dataOption' + dataOption.id }}"
-                                   ng-if="!dataOption.replacement[model.viewModel.language]"
-                                   ng-model="model.viewModel.dataOptionValueList[dataOption.id]"
-                                   ng-change="model.viewModel.setDataOptionValue( dataOption.id )"
-                                   type="checkbox">
-                            </input>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                    <hr/>
-                    <h4 class="text-center" ng-bind-html="t( 'part2.a.mcq' )"></h4>
-                    <table class="table">
-                      <thead class="bg-info">
-                        <tr>
-                          <td ng-bind-html="t( 'part2.a.module' )"></td>
-                          <td ng-bind-html="t( 'part2.a.comprehensive' )"></td>
-                          <td ng-bind-html="t( 'part2.a.tracking' )"></td>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr ng-repeat="dataOptionCat in model.dataOptionList.mcq">
-                          <td ng-if="dataOptionCat.parent"
-                              colspan="3" class="text-left" ng-class="{ '': dataOptionCat.parentId }">
-                            <h4 uib-tooltip-html="dataOptionCat.note[model.viewModel.language]"
-                                tooltip-popup-delay="100">
-                              {{ dataOptionCat.name[model.viewModel.language] }}
-                              <sup ng-if="dataOptionCat.note[model.viewModel.language]">?</sup>
-                            </h4>
-                          </td>
-                          <td ng-if="!dataOptionCat.parent"
-                              class="text-right"
-                              ng-class="{ 'active': dataOptionCat.parentId }">
-                            <span uib-tooltip-html="dataOptionCat.note[model.viewModel.language]"
-                                  tooltip-popup-delay="100">
-                              {{ dataOptionCat.name[model.viewModel.language] }}
-                              <sup ng-if="dataOptionCat.note[model.viewModel.language]">?</sup>
-                            </span>
-                          </td>
-                          <td ng-repeat="dataOption in dataOptionCat.typeList"
-                              ng-class="{ 'active': dataOptionCat.parentId }">
-                            <span ng-if="dataOption.replacement[model.viewModel.language]">
-                              {{ dataOption.replacement[model.viewModel.language] }}
-                            </span>
-                            <input id="{{ 'dataOption' + dataOption.id }}"
-                                   ng-if="!dataOption.replacement[model.viewModel.language]"
-                                   ng-model="model.viewModel.dataOptionValueList[dataOption.id]"
-                                   ng-change="model.viewModel.setDataOptionValue( dataOption.id )"
-                                   type="checkbox">
-                            </input>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                    <div class="spacer">
-                      <label for="baseline_comments" class="control-label"
-                             ng-bind-html="t( 'misc.comments' )"></label>
-                      <textarea
-                        id="baseline_comments"
-                        ng-model="model.viewModel.record.baseline_comments"
-                        cn-elastic
-                        class="form-control"
-                        type="text"></textarea>
-                    </div>
+        </div>
+        <div ng-if="'a'==model.viewModel.tab[2]"
+             class="panel panel-default"
+             style="border-top-left-radius: 0px;">
+          <div class="panel-body">
+            <form name="part2aForm" novalidate>
+              <div class="form-horizontal">
+                <div class="form-group">
+                  <label for="qnaire" class="col-sm-9 control-label"
+                         ng-bind-html="t( 'part2.a.question' )"></label>
+                  <div class="col-sm-3">
+                    <input id="qnaire"
+                           ng-model="model.viewModel.record.qnaire"
+                           ng-change="model.viewModel.onPatch( { qnaire: model.viewModel.record.qnaire } )"
+                           class="form-control"
+                           type="checkbox"></input>
                   </div>
                 </div>
-              </fieldset></form>
-            </div>
-          </div>
-          <div ng-if="'b'==model.viewModel.tab[2]"
-               class="panel panel-default"
-               style="border-top-left-radius: 0px;">
-            <div class="panel-body">
-              <form name="part2bForm" novalidate><fieldset ng-disabled="!isComplete">
-                <div class="form-horizontal">
-                  <div class="form-group">
-                    <label for="physical" class="col-sm-9 control-label"
-                           ng-bind-html="t( 'part2.b.question' )"></label>
-                    <div class="col-sm-3">
-                      <input id="physical"
-                             ng-model="model.viewModel.record.physical"
-                             ng-change="model.viewModel.onPatch( { physical: model.viewModel.record.physical } )"
-                             class="form-control"
-                             type="checkbox"></input>
-                    </div>
-                  </div>
-                  <div ng-if="isComplete && model.viewModel.record.physical">
-                    <table class="table">
-                      <thead class="bg-info">
-                        <tr>
-                          <td ng-bind-html="t( 'part2.b.physical' )"></td>
-                          <td ng-bind-html="t( 'part2.b.data' )"></td>
-                          <td ng-bind-html="t( 'part2.b.image' )"></td>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr ng-repeat="dataOptionCat in model.dataOptionList.physical">
-                          <td ng-if="dataOptionCat.parent"
-                              colspan="3" class="text-left" ng-class="{ '': dataOptionCat.parentId }">
-                            <h4 uib-tooltip-html="dataOptionCat.note[model.viewModel.language]"
+                <div ng-if="model.viewModel.record.qnaire">
+                  <table class="table">
+                    <thead class="bg-info">
+                      <tr>
+                        <td ng-bind-html="t( 'part2.a.module' )"></td>
+                        <td ng-bind-html="t( 'part2.a.comprehensive' )"></td>
+                        <td ng-bind-html="t( 'part2.a.tracking' )"></td>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr ng-repeat="dataOptionCat in model.dataOptionList.baseline">
+                        <td ng-if="dataOptionCat.parent"
+                            colspan="3" class="text-left" ng-class="{ '': dataOptionCat.parentId }">
+                          <h4 uib-tooltip-html="dataOptionCat.note[model.viewModel.record.language]"
+                              tooltip-popup-delay="100">
+                            {{ dataOptionCat.name[model.viewModel.record.language] }}
+                            <sup ng-if="dataOptionCat.note[model.viewModel.record.language]">?</sup>
+                          </h4>
+                        </td>
+                        <td ng-if="!dataOptionCat.parent"
+                            class="text-right"
+                            ng-class="{ 'active': dataOptionCat.parentId }">
+                          <span uib-tooltip-html="dataOptionCat.note[model.viewModel.record.language]"
                                 tooltip-popup-delay="100">
-                              {{ dataOptionCat.name[model.viewModel.language] }}
-                              <sup ng-if="dataOptionCat.note[model.viewModel.language]">?</sup>
-                            </h4>
-                          </td>
-                          <td ng-if="!dataOptionCat.parent"
-                              class="text-right"
-                              ng-class="{ 'active': dataOptionCat.parentId }">
-                            <span uib-tooltip-html="dataOptionCat.note[model.viewModel.language]"
-                                  tooltip-popup-delay="100">
-                              {{ dataOptionCat.name[model.viewModel.language] }}
-                              <sup ng-if="dataOptionCat.note[model.viewModel.language]">?</sup>
-                            </span>
-                          </td>
-                          <td ng-repeat="dataOption in dataOptionCat.typeList"
-                              ng-class="{ 'active': dataOptionCat.parentId }">
-                            <span ng-if="dataOption.replacement[model.viewModel.language]">
-                              {{ dataOption.replacement[model.viewModel.language] }}
-                            </span>
-                            <input id="{{ 'dataOption' + dataOption.id }}"
-                                   ng-if="!dataOption.replacement[model.viewModel.language]"
-                                   ng-model="model.viewModel.dataOptionValueList[dataOption.id]"
-                                   ng-change="model.viewModel.setDataOptionValue( dataOption.id )"
-                                   type="checkbox">
-                            </input>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                    <div class="spacer">
-                      <label for="physical_comments" class="control-label"
-                             ng-bind-html="t( 'misc.comments' )"></label>
-                      <textarea
-                        id="physical_comments"
-                        ng-model="model.viewModel.record.physical_comments"
-                        cn-elastic
-                        class="form-control"
-                        type="text"></textarea>
-                    </div>
+                            {{ dataOptionCat.name[model.viewModel.record.language] }}
+                            <sup ng-if="dataOptionCat.note[model.viewModel.record.language]">?</sup>
+                          </span>
+                        </td>
+                        <td ng-repeat="dataOption in dataOptionCat.typeList"
+                            ng-class="{ 'active': dataOptionCat.parentId }">
+                          <span ng-if="dataOption.replacement[model.viewModel.record.language]">
+                            {{ dataOption.replacement[model.viewModel.record.language] }}
+                          </span>
+                          <input id="{{ 'dataOption' + dataOption.id }}"
+                                 ng-if="!dataOption.replacement[model.viewModel.record.language]"
+                                 ng-model="model.viewModel.dataOptionValueList[dataOption.id]"
+                                 ng-change="model.viewModel.setDataOptionValue( dataOption.id )"
+                                 type="checkbox">
+                          </input>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <hr/>
+                  <h4 class="text-center" ng-bind-html="t( 'part2.a.mcq' )"></h4>
+                  <table class="table">
+                    <thead class="bg-info">
+                      <tr>
+                        <td ng-bind-html="t( 'part2.a.module' )"></td>
+                        <td ng-bind-html="t( 'part2.a.comprehensive' )"></td>
+                        <td ng-bind-html="t( 'part2.a.tracking' )"></td>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr ng-repeat="dataOptionCat in model.dataOptionList.mcq">
+                        <td ng-if="dataOptionCat.parent"
+                            colspan="3" class="text-left" ng-class="{ '': dataOptionCat.parentId }">
+                          <h4 uib-tooltip-html="dataOptionCat.note[model.viewModel.record.language]"
+                              tooltip-popup-delay="100">
+                            {{ dataOptionCat.name[model.viewModel.record.language] }}
+                            <sup ng-if="dataOptionCat.note[model.viewModel.record.language]">?</sup>
+                          </h4>
+                        </td>
+                        <td ng-if="!dataOptionCat.parent"
+                            class="text-right"
+                            ng-class="{ 'active': dataOptionCat.parentId }">
+                          <span uib-tooltip-html="dataOptionCat.note[model.viewModel.record.language]"
+                                tooltip-popup-delay="100">
+                            {{ dataOptionCat.name[model.viewModel.record.language] }}
+                            <sup ng-if="dataOptionCat.note[model.viewModel.record.language]">?</sup>
+                          </span>
+                        </td>
+                        <td ng-repeat="dataOption in dataOptionCat.typeList"
+                            ng-class="{ 'active': dataOptionCat.parentId }">
+                          <span ng-if="dataOption.replacement[model.viewModel.record.language]">
+                            {{ dataOption.replacement[model.viewModel.record.language] }}
+                          </span>
+                          <input id="{{ 'dataOption' + dataOption.id }}"
+                                 ng-if="!dataOption.replacement[model.viewModel.record.language]"
+                                 ng-model="model.viewModel.dataOptionValueList[dataOption.id]"
+                                 ng-change="model.viewModel.setDataOptionValue( dataOption.id )"
+                                 type="checkbox">
+                          </input>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <div class="spacer">
+                    <label for="baseline_comments" class="control-label"
+                           ng-bind-html="t( 'misc.comments' )"></label>
+                    <textarea
+                      id="baseline_comments"
+                      ng-model="model.viewModel.record.baseline_comments"
+                      cn-elastic
+                      class="form-control"
+                      type="text"></textarea>
                   </div>
                 </div>
-              </fieldset></form>
-            </div>
+              </div>
+            </form>
           </div>
-          <div ng-if="'c'==model.viewModel.tab[2]"
-               class="panel panel-default"
-               style="border-top-left-radius: 0px;">
-            <div class="panel-body">
-              <form name="part2cForm" novalidate><fieldset ng-disabled="!isComplete">
-                <div class="form-horizontal">
-                  <div class="form-group">
-                    <label for="biomarker" class="col-sm-9 control-label"
-                           ng-bind-html="t( 'part2.c.question' )"></label>
-                    <div class="col-sm-3">
-                      <input id="biomarker"
-                             ng-model="model.viewModel.record.biomarker"
-                             ng-change="model.viewModel.onPatch( { biomarker: model.viewModel.record.biomarker } )"
-                             class="form-control"
-                             type="checkbox"></input>
-                    </div>
-                  </div>
-                  <div ng-if="isComplete && model.viewModel.record.biomarker">
-                    <table class="table">
-                      <thead class="bg-info">
-                        <tr>
-                          <td ng-bind-html="t( 'part2.c.hematology' )"></td>
-                          <td ng-bind-html="t( 'part2.c.data' )"></td>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr ng-repeat="dataOptionCat in model.dataOptionList.biomarker">
-                          <td ng-if="dataOptionCat.parent"
-                              colspan="3" class="text-left" ng-class="{ '': dataOptionCat.parentId }">
-                            <h4 uib-tooltip-html="dataOptionCat.note[model.viewModel.language]"
-                                tooltip-popup-delay="100">
-                              {{ dataOptionCat.name[model.viewModel.language] }}
-                              <sup ng-if="dataOptionCat.note[model.viewModel.language]">?</sup>
-                            </h4>
-                          </td>
-                          <td ng-if="!dataOptionCat.parent" ng-class="{ 'active': dataOptionCat.parentId }">
-                            <span uib-tooltip-html="dataOptionCat.note[model.viewModel.language]"
-                                  tooltip-popup-delay="100">
-                              {{ dataOptionCat.name[model.viewModel.language] }}
-                              <sup ng-if="dataOptionCat.note[model.viewModel.language]">?</sup>
-                            </span>
-                          </td>
-                          <td ng-repeat="dataOption in dataOptionCat.typeList"
-                              ng-class="{ 'active': dataOptionCat.parentId }">
-                            <span ng-if="dataOption.replacement[model.viewModel.language]">
-                              {{ dataOption.replacement[model.viewModel.language] }}
-                            </span>
-                            <input id="{{ 'dataOption' + dataOption.id }}"
-                                   ng-if="!dataOption.replacement[model.viewModel.language]"
-                                   ng-model="model.viewModel.dataOptionValueList[dataOption.id]"
-                                   ng-change="model.viewModel.setDataOptionValue( dataOption.id )"
-                                   type="checkbox">
-                            </input>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                    <div class="spacer">
-                      <label for="biomarker_comments" class="control-label"
-                             ng-bind-html="t( 'misc.comments' )"></label>
-                      <textarea
-                        id="biomarker_comments"
-                        ng-model="model.viewModel.record.biomarker_comments"
-                        cn-elastic
-                        class="form-control"
-                        type="text"></textarea>
-                    </div>
+        </div>
+        <div ng-if="'b'==model.viewModel.tab[2]"
+             class="panel panel-default"
+             style="border-top-left-radius: 0px;">
+          <div class="panel-body">
+            <form name="part2bForm" novalidate>
+              <div class="form-horizontal">
+                <div class="form-group">
+                  <label for="physical" class="col-sm-9 control-label"
+                         ng-bind-html="t( 'part2.b.question' )"></label>
+                  <div class="col-sm-3">
+                    <input id="physical"
+                           ng-model="model.viewModel.record.physical"
+                           ng-change="model.viewModel.onPatch( { physical: model.viewModel.record.physical } )"
+                           class="form-control"
+                           type="checkbox"></input>
                   </div>
                 </div>
-              </fieldset></form>
-            </div>
+                <div ng-if="model.viewModel.record.physical">
+                  <table class="table">
+                    <thead class="bg-info">
+                      <tr>
+                        <td ng-bind-html="t( 'part2.b.physical' )"></td>
+                        <td ng-bind-html="t( 'part2.b.data' )"></td>
+                        <td ng-bind-html="t( 'part2.b.image' )"></td>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr ng-repeat="dataOptionCat in model.dataOptionList.physical">
+                        <td ng-if="dataOptionCat.parent"
+                            colspan="3" class="text-left" ng-class="{ '': dataOptionCat.parentId }">
+                          <h4 uib-tooltip-html="dataOptionCat.note[model.viewModel.record.language]"
+                              tooltip-popup-delay="100">
+                            {{ dataOptionCat.name[model.viewModel.record.language] }}
+                            <sup ng-if="dataOptionCat.note[model.viewModel.record.language]">?</sup>
+                          </h4>
+                        </td>
+                        <td ng-if="!dataOptionCat.parent"
+                            class="text-right"
+                            ng-class="{ 'active': dataOptionCat.parentId }">
+                          <span uib-tooltip-html="dataOptionCat.note[model.viewModel.record.language]"
+                                tooltip-popup-delay="100">
+                            {{ dataOptionCat.name[model.viewModel.record.language] }}
+                            <sup ng-if="dataOptionCat.note[model.viewModel.record.language]">?</sup>
+                          </span>
+                        </td>
+                        <td ng-repeat="dataOption in dataOptionCat.typeList"
+                            ng-class="{ 'active': dataOptionCat.parentId }">
+                          <span ng-if="dataOption.replacement[model.viewModel.record.language]">
+                            {{ dataOption.replacement[model.viewModel.record.language] }}
+                          </span>
+                          <input id="{{ 'dataOption' + dataOption.id }}"
+                                 ng-if="!dataOption.replacement[model.viewModel.record.language]"
+                                 ng-model="model.viewModel.dataOptionValueList[dataOption.id]"
+                                 ng-change="model.viewModel.setDataOptionValue( dataOption.id )"
+                                 type="checkbox">
+                          </input>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <div class="spacer">
+                    <label for="physical_comments" class="control-label"
+                           ng-bind-html="t( 'misc.comments' )"></label>
+                    <textarea
+                      id="physical_comments"
+                      ng-model="model.viewModel.record.physical_comments"
+                      cn-elastic
+                      class="form-control"
+                      type="text"></textarea>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div ng-if="'c'==model.viewModel.tab[2]"
+             class="panel panel-default"
+             style="border-top-left-radius: 0px;">
+          <div class="panel-body">
+            <form name="part2cForm" novalidate>
+              <div class="form-horizontal">
+                <div class="form-group">
+                  <label for="biomarker" class="col-sm-9 control-label"
+                         ng-bind-html="t( 'part2.c.question' )"></label>
+                  <div class="col-sm-3">
+                    <input id="biomarker"
+                           ng-model="model.viewModel.record.biomarker"
+                           ng-change="model.viewModel.onPatch( { biomarker: model.viewModel.record.biomarker } )"
+                           class="form-control"
+                           type="checkbox"></input>
+                  </div>
+                </div>
+                <div ng-if="model.viewModel.record.biomarker">
+                  <table class="table">
+                    <thead class="bg-info">
+                      <tr>
+                        <td ng-bind-html="t( 'part2.c.hematology' )"></td>
+                        <td ng-bind-html="t( 'part2.c.data' )"></td>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr ng-repeat="dataOptionCat in model.dataOptionList.biomarker">
+                        <td ng-if="dataOptionCat.parent"
+                            colspan="3" class="text-left" ng-class="{ '': dataOptionCat.parentId }">
+                          <h4 uib-tooltip-html="dataOptionCat.note[model.viewModel.record.language]"
+                              tooltip-popup-delay="100">
+                            {{ dataOptionCat.name[model.viewModel.record.language] }}
+                            <sup ng-if="dataOptionCat.note[model.viewModel.record.language]">?</sup>
+                          </h4>
+                        </td>
+                        <td ng-if="!dataOptionCat.parent" ng-class="{ 'active': dataOptionCat.parentId }">
+                          <span uib-tooltip-html="dataOptionCat.note[model.viewModel.record.language]"
+                                tooltip-popup-delay="100">
+                            {{ dataOptionCat.name[model.viewModel.record.language] }}
+                            <sup ng-if="dataOptionCat.note[model.viewModel.record.language]">?</sup>
+                          </span>
+                        </td>
+                        <td ng-repeat="dataOption in dataOptionCat.typeList"
+                            ng-class="{ 'active': dataOptionCat.parentId }">
+                          <span ng-if="dataOption.replacement[model.viewModel.record.language]">
+                            {{ dataOption.replacement[model.viewModel.record.language] }}
+                          </span>
+                          <input id="{{ 'dataOption' + dataOption.id }}"
+                                 ng-if="!dataOption.replacement[model.viewModel.record.language]"
+                                 ng-model="model.viewModel.dataOptionValueList[dataOption.id]"
+                                 ng-change="model.viewModel.setDataOptionValue( dataOption.id )"
+                                 type="checkbox">
+                          </input>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <div class="spacer">
+                    <label for="biomarker_comments" class="control-label"
+                           ng-bind-html="t( 'misc.comments' )"></label>
+                    <textarea
+                      id="biomarker_comments"
+                      ng-model="model.viewModel.record.biomarker_comments"
+                      cn-elastic
+                      class="form-control"
+                      type="text"></textarea>
+                  </div>
+                </div>
+              </div>
+            </form>
           </div>
         </div>
       </div>
-      <div ng-if="'part3'==model.viewModel.tab[0]"
-           class="panel panel-default"
-           style="border-top-left-radius: 0px;">
-        <div class="panel-body" style="padding-bottom: 0px;">
-          <h4 style="margin-top: 0; margin-bottom: 1em;" ng-bind-html="t( 'part3.title' )"></h4>
-          <p class="text-primary" ng-bind-html="t( 'part3.text' )"></p>
-        </div>
+    </div>
+    <div ng-if="'part3'==model.viewModel.tab[0]"
+         class="panel panel-default"
+         style="border-top-left-radius: 0px;">
+      <div class="panel-body" style="padding-bottom: 0px;">
+        <h4 style="margin-top: 0; margin-bottom: 1em;" ng-bind-html="t( 'part3.title' )"></h4>
+        <p class="text-primary" ng-bind-html="t( 'part3.text' )"></p>
       </div>
+    </div>
   </div>
 </div>
-<div class="vertical-spacer" ng-repeat="child in model.module.children">
-  <cn-record-list ng-if="model.viewModel[child.subject.camel+'Model']"
-                  model="model.viewModel[child.subject.camel+'Model']"></cn-record-list>
-</div>
-<div class="vertical-spacer" ng-repeat="child in model.module.choosing">
+<div class="vertical-spacer" ng-repeat="child in model.module.children" ng-if="isComplete">
   <cn-record-list ng-if="model.viewModel[child.subject.camel+'Model']"
                   model="model.viewModel[child.subject.camel+'Model']"></cn-record-list>
 </div>
