@@ -1,4 +1,4 @@
-define( [ 'coapplicant', 'keyword', 'reference' ].reduce( function( list, name ) {
+define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
   return list.concat( cenozoApp.module( name ).getRequiredFiles() );
 }, [] ), function() {
   'use strict';
@@ -62,6 +62,7 @@ define( [ 'coapplicant', 'keyword', 'reference' ].reduce( function( list, name )
     start_date: { type: 'date' },
     duration: { type: 'string' },
     title: { type: 'string' },
+    keywords: { type: 'string' },
     lay_summary: { type: 'string' },
     background: { type: 'text' },
     objectives: { type: 'text' },

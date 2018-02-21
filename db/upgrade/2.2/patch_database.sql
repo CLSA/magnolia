@@ -16,7 +16,6 @@ SOURCE writelog.sql
 
 SOURCE requisition.sql
 SOURCE coapplicant.sql
-SOURCE keyword.sql
 SOURCE reference.sql
 SOURCE data_option_parent.sql
 SOURCE data_option_subcategory.sql

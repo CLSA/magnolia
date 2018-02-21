@@ -30,6 +30,7 @@ CREATE PROCEDURE patch_requisition()
         "start_date DATE NULL, ",
         "duration VARCHAR(45) NULL, ",
         "title VARCHAR(511) NULL, ",
+        "keywords VARCHAR(255) NULL, ",
         "lay_summary VARCHAR(2047) NULL, ",
         "background TEXT NULL, ",
         "objectives TEXT NULL, ",
