@@ -1,4 +1,6 @@
-<div class="utility-view rounded">
+<div class="utility-view rounded" style="padding-bottom: 2em;" ng-if="!isComplete">
+</div>
+<div class="utility-view rounded" ng-if="isComplete">
   <div class="container-fluid bg-primary rounded-top">
     <h4>
       <button class="btn btn-menu btn-header btn-info pull-right"
@@ -34,15 +36,31 @@
          class="panel panel-default"
          style="border-top-left-radius: 0px;">
       <div class="panel-body">
+        <h4 ng-bind-html="t( 'a1.title' )"></h4>
+        <p class="text-primary" ng-bind-html="t( 'a1.text' )"></p>
+        <hr/>
+        <strong ng-bind-html="'a. '+t( 'a1.a.question' )"></strong>
+        <form name="part1a3Form" novalidate>
+          <cn-view-input
+            input="{ key: 'activities', title: t( 'a1.a.activities' ), type: 'text' }"
+            no-cols="true"
+            model="model"
+            state="$state">
+          </cn-view-input>
+          <cn-view-input
+            input="{ key: 'findings', title: t( 'a1.a.findings' ), type: 'text' }"
+            no-cols="true"
+            model="model"
+            state="$state">
+          </cn-view-input>
+          <cn-view-input
+            input="{ key: 'outcomes', title: t( 'a1.a.outcomes' ), type: 'text' }"
+            no-cols="true"
+            model="model"
+            state="$state">
+          </cn-view-input>
+        </form>
       </div>
     </div>
   </div>
-</div>
-<div class="vertical-spacer" ng-repeat="child in model.module.children">
-  <cn-record-list ng-if="model.viewModel[child.subject.camel+'Model']"
-                  model="model.viewModel[child.subject.camel+'Model']"></cn-record-list>
-</div>
-<div class="vertical-spacer" ng-repeat="child in model.module.choosing">
-  <cn-record-list ng-if="model.viewModel[child.subject.camel+'Model']"
-                  model="model.viewModel[child.subject.camel+'Model']"></cn-record-list>
 </div>
