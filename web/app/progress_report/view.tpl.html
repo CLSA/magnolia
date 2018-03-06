@@ -36,29 +36,48 @@
          class="panel panel-default"
          style="border-top-left-radius: 0px;">
       <div class="panel-body">
-        <h4 ng-bind-html="t( 'a1.title' )"></h4>
-        <p class="text-primary" ng-bind-html="t( 'a1.text' )"></p>
-        <hr/>
-        <strong ng-bind-html="'a. '+t( 'a1.a.question' )"></strong>
-        <form name="part1a3Form" novalidate>
-          <cn-view-input
-            input="{ key: 'activities', title: t( 'a1.a.activities' ), type: 'text' }"
-            no-cols="true"
-            model="model"
-            state="$state">
-          </cn-view-input>
-          <cn-view-input
-            input="{ key: 'findings', title: t( 'a1.a.findings' ), type: 'text' }"
-            no-cols="true"
-            model="model"
-            state="$state">
-          </cn-view-input>
-          <cn-view-input
-            input="{ key: 'outcomes', title: t( 'a1.a.outcomes' ), type: 'text' }"
-            no-cols="true"
-            model="model"
-            state="$state">
-          </cn-view-input>
+        <form name="a1Form" novalidate>
+          <h4 ng-bind-html="t( 'a1.title' )"></h4>
+          <p class="text-primary" ng-bind-html="t( 'a1.text' )"></p>
+          <hr/>
+          <div class="container-fluid">
+            <strong ng-bind-html="'a. '+t( 'a1.a.question' )"></strong>
+            <cn-view-input
+              input="{ key: 'activities', title: t( 'a1.a.activities' ), type: 'text' }"
+              no-cols="true"
+              model="model"
+              state="$state">
+            </cn-view-input>
+            <cn-view-input
+              input="{ key: 'findings', title: t( 'a1.a.findings' ), type: 'text' }"
+              no-cols="true"
+              model="model"
+              state="$state">
+            </cn-view-input>
+            <cn-view-input
+              input="{ key: 'outcomes', title: t( 'a1.a.outcomes' ), type: 'text' }"
+              no-cols="true"
+              model="model"
+              state="$state">
+            </cn-view-input>
+          </div>
+          <hr/>
+          <div class="container">
+            <strong ng-bind-html="'b. '+t( 'a1.b.question' )"></strong>
+            <cn-view-input
+              input="{ key: 'thesis_title', title: t( 'a1.b.thesis_title' ), type: 'text' }"
+              no-cols="true"
+              model="model"
+              state="$state">
+            </cn-view-input>
+            <cn-view-input
+              input="{ key: 'thesis_status', title: t( 'a1.b.thesis_status' ), type: 'text' }"
+              no-cols="true"
+              model="model"
+              state="$state">
+            </cn-view-input>
+          </div>
+          <hr/>
         </form>
       </div>
     </div>
