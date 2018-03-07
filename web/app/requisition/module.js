@@ -9,8 +9,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     name: {
       singular: 'requisition',
       plural: 'requisitions',
-      possessive: 'requisition’s',
-      pluralPossessive: 'requisitions’'
+      possessive: 'requisition’s'
     },
     columnList: {
       identifier: {
@@ -69,7 +68,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     physical: { type: 'boolean' },
     physical_comment: { type: 'text' },
     biomarker: { type: 'boolean' },
-    biomarker_comment: { type: 'text' }
+    biomarker_comment: { type: 'text' },
+    last_stage_type: { column: 'stage_type.name', type: 'string' }
   } );
 
   /* ######################################################################################################## */
@@ -441,7 +441,13 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               upload: { en: 'upload', fr: 'téléverser' },
               uploaded: { en: 'uploaded', fr: 'téléversé' },
               uploading: { en: 'uploading', fr: 'téléversement' },
-              fileSize: { en: 'file size', fr: 'taille du fichier' }
+              fileSize: { en: 'file size', fr: 'taille du fichier' },
+              deleteWarning: {
+                en: 'Are you sure you want to delete the application?\n\n' +
+                    'This will permanantly destroy all details you have provided. ' +
+                    'Once this is done there will be no way to restore the application!',
+                fr: 'TRANSLATION REQUIRED'
+              }
             }
           };
         }

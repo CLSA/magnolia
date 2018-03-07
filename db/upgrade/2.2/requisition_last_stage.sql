@@ -2,7 +2,7 @@ SELECT "Creating new requisition_last_stage table" AS "";
 
 CREATE TABLE IF NOT EXISTS requisition_last_stage (
   requisition_id INT UNSIGNED NOT NULL,
-  stage_id INT UNSIGNED NOT NULL,
+  stage_id INT UNSIGNED NULL DEFAULT NULL,
   update_timestamp TIMESTAMP NOT NULL,
   create_timestamp TIMESTAMP NOT NULL,
   PRIMARY KEY (requisition_id),

@@ -24,8 +24,8 @@ SOURCE requisition_has_data_option.sql
 SOURCE progress_report.sql
 SOURCE production_type.sql
 SOURCE production.sql
+SOURCE stage_type.sql
 SOURCE stage.sql
-SOURCE requisition_has_stage.sql
 SOURCE requisition_last_stage.sql
 
 SOURCE update_requisition_last_stage.sql

@@ -9,7 +9,7 @@ BEGIN
   REPLACE INTO requisition_last_stage( requisition_id, stage_id )
   SELECT requisition.id, stage.id
   FROM requisition
-  JOIN stage ON requisition.id = stage.requisition_id
+  LEFT JOIN stage ON requisition.id = stage.requisition_id
   AND stage.datetime <=> (
     SELECT MAX( datetime )
     FROM stage

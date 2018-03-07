@@ -12,8 +12,7 @@ define( function() {
     name: {
       singular: 'co-applicant',
       plural: 'co-applicants',
-      possessive: 'co-applicant\'s',
-      pluralPossessive: 'co-applicants\''
+      possessive: 'co-applicant\'s'
     },
     columnList: {
       name: { title: 'Name' },

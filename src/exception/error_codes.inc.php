@@ -21,6 +21,8 @@ define( 'VOIP_MAGNOLIA_BASE_ERRNO',       990000 );
 /**
  * "argument" error codes
  */
+define( 'ARGUMENT__MAGNOLIA_DATABASE_REQUISITION__ADD_TO_STAGE__ERRNO',
+        ARGUMENT_MAGNOLIA_BASE_ERRNO + 1 );
 
 /**
  * "database" error codes

@@ -107,4 +107,7 @@ INSERT INTO service ( subject, method, resource, restricted ) VALUES
 ( 'requisition', 'GET', 0, 0 ),
 ( 'requisition', 'GET', 1, 0 ),
 ( 'requisition', 'PATCH', 1, 1 ),
-( 'requisition', 'POST', 0, 1 );
+( 'requisition', 'POST', 0, 1 ),
+( 'stage', 'GET', 0, 1 ),
+( 'stage_type', 'GET', 0, 1 ),
+( 'stage_type', 'GET', 1, 1 );

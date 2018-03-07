@@ -1,28 +1,86 @@
-SELECT "Creating new stage table" AS "";
+DROP PROCEDURE IF EXISTS patch_stage;
+DELIMITER //
+CREATE PROCEDURE patch_stage()
+  BEGIN
 
-CREATE TABLE IF NOT EXISTS stage (
-  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  update_timestamp TIMESTAMP NOT NULL,
-  create_timestamp TIMESTAMP NOT NULL,
-  phase ENUM("new", "review", "agreement", "complete") NOT NULL,
-  rank INT UNSIGNED NOT NULL,
-  name VARCHAR(45) NOT NULL,
-  PRIMARY KEY (id),
-  UNIQUE INDEX uq_name (name ASC),
-  UNIQUE INDEX uq_phase_rank (phase ASC, rank ASC))
-ENGINE = InnoDB;
+    -- determine cenozo's database name
+    SET @cenozo = ( 
+      SELECT unique_constraint_schema
+      FROM information_schema.referential_constraints
+      WHERE constraint_schema = DATABASE()
+      AND constraint_name = "fk_access_site_id" );
 
-INSERT IGNORE INTO stage( phase, rank, name ) VALUES
-( "new", 1, "New" ),
-( "review", 1, "Admin Review" ),
-( "review", 2, "SAC Review" ),
-( "review", 3, "DSAC Selection" ),
-( "review", 4, "DSAC Review" ),
-( "review", 5, "SMT Review" ),
-( "review", 6, "Not Approved" ),
-( "review", 7, "Conditionally Approved" ),
-( "agreement", 1, "Approved" ),
-( "agreement", 2, "Data Release" ),
-( "agreement", 3, "Active" ),
-( "agreement", 4, "Report Required" ),
-( "complete", 1, "Complete" );
+    SET @test = ( 
+      SELECT COUNT(*)
+      FROM information_schema.TABLES
+      WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = "stage" );
+    IF @test = 0 THEN
+
+      SELECT "Creating new stage table" AS "";
+
+      SET @sql = CONCAT(
+        "CREATE TABLE IF NOT EXISTS stage ( ",
+          "id INT UNSIGNED NOT NULL AUTO_INCREMENT, ",
+          "update_timestamp TIMESTAMP NOT NULL, ",
+          "create_timestamp TIMESTAMP NOT NULL, ",
+          "requisition_id INT UNSIGNED NOT NULL, ",
+          "stage_type_id INT UNSIGNED NOT NULL, ",
+          "user_id INT UNSIGNED NOT NULL, ",
+          "datetime DATETIME NOT NULL, ",
+          "unprepared TINYINT(1) NOT NULL DEFAULT 0, ",
+          "PRIMARY KEY (id), ",
+          "INDEX fk_requisition_id (requisition_id ASC), ",
+          "INDEX fk_stage_type_id (stage_type_id ASC), ",
+          "INDEX fk_user_id (user_id ASC), ",
+          "CONSTRAINT fk_stage_requisition_id ",
+            "FOREIGN KEY (requisition_id) ",
+            "REFERENCES requisition (id) ",
+            "ON DELETE NO ACTION ",
+            "ON UPDATE NO ACTION, ",
+          "CONSTRAINT fk_stage_stage_type_id ",
+            "FOREIGN KEY (stage_type_id) ",
+            "REFERENCES stage_type (id) ",
+            "ON DELETE NO ACTION ",
+            "ON UPDATE NO ACTION, ",
+          "CONSTRAINT fk_stage_user_id ",
+            "FOREIGN KEY (user_id) ",
+            "REFERENCES ", @cenozo, ".user (id) ",
+            "ON DELETE NO ACTION ",
+            "ON UPDATE NO ACTION) ",
+        "ENGINE = InnoDB" );
+      PREPARE statement FROM @sql;
+      EXECUTE statement;
+      DEALLOCATE PREPARE statement;
+
+    END IF;
+
+  END //
+DELIMITER ;
+
+CALL patch_stage();
+DROP PROCEDURE IF EXISTS patch_stage;
+
+DELIMITER $$
+
+DROP TRIGGER IF EXISTS stage_AFTER_INSERT $$
+CREATE DEFINER = CURRENT_USER TRIGGER stage_AFTER_INSERT AFTER INSERT ON stage FOR EACH ROW
+BEGIN
+  CALL update_requisition_last_stage( NEW.requisition_id );
+END$$
+
+
+DROP TRIGGER IF EXISTS stage_AFTER_UPDATE $$
+CREATE DEFINER = CURRENT_USER TRIGGER stage_AFTER_UPDATE AFTER UPDATE ON stage FOR EACH ROW
+BEGIN
+  CALL update_requisition_last_stage( NEW.requisition_id );
+END$$
+
+
+DROP TRIGGER IF EXISTS stage_AFTER_DELETE $$
+CREATE DEFINER = CURRENT_USER TRIGGER stage_AFTER_DELETE AFTER DELETE ON stage FOR EACH ROW
+BEGIN
+  CALL update_requisition_last_stage( OLD.requisition_id );
+END$$
+
+DELIMITER ;

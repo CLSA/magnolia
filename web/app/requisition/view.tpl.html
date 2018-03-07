@@ -922,6 +922,14 @@
       </div>
     </div>
   </div>
+  <div class="form-footer text-right rounded-bottom bg-info">
+    <button class="btn btn-danger pull-left"
+            ng-if="'New' == model.viewModel.record.last_stage_type"
+            cn-really-message="{{ t( 'misc.deleteWarning' ) }}"
+            cn-really-click="delete()"
+            type="button">Delete</button>
+    <button type="button" class="btn btn-primary">Submit</button>
+  </div>
 </div>
 <div class="vertical-spacer" ng-repeat="child in model.module.children" ng-if="isComplete">
   <cn-record-list ng-if="model.viewModel[child.subject.camel+'Model']"

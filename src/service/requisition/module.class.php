@@ -60,5 +60,12 @@ class module extends \cenozo\service\module
       $select->add_table_column(
         'user', 'CONCAT_WS( " ", user.first_name, user.last_name )', 'user_full_name', false );
     }
+
+    if( $select->has_table_columns( 'stage_type' ) )
+    {
+      $modifier->join( 'requisition_last_stage', 'requisition.id', 'requisition_last_stage.requisition_id' );
+      $modifier->join( 'stage', 'requisition_last_stage.stage_id', 'stage.id' );
+      $modifier->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
+    }
   }
 }

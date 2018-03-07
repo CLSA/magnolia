@@ -25,12 +25,15 @@ class ui extends \cenozo\ui\ui
     if( !is_null( $module ) )
     {
       if( $module->has_action( 'view' ) ) $module->add_action( 'view', '/{identifier}?{t0}&{t1}&{t2}' );
-      $module->add_child( 'progress_report' );
+      $module->add_child( 'stage' );
     }
 
     $module = $this->get_module( 'progress_report' );
     if( !is_null( $module ) )
       if( $module->has_action( 'view' ) ) $module->add_action( 'view', '/{identifier}?{t}' );
+
+    $module = $this->get_module( 'stage_type' );
+    if( !is_null( $module ) ) $module->add_child( 'stage' );
   }
 
   /**
@@ -43,12 +46,12 @@ class ui extends \cenozo\ui\ui
     $db_role = lib::create( 'business\session' )->get_role();
 
     $this->add_listitem( 'Requisitions', 'requisition' );
+    $this->add_listitem( 'Stage Types', 'stage_type' );
 
     $this->remove_listitem( 'Availability Types' );
     $this->remove_listitem( 'Consent Types' );
     $this->remove_listitem( 'Event Types' );
     $this->remove_listitem( 'Languages' );
-    $this->remove_listitem( 'States' );
       
     if( 'applicant' == $db_role->name || 'reviewer' == $db_role->name )
       $this->remove_listitem( 'Users' );

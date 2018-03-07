@@ -13,7 +13,6 @@ define( function() {
       singular: 'progress report',
       plural: 'progress reports',
       possessive: 'progress report\'s',
-      pluralPossessive: 'progress reports\'',
       friendlyColumn: 'type'
     },
     columnList: {

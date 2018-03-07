@@ -12,8 +12,7 @@ define( function() {
     name: {
       singular: 'reference',
       plural: 'references',
-      possessive: 'reference\'s',
-      pluralPossessive: 'references\''
+      possessive: 'reference\'s'
     },
     columnList: {
       rank: { title: 'Rank', type: 'rank' },
