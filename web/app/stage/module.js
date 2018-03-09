@@ -27,14 +27,14 @@ define( function() {
         type: 'datetime'
       },
       unprepared: {
-        title: 'Administrator Required',
+        title: 'Preperation Required',
         type: 'boolean'
       },
 
     },
     defaultOrder: {
       column: 'datetime',
-      reverse: false
+      reverse: true
     }
   } );
 

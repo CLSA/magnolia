@@ -34,8 +34,8 @@ class requisition extends \cenozo\database\record
       if( file_exists( $filename ) ) unlink( $filename );
     }
 
-    // if this is a new requisition then assign it to the new stage
-    if( $is_new ) $this->add_to_stage( 1, false );
+    // if this is a new requisition then assign it to the first stage
+    if( $is_new ) $this->add_to_stage( 1 );
   }
 
   /**
@@ -64,11 +64,15 @@ class requisition extends \cenozo\database\record
 
   /**
    * Adds the requisition to a stage
+   * 
+   * The stage type may either be a stage_type object, the name of a stage_type, the rank of a
+   * stage_type or NULL.  NULL should only be used when the current stage_type only has one "next"
+   * stage_type, otherwise an exception will be thrown.
    * @param mixed $stage_type A rank, name or stage_type record
-   * @param boolean $unprepared Whether the stage must be prepared
+   * @param boolean $unprepared Whether the stage must be prepared (set to NULL for the stage_type's default)
    * @access public
    */
-  public function add_to_stage( $stage_type, $unprepared = false )
+  public function add_to_stage( $stage_type = NULL, $unprepared = NULL )
   {
     // check the primary key value
     if( is_null( $this->id ) ) 
@@ -81,12 +85,28 @@ class requisition extends \cenozo\database\record
     $db_user = lib::create( 'business\session' )->get_user();
 
     $db_stage_type = NULL;
-    if( util::string_matches_int( $stage_type ) )
+    if( is_null( $stage_type ) )
+    {
+      // get the next stage_type
+      $db_last_stage = $this->get_last_stage();
+      if( !is_null( $db_last_stage ) )
+      {
+        $next_stage_type_list = $db_last_stage->get_stage_type()->get_next_stage_type_list();
+        if( 1 == count( $next_stage_type_list ) ) $db_stage_type = current( $next_stage_type_list );
+      }
+    }
+    else if( util::string_matches_int( $stage_type ) )
+    {
       $db_stage_type = $stage_type_class_name::get_unique_record( 'rank', $stage_type );
+    }
     else if( is_string( $stage_type ) )
+    {
       $db_stage_type = $stage_type_class_name::get_unique_record( 'name', $stage_type );
+    }
     else if( is_a( $db_stage_type, lib::get_class_name( 'database\stage_type' ) ) )
+    {
       $db_stage_type = $stage_type;
+    }
 
     if( is_null( $db_stage_type ) )
       throw lib::create( 'exception\argument', 'stage_type', $stage_type, __METHOD__ );
@@ -96,7 +116,7 @@ class requisition extends \cenozo\database\record
     $db_stage->stage_type_id = $db_stage_type->id;
     $db_stage->datetime = util::get_datetime_object();
     $db_stage->user_id = $db_user->id;
-    $db_stage->unprepared = $unprepared;
+    $db_stage->unprepared = is_null( $unprepared ) ? $db_stage_type->preperation_required : $unprepared;
     $db_stage->save();
   }
 }

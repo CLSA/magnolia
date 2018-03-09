@@ -35,6 +35,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
   module.addInputGroup( '', {
     language: { type: 'string', column: 'language.code' },
     identifier: { type: 'string' },
+    state: { type: 'string' },
     name: { type: 'string' },
     position: { type: 'string' },
     affiliation: { type: 'string' },
@@ -89,8 +90,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
   /* ######################################################################################################## */
   cenozo.providers.directive( 'cnRequisitionView', [
-    'CnRequisitionModelFactory', 'cnRecordViewDirective', '$q',
-    function( CnRequisitionModelFactory, cnRecordViewDirective, $q ) {
+    'CnRequisitionModelFactory', 'cnRecordViewDirective', 'CnSession', '$q',
+    function( CnRequisitionModelFactory, cnRecordViewDirective, CnSession, $q ) {
       // used to piggy-back on the basic view controller's functionality (but not used in the DOM)
       var cnRecordView = cnRecordViewDirective[0];
 
@@ -100,6 +101,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         scope: { model: '=?' },
         link: function( scope, element, attrs ) {
           cnRecordView.link( scope, element, attrs );
+          scope.isApplicant = 'applicant' == CnSession.role.name;
           scope.isAddingCoapplicant = false;
           scope.isDeletingCoapplicant = [];
           scope.isAddingReference = false;
@@ -442,6 +444,13 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               uploaded: { en: 'uploaded', fr: 'téléversé' },
               uploading: { en: 'uploading', fr: 'téléversement' },
               fileSize: { en: 'file size', fr: 'taille du fichier' },
+              submit: { en: 'Submit', fr: 'TRANSLATION REQUIRED' },
+              submitWarning: {
+                en: 'Are you sure that all changes are complete and the application is ready to be submitted?',
+                fr: 'TRANSLATION REQUIRED'
+              },
+              abandon: { en: 'Abandon', fr: 'TRANSLATION REQUIRED' },
+              delete: { en: 'Delete', fr: 'TRANSLATION REQUIRED' },
               deleteWarning: {
                 en: 'Are you sure you want to delete the application?\n\n' +
                     'This will permanantly destroy all details you have provided. ' +
@@ -642,6 +651,46 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             }
           } );
           return add ? http.post() : http.delete();
+        };
+
+        this.abandon = function() {
+          return CnHttpFactory.instance( {
+            path: this.parentModel.getServiceResourcePath() + "?action=abandon"
+          } ).patch().then( function() {
+            // TODO: implement
+          } );
+        };
+
+        this.defer = function() {
+          return CnHttpFactory.instance( {
+            path: this.parentModel.getServiceResourcePath() + "?action=defer"
+          } ).patch().then( function() {
+            // TODO: implement
+          } );
+        };
+
+        this.reactivate = function() {
+          return CnHttpFactory.instance( {
+            path: this.parentModel.getServiceResourcePath() + "?action=reactivate"
+          } ).patch().then( function() {
+            // TODO: implement
+          } );
+        };
+
+        this.reject = function() {
+          return CnHttpFactory.instance( {
+            path: this.parentModel.getServiceResourcePath() + "?action=reject"
+          } ).patch().then( function() {
+            // TODO: implement
+          } );
+        };
+
+        this.submit = function() {
+          return CnHttpFactory.instance( {
+            path: this.parentModel.getServiceResourcePath() + "?action=submit"
+          } ).patch().then( function() {
+            // TODO: implement
+          } );
         };
 
         this.onView = function( force ) {

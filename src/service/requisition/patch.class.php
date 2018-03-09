@@ -45,5 +45,40 @@ class patch extends \cenozo\service\patch
           sprintf( 'Unable to write file "%s"', $filename ),
           __METHOD__ );
     }
+
+    $action = $this->get_argument( 'action', false );
+    if( $action )
+    {
+      $db_requisition = $this->get_leaf_record();
+      if( 'abandon' == $action )
+      {
+        // TODO: implement
+      }
+      else if( 'defer' == $action )
+      {
+        // TODO: implement
+      }
+      else if( 'reactivate' == $action )
+      {
+        // TODO: implement
+      }
+      else if( 'reject' == $action )
+      {
+        // TODO: implement
+      }
+      else if( 'submit' == $action )
+      {
+        // add the requisition to whatever the next stage is
+        $db_requisition->add_to_stage();
+      }
+      else
+      {
+        log::warning( sprintf(
+          'Received PATCH:requisition/%d with unknown action "%s"',
+          $db_requisition->id,
+          $action
+        ) );
+      }
+    }
   }
 }

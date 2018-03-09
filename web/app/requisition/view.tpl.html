@@ -927,8 +927,25 @@
             ng-if="'New' == model.viewModel.record.last_stage_type"
             cn-really-message="{{ t( 'misc.deleteWarning' ) }}"
             cn-really-click="delete()"
-            type="button">Delete</button>
-    <button type="button" class="btn btn-primary">Submit</button>
+            ng-bind-html="t( 'misc.delete' )"
+            type="button"></button>
+    <button class="btn btn-danger pull-left"
+            ng-if="isApplicant && 'deferred' == model.viewModel.record.state"
+            ng-click="model.viewModel.abandon()"
+            ng-bind-html="t( 'misc.abandon' )"
+            type="button"></button>
+    <button class="btn btn-danger pull-left"
+            ng-if="!isApplicant && (
+              'rejected' == model.viewModel.record.state ||
+              'abandoned' == model.viewModel.record.state
+            )"
+            ng-click="model.viewModel.reactivate()"
+            type="button">Re-Activate</button>
+    <button class="btn btn-primary"
+            cn-really-message="{{ t( 'misc.submitWarning' ) }}"
+            cn-really-click="model.viewModel.submit()"
+            ng-bind-html="t( 'misc.submit' )"
+            type="button"></button>
   </div>
 </div>
 <div class="vertical-spacer" ng-repeat="child in model.module.children" ng-if="isComplete">

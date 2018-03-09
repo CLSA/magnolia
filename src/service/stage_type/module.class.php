@@ -25,8 +25,8 @@ class module extends \cenozo\service\module
     if( $select->has_column( 'requisition_count' ) ) 
     {   
       $join_sel = lib::create( 'database\select' );
-      $join_sel->from( 'stage' );
-      $join_sel->add_column( 'stage_type_id' );
+      $join_sel->from( 'requisition_last_stage' );
+      $join_sel->add_table_column( 'stage', 'stage_type_id' );
       $join_sel->add_column(
         'IF( stage.requisition_id IS NOT NULL, COUNT(*), 0 )',
         'requisition_count',
@@ -34,7 +34,8 @@ class module extends \cenozo\service\module
       );
 
       $join_mod = lib::create( 'database\modifier' );
-      $join_mod->group( 'stage_type_id' );
+      $join_mod->join( 'stage', 'requisition_last_stage.stage_id', 'stage.id' );
+      $join_mod->group( 'stage.stage_type_id' );
 
       $modifier->left_join(
         sprintf( '( %s %s ) AS stage_type_join_requisition', $join_sel->get_sql(), $join_mod->get_sql() ),
