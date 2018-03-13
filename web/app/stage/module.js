@@ -27,7 +27,7 @@ define( function() {
         type: 'datetime'
       },
       unprepared: {
-        title: 'Preperation Required',
+        title: 'Prep Required',
         type: 'boolean'
       },
 

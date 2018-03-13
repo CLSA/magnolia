@@ -51,6 +51,8 @@ class module extends \cenozo\service\module
     $db_user = $session->get_user();
     $db_role = $session->get_role();
 
+    $modifier->join( 'deadline', 'requisition.deadline_id', 'deadline.id' );
+
     // only show applicants their own requisitions
     if( 'applicant' == $db_role->name ) $modifier->where( 'requisition.user_id', '=', $db_user->id );
 
@@ -66,6 +68,21 @@ class module extends \cenozo\service\module
       $modifier->join( 'requisition_last_stage', 'requisition.id', 'requisition_last_stage.requisition_id' );
       $modifier->join( 'stage', 'requisition_last_stage.stage_id', 'stage.id' );
       $modifier->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
+
+      if( $select->has_table_column( 'stage_type', 'status' ) )
+      {
+        // show admin stages before deadline as waiting for review
+        $select->add_table_column(
+          'stage_type',
+          'IF( '.
+          '  "review" = stage_type.phase AND deadline.date > DATE( UTC_TIMESTAMP() ), '.
+          '  "Waiting for Review", '.
+          '  stage_type.status '.
+          ')',
+          'status',
+          false
+        );
+      }
     }
   }
 }

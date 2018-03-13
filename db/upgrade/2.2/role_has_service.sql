@@ -45,6 +45,7 @@ CREATE PROCEDURE patch_role_has_service()
       "AND NOT( service.subject = 'requisition' AND service.method = 'POST' ) ",
       "AND NOT( service.subject = 'progress_report' AND service.method = 'POST' ) ",
       "AND NOT( service.subject = 'production' AND service.method = 'POST' )" );
+    SELECT @sql AS "";
     PREPARE statement FROM @sql;
     EXECUTE statement;
     DEALLOCATE PREPARE statement;
@@ -57,6 +58,7 @@ CREATE PROCEDURE patch_role_has_service()
       "WHERE role.name = 'applicant' ",
       "AND service.restricted = 1 ",
       "AND service.subject IN( 'coapplicant', 'progress_report', 'production', 'reference', 'requisition' )" );
+    SELECT @sql AS "";
     PREPARE statement FROM @sql;
     EXECUTE statement;
     DEALLOCATE PREPARE statement;

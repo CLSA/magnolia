@@ -14,6 +14,7 @@ SOURCE role_has_service.sql
 SOURCE setting.sql
 SOURCE writelog.sql
 
+SOURCE deadline.sql
 SOURCE requisition.sql
 SOURCE coapplicant.sql
 SOURCE reference.sql

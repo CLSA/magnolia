@@ -25,6 +25,19 @@ class requisition extends \cenozo\database\record
     // generate a random identifier if none exists
     if( is_null( $this->identifier ) ) $this->identifier = 'T'.rand( 10000, 99999 );
 
+    // select the next deadline
+    if( is_null( $this->deadline_id ) )
+    {
+      $deadline_class_name = lib::get_class_name( 'database\deadline' );
+      $db_deadline = $deadline_class_name::get_next();
+      if( is_null( $db_deadline ) )
+        throw lib::create( 'exception\runtime',
+          'Cannot create new requisition since there are no deadlines defined.',
+          __METHOD__ );
+
+      $this->deadline_id = $db_deadline->id;
+    }
+
     parent::save();
 
     // if we're changing the ethics_filename to null then delete the ethics_letter file

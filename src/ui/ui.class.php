@@ -21,6 +21,9 @@ class ui extends \cenozo\ui\ui
   {
     parent::build_module_list();
 
+    $module = $this->get_module( 'deadline' );
+    if( !is_null( $module ) ) $module->add_child( 'requisition' );
+
     $module = $this->get_module( 'requisition' );
     if( !is_null( $module ) )
     {
@@ -45,6 +48,7 @@ class ui extends \cenozo\ui\ui
 
     $db_role = lib::create( 'business\session' )->get_role();
 
+    $this->add_listitem( 'Deadlines', 'deadline' );
     $this->add_listitem( 'Requisitions', 'requisition' );
     $this->add_listitem( 'Stage Types', 'stage_type' );
 

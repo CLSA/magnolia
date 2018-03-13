@@ -18,12 +18,26 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
       user_full_name: {
         title: 'Applicant',
       },
-      start_date: {
-        title: 'Start Date',
-        type: 'date'
+      deadline: {
+        column: 'deadline.name',
+        title: 'Deadline'
       },
-      duration: {
-        title: 'Duration'
+      status: {
+        column: 'stage_type.status',
+        title: 'Status',
+        isIncluded: function( $state, model ) { return model.isApplicant(); }
+      },
+      stage_type: {
+        column: 'stage_type.name',
+        title: 'Stage',
+        type: 'string',
+        isIncluded: function( $state, model ) { return !model.isApplicant(); }
+      },
+      unprepared: {
+        column: 'stage.unprepared',
+        title: 'Prep Required',
+        type: 'boolean',
+        isIncluded: function( $state, model ) { return !model.isApplicant(); }
       }
     },
     defaultOrder: {
@@ -492,6 +506,10 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         this.wordCount = { background: 0, objectives: 0, methodology: 0, analysis: 0 };
         this.uploadingEthicsFile = false;
 
+        this.deferred.promise.then( function() {
+          if( angular.isDefined( self.stageModel ) ) self.stageModel.listModel.heading = 'Stage History';
+        } );
+
         // setup language and tab state parameters
         this.toggleLanguage = function() {
           this.record.language = 'en' == this.record.language ? 'fr' : 'en';
@@ -720,6 +738,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
         // make the input list more accessible 
         this.inputList = module.inputGroupList[0].inputList;
+
+        this.isApplicant = function() { return 'applicant' == CnSession.role.name; }
 
         // override transitionToAddState
         this.transitionToAddState = function() {
