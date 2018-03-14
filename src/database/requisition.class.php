@@ -96,17 +96,21 @@ class requisition extends \cenozo\database\record
 
     $stage_type_class_name = lib::get_class_name( 'database\stage_type' );
     $db_user = lib::create( 'business\session' )->get_user();
+    $db_last_stage = $this->get_last_stage();
+    $db_last_stage_type = is_null( $db_last_stage ) ? NULL : $db_last_stage->get_stage_type();
+
+    // get the next stage_type
+    $next_stage_type_list = is_null( $db_last_stage_type )
+                          ? array()
+                          : $db_last_stage_type->get_next_stage_type_list();
 
     $db_stage_type = NULL;
     if( is_null( $stage_type ) )
     {
-      // get the next stage_type
-      $db_last_stage = $this->get_last_stage();
-      if( !is_null( $db_last_stage ) )
-      {
-        $next_stage_type_list = $db_last_stage->get_stage_type()->get_next_stage_type_list();
-        if( 1 == count( $next_stage_type_list ) ) $db_stage_type = current( $next_stage_type_list );
-      }
+      if( 1 < count( $next_stage_type_list ) )
+        throw lib::create( 'exception\runtime',
+          'Cannot add next default stage as more than one stage type is possible.', __METHOD__ );
+      $db_stage_type = current( $next_stage_type_list );
     }
     else if( util::string_matches_int( $stage_type ) )
     {
@@ -123,6 +127,34 @@ class requisition extends \cenozo\database\record
 
     if( is_null( $db_stage_type ) )
       throw lib::create( 'exception\argument', 'stage_type', $stage_type, __METHOD__ );
+
+    // make sure the stage type is appropriate
+    if( is_null( $db_last_stage_type ) )
+    {
+      if( 1 != $db_stage_type->rank )
+        throw lib::create( 'exception\runtime',
+          sprintf( 'Tried to add stage "%s" but requisition has no existing stage.', $db_stage_type->name ),
+          __METHOD__ );
+    }
+    else
+    {
+      $found = false;
+      foreach( $next_stage_type_list as $db_next_stage_type )
+      {
+        if( $db_stage_type->id == $db_next_stage_type->id )
+        {
+          $found = true;
+          break;
+        }
+      }
+
+      if( !$found )
+        throw lib::create( 'exception\runtime',
+          sprintf( 'Tried to add stage "%s" which does not come after current stage "%s".',
+                   $db_stage_type->name,
+                   $db_last_stage_type->name ),
+          __METHOD__ );
+    }
 
     $db_stage = lib::create( 'database\stage' );
     $db_stage->requisition_id = $this->id;

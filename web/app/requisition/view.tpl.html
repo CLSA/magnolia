@@ -9,8 +9,75 @@
               ng-click="model.viewModel.toggleLanguage()">
         {{ 'en'==model.viewModel.record.language ? 'Version Française' : 'English Version' }}
       </button>
-      <span ng-bind-html="t( 'heading' ) + ' - ' + model.viewModel.record.identifier"></span>
+      <span ng-bind-html="t( 'heading' ) + ' - ' +
+                          model.viewModel.record.identifier +
+                          ' (' + model.viewModel.record[model.isApplicant()?'status':'stage_type'] + ')'"></span>
     </h4>
+  </div>
+  <div class="form-footer text-right bg-info" style="height:4.6em;">
+    <button class="btn btn-primary"
+            ng-if="model.viewModel.showSubmit()"
+            cn-really-message="{{ t( 'misc.submitWarning.' + (model.isApplicant()?'applicant':'staff') ) }}"
+            cn-really-click="model.viewModel.submit()"
+            ng-bind-html="t( 'misc.submit' )"
+            type="button"></button>
+    <div class="btn-group dropdown">
+      <button class="btn btn-primary"
+              ng-if="model.viewModel.showDecide()"
+              id="decideList"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
+              type="button">
+        Apply Decision <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu pull-right" aria-labelledby="decideList">
+        <li>
+          <a cn-really-message="{{ t( 'misc.decideApprovedWarning' ) }}"
+             cn-really-click="model.viewModel.decide( 'yes' )">Approved</a>
+        </li>
+        <li>
+          <a cn-really-message="{{ t( 'misc.decideConditionallyApprovedWarning' ) }}"
+             cn-really-click="model.viewModel.decide( 'conditional' )">Conditionally Approved</a>
+        </li>
+        <li>
+          <a cn-really-message="{{ t( 'misc.decideNotApprovedWarning' ) }}"
+             cn-really-click="model.viewModel.decide( 'no' )">Not Approved</a>
+        </li>
+      </ul>
+    </div>
+    <div class="btn-group pull-left">
+      <button class="btn btn-danger"
+              ng-if="model.viewModel.showDelete()"
+              cn-really-message="{{ t( 'misc.deleteWarning' ) }}"
+              cn-really-click="delete()"
+              ng-bind-html="t( 'misc.delete' )"
+              type="button"></button>
+      <button class="btn btn-warning"
+              ng-if="model.viewModel.showReject()"
+              cn-really-message="{{ t( 'misc.rejectWarning' ) }}"
+              cn-really-click="model.viewModel.reject()"
+              ng-bind-html="t( 'misc.reject' )"
+              type="button"></button>
+      <button class="btn btn-default"
+              ng-if="model.viewModel.showDefer()"
+              cn-really-message="{{ t( 'misc.deferWarning' ) }}"
+              cn-really-click="model.viewModel.defer()"
+              ng-bind-html="t( 'misc.defer' )"
+              type="button"></button>
+      <button class="btn btn-danger"
+              ng-if="model.viewModel.showAbandon()"
+              cn-really-message="{{ t( 'misc.abandonWarning' ) }}"
+              cn-really-click="model.viewModel.abandon()"
+              ng-bind-html="t( 'misc.abandon' )"
+              type="button"></button>
+      <button class="btn btn-warning"
+              ng-if="model.viewModel.showReactivate()"
+              cn-really-message="{{ t( 'misc.reactivateWarning' ) }}"
+              cn-really-click="model.viewModel.reactivate()"
+              ng-bind-html="t( 'misc.reactivate' )"
+              type="button"></button>
+    </div>
   </div>
   <div class="container-fluid" style="padding-top: 1em;">
     <ul class="nav nav-tabs nav-justified">
@@ -75,7 +142,7 @@
             <p class="text-primary" ng-bind-html="t( 'part1.a1.text1' )"></p>
             <p class="text-primary" ng-bind-html="t( 'part1.a1.text2' )"></p>
             <hr/>
-            <form name="part1a1Form" novalidate>
+            <form name="part1a1Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
               <div class="form-horizontal">
                 <cn-view-input
                   input="{
@@ -190,7 +257,7 @@
                   state="$state">
                 </cn-view-input>
               </div>
-            </form>
+            </fieldset></form>
           </div>
         </div>
         <div ng-if="'a2'==model.viewModel.tab[1]"
@@ -233,7 +300,7 @@
                 </table>
               </div>
             </div>
-            <form name="part1a2Form" novalidate>
+            <form name="part1a2Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
               <div class="form-horizontal">
                 <cn-add-input
                   input="{ key: 'name', title: t( 'part1.a2.name' ), type: 'string' }"
@@ -287,7 +354,7 @@
                         ng-click="addCoapplicant()"
                         ng-bind-html="t( 'part1.a2.addCoapplicant' )"></button>
               </div>
-            </form>
+            </fieldset></form>
           </div>
         </div>
         <div ng-if="'a3'==model.viewModel.tab[1]"
@@ -296,7 +363,7 @@
           <div class="panel-body">
             <p class="text-primary" ng-bind-html="t( 'part1.a3.text' )"></p>
             <hr/>
-            <form name="part1a3Form" novalidate>
+            <form name="part1a3Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
               <div class="form-horizontal">
                 <cn-view-input
                   input="{
@@ -318,7 +385,7 @@
                   state="$state">
                 </cn-view-input>
               </div>
-            </form>
+            </fieldset></form>
           </div>
         </div>
         <div ng-if="'a4'==model.viewModel.tab[1]"
@@ -327,7 +394,7 @@
           <div class="panel-body">
             <p class="text-primary" ng-bind-html="t( 'part1.a4.text1' )"></p>
             <hr/>
-            <form name="part1a4Form" novalidate>
+            <form name="part1a4Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
               <div class="form-horizontal">
                 <cn-view-input
                   input="{
@@ -469,7 +536,7 @@
                           ng-bind-html="t( 'part1.a4.addReference' )"></button>
                 </div>
               </div>
-            </form>
+            </fieldset></form>
           </div>
         </div>
         <div ng-if="'a5'==model.viewModel.tab[1]"
@@ -478,7 +545,7 @@
           <div class="panel-body">
             <p class="text-primary" ng-bind-html="t( 'part1.a5.text' )"></p>
             <hr/>
-            <form name="part1a5Form" novalidate>
+            <form name="part1a5Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
               <div class="form-horizontal">
                 <cn-view-input
                   input="{
@@ -511,7 +578,7 @@
                   state="$state">
                 </cn-view-input>
               </div>
-            </form>
+            </fieldset></form>
           </div>
         </div>
         <div ng-if="'a6'==model.viewModel.tab[1]"
@@ -520,7 +587,7 @@
           <div class="panel-body">
             <p class="text-primary" ng-bind-html="t( 'part1.a6.text' )"></p>
             <hr/>
-            <form name="part1a6Form" novalidate>
+            <form name="part1a6Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
               <div class="form-horizontal">
                 <cn-view-input
                   input="{
@@ -587,7 +654,7 @@
                   </div>
                 </div>
               </div>
-            </form>
+            </fieldset></form>
           </div>
         </div>
         <div ng-if="'a7'==model.viewModel.tab[1]"
@@ -596,7 +663,7 @@
           <div class="panel-body">
             <p class="text-primary" ng-bind-html="t( 'part1.a7.text' )"></p>
             <hr/>
-            <form name="part1a7Form" novalidate>
+            <form name="part1a7Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
               <div class="form-horizontal">
                 <cn-view-input
                   input="{
@@ -609,7 +676,7 @@
                   state="$state">
                 </cn-view-input>
               </div>
-            </form>
+            </fieldset></form>
           </div>
         </div>
       </div>
@@ -649,7 +716,7 @@
              class="panel panel-default"
              style="border-top-left-radius: 0px;">
           <div class="panel-body">
-            <form name="part2aForm" novalidate>
+            <form name="part2aForm" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
               <div class="form-horizontal">
                 <div class="form-group">
                   <label for="qnaire" class="col-sm-9 control-label"
@@ -761,14 +828,14 @@
                   </div>
                 </div>
               </div>
-            </form>
+            </fieldset></form>
           </div>
         </div>
         <div ng-if="'b'==model.viewModel.tab[2]"
              class="panel panel-default"
              style="border-top-left-radius: 0px;">
           <div class="panel-body">
-            <form name="part2bForm" novalidate>
+            <form name="part2bForm" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
               <div class="form-horizontal">
                 <div class="form-group">
                   <label for="physical" class="col-sm-9 control-label"
@@ -836,14 +903,14 @@
                   </div>
                 </div>
               </div>
-            </form>
+            </fieldset></form>
           </div>
         </div>
         <div ng-if="'c'==model.viewModel.tab[2]"
              class="panel panel-default"
              style="border-top-left-radius: 0px;">
           <div class="panel-body">
-            <form name="part2cForm" novalidate>
+            <form name="part2cForm" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
               <div class="form-horizontal">
                 <div class="form-group">
                   <label for="biomarker" class="col-sm-9 control-label"
@@ -908,7 +975,7 @@
                   </div>
                 </div>
               </div>
-            </form>
+            </fieldset></form>
           </div>
         </div>
       </div>
@@ -921,31 +988,6 @@
         <p class="text-primary" ng-bind-html="t( 'part3.text' )"></p>
       </div>
     </div>
-  </div>
-  <div class="form-footer text-right rounded-bottom bg-info">
-    <button class="btn btn-danger pull-left"
-            ng-if="'New' == model.viewModel.record.last_stage_type"
-            cn-really-message="{{ t( 'misc.deleteWarning' ) }}"
-            cn-really-click="delete()"
-            ng-bind-html="t( 'misc.delete' )"
-            type="button"></button>
-    <button class="btn btn-danger pull-left"
-            ng-if="isApplicant && 'deferred' == model.viewModel.record.state"
-            ng-click="model.viewModel.abandon()"
-            ng-bind-html="t( 'misc.abandon' )"
-            type="button"></button>
-    <button class="btn btn-danger pull-left"
-            ng-if="!isApplicant && (
-              'rejected' == model.viewModel.record.state ||
-              'abandoned' == model.viewModel.record.state
-            )"
-            ng-click="model.viewModel.reactivate()"
-            type="button">Re-Activate</button>
-    <button class="btn btn-primary"
-            cn-really-message="{{ t( 'misc.submitWarning' ) }}"
-            cn-really-click="model.viewModel.submit()"
-            ng-bind-html="t( 'misc.submit' )"
-            type="button"></button>
   </div>
 </div>
 <div class="vertical-spacer" ng-repeat="child in model.module.children" ng-if="isComplete">

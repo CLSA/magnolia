@@ -49,6 +49,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
   module.addInputGroup( '', {
     language: { type: 'string', column: 'language.code' },
     identifier: { type: 'string' },
+    status: { column: 'stage_type.status', type: 'string' },
+    phase: { column: 'stage_type.phase', type: 'string' },
+    stage_type: { column: 'stage_type.name', type: 'string' },
     state: { type: 'string' },
     name: { type: 'string' },
     position: { type: 'string' },
@@ -115,7 +118,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         scope: { model: '=?' },
         link: function( scope, element, attrs ) {
           cnRecordView.link( scope, element, attrs );
-          scope.isApplicant = 'applicant' == CnSession.role.name;
           scope.isAddingCoapplicant = false;
           scope.isDeletingCoapplicant = [];
           scope.isAddingReference = false;
@@ -458,18 +460,54 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               uploaded: { en: 'uploaded', fr: 'téléversé' },
               uploading: { en: 'uploading', fr: 'téléversement' },
               fileSize: { en: 'file size', fr: 'taille du fichier' },
+              delete: { en: 'Delete', fr: 'TRANSLATION REQUIRED' },
               submit: { en: 'Submit', fr: 'TRANSLATION REQUIRED' },
               submitWarning: {
-                en: 'Are you sure that all changes are complete and the application is ready to be submitted?',
+                applicant: {
+                  en: 'Are you sure that all changes are complete and the application is ready to be submitted?',
+                  fr: 'TRANSLATION REQUIRED'
+                },
+                staff: {
+                  en: 'Are you sure you wish to proceed to the next stage?',
+                  fr: 'Are you sure you wish to proceed to the next stage?'
+                }
+              },
+              decideApprovedWarning: {
+                en: 'Are you sure you wish to mark the '+$scope.model.module.name.singular+' as approved?',
+                fr: 'Are you sure you wish to mark the '+$scope.model.module.name.singular+' as approved?'
+              },
+              decideConditionallyApprovedWarning: {
+                en: 'Are you sure you wish to mark the '+$scope.model.module.name.singular+' as conditionally approved?',
+                fr: 'Are you sure you wish to mark the '+$scope.model.module.name.singular+' as conditionally approved?'
+              },
+              decideNotApprovedWarning: {
+                en: 'Are you sure you wish to mark the '+$scope.model.module.name.singular+' as not approved?',
+                fr: 'Are you sure you wish to mark the '+$scope.model.module.name.singular+' as not approved?'
+              },
+              deleteWarning: {
+                en: 'Are you sure you want to delete the application?\n\nThis will permanantly destroy all details you have provided. Once this is done there will be no way to restore the application!',
                 fr: 'TRANSLATION REQUIRED'
               },
+              reject: { en: 'Reject', fr: 'Reject' },
+              rejectWarning: {
+                en: 'Please ensure that rejection information is ready for the applicant before proceeding.\n\nDo you wish to proceed?',
+                fr: 'Please ensure that rejection information is ready for the applicant before proceeding.\n\nDo you wish to proceed?'
+              },
+              defer: { en: 'Defer to Applicant', fr: 'Defer to Applicant' },
+              deferWarning: {
+                en: 'Are you sure you wish to defer to the applicant?',
+                fr: 'Are you sure you wish to defer to the applicant?'
+              },
               abandon: { en: 'Abandon', fr: 'TRANSLATION REQUIRED' },
-              delete: { en: 'Delete', fr: 'TRANSLATION REQUIRED' },
-              deleteWarning: {
-                en: 'Are you sure you want to delete the application?\n\n' +
-                    'This will permanantly destroy all details you have provided. ' +
-                    'Once this is done there will be no way to restore the application!',
+              abandonWarning: {
+                en: 'Are you sure you want to abandon the application?\n\nYou will no longer have access to the application and the review process will be discontinued.',
+                    
                 fr: 'TRANSLATION REQUIRED'
+              },
+              reactivate: { en: 'Re-Activate', fr: 'Re-Activate' },
+              reactivateWarning: {
+                en: 'Are you sure you want to re-activate the '+$scope.model.module.name.singular+'?\n\nThis will return to its previous "'+$scope.model.viewModel.record.stage_type+'" stage.',
+                fr: 'Are you sure you want to re-activate the '+$scope.model.module.name.singular+'?\n\nThis will return to its previous "'+$scope.model.viewModel.record.stage_type+'" stage.'
               }
             }
           };
@@ -671,49 +709,98 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           return add ? http.post() : http.delete();
         };
 
-        this.abandon = function() {
-          return CnHttpFactory.instance( {
-            path: this.parentModel.getServiceResourcePath() + "?action=abandon"
-          } ).patch().then( function() {
-            // TODO: implement
-          } );
+        this.showDelete = function() {
+          return 'new' == this.record.phase && this.parentModel.getEditEnabled();
         };
 
-        this.defer = function() {
-          return CnHttpFactory.instance( {
-            path: this.parentModel.getServiceResourcePath() + "?action=defer"
-          } ).patch().then( function() {
-            // TODO: implement
-          } );
+        this.showSubmit = function() {
+          return ( this.parentModel.isApplicant()
+            ? 'new' == this.record.phase || 'deferred' == this.record.state
+            : this.parentModel.isAdministrator()
+            ? ( 'review' == this.record.phase && 'SMT Review' != this.record.stage_type )
+              || 'agreement' == this.record.phase
+            : false
+          ) && this.parentModel.getEditEnabled();
         };
-
-        this.reactivate = function() {
-          return CnHttpFactory.instance( {
-            path: this.parentModel.getServiceResourcePath() + "?action=reactivate"
-          } ).patch().then( function() {
-            // TODO: implement
-          } );
-        };
-
-        this.reject = function() {
-          return CnHttpFactory.instance( {
-            path: this.parentModel.getServiceResourcePath() + "?action=reject"
-          } ).patch().then( function() {
-            // TODO: implement
-          } );
-        };
-
         this.submit = function() {
           return CnHttpFactory.instance( {
             path: this.parentModel.getServiceResourcePath() + "?action=submit"
           } ).patch().then( function() {
-            // TODO: implement
+            self.transitionOnViewParent();
+          } );
+        };
+
+        this.showDecide = function() {
+          return this.parentModel.getEditEnabled() &&
+                 this.parentModel.isAdministrator() &&
+                 'SMT Review' == this.record.stage_type &&
+                 null == this.record.state;
+        };
+        this.decide = function( decision ) {
+          return CnHttpFactory.instance( {
+            path: this.parentModel.getServiceResourcePath() + "?action=decide&approve=" + decision
+          } ).patch().then( function() {
+            self.transitionOnViewParent();
+          } );
+        };
+
+        this.showReject = function() {
+          return this.parentModel.isAdministrator() &&
+                 'rejected' != this.record.state &&
+                 ( 'review' == this.record.phase || 'deferred' == this.record.state );
+        };
+        this.reject = function() {
+          return CnHttpFactory.instance( {
+            path: this.parentModel.getServiceResourcePath() + "?action=reject"
+          } ).patch().then( function() {
+            self.record.state = 'rejected';
+          } );
+        };
+
+        this.showDefer = function() {
+          return this.parentModel.getEditEnabled() &&
+                 'deferred' != this.record.state &&
+                 ( 'review' == this.record.phase || 'agreement' == this.record.phase );
+        };
+        this.defer = function() {
+          return CnHttpFactory.instance( {
+            path: this.parentModel.getServiceResourcePath() + "?action=defer"
+          } ).patch().then( function() {
+            self.record.state = 'deferred';
+          } );
+        };
+
+        this.showAbandon = function() {
+          return this.parentModel.isApplicant() &&
+                 'deferred' == this.record.state &&
+                 'review' == this.record.phase;
+        };
+        this.abandon = function() {
+          return CnHttpFactory.instance( {
+            path: this.parentModel.getServiceResourcePath() + "?action=abandon"
+          } ).patch().then( function() {
+            self.record.state = 'abandoned';
+            self.transitionOnViewParent();
+          } );
+        };
+
+        this.showReactivate = function() {
+          return this.parentModel.isAdministrator() &&
+                 ( 'abandoned' == this.record.state || 'rejected' == this.record.state );
+        };
+        this.reactivate = function() {
+          return CnHttpFactory.instance( {
+            path: this.parentModel.getServiceResourcePath() + "?action=reactivate"
+          } ).patch().then( function() {
+            self.record.state = null;
           } );
         };
 
         this.onView = function( force ) {
           return $q.all( [
-            this.$$onView( force ).then( function() { return self.updateEthicsFileSize(); } ),
+            this.$$onView( force ).then( function() {
+              return self.updateEthicsFileSize();
+            } ),
             this.getCoapplicantList(),
             this.getReferenceList(),
             this.getDataOptionValueList()
@@ -740,6 +827,17 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         this.inputList = module.inputGroupList[0].inputList;
 
         this.isApplicant = function() { return 'applicant' == CnSession.role.name; }
+        this.isAdministrator = function() { return 'administrator' == CnSession.role.name; }
+
+        this.getEditEnabled = function() {
+          var phase = this.viewModel.record.phase;
+          var roleCheck = 'applicant' == CnSession.role.name
+                        ? 'new' == phase || ( 'review' == phase && 'deferred' == this.viewModel.record.state )
+                        : 'administrator' == CnSession.role.name
+                        ? 'new' == phase || ( 'review' == phase && null == this.viewModel.record.state )
+                        : false;
+          return this.$$getEditEnabled() && roleCheck;
+        };
 
         // override transitionToAddState
         this.transitionToAddState = function() {

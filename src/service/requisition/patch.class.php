@@ -32,6 +32,76 @@ class patch extends \cenozo\service\patch
   /**
    * Extend parent method
    */
+  public function validate()
+  {
+    parent::validate();
+
+    $action = $this->get_argument( 'action', false );
+    if( $action )
+    {
+      // define whether the action is allowed
+      $db_role = lib::create( 'business\session' )->get_role();
+      $applicant = 'applicant' == $db_role->name;
+      $administrator = 'administrator' == $db_role->name;
+      $db_requisition = $this->get_leaf_record();
+      $db_stage_type = $db_requisition->get_last_stage()->get_stage_type();
+      $state = $db_requisition->state;
+      $phase = $db_stage_type->phase;
+      $code = NULL;
+      if( 'abandon' == $action )
+      {
+        if( ( !$applicant && !$administrator ) || 'deferred' != $state ) $code = 403;
+      }
+      else if( 'defer' == $action )
+      {
+        if( 'review' != $phase && 'agreement' != $phase ) $code = 403;
+      }
+      else if( 'reactivate' == $action )
+      {
+        if( !$administrator || ( 'abandoned' != $state && 'rejected' != $state ) ) $code = 403;
+      }
+      else if( 'reject' == $action )
+      {
+        if( !$administrator || ( 'review' != $phase && 'defered' != $state ) ) $code = 403;
+      }
+      else if( 'submit' == $action )
+      {
+        if( $administrator )
+        {
+          if( 'review' != $phase && 'agreement' != $phase ) $code = 403;
+        }
+        else if( $applicant )
+        {
+          if( 'new' != $phase && 'defered' != $state ) $code = 403;
+        }
+        else $code = 403;
+      }
+      else if( 'decide' == $action )
+      {
+        if( !$administrator || 'SMT Review' != $db_stage_type->name ) $code = 403;
+        else
+        {
+          $approve = $this->get_argument( 'approve' );
+          if( !in_array( $approve, array( 'yes', 'conditional', 'no' ) ) )
+          {
+            $this->set_data( 'Invalid approve type.' );
+            $code = 400;
+          }
+        }
+      }
+      else
+      {
+        $this->set_data( 'Invalid action type.' );
+        $code = 400;
+      }
+
+      if( !is_null( $code ) ) $this->status->set_code( $code );
+    }
+  }
+
+  /**
+   * Extend parent method
+   */
   public function execute()
   {
     parent::execute();
@@ -52,24 +122,45 @@ class patch extends \cenozo\service\patch
       $db_requisition = $this->get_leaf_record();
       if( 'abandon' == $action )
       {
-        // TODO: implement
+        $db_requisition->state = 'abandoned';
+        $db_requisition->save();
       }
       else if( 'defer' == $action )
       {
-        // TODO: implement
+        $db_requisition->state = 'deferred';
+        $db_requisition->save();
       }
       else if( 'reactivate' == $action )
       {
-        // TODO: implement
+        $db_requisition->state = NULL;
+        $db_requisition->save();
       }
       else if( 'reject' == $action )
       {
-        // TODO: implement
+        $db_requisition->state = 'rejected';
+        $db_requisition->save();
       }
       else if( 'submit' == $action )
       {
-        // add the requisition to whatever the next stage is
-        $db_requisition->add_to_stage();
+        if( 'deferred' == $db_requisition->state )
+        {
+          $db_requisition->state = NULL;
+          $db_requisition->save();
+        }
+        else
+        {
+          // add the requisition to whatever the next stage is
+          $db_requisition->add_to_stage();
+        }
+      }
+      else if( 'decide' == $action )
+      {
+        $approve = $this->get_argument( 'approve' );
+        $stage_type = NULL;
+        if( 'yes' == $approve ) $stage_type = 'Approved';
+        else if( 'conditional' == $approve ) $stage_type = 'Conditionally Approved';
+        else if( 'no' == $approve ) $stage_type = 'Not Approved';
+        $db_requisition->add_to_stage( $stage_type );
       }
       else
       {
