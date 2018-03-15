@@ -14,7 +14,16 @@
                           ' (' + model.viewModel.record[model.isApplicant()?'status':'stage_type'] + ')'"></span>
     </h4>
   </div>
-  <div class="form-footer text-right bg-info" style="height:4.6em;">
+  <div ng-if="model.viewModel.showSubmit() ||
+              model.viewModel.showDecide() ||
+              model.viewModel.showDelete() ||
+              model.viewModel.showReject() ||
+              model.viewModel.showDefer() ||
+              model.viewModel.showAbandon() ||
+              model.viewModel.showReactivate() ||
+              model.viewModel.showPrepare()"
+       class="form-footer text-right bg-info"
+       style="height:4.6em;">
     <button class="btn btn-primary"
             ng-if="model.viewModel.showSubmit()"
             cn-really-message="{{ t( 'misc.submitWarning.' + (model.isApplicant()?'applicant':'staff') ) }}"
@@ -47,11 +56,16 @@
       </ul>
     </div>
     <div class="btn-group pull-left">
-      <button class="btn btn-danger"
-              ng-if="model.viewModel.showDelete()"
-              cn-really-message="{{ t( 'misc.deleteWarning' ) }}"
-              cn-really-click="delete()"
-              ng-bind-html="t( 'misc.delete' )"
+      <button class="btn btn-default"
+              ng-if="model.viewModel.showDefer()"
+              cn-really-message="{{ t( 'misc.deferWarning' ) }}"
+              cn-really-click="model.viewModel.defer()"
+              ng-bind-html="t( 'misc.defer' )"
+              type="button"></button>
+      <button class="btn btn-default"
+              ng-if="model.viewModel.showPrepare()"
+              ng-click="model.viewModel.prepare()"
+              ng-bind-html="t( 'misc.prepare' )"
               type="button"></button>
       <button class="btn btn-warning"
               ng-if="model.viewModel.showReject()"
@@ -59,23 +73,23 @@
               cn-really-click="model.viewModel.reject()"
               ng-bind-html="t( 'misc.reject' )"
               type="button"></button>
-      <button class="btn btn-default"
-              ng-if="model.viewModel.showDefer()"
-              cn-really-message="{{ t( 'misc.deferWarning' ) }}"
-              cn-really-click="model.viewModel.defer()"
-              ng-bind-html="t( 'misc.defer' )"
+      <button class="btn btn-warning"
+              ng-if="model.viewModel.showReactivate()"
+              cn-really-message="{{ t( 'misc.reactivateWarning' ) }}"
+              cn-really-click="model.viewModel.reactivate()"
+              ng-bind-html="t( 'misc.reactivate' )"
+              type="button"></button>
+      <button class="btn btn-danger"
+              ng-if="model.viewModel.showDelete()"
+              cn-really-message="{{ t( 'misc.deleteWarning' ) }}"
+              cn-really-click="delete()"
+              ng-bind-html="t( 'misc.delete' )"
               type="button"></button>
       <button class="btn btn-danger"
               ng-if="model.viewModel.showAbandon()"
               cn-really-message="{{ t( 'misc.abandonWarning' ) }}"
               cn-really-click="model.viewModel.abandon()"
               ng-bind-html="t( 'misc.abandon' )"
-              type="button"></button>
-      <button class="btn btn-warning"
-              ng-if="model.viewModel.showReactivate()"
-              cn-really-message="{{ t( 'misc.reactivateWarning' ) }}"
-              cn-really-click="model.viewModel.reactivate()"
-              ng-bind-html="t( 'misc.reactivate' )"
               type="button"></button>
     </div>
   </div>

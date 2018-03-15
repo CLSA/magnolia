@@ -60,6 +60,10 @@ class patch extends \cenozo\service\patch
       {
         if( !$administrator || ( 'abandoned' != $state && 'rejected' != $state ) ) $code = 403;
       }
+      else if( 'prepare' == $action )
+      {
+        if( !$administrator || !is_null( $state ) ) $code = 403;
+      }
       else if( 'reject' == $action )
       {
         if( !$administrator || ( 'review' != $phase && 'defered' != $state ) ) $code = 403;
@@ -129,16 +133,30 @@ class patch extends \cenozo\service\patch
       {
         $db_requisition->state = 'deferred';
         $db_requisition->save();
+        log::info( sprintf(
+          'Send "Action required" notification email to applicant of %s',
+          $db_requisition->identifier
+        ) );
       }
       else if( 'reactivate' == $action )
       {
         $db_requisition->state = NULL;
         $db_requisition->save();
       }
+      else if( 'prepare' == $action )
+      {
+        $db_last_stage = $db_requisition->get_last_stage();
+        $db_last_stage->unprepared = false;
+        $db_last_stage->save();
+      }
       else if( 'reject' == $action )
       {
         $db_requisition->state = 'rejected';
         $db_requisition->save();
+        log::info( sprintf(
+          'Send "Rejected" notification email to applicant of %s',
+          $db_requisition->identifier
+        ) );
       }
       else if( 'submit' == $action )
       {
@@ -161,6 +179,10 @@ class patch extends \cenozo\service\patch
         else if( 'conditional' == $approve ) $stage_type = 'Conditionally Approved';
         else if( 'no' == $approve ) $stage_type = 'Not Approved';
         $db_requisition->add_to_stage( $stage_type );
+        log::info( sprintf(
+          'Send "Notice of Decision" notification email to applicant of %s',
+          $db_requisition->identifier
+        ) );
       }
       else
       {

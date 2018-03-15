@@ -52,6 +52,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     status: { column: 'stage_type.status', type: 'string' },
     phase: { column: 'stage_type.phase', type: 'string' },
     stage_type: { column: 'stage_type.name', type: 'string' },
+    unprepared: { column: 'stage.unprepared', type: 'boolean' },
     state: { type: 'string' },
     name: { type: 'string' },
     position: { type: 'string' },
@@ -508,7 +509,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               reactivateWarning: {
                 en: 'Are you sure you want to re-activate the '+$scope.model.module.name.singular+'?\n\nThis will return to its previous "'+$scope.model.viewModel.record.stage_type+'" stage.',
                 fr: 'Are you sure you want to re-activate the '+$scope.model.module.name.singular+'?\n\nThis will return to its previous "'+$scope.model.viewModel.record.stage_type+'" stage.'
-              }
+              },
+              prepare: { en: 'Mark as Prepared', fr: 'Mark as Prepared' }
             }
           };
         }
@@ -793,6 +795,18 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             path: this.parentModel.getServiceResourcePath() + "?action=reactivate"
           } ).patch().then( function() {
             self.record.state = null;
+          } );
+        };
+
+        this.showPrepare = function() {
+          return this.parentModel.isAdministrator() && this.record.unprepared && null == this.record.state;
+        };
+        this.prepare = function() {
+          return CnHttpFactory.instance( {
+            path: this.parentModel.getServiceResourcePath() + "?action=prepare"
+          } ).patch().then( function() {
+            self.record.unprepared = false;
+            return self.stageModel.listModel.onList( true );
           } );
         };
 
