@@ -63,6 +63,9 @@ class module extends \cenozo\service\module
         'user', 'CONCAT_WS( " ", user.first_name, user.last_name )', 'user_full_name', false );
     }
 
+    if( $select->has_column( 'unprepared' ) )
+      $select->add_column( 'IF( stage.unprepared, "Yes", "No" )', 'unprepared', false );
+
     if( $select->has_table_columns( 'stage_type' ) )
     {
       $modifier->join( 'requisition_last_stage', 'requisition.id', 'requisition_last_stage.requisition_id' );

@@ -47,74 +47,111 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
   } );
 
   module.addInputGroup( '', {
-    language: { type: 'string', column: 'language.code' },
-    identifier: { type: 'string' },
-    status: { column: 'stage_type.status', type: 'string' },
-    phase: { column: 'stage_type.phase', type: 'string' },
-    stage_type: { column: 'stage_type.name', type: 'string' },
-    unprepared: { column: 'stage.unprepared', type: 'boolean' },
-    state: { type: 'string' },
-    name: { type: 'string' },
-    position: { type: 'string' },
-    affiliation: { type: 'string' },
-    address: { type: 'string' },
-    phone: { type: 'string' },
-    email: { type: 'string' },
-    graduate_name: { type: 'string' },
-    graduate_program: { type: 'string' },
-    graduate_institution: { type: 'string' },
-    graduate_address: { type: 'string' },
-    graduate_phone: { type: 'string' },
-    graduate_email: { type: 'string' },
-    start_date: { type: 'date' },
-    duration: { type: 'string' },
-    title: { type: 'string' },
-    keywords: { type: 'string' },
-    lay_summary: { type: 'string' },
-    background: { type: 'text' },
-    objectives: { type: 'text' },
-    methodology: { type: 'text' },
-    analysis: { type: 'text' },
-    funding: { type: 'enum' },
-    funding_agency: { type: 'string' },
-    grant_number: { type: 'string' },
-    ethics: { type: 'boolean' },
-    ethics_date: { type: 'date' },
-    ethics_filename: { type: 'string' },
-    waiver: { type: 'enum' },
-    qnaire: { type: 'boolean' },
-    qnaire_comment: { type: 'text' },
-    physical: { type: 'boolean' },
-    physical_comment: { type: 'text' },
-    biomarker: { type: 'boolean' },
-    biomarker_comment: { type: 'text' },
-    last_stage_type: { column: 'stage_type.name', type: 'string' }
+    identifier: { title: 'Identifier', type: 'string' },
+    language_id: { title: 'Language', type: 'enum' },
+    stage_type: { title: 'Current Stage', column: 'stage_type.name', type: 'string', constant: true },
+    state: { title: 'State', type: 'enum', constant: true },
+    unprepared: {
+      title: 'Preperation Required',
+      type: 'string',
+      constant: true
+    },
+
+    // the following are for the form and will not appear in the view
+    phase: { column: 'stage_type.phase', type: 'string', exclude: true },
+    status: { column: 'stage_type.status', type: 'string', exclude: true },
+    language: { type: 'string', column: 'language.code', exclude: true },
+    name: { type: 'string', exclude: true },
+    position: { type: 'string', exclude: true },
+    affiliation: { type: 'string', exclude: true },
+    address: { type: 'string', exclude: true },
+    phone: { type: 'string', exclude: true },
+    email: { type: 'string', exclude: true },
+    graduate_name: { type: 'string', exclude: true },
+    graduate_program: { type: 'string', exclude: true },
+    graduate_institution: { type: 'string', exclude: true },
+    graduate_address: { type: 'string', exclude: true },
+    graduate_phone: { type: 'string', exclude: true },
+    graduate_email: { type: 'string', exclude: true },
+    start_date: { type: 'date', exclude: true },
+    duration: { type: 'string', exclude: true },
+    title: { type: 'string', exclude: true },
+    keywords: { type: 'string', exclude: true },
+    lay_summary: { type: 'string', exclude: true },
+    background: { type: 'text', exclude: true },
+    objectives: { type: 'text', exclude: true },
+    methodology: { type: 'text', exclude: true },
+    analysis: { type: 'text', exclude: true },
+    funding: { type: 'enum', exclude: true },
+    funding_agency: { type: 'string', exclude: true },
+    grant_number: { type: 'string', exclude: true },
+    ethics: { type: 'boolean', exclude: true },
+    ethics_date: { type: 'date', exclude: true },
+    ethics_filename: { type: 'string', exclude: true },
+    waiver: { type: 'enum', exclude: true },
+    qnaire: { type: 'boolean', exclude: true },
+    qnaire_comment: { type: 'text', exclude: true },
+    physical: { type: 'boolean', exclude: true },
+    physical_comment: { type: 'text', exclude: true },
+    biomarker: { type: 'boolean', exclude: true },
+    biomarker_comment: { type: 'text', exclude: true },
+  } );
+
+  module.addExtraOperation( 'view', {
+    title: 'View Form',
+    operation: function( $state, model ) {
+      $state.go( 'requisition.form', { identifier: model.viewModel.record.getIdentifier() } );
+    }
+  } );
+
+  module.addExtraOperation( 'view', {
+    title: 'Apply Decision',
+    isIncluded: function( $state, model ) { return model.viewModel.showDecide(); },
+    operations: [ {
+      title: 'Approved',
+      operation: function( $state, model ) { model.viewModel.decide( 'yes' ); }
+    }, {
+      title: 'Conditionally Approved',
+      operation: function( $state, model ) { model.viewModel.decide( 'conditional' ); }
+    }, {
+      title: 'Not Approved',
+      operation: function( $state, model ) { model.viewModel.decide( 'no' ); }
+    } ]
+  } );
+
+  module.addExtraOperation( 'view', {
+    title: 'Defer to Applicant',
+    isIncluded: function( $state, model ) { return model.viewModel.showDefer(); },
+    operation: function( $state, model ) { model.viewModel.defer(); }
+  } );
+
+  module.addExtraOperation( 'view', {
+    title: 'Mark as Prepared',
+    isIncluded: function( $state, model ) { return model.viewModel.showPrepare(); },
+    operation: function( $state, model ) { model.viewModel.prepare(); }
+  } );
+
+  module.addExtraOperation( 'view', {
+    title: 'Reject',
+    isIncluded: function( $state, model ) { return model.viewModel.showReject(); },
+    operation: function( $state, model ) { model.viewModel.reject(); }
+  } );
+
+  module.addExtraOperation( 'view', {
+    title: 'Re-activate',
+    isIncluded: function( $state, model ) { return model.viewModel.showReactivate(); },
+    operation: function( $state, model ) { model.viewModel.reactivate(); }
   } );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnRequisitionList', [
-    'CnRequisitionModelFactory',
-    function( CnRequisitionModelFactory ) {
-      return {
-        templateUrl: module.getFileUrl( 'list.tpl.html' ),
-        restrict: 'E',
-        scope: { model: '=?' },
-        controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnRequisitionModelFactory.root;
-        }
-      };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnRequisitionView', [
+  cenozo.providers.directive( 'cnRequisitionForm', [
     'CnRequisitionModelFactory', 'cnRecordViewDirective', 'CnSession', '$q',
     function( CnRequisitionModelFactory, cnRecordViewDirective, CnSession, $q ) {
       // used to piggy-back on the basic view controller's functionality (but not used in the DOM)
       var cnRecordView = cnRecordViewDirective[0];
 
       return {
-        templateUrl: module.getFileUrl( 'view.tpl.html' ),
+        templateUrl: module.getFileUrl( 'form.tpl.html' ),
         restrict: 'E',
         scope: { model: '=?' },
         link: function( scope, element, attrs ) {
@@ -124,6 +161,17 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           scope.isAddingReference = false;
           scope.isDeletingReference = [];
           scope.minStartDate = moment().add( 5, 'months' );
+
+          scope.model.viewModel.afterView( function() {
+            CnSession.setBreadcrumbTrail(
+              [ {
+                title: scope.model.module.name.plural.ucWords(),
+                go: function() { scope.model.transitionToListState(); }
+              }, {
+                title: scope.model.viewModel.record.identifier
+              } ]
+            );
+          } );
 
           scope.$watch( 'model.viewModel.record.background', function( text ) {
             scope.model.viewModel.wordCount.background = text ? text.split( ' ' ).length : 0;
@@ -146,7 +194,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           var addModel = $scope.model.viewModel.coapplicantModel.addModel;
           $scope.coapplicantRecord = {};
           addModel.onNew( $scope.coapplicantRecord );
-          
+
           $scope.addCoapplicant = function() {
             if( $scope.model.viewModel.coapplicantModel.getAddEnabled() ) {
               var form = cenozo.getScopeByQuerySelector( '[name=part1a2Form]' ).part1a2Form;
@@ -473,46 +521,47 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                   fr: 'Are you sure you wish to proceed to the next stage?'
                 }
               },
-              decideApprovedWarning: {
-                en: 'Are you sure you wish to mark the '+$scope.model.module.name.singular+' as approved?',
-                fr: 'Are you sure you wish to mark the '+$scope.model.module.name.singular+' as approved?'
-              },
-              decideConditionallyApprovedWarning: {
-                en: 'Are you sure you wish to mark the '+$scope.model.module.name.singular+' as conditionally approved?',
-                fr: 'Are you sure you wish to mark the '+$scope.model.module.name.singular+' as conditionally approved?'
-              },
-              decideNotApprovedWarning: {
-                en: 'Are you sure you wish to mark the '+$scope.model.module.name.singular+' as not approved?',
-                fr: 'Are you sure you wish to mark the '+$scope.model.module.name.singular+' as not approved?'
-              },
               deleteWarning: {
                 en: 'Are you sure you want to delete the application?\n\nThis will permanantly destroy all details you have provided. Once this is done there will be no way to restore the application!',
                 fr: 'TRANSLATION REQUIRED'
               },
-              reject: { en: 'Reject', fr: 'Reject' },
-              rejectWarning: {
-                en: 'Please ensure that rejection information is ready for the applicant before proceeding.\n\nDo you wish to proceed?',
-                fr: 'Please ensure that rejection information is ready for the applicant before proceeding.\n\nDo you wish to proceed?'
-              },
-              defer: { en: 'Defer to Applicant', fr: 'Defer to Applicant' },
-              deferWarning: {
-                en: 'Are you sure you wish to defer to the applicant?',
-                fr: 'Are you sure you wish to defer to the applicant?'
-              },
               abandon: { en: 'Abandon', fr: 'TRANSLATION REQUIRED' },
               abandonWarning: {
                 en: 'Are you sure you want to abandon the application?\n\nYou will no longer have access to the application and the review process will be discontinued.',
-                    
                 fr: 'TRANSLATION REQUIRED'
-              },
-              reactivate: { en: 'Re-Activate', fr: 'Re-Activate' },
-              reactivateWarning: {
-                en: 'Are you sure you want to re-activate the '+$scope.model.module.name.singular+'?\n\nThis will return to its previous "'+$scope.model.viewModel.record.stage_type+'" stage.',
-                fr: 'Are you sure you want to re-activate the '+$scope.model.module.name.singular+'?\n\nThis will return to its previous "'+$scope.model.viewModel.record.stage_type+'" stage.'
-              },
-              prepare: { en: 'Mark as Prepared', fr: 'Mark as Prepared' }
+              }
             }
           };
+        }
+      };
+    }
+  ] );
+
+  /* ######################################################################################################## */
+  cenozo.providers.directive( 'cnRequisitionView', [
+    'CnRequisitionModelFactory',
+    function( CnRequisitionModelFactory ) {
+      return {
+        templateUrl: module.getFileUrl( 'view.tpl.html' ),
+        restrict: 'E',
+        scope: { model: '=?' },
+        controller: function( $scope ) {
+          if( angular.isUndefined( $scope.model ) ) $scope.model = CnRequisitionModelFactory.root;
+        }
+      };
+    }
+  ] );
+
+  /* ######################################################################################################## */
+  cenozo.providers.directive( 'cnRequisitionList', [
+    'CnRequisitionModelFactory',
+    function( CnRequisitionModelFactory ) {
+      return {
+        templateUrl: module.getFileUrl( 'list.tpl.html' ),
+        restrict: 'E',
+        scope: { model: '=?' },
+        controller: function( $scope ) {
+          if( angular.isUndefined( $scope.model ) ) $scope.model = CnRequisitionModelFactory.root;
         }
       };
     }
@@ -530,9 +579,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnRequisitionViewFactory', [
     'CnBaseViewFactory', 'CnCoapplicantModelFactory', 'CnReferenceModelFactory',
-    'CnHttpFactory', 'CnModalMessageFactory', '$q',
+    'CnHttpFactory', 'CnModalMessageFactory', 'CnModalConfirmFactory', '$q',
     function( CnBaseViewFactory, CnCoapplicantModelFactory, CnReferenceModelFactory,
-              CnHttpFactory, CnModalMessageFactory, $q ) {
+              CnHttpFactory, CnModalMessageFactory, CnModalConfirmFactory, $q ) {
       var object = function( parentModel, root ) {
         var self = this;
         CnBaseViewFactory.construct( this, parentModel, root );
@@ -736,13 +785,23 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           return this.parentModel.getEditEnabled() &&
                  this.parentModel.isAdministrator() &&
                  'SMT Review' == this.record.stage_type &&
-                 null == this.record.state;
+                 !this.record.state;
         };
         this.decide = function( decision ) {
-          return CnHttpFactory.instance( {
-            path: this.parentModel.getServiceResourcePath() + "?action=decide&approve=" + decision
-          } ).patch().then( function() {
-            self.transitionOnViewParent();
+          return CnModalConfirmFactory.instance( {
+            message: 'Are you sure you wish to mark the ' + $scope.model.module.name.singular + ' as ' + (
+              'yes' == decision ? 'approved' :
+              'conditional' == decision ? 'conditionally approved' :
+              'not approved'
+            ) + '?'
+          } ).show().then( function( response ) {
+            if( response ) {
+              return CnHttpFactory.instance( {
+                path: self.parentModel.getServiceResourcePath() + "?action=decide&approve=" + decision
+              } ).patch().then( function() {
+                self.transitionOnViewParent();
+              } );
+            }
           } );
         };
 
@@ -752,10 +811,17 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                  ( 'review' == this.record.phase || 'deferred' == this.record.state );
         };
         this.reject = function() {
-          return CnHttpFactory.instance( {
-            path: this.parentModel.getServiceResourcePath() + "?action=reject"
-          } ).patch().then( function() {
-            self.record.state = 'rejected';
+          return CnModalConfirmFactory.instance( {
+            message: 'Please ensure that rejection information is ready for the applicant before proceeding.' +
+                     '\n\nDo you wish to proceed?'
+          } ).show().then( function( response ) {
+            if( response ) {
+              return CnHttpFactory.instance( {
+                path: self.parentModel.getServiceResourcePath() + "?action=reject"
+              } ).patch().then( function() {
+                self.record.state = 'rejected';
+              } );
+            }
           } );
         };
 
@@ -765,17 +831,21 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                  ( 'review' == this.record.phase || 'agreement' == this.record.phase );
         };
         this.defer = function() {
-          return CnHttpFactory.instance( {
-            path: this.parentModel.getServiceResourcePath() + "?action=defer"
-          } ).patch().then( function() {
-            self.record.state = 'deferred';
+          return CnModalConfirmFactory.instance( {
+            message: 'Are you sure you wish to defer to the applicant?'
+          } ).show().then( function( response ) {
+            if( response ) {
+              return CnHttpFactory.instance( {
+                path: self.parentModel.getServiceResourcePath() + "?action=defer"
+              } ).patch().then( function() {
+                self.record.state = 'deferred';
+              } );
+            }
           } );
         };
 
         this.showAbandon = function() {
-          return this.parentModel.isApplicant() &&
-                 'deferred' == this.record.state &&
-                 'review' == this.record.phase;
+          return 'deferred' == this.record.state && 'review' == this.record.phase;
         };
         this.abandon = function() {
           return CnHttpFactory.instance( {
@@ -791,21 +861,28 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                  ( 'abandoned' == this.record.state || 'rejected' == this.record.state );
         };
         this.reactivate = function() {
-          return CnHttpFactory.instance( {
-            path: this.parentModel.getServiceResourcePath() + "?action=reactivate"
-          } ).patch().then( function() {
-            self.record.state = null;
+          return CnModalConfirmFactory.instance( {
+            message: 'Are you sure you want to re-activate the ' + $scope.model.module.name.singular + '?' +
+              '\n\nThis will return to its previous "' + $scope.model.viewModel.record.stage_type + '" stage.'
+          } ).show().then( function( response ) {
+            if( response ) {
+              return CnHttpFactory.instance( {
+                path: self.parentModel.getServiceResourcePath() + "?action=reactivate"
+              } ).patch().then( function() {
+                self.record.state = '';
+              } );
+            }
           } );
         };
 
         this.showPrepare = function() {
-          return this.parentModel.isAdministrator() && this.record.unprepared && null == this.record.state;
+          return this.parentModel.isAdministrator() && 'Yes' == this.record.unprepared && !this.record.state;
         };
         this.prepare = function() {
           return CnHttpFactory.instance( {
             path: this.parentModel.getServiceResourcePath() + "?action=prepare"
           } ).patch().then( function() {
-            self.record.unprepared = false;
+            self.record.unprepared = 'No';
             return self.stageModel.listModel.onList( true );
           } );
         };
@@ -828,16 +905,16 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnRequisitionModelFactory', [
     'CnBaseModelFactory', 'CnRequisitionListFactory', 'CnRequisitionViewFactory',
-    'CnHttpFactory', 'CnSession', '$q',
+    'CnHttpFactory', 'CnSession', '$state', '$q',
     function( CnBaseModelFactory, CnRequisitionListFactory, CnRequisitionViewFactory,
-              CnHttpFactory, CnSession, $q ) {
+              CnHttpFactory, CnSession, $state, $q ) {
       var object = function( root ) {
         var self = this;
         CnBaseModelFactory.construct( this, module );
         this.listModel = CnRequisitionListFactory.instance( this );
         this.viewModel = CnRequisitionViewFactory.instance( this, root );
 
-        // make the input list more accessible 
+        // make the input list more accessible
         this.inputList = module.inputGroupList[0].inputList;
 
         this.isApplicant = function() { return 'applicant' == CnSession.role.name; }
@@ -848,7 +925,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           var roleCheck = 'applicant' == CnSession.role.name
                         ? 'new' == phase || ( 'review' == phase && 'deferred' == this.viewModel.record.state )
                         : 'administrator' == CnSession.role.name
-                        ? 'new' == phase || ( 'review' == phase && null == this.viewModel.record.state )
+                        ? 'new' == phase || ( 'review' == phase && !this.viewModel.record.state )
                         : false;
           return this.$$getEditEnabled() && roleCheck;
         };
@@ -859,10 +936,16 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           return CnHttpFactory.instance( {
             path: 'requisition',
             data: { user_id: CnSession.user.id }
-          } ).post().then( function ( response ) { 
+          } ).post().then( function ( response ) {
             // immediately view the new requisition
             return self.transitionToViewState( { getIdentifier: function() { return response.data; } } );
           } )
+        };
+
+        // override transitionToViewState
+        this.transitionToViewState = function( record ) {
+          if( this.isApplicant() ) $state.go( 'requisition.form', { identifier: record.getIdentifier() } );
+          else this.$$transitionToViewState( record );
         };
 
         this.dataOptionParentList = [];
@@ -908,6 +991,25 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               self.metadata.columnList.waiver.enumList.fr[2].name =
                 'Exonération pour un boursier postdoctoral ' +
                 '(limite d’une exonération pour les études postdoctorales)';
+
+              return CnHttpFactory.instance( {
+                path: 'language',
+                data: {
+                  select: { column: [ 'id', 'name' ] },
+                  modifier: {
+                    where: { column: 'active', operator: '=', value: true },
+                    order: 'name'
+                  }
+                }
+              } ).query().then( function success( response ) {
+                self.metadata.columnList.language_id.enumList = [];
+                response.data.forEach( function( item ) {
+                  self.metadata.columnList.language_id.enumList.push( {
+                    value: item.id,
+                    name: item.name
+                  } );
+                } );
+              } );
             } ),
 
             CnHttpFactory.instance( {

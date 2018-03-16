@@ -27,7 +27,8 @@ class ui extends \cenozo\ui\ui
     $module = $this->get_module( 'requisition' );
     if( !is_null( $module ) )
     {
-      if( $module->has_action( 'view' ) ) $module->add_action( 'view', '/{identifier}?{t0}&{t1}&{t2}' );
+      $module->add_action( 'form', '/{identifier}?{t0}&{t1}&{t2}' );
+      //if( $module->has_action( 'view' ) ) $module->add_action( 'view', '/{identifier}?{t0}&{t1}&{t2}' );
       $module->add_child( 'stage' );
     }
 
