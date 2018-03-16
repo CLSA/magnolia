@@ -47,14 +47,34 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
   } );
 
   module.addInputGroup( '', {
-    identifier: { title: 'Identifier', type: 'string' },
-    language_id: { title: 'Language', type: 'enum' },
-    stage_type: { title: 'Current Stage', column: 'stage_type.name', type: 'string', constant: true },
-    state: { title: 'State', type: 'enum', constant: true },
+    identifier: {
+      title: 'Identifier',
+      type: 'string',
+      constant: true // modified in the model
+    },
+    language_id: {
+      title: 'Language',
+      type: 'enum',
+      constant: true // modified in the model
+    },
+    stage_type: {
+      title: 'Current Stage',
+      column: 'stage_type.name',
+      type: 'string',
+      constant: true,
+      exclude: true // modified in the model
+    },
+    state: {
+      title: 'State',
+      type: 'enum',
+      constant: true,
+      exclude: true // modified in the model
+    },
     unprepared: {
       title: 'Preperation Required',
       type: 'string',
-      constant: true
+      constant: true,
+      exclude: true // modified in the model
     },
 
     // the following are for the form and will not appear in the view
@@ -104,43 +124,50 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     }
   } );
 
+  module.addExtraOperationGroup( 'view', {
+    title: 'Special Operation',
+    classes: 'btn-warning',
+    isIncluded: function( $state, model ) { return model.viewModel.showDefer() || model.viewModel.showReject(); },
+    operations: [ {
+      title: 'Defer to Applicant',
+      isIncluded: function( $state, model ) { return model.viewModel.showDefer(); },
+      operation: function( $state, model ) { model.viewModel.defer(); }
+    }, {
+      title: 'Mark as Prepared',
+      isIncluded: function( $state, model ) { return model.viewModel.showPrepare(); },
+      operation: function( $state, model ) { model.viewModel.prepare(); }
+    }, {
+      title: 'Reject',
+      isIncluded: function( $state, model ) { return model.viewModel.showReject(); },
+      operation: function( $state, model ) { model.viewModel.reject(); }
+    }, {
+      title: 'Re-activate',
+      isIncluded: function( $state, model ) { return model.viewModel.showReactivate(); },
+      operation: function( $state, model ) { model.viewModel.reactivate(); }
+    } ]
+  } );
+
   module.addExtraOperation( 'view', {
+    title: 'Next Stage',
+    classes: 'btn-primary',
+    isIncluded: function( $state, model ) { return model.viewModel.showNextStage(); },
+    operation: function( $state, model ) { model.viewModel.nextStage(); }
+  } );
+
+  module.addExtraOperationGroup( 'view', {
     title: 'Apply Decision',
+    classes: 'btn-primary',
     isIncluded: function( $state, model ) { return model.viewModel.showDecide(); },
     operations: [ {
       title: 'Approved',
       operation: function( $state, model ) { model.viewModel.decide( 'yes' ); }
     }, {
-      title: 'Conditionally Approved',
+      title: 'Conditional',
       operation: function( $state, model ) { model.viewModel.decide( 'conditional' ); }
     }, {
       title: 'Not Approved',
       operation: function( $state, model ) { model.viewModel.decide( 'no' ); }
     } ]
-  } );
-
-  module.addExtraOperation( 'view', {
-    title: 'Defer to Applicant',
-    isIncluded: function( $state, model ) { return model.viewModel.showDefer(); },
-    operation: function( $state, model ) { model.viewModel.defer(); }
-  } );
-
-  module.addExtraOperation( 'view', {
-    title: 'Mark as Prepared',
-    isIncluded: function( $state, model ) { return model.viewModel.showPrepare(); },
-    operation: function( $state, model ) { model.viewModel.prepare(); }
-  } );
-
-  module.addExtraOperation( 'view', {
-    title: 'Reject',
-    isIncluded: function( $state, model ) { return model.viewModel.showReject(); },
-    operation: function( $state, model ) { model.viewModel.reject(); }
-  } );
-
-  module.addExtraOperation( 'view', {
-    title: 'Re-activate',
-    isIncluded: function( $state, model ) { return model.viewModel.showReactivate(); },
-    operation: function( $state, model ) { model.viewModel.reactivate(); }
   } );
 
   /* ######################################################################################################## */
@@ -194,6 +221,17 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           var addModel = $scope.model.viewModel.coapplicantModel.addModel;
           $scope.coapplicantRecord = {};
           addModel.onNew( $scope.coapplicantRecord );
+
+          $scope.getHeading = function() {
+            var status = $scope.model.viewModel.record[$scope.model.isApplicant() ? 'status' : 'stage_type'];
+            if( 'deferred' == $scope.model.viewModel.record.state ) {
+              status = $scope.model.isApplicant() ? 'Action Required' : 'Deferred to Applicant';
+            } else if( $scope.model.viewModel.record.state ) {
+              status = $scope.model.viewModel.record.state.ucWords();
+            }
+
+            return $scope.t( 'heading' ) + ' - ' + $scope.model.viewModel.record.identifier + ' (' + status + ')';
+          };
 
           $scope.addCoapplicant = function() {
             if( $scope.model.viewModel.coapplicantModel.getAddEnabled() ) {
@@ -765,17 +803,27 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         };
 
         this.showSubmit = function() {
-          return ( this.parentModel.isApplicant()
-            ? 'new' == this.record.phase || 'deferred' == this.record.state
-            : this.parentModel.isAdministrator()
-            ? ( 'review' == this.record.phase && 'SMT Review' != this.record.stage_type )
-              || 'agreement' == this.record.phase
-            : false
+          return this.parentModel.isApplicant() && (
+            'new' == this.record.phase || 'deferred' == this.record.state
           ) && this.parentModel.getEditEnabled();
         };
         this.submit = function() {
           return CnHttpFactory.instance( {
             path: this.parentModel.getServiceResourcePath() + "?action=submit"
+          } ).patch().then( function() {
+            self.transitionOnViewParent();
+          } );
+        };
+
+        this.showNextStage = function() {
+          return this.parentModel.isAdministrator() && (
+            'agreement' == this.record.phase ||
+            ( 'review' == this.record.phase && 'SMT Review' != this.record.stage_type )
+          ) && this.parentModel.getEditEnabled();
+        };
+        this.nextStage = function() {
+          return CnHttpFactory.instance( {
+            path: this.parentModel.getServiceResourcePath() + "?action=next_stage"
           } ).patch().then( function() {
             self.transitionOnViewParent();
           } );
@@ -789,7 +837,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         };
         this.decide = function( decision ) {
           return CnModalConfirmFactory.instance( {
-            message: 'Are you sure you wish to mark the ' + $scope.model.module.name.singular + ' as ' + (
+            message: 'Are you sure you wish to mark the ' + this.parentModel.module.name.singular + ' as ' + (
               'yes' == decision ? 'approved' :
               'conditional' == decision ? 'conditionally approved' :
               'not approved'
@@ -862,8 +910,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         };
         this.reactivate = function() {
           return CnModalConfirmFactory.instance( {
-            message: 'Are you sure you want to re-activate the ' + $scope.model.module.name.singular + '?' +
-              '\n\nThis will return to its previous "' + $scope.model.viewModel.record.stage_type + '" stage.'
+            message: 'Are you sure you want to re-activate the ' + this.parentModel.module.name.singular + '?' +
+              '\n\nThis will return to its previous "' + this.parentModel.viewModel.record.stage_type + '" stage.'
           } ).show().then( function( response ) {
             if( response ) {
               return CnHttpFactory.instance( {
@@ -905,9 +953,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnRequisitionModelFactory', [
     'CnBaseModelFactory', 'CnRequisitionListFactory', 'CnRequisitionViewFactory',
-    'CnHttpFactory', 'CnSession', '$state', '$q',
+    'CnHttpFactory', 'CnSession', '$state', '$transitions', '$q',
     function( CnBaseModelFactory, CnRequisitionListFactory, CnRequisitionViewFactory,
-              CnHttpFactory, CnSession, $state, $q ) {
+              CnHttpFactory, CnSession, $state, $transitions, $q ) {
       var object = function( root ) {
         var self = this;
         CnBaseModelFactory.construct( this, module );
@@ -919,6 +967,15 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
         this.isApplicant = function() { return 'applicant' == CnSession.role.name; }
         this.isAdministrator = function() { return 'administrator' == CnSession.role.name; }
+
+        if( this.isAdministrator() ) {
+          var mainInputGroup = module.inputGroupList.findByProperty( 'title', '' );
+          mainInputGroup.inputList.identifier.constant = false;
+          mainInputGroup.inputList.language_id.constant = false;
+          mainInputGroup.inputList.stage_type.exclude = false;
+          mainInputGroup.inputList.state.exclude = false;
+          mainInputGroup.inputList.unprepared.exclude = false;
+        }
 
         this.getEditEnabled = function() {
           var phase = this.viewModel.record.phase;
@@ -947,6 +1004,15 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           if( this.isApplicant() ) $state.go( 'requisition.form', { identifier: record.getIdentifier() } );
           else this.$$transitionToViewState( record );
         };
+
+        /*
+        $transitions.on( {}, function( transition ) {
+          // don't allow applicants to view requisitions, show them the form instead
+          if( self.isApplicant() )
+            return transition.router.stateService.target( 'requisition.form', transition.params() );
+          console.log( self.isApplicant(), transition.params() );
+        } );
+        */
 
         this.dataOptionParentList = [];
         this.dataOptionList = [];

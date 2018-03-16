@@ -9,9 +9,7 @@
               ng-click="model.viewModel.toggleLanguage()">
         {{ 'en'==model.viewModel.record.language ? 'Version Française' : 'English Version' }}
       </button>
-      <span ng-bind-html="t( 'heading' ) + ' - ' +
-                          model.viewModel.record.identifier +
-                          ' (' + model.viewModel.record[model.isApplicant()?'status':'stage_type'] + ')'"></span>
+      <span ng-bind-html="getHeading()"></span>
     </h4>
   </div>
   <div ng-if="model.viewModel.showSubmit() ||
@@ -19,7 +17,7 @@
               model.viewModel.showAbandon()"
        class="form-footer text-right bg-info"
        style="height:4.6em;">
-    <button class="btn btn-primary"
+    <button class="btn btn-warning"
             ng-if="model.viewModel.showSubmit()"
             cn-really-message="{{ t( 'misc.submitWarning.' + (model.isApplicant()?'applicant':'staff') ) }}"
             cn-really-click="model.viewModel.submit()"

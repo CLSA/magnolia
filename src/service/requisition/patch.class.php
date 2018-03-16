@@ -66,17 +66,21 @@ class patch extends \cenozo\service\patch
       }
       else if( 'reject' == $action )
       {
-        if( !$administrator || ( 'review' != $phase && 'defered' != $state ) ) $code = 403;
+        if( !$administrator || ( 'review' != $phase && 'deferred' != $state ) ) $code = 403;
       }
       else if( 'submit' == $action )
+      {
+        if( $applicant )
+        {
+          if( 'new' != $phase && 'deferred' != $state ) $code = 403;
+        }
+        else $code = 403;
+      }
+      else if( 'next_stage' == $action )
       {
         if( $administrator )
         {
           if( 'review' != $phase && 'agreement' != $phase ) $code = 403;
-        }
-        else if( $applicant )
-        {
-          if( 'new' != $phase && 'defered' != $state ) $code = 403;
         }
         else $code = 403;
       }
@@ -170,6 +174,11 @@ class patch extends \cenozo\service\patch
           // add the requisition to whatever the next stage is
           $db_requisition->add_to_stage();
         }
+      }
+      else if( 'next_stage' == $action )
+      {
+        // add the requisition to whatever the next stage is
+        $db_requisition->add_to_stage();
       }
       else if( 'decide' == $action )
       {
