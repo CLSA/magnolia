@@ -80,7 +80,10 @@ class patch extends \cenozo\service\patch
       {
         if( $administrator )
         {
-          if( 'review' != $phase && 'agreement' != $phase ) $code = 403;
+          if( !is_null( $state ) || (
+            ( 'review' != $phase || 'SMT Review' == $db_stage_type->name ) &&
+            ( 'agreement' != $phase || 'Report Required' == $db_stage_type->name )
+          ) ) $code = 403;
         }
         else $code = 403;
       }

@@ -816,10 +816,11 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         };
 
         this.showNextStage = function() {
-          return this.parentModel.isAdministrator() && (
-            'agreement' == this.record.phase ||
-            ( 'review' == this.record.phase && 'SMT Review' != this.record.stage_type )
-          ) && this.parentModel.getEditEnabled();
+          return this.parentModel.isAdministrator() &&
+                 !this.record.state && (
+                   ( 'review' == this.record.phase && 'SMT Review' != this.record.stage_type ) ||
+                   ( 'agreement' == this.record.phase && 'Report Required' != this.record.stage_type )
+                 );
         };
         this.nextStage = function() {
           return CnHttpFactory.instance( {
