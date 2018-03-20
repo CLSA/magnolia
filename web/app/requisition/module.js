@@ -50,12 +50,12 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     identifier: {
       title: 'Identifier',
       type: 'string',
-      constant: true // modified in the model
+      constant: true
     },
     language_id: {
       title: 'Language',
       type: 'enum',
-      constant: true // modified in the model
+      constant: true
     },
     stage_type: {
       title: 'Current Stage',
@@ -756,8 +756,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
         if( this.isAdministrator() ) {
           var mainInputGroup = module.inputGroupList.findByProperty( 'title', '' );
-          mainInputGroup.inputList.identifier.constant = false;
-          mainInputGroup.inputList.language_id.constant = false;
           mainInputGroup.inputList.stage_type.exclude = false;
           mainInputGroup.inputList.state.exclude = false;
           mainInputGroup.inputList.unprepared.exclude = false;

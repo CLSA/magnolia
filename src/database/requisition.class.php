@@ -163,5 +163,13 @@ class requisition extends \cenozo\database\record
     $db_stage->user_id = $db_user->id;
     $db_stage->unprepared = is_null( $unprepared ) ? $db_stage_type->preperation_required : $unprepared;
     $db_stage->save();
+
+    // if we have just entered the admin review stage then set the identifier
+    if( 'Admin Review' == $db_stage_type->name )
+    {
+      $base = $this->get_deadline()->date->format( 'ym' );
+      $this->identifier = $this->get_deadline()->get_next_identifier();
+      $this->save();
+    }
   }
 }

@@ -174,7 +174,7 @@ class patch extends \cenozo\service\patch
         }
         else
         {
-          // add the requisition to whatever the next stage is
+          // this will submit the requisition for the first time
           $db_requisition->add_to_stage();
         }
       }
