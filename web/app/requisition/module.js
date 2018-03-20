@@ -200,6 +200,13 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             );
           } );
 
+          scope.$watch( 'model.viewModel.record.start_date', function( date ) {
+            var element = cenozo.getFormElement( 'start_date' );
+            if( element && null != date && null != element && element.$error.required ) {
+              element.$error.required = false;
+              cenozo.updateFormElement( element, true );
+            }
+          } );
           scope.$watch( 'model.viewModel.record.background', function( text ) {
             scope.model.viewModel.wordCount.background = text ? text.split( ' ' ).length : 0;
           } );
@@ -387,7 +394,12 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           else if( 2 == index && 0 > ['notes','a','b','c'].indexOf( tab ) ) tab = 'notes';
           this.tab[index] = tab;
           this.parentModel.setQueryParameter( 't'+index, tab );
-          if( transition ) this.parentModel.reloadState( false, false, 'replace' );
+          if( transition ) {
+            this.parentModel.reloadState( false, false, 'replace' ).then( function() {
+              // update all textarea sizes
+              angular.element( 'textarea[cn-elastic]' ).trigger( 'change' );
+            } );
+          }
         };
 
         this.tab = [];
@@ -560,7 +572,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               for( var tab in requiredTabList ) {
                 var firstProperty = null;
                 requiredTabList[tab].forEach( function( property ) {
-                  if( null == self.record[property] ) {
+                  if( null == self.record[property] || '' == self.record[property] ) {
                     var element = cenozo.getFormElement( property );
                     element.$error.required = true;
                     cenozo.updateFormElement( element, true );
@@ -570,7 +582,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                 } );
               }
 
-              console.log( errorCount, errorTab );
               if( 0 < errorCount ) {
                 var messageLookupCode = 'misc.missingFieldMessage.' + ( 1 == errorCount ? 'singular' : 'plural' );
                 CnModalMessageFactory.instance( {
@@ -815,6 +826,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               self.metadata.columnList.funding.enumList.fr[0].name = 'oui';
               self.metadata.columnList.funding.enumList.fr[1].name = 'non';
               self.metadata.columnList.funding.enumList.fr[2].name = 'demandé';
+
+              self.metadata.columnList.funding.enumList.en.unshift( { value: '', name: '(choose)' } );
+              self.metadata.columnList.funding.enumList.fr.unshift( { value: '', name: '(choisir)' } );
 
               // translate waiver enum
               self.metadata.columnList.waiver.enumList.unshift( { value: '', name: 'none' } );
@@ -1232,7 +1246,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         }
       },
       deleteWarning: {
-        en: 'Are you sure you want to delete the application?\n\nThis will permanantly destroy all details you have provided. Once this is done there will be no way to restore the application!',
+        en: 'Are you sure you want to delete the application?\n\nThis will permanently destroy all details you have provided. Once this is done there will be no way to restore the application!',
         fr: 'TRANSLATION REQUIRED'
       },
       abandon: { en: 'Abandon', fr: 'TRANSLATION REQUIRED' },
