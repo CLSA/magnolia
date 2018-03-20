@@ -17,10 +17,9 @@
               model.viewModel.showAbandon()"
        class="form-footer text-right bg-info"
        style="height:4.6em;">
-    <button class="btn btn-warning"
+    <button class="btn btn-success"
             ng-if="model.viewModel.showSubmit()"
-            cn-really-message="{{ t( 'misc.submitWarning.' + (model.isApplicant()?'applicant':'staff') ) }}"
-            cn-really-click="model.viewModel.submit()"
+            ng-click="model.viewModel.submit()"
             ng-bind-html="t( 'misc.submit' )"
             type="button"></button>
     <div class="btn-group pull-left">
@@ -53,7 +52,7 @@
         <a ng-click="model.viewModel.setTab(0,'part3')" ng-bind-html="t( 'part3.tab' )"></a>
       </li>
     </ul>
-    <div ng-if="'instructions'==model.viewModel.tab[0]"
+    <div ng-show="'instructions'==model.viewModel.tab[0]"
          class="panel panel-default"
          style="border-top-left-radius: 0px;">
       <div class="panel-body" style="padding-bottom: 0px;">
@@ -66,7 +65,7 @@
         </ul>
       </div>
     </div>
-    <div ng-if="'part1'==model.viewModel.tab[0]"
+    <div ng-show="'part1'==model.viewModel.tab[0]"
          class="panel panel-default"
          style="border-top-left-radius: 0px;">
       <div class="panel-body" style="padding-bottom: 0px;">
@@ -94,14 +93,14 @@
             <a ng-click="model.viewModel.setTab(1,'a7')" ng-bind-html="t( 'part1.a7.tab' )"></a>
           </li>
         </ul>
-        <div ng-if="'a1'==model.viewModel.tab[1]"
+        <div ng-show="'a1'==model.viewModel.tab[1]"
              class="panel panel-default"
              style="border-top-left-radius: 0px;">
           <div class="panel-body">
             <p class="text-primary" ng-bind-html="t( 'part1.a1.text1' )"></p>
             <p class="text-primary" ng-bind-html="t( 'part1.a1.text2' )"></p>
             <hr/>
-            <form name="part1a1Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
+            <form id="part1a1Form" name="form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
               <div class="form-horizontal">
                 <cn-view-input
                   input="{
@@ -219,7 +218,7 @@
             </fieldset></form>
           </div>
         </div>
-        <div ng-if="'a2'==model.viewModel.tab[1]"
+        <div ng-show="'a2'==model.viewModel.tab[1]"
              class="panel panel-default"
              style="border-top-left-radius: 0px;">
           <div class="panel-body">
@@ -259,7 +258,7 @@
                 </table>
               </div>
             </div>
-            <form name="part1a2Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
+            <form id="part1a2Form" name="form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
               <div class="form-horizontal">
                 <cn-add-input
                   input="{ key: 'name', title: t( 'part1.a2.name' ), type: 'string' }"
@@ -316,13 +315,13 @@
             </fieldset></form>
           </div>
         </div>
-        <div ng-if="'a3'==model.viewModel.tab[1]"
+        <div ng-show="'a3'==model.viewModel.tab[1]"
              class="panel panel-default"
              style="border-top-left-radius: 0px;">
           <div class="panel-body">
             <p class="text-primary" ng-bind-html="t( 'part1.a3.text' )"></p>
             <hr/>
-            <form name="part1a3Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
+            <form id="part1a3Form" name="form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
               <div class="form-horizontal">
                 <cn-view-input
                   input="{
@@ -347,13 +346,13 @@
             </fieldset></form>
           </div>
         </div>
-        <div ng-if="'a4'==model.viewModel.tab[1]"
+        <div ng-show="'a4'==model.viewModel.tab[1]"
              class="panel panel-default"
              style="border-top-left-radius: 0px;">
           <div class="panel-body">
             <p class="text-primary" ng-bind-html="t( 'part1.a4.text1' )"></p>
             <hr/>
-            <form name="part1a4Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
+            <form id="part1a4Form" name="form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
               <div class="form-horizontal">
                 <cn-view-input
                   input="{
@@ -498,13 +497,13 @@
             </fieldset></form>
           </div>
         </div>
-        <div ng-if="'a5'==model.viewModel.tab[1]"
+        <div ng-show="'a5'==model.viewModel.tab[1]"
              class="panel panel-default"
              style="border-top-left-radius: 0px;">
           <div class="panel-body">
             <p class="text-primary" ng-bind-html="t( 'part1.a5.text' )"></p>
             <hr/>
-            <form name="part1a5Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
+            <form id="part1a5Form" name="form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
               <div class="form-horizontal">
                 <cn-view-input
                   input="{
@@ -540,13 +539,13 @@
             </fieldset></form>
           </div>
         </div>
-        <div ng-if="'a6'==model.viewModel.tab[1]"
+        <div ng-show="'a6'==model.viewModel.tab[1]"
              class="panel panel-default"
              style="border-top-left-radius: 0px;">
           <div class="panel-body">
             <p class="text-primary" ng-bind-html="t( 'part1.a6.text' )"></p>
             <hr/>
-            <form name="part1a6Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
+            <form id="part1a6Form" name="form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
               <div class="form-horizontal">
                 <cn-view-input
                   input="{
@@ -616,13 +615,13 @@
             </fieldset></form>
           </div>
         </div>
-        <div ng-if="'a7'==model.viewModel.tab[1]"
+        <div ng-show="'a7'==model.viewModel.tab[1]"
              class="panel panel-default"
              style="border-top-left-radius: 0px;">
           <div class="panel-body">
             <p class="text-primary" ng-bind-html="t( 'part1.a7.text' )"></p>
             <hr/>
-            <form name="part1a7Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
+            <form id="part1a7Form" name="form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
               <div class="form-horizontal">
                 <cn-view-input
                   input="{
@@ -640,7 +639,7 @@
         </div>
       </div>
     </div>
-    <div ng-if="'part2'==model.viewModel.tab[0]"
+    <div ng-show="'part2'==model.viewModel.tab[0]"
          class="panel panel-default"
          style="border-top-left-radius: 0px;">
       <div class="panel-body" style="padding-bottom: 0px;">
@@ -659,7 +658,7 @@
             <a ng-click="model.viewModel.setTab(2,'c')" ng-bind-html="t( 'part2.c.tab' )"></a>
           </li>
         </ul>
-        <div ng-if="'notes'==model.viewModel.tab[2]"
+        <div ng-show="'notes'==model.viewModel.tab[2]"
              class="panel panel-default"
              style="border-top-left-radius: 0px;">
           <div class="panel-body" style="padding-bottom: 0px;">
@@ -671,11 +670,11 @@
             </ul>
           </div>
         </div>
-        <div ng-if="'a'==model.viewModel.tab[2]"
+        <div ng-show="'a'==model.viewModel.tab[2]"
              class="panel panel-default"
              style="border-top-left-radius: 0px;">
           <div class="panel-body">
-            <form name="part2aForm" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
+            <form id="part2aForm" name="form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
               <div class="form-horizontal">
                 <div class="form-group">
                   <label for="qnaire" class="col-sm-9 control-label"
@@ -790,11 +789,11 @@
             </fieldset></form>
           </div>
         </div>
-        <div ng-if="'b'==model.viewModel.tab[2]"
+        <div ng-show="'b'==model.viewModel.tab[2]"
              class="panel panel-default"
              style="border-top-left-radius: 0px;">
           <div class="panel-body">
-            <form name="part2bForm" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
+            <form id="part2bForm" name="form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
               <div class="form-horizontal">
                 <div class="form-group">
                   <label for="physical" class="col-sm-9 control-label"
@@ -865,11 +864,11 @@
             </fieldset></form>
           </div>
         </div>
-        <div ng-if="'c'==model.viewModel.tab[2]"
+        <div ng-show="'c'==model.viewModel.tab[2]"
              class="panel panel-default"
              style="border-top-left-radius: 0px;">
           <div class="panel-body">
-            <form name="part2cForm" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
+            <form id="part2cForm" name="form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
               <div class="form-horizontal">
                 <div class="form-group">
                   <label for="biomarker" class="col-sm-9 control-label"
@@ -939,7 +938,7 @@
         </div>
       </div>
     </div>
-    <div ng-if="'part3'==model.viewModel.tab[0]"
+    <div ng-show="'part3'==model.viewModel.tab[0]"
          class="panel panel-default"
          style="border-top-left-radius: 0px;">
       <div class="panel-body" style="padding-bottom: 0px;">
