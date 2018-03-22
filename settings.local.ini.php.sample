@@ -23,3 +23,6 @@ $SETTINGS['general']['new_requisition_delay'] = 5;
 
 // the location of uploaded ethics letter (defaults to magnolia/doc/ethics_letter)
 $SETTINGS['path']['ETHICS_LETTER'] = '/path/to/deployment/reports';
+
+// how many months past a requisition's deadline must its start date be?
+$SETTINGS['general']['start_date_delay'] = 5;

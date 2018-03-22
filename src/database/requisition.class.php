@@ -25,18 +25,8 @@ class requisition extends \cenozo\database\record
     // generate a random identifier if none exists
     if( is_null( $this->identifier ) ) $this->identifier = 'T'.rand( 10000, 99999 );
 
-    // select the next deadline
-    if( is_null( $this->deadline_id ) )
-    {
-      $deadline_class_name = lib::get_class_name( 'database\deadline' );
-      $db_deadline = $deadline_class_name::get_next();
-      if( is_null( $db_deadline ) )
-        throw lib::create( 'exception\runtime',
-          'Cannot create new requisition since there are no deadlines defined.',
-          __METHOD__ );
-
-      $this->deadline_id = $db_deadline->id;
-    }
+    // make sure the deadline is appropriate
+    $this->assert_deadline();
 
     parent::save();
 
@@ -52,6 +42,45 @@ class requisition extends \cenozo\database\record
   }
 
   /**
+   * Check the requisition's deadline and change it to the next available deadline if needed
+   * NOTE: This method will change the deadline_id column but not save the record
+   * @access public
+   */
+  public function assert_deadline()
+  {
+    $deadline_class_name = lib::get_class_name( 'database\deadline' );
+
+    $db_deadline = NULL;
+    $change_deadline = false;
+    if( is_null( $this->deadline_id ) )
+    { // no deadline found
+      $db_deadline = $deadline_class_name::get_next();
+      $change_deadline = true;
+    }
+    else
+    {
+      $rank = $this->get_current_rank();
+      if( is_null( $rank ) || 1 == $rank )
+      {
+        if( 0 < $this->get_deadline()->date->diff( util::get_datetime_object() )->days )
+        { // deadline has expired, get the next one
+          $db_deadline = $deadline_class_name::get_next();
+          $change_deadline = true;
+        }
+      }
+    }
+    
+    if( $change_deadline )
+    {
+      if( is_null( $db_deadline ) )
+        throw lib::create( 'exception\runtime',
+          'Cannot create new requisition since there are no future deadlines defined.',
+          __METHOD__ );
+      $this->deadline_id = $db_deadline->id;
+    }
+  }
+
+  /**
    * Returns the requisitions last stage
    * @return database\stage
    * @access public
@@ -59,12 +88,12 @@ class requisition extends \cenozo\database\record
   public function get_last_stage()
   {
     // check the primary key value
-    if( is_null( $this->id ) ) 
-    {   
+    if( is_null( $this->id ) )
+    {
       log::warning( 'Tried to query requisition with no primary key.' );
       return NULL;
-    }   
-    
+    }
+
     $select = lib::create( 'database\select' );
     $select->from( 'requisition_last_stage' );
     $select->add_column( 'stage_id' );
@@ -73,6 +102,55 @@ class requisition extends \cenozo\database\record
 
     $stage_id = static::db()->get_one( sprintf( '%s %s', $select->get_sql(), $modifier->get_sql() ) );
     return $stage_id ? lib::create( 'database\stage', $stage_id ) : NULL;
+  }
+
+  /**
+   * Returns the requisitions last stage's stage type
+   * @return database\stage_type
+   * @access public
+   */
+  public function get_last_stage_type()
+  {
+    if( is_null( $this->id ) )
+    {
+      log::warning( 'Tried to query requisition with no primary key.' );
+      return NULL;
+    }
+
+    $select = lib::create( 'database\select' );
+    $select->from( 'requisition_last_stage' );
+    $select->add_table_column( 'stage', 'stage_type_id' );
+    $modifier = lib::create( 'database\modifier' );
+    $modifier->left_join( 'stage', 'requisition_last_stage.stage_id', 'stage.id' );
+    $modifier->where( 'requisition_last_stage.requisition_id', '=', $this->id );
+
+    $stage_type_id = static::db()->get_one( sprintf( '%s %s', $select->get_sql(), $modifier->get_sql() ) );
+    return $stage_type_id ? lib::create( 'database\stage_type', $stage_type_id ) : NULL;
+  }
+
+  /**
+   * Returns the requisition's current stage type rank
+   * @param integer $rank
+   * @return boolean (may be NULL if the requisition has no rank)
+   * @access public
+   */
+  public function get_current_rank()
+  {
+    if( is_null( $this->id ) )
+    {
+      log::warning( 'Tried to query requisition with no primary key.' );
+      return NULL;
+    }
+
+    $select = lib::create( 'database\select' );
+    $select->from( 'requisition_last_stage' );
+    $select->add_table_column( 'stage_type', 'rank' );
+    $modifier = lib::create( 'database\modifier' );
+    $modifier->left_join( 'stage', 'requisition_last_stage.stage_id', 'stage.id' );
+    $modifier->left_join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
+    $modifier->where( 'requisition_last_stage.requisition_id', '=', $this->id );
+
+    return static::db()->get_one( sprintf( '%s %s', $select->get_sql(), $modifier->get_sql() ) );
   }
 
   /**
@@ -88,16 +166,15 @@ class requisition extends \cenozo\database\record
   public function add_to_stage( $stage_type = NULL, $unprepared = NULL )
   {
     // check the primary key value
-    if( is_null( $this->id ) ) 
-    {   
+    if( is_null( $this->id ) )
+    {
       log::warning( 'Tried to add stage to requisition with no primary key.' );
       return;
-    }   
+    }
 
     $stage_type_class_name = lib::get_class_name( 'database\stage_type' );
     $db_user = lib::create( 'business\session' )->get_user();
-    $db_last_stage = $this->get_last_stage();
-    $db_last_stage_type = is_null( $db_last_stage ) ? NULL : $db_last_stage->get_stage_type();
+    $db_last_stage_type = $this->get_last_stage_type();
 
     // get the next stage_type
     $next_stage_type_list = is_null( $db_last_stage_type )
@@ -131,6 +208,7 @@ class requisition extends \cenozo\database\record
     // make sure the stage type is appropriate
     if( is_null( $db_last_stage_type ) )
     {
+      // we can only add the first stage when the requisition currently has no stages
       if( 1 != $db_stage_type->rank )
         throw lib::create( 'exception\runtime',
           sprintf( 'Tried to add stage "%s" but requisition has no existing stage.', $db_stage_type->name ),

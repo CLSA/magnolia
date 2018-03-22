@@ -44,9 +44,9 @@ class patch extends \cenozo\service\patch
       $applicant = 'applicant' == $db_role->name;
       $administrator = 'administrator' == $db_role->name;
       $db_requisition = $this->get_leaf_record();
-      $db_stage_type = $db_requisition->get_last_stage()->get_stage_type();
+      $db_last_stage_type = $db_requisition->get_last_stage_type();
       $state = $db_requisition->state;
-      $phase = $db_stage_type->phase;
+      $phase = $db_last_stage_type->phase;
       $code = NULL;
       if( 'abandon' == $action )
       {
@@ -73,6 +73,15 @@ class patch extends \cenozo\service\patch
         if( $applicant )
         {
           if( 'new' != $phase && 'deferred' != $state ) $code = 403;
+          else
+          {
+            // check to make sure the start date is appropriate
+            $delay = lib::create( 'business\setting_manager' )->get_setting( 'general', 'start_date_delay' );
+            $db_requisition->save(); // this will make sure the deadline is appropriate
+            $deadline = util::get_datetime_object( $db_requisition->get_deadline()->date );
+            $deadline->add( new \DateInterval( sprintf( 'P%dM', $delay ) ) );
+            if( $db_requisition->start_date < $deadline ) $code = 409;
+          }
         }
         else $code = 403;
       }
@@ -81,15 +90,15 @@ class patch extends \cenozo\service\patch
         if( $administrator )
         {
           if( !is_null( $state ) || (
-            ( 'review' != $phase || 'SMT Review' == $db_stage_type->name ) &&
-            ( 'agreement' != $phase || 'Report Required' == $db_stage_type->name )
+            ( 'review' != $phase || 'SMT Review' == $db_last_stage_type->name ) &&
+            ( 'agreement' != $phase || 'Report Required' == $db_last_stage_type->name )
           ) ) $code = 403;
         }
         else $code = 403;
       }
       else if( 'decide' == $action )
       {
-        if( !$administrator || 'SMT Review' != $db_stage_type->name ) $code = 403;
+        if( !$administrator || 'SMT Review' != $db_last_stage_type->name ) $code = 403;
         else
         {
           $approve = $this->get_argument( 'approve' );

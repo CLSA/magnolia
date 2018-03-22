@@ -10,3 +10,7 @@ CREATE TABLE IF NOT EXISTS deadline (
   UNIQUE INDEX uq_date (date ASC),
   UNIQUE INDEX uq_name (name ASC))
 ENGINE = InnoDB;
+
+INSERT IGNORE INTO deadline( name, date ) VALUES
+( "Summer, 2018", "2018-06-11" ),
+( "Fall, 2018", "2018-09-24" );

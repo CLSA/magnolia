@@ -325,6 +325,16 @@
               <div class="form-horizontal">
                 <cn-view-input
                   input="{
+                    key: 'deadline',
+                    title: t( 'part1.a3.deadline' ),
+                    type: 'date',
+                    constant: true
+                  }"
+                  model="model"
+                  state="$state">
+                </cn-view-input>
+                <cn-view-input
+                  input="{
                     key: 'start_date',
                     title: t( 'part1.a3.start_date' ),
                     type: model.inputList.start_date.type,

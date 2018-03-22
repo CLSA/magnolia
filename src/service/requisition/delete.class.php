@@ -17,10 +17,12 @@ class delete extends \cenozo\service\delete
   {
     parent::setup();
 
-    // if the only stage the requisition has been in is the New stage then delete it
+    // if the requisition's stage has the first rank then delete that stage
     $db_requisition = $this->get_leaf_record();
-    $db_last_stage = $db_requisition->get_last_stage();
-    if( 1 == $db_requisition->get_stage_count() && 'New' == $db_last_stage->get_stage_type()->name )
+    if( 1 == $db_requisition->get_current_rank() )
+    {
+      $db_last_stage = $db_requisition->get_last_stage();
       $db_last_stage->delete();
+    }
   }
 }
