@@ -3,13 +3,13 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 }, [] ), function() {
   'use strict';
 
-  try { var module = cenozoApp.module( 'requisition', true ); } catch( err ) { console.warn( err ); return; }
+  try { var module = cenozoApp.module( 'reqn', true ); } catch( err ) { console.warn( err ); return; }
   angular.extend( module, {
     identifier: { column: 'identifier' },
     name: {
       singular: 'requisition',
       plural: 'requisitions',
-      possessive: 'requisition’s'
+      possessive: 'requisition\'s'
     },
     columnList: {
       identifier: {
@@ -41,7 +41,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
       }
     },
     defaultOrder: {
-      column: 'requisition.identifier',
+      column: 'reqn.identifier',
       reverse: false
     }
   } );
@@ -121,7 +121,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
   module.addExtraOperation( 'view', {
     title: 'View Form',
     operation: function( $state, model ) {
-      $state.go( 'requisition.form', { identifier: model.viewModel.record.getIdentifier() } );
+      $state.go( 'reqn.form', { identifier: model.viewModel.record.getIdentifier() } );
     }
   } );
 
@@ -172,9 +172,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
   } );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnRequisitionForm', [
-    'CnRequisitionModelFactory', 'cnRecordViewDirective', 'CnSession', '$q',
-    function( CnRequisitionModelFactory, cnRecordViewDirective, CnSession, $q ) {
+  cenozo.providers.directive( 'cnReqnForm', [
+    'CnReqnModelFactory', 'cnRecordViewDirective', 'CnSession', '$q',
+    function( CnReqnModelFactory, cnRecordViewDirective, CnSession, $q ) {
       // used to piggy-back on the basic view controller's functionality (but not used in the DOM)
       var cnRecordView = cnRecordViewDirective[0];
 
@@ -225,7 +225,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           } );
         },
         controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnRequisitionModelFactory.root;
+          if( angular.isUndefined( $scope.model ) ) $scope.model = CnReqnModelFactory.root;
           cnRecordView.controller[1]( $scope );
 
           // coapplicant resources
@@ -318,37 +318,37 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnRequisitionView', [
-    'CnRequisitionModelFactory',
-    function( CnRequisitionModelFactory ) {
+  cenozo.providers.directive( 'cnReqnView', [
+    'CnReqnModelFactory',
+    function( CnReqnModelFactory ) {
       return {
         templateUrl: module.getFileUrl( 'view.tpl.html' ),
         restrict: 'E',
         scope: { model: '=?' },
         controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnRequisitionModelFactory.root;
+          if( angular.isUndefined( $scope.model ) ) $scope.model = CnReqnModelFactory.root;
         }
       };
     }
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnRequisitionList', [
-    'CnRequisitionModelFactory',
-    function( CnRequisitionModelFactory ) {
+  cenozo.providers.directive( 'cnReqnList', [
+    'CnReqnModelFactory',
+    function( CnReqnModelFactory ) {
       return {
         templateUrl: module.getFileUrl( 'list.tpl.html' ),
         restrict: 'E',
         scope: { model: '=?' },
         controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnRequisitionModelFactory.root;
+          if( angular.isUndefined( $scope.model ) ) $scope.model = CnReqnModelFactory.root;
         }
       };
     }
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnRequisitionListFactory', [
+  cenozo.providers.factory( 'CnReqnListFactory', [
     'CnBaseListFactory',
     function( CnBaseListFactory ) {
       var object = function( parentModel ) { CnBaseListFactory.construct( this, parentModel ); };
@@ -357,7 +357,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnRequisitionViewFactory', [
+  cenozo.providers.factory( 'CnReqnViewFactory', [
     'CnBaseViewFactory', 'CnCoapplicantModelFactory', 'CnReferenceModelFactory',
     'CnHttpFactory', 'CnModalMessageFactory', 'CnModalConfirmFactory', '$q',
     function( CnBaseViewFactory, CnCoapplicantModelFactory, CnReferenceModelFactory,
@@ -757,16 +757,16 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnRequisitionModelFactory', [
-    'CnBaseModelFactory', 'CnRequisitionListFactory', 'CnRequisitionViewFactory',
+  cenozo.providers.factory( 'CnReqnModelFactory', [
+    'CnBaseModelFactory', 'CnReqnListFactory', 'CnReqnViewFactory',
     'CnHttpFactory', 'CnSession', '$state', '$transitions', '$q',
-    function( CnBaseModelFactory, CnRequisitionListFactory, CnRequisitionViewFactory,
+    function( CnBaseModelFactory, CnReqnListFactory, CnReqnViewFactory,
               CnHttpFactory, CnSession, $state, $transitions, $q ) {
       var object = function( root ) {
         var self = this;
         CnBaseModelFactory.construct( this, module );
-        this.listModel = CnRequisitionListFactory.instance( this );
-        this.viewModel = CnRequisitionViewFactory.instance( this, root );
+        this.listModel = CnReqnListFactory.instance( this );
+        this.viewModel = CnReqnViewFactory.instance( this, root );
 
         // make the input list more accessible
         this.inputList = module.inputGroupList[0].inputList;
@@ -793,19 +793,19 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
         // override transitionToAddState
         this.transitionToAddState = function() {
-          // immediately get a new requisition and view it (no add state required)
+          // immediately get a new reqn and view it (no add state required)
           return CnHttpFactory.instance( {
-            path: 'requisition',
+            path: 'reqn',
             data: { user_id: CnSession.user.id }
           } ).post().then( function ( response ) {
-            // immediately view the new requisition
+            // immediately view the new reqn
             return self.transitionToViewState( { getIdentifier: function() { return response.data; } } );
           } )
         };
 
         // override transitionToViewState
         this.transitionToViewState = function( record ) {
-          if( this.isApplicant() ) $state.go( 'requisition.form', { identifier: record.getIdentifier() } );
+          if( this.isApplicant() ) $state.go( 'reqn.form', { identifier: record.getIdentifier() } );
           else this.$$transitionToViewState( record );
         };
 

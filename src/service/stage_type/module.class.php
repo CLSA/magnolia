@@ -21,27 +21,27 @@ class module extends \cenozo\service\module
   {
     parent::prepare_read( $select, $modifier );
 
-    // add the total number of requisitions
-    if( $select->has_column( 'requisition_count' ) ) 
+    // add the total number of reqns
+    if( $select->has_column( 'reqn_count' ) ) 
     {   
       $join_sel = lib::create( 'database\select' );
-      $join_sel->from( 'requisition_last_stage' );
+      $join_sel->from( 'reqn_last_stage' );
       $join_sel->add_table_column( 'stage', 'stage_type_id' );
       $join_sel->add_column(
-        'IF( stage.requisition_id IS NOT NULL, COUNT(*), 0 )',
-        'requisition_count',
+        'IF( stage.reqn_id IS NOT NULL, COUNT(*), 0 )',
+        'reqn_count',
         false
       );
 
       $join_mod = lib::create( 'database\modifier' );
-      $join_mod->join( 'stage', 'requisition_last_stage.stage_id', 'stage.id' );
+      $join_mod->join( 'stage', 'reqn_last_stage.stage_id', 'stage.id' );
       $join_mod->group( 'stage.stage_type_id' );
 
       $modifier->left_join(
-        sprintf( '( %s %s ) AS stage_type_join_requisition', $join_sel->get_sql(), $join_mod->get_sql() ),
+        sprintf( '( %s %s ) AS stage_type_join_reqn', $join_sel->get_sql(), $join_mod->get_sql() ),
         'stage_type.id',
-        'stage_type_join_requisition.stage_type_id' );
-      $select->add_column( 'IFNULL( requisition_count, 0 )', 'requisition_count', false );
+        'stage_type_join_reqn.stage_type_id' );
+      $select->add_column( 'IFNULL( reqn_count, 0 )', 'reqn_count', false );
     }   
   }
 }

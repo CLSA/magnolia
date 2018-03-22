@@ -22,9 +22,9 @@ class ui extends \cenozo\ui\ui
     parent::build_module_list();
 
     $module = $this->get_module( 'deadline' );
-    if( !is_null( $module ) ) $module->add_child( 'requisition' );
+    if( !is_null( $module ) ) $module->add_child( 'reqn' );
 
-    $module = $this->get_module( 'requisition' );
+    $module = $this->get_module( 'reqn' );
     if( !is_null( $module ) )
     {
       $module->add_action( 'form', '/{identifier}?{t0}&{t1}&{t2}' );
@@ -49,7 +49,7 @@ class ui extends \cenozo\ui\ui
     $db_role = lib::create( 'business\session' )->get_role();
 
     $this->add_listitem( 'Deadlines', 'deadline' );
-    $this->add_listitem( 'Requisitions', 'requisition' );
+    $this->add_listitem( 'Requisitions', 'reqn' );
     $this->add_listitem( 'Stage Types', 'stage_type' );
 
     $this->remove_listitem( 'Availability Types' );

@@ -15,22 +15,22 @@ SOURCE setting.sql
 SOURCE writelog.sql
 
 SOURCE deadline.sql
-SOURCE requisition.sql
+SOURCE reqn.sql
 SOURCE coapplicant.sql
 SOURCE reference.sql
 SOURCE data_option_parent.sql
 SOURCE data_option_subcategory.sql
 SOURCE data_option.sql
-SOURCE requisition_has_data_option.sql
+SOURCE reqn_has_data_option.sql
 SOURCE progress_report.sql
 SOURCE production_type.sql
 SOURCE production.sql
 SOURCE stage_type.sql
 SOURCE stage_type_has_stage_type.sql
 SOURCE stage.sql
-SOURCE requisition_last_stage.sql
+SOURCE reqn_last_stage.sql
 
-SOURCE update_requisition_last_stage.sql
+SOURCE update_reqn_last_stage.sql
 SOURCE update_version_number.sql
 
 COMMIT;

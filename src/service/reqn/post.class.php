@@ -5,7 +5,7 @@
  * @author Patrick Emond <emondpd@mcmaster.ca>
  */
 
-namespace magnolia\service\requisition;
+namespace magnolia\service\reqn;
 use cenozo\lib, cenozo\log, magnolia\util;
 
 class post extends \cenozo\service\post

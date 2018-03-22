@@ -1,15 +1,15 @@
-DROP PROCEDURE IF EXISTS patch_requisition;
+DROP PROCEDURE IF EXISTS patch_reqn;
 DELIMITER //
-CREATE PROCEDURE patch_requisition()
+CREATE PROCEDURE patch_reqn()
   BEGIN
 
     -- determine the @cenozo database name
     SET @cenozo = ( SELECT REPLACE( DATABASE(), "magnolia", "cenozo" ) );
 
-    SELECT "Creating new requisition table" AS "";
+    SELECT "Creating new reqn table" AS "";
 
     SET @sql = CONCAT(
-      "CREATE TABLE IF NOT EXISTS requisition ( ",
+      "CREATE TABLE IF NOT EXISTS reqn ( ",
         "id INT UNSIGNED NOT NULL AUTO_INCREMENT, ",
         "update_timestamp TIMESTAMP NOT NULL, ",
         "create_timestamp TIMESTAMP NOT NULL, ",
@@ -57,39 +57,39 @@ CREATE PROCEDURE patch_requisition()
         "biomarker_comment TEXT NULL, ",
         "PRIMARY KEY (id), ",
         "INDEX fk_user_id (user_id ASC), ",
-        "INDEX fk_requisition_chair_user_id (chair_user_id ASC), ",
+        "INDEX fk_chair_user_id (chair_user_id ASC), ",
         "INDEX fk_reviewer1_user_id (reviewer1_user_id ASC), ",
         "INDEX fk_reviewer2_user_id (reviewer2_user_id ASC), ",
         "UNIQUE INDEX uq_identifier (identifier ASC), ",
         "INDEX fk_language_id (language_id ASC), ",
         "INDEX dk_state (state ASC), ",
         "INDEX fk_deadline_id (deadline_id ASC), ",
-        "CONSTRAINT fk_requisition_user_id ",
+        "CONSTRAINT fk_reqn_user_id ",
           "FOREIGN KEY (user_id) ",
           "REFERENCES ", @cenozo, ".user (id) ",
           "ON DELETE NO ACTION ",
           "ON UPDATE NO ACTION, ",
-        "CONSTRAINT fk_requisition_language_id ",
+        "CONSTRAINT fk_reqn_language_id ",
           "FOREIGN KEY (language_id) ",
           "REFERENCES ", @cenozo, ".language (id) ",
           "ON DELETE NO ACTION ",
           "ON UPDATE NO ACTION, ",
-        "CONSTRAINT fk_requisition_deadline_id ",
+        "CONSTRAINT fk_reqn_deadline_id ",
           "FOREIGN KEY (deadline_id) ",
           "REFERENCES deadline (id) ",
           "ON DELETE NO ACTION ",
           "ON UPDATE NO ACTION, ",
-        "CONSTRAINT fk_requisition_chair_user_id ",
+        "CONSTRAINT fk_reqn_chair_user_id ",
           "FOREIGN KEY (chair_user_id) ",
           "REFERENCES ", @cenozo, ".user (id) ",
           "ON DELETE NO ACTION ",
           "ON UPDATE NO ACTION, ",
-        "CONSTRAINT fk_requisition_reviewer1_user_id ",
+        "CONSTRAINT fk_reqn_reviewer1_user_id ",
           "FOREIGN KEY (reviewer1_user_id) ",
           "REFERENCES ", @cenozo, ".user (id) ",
           "ON DELETE NO ACTION ",
           "ON UPDATE NO ACTION, ",
-        "CONSTRAINT fk_requisition_reviewer2_user_id ",
+        "CONSTRAINT fk_reqn_reviewer2_user_id ",
           "FOREIGN KEY (reviewer2_user_id) ",
           "REFERENCES ", @cenozo, ".user (id) ",
           "ON DELETE NO ACTION ",
@@ -99,13 +99,13 @@ CREATE PROCEDURE patch_requisition()
     EXECUTE statement;
     DEALLOCATE PREPARE statement;
 
-    SET @test = ( SELECT COUNT(*) FROM requisition );
+    SET @test = ( SELECT COUNT(*) FROM reqn );
     IF @test = 0 THEN
-      ALTER TABLE requisition AUTO_INCREMENT = 1001;
+      ALTER TABLE reqn AUTO_INCREMENT = 1001;
     END IF;
 
   END //
 DELIMITER ;
 
-CALL patch_requisition();
-DROP PROCEDURE IF EXISTS patch_requisition;
+CALL patch_reqn();
+DROP PROCEDURE IF EXISTS patch_reqn;

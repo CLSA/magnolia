@@ -1,6 +1,6 @@
 <?php
 /**
- * requisition.class.php
+ * reqn.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
  * @filesource
@@ -10,16 +10,16 @@ namespace magnolia\database;
 use cenozo\lib, cenozo\log, magnolia\util;
 
 /**
- * requisition: record
+ * reqn: record
  */
-class requisition extends \cenozo\database\record
+class reqn extends \cenozo\database\record
 {
   /**
    * Override the parent method
    */
   public function save()
   {
-    // track if this is a new requisition
+    // track if this is a new reqn
     $is_new = is_null( $this->id );
 
     // generate a random identifier if none exists
@@ -37,12 +37,12 @@ class requisition extends \cenozo\database\record
       if( file_exists( $filename ) ) unlink( $filename );
     }
 
-    // if this is a new requisition then assign it to the first stage
+    // if this is a new reqn then assign it to the first stage
     if( $is_new ) $this->add_to_stage( 1 );
   }
 
   /**
-   * Check the requisition's deadline and change it to the next available deadline if needed
+   * Check the reqn's deadline and change it to the next available deadline if needed
    * NOTE: This method will change the deadline_id column but not save the record
    * @access public
    */
@@ -74,14 +74,14 @@ class requisition extends \cenozo\database\record
     {
       if( is_null( $db_deadline ) )
         throw lib::create( 'exception\runtime',
-          'Cannot create new requisition since there are no future deadlines defined.',
+          'Cannot proceed since there are no future deadlines defined.',
           __METHOD__ );
       $this->deadline_id = $db_deadline->id;
     }
   }
 
   /**
-   * Returns the requisitions last stage
+   * Returns the reqns last stage
    * @return database\stage
    * @access public
    */
@@ -90,22 +90,22 @@ class requisition extends \cenozo\database\record
     // check the primary key value
     if( is_null( $this->id ) )
     {
-      log::warning( 'Tried to query requisition with no primary key.' );
+      log::warning( 'Tried to query reqn with no primary key.' );
       return NULL;
     }
 
     $select = lib::create( 'database\select' );
-    $select->from( 'requisition_last_stage' );
+    $select->from( 'reqn_last_stage' );
     $select->add_column( 'stage_id' );
     $modifier = lib::create( 'database\modifier' );
-    $modifier->where( 'requisition_id', '=', $this->id );
+    $modifier->where( 'reqn_id', '=', $this->id );
 
     $stage_id = static::db()->get_one( sprintf( '%s %s', $select->get_sql(), $modifier->get_sql() ) );
     return $stage_id ? lib::create( 'database\stage', $stage_id ) : NULL;
   }
 
   /**
-   * Returns the requisitions last stage's stage type
+   * Returns the reqns last stage's stage type
    * @return database\stage_type
    * @access public
    */
@@ -113,48 +113,48 @@ class requisition extends \cenozo\database\record
   {
     if( is_null( $this->id ) )
     {
-      log::warning( 'Tried to query requisition with no primary key.' );
+      log::warning( 'Tried to query reqn with no primary key.' );
       return NULL;
     }
 
     $select = lib::create( 'database\select' );
-    $select->from( 'requisition_last_stage' );
+    $select->from( 'reqn_last_stage' );
     $select->add_table_column( 'stage', 'stage_type_id' );
     $modifier = lib::create( 'database\modifier' );
-    $modifier->left_join( 'stage', 'requisition_last_stage.stage_id', 'stage.id' );
-    $modifier->where( 'requisition_last_stage.requisition_id', '=', $this->id );
+    $modifier->left_join( 'stage', 'reqn_last_stage.stage_id', 'stage.id' );
+    $modifier->where( 'reqn_last_stage.reqn_id', '=', $this->id );
 
     $stage_type_id = static::db()->get_one( sprintf( '%s %s', $select->get_sql(), $modifier->get_sql() ) );
     return $stage_type_id ? lib::create( 'database\stage_type', $stage_type_id ) : NULL;
   }
 
   /**
-   * Returns the requisition's current stage type rank
+   * Returns the reqn's current stage type rank
    * @param integer $rank
-   * @return boolean (may be NULL if the requisition has no rank)
+   * @return boolean (may be NULL if the reqn has no rank)
    * @access public
    */
   public function get_current_rank()
   {
     if( is_null( $this->id ) )
     {
-      log::warning( 'Tried to query requisition with no primary key.' );
+      log::warning( 'Tried to query reqn with no primary key.' );
       return NULL;
     }
 
     $select = lib::create( 'database\select' );
-    $select->from( 'requisition_last_stage' );
+    $select->from( 'reqn_last_stage' );
     $select->add_table_column( 'stage_type', 'rank' );
     $modifier = lib::create( 'database\modifier' );
-    $modifier->left_join( 'stage', 'requisition_last_stage.stage_id', 'stage.id' );
+    $modifier->left_join( 'stage', 'reqn_last_stage.stage_id', 'stage.id' );
     $modifier->left_join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
-    $modifier->where( 'requisition_last_stage.requisition_id', '=', $this->id );
+    $modifier->where( 'reqn_last_stage.reqn_id', '=', $this->id );
 
     return static::db()->get_one( sprintf( '%s %s', $select->get_sql(), $modifier->get_sql() ) );
   }
 
   /**
-   * Adds the requisition to a stage
+   * Adds the reqn to a stage
    * 
    * The stage type may either be a stage_type object, the name of a stage_type, the rank of a
    * stage_type or NULL.  NULL should only be used when the current stage_type only has one "next"
@@ -168,7 +168,7 @@ class requisition extends \cenozo\database\record
     // check the primary key value
     if( is_null( $this->id ) )
     {
-      log::warning( 'Tried to add stage to requisition with no primary key.' );
+      log::warning( 'Tried to add stage to reqn with no primary key.' );
       return;
     }
 
@@ -208,10 +208,10 @@ class requisition extends \cenozo\database\record
     // make sure the stage type is appropriate
     if( is_null( $db_last_stage_type ) )
     {
-      // we can only add the first stage when the requisition currently has no stages
+      // we can only add the first stage when the reqn currently has no stages
       if( 1 != $db_stage_type->rank )
         throw lib::create( 'exception\runtime',
-          sprintf( 'Tried to add stage "%s" but requisition has no existing stage.', $db_stage_type->name ),
+          sprintf( 'Tried to add stage "%s" but reqn has no existing stage.', $db_stage_type->name ),
           __METHOD__ );
     }
     else
@@ -235,7 +235,7 @@ class requisition extends \cenozo\database\record
     }
 
     $db_stage = lib::create( 'database\stage' );
-    $db_stage->requisition_id = $this->id;
+    $db_stage->reqn_id = $this->id;
     $db_stage->stage_type_id = $db_stage_type->id;
     $db_stage->datetime = util::get_datetime_object();
     $db_stage->user_id = $db_user->id;

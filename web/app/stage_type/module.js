@@ -20,7 +20,7 @@ define( function() {
       name: {
         title: 'Name'
       },
-      requisition_count: {
+      reqn_count: {
         title: 'Requisitions',
         type: 'number'
       }

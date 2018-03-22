@@ -11,7 +11,7 @@ define( function() {
     },
     columnList: {
       identifier: {
-        column: 'requisition.identifier',
+        column: 'reqn.identifier',
         title: 'Requisition'
       },
       stage_type: {
@@ -70,14 +70,14 @@ define( function() {
         CnBaseModelFactory.construct( this, module );
         this.listModel = CnStageListFactory.instance( this );
 
-        // Only allow viewing a stage when in the stage_type.view state (which will go to the requisition)
+        // Only allow viewing a stage when in the stage_type.view state (which will go to the reqn)
         this.getViewEnabled = function() {
           return 'stage_type' == this.getSubjectFromState() && 'view' == this.getActionFromState();
         };
 
-        // When in the stage.list state transition to the requisition when clicking the stage record
+        // When in the stage.list state transition to the reqn when clicking the stage record
         this.transitionToViewState = function( record ) { 
-          $state.go( 'requisition.view', { identifier: 'identifier=' + record.identifier } );
+          $state.go( 'reqn.view', { identifier: 'identifier=' + record.identifier } );
         };
       };
 

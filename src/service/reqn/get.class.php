@@ -5,7 +5,7 @@
  * @author Patrick Emond <emondpd@mcmaster.ca>
  */
 
-namespace magnolia\service\requisition;
+namespace magnolia\service\reqn;
 use cenozo\lib, cenozo\log, magnolia\util;
 
 class get extends \cenozo\service\downloadable
@@ -13,7 +13,7 @@ class get extends \cenozo\service\downloadable
   /**
    * Replace parent method
    * 
-   * When the client calls for a file we return the requisition's ethics letter
+   * When the client calls for a file we return the reqn's ethics letter
    */
   protected function get_downloadable_mime_type_list()
   {
@@ -23,7 +23,7 @@ class get extends \cenozo\service\downloadable
   /**
    * Replace parent method
    * 
-   * When the client calls for a file we return the requisition's ethics letter
+   * When the client calls for a file we return the reqn's ethics letter
    */
   protected function get_downloadable_public_name()
   {
@@ -33,7 +33,7 @@ class get extends \cenozo\service\downloadable
   /**
    * Replace parent method
    * 
-   * When the client calls for a file we return the requisition's ethics letter
+   * When the client calls for a file we return the reqn's ethics letter
    */
   protected function get_downloadable_file_path()
   {
@@ -48,8 +48,8 @@ class get extends \cenozo\service\downloadable
     if( $this->get_argument( 'letter', false ) )
     {
       $data = NULL;
-      $db_requisition = $this->get_leaf_record();
-      if( !is_null( $db_requisition ) && file_exists( $this->get_downloadable_file_path() ) )
+      $db_reqn = $this->get_leaf_record();
+      if( !is_null( $db_reqn ) && file_exists( $this->get_downloadable_file_path() ) )
         $this->set_data( stat( $this->get_downloadable_file_path() )['size'] );
     }
     else

@@ -21,7 +21,7 @@ class module extends \cenozo\service\module
   {
     parent::prepare_read( $select, $modifier );
 
-    $modifier->join( 'requisition', 'progress_report.requisition_id', 'requisition.id' );
-    $modifier->join( 'language', 'requisition.language_id', 'language.id' );
+    $modifier->join( 'reqn', 'progress_report.reqn_id', 'reqn.id' );
+    $modifier->join( 'language', 'reqn.language_id', 'language.id' );
   }
 }

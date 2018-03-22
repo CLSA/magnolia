@@ -17,7 +17,7 @@ define( function() {
         title: 'Date',
         type: 'date'
       },
-      requisition_count: {
+      reqn_count: {
         title: 'Requisitions'
       }
     },

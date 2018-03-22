@@ -5,7 +5,7 @@
  * @author Patrick Emond <emondpd@mcmaster.ca>
  */
 
-namespace magnolia\service\requisition;
+namespace magnolia\service\reqn;
 use cenozo\lib, cenozo\log, magnolia\util;
 
 class patch extends \cenozo\service\patch
@@ -43,9 +43,9 @@ class patch extends \cenozo\service\patch
       $db_role = lib::create( 'business\session' )->get_role();
       $applicant = 'applicant' == $db_role->name;
       $administrator = 'administrator' == $db_role->name;
-      $db_requisition = $this->get_leaf_record();
-      $db_last_stage_type = $db_requisition->get_last_stage_type();
-      $state = $db_requisition->state;
+      $db_reqn = $this->get_leaf_record();
+      $db_last_stage_type = $db_reqn->get_last_stage_type();
+      $state = $db_reqn->state;
       $phase = $db_last_stage_type->phase;
       $code = NULL;
       if( 'abandon' == $action )
@@ -77,10 +77,10 @@ class patch extends \cenozo\service\patch
           {
             // check to make sure the start date is appropriate
             $delay = lib::create( 'business\setting_manager' )->get_setting( 'general', 'start_date_delay' );
-            $db_requisition->save(); // this will make sure the deadline is appropriate
-            $deadline = util::get_datetime_object( $db_requisition->get_deadline()->date );
+            $db_reqn->save(); // this will make sure the deadline is appropriate
+            $deadline = util::get_datetime_object( $db_reqn->get_deadline()->date );
             $deadline->add( new \DateInterval( sprintf( 'P%dM', $delay ) ) );
-            if( $db_requisition->start_date < $deadline ) $code = 409;
+            if( $db_reqn->start_date < $deadline ) $code = 409;
           }
         }
         else $code = 403;
@@ -139,58 +139,58 @@ class patch extends \cenozo\service\patch
     $action = $this->get_argument( 'action', false );
     if( $action )
     {
-      $db_requisition = $this->get_leaf_record();
+      $db_reqn = $this->get_leaf_record();
       if( 'abandon' == $action )
       {
-        $db_requisition->state = 'abandoned';
-        $db_requisition->save();
+        $db_reqn->state = 'abandoned';
+        $db_reqn->save();
       }
       else if( 'defer' == $action )
       {
-        $db_requisition->state = 'deferred';
-        $db_requisition->save();
+        $db_reqn->state = 'deferred';
+        $db_reqn->save();
         log::info( sprintf(
           'Send "Action required" notification email to applicant of %s',
-          $db_requisition->identifier
+          $db_reqn->identifier
         ) );
       }
       else if( 'reactivate' == $action )
       {
-        $db_requisition->state = NULL;
-        $db_requisition->save();
+        $db_reqn->state = NULL;
+        $db_reqn->save();
       }
       else if( 'prepare' == $action )
       {
-        $db_last_stage = $db_requisition->get_last_stage();
+        $db_last_stage = $db_reqn->get_last_stage();
         $db_last_stage->unprepared = false;
         $db_last_stage->save();
       }
       else if( 'reject' == $action )
       {
-        $db_requisition->state = 'rejected';
-        $db_requisition->save();
+        $db_reqn->state = 'rejected';
+        $db_reqn->save();
         log::info( sprintf(
           'Send "Rejected" notification email to applicant of %s',
-          $db_requisition->identifier
+          $db_reqn->identifier
         ) );
       }
       else if( 'submit' == $action )
       {
-        if( 'deferred' == $db_requisition->state )
+        if( 'deferred' == $db_reqn->state )
         {
-          $db_requisition->state = NULL;
-          $db_requisition->save();
+          $db_reqn->state = NULL;
+          $db_reqn->save();
         }
         else
         {
-          // this will submit the requisition for the first time
-          $db_requisition->add_to_stage();
+          // this will submit the reqn for the first time
+          $db_reqn->add_to_stage();
         }
       }
       else if( 'next_stage' == $action )
       {
-        // add the requisition to whatever the next stage is
-        $db_requisition->add_to_stage();
+        // add the reqn to whatever the next stage is
+        $db_reqn->add_to_stage();
       }
       else if( 'decide' == $action )
       {
@@ -199,17 +199,17 @@ class patch extends \cenozo\service\patch
         if( 'yes' == $approve ) $stage_type = 'Approved';
         else if( 'conditional' == $approve ) $stage_type = 'Conditionally Approved';
         else if( 'no' == $approve ) $stage_type = 'Not Approved';
-        $db_requisition->add_to_stage( $stage_type );
+        $db_reqn->add_to_stage( $stage_type );
         log::info( sprintf(
           'Send "Notice of Decision" notification email to applicant of %s',
-          $db_requisition->identifier
+          $db_reqn->identifier
         ) );
       }
       else
       {
         log::warning( sprintf(
-          'Received PATCH:requisition/%d with unknown action "%s"',
-          $db_requisition->id,
+          'Received PATCH:reqn/%d with unknown action "%s"',
+          $db_reqn->id,
           $action
         ) );
       }

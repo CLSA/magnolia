@@ -5,8 +5,8 @@ define( function() {
   angular.extend( module, {
     identifier: {
       parent: {
-        subject: 'requisition',
-        column: 'requisition.identifier'
+        subject: 'reqn',
+        column: 'reqn.identifier'
       }
     },
     name: {
@@ -380,12 +380,12 @@ define( function() {
 
         // override transitionToAddState
         this.transitionToAddState = function() {
-          // immediately get a new requisition and view it (no add state required)
+          // immediately get a new reqn and view it (no add state required)
           return CnHttpFactory.instance( {
             path: 'progress_report',
-            data: { requisition_id: $state.params.identifier } // when adding the current id is always a req'n
+            data: { reqn_id: $state.params.identifier } // when adding the current id is always a req'n
           } ).post().then( function ( response ) { 
-            // immediately view the new requisition
+            // immediately view the new reqn
             return self.transitionToViewState( { getIdentifier: function() { return response.data; } } );
           } )
         };
