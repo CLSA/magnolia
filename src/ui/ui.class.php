@@ -29,7 +29,11 @@ class ui extends \cenozo\ui\ui
     {
       $module->add_action( 'form', '/{identifier}?{t0}&{t1}&{t2}' );
       $module->add_child( 'stage' );
+      $module->add_child( 'notification' );
     }
+
+    $module = $this->get_module( 'notification_type' );
+    if( !is_null( $module ) ) $module->add_child( 'notification' );
 
     $module = $this->get_module( 'progress_report' );
     if( !is_null( $module ) )
@@ -49,6 +53,7 @@ class ui extends \cenozo\ui\ui
     $db_role = lib::create( 'business\session' )->get_role();
 
     $this->add_listitem( 'Deadlines', 'deadline' );
+    $this->add_listitem( 'Notification Types', 'notification_type' );
     $this->add_listitem( 'Requisitions', 'reqn' );
     $this->add_listitem( 'Stage Types', 'stage_type' );
 

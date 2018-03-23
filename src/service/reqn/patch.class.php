@@ -126,6 +126,8 @@ class patch extends \cenozo\service\patch
   {
     parent::execute();
 
+    $notification_type_class_name = lib::get_class_name( 'database\notification_type' );
+
     $headers = apache_request_headers();
     if( false !== strpos( $headers['Content-Type'], 'application/octet-stream' ) )
     {
@@ -149,10 +151,15 @@ class patch extends \cenozo\service\patch
       {
         $db_reqn->state = 'deferred';
         $db_reqn->save();
-        log::info( sprintf(
-          'Send "Action required" notification email to applicant of %s',
-          $db_reqn->identifier
-        ) );
+
+        // send a notification
+        $db_notification = lib::create( 'database\notification' );
+        $db_notification->reqn_id = $db_reqn->id;
+        $db_notification->notification_type_id =
+          $notification_type_class_name::get_unique_record( 'name', 'Action required' )->id;
+        $db_notification->email = $db_reqn->email;
+        $db_notification->datetime = util::get_datetime_object();
+        $db_notification->save();
       }
       else if( 'reactivate' == $action )
       {
@@ -169,10 +176,15 @@ class patch extends \cenozo\service\patch
       {
         $db_reqn->state = 'rejected';
         $db_reqn->save();
-        log::info( sprintf(
-          'Send "Rejected" notification email to applicant of %s',
-          $db_reqn->identifier
-        ) );
+
+        // send a notification
+        $db_notification = lib::create( 'database\notification' );
+        $db_notification->reqn_id = $db_reqn->id;
+        $db_notification->notification_type_id =
+          $notification_type_class_name::get_unique_record( 'name', 'Rejection' )->id;
+        $db_notification->email = $db_reqn->email;
+        $db_notification->datetime = util::get_datetime_object();
+        $db_notification->save();
       }
       else if( 'submit' == $action )
       {
@@ -200,10 +212,15 @@ class patch extends \cenozo\service\patch
         else if( 'conditional' == $approve ) $stage_type = 'Conditionally Approved';
         else if( 'no' == $approve ) $stage_type = 'Not Approved';
         $db_reqn->add_to_stage( $stage_type );
-        log::info( sprintf(
-          'Send "Notice of Decision" notification email to applicant of %s',
-          $db_reqn->identifier
-        ) );
+
+        // send a notification
+        $db_notification = lib::create( 'database\notification' );
+        $db_notification->reqn_id = $db_reqn->id;
+        $db_notification->notification_type_id =
+          $notification_type_class_name::get_unique_record( 'name', 'Notice of decision' )->id;
+        $db_notification->email = $db_reqn->email;
+        $db_notification->datetime = util::get_datetime_object();
+        $db_notification->save();
       }
       else
       {

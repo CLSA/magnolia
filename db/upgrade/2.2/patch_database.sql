@@ -16,6 +16,8 @@ SOURCE writelog.sql
 
 SOURCE deadline.sql
 SOURCE reqn.sql
+SOURCE notification_type.sql
+SOURCE notification.sql
 SOURCE coapplicant.sql
 SOURCE reference.sql
 SOURCE data_option_parent.sql
