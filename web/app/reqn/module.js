@@ -211,6 +211,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               cenozo.updateFormElement( element, true );
             }
           } );
+          scope.$watch( 'model.viewModel.record.lay_summary', function( text ) {
+            scope.model.viewModel.charCount.lay_summary = text ? text.length : 0;
+          } );
           scope.$watch( 'model.viewModel.record.background', function( text ) {
             scope.model.viewModel.wordCount.background = text ? text.split( ' ' ).length : 0;
           } );
@@ -372,6 +375,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         this.referenceModel.metadata.getPromise(); // needed to get the reference's metadata
         this.referenceList = [];
         this.dataOptionValueList = [];
+        this.charCount = { lay_summary: 0 };
         this.wordCount = { background: 0, objectives: 0, methodology: 0, analysis: 0 };
         this.uploadingEthicsFile = false;
 
@@ -573,7 +577,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                 a6: [ 'ethics' ]
               };
 
-              var errorCount = 0;
+              var error = null;
               var errorTab = null;
               for( var tab in requiredTabList ) {
                 var firstProperty = null;
@@ -583,18 +587,30 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                     element.$error.required = true;
                     cenozo.updateFormElement( element, true );
                     if( null == errorTab ) errorTab = tab;
-                    errorCount++;
+                    if( null == error ) error = {
+                      title: self.translate( 'misc.missingFieldTitle' ),
+                      message: self.translate( 'misc.missingFieldMessage' ),
+                      error: true
+                    };
                   }
                 } );
               }
 
-              if( 0 < errorCount ) {
-                var messageLookupCode = 'misc.missingFieldMessage.' + ( 1 == errorCount ? 'singular' : 'plural' );
-                CnModalMessageFactory.instance( {
-                  title: self.translate( 'misc.missingFieldTitle' ),
-                  message: self.translate( messageLookupCode ),
+              if( 1000 < self.record.lay_summary.length ) {
+                var element = cenozo.getFormElement( 'lay_summary' );
+                element.$error.custom = self.translate( 'misc.tooManyCharactersTitle' );
+                cenozo.updateFormElement( element, true );
+                if( null == errorTab ) errorTab = 'a4';
+                if( null == error ) error = {
+                  title: self.translate( 'misc.tooManyCharactersTitle' ),
+                  message: self.translate( 'misc.tooManyCharactersMessage' ),
                   error: true
-                } ).show().then( function() { self.setTab( 1, errorTab ); } );
+                };
+              }
+
+              if( null != error ) {
+                // if there was an error then display it now
+                CnModalMessageFactory.instance( error ).show().then( function() { self.setTab( 1, errorTab ); } );
               } else {
                 return CnHttpFactory.instance( {
                   path: self.parentModel.getServiceResourcePath() + "?action=submit",
@@ -1092,8 +1108,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               },
               lay_summary: { en: 'Lay Summary', fr: 'Résumé non scientifique' },
               lay_summary_text: {
-                en: 'Please provide a lay language summary of your project (<strong>maximum 150 words</strong>) suitable for posting on the CLSA website if your application is approved. Please ensure that the lay summary provides a stand-alone, informative description of your project.',
-                fr: 'Veuillez fournir un résumé non scientifique de votre projet (<strong>150 mots maximum</strong>) pouvant être publié sur le site Web de l’ÉLCV si votre demande est approuvée. Assurez-vous de fournir un résumé détaillé et complet de votre projet.'
+                en: 'Please provide a lay language summary of your project (<strong>maximum 1000 characters</strong>) suitable for posting on the CLSA website if your application is approved. Please ensure that the lay summary provides a stand-alone, informative description of your project.',
+                fr: 'Veuillez fournir un résumé non scientifique de votre projet (<strong>TRANSLATION REQUIRED</strong>) pouvant être publié sur le site Web de l’ÉLCV si votre demande est approuvée. Assurez-vous de fournir un résumé détaillé et complet de votre projet.'
               },
               text2: {
                 en: 'Please provide a description of the proposed project. The proposal should be informative and specific and <strong>no more than TODO words. Non-compliant applications will be returned.</strong>',
@@ -1232,6 +1248,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             pleaseConfirm: { en: 'Please confirm', fr: 'Veuillez confirmer' },
             remove: { en: 'Remove', fr: 'Supprimer' },
             words: { en: 'words', fr: 'mots' },
+            chars: { en: 'characters', fr: 'TRANSLATION REQUIRED' },
             wordCount: { en: 'word count', fr: 'nombre de mots' },
             comments: { en: 'Comments', fr: 'Commentaires' },
             upload: { en: 'upload', fr: 'téléverser' },
@@ -1246,14 +1263,13 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             },
             missingFieldTitle: { en: 'Missing mandatory field', fr: 'Champ obligatoire manquant' },
             missingFieldMessage: {
-              singular: {
-                en: 'There is a mandatory field which is missing. You will now be redirected to where the incomplete field can be found.  Please try re-submitting once all mandatory fields have been filled out.',
-                fr: 'Un champ obligatoire est manquant. Vous allez être redirigé vers l’endroit où se trouve le champ incomplet. Veuillez soumettre la demande d’accès à nouveau quand tous les champs obligatoires auront été remplis.'
-              },
-              plural: {
-                en: 'There are mandatory fields which are missing. You will now be redirected to where the incomplete fields can be found.  Please try re-submitting once all mandatory fields have been filled out.',
-                fr: 'Des champs obligatoires sont manquants. Vous serez redirigé vers l’endroit où se trouvent les champs incomplets. Veuillez soumettre la demande d’accès à nouveau quand tous les champs obligatoires auront été remplis.'
-              }
+              en: 'There are mandatory fields which are missing. You will now be redirected to where the incomplete fields can be found.  Please try re-submitting once all mandatory fields have been filled out.',
+              fr: 'Des champs obligatoires sont manquants. Vous serez redirigé vers l’endroit où se trouvent les champs incomplets. Veuillez soumettre la demande d’accès à nouveau quand tous les champs obligatoires auront été remplis.'
+            },
+            tooManyCharactersTitle: { en: 'Too many characters', fr: 'TRANSLATION REQUIRED' },
+            tooManyCharactersMessage: {
+              en: 'Some of your descriptions are too long.  You will now be redirected to the general project information details.  Please try re-submitting once all descriptions are within the maximum limits.',
+              fr: 'TRANSLATION REQUIRED'
             },
             invalidStartDateTitle: { en: 'Invalid start date', fr: 'TRANSLATION REQUIRED' },
             invalidStartDateMessage: {

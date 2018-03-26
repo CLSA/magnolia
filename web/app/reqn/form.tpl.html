@@ -386,7 +386,8 @@
                 <cn-view-input
                   input="{
                     key: 'lay_summary',
-                    title: t( 'part1.a4.lay_summary' )+'<sup>?</sup>',
+                    title: t( 'part1.a4.lay_summary' ) + '<br><span class=text-info>(' +
+                           model.viewModel.charCount.lay_summary + ' ' + t( 'misc.chars' ) + ')</span>',
                     type: 'text',
                     help: t( 'part1.a4.lay_summary_text' )
                   }"
