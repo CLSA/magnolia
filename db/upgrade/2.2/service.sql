@@ -116,6 +116,13 @@ INSERT INTO service ( subject, method, resource, restricted ) VALUES
 ( 'reqn', 'GET', 1, 0 ),
 ( 'reqn', 'PATCH', 1, 1 ),
 ( 'reqn', 'POST', 0, 1 ),
+( 'reqn_note', 'GET', 0, 0 ),
+( 'reqn_note', 'GET', 1, 0 ),
+( 'reqn_note', 'PATCH', 1, 1 ),
+( 'reqn_note', 'POST', 0, 1 ),
+( 'review', 'GET', 0, 1 ),
+( 'review', 'GET', 1, 1 ),
+( 'review', 'PATCH', 1, 1 ),
 ( 'stage', 'GET', 0, 1 ),
 ( 'stage_type', 'GET', 0, 1 ),
 ( 'stage_type', 'GET', 1, 1 );
