@@ -145,8 +145,9 @@
                 <cn-view-input
                   input="{
                     key: 'applicant_email',
-                    title: t( 'part1.a1.applicant_email' ),
-                    type: model.inputList.applicant_email.type
+                    title: t( 'part1.a1.applicant_email' )+'<sup>?</sup>',
+                    type: model.inputList.applicant_email.type,
+                    help: t( 'misc.email_text' )
                   }"
                   model="model">
                 </cn-view-input>
@@ -197,8 +198,9 @@
                 <cn-view-input
                   input="{
                     key: 'graduate_email',
-                    title: t( 'part1.a1.graduate_email' ),
-                    type: model.inputList.graduate_email.type
+                    title: t( 'part1.a1.graduate_email' )+'<sup>?</sup>',
+                    type: model.inputList.graduate_email.type,
+                    help: t( 'misc.email_text' )
                   }"
                   model="model">
                 </cn-view-input>
@@ -268,7 +270,12 @@
                   first="false">
                 </cn-add-input>
                 <cn-add-input
-                  input="{ key: 'email', title: t( 'part1.a2.email' ), type: 'string' }"
+                  input="{
+                    key: 'email',
+                    title: t( 'part1.a2.email' )+'<sup>?</sup>',
+                    type: 'string',
+                    help: t( 'misc.email_text' )
+                  }"
                   record="coapplicantRecord"
                   model="model.viewModel.coapplicantModel"
                   first="false">

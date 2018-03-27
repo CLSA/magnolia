@@ -13,11 +13,7 @@ global $SETTINGS;
 $SETTINGS['general']['application_name'] = 'magnolia';
 $SETTINGS['general']['instance_name'] = $SETTINGS['general']['application_name'];
 $SETTINGS['general']['version'] = '2.2';
-<<<<<<< HEAD
-$SETTINGS['general']['build'] = '96aedbf';
-=======
-$SETTINGS['general']['build'] = 'b287374';
->>>>>>> origin/release
+$SETTINGS['general']['build'] = '8a22535';
 
 // the location of magnolia internal path
 $SETTINGS['path']['APPLICATION'] = str_replace( '/settings.ini.php', '', __FILE__ );

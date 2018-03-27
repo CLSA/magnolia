@@ -1285,6 +1285,10 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             abandonWarning: {
               en: 'Are you sure you want to abandon the application?\n\nYou will no longer have access to the application and the review process will be discontinued.',
               fr: 'Êtes-vous sûr(e) de vouloir abandonner la demande d’accès? Vous n’y aurez plus accès et le processus d’évaluation sera interrompu.'
+            },
+            email_text: {
+              en: 'You must provide an intitutional email.  Public email acounts such as @gmail.com are not allowed.',
+              fr: 'TRANSLATION REQUIRED'
             }
           }
         };
