@@ -405,6 +405,13 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           this.tab[index] = tab;
           this.parentModel.setQueryParameter( 't'+index, tab );
           if( transition ) {
+            if( 1 == index ) {
+              this.tab[0] = 'part1';
+              this.parentModel.setQueryParameter( 't0', 'part1' );
+            } else if( 2 == index ) {
+              this.tab[0] = 'part2';
+              this.parentModel.setQueryParameter( 't0', 'part2' );
+            }
             this.parentModel.reloadState( false, false, 'replace' ).then( function() {
               // update all textarea sizes
               angular.element( 'textarea[cn-elastic]' ).trigger( 'change' );
@@ -597,19 +604,24 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                 } );
               }
 
-              if( 1000 < self.record.lay_summary.length ) {
-                var element = cenozo.getFormElement( 'lay_summary' );
-                element.$error.custom = self.translate( 'misc.tooManyCharactersTitle' );
-                cenozo.updateFormElement( element, true );
-                if( null == errorTab ) errorTab = 'a4';
-                if( null == error ) error = {
-                  title: self.translate( 'misc.tooManyCharactersTitle' ),
-                  message: self.translate( 'misc.tooManyCharactersMessage' ),
-                  error: true
-                };
+              // now check for limited inputs if there are no empty errors
+              if( null == error ) {
+                if( null != self.record.lay_summary && 1000 < self.record.lay_summary.length ) {
+                  var element = cenozo.getFormElement( 'lay_summary' );
+                  element.$error.custom = self.translate( 'misc.tooManyCharactersTitle' );
+                  cenozo.updateFormElement( element, true );
+                  if( null == errorTab ) errorTab = 'a4';
+                  if( null == error ) error = {
+                    title: self.translate( 'misc.tooManyCharactersTitle' ),
+                    message: self.translate( 'misc.tooManyCharactersMessage' ),
+                    error: true
+                  };
+                }
               }
 
               if( null != error ) {
+                var element = cenozo.getFormElement( 'lay_summary' );
+
                 // if there was an error then display it now
                 CnModalMessageFactory.instance( error ).show().then( function() { self.setTab( 1, errorTab ); } );
               } else {
