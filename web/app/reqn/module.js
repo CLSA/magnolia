@@ -232,9 +232,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           cnRecordView.controller[1]( $scope );
 
           // coapplicant resources
-          var addModel = $scope.model.viewModel.coapplicantModel.addModel;
+          var coapplicantAddModel = $scope.model.viewModel.coapplicantModel.addModel;
           $scope.coapplicantRecord = {};
-          addModel.onNew( $scope.coapplicantRecord );
+          coapplicantAddModel.onNew( $scope.coapplicantRecord );
 
           $scope.getHeading = function() {
             var status = $scope.model.viewModel.record[$scope.model.isApplicant() ? 'status' : 'stage_type'];
@@ -249,16 +249,16 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
           $scope.addCoapplicant = function() {
             if( $scope.model.viewModel.coapplicantModel.getAddEnabled() ) {
-              var form = cenozo.getScopeByQuerySelector( '[name=part1a2Form]' ).part1a2Form;
+              var form = cenozo.getScopeByQuerySelector( '#part1a2Form' ).part1a2Form;
               if( !form.$valid ) {
                 // dirty all inputs so we can find the problem
                 cenozo.forEachFormElement( 'part1a2Form', function( element ) { element.$dirty = true; } );
               } else {
                 $scope.isAddingCoapplicant = true;
-                addModel.onAdd( $scope.coapplicantRecord ).then( function( response ) {
+                coapplicantAddModel.onAdd( $scope.coapplicantRecord ).then( function( response ) {
                   form.$setPristine();
                   return $q.all( [
-                    addModel.onNew( $scope.coapplicantRecord ),
+                    coapplicantAddModel.onNew( $scope.coapplicantRecord ),
                     $scope.model.viewModel.getCoapplicantList()
                   ] );
                 } ).finally( function() { $scope.isAddingCoapplicant = false; } );
@@ -277,22 +277,22 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           };
 
           // reference resources
-          var addModel = $scope.model.viewModel.referenceModel.addModel;
+          var referenceAddModel = $scope.model.viewModel.referenceModel.addModel;
           $scope.referenceRecord = {};
-          addModel.onNew( $scope.referenceRecord );
+          referenceAddModel.onNew( $scope.referenceRecord );
 
           $scope.addReference = function() {
             if( $scope.model.viewModel.referenceModel.getAddEnabled() ) {
-              var form = cenozo.getScopeByQuerySelector( '[name=part1a4Form]' ).part1a4Form;
+              var form = cenozo.getScopeByQuerySelector( '#part1a4Form' ).part1a4Form;
               if( !form.$valid ) {
                 // dirty all inputs so we can find the problem
                 cenozo.forEachFormElement( 'part1a4Form', function( element ) { element.$dirty = true; } );
               } else {
                 $scope.isAddingReference = true;
-                addModel.onAdd( $scope.referenceRecord ).then( function( response ) {
+                referenceAddModel.onAdd( $scope.referenceRecord ).then( function( response ) {
                   form.$setPristine();
                   return $q.all( [
-                    addModel.onNew( $scope.referenceRecord ),
+                    referenceAddModel.onNew( $scope.referenceRecord ),
                     $scope.model.viewModel.getReferenceList()
                   ] );
                 } ).finally( function() { $scope.isAddingReference = false; } );
