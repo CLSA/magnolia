@@ -82,12 +82,12 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     status: { column: 'stage_type.status', type: 'string', exclude: true },
     language: { type: 'string', column: 'language.code', exclude: true },
     deadline: { type: 'date', column: 'deadline.date', exclude: true },
-    name: { type: 'string', exclude: true },
-    position: { type: 'string', exclude: true },
-    affiliation: { type: 'string', exclude: true },
-    address: { type: 'string', exclude: true },
-    phone: { type: 'string', exclude: true },
-    email: { type: 'string', exclude: true },
+    applicant_name: { type: 'string', exclude: true },
+    applicant_position: { type: 'string', exclude: true },
+    applicant_affiliation: { type: 'string', exclude: true },
+    applicant_address: { type: 'string', exclude: true },
+    applicant_phone: { type: 'string', exclude: true },
+    applicant_email: { type: 'string', exclude: true },
     graduate_name: { type: 'string', exclude: true },
     graduate_program: { type: 'string', exclude: true },
     graduate_institution: { type: 'string', exclude: true },
@@ -229,9 +229,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           cnRecordView.controller[1]( $scope );
 
           // coapplicant resources
-          var addModel = $scope.model.viewModel.coapplicantModel.addModel;
+          var coapplicantAddModel = $scope.model.viewModel.coapplicantModel.addModel;
           $scope.coapplicantRecord = {};
-          addModel.onNew( $scope.coapplicantRecord );
+          coapplicantAddModel.onNew( $scope.coapplicantRecord );
 
           $scope.getHeading = function() {
             var status = $scope.model.viewModel.record[$scope.model.isApplicant() ? 'status' : 'stage_type'];
@@ -246,16 +246,16 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
           $scope.addCoapplicant = function() {
             if( $scope.model.viewModel.coapplicantModel.getAddEnabled() ) {
-              var form = cenozo.getScopeByQuerySelector( '[name=part1a2Form]' ).part1a2Form;
+              var form = cenozo.getScopeByQuerySelector( '#part1a2Form' ).part1a2Form;
               if( !form.$valid ) {
                 // dirty all inputs so we can find the problem
                 cenozo.forEachFormElement( 'part1a2Form', function( element ) { element.$dirty = true; } );
               } else {
                 $scope.isAddingCoapplicant = true;
-                addModel.onAdd( $scope.coapplicantRecord ).then( function( response ) {
+                coapplicantAddModel.onAdd( $scope.coapplicantRecord ).then( function( response ) {
                   form.$setPristine();
                   return $q.all( [
-                    addModel.onNew( $scope.coapplicantRecord ),
+                    coapplicantAddModel.onNew( $scope.coapplicantRecord ),
                     $scope.model.viewModel.getCoapplicantList()
                   ] );
                 } ).finally( function() { $scope.isAddingCoapplicant = false; } );
@@ -274,22 +274,22 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           };
 
           // reference resources
-          var addModel = $scope.model.viewModel.referenceModel.addModel;
+          var referenceAddModel = $scope.model.viewModel.referenceModel.addModel;
           $scope.referenceRecord = {};
-          addModel.onNew( $scope.referenceRecord );
+          referenceAddModel.onNew( $scope.referenceRecord );
 
           $scope.addReference = function() {
             if( $scope.model.viewModel.referenceModel.getAddEnabled() ) {
-              var form = cenozo.getScopeByQuerySelector( '[name=part1a4Form]' ).part1a4Form;
+              var form = cenozo.getScopeByQuerySelector( '#part1a4Form' ).part1a4Form;
               if( !form.$valid ) {
                 // dirty all inputs so we can find the problem
                 cenozo.forEachFormElement( 'part1a4Form', function( element ) { element.$dirty = true; } );
               } else {
                 $scope.isAddingReference = true;
-                addModel.onAdd( $scope.referenceRecord ).then( function( response ) {
+                referenceAddModel.onAdd( $scope.referenceRecord ).then( function( response ) {
                   form.$setPristine();
                   return $q.all( [
-                    addModel.onNew( $scope.referenceRecord ),
+                    referenceAddModel.onNew( $scope.referenceRecord ),
                     $scope.model.viewModel.getReferenceList()
                   ] );
                 } ).finally( function() { $scope.isAddingReference = false; } );
@@ -566,7 +566,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             if( response ) {
               // make sure that certain properties have been defined, one tab at a time
               var requiredTabList = {
-                a1: [ 'name', 'position', 'affiliation', 'address', 'phone', 'email' ],
+                a1: [ 'applicant_name', 'applicant_position', 'applicant_affiliation',
+                      'applicant_address', 'applicant_phone', 'applicant_email' ],
                 a3: [ 'start_date', 'duration' ],
                 a4: [ 'title', 'keywords', 'lay_summary', 'background', 'objectives', 'methodology', 'analysis' ],
                 a5: [ 'funding' ],
@@ -1037,12 +1038,12 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                 en: 'For <strong>Graduate student</strong> (MSc, PhD) applications, the primary applicant must be the supervisor and the student must be clearly identified. <strong>Postdoctoral Fellows</strong> are permitted to apply as a primary applicant, but the application must be co-signed by their supervisor (see sections A7 and A8). If requesting a Fee Waiver, the Postdoctoral Fellow must be listed as the primary applicant.',
                 fr: 'Pour les <strong>demandes faites par des étudiants des cycles supérieurs</strong> (M. Sc., Ph. D.), le demandeur principal doit être le superviseur et l’étudiant doit être clairement identifié. Les <strong>boursiers postdoctoraux</strong> peuvent soumettre une demande à titre de demandeur principal, mais celle-ci doit être cosignée par leur superviseur (voir les sections A7 et A8). Le boursier postdoctoral doit être le demandeur principal pour bénéficier d’une exonération des frais.'
               },
-              name: { en: 'Name', fr: 'Nom' },
-              position: { en: 'Position', fr: 'Poste' },
-              affiliation: { en: 'Affiliation', fr: 'Organisme d’appartenance' },
-              address: { en: 'Mailing Address', fr: 'Adresse de correspondance' },
-              phone: { en: 'Phone', fr: 'Téléphone' },
-              email: { en: 'E-mail', fr: 'Courriel' },
+              applicant_name: { en: 'Name', fr: 'Nom' },
+              applicant_position: { en: 'Position', fr: 'Poste' },
+              applicant_affiliation: { en: 'Affiliation', fr: 'Organisme d’appartenance' },
+              applicant_address: { en: 'Mailing Address', fr: 'Adresse de correspondance' },
+              applicant_phone: { en: 'Phone', fr: 'Téléphone' },
+              applicant_email: { en: 'E-mail', fr: 'Courriel' },
               text3: {
                 en: 'Complete this section if this is a Graduate student or Postdoctoral Fellow application (if Fellow is not the primary applicant)',
                 fr: 'Remplir cette section si la demande est faite par un étudiant des cycles supérieurs ou un boursier postdoctoral (si le boursier n’est pas le demandeur principal)'
