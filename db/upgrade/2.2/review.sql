@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS review (
   create_timestamp TIMESTAMP NOT NULL,
   reqn_id INT UNSIGNED NOT NULL,
   type ENUM('Admin', 'SAC') NOT NULL,
-  description TEXT NOT NULL,
+  description TEXT NULL DEFAULT NULL,
   PRIMARY KEY (id),
   INDEX fk_reqn_id (reqn_id ASC),
   UNIQUE INDEX uq_reqn_id_type (reqn_id ASC, type ASC),
