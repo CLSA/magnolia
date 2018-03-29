@@ -17,7 +17,7 @@ define( function() {
     columnList: {
       name: { title: 'Name' },
       position: { title: 'Position' },
-      affliation: { title: 'Affiliation' },
+      affiliation: { title: 'Affiliation' },
       email: { title: 'E-mail' },
       role: { title: 'Role' },
       access: { title: 'Access', type: 'boolean' }
@@ -31,8 +31,8 @@ define( function() {
   module.addInputGroup( '', {
     name: { title: 'Name', type: 'string' },
     position: { title: 'Position', type: 'string' },
-    affliation: { title: 'Affiliation', type: 'string' },
-    email: { title: 'E-mail', type: 'string' },
+    affiliation: { title: 'Affiliation', type: 'string' },
+    email: { title: 'E-mail', type: 'string', format: 'email' },
     role: { title: 'Role', type: 'string' },
     access: { title: 'Access', type: 'boolean', type: 'boolean' }
   } );

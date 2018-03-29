@@ -87,13 +87,13 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     applicant_affiliation: { type: 'string', exclude: true },
     applicant_address: { type: 'string', exclude: true },
     applicant_phone: { type: 'string', exclude: true },
-    applicant_email: { type: 'string', exclude: true },
+    applicant_email: { type: 'string', format: 'email', exclude: true },
     graduate_name: { type: 'string', exclude: true },
     graduate_program: { type: 'string', exclude: true },
     graduate_institution: { type: 'string', exclude: true },
     graduate_address: { type: 'string', exclude: true },
     graduate_phone: { type: 'string', exclude: true },
-    graduate_email: { type: 'string', exclude: true },
+    graduate_email: { type: 'string', format: 'email', exclude: true },
     start_date: { type: 'date', exclude: true },
     duration: { type: 'string', exclude: true },
     title: { type: 'string', exclude: true },
@@ -250,7 +250,16 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           $scope.addCoapplicant = function() {
             if( $scope.model.viewModel.coapplicantModel.getAddEnabled() ) {
               var form = cenozo.getScopeByQuerySelector( '#part1a2Form' ).part1a2Form;
-              if( !form.$valid ) {
+              
+              // we need to check each add-input for errors
+              var valid = true;
+              for( var property in $scope.model.viewModel.coapplicantModel.module.inputGroupList[0].inputList ) {
+                if( cenozo.getFormElement( property ).$invalid ) {
+                  valid = false;
+                  break;
+                }
+              }
+              if( !valid ) {
                 // dirty all inputs so we can find the problem
                 cenozo.forEachFormElement( 'part1a2Form', function( element ) { element.$dirty = true; } );
               } else {
