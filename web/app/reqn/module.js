@@ -414,7 +414,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           [ 'part1', 'a4', null ],
           [ 'part1', 'a5', null ],
           [ 'part1', 'a6', null ],
-          [ 'part1', 'a7', null ],
           [ 'part2', null, 'notes' ],
           [ 'part2', null, 'a' ],
           [ 'part2', null, 'b' ],
@@ -1142,7 +1141,12 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               graduate_institution: { en: 'Institution of Enrollment', fr: 'Établissement d’étude' },
               graduate_address: { en: 'Current Mailing Address', fr: 'Adresse de correspondance actuelle' },
               graduate_phone: { en: 'Phone', fr: 'Téléphone' },
-              graduate_email: { en: 'E-mail', fr: 'Courriel' }
+              graduate_email: { en: 'E-mail', fr: 'Courriel' },
+              text3: {
+                en: 'In order to be eligible for the Fee Waiver for Graduate students, the application must clearly indicate that the proposed project forms part of a thesis (see section A1). In order to be eligible for the Fee Waiver for Postdoctoral Fellows, the Fellow must be the primary applicant and the supervisor must sign the application.',
+                fr: 'Pour que les étudiants des cycles supérieurs soient admissibles à l’exonération des frais, la demande doit indiquer clairement que le projet proposé s’inscrit dans une thèse (voir la section A1). Pour que les boursiers postdoctoraux soient admissibles à l’exonération des frais, le boursier doit être le demandeur principal et le superviseur doit signer la demande.'
+              },
+              waiver: { en: 'Fee Waiver Type', fr: 'Type d’exemption de frais' }
             },
             a2: {
               tab: { en: 'A2. Project Team', fr: 'A2. Équipe de projet' },
@@ -1238,14 +1242,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               },
               expiration: { en: 'Expiration date of approval', fr: 'Date limite d’autorisation' },
               response: { en: 'Expected date of response', fr: 'Date approximative de la réponse' }
-            },
-            a7: {
-              tab: { en: 'A7. Fee Waiver', fr: 'A7. Demande d’exonération' },
-              text: {
-                en: 'In order to be eligible for the Fee Waiver for Graduate students, the application must clearly indicate that the proposed project forms part of a thesis (see section A1). In order to be eligible for the Fee Waiver for Postdoctoral Fellows, the Fellow must be the primary applicant and the supervisor must sign the application.',
-                fr: 'Pour que les étudiants des cycles supérieurs soient admissibles à l’exonération des frais, la demande doit indiquer clairement que le projet proposé s’inscrit dans une thèse (voir la section A1). Pour que les boursiers postdoctoraux soient admissibles à l’exonération des frais, le boursier doit être le demandeur principal et le superviseur doit signer la demande.'
-              },
-              waiver: { en: 'Fee Waiver Type', fr: 'Type d’exemption de frais' }
             }
           },
           part2: {

@@ -89,9 +89,6 @@
           <li ng-class="{'active':'a6' == model.viewModel.tab[1]}">
             <a ng-click="model.viewModel.setTab(1,'a6')" ng-bind-html="t( 'part1.a6.tab' )"></a>
           </li>
-          <li ng-class="{'active':'a7' == model.viewModel.tab[1]}">
-            <a ng-click="model.viewModel.setTab(1,'a7')" ng-bind-html="t( 'part1.a7.tab' )"></a>
-          </li>
         </ul>
         <div ng-show="'a1'==model.viewModel.tab[1]"
              class="panel panel-default"
@@ -201,6 +198,19 @@
                     title: t( 'part1.a1.graduate_email' )+'<sup>?</sup>',
                     type: model.inputList.graduate_email.type,
                     help: t( 'misc.email_text' )
+                  }"
+                  model="model">
+                </cn-view-input>
+              </div>
+              <hr/>
+              <p class="text-primary" ng-bind-html="t( 'part1.a1.text3' )"></p>
+              <div class="form-horizontal">
+                <cn-view-input
+                  input="{
+                    key: 'waiver',
+                    title: t( 'part1.a1.waiver' ),
+                    type: 'enum',
+                    enumList: model.metadata.columnList.waiver.enumList[model.viewModel.record.language]
                   }"
                   model="model">
                 </cn-view-input>
@@ -594,27 +604,6 @@
                     </div>
                   </div>
                 </div>
-              </div>
-            </fieldset></form>
-          </div>
-        </div>
-        <div ng-show="'a7'==model.viewModel.tab[1]"
-             class="panel panel-default"
-             style="border-top-left-radius: 0px;">
-          <div class="panel-body">
-            <p class="text-primary" ng-bind-html="t( 'part1.a7.text' )"></p>
-            <hr/>
-            <form id="part1a7Form" name="part1a7Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
-              <div class="form-horizontal">
-                <cn-view-input
-                  input="{
-                    key: 'waiver',
-                    title: t( 'part1.a7.waiver' ),
-                    type: 'enum',
-                    enumList: model.metadata.columnList.waiver.enumList[model.viewModel.record.language]
-                  }"
-                  model="model">
-                </cn-view-input>
               </div>
             </fieldset></form>
           </div>
