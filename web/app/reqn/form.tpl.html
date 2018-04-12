@@ -929,4 +929,16 @@
       </div>
     </div>
   </div>
+  <div class="form-footer text-right rounded-bottom bg-info" style="height:4.6em;">
+    <button class="btn btn-primary pull-left"
+            ng-if="'instructions' != model.viewModel.tab[0]"
+            ng-click="model.viewModel.nextSection( true )"
+            ng-bind-html="'<i class=\'glyphicon glyphicon-arrow-left\'></i> ' + t( 'misc.prevButton' )">
+    </button>
+    <button class="btn btn-primary"
+            ng-if="'part3' != model.viewModel.tab[0]"
+            ng-click="model.viewModel.nextSection( false )"
+            ng-bind-html="t( 'misc.nextButton' ) + ' <i class=\'glyphicon glyphicon-arrow-right\'></i>'">
+    </button>
+  </div>
 </div>

@@ -250,7 +250,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           $scope.addCoapplicant = function() {
             if( $scope.model.viewModel.coapplicantModel.getAddEnabled() ) {
               var form = cenozo.getScopeByQuerySelector( '#part1a2Form' ).part1a2Form;
-              
+
               // we need to check each add-input for errors
               var valid = true;
               for( var property in $scope.model.viewModel.coapplicantModel.module.inputGroupList[0].inputList ) {
@@ -405,26 +405,78 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           } ).patch();
         };
 
+        // the sequencial list of all tabs where every item has an array of the three indexed tab values
+        var tabSectionList = [
+          [ 'instructions', null, null ],
+          [ 'part1', 'a1', null ],
+          [ 'part1', 'a2', null ],
+          [ 'part1', 'a3', null ],
+          [ 'part1', 'a4', null ],
+          [ 'part1', 'a5', null ],
+          [ 'part1', 'a6', null ],
+          [ 'part1', 'a7', null ],
+          [ 'part2', null, 'notes' ],
+          [ 'part2', null, 'a' ],
+          [ 'part2', null, 'b' ],
+          [ 'part2', null, 'c' ],
+          [ 'part3', null, null ]
+        ];
+
+        // set default tab values
+        if( angular.isUndefined( this.parentModel.getQueryParameter( 't0' ) ) )
+          this.parentModel.setQueryParameter( 't0', 'instructions' );
+        if( angular.isUndefined( this.parentModel.getQueryParameter( 't1' ) ) )
+          this.parentModel.setQueryParameter( 't1', 'a1' );
+        if( angular.isUndefined( this.parentModel.getQueryParameter( 't2' ) ) )
+          this.parentModel.setQueryParameter( 't2', 'notes' );
+
         this.setTab = function( index, tab, transition ) {
           if( angular.isUndefined( transition ) ) transition = true;
           if( !( 0 <= index && index <= 2 ) ) index = 0;
-          if( 0 == index && 0 > ['instructions','part1','part2','part3'].indexOf( tab ) ) tab = 'instructions';
-          else if( 1 == index && 0 > ['a1','a2','a3','a4','a5','a6','a7'].indexOf( tab ) ) tab = 'a1';
-          else if( 2 == index && 0 > ['notes','a','b','c'].indexOf( tab ) ) tab = 'notes';
-          this.tab[index] = tab;
-          this.parentModel.setQueryParameter( 't'+index, tab );
-          if( transition ) {
-            if( 1 == index ) {
-              this.tab[0] = 'part1';
-              this.parentModel.setQueryParameter( 't0', 'part1' );
-            } else if( 2 == index ) {
-              this.tab[0] = 'part2';
-              this.parentModel.setQueryParameter( 't0', 'part2' );
+
+          // find the tab section
+          var selectedTabSection = null;
+          tabSectionList.some( function( tabSection ) {
+            if( tab == tabSection[index] ) {
+              selectedTabSection = tabSection;
+              return true;
             }
-            this.parentModel.reloadState( false, false, 'replace' ).then( function() {
-              // update all textarea sizes
-              angular.element( 'textarea[cn-elastic]' ).trigger( 'change' );
-            } );
+          } );
+
+          if( null != selectedTabSection ) {
+            self.tab[index] = selectedTabSection[index];
+            self.parentModel.setQueryParameter( 't'+index, self.tab[index] );
+
+            if( transition ) {
+              this.parentModel.reloadState( false, false, 'replace' ).then( function() {
+                // update all textarea sizes
+                angular.element( 'textarea[cn-elastic]' ).trigger( 'change' );
+              } );
+            }
+          }
+        };
+
+        this.nextSection = function( reverse ) {
+          if( angular.isUndefined( reverse ) ) reverse = false;
+
+          var currentTabSectionIndex = null;
+          tabSectionList.some( function( tabSection, index ) {
+            if( self.tab[0] == tabSection[0] ) {
+              if( ( null == tabSection[1] || self.tab[1] == tabSection[1] ) &&
+                  ( null == tabSection[2] || self.tab[2] == tabSection[2] ) ) {
+                currentTabSectionIndex = index;
+                return true;
+              }
+            }
+          } );
+          
+          if( null != currentTabSectionIndex ) {
+            var tabSection = tabSectionList[currentTabSectionIndex + (reverse?-1:1)];
+            if( angular.isDefined( tabSection ) ) {
+              if( null != tabSection[2] ) this.setTab( 2, tabSection[2], false );
+              if( null != tabSection[1] ) this.setTab( 1, tabSection[1], false );
+              this.setTab( 0, tabSection[0] );
+            }
           }
         };
 
@@ -1267,6 +1319,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             }
           },
           misc: {
+            prevButton: { en: 'Return to the previous section', fr: 'TRANSLATION REQUIRED' },
+            nextButton: { en: 'Proceed to the next section', fr: 'TRANSLATION REQUIRED' },
             pleaseConfirm: { en: 'Please confirm', fr: 'Veuillez confirmer' },
             remove: { en: 'Remove', fr: 'Supprimer' },
             words: { en: 'words', fr: 'mots' },
