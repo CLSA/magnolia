@@ -440,7 +440,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               ? selectedTabSection[index]
               : ( 0 == index ? 'instructions' : 1 == index ? 'a1' : 'notes' );
 
-          console.log( index, selectedTabSection, tab );
           self.tab[index] = tab;
           self.parentModel.setQueryParameter( 't'+index, tab );
 
