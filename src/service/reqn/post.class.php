@@ -18,11 +18,18 @@ class post extends \cenozo\service\post
     parent::prepare();
 
     $language_class_name = lib::get_class_name( 'database\language' );
+    $db_reqn = $this->get_leaf_record();
+
+    // generate a random identifier if none exists
+    if( is_null( $db_reqn->identifier ) ) $db_reqn->identifier = 'T'.rand( 10000, 99999 );
 
     // if the language_id isn't set then default to English
-    $db_reqn = $this->get_leaf_record();
     if( is_null( $db_reqn->language_id ) )
       $db_reqn->language_id = $language_class_name::get_unique_record( 'code', 'en' )->id;
+
+    // fill in the applicant's email
+    if( is_null( $db_reqn->applicant_email ) )
+      $db_reqn->applicant_email = lib::create( 'business\session' )->get_user()->email;
   }
 
   /**

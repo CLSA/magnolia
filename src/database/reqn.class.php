@@ -22,9 +22,6 @@ class reqn extends \cenozo\database\record
     // track if this is a new reqn
     $is_new = is_null( $this->id );
 
-    // generate a random identifier if none exists
-    if( is_null( $this->identifier ) ) $this->identifier = 'T'.rand( 10000, 99999 );
-
     // make sure the deadline is appropriate
     $this->assert_deadline();
 
