@@ -406,6 +406,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         };
 
         // the sequencial list of all tabs where every item has an array of the three indexed tab values
+        this.tab = [];
         var tabSectionList = [
           [ 'instructions', null, null ],
           [ 'part1', 'a1', null ],
@@ -421,14 +422,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           [ 'part3', null, null ]
         ];
 
-        // set default tab values
-        if( angular.isUndefined( this.parentModel.getQueryParameter( 't0' ) ) )
-          this.parentModel.setQueryParameter( 't0', 'instructions' );
-        if( angular.isUndefined( this.parentModel.getQueryParameter( 't1' ) ) )
-          this.parentModel.setQueryParameter( 't1', 'a1' );
-        if( angular.isUndefined( this.parentModel.getQueryParameter( 't2' ) ) )
-          this.parentModel.setQueryParameter( 't2', 'notes' );
-
         this.setTab = function( index, tab, transition ) {
           if( angular.isUndefined( transition ) ) transition = true;
           if( !( 0 <= index && index <= 2 ) ) index = 0;
@@ -442,16 +435,20 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             }
           } );
 
-          if( null != selectedTabSection ) {
-            self.tab[index] = selectedTabSection[index];
-            self.parentModel.setQueryParameter( 't'+index, self.tab[index] );
+          // get the tab (or default of none was found)
+          tab = null != selectedTabSection && null != selectedTabSection[index]
+              ? selectedTabSection[index]
+              : ( 0 == index ? 'instructions' : 1 == index ? 'a1' : 'notes' );
 
-            if( transition ) {
-              this.parentModel.reloadState( false, false, 'replace' ).then( function() {
-                // update all textarea sizes
-                angular.element( 'textarea[cn-elastic]' ).trigger( 'change' );
-              } );
-            }
+          console.log( index, selectedTabSection, tab );
+          self.tab[index] = tab;
+          self.parentModel.setQueryParameter( 't'+index, tab );
+
+          if( transition ) {
+            this.parentModel.reloadState( false, false, 'replace' ).then( function() {
+              // update all textarea sizes
+              angular.element( 'textarea[cn-elastic]' ).trigger( 'change' );
+            } );
           }
         };
 
@@ -478,11 +475,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             }
           }
         };
-
-        this.tab = [];
-        this.setTab( 0, this.parentModel.getQueryParameter( 't0' ), false );
-        this.setTab( 1, this.parentModel.getQueryParameter( 't1' ), false );
-        this.setTab( 2, this.parentModel.getQueryParameter( 't2' ), false );
 
         this.getCoapplicantList = function() {
           return CnHttpFactory.instance( {
@@ -831,6 +823,11 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         };
 
         this.onView = function( force ) {
+          // reset tab values
+          this.setTab( 0, this.parentModel.getQueryParameter( 't0' ), false );
+          this.setTab( 1, this.parentModel.getQueryParameter( 't1' ), false );
+          this.setTab( 2, this.parentModel.getQueryParameter( 't2' ), false );
+
           return $q.all( [
             this.$$onView( force ).then( function() {
               return self.updateEthicsFileSize();
