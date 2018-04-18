@@ -18,8 +18,5 @@ $SETTINGS['general']['build'] = 'abe8478';
 // the location of magnolia internal path
 $SETTINGS['path']['APPLICATION'] = str_replace( '/settings.ini.php', '', __FILE__ );
 
-// Magnolia does not use VOIP
-$SETTINGS['voip']['enabled'] = false;
-
 // the location of deployment reports (defaults to magnolia/doc/ethics_letter)
 $SETTINGS['path']['ETHICS_LETTER'] = str_replace( 'settings.ini.php', 'doc/ethics_letter', __FILE__ );

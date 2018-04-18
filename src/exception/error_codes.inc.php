@@ -16,7 +16,6 @@ define( 'NOTICE_MAGNOLIA_BASE_ERRNO',     490000 );
 define( 'PERMISSION_MAGNOLIA_BASE_ERRNO', 590000 );
 define( 'RUNTIME_MAGNOLIA_BASE_ERRNO',    690000 );
 define( 'SYSTEM_MAGNOLIA_BASE_ERRNO',     790000 );
-define( 'VOIP_MAGNOLIA_BASE_ERRNO',       990000 );
 
 /**
  * "argument" error codes
@@ -70,9 +69,5 @@ define( 'RUNTIME__MAGNOLIA_SERVICE_REQN_PATCH__EXECUTE__ERRNO',
  *    256: user error,
  *    512: user warning,
  *   1024: user notice
- */
-
-/**
- * "voip" error codes
  */
 
