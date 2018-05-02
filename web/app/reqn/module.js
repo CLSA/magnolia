@@ -4,6 +4,10 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
   'use strict';
 
   try { var module = cenozoApp.module( 'reqn', true ); } catch( err ) { console.warn( err ); return; }
+
+  var coapplicantModule = cenozoApp.module( 'coapplicant' );
+  var referenceModule = cenozoApp.module( 'reference' );
+
   angular.extend( module, {
     identifier: { column: 'identifier' },
     name: {
@@ -71,7 +75,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
       exclude: true // modified in the model
     },
     unprepared: {
-      title: 'Preperation Required',
+      title: 'Preparation Required',
       type: 'string',
       constant: true,
       exclude: true // modified in the model
@@ -321,6 +325,27 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
           $scope.setReferenceRank = function( id, rank ) {
             $scope.model.viewModel.setReferenceRank( id, rank );
+          };
+
+          $scope.check = function( property ) {
+            // The cn-reqn-form directive makes use of cn-add-input directives.  These directives need their
+            // parent to have a check() function which checks to see whether the input is valid or not.  Since
+            // that function is usually in the cn-record-add directive we have to implement on here instead.
+            var element = cenozo.getFormElement( property );
+            if( element ) {
+              // Both the coapplicant and reference cn-add-input directives share this method, so differentiate
+              // by checking to see which module has the property
+              if( null != coapplicantModule.getInput( property ) ) {
+                element.$error.format = !$scope.model.viewModel.coapplicantModel.testFormat(
+                  property, $scope.coapplicantRecord[property]
+                );
+              } else if( null != referenceModule.getInput( property ) ) {
+                element.$error.format = !$scope.model.viewModel.referenceModel.testFormat(
+                  property, $scope.referenceRecord[property]
+                );
+              }
+              cenozo.updateFormElement( element, true );
+            }
           };
 
           $scope.t = function( value ) { return $scope.model.viewModel.translate( value ); };
@@ -1102,6 +1127,10 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               fr: 'La demande est séparée en trois parties :<ul><li>1<sup>re</sup> partie : Renseignements généraux</li><li>2<sup>e</sup> partie : Sélection des données</li><li>3<sup>e</sup> partie : Sélection des échantillons biologiques</li></ul>'
             },
             text4: {
+              en: 'Additional information or instructions are available anywhere that the ⓘ symbol appears.  Hover your mouse cursor over the text to see the additional details.',
+              fr: 'TRANSLATION REQUIRED'
+            },
+            text5: {
               en: 'Please ensure that you have completed <strong>all of the sections of the application</strong> form that are relevant to your application. Incomplete applications may result in processing delays or refusal of your application.',
               fr: 'Assurez-vous de bien remplir <strong>toutes les sections pertinentes du formulaire de demande d’accès</strong>.  Les demandes incomplètes pourront causer un retard dans le traitement de votre demande ou entraîner un refus.'
             }
@@ -1119,7 +1148,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                 fr: '<strong>Demandeur principal</strong> : Le demandeur principal sera la personne-ressource pour l’Entente d’accès de l’ÉLCV, ainsi que pour la transmission des données et toute mise à jour pertinente.'
               },
               text2: {
-                en: 'For <strong>Graduate student</strong> (MSc, PhD) applications, the primary applicant must be the supervisor and the student must be clearly identified. <strong>Postdoctoral Fellows</strong> are permitted to apply as a primary applicant, but the application must be co-signed by their supervisor (see sections A7 and A8). If requesting a Fee Waiver, the Postdoctoral Fellow must be listed as the primary applicant.',
+                en: 'For <strong>Graduate student</strong> (MSc, PhD) applications, the primary applicant must be the supervisor and the student must be clearly identified. <strong>Postdoctoral Fellows</strong> are permitted to apply as a primary applicant, but the application must be co-signed by their supervisor. If requesting a Fee Waiver, the Postdoctoral Fellow must be listed as the primary applicant.',
                 fr: 'Pour les <strong>demandes faites par des étudiants des cycles supérieurs</strong> (M. Sc., Ph. D.), le demandeur principal doit être le superviseur et l’étudiant doit être clairement identifié. Les <strong>boursiers postdoctoraux</strong> peuvent soumettre une demande à titre de demandeur principal, mais celle-ci doit être cosignée par leur superviseur (voir les sections A7 et A8). Le boursier postdoctoral doit être le demandeur principal pour bénéficier d’une exonération des frais.'
               },
               applicant_name: { en: 'Name', fr: 'Nom' },
@@ -1138,8 +1167,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               graduate_address: { en: 'Current Mailing Address', fr: 'Adresse de correspondance actuelle' },
               graduate_phone: { en: 'Phone', fr: 'Téléphone' },
               graduate_email: { en: 'E-mail', fr: 'Courriel' },
-              text3: {
-                en: 'In order to be eligible for the Fee Waiver for Graduate students, the application must clearly indicate that the proposed project forms part of a thesis (see section A1). In order to be eligible for the Fee Waiver for Postdoctoral Fellows, the Fellow must be the primary applicant and the supervisor must sign the application.',
+              text4: {
+                en: 'In order to be eligible for the Fee Waiver for Graduate students, the application must clearly indicate that the proposed project forms part of a thesis. In order to be eligible for the Fee Waiver for Postdoctoral Fellows, the Fellow must be the primary applicant and the supervisor must sign the application.',
                 fr: 'Pour que les étudiants des cycles supérieurs soient admissibles à l’exonération des frais, la demande doit indiquer clairement que le projet proposé s’inscrit dans une thèse (voir la section A1). Pour que les boursiers postdoctoraux soient admissibles à l’exonération des frais, le boursier doit être le demandeur principal et le superviseur doit signer la demande.'
               },
               waiver: { en: 'Fee Waiver Type', fr: 'Type d’exemption de frais' }
@@ -1354,7 +1383,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               fr: 'Êtes-vous sûr(e) de vouloir abandonner la demande d’accès? Vous n’y aurez plus accès et le processus d’évaluation sera interrompu.'
             },
             email_text: {
-              en: 'You must provide an intitutional email.  Public email acounts such as @gmail.com are not allowed.',
+              en: 'You must provide an institutional email.  Public email accounts such as @gmail.com are not allowed.',
               fr: 'TRANSLATION REQUIRED'
             }
           }

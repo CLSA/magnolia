@@ -1,7 +1,7 @@
-<div class="utility-view rounded" style="padding-bottom: 2em;" ng-if="!isComplete">
+<div class="utility-view rounded" style="padding-bottom: 2em;" ng-show="!isComplete">
   <cn-loading></cn-loading>
 </div>
-<div class="utility-view rounded" ng-if="isComplete">
+<div class="utility-view rounded" ng-show="isComplete">
   <div class="container-fluid bg-primary rounded-top">
     <h4>
       <button class="btn btn-menu btn-header btn-info pull-right"
@@ -62,6 +62,7 @@
           <li class="list-group-item" ng-bind-html="t( 'instructions.text2' )"></li>
           <li class="list-group-item" ng-bind-html="t( 'instructions.text3' )"></li>
           <li class="list-group-item" ng-bind-html="t( 'instructions.text4' )"></li>
+          <li class="list-group-item" ng-bind-html="t( 'instructions.text5' )"></li>
         </ul>
       </div>
     </div>
@@ -142,7 +143,7 @@
                 <cn-view-input
                   input="{
                     key: 'applicant_email',
-                    title: t( 'part1.a1.applicant_email' )+'<sup>?</sup>',
+                    title: t( 'part1.a1.applicant_email' )+'<sup>ⓘ</sup>',
                     type: model.inputList.applicant_email.type,
                     help: t( 'misc.email_text' )
                   }"
@@ -195,7 +196,7 @@
                 <cn-view-input
                   input="{
                     key: 'graduate_email',
-                    title: t( 'part1.a1.graduate_email' )+'<sup>?</sup>',
+                    title: t( 'part1.a1.graduate_email' )+'<sup>ⓘ</sup>',
                     type: model.inputList.graduate_email.type,
                     help: t( 'misc.email_text' )
                   }"
@@ -203,7 +204,7 @@
                 </cn-view-input>
               </div>
               <hr/>
-              <p class="text-primary" ng-bind-html="t( 'part1.a1.text3' )"></p>
+              <p class="text-primary" ng-bind-html="t( 'part1.a1.text4' )"></p>
               <div class="form-horizontal">
                 <cn-view-input
                   input="{
@@ -281,7 +282,7 @@
                 <cn-add-input
                   input="{
                     key: 'email',
-                    title: t( 'part1.a2.email' )+'<sup>?</sup>',
+                    title: t( 'part1.a2.email' )+'<sup>ⓘ</sup>',
                     type: 'string',
                     help: t( 'misc.email_text' )
                   }"
@@ -371,7 +372,7 @@
                 <cn-view-input
                   input="{
                     key: 'keywords',
-                    title: t( 'part1.a4.keywords' )+'<sup>?</sup>',
+                    title: t( 'part1.a4.keywords' )+'<sup>ⓘ</sup>',
                     type: 'string',
                     help: t( 'part1.a4.keywords_text' )
                   }"
@@ -417,7 +418,7 @@
                 <cn-view-input
                   input="{
                     key: 'methodology',
-                    title: t( 'part1.a4.methodology' )+'<sup>?</sup>' + '<br><span class=text-info>(' +
+                    title: t( 'part1.a4.methodology' )+'<sup>ⓘ</sup>' + '<br><span class=text-info>(' +
                            model.viewModel.wordCount.methodology + ' ' + t( 'misc.words' ) + ')</span>',
                     type: 'text',
                     help: t( 'part1.a4.methodology_text' )
@@ -427,7 +428,7 @@
                 <cn-view-input
                   input="{
                     key: 'analysis',
-                    title: t( 'part1.a4.analysis' )+'<sup>?</sup>' + '<br><span class=text-info>(' +
+                    title: t( 'part1.a4.analysis' )+'<sup>ⓘ</sup>' + '<br><span class=text-info>(' +
                            model.viewModel.wordCount.analysis + ' ' + t( 'misc.words' ) + ')</span>',
                     type: 'text',
                     help: t( 'part1.a4.analysis_text' )
@@ -674,7 +675,7 @@
                           <h4 uib-tooltip-html="dataOptionCat.note[model.viewModel.record.language]"
                               tooltip-popup-delay="100">
                             {{ dataOptionCat.name[model.viewModel.record.language] }}
-                            <sup ng-if="dataOptionCat.note[model.viewModel.record.language]">?</sup>
+                            <sup ng-if="dataOptionCat.note[model.viewModel.record.language]">ⓘ</sup>
                           </h4>
                         </td>
                         <td ng-if="!dataOptionCat.parent"
@@ -683,7 +684,7 @@
                           <span uib-tooltip-html="dataOptionCat.note[model.viewModel.record.language]"
                                 tooltip-popup-delay="100">
                             {{ dataOptionCat.name[model.viewModel.record.language] }}
-                            <sup ng-if="dataOptionCat.note[model.viewModel.record.language]">?</sup>
+                            <sup ng-if="dataOptionCat.note[model.viewModel.record.language]">ⓘ</sup>
                           </span>
                         </td>
                         <td ng-repeat="dataOption in dataOptionCat.typeList"
@@ -718,7 +719,7 @@
                           <h4 uib-tooltip-html="dataOptionCat.note[model.viewModel.record.language]"
                               tooltip-popup-delay="100">
                             {{ dataOptionCat.name[model.viewModel.record.language] }}
-                            <sup ng-if="dataOptionCat.note[model.viewModel.record.language]">?</sup>
+                            <sup ng-if="dataOptionCat.note[model.viewModel.record.language]">ⓘ</sup>
                           </h4>
                         </td>
                         <td ng-if="!dataOptionCat.parent"
@@ -727,7 +728,7 @@
                           <span uib-tooltip-html="dataOptionCat.note[model.viewModel.record.language]"
                                 tooltip-popup-delay="100">
                             {{ dataOptionCat.name[model.viewModel.record.language] }}
-                            <sup ng-if="dataOptionCat.note[model.viewModel.record.language]">?</sup>
+                            <sup ng-if="dataOptionCat.note[model.viewModel.record.language]">ⓘ</sup>
                           </span>
                         </td>
                         <td ng-repeat="dataOption in dataOptionCat.typeList"
@@ -793,7 +794,7 @@
                           <h4 uib-tooltip-html="dataOptionCat.note[model.viewModel.record.language]"
                               tooltip-popup-delay="100">
                             {{ dataOptionCat.name[model.viewModel.record.language] }}
-                            <sup ng-if="dataOptionCat.note[model.viewModel.record.language]">?</sup>
+                            <sup ng-if="dataOptionCat.note[model.viewModel.record.language]">ⓘ</sup>
                           </h4>
                         </td>
                         <td ng-if="!dataOptionCat.parent"
@@ -802,7 +803,7 @@
                           <span uib-tooltip-html="dataOptionCat.note[model.viewModel.record.language]"
                                 tooltip-popup-delay="100">
                             {{ dataOptionCat.name[model.viewModel.record.language] }}
-                            <sup ng-if="dataOptionCat.note[model.viewModel.record.language]">?</sup>
+                            <sup ng-if="dataOptionCat.note[model.viewModel.record.language]">ⓘ</sup>
                           </span>
                         </td>
                         <td ng-repeat="dataOption in dataOptionCat.typeList"
@@ -867,14 +868,14 @@
                           <h4 uib-tooltip-html="dataOptionCat.note[model.viewModel.record.language]"
                               tooltip-popup-delay="100">
                             {{ dataOptionCat.name[model.viewModel.record.language] }}
-                            <sup ng-if="dataOptionCat.note[model.viewModel.record.language]">?</sup>
+                            <sup ng-if="dataOptionCat.note[model.viewModel.record.language]">ⓘ</sup>
                           </h4>
                         </td>
                         <td ng-if="!dataOptionCat.parent" ng-class="{ 'active': dataOptionCat.parentId }">
                           <span uib-tooltip-html="dataOptionCat.note[model.viewModel.record.language]"
                                 tooltip-popup-delay="100">
                             {{ dataOptionCat.name[model.viewModel.record.language] }}
-                            <sup ng-if="dataOptionCat.note[model.viewModel.record.language]">?</sup>
+                            <sup ng-if="dataOptionCat.note[model.viewModel.record.language]">ⓘ</sup>
                           </span>
                         </td>
                         <td ng-repeat="dataOption in dataOptionCat.typeList"

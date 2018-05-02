@@ -2950,7 +2950,7 @@ CREATE TABLE IF NOT EXISTS `magnolia`.`stage_type` (
   `rank` INT UNSIGNED NOT NULL,
   `name` VARCHAR(45) NOT NULL,
   `status` VARCHAR(45) NOT NULL,
-  `preperation_required` TINYINT(1) NOT NULL DEFAULT 0,
+  `preparation_required` TINYINT(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `uq_name` (`name` ASC),
   UNIQUE INDEX `uq_rank` (`rank` ASC))

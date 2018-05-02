@@ -236,7 +236,7 @@ class reqn extends \cenozo\database\record
     $db_stage->stage_type_id = $db_stage_type->id;
     $db_stage->datetime = util::get_datetime_object();
     $db_stage->user_id = $db_user->id;
-    $db_stage->unprepared = is_null( $unprepared ) ? $db_stage_type->preperation_required : $unprepared;
+    $db_stage->unprepared = is_null( $unprepared ) ? $db_stage_type->preparation_required : $unprepared;
     $db_stage->save();
 
     // if we have just entered the admin review stage then set the identifier

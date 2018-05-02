@@ -8,13 +8,13 @@ CREATE TABLE IF NOT EXISTS stage_type (
   rank INT UNSIGNED NOT NULL,
   name VARCHAR(45) NOT NULL,
   status VARCHAR(45) NOT NULL,
-  preperation_required TINYINT(1) NOT NULL DEFAULT 0,
+  preparation_required TINYINT(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (id),
   UNIQUE INDEX uq_name (name ASC),
   UNIQUE INDEX uq_rank (rank ASC))
 ENGINE = InnoDB;
 
-INSERT IGNORE INTO stage_type( phase, rank, name, status, preperation_required ) VALUES
+INSERT IGNORE INTO stage_type( phase, rank, name, status, preparation_required ) VALUES
 ( "New", 1, "New", "New", 0 ),
 ( "Review", 2, "Admin Review", "Under Review", 0 ),
 ( "Review", 3, "SAC Review", "Under Review", 0 ),
@@ -23,7 +23,7 @@ INSERT IGNORE INTO stage_type( phase, rank, name, status, preperation_required )
 ( "Review", 6, "SMT Review", "Under Review", 1 ),
 ( "Review", 7, "Not Approved", "Notice of Decision", 0 ),
 ( "Review", 8, "Conditionally Approved", "Notice of Decision", 0 ),
-( "Agreement", 9, "Approved", "Agreement in Preperation", 1 ),
+( "Agreement", 9, "Approved", "Agreement in Preparation", 1 ),
 ( "Agreement", 10, "Data Release", "Preparing Data", 0 ),
 ( "Agreement", 11, "Active", "Active", 0 ),
 ( "Agreement", 12, "Report Required", "Report Required", 0 ),
