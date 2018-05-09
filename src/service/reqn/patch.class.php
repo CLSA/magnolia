@@ -157,7 +157,7 @@ class patch extends \cenozo\service\patch
         $db_notification->reqn_id = $db_reqn->id;
         $db_notification->notification_type_id =
           $notification_type_class_name::get_unique_record( 'name', 'Action required' )->id;
-        $db_notification->email = $db_reqn->email;
+        $db_notification->email = $db_reqn->applicant_email;
         $db_notification->datetime = util::get_datetime_object();
         $db_notification->save();
       }
@@ -182,7 +182,7 @@ class patch extends \cenozo\service\patch
         $db_notification->reqn_id = $db_reqn->id;
         $db_notification->notification_type_id =
           $notification_type_class_name::get_unique_record( 'name', 'Rejection' )->id;
-        $db_notification->email = $db_reqn->email;
+        $db_notification->email = $db_reqn->applicant_email;
         $db_notification->datetime = util::get_datetime_object();
         $db_notification->save();
       }
@@ -218,7 +218,7 @@ class patch extends \cenozo\service\patch
         $db_notification->reqn_id = $db_reqn->id;
         $db_notification->notification_type_id =
           $notification_type_class_name::get_unique_record( 'name', 'Notice of decision' )->id;
-        $db_notification->email = $db_reqn->email;
+        $db_notification->email = $db_reqn->applicant_email;
         $db_notification->datetime = util::get_datetime_object();
         $db_notification->save();
       }
