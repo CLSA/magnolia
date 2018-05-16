@@ -1,0 +1,20 @@
+<span ng-show="$parent.model.isAdministrator()">
+  <div class="container">
+    <cn-view-input
+      class="text-danger"
+      input="{
+        key: note,
+        title: 'Note to Applicant',
+        type: $parent.model.inputList[note].type
+      }"
+      model="$parent.model">
+    </cn-view-input>
+  </div>
+  <hr/>
+</span>
+<span ng-show="!$parent.model.isAdministrator() && $parent.model.viewModel.record[note]">
+  <h4 class="text-danger flashing"><i class="glyphicon glyphicon-warning-sign"></i> Attention</h4>
+  <pre class="text-danger"
+       style="font-weight: bold;">{{ $parent.model.viewModel.record[note] }}</pre>
+  <hr/>
+</span>

@@ -120,6 +120,56 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     physical_comment: { type: 'text', exclude: true },
     biomarker: { type: 'boolean', exclude: true },
     biomarker_comment: { type: 'text', exclude: true },
+    /*
+    deferral_note_part1_a1: { type: 'text', exclude: true },
+    deferral_note_part1_a2: { type: 'text', exclude: true },
+    deferral_note_part1_a3: { type: 'text', exclude: true },
+    deferral_note_part1_a4: { type: 'text', exclude: true },
+    deferral_note_part1_a5: { type: 'text', exclude: true },
+    deferral_note_part1_a6: { type: 'text', exclude: true },
+    deferral_note_part2_a: { type: 'text', exclude: true },
+    deferral_note_part2_b: { type: 'text', exclude: true },
+    deferral_note_part2_c: { type: 'text', exclude: true }
+    */
+  } );
+
+  module.addInputGroup( 'Deferral Notes', {
+    deferral_note_part1_a1: {
+      title: 'Part1 A1',
+      type: 'text',
+    },
+    deferral_note_part1_a2: {
+      title: 'Part1 A2',
+      type: 'text',
+    },
+    deferral_note_part1_a3: {
+      title: 'Part1 A3',
+      type: 'text',
+    },
+    deferral_note_part1_a4: {
+      title: 'Part1 A4',
+      type: 'text',
+    },
+    deferral_note_part1_a5: {
+      title: 'Part1 A5',
+      type: 'text',
+    },
+    deferral_note_part1_a6: {
+      title: 'Part1 A6',
+      type: 'text',
+    },
+    deferral_note_part2_a: {
+      title: 'Part2 A',
+      type: 'text',
+    },
+    deferral_note_part2_b: {
+      title: 'Part2 B',
+      type: 'text',
+    },
+    deferral_note_part2_c: {
+      title: 'Part2 C',
+      type: 'text',
+    }
   } );
 
   module.addExtraOperation( 'view', {
@@ -176,6 +226,20 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
   } );
 
   /* ######################################################################################################## */
+  cenozo.providers.directive( 'cnReqnDeferralNote',
+    function() {
+      return {
+        templateUrl: module.getFileUrl( 'deferral-note.tpl.html' ),
+        restrict: 'E',
+        scope: { note: '@' },
+        controller: [ '$scope', function( $scope ) {
+          $scope.directive = 'cnReqnDeferralNote';
+        } ]
+      };
+    }
+  );
+
+  /* ######################################################################################################## */
   cenozo.providers.directive( 'cnReqnForm', [
     'CnReqnModelFactory', 'cnRecordViewDirective', 'CnSession', '$q',
     function( CnReqnModelFactory, cnRecordViewDirective, CnSession, $q ) {
@@ -194,16 +258,20 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           scope.isDeletingReference = [];
 
           scope.model.viewModel.afterView( function() {
-            scope.minStartDate = moment( scope.model.viewModel.record.deadline )
-                                 .add( CnSession.application.startDateDelay, 'months' );
+            // setup the breadcrumbtrail
             CnSession.setBreadcrumbTrail(
               [ {
                 title: scope.model.module.name.plural.ucWords(),
                 go: function() { scope.model.transitionToListState(); }
               }, {
-                title: scope.model.viewModel.record.identifier
+                title: scope.model.viewModel.record.identifier,
+                go: function() { scope.model.transitionToViewState( scope.model.viewModel.record ); }
               } ]
             );
+
+            // define the earliest date that the reqn may start
+            scope.minStartDate = moment( scope.model.viewModel.record.deadline )
+                                 .add( CnSession.application.startDateDelay, 'months' );
           } );
 
           scope.$watch( 'model.viewModel.record.start_date', function( date ) {
@@ -432,7 +500,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
         // the sequencial list of all tabs where every item has an array of the three indexed tab values
         this.tab = [];
-        var tabSectionList = [
+        this.tabSectionList = [
           [ 'instructions', null, null ],
           [ 'part1', 'a1', null ],
           [ 'part1', 'a2', null ],
@@ -453,7 +521,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
           // find the tab section
           var selectedTabSection = null;
-          tabSectionList.some( function( tabSection ) {
+          this.tabSectionList.some( function( tabSection ) {
             if( tab == tabSection[index] ) {
               selectedTabSection = tabSection;
               return true;
@@ -468,19 +536,17 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           self.tab[index] = tab;
           self.parentModel.setQueryParameter( 't'+index, tab );
 
-          if( transition ) {
-            this.parentModel.reloadState( false, false, 'replace' ).then( function() {
-              // update all textarea sizes
-              angular.element( 'textarea[cn-elastic]' ).trigger( 'change' );
-            } );
-          }
+          if( transition ) this.parentModel.reloadState( false, false, 'replace' );
+
+          // update all textarea sizes
+          angular.element( 'textarea[cn-elastic]' ).trigger( 'blur' );
         };
 
         this.nextSection = function( reverse ) {
           if( angular.isUndefined( reverse ) ) reverse = false;
 
           var currentTabSectionIndex = null;
-          tabSectionList.some( function( tabSection, index ) {
+          this.tabSectionList.some( function( tabSection, index ) {
             if( self.tab[0] == tabSection[0] ) {
               if( ( null == tabSection[1] || self.tab[1] == tabSection[1] ) &&
                   ( null == tabSection[2] || self.tab[2] == tabSection[2] ) ) {
@@ -489,9 +555,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               }
             }
           } );
-          
+
           if( null != currentTabSectionIndex ) {
-            var tabSection = tabSectionList[currentTabSectionIndex + (reverse?-1:1)];
+            var tabSection = this.tabSectionList[currentTabSectionIndex + (reverse?-1:1)];
             if( angular.isDefined( tabSection ) ) {
               if( null != tabSection[2] ) this.setTab( 2, tabSection[2], false );
               if( null != tabSection[1] ) this.setTab( 1, tabSection[1], false );
@@ -666,7 +732,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               for( var tab in requiredTabList ) {
                 var firstProperty = null;
                 requiredTabList[tab].forEach( function( property ) {
-                  if( null == self.record[property] || '' == self.record[property] ) {
+                  if( null === self.record[property] || '' === self.record[property] ) {
                     var element = cenozo.getFormElement( property );
                     element.$error.required = true;
                     cenozo.updateFormElement( element, true );
@@ -878,8 +944,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         this.listModel = CnReqnListFactory.instance( this );
         this.viewModel = CnReqnViewFactory.instance( this, root );
 
-        // make the input list more accessible
-        this.inputList = module.inputGroupList[0].inputList;
+        // make the input lists from all groups more accessible
+        this.inputList = {};
+        module.inputGroupList.forEach( group => Object.assign( self.inputList, group.inputList ) );
 
         this.isApplicant = function() { return 'applicant' == CnSession.role.name; }
         this.isAdministrator = function() { return 'administrator' == CnSession.role.name; }
