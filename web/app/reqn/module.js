@@ -1246,6 +1246,10 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                 en: 'All Co-Applicants and Other Personnel must be listed in the table below. Please note that changes to the project team, including change of Primary Applicant and addition or removal of Co-Applicants and Support Personnel <strong>require an amendment</strong>. To request an Amendment Form, please email <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.',
                 fr: 'Tous les codemandeurs et les membres du personnel de soutien doivent être identifiés dans le tableau suivant. Veuillez noter que tout changement à l’équipe de projet y compris un changement de demandeur principal et l’ajout ou le retrait d’un codemandeur ou d’un membre du personnel de soutien <strong>nécessite une modification</strong>. Pour obtenir le formulaire de modification, écrivez àeilto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.'
               },
+              noCoapplicants: {
+                en: 'No co-applicants have been added.',
+                fr: 'TRANSLATION REQUIRED'
+              },
               name: { en: 'Name', fr: 'Nom' },
               position: { en: 'Position', fr: 'Poste' },
               affiliation: { en: 'Affiliation', fr: 'Organisme d’appartenance' },
@@ -1306,6 +1310,10 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               },
               number: { en: 'Number', fr: 'Numéro' },
               reference: { en: 'Reference', fr: 'Référence' },
+              noReferences: {
+                en: 'No references have been added.',
+                fr: 'TRANSLATION REQUIRED'
+              },
               addReference: { en: 'Add Reference', fr: 'Ajouter référence' }
             },
             a5: {

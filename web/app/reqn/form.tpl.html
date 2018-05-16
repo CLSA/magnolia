@@ -226,9 +226,11 @@
           <div class="panel-body">
             <cn-reqn-deferral-note note="deferral_note_part1_a2"></cn-reqn-deferral-note>
             <p class="text-primary" ng-bind-html="t( 'part1.a2.text' )"></p>
-            <div class="panel panel-default" ng-if="0 < model.viewModel.coapplicantList.length">
+            <div class="panel panel-default">
               <div class="panel-body">
-                <table class="table table-striped">
+                <span ng-show="0 == model.viewModel.coapplicantList.length"
+                      ng-bind-html="t( 'part1.a2.noCoapplicants' )"></span>
+                <table class="table table-striped" ng-show="0 < model.viewModel.coapplicantList.length">
                   <thead class="bg-info">
                     <tr>
                       <td ng-bind-html="t( 'part1.a2.name' )"></td>
@@ -237,7 +239,7 @@
                       <td ng-bind-html="t( 'part1.a2.email' )"></td>
                       <td ng-bind-html="t( 'part1.a2.role' )"></td>
                       <td ng-bind-html="t( 'part1.a2.access' )"></td>
-                      <td></td>
+                      <td ng-show="model.getEditEnabled()"></td>
                     </tr>
                   </thead>
                   <tbody>
@@ -248,7 +250,7 @@
                       <td>{{ coapplicant.email }}</td>
                       <td>{{ coapplicant.role }}</td>
                       <td>{{ coapplicant.access ? 'Yes' : 'No' }}</td>
-                      <td>
+                      <td ng-show="model.getEditEnabled()">
                         <button class="btn btn-xs btn-danger"
                                 ng-disabled="0 <= isDeletingCoapplicant.indexOf( coapplicant.id )"
                                 ng-click="removeCoapplicant( coapplicant.id )"
@@ -261,60 +263,62 @@
                 </table>
               </div>
             </div>
-            <form id="part1a2Form" name="part1a2Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
-              <div class="form-horizontal">
-                <cn-add-input
-                  input="{ key: 'name', title: t( 'part1.a2.name' ), type: 'string' }"
-                  record="coapplicantRecord"
-                  model="model.viewModel.coapplicantModel"
-                  first="true">
-                </cn-add-input>
-                <cn-add-input
-                  input="{ key: 'position', title: t( 'part1.a2.position' ), type: 'string' }"
-                  record="coapplicantRecord"
-                  model="model.viewModel.coapplicantModel"
-                  first="false">
-                </cn-add-input>
-                <cn-add-input
-                  input="{ key: 'affiliation', title: t( 'part1.a2.affiliation' ), type: 'string' }"
-                  record="coapplicantRecord"
-                  model="model.viewModel.coapplicantModel"
-                  first="false">
-                </cn-add-input>
-                <cn-add-input
-                  input="{
-                    key: 'email',
-                    title: t( 'part1.a2.email' )+'<sup>ⓘ</sup>',
-                    type: 'string',
-                    help: t( 'misc.email_text' )
-                  }"
-                  record="coapplicantRecord"
-                  model="model.viewModel.coapplicantModel"
-                  first="false">
-                </cn-add-input>
-                <cn-add-input
-                  input="{ key: 'role', title: t( 'part1.a2.role' ), type: 'string' }"
-                  record="coapplicantRecord"
-                  model="model.viewModel.coapplicantModel"
-                  first="false">
-                </cn-add-input>
-                <cn-add-input
-                  input="{
-                    key: 'access',
-                    title: t( 'part1.a2.access' ),
-                    type: 'boolean',
-                    enumList: model.metadata.accessEnumList[model.viewModel.record.language]
-                  }"
-                  record="coapplicantRecord"
-                  model="model.viewModel.coapplicantModel"
-                  first="false">
-                </cn-add-input>
-                <button class="btn btn-primary pull-right"
-                        ng-disabled="isAddingCoapplicant"
-                        ng-click="addCoapplicant()"
-                        ng-bind-html="t( 'part1.a2.addCoapplicant' )"></button>
-              </div>
-            </fieldset></form>
+            <form id="part1a2Form" name="part1a2Form" ng-show="model.getEditEnabled()" novalidate>
+              <fieldset ng-disabled="!model.getEditEnabled()">
+                <div class="form-horizontal">
+                  <cn-add-input
+                    input="{ key: 'name', title: t( 'part1.a2.name' ), type: 'string' }"
+                    record="coapplicantRecord"
+                    model="model.viewModel.coapplicantModel"
+                    first="true">
+                  </cn-add-input>
+                  <cn-add-input
+                    input="{ key: 'position', title: t( 'part1.a2.position' ), type: 'string' }"
+                    record="coapplicantRecord"
+                    model="model.viewModel.coapplicantModel"
+                    first="false">
+                  </cn-add-input>
+                  <cn-add-input
+                    input="{ key: 'affiliation', title: t( 'part1.a2.affiliation' ), type: 'string' }"
+                    record="coapplicantRecord"
+                    model="model.viewModel.coapplicantModel"
+                    first="false">
+                  </cn-add-input>
+                  <cn-add-input
+                    input="{
+                      key: 'email',
+                      title: t( 'part1.a2.email' )+'<sup>ⓘ</sup>',
+                      type: 'string',
+                      help: t( 'misc.email_text' )
+                    }"
+                    record="coapplicantRecord"
+                    model="model.viewModel.coapplicantModel"
+                    first="false">
+                  </cn-add-input>
+                  <cn-add-input
+                    input="{ key: 'role', title: t( 'part1.a2.role' ), type: 'string' }"
+                    record="coapplicantRecord"
+                    model="model.viewModel.coapplicantModel"
+                    first="false">
+                  </cn-add-input>
+                  <cn-add-input
+                    input="{
+                      key: 'access',
+                      title: t( 'part1.a2.access' ),
+                      type: 'boolean',
+                      enumList: model.metadata.accessEnumList[model.viewModel.record.language]
+                    }"
+                    record="coapplicantRecord"
+                    model="model.viewModel.coapplicantModel"
+                    first="false">
+                  </cn-add-input>
+                  <button class="btn btn-primary pull-right"
+                          ng-disabled="isAddingCoapplicant"
+                          ng-click="addCoapplicant()"
+                          ng-bind-html="t( 'part1.a2.addCoapplicant' )"></button>
+                </div>
+              </fieldset>
+            </form>
           </div>
         </div>
         <div ng-show="'a3'==model.viewModel.tab[1]"
@@ -441,14 +445,16 @@
                 </cn-view-input>
                 <hr/>
                 <p class="text-primary" ng-bind-html="t( 'part1.a4.text3' )"></p>
-                <div class="panel panel-default" ng-if="0 < model.viewModel.referenceList.length">
+                <div class="panel panel-default">
                   <div class="panel-body">
-                    <table class="table table-striped">
+                    <span ng-show="0 == model.viewModel.referenceList.length"
+                          ng-bind-html="t( 'part1.a4.noReferences' )"></span>
+                    <table class="table table-striped" ng-show="0 < model.viewModel.referenceList.length">
                       <thead class="bg-info">
                         <tr>
                           <td ng-bind-html="t( 'part1.a4.number' )"></td>
                           <td ng-bind-html="t( 'part1.a4.reference' )"></td>
-                          <td></td>
+                          <td ng-show="model.getEditEnabled()"></td>
                         </tr>
                       </thead>
                       <tbody>
@@ -457,6 +463,7 @@
                             <div class="btn-group">
                               <button class="btn btn-info dropdown-toggle"
                                       data-toggle="dropdown"
+                                      ng-enabled="model.getEditEnabled()"
                                       type="button"> 
                                 {{ reference.rank }}
                               </button>
@@ -471,7 +478,7 @@
                             </div>
                           </td>
                           <td class="text-left">{{ reference.reference }}</td>
-                          <td>
+                          <td ng-show="model.getEditEnabled()">
                             <button class="btn btn-xs btn-danger"
                                     ng-disabled="0 <= isDeletingReference.indexOf( reference.id )"
                                     ng-click="removeReference( reference.id )"
@@ -484,7 +491,7 @@
                     </table>
                   </div>
                 </div>
-                <div>
+                <div ng-show="model.getEditEnabled()">
                   <cn-add-input
                     class="col-sm-10"
                     input="{ key: 'reference', title: t( 'part1.a4.reference' ), type: 'string' }"
@@ -592,7 +599,7 @@
                           {{ model.viewModel.record.ethicsFileSize | cnSize }}
                         </span>
                         <button class="btn btn-default"
-                                ng-if="0 < model.viewModel.record.ethicsFileSize"
+                                ng-if="model.getEditEnabled() && 0 < model.viewModel.record.ethicsFileSize"
                                 ng-class="{ 'pull-right':0 < model.viewModel.record.ethicsFileSize }"
                                 ng-click="model.viewModel.removeEthicsFile()"
                                 ng-bind-html="t( 'misc.remove' )">
