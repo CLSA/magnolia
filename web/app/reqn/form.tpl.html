@@ -95,7 +95,7 @@
              class="panel panel-default"
              style="border-top-left-radius: 0px;">
           <div class="panel-body">
-            <cn-reqn-deferral-note note="deferral_note_part1_a1"></cn-reqn-deferral-note>
+            <cn-reqn-deferral-note note="deferral_note_part1_a1" class="bg-info"></cn-reqn-deferral-note>
             <p class="text-primary" ng-bind-html="t( 'part1.a1.text1' )"></p>
             <p class="text-primary" ng-bind-html="t( 'part1.a1.text2' )"></p>
             <hr/>
@@ -760,15 +760,15 @@
                       </tr>
                     </tbody>
                   </table>
-                  <div class="spacer">
-                    <label for="baseline_comments" class="control-label"
-                           ng-bind-html="t( 'misc.comments' )"></label>
-                    <textarea
-                      id="baseline_comments"
-                      ng-model="model.viewModel.record.baseline_comments"
-                      cn-elastic
-                      class="form-control"
-                      type="text"></textarea>
+                  <div class="container">
+                    <cn-view-input
+                      no-cols=true
+                      input="{
+                        key: 'baseline_comment',
+                        title: t( 'misc.comments' ),
+                        type: model.inputList.baseline_comment.type
+                      }"
+                      model="model"></cn-view-input>
                   </div>
                 </div>
               </div>
@@ -836,15 +836,15 @@
                       </tr>
                     </tbody>
                   </table>
-                  <div class="spacer">
-                    <label for="physical_comments" class="control-label"
-                           ng-bind-html="t( 'misc.comments' )"></label>
-                    <textarea
-                      id="physical_comments"
-                      ng-model="model.viewModel.record.physical_comments"
-                      cn-elastic
-                      class="form-control"
-                      type="text"></textarea>
+                  <div class="container">
+                    <cn-view-input
+                      no-cols=true
+                      input="{
+                        key: 'physical_comment',
+                        title: t( 'misc.comments' ),
+                        type: model.inputList.physical_comment.type
+                      }"
+                      model="model"></cn-view-input>
                   </div>
                 </div>
               </div>
@@ -909,15 +909,15 @@
                       </tr>
                     </tbody>
                   </table>
-                  <div class="spacer">
-                    <label for="biomarker_comments" class="control-label"
-                           ng-bind-html="t( 'misc.comments' )"></label>
-                    <textarea
-                      id="biomarker_comments"
-                      ng-model="model.viewModel.record.biomarker_comments"
-                      cn-elastic
-                      class="form-control"
-                      type="text"></textarea>
+                  <div class="container">
+                    <cn-view-input
+                      no-cols=true
+                      input="{
+                        key: 'biomarker_comment',
+                        title: t( 'misc.comments' ),
+                        type: model.inputList.biomarker_comment.type
+                      }"
+                      model="model"></cn-view-input>
                   </div>
                 </div>
               </div>

@@ -120,17 +120,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     physical_comment: { type: 'text', exclude: true },
     biomarker: { type: 'boolean', exclude: true },
     biomarker_comment: { type: 'text', exclude: true },
-    /*
-    deferral_note_part1_a1: { type: 'text', exclude: true },
-    deferral_note_part1_a2: { type: 'text', exclude: true },
-    deferral_note_part1_a3: { type: 'text', exclude: true },
-    deferral_note_part1_a4: { type: 'text', exclude: true },
-    deferral_note_part1_a5: { type: 'text', exclude: true },
-    deferral_note_part1_a6: { type: 'text', exclude: true },
-    deferral_note_part2_a: { type: 'text', exclude: true },
-    deferral_note_part2_b: { type: 'text', exclude: true },
-    deferral_note_part2_c: { type: 'text', exclude: true }
-    */
   } );
 
   module.addInputGroup( 'Deferral Notes', {
