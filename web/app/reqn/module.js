@@ -539,7 +539,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           if( transition ) this.parentModel.reloadState( false, false, 'replace' );
 
           // update all textarea sizes
-          angular.element( 'textarea[cn-elastic]' ).trigger( 'blur' );
+          angular.element( 'textarea[cn-elastic]' ).trigger( 'elastic' );
         };
 
         this.nextSection = function( reverse ) {
