@@ -321,7 +321,11 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               // we need to check each add-input for errors
               var valid = true;
               for( var property in $scope.model.viewModel.coapplicantModel.module.inputGroupList[0].inputList ) {
-                if( cenozo.getFormElement( property ).$invalid ) {
+                // get the property's form element and remove any conflict errors, then see if it's invalid
+                var currentElement = cenozo.getFormElement( property );
+                currentElement.$error.conflict = false;
+                cenozo.updateFormElement( currentElement );
+                if( currentElement.$invalid ) {
                   valid = false;
                   break;
                 }
@@ -561,6 +565,14 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           }
         };
 
+        this.deferralNotesExist = function() {
+          return this.record.deferral_note_part1_a1 || this.record.deferral_note_part1_a2 ||
+                 this.record.deferral_note_part1_a3 || this.record.deferral_note_part1_a4 ||
+                 this.record.deferral_note_part1_a5 || this.record.deferral_note_part1_a6 ||
+                 this.record.deferral_note_part2_a || this.record.deferral_note_part2_b ||
+                 this.record.deferral_note_part2_c;
+        };
+
         this.getCoapplicantList = function() {
           return CnHttpFactory.instance( {
             path: this.parentModel.getServiceResourcePath() + '/coapplicant',
@@ -794,10 +806,21 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                  );
         };
         this.nextStage = function() {
-          return CnHttpFactory.instance( {
-            path: this.parentModel.getServiceResourcePath() + "?action=next_stage"
-          } ).patch().then( function() {
-            self.transitionOnViewParent();
+          var message = 'Are you sure you wish to proceed to the next stage?';
+          if( this.deferralNotesExist() ) {
+            message += '\n\nWARNING: there are deferral notes present, you may wish to remove them before ' +
+                       'proceeding to the next stage.';
+          }
+          return CnModalConfirmFactory.instance( {
+            message: message
+          } ).show().then( function( response ) {
+            if( response ) {
+              return CnHttpFactory.instance( {
+                path: this.parentModel.getServiceResourcePath() + "?action=next_stage"
+              } ).patch().then( function() {
+                self.transitionOnViewParent();
+              } );
+            }
           } );
         };
 
@@ -851,8 +874,13 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                  ( 'review' == this.record.phase || 'agreement' == this.record.phase );
         };
         this.defer = function() {
+          var message = 'Are you sure you wish to defer to the applicant?';
+          if( !this.deferralNotesExist() ) {
+            message += '\n\nWARNING: there are currently no deferral notes to instruct the applicant why ' +
+                       'their attention is required.';
+          }
           return CnModalConfirmFactory.instance( {
-            message: 'Are you sure you wish to defer to the applicant?'
+            message: message
           } ).show().then( function( response ) {
             if( response ) {
               return CnHttpFactory.instance( {
