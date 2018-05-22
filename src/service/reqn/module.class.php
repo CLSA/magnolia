@@ -78,9 +78,14 @@ class module extends \cenozo\service\module
         $select->add_table_column(
           'stage_type',
           'IF( '.
-          '  "review" = stage_type.phase AND deadline.date > DATE( UTC_TIMESTAMP() ), '.
-          '  "Waiting for Review", '.
-          '  stage_type.status '.
+          '  "deferred" = state, "Attention Required", '.
+          '  IF( state IS NOT NULL, CONCAT( UPPER( SUBSTRING( state, 1, 1 ) ), SUBSTRING( state, 2 ) ), '.
+          '    IF( '.
+          '      "review" = stage_type.phase AND deadline.date > DATE( UTC_TIMESTAMP() ), '.
+          '      "Waiting for Review", '.
+          '      stage_type.status '.
+          '    )'.
+          '  )'.
           ')',
           'status',
           false

@@ -31,6 +31,12 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         title: 'Status',
         isIncluded: function( $state, model ) { return model.isApplicant(); }
       },
+      state: {
+        title: 'On Hold',
+        type: 'string',
+        isIncluded: function( $state, model ) { return !model.isApplicant(); },
+        help: 'The reason the requisition is on hold (empty if the requisition hasn\'t been held up)'
+      },
       stage_type: {
         column: 'stage_type.name',
         title: 'Stage',
