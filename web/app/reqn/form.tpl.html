@@ -43,10 +43,23 @@
         <a ng-click="model.viewModel.setTab(0,'instructions')" ng-bind-html="t( 'instructions.tab' )"></a>
       </li>
       <li ng-class="{'active':'part1'==model.viewModel.tab[0]}">
-        <a ng-click="model.viewModel.setTab(0,'part1')" ng-bind-html="t( 'part1.tab' )"></a>
+        <a ng-click="model.viewModel.setTab(0,'part1')"
+           ng-class="{
+             'text-warning flashing':
+               model.viewModel.record.deferral_note_part1_a1 || model.viewModel.record.deferral_note_part1_a2 ||
+               model.viewModel.record.deferral_note_part1_a3 || model.viewModel.record.deferral_note_part1_a4 ||
+               model.viewModel.record.deferral_note_part1_a5 || model.viewModel.record.deferral_note_part1_a6
+           }"
+           ng-bind-html="t( 'part1.tab' )"></a>
       </li>
       <li ng-class="{'active':'part2'==model.viewModel.tab[0]}">
-        <a ng-click="model.viewModel.setTab(0,'part2')" ng-bind-html="t( 'part2.tab' )"></a>
+        <a ng-click="model.viewModel.setTab(0,'part2')"
+           ng-class="{
+             'text-warning flashing':
+               model.viewModel.record.deferral_note_part2_a || model.viewModel.record.deferral_note_part2_b ||
+               model.viewModel.record.deferral_note_part2_c
+           }"
+           ng-bind-html="t( 'part2.tab' )"></a>
       </li>
       <li ng-class="{'active':'part3'==model.viewModel.tab[0]}">
         <a ng-click="model.viewModel.setTab(0,'part3')" ng-bind-html="t( 'part3.tab' )"></a>
@@ -72,23 +85,12 @@
       <div class="panel-body" style="padding-bottom: 0px;">
         <h4 style="margin-top: 0; margin-bottom: 1em;" ng-bind-html="t( 'part1.title' )"></h4>
         <ul class="nav nav-tabs">
-          <li ng-class="{'active':'a1' == model.viewModel.tab[1]}">
-            <a ng-click="model.viewModel.setTab(1,'a1')" ng-bind-html="t( 'part1.a1.tab' )"></a>
-          </li>
-          <li ng-class="{'active':'a2' == model.viewModel.tab[1]}">
-            <a ng-click="model.viewModel.setTab(1,'a2')" ng-bind-html="t( 'part1.a2.tab' )"></a>
-          </li>
-          <li ng-class="{'active':'a3' == model.viewModel.tab[1]}">
-            <a ng-click="model.viewModel.setTab(1,'a3')" ng-bind-html="t( 'part1.a3.tab' )"></a>
-          </li>
-          <li ng-class="{'active':'a4' == model.viewModel.tab[1]}">
-            <a ng-click="model.viewModel.setTab(1,'a4')" ng-bind-html="t( 'part1.a4.tab' )"></a>
-          </li>
-          <li ng-class="{'active':'a5' == model.viewModel.tab[1]}">
-            <a ng-click="model.viewModel.setTab(1,'a5')" ng-bind-html="t( 'part1.a5.tab' )"></a>
-          </li>
-          <li ng-class="{'active':'a6' == model.viewModel.tab[1]}">
-            <a ng-click="model.viewModel.setTab(1,'a6')" ng-bind-html="t( 'part1.a6.tab' )"></a>
+          <li ng-repeat="section in model.viewModel.tabSectionList"
+              ng-if="'part1' == section[0]"
+              ng-class="{'active':section[1] == model.viewModel.tab[1]}">
+            <a ng-click="model.viewModel.setTab(1,section[1])"
+               ng-class="{'text-warning flashing':model.viewModel.record['deferral_note_part1_'+section[1]]}"
+               ng-bind-html="t( 'part1.'+section[1]+'.tab' )"></a>
           </li>
         </ul>
         <div ng-show="'a1'==model.viewModel.tab[1]"
@@ -630,17 +632,12 @@
       <div class="panel-body" style="padding-bottom: 0px;">
         <h4 style="margin-top: 0; margin-bottom: 1em;" ng-bind-html="t( 'part2.title' )"></h4>
         <ul class="nav nav-tabs">
-          <li ng-class="{'active':'notes'==model.viewModel.tab[2]}">
-            <a ng-click="model.viewModel.setTab(2,'notes')" ng-bind-html="t( 'part2.notes.tab' )"></a>
-          </li>
-          <li ng-class="{'active':'a'==model.viewModel.tab[2]}">
-            <a ng-click="model.viewModel.setTab(2,'a')" ng-bind-html="t( 'part2.a.tab' )"></a>
-          </li>
-          <li ng-class="{'active':'b'==model.viewModel.tab[2]}">
-            <a ng-click="model.viewModel.setTab(2,'b')" ng-bind-html="t( 'part2.b.tab' )"></a>
-          </li>
-          <li ng-class="{'active':'c'==model.viewModel.tab[2]}">
-            <a ng-click="model.viewModel.setTab(2,'c')" ng-bind-html="t( 'part2.c.tab' )"></a>
+          <li ng-repeat="section in model.viewModel.tabSectionList"
+              ng-if="'part2' == section[0]"
+              ng-class="{'active':section[2] == model.viewModel.tab[2]}">
+            <a ng-click="model.viewModel.setTab(2,section[2])"
+               ng-class="{'text-warning flashing':model.viewModel.record['deferral_note_part2_'+section[2]]}"
+               ng-bind-html="t( 'part2.'+section[2]+'.tab' )"></a>
           </li>
         </ul>
         <div ng-show="'notes'==model.viewModel.tab[2]"

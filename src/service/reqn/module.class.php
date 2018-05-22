@@ -63,6 +63,32 @@ class module extends \cenozo\service\module
         'user', 'CONCAT_WS( " ", user.first_name, user.last_name )', 'user_full_name', false );
     }
 
+    // don't show applicants the deferral notes unless the reqn is deferred
+    if( 'applicant' == $db_role->name )
+    {
+      if( $select->has_column( 'deferral_note_part1_a1' ) )
+      {
+        $select->add_column(
+          'IF( "deferred" = reqn.state, deferral_note_part1_a1, NULL )', 'deferral_note_part1_a1', false );
+        $select->add_column(
+          'IF( "deferred" = reqn.state, deferral_note_part1_a2, NULL )', 'deferral_note_part1_a2', false );
+        $select->add_column(
+          'IF( "deferred" = reqn.state, deferral_note_part1_a3, NULL )', 'deferral_note_part1_a3', false );
+        $select->add_column(
+          'IF( "deferred" = reqn.state, deferral_note_part1_a4, NULL )', 'deferral_note_part1_a4', false );
+        $select->add_column(
+          'IF( "deferred" = reqn.state, deferral_note_part1_a5, NULL )', 'deferral_note_part1_a5', false );
+        $select->add_column(
+          'IF( "deferred" = reqn.state, deferral_note_part1_a6, NULL )', 'deferral_note_part1_a6', false );
+        $select->add_column(
+          'IF( "deferred" = reqn.state, deferral_note_part2_a, NULL )', 'deferral_note_part2_a', false );
+        $select->add_column(
+          'IF( "deferred" = reqn.state, deferral_note_part2_b, NULL )', 'deferral_note_part2_b', false );
+        $select->add_column(
+          'IF( "deferred" = reqn.state, deferral_note_part2_c, NULL )', 'deferral_note_part2_c', false );
+      }
+    }
+
     if( $select->has_column( 'unprepared' ) )
       $select->add_column( 'IF( stage.unprepared, "Yes", "No" )', 'unprepared', false );
 
