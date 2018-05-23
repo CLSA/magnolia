@@ -816,7 +816,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           } ).show().then( function( response ) {
             if( response ) {
               return CnHttpFactory.instance( {
-                path: this.parentModel.getServiceResourcePath() + "?action=next_stage"
+                path: self.parentModel.getServiceResourcePath() + "?action=next_stage"
               } ).patch().then( function() {
                 self.transitionOnViewParent();
               } );
