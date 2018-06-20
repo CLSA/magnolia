@@ -36,6 +36,9 @@ class ui extends \cenozo\ui\ui
     $module = $this->get_module( 'notification_type' );
     if( !is_null( $module ) ) $module->add_child( 'notification' );
 
+    $module = $this->get_module( 'pdf_form_type' );
+    if( !is_null( $module ) ) $module->add_child( 'pdf_form' );
+
     $module = $this->get_module( 'progress_report' );
     if( !is_null( $module ) )
       if( $module->has_action( 'view' ) ) $module->add_action( 'view', '/{identifier}?{t}' );
@@ -55,6 +58,7 @@ class ui extends \cenozo\ui\ui
 
     $this->add_listitem( 'Deadlines', 'deadline' );
     $this->add_listitem( 'Notification Types', 'notification_type' );
+    $this->add_listitem( 'PDF Form Types', 'pdf_form_type' );
     $this->add_listitem( 'Requisitions', 'reqn' );
     $this->add_listitem( 'Stage Types', 'stage_type' );
 

@@ -14,6 +14,8 @@ SOURCE role_has_service.sql
 SOURCE setting.sql
 SOURCE writelog.sql
 
+SOURCE pdf_form_type.sql
+SOURCE pdf_form.sql
 SOURCE deadline.sql
 SOURCE reqn.sql
 SOURCE review.sql
