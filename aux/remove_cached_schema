@@ -1,6 +1,6 @@
 #!/usr/bin/php
 <?php
-/** 
+/**
  * Utility which removes the cached schema file
  * @author Patrick Emond <emondpd@mcmaster.ca>
  */

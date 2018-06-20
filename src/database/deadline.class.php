@@ -45,7 +45,7 @@ class deadline extends \cenozo\database\record
     $reqn_mod->order_desc( 'identifier' );
     $reqn_mod->limit( 1 );
     $reqn_list = $reqn_class_name::select( $reqn_sel, $reqn_mod );
-    
+
     $number = 0 < count( $reqn_list ) ? substr( $reqn_list[0]['identifier'], 4 ) + 1 : 1;
     return $base.str_pad( $number, 2, '0', STR_PAD_LEFT );
   }

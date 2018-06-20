@@ -73,11 +73,11 @@ foreach( $grep_line_list as $grep_line )
 
     $end_match = "'";
     $end = strpos( $grep_line, $end_match, $start );
-    
+
     // make sure a match was found
     if( false === $start || false === $end ) continue;
     $exception_type = substr( $grep_line, $start, $end - $start );
-    
+
     // now add the error code
     if( !array_key_exists( $exception_type, $error_codes ) )
       $error_codes[$exception_type] = array();
@@ -97,7 +97,7 @@ foreach( $grep_line_list as $grep_line )
     $start = strpos( substr( $grep_line, 0, $colon_position ), $start_match ) +
              strlen( $start_match );
     $end = strpos( $grep_line, $end_match, $start );
-    
+
     // make sure a match was found
     if( false === $start || false === $end ) continue;
     $class_name =
@@ -112,7 +112,7 @@ foreach( $grep_line_list as $grep_line )
     // make sure a match was found
     if( false === $start || false === $end ) continue;
     $method_name = substr( $grep_line, $start, $end - $start );
-    
+
     $current_class_name = $class_name;
     $current_method_name = $method_name;
   }

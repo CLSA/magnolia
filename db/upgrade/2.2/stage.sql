@@ -4,13 +4,13 @@ CREATE PROCEDURE patch_stage()
   BEGIN
 
     -- determine cenozo's database name
-    SET @cenozo = ( 
+    SET @cenozo = (
       SELECT unique_constraint_schema
       FROM information_schema.referential_constraints
       WHERE constraint_schema = DATABASE()
       AND constraint_name = "fk_access_site_id" );
 
-    SET @test = ( 
+    SET @test = (
       SELECT COUNT(*)
       FROM information_schema.TABLES
       WHERE TABLE_SCHEMA = DATABASE()

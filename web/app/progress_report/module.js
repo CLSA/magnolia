@@ -351,7 +351,7 @@ define( function() {
           } ).patch();
         };
 
-        this.setTab = function( tab, transition ) { 
+        this.setTab = function( tab, transition ) {
           if( angular.isUndefined( transition ) ) transition = true;
           if( 0 > ['instructions','a1'].indexOf( tab ) ) tab = 'instructions';
           this.tab = tab;
@@ -384,7 +384,7 @@ define( function() {
           return CnHttpFactory.instance( {
             path: 'progress_report',
             data: { reqn_id: $state.params.identifier } // when adding the current id is always a req'n
-          } ).post().then( function ( response ) { 
+          } ).post().then( function ( response ) {
             // immediately view the new reqn
             return self.transitionToViewState( { getIdentifier: function() { return response.data; } } );
           } )

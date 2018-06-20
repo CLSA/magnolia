@@ -31,6 +31,5 @@ doc/report/
 
 db/
   This is where all sql needed to install the application belongs.
-  This includes database schemas, default data and script to upgrade from older 
+  This includes database schemas, default data and script to upgrade from older
   versions.
-  

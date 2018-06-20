@@ -66,7 +66,7 @@ class reqn extends \cenozo\database\record
         }
       }
     }
-    
+
     if( $change_deadline )
     {
       if( is_null( $db_deadline ) )

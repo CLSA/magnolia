@@ -22,8 +22,8 @@ class module extends \cenozo\service\module
     parent::prepare_read( $select, $modifier );
 
     // add the total number of notifications
-    if( $select->has_column( 'notification_count' ) ) 
-    {   
+    if( $select->has_column( 'notification_count' ) )
+    {
       $join_sel = lib::create( 'database\select' );
       $join_sel->from( 'notification' );
       $join_sel->add_column( 'notification_type_id' );
@@ -37,6 +37,6 @@ class module extends \cenozo\service\module
         'notification_type.id',
         'notification_type_join_notification.notification_type_id' );
       $select->add_column( 'IFNULL( notification_count, 0 )', 'notification_count', false );
-    }   
+    }
   }
 }

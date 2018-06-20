@@ -1,6 +1,6 @@
 #!/usr/bin/php
 <?php
-/** 
+/**
  * Utility which changes a setting in settings.local.ini.php
  * @author Patrick Emond <emondpd@mcmaster.ca>
  * @param string category

@@ -62,7 +62,7 @@ class ui extends \cenozo\ui\ui
     $this->remove_listitem( 'Consent Types' );
     $this->remove_listitem( 'Event Types' );
     $this->remove_listitem( 'Languages' );
-      
+
     if( 'applicant' == $db_role->name || 'reviewer' == $db_role->name )
       $this->remove_listitem( 'Users' );
   }
@@ -84,7 +84,7 @@ class ui extends \cenozo\ui\ui
     if( array_key_exists( 'User Overview', $list ) )
       if( 'applicant' == $db_role->name || 'reviewer' == $db_role->name )
         unset( $list['User Overview'] );
-      
+
     return $list;
   }
 }

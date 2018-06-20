@@ -1,6 +1,6 @@
 #!/usr/bin/php
 <?php
-/** 
+/**
  * Utility which rewrites all minified versions of javascript files which are out of date
  * @author Patrick Emond <emondpd@mcmaster.ca>
  * @param string version
