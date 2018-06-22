@@ -13,13 +13,19 @@ global $SETTINGS;
 $SETTINGS['general']['application_name'] = 'magnolia';
 $SETTINGS['general']['instance_name'] = $SETTINGS['general']['application_name'];
 $SETTINGS['general']['version'] = '2.2';
-$SETTINGS['general']['build'] = '93bcafa';
+$SETTINGS['general']['build'] = 'e3c67a0';
 
 // the location of magnolia internal path
 $SETTINGS['path']['APPLICATION'] = str_replace( '/settings.ini.php', '', __FILE__ );
 
 // the location of deployment reports (defaults to magnolia/doc/ethics_letter)
 $SETTINGS['path']['ETHICS_LETTER'] = str_replace( 'settings.ini.php', 'doc/ethics_letter', __FILE__ );
+
+// the location of PDF form templates (defaults to magnolia/doc/pdf_form)
+$SETTINGS['path']['PDF_FORM'] = str_replace( 'settings.ini.php', 'doc/pdf_form', __FILE__ );
+
+// the location of reqn forms (defaults to magnolia/doc/reqn)
+$SETTINGS['path']['REQN'] = str_replace( 'settings.ini.php', 'doc/reqn', __FILE__ );
 
 // add modules used by the application
 $SETTINGS['module']['pdf'] = true;

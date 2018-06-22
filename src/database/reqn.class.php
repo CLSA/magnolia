@@ -247,4 +247,89 @@ class reqn extends \cenozo\database\record
       $this->save();
     }
   }
+
+  /**
+   * Generates a PDF form version of the reqn (overwritting the previous version)
+   * 
+   * @access public
+   */
+  public function generate_pdf_form()
+  {
+    $pdf_writer = lib::create( 'business\pdf_writer' );
+    $pdf_writer->set_template( sprintf( '%s/2.pdf', PDF_FORM_PATH ) );
+
+    $data = array( 'identifier' => $this->identifier );
+
+    if( !is_null( $this->applicant_name ) ) $data['applicant_name'] = $this->applicant_name;
+    if( !is_null( $this->applicant_position ) ) $data['applicant_position'] = $this->applicant_position;
+    if( !is_null( $this->applicant_affiliation ) ) $data['applicant_affiliation'] = $this->applicant_affiliation;
+    if( !is_null( $this->applicant_address ) ) $data['applicant_address'] = $this->applicant_address;
+    if( !is_null( $this->applicant_phone ) ) $data['applicant_phone'] = $this->applicant_phone;
+    if( !is_null( $this->applicant_email ) ) $data['applicant_email'] = $this->applicant_email;
+    if( !is_null( $this->graduate_name ) ) $data['graduate_name'] = $this->graduate_name;
+    if( !is_null( $this->graduate_program ) ) $data['graduate_program'] = $this->graduate_program;
+    if( !is_null( $this->graduate_institution ) ) $data['graduate_institution'] = $this->graduate_institution;
+    if( !is_null( $this->graduate_address ) ) $data['graduate_address'] = $this->graduate_address;
+    if( !is_null( $this->graduate_phone ) ) $data['graduate_phone'] = $this->graduate_phone;
+    if( !is_null( $this->graduate_email ) ) $data['graduate_email'] = $this->graduate_email;
+    if( !is_null( $this->start_date ) ) $data['start_date'] = $this->start_date->format( 'Y-m-d' );
+    if( !is_null( $this->duration ) ) $data['duration'] = $this->duration;
+    if( !is_null( $this->title ) ) $data['title'] = $this->title;
+    if( !is_null( $this->keywords ) ) $data['keywords'] = $this->keywords;
+    if( !is_null( $this->lay_summary ) ) $data['lay_summary'] = $this->lay_summary;
+    if( !is_null( $this->background ) ) $data['background'] = $this->background;
+    if( !is_null( $this->objectives ) ) $data['objectives'] = $this->objectives;
+    if( !is_null( $this->methodology ) ) $data['methodology'] = $this->methodology;
+    if( !is_null( $this->analysis ) ) $data['analysis'] = $this->analysis;
+    if( !is_null( $this->funding ) )
+    {
+      if( 'yes' == $this->funding ) $data['funding_yes'] = 'Yes';
+      else if( 'no' == $this->funding ) $data['funding_no'] = 'Yes';
+      else if( 'requested' == $this->funding ) $data['funding_requested'] = 'Yes';
+    }
+    if( !is_null( $this->funding_agency ) ) $data['funding_agency'] = $this->funding_agency;
+    if( !is_null( $this->grant_number ) ) $data['grant_number'] = $this->grant_number;
+    if( !is_null( $this->ethics ) ) $data['ethics'] = $this->ethics ? 'yes' : 'no';
+    if( !is_null( $this->ethics_date ) ) $data['ethics_date'] = $this->ethics_date->format( 'Y-m-d' );
+    if( !is_null( $this->ethics_filename ) ) $data['ethics_filename'] = $this->ethics_filename;
+    if( !is_null( $this->waiver ) )
+    {
+      if( 'graduate' == $this->waiver ) $data['waiver_graduate'] = 'Yes';
+      else if( 'postdoc' == $this->waiver ) $data['waiver_postdoc'] = 'Yes';
+    }
+    if( !is_null( $this->applicant_name ) ) $data['signature_applicant_name'] = $this->applicant_name;
+
+    foreach( $this->get_coapplicant_list() as $index => $coapplicant )
+    {
+      $data[sprintf( 'coapplicant%d_name', $index+1 )] = $coapplicant['name'];
+      $data[sprintf( 'coapplicant%d_position', $index+1 )] =
+        sprintf( "%s\n%s\n%s", $coapplicant['position'], $coapplicant['affiliation'], $coapplicant['email'] );
+      $data[sprintf( 'coapplicant%d_role', $index+1 )] = $coapplicant['role'];
+      $data[sprintf( 'coapplicant%d_%s', $index+1, $coapplicant['access'] ? 'yes' : 'no' )] = 'Yes';
+    }
+
+    $reference_list = array();
+    $reference_sel = lib::create( 'database\select' );
+    $reference_sel->add_column( 'reference' );
+    $reference_mod = lib::create( 'database\modifier' );
+    $reference_mod->order( 'rank' );
+    foreach( $this->get_reference_list( $reference_sel, $reference_mod ) as $index => $reference )
+      $reference_list[] = $reference['reference'];
+    $data['references'] = implode( "\n", $reference_list );
+    log::debug( $data['references'] );
+
+    $pdf_writer->fill_form( $data );
+    $filename = sprintf( '%s/%s.pdf', REQN_PATH, $this->id );
+    if( !$pdf_writer->save( $filename ) ) 
+    {
+      throw lib::create( 'exception\runtime',
+        sprintf(
+          'Failed to generate PDF form "%s" for requisition %s',
+          $filename,
+          $this->identifier
+        ),
+        __METHOD__
+      );
+    }
+  }
 }

@@ -10,9 +10,9 @@ define( function() {
       }
     },
     name: {
-      singular: 'PDF form',
-      plural: 'PDF forms',
-      possessive: 'PDF form\'s',
+      singular: 'version',
+      plural: 'versions',
+      possessive: 'version\'s',
       friendlyColumn: 'version'
     },
     columnList: {
@@ -42,6 +42,12 @@ define( function() {
       type: 'boolean',
       help: 'Determines whether this is the actively used version of the form (only one version may be active)'
     }
+  } );
+
+  module.addExtraOperation( 'view', {
+    title: 'Download',
+    isDisabled: function( $state, model ) { return angular.isUndefined( model.viewModel.downloadFile ); },
+    operation: function( $state, model ) { model.viewModel.downloadFile(); }
   } );
 
   /* ######################################################################################################## */
@@ -109,9 +115,23 @@ define( function() {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnPdfFormViewFactory', [
-    'CnBaseViewFactory',
-    function( CnBaseViewFactory ) {
-      var object = function( parentModel, root ) { CnBaseViewFactory.construct( this, parentModel, root ); }
+    'CnBaseViewFactory', 'CnHttpFactory',
+    function( CnBaseViewFactory, CnHttpFactory ) {
+      var object = function( parentModel, root ) {
+        var self = this;
+        CnBaseViewFactory.construct( this, parentModel, root );
+
+        this.afterView( function() {
+          if( angular.isUndefined( self.downloadFile ) ) {
+            self.downloadFile = function() {
+              return CnHttpFactory.instance( {
+                path: self.parentModel.getServiceResourcePath(),
+                format: 'pdf'
+              } ).file();
+            };
+          }
+        } );
+      }
       return { instance: function( parentModel, root ) { return new object( parentModel, root ); } };
     }
   ] );

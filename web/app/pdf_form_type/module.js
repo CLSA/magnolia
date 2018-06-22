@@ -5,9 +5,9 @@ define( function() {
   angular.extend( module, {
     identifier: { column: 'name' },
     name: {
-      singular: 'PDF form type',
-      plural: 'PDF form types',
-      possessive: 'PDF form type\'s'
+      singular: 'PDF form template',
+      plural: 'PDF form templates',
+      possessive: 'PDF form template\'s'
     },
     columnList: {
       name: {
@@ -76,14 +76,7 @@ define( function() {
   cenozo.providers.factory( 'CnPdfFormTypeViewFactory', [
     'CnBaseViewFactory',
     function( CnBaseViewFactory ) {
-      var object = function( parentModel, root ) {
-        var self = this;
-        CnBaseViewFactory.construct( this, parentModel, root );
-
-        this.deferred.promise.then( function() {
-          self.pdfFormModel.listModel.heading = 'Version List';
-        } );
-      }
+      var object = function( parentModel, root ) { CnBaseViewFactory.construct( this, parentModel, root ); }
       return { instance: function( parentModel, root ) { return new object( parentModel, root ); } };
     }
   ] );

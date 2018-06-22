@@ -220,6 +220,11 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     } ]
   } );
 
+  module.addExtraOperation( 'view', {
+    title: 'Download',
+    operation: function( $state, model ) { model.viewModel.downloadForm(); }
+  } );
+
   /* ######################################################################################################## */
   cenozo.providers.directive( 'cnReqnDeferralNote',
     function() {
@@ -632,7 +637,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
         this.downloadEthicsFile = function() {
           return CnHttpFactory.instance( {
-            path: this.parentModel.getServiceResourcePath(),
+            path: this.parentModel.getServiceResourcePath() + '?letter=1',
             format: 'unknown'
           } ).file();
         };
@@ -658,7 +663,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
             // upload the file
             return CnHttpFactory.instance( {
-              path: self.parentModel.getServiceResourcePath(),
+              path: self.parentModel.getServiceResourcePath() + '?letter=1',
               data: self.ethicsFile,
               format: 'unknown'
             } ).patch()
@@ -822,6 +827,13 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               } );
             }
           } );
+        };
+
+        this.downloadForm = function() {
+          return CnHttpFactory.instance( {
+            path: this.parentModel.getServiceResourcePath(),
+            format: 'pdf'
+          } ).file();
         };
 
         this.showDecide = function() {

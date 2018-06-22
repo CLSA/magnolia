@@ -58,7 +58,7 @@ class ui extends \cenozo\ui\ui
 
     $this->add_listitem( 'Deadlines', 'deadline' );
     $this->add_listitem( 'Notification Types', 'notification_type' );
-    $this->add_listitem( 'PDF Form Types', 'pdf_form_type' );
+    $this->add_listitem( 'PDF Form Templates', 'pdf_form_type' );
     $this->add_listitem( 'Requisitions', 'reqn' );
     $this->add_listitem( 'Stage Types', 'stage_type' );
 

@@ -17,7 +17,7 @@ class get extends \cenozo\service\downloadable
    */
   protected function get_downloadable_mime_type_list()
   {
-    return array( 'application/octet-stream' );
+    return array( 'application/octet-stream', 'application/pdf' );
   }
 
   /**
@@ -27,7 +27,10 @@ class get extends \cenozo\service\downloadable
    */
   protected function get_downloadable_public_name()
   {
-    return $this->get_leaf_record()->ethics_filename;
+    $db_reqn = $this->get_leaf_record();
+    return $this->get_argument( 'letter', false ) ?
+      $db_reqn->ethics_filename :
+      sprintf( '%s.pdf', $db_reqn->identifier ); 
   }
 
   /**
@@ -37,7 +40,25 @@ class get extends \cenozo\service\downloadable
    */
   protected function get_downloadable_file_path()
   {
-    return sprintf( '%s/%s', ETHICS_LETTER_PATH, $this->get_leaf_record()->id );
+    $db_reqn = $this->get_leaf_record();
+    return $this->get_argument( 'letter', false ) ?
+      sprintf( '%s/%s', ETHICS_LETTER_PATH, $db_reqn->id ) :
+      sprintf( '%s/%s.pdf', REQN_PATH, $db_reqn->id );
+  }
+
+  /**
+   * Extend parent method
+   */
+  public function prepare()
+  {
+    parent::prepare();
+
+    // if requesting the reqn as a PDF file then create it first
+    if( 'application/pdf' == $this->get_mime_type() && !$this->get_argument( 'letter', false ) )
+    {
+      $db_reqn = $this->get_leaf_record();
+      $db_reqn->generate_pdf_form();
+    }
   }
 
   /**
