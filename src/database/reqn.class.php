@@ -288,22 +288,10 @@ class reqn extends \cenozo\database\record
     if( !is_null( $this->keywords ) ) $data['keywords'] = $this->keywords;
     if( !is_null( $this->lay_summary ) ) $data['lay_summary'] = $this->lay_summary;
     $data['word_count'] = is_null( $this->lay_summary ) ? 0 : count( explode( ' ', $this->lay_summary ) );
-
-    $description = ( 'en' == $language ? 'Background and study relevance' : 'Contexte et pertinence de l’étude' )."\n\n";
-    if( !is_null( $this->background ) ) $description .= $this->background;
-    $data['description1'] = $description;
-
-    $description = ( 'en' == $language ? 'Study objectives and/or hypotheses' : 'Objectifs et/ou hypothèses de l’étude' )."\n\n";
-    if( !is_null( $this->objectives ) ) $description .= $this->objectives;
-    $data['description2'] = $description;
-
-    $description = ( 'en' == $language ? 'Study design and methodology' : 'Modèle d’étude et méthodologie' )."\n\n";
-    if( !is_null( $this->methodology ) ) $description .= $this->methodology;
-    $data['description3'] = $description;
-
-    $description = ( 'en' == $language ? 'Data analysis' : 'Analyse de données' )."\n\n";
-    if( !is_null( $this->analysis ) ) $description .= $this->analysis;
-    $data['description4'] = $description;
+    if( !is_null( $this->background ) ) $data['background'] = $this->background;
+    if( !is_null( $this->objectives ) ) $data['objectives'] = $this->objectives;
+    if( !is_null( $this->methodology ) ) $data['methodology'] = $this->methodology;
+    if( !is_null( $this->analysis ) ) $data['analysis'] = $this->analysis;
 
     if( !is_null( $this->funding ) )
     {
