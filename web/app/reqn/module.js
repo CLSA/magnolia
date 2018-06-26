@@ -1329,7 +1329,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                 en: 'Study Objectives and/or Hypotheses',
                 fr: 'Objectifs et/ou hypothèses de l’étude'
               },
-              methodology: { en: 'The Study Design and Methodology', fr: 'Modèle d’étude et méthodologie' },
+              methodology: { en: 'Study Design and Methodology', fr: 'Modèle d’étude et méthodologie' },
               methodology_text: {
                 en: 'The study design and methodology including an overview of the variables and/or biospecimens requested for the project. In no more than half a page, describe the inclusion and exclusion criteria for participants to be included in your study (e.g., age, sex, etc.).',
                 fr: 'Modèle d’étude et méthodologie comprenant un survol de la liste de variables et/ou échantillons demandés. Sans dépasser une demi-page, décrivez les critères d’inclusion et d’exclusion des participants qui seront inclus dans votre étude (p. ex. âge, sexe, etc.).'

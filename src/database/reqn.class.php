@@ -257,6 +257,7 @@ class reqn extends \cenozo\database\record
   {
     $pdf_writer = lib::create( 'business\pdf_writer' );
     $pdf_writer->set_template( sprintf( '%s/2.pdf', PDF_FORM_PATH ) );
+    $language = $this->get_language()->code;
 
     $data = array( 'identifier' => $this->identifier );
 
@@ -277,10 +278,24 @@ class reqn extends \cenozo\database\record
     if( !is_null( $this->title ) ) $data['title'] = $this->title;
     if( !is_null( $this->keywords ) ) $data['keywords'] = $this->keywords;
     if( !is_null( $this->lay_summary ) ) $data['lay_summary'] = $this->lay_summary;
-    if( !is_null( $this->background ) ) $data['background'] = $this->background;
-    if( !is_null( $this->objectives ) ) $data['objectives'] = $this->objectives;
-    if( !is_null( $this->methodology ) ) $data['methodology'] = $this->methodology;
-    if( !is_null( $this->analysis ) ) $data['analysis'] = $this->analysis;
+    $data['word_count'] = is_null( $this->lay_summary ) ? 0 : count( explode( ' ', $this->lay_summary ) );
+
+    $description = ( 'en' == $language ? 'Background and study relevance' : 'Contexte et pertinence de l’étude' )."\n\n";
+    if( !is_null( $this->background ) ) $description .= $this->background;
+    $data['description1'] = $description;
+
+    $description = ( 'en' == $language ? 'Study objectives and/or hypotheses' : 'Objectifs et/ou hypothèses de l’étude' )."\n\n";
+    if( !is_null( $this->objectives ) ) $description .= $this->objectives;
+    $data['description2'] = $description;
+
+    $description = ( 'en' == $language ? 'Study design and methodology' : 'Modèle d’étude et méthodologie' )."\n\n";
+    if( !is_null( $this->methodology ) ) $description .= $this->methodology;
+    $data['description3'] = $description;
+
+    $description = ( 'en' == $language ? 'Data analysis' : 'Analyse de données' )."\n\n";
+    if( !is_null( $this->analysis ) ) $description .= $this->analysis;
+    $data['description4'] = $description;
+
     if( !is_null( $this->funding ) )
     {
       if( 'yes' == $this->funding ) $data['funding_yes'] = 'Yes';
@@ -316,7 +331,6 @@ class reqn extends \cenozo\database\record
     foreach( $this->get_reference_list( $reference_sel, $reference_mod ) as $index => $reference )
       $reference_list[] = $reference['reference'];
     $data['references'] = implode( "\n", $reference_list );
-    log::debug( $data['references'] );
 
     $pdf_writer->fill_form( $data );
     $filename = sprintf( '%s/%s.pdf', REQN_PATH, $this->id );
