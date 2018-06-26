@@ -59,13 +59,11 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
   module.addInputGroup( '', {
     identifier: {
       title: 'Identifier',
-      type: 'string',
-      constant: true
+      type: 'string'
     },
     language_id: {
       title: 'Language',
-      type: 'enum',
-      constant: true
+      type: 'enum'
     },
     stage_type: {
       title: 'Current Stage',

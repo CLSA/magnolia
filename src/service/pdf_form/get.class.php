@@ -38,6 +38,6 @@ class get extends \cenozo\service\downloadable
    */
   protected function get_downloadable_file_path()
   {
-    return sprintf( '%s/%s.pdf', PDF_FORM_PATH, $this->get_leaf_record()->id );
+    return sprintf( '%s/%d.%s.pdf', PDF_FORM_PATH, $this->get_leaf_record()->id, $this->get_argument( 'language', 'en' ) );
   }
 }

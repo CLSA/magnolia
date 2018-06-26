@@ -44,10 +44,17 @@ define( function() {
     }
   } );
 
-  module.addExtraOperation( 'view', {
+  module.addExtraOperationGroup( 'view', {
     title: 'Download',
-    isDisabled: function( $state, model ) { return angular.isUndefined( model.viewModel.downloadFile ); },
-    operation: function( $state, model ) { model.viewModel.downloadFile(); }
+    operations: [ {
+      title: 'English',
+      isDisabled: function( $state, model ) { return angular.isUndefined( model.viewModel.downloadFile ); },
+      operation: function( $state, model ) { model.viewModel.downloadFile( 'en' ); }
+    }, {
+      title: 'French',
+      isDisabled: function( $state, model ) { return angular.isUndefined( model.viewModel.downloadFile ); },
+      operation: function( $state, model ) { model.viewModel.downloadFile( 'fr' ); }
+    } ]
   } );
 
   /* ######################################################################################################## */
@@ -123,9 +130,9 @@ define( function() {
 
         this.afterView( function() {
           if( angular.isUndefined( self.downloadFile ) ) {
-            self.downloadFile = function() {
+            self.downloadFile = function( language ) {
               return CnHttpFactory.instance( {
-                path: self.parentModel.getServiceResourcePath(),
+                path: self.parentModel.getServiceResourcePath() + '?language=' + language,
                 format: 'pdf'
               } ).file();
             };
