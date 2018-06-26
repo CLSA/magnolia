@@ -255,8 +255,17 @@ class reqn extends \cenozo\database\record
    */
   public function generate_pdf_form()
   {
+    $pdf_form_type_class_name = lib::get_class_name( 'database\pdf_form_type' );
+
+    // get the data application
+    $db_pdf_form_type = $pdf_form_type_class_name::get_unique_record( 'name', 'Data Application' );
+    $db_pdf_form = $db_pdf_form_type->get_active_pdf_form();
+    if( is_null( $db_pdf_form ) )
+      throw lib::create( 'exception\runtime',
+        'Cannot generate PDF form since there is no active Data Application PDF form.', __METHOD__ );
+
     $pdf_writer = lib::create( 'business\pdf_writer' );
-    $pdf_writer->set_template( sprintf( '%s/2.pdf', PDF_FORM_PATH ) );
+    $pdf_writer->set_template( sprintf( '%s/%d.pdf', PDF_FORM_PATH, $db_pdf_form->id ) );
     $language = $this->get_language()->code;
 
     $data = array( 'identifier' => $this->identifier );
@@ -338,9 +347,10 @@ class reqn extends \cenozo\database\record
     {
       throw lib::create( 'exception\runtime',
         sprintf(
-          'Failed to generate PDF form "%s" for requisition %s',
+          'Failed to generate PDF form "%s" for requisition %s%s',
           $filename,
-          $this->identifier
+          $this->identifier,
+          "\n".$pdf_writer->get_error()
         ),
         __METHOD__
       );
