@@ -28,8 +28,9 @@ class ui extends \cenozo\ui\ui
     if( !is_null( $module ) )
     {
       $module->add_action( 'form', '/{identifier}?{t0}&{t1}&{t2}' );
-      $module->add_child( 'review' );
       $module->add_child( 'stage' );
+      $module->add_child( 'review' );
+      $module->add_child( 'dsac_review' );
       $module->add_child( 'notification' );
     }
 
