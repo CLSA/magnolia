@@ -15,16 +15,51 @@ define( function() {
       possessive: 'DSAC review\'s'
     },
     columnList: {
-      note: { title: 'Note', type: 'text', limit: 1000, align: 'left' }
+      identifier: { column: 'reqn.identifier', title: 'Requisition' },
+      user: { column: 'user.name', title: 'Reviewer' },
+      recommendation: { title: 'Recomendation' },
+      scientific_review: { title: 'Scientific Review' }
     },
     defaultOrder: {
-      column: 'datetime',
+      column: 'user.name',
       reverse: false
     }
   } );
 
   module.addInputGroup( '', {
-    note: { title: 'Note', type: 'text' }
+    identifier: {
+      column: 'reqn.identifier',
+      title: 'Requisition',
+      type: 'string',
+      constant: true,
+      exclude: 'add'
+    },
+    user_id: {
+      column: 'reqn.user_id',
+      title: 'Reviewer',
+      type: 'lookup-typeahead',
+      typeahead: {
+        table: 'user',
+        select: 'CONCAT( user.first_name, " ", user.last_name, " (", user.name, ")" )',
+        where: [ 'user.first_name', 'user.last_name', 'user.name' ]
+      },
+      constant: 'view'
+    },
+    recommendation: {
+      title: 'Recomendation',
+      type: 'enum',
+      exclude: 'add'
+    },
+    scientific_review: {
+      title: 'Scientific Review',
+      type: 'boolean',
+      exclude: 'add'
+    },
+    note: {
+      title: 'Note',
+      type: 'text',
+      exclude: 'add'
+    }
   } );
 
   /* ######################################################################################################## */

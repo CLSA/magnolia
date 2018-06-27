@@ -38,6 +38,8 @@ define( 'ARGUMENT__MAGNOLIA_DATABASE_REQN__ADD_TO_STAGE__ERRNO',
 /**
  * "notice" error codes
  */
+define( 'NOTICE__MAGNOLIA_DATABASE_REQN__ADD_TO_STAGE__ERRNO',
+        NOTICE_MAGNOLIA_BASE_ERRNO + 1 );
 
 /**
  * "permission" error codes

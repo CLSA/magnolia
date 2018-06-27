@@ -169,6 +169,7 @@ class reqn extends \cenozo\database\record
       return;
     }
 
+    $review_class_name = lib::get_class_name( 'database\review' );
     $stage_type_class_name = lib::get_class_name( 'database\stage_type' );
     $db_user = lib::create( 'business\session' )->get_user();
     $db_last_stage_type = $this->get_last_stage_type();
@@ -213,6 +214,55 @@ class reqn extends \cenozo\database\record
     }
     else
     {
+      // determine whether we can safely proceed to the next stage
+      $notice = false;
+      if( 'Admin Review' == $db_last_stage_type->name )
+      {
+        // make sure the admin review is done
+        $db_review = $review_class_name::get_unique_record( array( 'reqn_id', 'type' ), array( $this->id, 'Admin' ) );
+        if( is_null( $db_review ) || !$db_review->description )
+          $notice = 'The Admin review must be completed before proceeding to the next stage.';
+      }
+      else if( 'SAC Review' == $db_last_stage_type->name )
+      {
+        // make sure the SAC review is done
+        $db_review = $review_class_name::get_unique_record( array( 'reqn_id', 'type' ), array( $this->id, 'SAC' ) );
+        if( is_null( $db_review ) || !$db_review->description )
+          $notice = 'The SAC review must be completed before proceeding to the next stage.';
+      }
+      else if( 'DSAC Selection' == $db_last_stage_type->name )
+      {
+        // make sure at least 2 reviewers have been selected
+        if( 2 > $this->get_dsac_review_count() )
+          $notice = 'At least 2 reviewers must be selected before proceeding to the next stage.';
+      }
+      else if( 'DSAC Review' == $db_last_stage_type->name )
+      {
+        // make sure all DSAC reviews have been completed
+        $modifier = lib::create( 'database\modifier' );
+        $modifier->where( 'recommendation', '=', NULL );
+        $modifier->or_where( 'scientific_review', '=', NULL );
+        if( 0 < $this->get_dsac_review_count( $modifier ) )
+        {
+          $notice = 'All DSAC reviews must be completed before proceeding to the next stage.';
+        }
+        else
+        {
+          // make sure all DSAC reviews have been approved
+          $modifier = lib::create( 'database\modifier' );
+          $modifier->where( 'recommendation', '!=', 'Approved' );
+          if( 0 < $this->get_dsac_review_count( $modifier ) )
+            $notice = 'The requisition cannot proceed to the next stage because it has not been approved by all DSAC reviewers.';
+        }
+      }
+      else if( 'SMT Review' == $db_last_stage_type->name )
+      {
+        // TODO
+      }
+
+      if( $notice ) throw lib::create( 'exception\notice', $notice, __METHOD__ );
+
+      // determine which is the next stage type
       $found = false;
       foreach( $next_stage_type_list as $db_next_stage_type )
       {
@@ -230,6 +280,7 @@ class reqn extends \cenozo\database\record
                    $db_last_stage_type->name ),
           __METHOD__ );
     }
+
 
     $db_stage = lib::create( 'database\stage' );
     $db_stage->reqn_id = $this->id;
