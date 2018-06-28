@@ -25,11 +25,9 @@ class module extends \cenozo\service\module
 
     if( !is_null( $this->get_resource() ) )
     {
-      // include the user first/last/name as supplemental data
-      $select->add_column(
-        'CONCAT( user.first_name, " ", user.last_name, " (", user.name, ")" )',
-        'formatted_user_id',
-        false );
+      // include the requisition identifier and user first/last/name as supplemental data
+      $select->add_column( 'reqn.identifier', 'formatted_reqn_id', false );
+      $select->add_column( 'CONCAT( user.first_name, " ", user.last_name, " (", user.name, ")" )', 'formatted_user_id', false );
     }
   }
 }

@@ -27,12 +27,16 @@ define( function() {
   } );
 
   module.addInputGroup( '', {
-    identifier: {
+    reqn_id: {
       column: 'reqn.identifier',
       title: 'Requisition',
-      type: 'string',
-      constant: true,
-      exclude: 'add'
+      type: 'lookup-typeahead',
+      typeahead: {
+        table: 'reqn',
+        select: 'reqn.identifier',
+        where: 'reqn.identifier'
+      },
+      constant: 'view'
     },
     user_id: {
       column: 'reqn.user_id',
