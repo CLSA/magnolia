@@ -16,7 +16,6 @@ CREATE PROCEDURE patch_dsac_review()
         "reqn_id INT UNSIGNED NOT NULL, ",
         "user_id INT UNSIGNED NOT NULL, ",
         "recommendation ENUM('Approved', 'Revise', 'Not Approved') NULL DEFAULT NULL, ",
-        "scientific_review TINYINT(1) NULL DEFAULT NULL, ",
         "note TEXT NULL DEFAULT NULL, ",
         "PRIMARY KEY (id), ",
         "INDEX fk_reqn_id (reqn_id ASC), ",

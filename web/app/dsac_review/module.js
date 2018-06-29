@@ -16,9 +16,8 @@ define( function() {
     },
     columnList: {
       identifier: { column: 'reqn.identifier', title: 'Requisition' },
-      user: { column: 'user.name', title: 'Reviewer' },
-      recommendation: { title: 'Recomendation' },
-      scientific_review: { title: 'Scientific Review' }
+      user_full_name: { title: 'Reviewer' },
+      recommendation: { title: 'Recomendation' }
     },
     defaultOrder: {
       column: 'user.name',
@@ -52,11 +51,6 @@ define( function() {
     recommendation: {
       title: 'Recomendation',
       type: 'enum',
-      exclude: 'add'
-    },
-    scientific_review: {
-      title: 'Scientific Review',
-      type: 'boolean',
       exclude: 'add'
     },
     note: {

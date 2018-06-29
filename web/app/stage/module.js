@@ -18,9 +18,8 @@ define( function() {
         column: 'stage_type.name',
         title: 'Stage Type'
       },
-      user: {
-        column: 'user.name',
-        title: 'User'
+      user_full_name: {
+        title: 'Completed By'
       },
       datetime: {
         title: 'Date & Time',

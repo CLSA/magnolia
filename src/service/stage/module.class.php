@@ -23,5 +23,9 @@ class module extends \cenozo\service\module
 
     $modifier->join( 'reqn', 'stage.reqn_id', 'reqn.id' );
     $modifier->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
+    $modifier->left_join( 'user', 'stage.user_id', 'user.id' );
+
+    if( $select->has_column( 'user_full_name' ) )
+      $select->add_column( 'CONCAT( user.first_name, " ", user.last_name )', 'user_full_name', false );
   }
 }

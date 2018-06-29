@@ -26,7 +26,7 @@ CREATE PROCEDURE patch_stage()
           "create_timestamp TIMESTAMP NOT NULL, ",
           "reqn_id INT UNSIGNED NOT NULL, ",
           "stage_type_id INT UNSIGNED NOT NULL, ",
-          "user_id INT UNSIGNED NOT NULL, ",
+          "user_id INT UNSIGNED NULL DEFAULT NULL, ",
           "datetime DATETIME NOT NULL, ",
           "unprepared TINYINT(1) NOT NULL DEFAULT 0, ",
           "PRIMARY KEY (id), ",

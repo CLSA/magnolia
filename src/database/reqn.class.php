@@ -172,7 +172,8 @@ class reqn extends \cenozo\database\record
     $review_class_name = lib::get_class_name( 'database\review' );
     $stage_type_class_name = lib::get_class_name( 'database\stage_type' );
     $db_user = lib::create( 'business\session' )->get_user();
-    $db_last_stage_type = $this->get_last_stage_type();
+    $db_last_stage = $this->get_last_stage();
+    $db_last_stage_type = $db_last_stage->get_stage_type();
 
     // get the next stage_type
     $next_stage_type_list = is_null( $db_last_stage_type )
@@ -241,7 +242,6 @@ class reqn extends \cenozo\database\record
         // make sure all DSAC reviews have been completed
         $modifier = lib::create( 'database\modifier' );
         $modifier->where( 'recommendation', '=', NULL );
-        $modifier->or_where( 'scientific_review', '=', NULL );
         if( 0 < $this->get_dsac_review_count( $modifier ) )
         {
           $notice = 'All DSAC reviews must be completed before proceeding to the next stage.';
@@ -282,11 +282,15 @@ class reqn extends \cenozo\database\record
     }
 
 
+    // save the user who completed the current last stage
+    $db_last_stage->user_id = $db_user->id;
+    $db_last_stage->save();
+
+    // create the new stage
     $db_stage = lib::create( 'database\stage' );
     $db_stage->reqn_id = $this->id;
     $db_stage->stage_type_id = $db_stage_type->id;
     $db_stage->datetime = util::get_datetime_object();
-    $db_stage->user_id = $db_user->id;
     $db_stage->unprepared = is_null( $unprepared ) ? $db_stage_type->preparation_required : $unprepared;
     $db_stage->save();
 
