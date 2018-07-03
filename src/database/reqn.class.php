@@ -34,8 +34,12 @@ class reqn extends \cenozo\database\record
       if( file_exists( $filename ) ) unlink( $filename );
     }
 
-    // if this is a new reqn then assign it to the first stage
-    if( $is_new ) $this->add_to_stage( 1 );
+    // if this is a new reqn then create its review records and assign it to the first stage
+    if( $is_new )
+    {
+      $this->create_reviews();
+      $this->add_to_stage( 1 );
+    }
   }
 
   /**
@@ -151,6 +155,28 @@ class reqn extends \cenozo\database\record
   }
 
   /**
+   * Creates all reviews for the requisition
+   * 
+   * The stage type may either be a stage_type object, the name of a stage_type, the rank of a
+   * stage_type or NULL.  NULL should only be used when the current stage_type only has one "next"
+   * stage_type, otherwise an exception will be thrown.
+   * @param mixed $stage_type A rank, name or stage_type record
+   * @param boolean $unprepared Whether the stage must be prepared (set to NULL for the stage_type's default)
+   * @access public
+   */
+  protected function create_reviews()
+  {
+    $review_class_name = lib::get_class_name( 'database\review' );
+    foreach( $review_class_name::get_enum_values( 'type' ) as $type )
+    {
+      $db_review = lib::create( 'database\review' );
+      $db_review->reqn_id = $this->id;
+      $db_review->type = $type;
+      $db_review->save();
+    }
+  }
+
+  /**
    * Adds the reqn to a stage
    * 
    * The stage type may either be a stage_type object, the name of a stage_type, the rank of a
@@ -173,13 +199,14 @@ class reqn extends \cenozo\database\record
     $stage_type_class_name = lib::get_class_name( 'database\stage_type' );
     $db_user = lib::create( 'business\session' )->get_user();
     $db_last_stage = $this->get_last_stage();
-    $db_last_stage_type = $db_last_stage->get_stage_type();
+    $db_last_stage_type = is_null( $db_last_stage ) ? NULL : $db_last_stage->get_stage_type();
 
     // get the next stage_type
     $next_stage_type_list = is_null( $db_last_stage_type )
                           ? array()
                           : $db_last_stage_type->get_next_stage_type_list();
 
+    $db_review = NULL;
     $db_stage_type = NULL;
     if( is_null( $stage_type ) )
     {
@@ -221,39 +248,40 @@ class reqn extends \cenozo\database\record
       {
         // make sure the admin review is done
         $db_review = $review_class_name::get_unique_record( array( 'reqn_id', 'type' ), array( $this->id, 'Admin' ) );
-        if( is_null( $db_review ) || !$db_review->description )
+        if( is_null( $db_review ) || is_null( $db_review->recommendation ) )
           $notice = 'The Admin review must be completed before proceeding to the next stage.';
       }
       else if( 'SAC Review' == $db_last_stage_type->name )
       {
         // make sure the SAC review is done
         $db_review = $review_class_name::get_unique_record( array( 'reqn_id', 'type' ), array( $this->id, 'SAC' ) );
-        if( is_null( $db_review ) || !$db_review->description )
+        if( is_null( $db_review ) || is_null( $db_review->recommendation ) )
           $notice = 'The SAC review must be completed before proceeding to the next stage.';
       }
       else if( 'DSAC Selection' == $db_last_stage_type->name )
       {
         // make sure at least 2 reviewers have been selected
-        if( 2 > $this->get_dsac_review_count() )
-          $notice = 'At least 2 reviewers must be selected before proceeding to the next stage.';
+        $review_mod = lib::create( 'database\modifier' );
+        $review_mod->where( 'type', 'LIKE', 'Reviewer %' );
+        $review_mod->where( 'review.user_id', '=', NULL );
+        if( 0 < $this->get_review_count( $review_mod ) )
+          $notice = 'Both reviewers must be selected before proceeding to the next stage.';
       }
       else if( 'DSAC Review' == $db_last_stage_type->name )
       {
-        // make sure all DSAC reviews have been completed
-        $modifier = lib::create( 'database\modifier' );
-        $modifier->where( 'recommendation', '=', NULL );
-        if( 0 < $this->get_dsac_review_count( $modifier ) )
-        {
-          $notice = 'All DSAC reviews must be completed before proceeding to the next stage.';
-        }
-        else
-        {
-          // make sure all DSAC reviews have been approved
-          $modifier = lib::create( 'database\modifier' );
-          $modifier->where( 'recommendation', '!=', 'Approved' );
-          if( 0 < $this->get_dsac_review_count( $modifier ) )
-            $notice = 'The requisition cannot proceed to the next stage because it has not been approved by all DSAC reviewers.';
-        }
+        // make sure both reviewer reviews have been completed
+        $review_mod = lib::create( 'database\modifier' );
+        $review_mod->where( 'type', 'LIKE', 'Reviewer %' );
+        $review_mod->where( 'recommendation', '=', NULL );
+        if( 0 < $this->get_review_count( $review_mod ) )
+          $notice = 'Both reviewers must complete their review before proceeding to the next stage.';
+      }
+      else if( 'DSAC Decision' == $db_last_stage_type->name )
+      {
+        // make sure the char review is done
+        $db_review = $review_class_name::get_unique_record( array( 'reqn_id', 'type' ), array( $this->id, 'Chair' ) );
+        if( is_null( $db_review ) || is_null( $db_review->recommendation ) )
+          $notice = 'The Chair review must be completed before proceeding to the next stage.';
       }
       else if( 'SMT Review' == $db_last_stage_type->name )
       {
@@ -283,8 +311,11 @@ class reqn extends \cenozo\database\record
 
 
     // save the user who completed the current last stage
-    $db_last_stage->user_id = $db_user->id;
-    $db_last_stage->save();
+    if( !is_null( $db_last_stage ) )
+    {
+      $db_last_stage->user_id = $db_user->id;
+      $db_last_stage->save();
+    }
 
     // create the new stage
     $db_stage = lib::create( 'database\stage' );
@@ -300,6 +331,13 @@ class reqn extends \cenozo\database\record
       $base = $this->get_deadline()->date->format( 'ym' );
       $this->identifier = $this->get_deadline()->get_next_identifier();
       $this->save();
+    }
+
+    // update the admin/sac/chair reviewer if it isn't already set
+    if( !is_null( $db_review ) && is_null( $db_review->user_id ) )
+    {
+      $db_review->user_id = $db_user->id;
+      $db_review->save();
     }
   }
 
@@ -398,5 +436,30 @@ class reqn extends \cenozo\database\record
         __METHOD__
       );
     }
+  }
+
+  /**
+   * Provides a new temporary identifier which doesn't already exist
+   * 
+   * @access public
+   */
+  public static function get_temporary_identifier()
+  {
+    $count = 0;
+    $modifier = NULL;
+    do
+    {
+      // guard against an infinite loop
+      if( $count++ > 1000 ) throw lib::create( 'exception\runtime', 'Unable to create a new temporary identifier.', __METHOD__ );
+
+      // pick a random number
+      $identifier = 'T'.rand( 10000, 99999 );
+      
+      // see if it is already in use
+      $modifier = lib::create( 'database\modifier' );
+      $modifier->where( 'identifier', '=', $identifier );
+    } while( static::count( $modifier ) );
+
+    return $identifier;
   }
 }

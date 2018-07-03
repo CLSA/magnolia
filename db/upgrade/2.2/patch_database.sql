@@ -19,7 +19,6 @@ SOURCE pdf_form.sql
 SOURCE deadline.sql
 SOURCE reqn.sql
 SOURCE review.sql
-SOURCE dsac_review.sql
 SOURCE reqn_note.sql
 SOURCE notification_type.sql
 SOURCE notification.sql

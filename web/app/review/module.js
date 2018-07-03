@@ -10,23 +10,54 @@ define( function() {
       }
     },
     name: {
-      singular: 'internal review',
-      plural: 'internal reviews',
-      possessive: 'internal review\'s'
+      singular: 'review',
+      plural: 'reviews',
+      possessive: 'review\'s'
     },
     columnList: {
+      identifier: { column: 'reqn.identifier', title: 'Requisition' },
       type: { title: 'Type' },
-      description: { title: 'Description', type: 'text', limit: 1000, align: 'left' }
+      user_full_name: { title: 'Reviewer' },
+      recommendation: { title: 'Recomendation' }
     },
     defaultOrder: {
-      column: 'type',
+      column: 'id',
       reverse: false
     }
   } );
 
   module.addInputGroup( '', {
-    type: { title: 'Type', type: 'enum', constant: 'view' },
-    description: { title: 'Description', type: 'text' }
+    reqn_id: {
+      column: 'reqn.identifier',
+      title: 'Requisition',
+      type: 'lookup-typeahead',
+      typeahead: {
+        table: 'reqn',
+        select: 'reqn.identifier',
+        where: 'reqn.identifier'
+      },
+      constant: 'view'
+    },
+    user_id: {
+      column: 'reqn.user_id',
+      title: 'Reviewer',
+      type: 'lookup-typeahead',
+      typeahead: {
+        table: 'user',
+        select: 'CONCAT( user.first_name, " ", user.last_name, " (", user.name, ")" )',
+        where: [ 'user.first_name', 'user.last_name', 'user.name' ]
+      }
+    },
+    recommendation: {
+      title: 'Recomendation',
+      type: 'enum',
+      exclude: 'add'
+    },
+    note: {
+      title: 'Note',
+      type: 'text',
+      exclude: 'add'
+    }
   } );
 
   /* ######################################################################################################## */

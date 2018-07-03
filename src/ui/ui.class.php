@@ -30,7 +30,6 @@ class ui extends \cenozo\ui\ui
       $module->add_action( 'form', '/{identifier}?{t0}&{t1}&{t2}' );
       $module->add_child( 'stage' );
       $module->add_child( 'review' );
-      $module->add_child( 'dsac_review' );
       $module->add_child( 'notification' );
     }
 
@@ -58,7 +57,6 @@ class ui extends \cenozo\ui\ui
     $db_role = lib::create( 'business\session' )->get_role();
 
     $this->add_listitem( 'Deadlines', 'deadline' );
-    $this->add_listitem( 'DSAC Reviews', 'dsac_review' );
     $this->add_listitem( 'Notification Types', 'notification_type' );
     $this->add_listitem( 'PDF Form Templates', 'pdf_form_type' );
     $this->add_listitem( 'Requisitions', 'reqn' );
@@ -68,6 +66,8 @@ class ui extends \cenozo\ui\ui
     $this->remove_listitem( 'Consent Types' );
     $this->remove_listitem( 'Event Types' );
     $this->remove_listitem( 'Languages' );
+    $this->remove_listitem( 'Settings' );
+    $this->remove_listitem( 'Sites' );
 
     if( 'applicant' == $db_role->name || 'reviewer' == $db_role->name )
       $this->remove_listitem( 'Users' );

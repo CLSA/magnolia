@@ -201,8 +201,24 @@ class patch extends \cenozo\service\patch
       }
       else if( 'next_stage' == $action )
       {
-        // add the reqn to whatever the next stage is
-        $db_reqn->add_to_stage();
+        $db_last_stage_type = $db_reqn->get_last_stage_type();
+        if( 'DSAC Decision' == $db_last_stage_type->name )
+        {
+          // determine the next stage based on the chair's recommendation
+          $review_sel = lib::create( 'database\select' );
+          $review_sel->add_column( 'recommendation' );
+          $review_mod = lib::create( 'database\modifier' );
+          $review_mod->where( 'type', '=', 'Chair' );
+          $review_list = $db_reqn->get_review_list( $review_sel, $review_mod );
+          $recommendation = current( $review_list )['recommendation'];
+          $stage_type = 'Approved' == $recommendation ? 'Approved' : 'SMT Review';
+          $db_reqn->add_to_stage( $stage_type );
+        }
+        else
+        {
+          // add the reqn to whatever the next stage is
+          $db_reqn->add_to_stage();
+        }
       }
       else if( 'decide' == $action )
       {
