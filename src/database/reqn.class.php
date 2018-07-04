@@ -415,11 +415,12 @@ class reqn extends \cenozo\database\record
 
     $reference_list = array();
     $reference_sel = lib::create( 'database\select' );
+    $reference_sel->add_column( 'rank' );
     $reference_sel->add_column( 'reference' );
     $reference_mod = lib::create( 'database\modifier' );
     $reference_mod->order( 'rank' );
     foreach( $this->get_reference_list( $reference_sel, $reference_mod ) as $index => $reference )
-      $reference_list[] = $reference['reference'];
+      $reference_list[] = sprintf( '%s.  %s', $reference['rank'], $reference['reference'] );
     $data['references'] = implode( "\n", $reference_list );
 
     $pdf_writer->fill_form( $data );
