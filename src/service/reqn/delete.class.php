@@ -13,6 +13,18 @@ class delete extends \cenozo\service\delete
   /**
    * Extends parent method
    */
+  protected function validate()
+  {
+    parent::validate();
+
+    $db_reqn = $this->get_leaf_record();
+    if( 1 < $db_reqn->get_current_rank() )
+      throw lib::create( 'exception\notice', 'Requisitions cannot be deleted once they have been submitted.', __METHOD__ );
+  }
+
+  /**
+   * Extends parent method
+   */
   protected function setup()
   {
     parent::setup();

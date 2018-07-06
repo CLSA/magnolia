@@ -1,0 +1,57 @@
+<div class="inner-view-frame">
+  <div class="container-fluid bg-white allow-select">
+    <div class="row">
+      <div class="col-sm-10">
+        <h3 class="text-primary">
+          Welcome to {{ session.application.title }} version {{ session.application.version }}
+        </h3>
+        <div class="container-fluid">
+          You are currently logged on as <strong>{{ session.user.firstName }} {{ session.user.lastName }}</strong>.<br/>
+          <span class="text-warning">
+            Use of any account other than your own is prohibited.
+            If this is not you please <a style="cursor:pointer" ng-click="session.logout()">click here</a>
+            to log in.
+          </span>
+        </div>
+        <div class="vertical-spacer"></div>
+        <div ng-if="session.user.lastActivity" class="container-fluid">
+          You were last logged in from
+          <strong>{{ session.user.lastActivity.start_datetime | cnDatetime:'datetimesecond' }}</strong>
+          until
+          <strong>{{ session.user.lastActivity.end_datetime | cnDatetime:'datetimesecond' }}</strong>.
+        </div>
+        <div class="vertical-spacer"></div>
+      </div>
+      <div class="col-sm-2 hidden-xs">
+        <h3>
+          <img ng-src="{{ cenozoUrl }}/img/branding.small.png"
+               class="img-responsive"
+               onerror="this.style.display='none'"
+               alt="" />
+        </h3>
+      </div>
+    </div>
+    <h3 class="text-primary">Messages</h3>
+    <div class="container-fluid" ng-repeat="message in session.messageList">
+      <h4>
+        <button type="button"
+                class="btn"
+                ng-class="message.unread ? 'btn-warning' : 'btn-default'"
+                ng-click="markMessage( message.id )"
+                uib-tooltip="Click to mark message as {{ message.unread ? 'read' : 'unread' }}"
+                tooltip-placement="right">
+          <i class="glyphicon" ng-class="message.unread ? 'glyphicon-envelope' : 'glyphicon-ok'"></i>
+        </button>
+        {{ message.title }}
+      </h4>
+      <blockquote class="text-info" style="white-space: pre-wrap;">{{ message.note }}</blockquote>
+    </div>
+    <div ng-if="0 == session.messageList.length">
+      <blockquote class="text-info" style="white-space: pre-wrap;">There are no messages.</blockquote>
+    </div>
+    <div class="container-fluid">
+      <cn-reqn-list model="reqnModel"></cn-reqn-list>
+    </div>
+  </div>
+</div>
+<div class="gradient-footer"></div>

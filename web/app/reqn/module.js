@@ -977,6 +977,12 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         this.listModel = CnReqnListFactory.instance( this );
         this.viewModel = CnReqnViewFactory.instance( this, root );
 
+        // override the service collection path so that applicants can view their requisitions from the home screen
+        this.getServiceCollectionPath = function() {
+          // ignore the parent if it is root
+          return this.$$getServiceCollectionPath( 'root' == this.getSubjectFromState() );
+        };
+
         // make the input lists from all groups more accessible
         this.inputList = {};
         module.inputGroupList.forEach( group => Object.assign( self.inputList, group.inputList ) );
