@@ -669,13 +669,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
              .finally( function() { self.uploadingEthicsFile = false; } );
         };
 
-        this.getWordCount = function() {
-          return this.wordCount.background +
-                 this.wordCount.objectives +
-                 this.wordCount.methodology +
-                 this.wordCount.analysis;
-        };
-
         this.getDataOptionValueList = function() {
           self.dataOptionValueList = [];
           return CnHttpFactory.instance( {
@@ -1325,8 +1318,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                 fr: 'Veuillez fournir un résumé non scientifique de votre projet (<strong>TRANSLATION REQUIRED</strong>) pouvant être publié sur le site Web de l’ÉLCV si votre demande est approuvée. Assurez-vous de fournir un résumé détaillé et complet de votre projet.'
               },
               text2: {
-                en: 'Please provide a description of the proposed project. The proposal should be informative and specific and <strong>no more than 750 words. Non-compliant applications will be returned.</strong>',
-                fr: 'Veuillez fournir une description du projet proposé. La proposition devrait être informative et précise <strong>sans dépasser 750 mots. Les demandes non conformes seront renvoyées au demandeur.</strong>'
+                en: 'Please provide a description of the proposed project. The proposal should be informative and specific and <strong>no more than 750 words per section. Non-compliant applications will be returned.</strong>',
+                fr: 'TRANSLATION REQUIRED'
               },
               background: { en: 'Background and Study Relevance', fr: 'Contexte et pertinence de l’étude' },
               objectives: {
@@ -1460,7 +1453,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             remove: { en: 'Remove', fr: 'Supprimer' },
             words: { en: 'words', fr: 'mots' },
             chars: { en: 'characters', fr: 'TRANSLATION REQUIRED' },
-            wordCount: { en: 'word count', fr: 'nombre de mots' },
             comments: { en: 'Comments', fr: 'Commentaires' },
             upload: { en: 'upload', fr: 'téléverser' },
             uploaded: { en: 'uploaded', fr: 'téléversé' },
