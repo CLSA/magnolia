@@ -34,12 +34,8 @@ class reqn extends \cenozo\database\record
       if( file_exists( $filename ) ) unlink( $filename );
     }
 
-    // if this is a new reqn then create its review records and assign it to the first stage
-    if( $is_new )
-    {
-      $this->create_reviews();
-      $this->add_to_stage( 1 );
-    }
+    // if this is a new reqn then assign it to the first stage
+    if( $is_new ) $this->add_to_stage( 1 );
   }
 
   /**
@@ -152,28 +148,6 @@ class reqn extends \cenozo\database\record
     $modifier->where( 'reqn_last_stage.reqn_id', '=', $this->id );
 
     return static::db()->get_one( sprintf( '%s %s', $select->get_sql(), $modifier->get_sql() ) );
-  }
-
-  /**
-   * Creates all reviews for the requisition
-   * 
-   * The stage type may either be a stage_type object, the name of a stage_type, the rank of a
-   * stage_type or NULL.  NULL should only be used when the current stage_type only has one "next"
-   * stage_type, otherwise an exception will be thrown.
-   * @param mixed $stage_type A rank, name or stage_type record
-   * @param boolean $unprepared Whether the stage must be prepared (set to NULL for the stage_type's default)
-   * @access public
-   */
-  protected function create_reviews()
-  {
-    $review_class_name = lib::get_class_name( 'database\review' );
-    foreach( $review_class_name::get_enum_values( 'type' ) as $type )
-    {
-      $db_review = lib::create( 'database\review' );
-      $db_review->reqn_id = $this->id;
-      $db_review->type = $type;
-      $db_review->save();
-    }
   }
 
   /**
@@ -325,12 +299,20 @@ class reqn extends \cenozo\database\record
     $db_stage->unprepared = is_null( $unprepared ) ? $db_stage_type->preparation_required : $unprepared;
     $db_stage->save();
 
-    // if we have just entered the admin review stage then set the identifier
+    // if we have just entered the admin review stage then set the identifier and create all reviews
     if( 'Admin Review' == $db_stage_type->name )
     {
       $base = $this->get_deadline()->date->format( 'ym' );
       $this->identifier = $this->get_deadline()->get_next_identifier();
       $this->save();
+
+      foreach( $review_class_name::get_enum_values( 'type' ) as $type )
+      {
+        $db_new_review = lib::create( 'database\review' );
+        $db_new_review->reqn_id = $this->id;
+        $db_new_review->type = $type;
+        $db_new_review->save();
+      }
     }
 
     // update the admin/sac/chair reviewer if it isn't already set
