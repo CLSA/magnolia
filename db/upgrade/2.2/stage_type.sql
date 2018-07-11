@@ -23,7 +23,7 @@ INSERT IGNORE INTO stage_type( phase, rank, name, status, preparation_required )
 ( "Review", 6, "DSAC Decision", "Under Review", 0 ),
 ( "Review", 7, "SMT Review", "Under Review", 0 ),
 ( "Review", 8, "Not Approved", "Notice of Decision", 0 ),
-( "Review", 9, "Conditionally Approved", "Notice of Decision", 0 ),
+( "Review", 9, "Revise and Resubmit", "Notice of Decision", 0 ),
 ( "Agreement", 10, "Approved", "Agreement in Preparation", 1 ),
 ( "Agreement", 11, "Data Release", "Preparing Data", 0 ),
 ( "Agreement", 12, "Active", "Active", 0 ),

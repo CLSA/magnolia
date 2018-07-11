@@ -18,7 +18,7 @@ define( function() {
       identifier: { column: 'reqn.identifier', title: 'Requisition' },
       type: { title: 'Type' },
       user_full_name: { title: 'Reviewer' },
-      recommendation: { title: 'Recomendation' }
+      recommendation: { title: 'Recommendation' }
     },
     defaultOrder: {
       column: 'id',
@@ -49,7 +49,7 @@ define( function() {
       }
     },
     recommendation: {
-      title: 'Recomendation',
+      title: 'Recommendation',
       type: 'enum',
       exclude: 'add'
     },

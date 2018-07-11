@@ -288,6 +288,7 @@ class reqn extends \cenozo\database\record
     if( !is_null( $db_last_stage ) )
     {
       $db_last_stage->user_id = $db_user->id;
+      $db_last_stage->datetime = util::get_datetime_object();
       $db_last_stage->save();
     }
 
@@ -295,7 +296,6 @@ class reqn extends \cenozo\database\record
     $db_stage = lib::create( 'database\stage' );
     $db_stage->reqn_id = $this->id;
     $db_stage->stage_type_id = $db_stage_type->id;
-    $db_stage->datetime = util::get_datetime_object();
     $db_stage->unprepared = is_null( $unprepared ) ? $db_stage_type->preparation_required : $unprepared;
     $db_stage->save();
 

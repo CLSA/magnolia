@@ -210,8 +210,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
       title: 'Approved',
       operation: function( $state, model ) { model.viewModel.decide( 'yes' ); }
     }, {
-      title: 'Conditional',
-      operation: function( $state, model ) { model.viewModel.decide( 'conditional' ); }
+      title: 'Revise and Resubmit',
+      operation: function( $state, model ) { model.viewModel.decide( 'revise' ); }
     }, {
       title: 'Not Approved',
       operation: function( $state, model ) { model.viewModel.decide( 'no' ); }
@@ -837,7 +837,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           return CnModalConfirmFactory.instance( {
             message: 'Are you sure you wish to mark the ' + this.parentModel.module.name.singular + ' as ' + (
               'yes' == decision ? 'approved' :
-              'conditional' == decision ? 'conditionally approved' :
+              'revise' == decision ? 'revise and resubmit' :
               'not approved'
             ) + '?'
           } ).show().then( function( response ) {

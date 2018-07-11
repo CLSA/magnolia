@@ -102,7 +102,7 @@ class patch extends \cenozo\service\patch
         else
         {
           $approve = $this->get_argument( 'approve' );
-          if( !in_array( $approve, array( 'yes', 'conditional', 'no' ) ) )
+          if( !in_array( $approve, array( 'yes', 'revise', 'no' ) ) )
           {
             $this->set_data( 'Invalid approve type.' );
             $code = 400;
@@ -225,7 +225,7 @@ class patch extends \cenozo\service\patch
         $approve = $this->get_argument( 'approve' );
         $stage_type = NULL;
         if( 'yes' == $approve ) $stage_type = 'Approved';
-        else if( 'conditional' == $approve ) $stage_type = 'Conditionally Approved';
+        else if( 'revise' == $approve ) $stage_type = 'Revise and Resubmit';
         else if( 'no' == $approve ) $stage_type = 'Not Approved';
         $db_reqn->add_to_stage( $stage_type );
 
