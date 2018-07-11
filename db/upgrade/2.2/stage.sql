@@ -28,7 +28,6 @@ CREATE PROCEDURE patch_stage()
           "stage_type_id INT UNSIGNED NOT NULL, ",
           "user_id INT UNSIGNED NULL DEFAULT NULL, ",
           "datetime DATETIME NOT NULL, ",
-          "unprepared TINYINT(1) NOT NULL DEFAULT 0, ",
           "PRIMARY KEY (id), ",
           "INDEX fk_reqn_id (reqn_id ASC), ",
           "INDEX fk_stage_type_id (stage_type_id ASC), ",
@@ -60,27 +59,3 @@ DELIMITER ;
 
 CALL patch_stage();
 DROP PROCEDURE IF EXISTS patch_stage;
-
-DELIMITER $$
-
-DROP TRIGGER IF EXISTS stage_AFTER_INSERT $$
-CREATE DEFINER = CURRENT_USER TRIGGER stage_AFTER_INSERT AFTER INSERT ON stage FOR EACH ROW
-BEGIN
-  CALL update_reqn_last_stage( NEW.reqn_id );
-END$$
-
-
-DROP TRIGGER IF EXISTS stage_AFTER_UPDATE $$
-CREATE DEFINER = CURRENT_USER TRIGGER stage_AFTER_UPDATE AFTER UPDATE ON stage FOR EACH ROW
-BEGIN
-  CALL update_reqn_last_stage( NEW.reqn_id );
-END$$
-
-
-DROP TRIGGER IF EXISTS stage_AFTER_DELETE $$
-CREATE DEFINER = CURRENT_USER TRIGGER stage_AFTER_DELETE AFTER DELETE ON stage FOR EACH ROW
-BEGIN
-  CALL update_reqn_last_stage( OLD.reqn_id );
-END$$
-
-DELIMITER ;

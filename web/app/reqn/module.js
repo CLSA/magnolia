@@ -42,12 +42,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         title: 'Stage',
         type: 'string',
         isIncluded: function( $state, model ) { return !model.isApplicant(); }
-      },
-      unprepared: {
-        column: 'stage.unprepared',
-        title: 'Prep Required',
-        type: 'boolean',
-        isIncluded: function( $state, model ) { return !model.isApplicant(); }
       }
     },
     defaultOrder: {
@@ -75,12 +69,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     state: {
       title: 'State',
       type: 'enum',
-      constant: true,
-      exclude: true // modified in the model
-    },
-    unprepared: {
-      title: 'Preparation Required',
-      type: 'string',
       constant: true,
       exclude: true // modified in the model
     },
@@ -180,10 +168,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
       title: 'Defer to Applicant',
       isIncluded: function( $state, model ) { return model.viewModel.showDefer(); },
       operation: function( $state, model ) { model.viewModel.defer(); }
-    }, {
-      title: 'Mark as Prepared',
-      isIncluded: function( $state, model ) { return model.viewModel.showPrepare(); },
-      operation: function( $state, model ) { model.viewModel.prepare(); }
     }, {
       title: 'Reject',
       isIncluded: function( $state, model ) { return model.viewModel.showReject(); },
@@ -797,7 +781,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         this.showNextStage = function() {
           return this.parentModel.isAdministrator() &&
                  !this.record.state && (
-                   ( 'review' == this.record.phase && 'SMT Review' != this.record.stage_type ) ||
+                   'review' == this.record.phase ||
                    ( 'agreement' == this.record.phase && 'Report Required' != this.record.stage_type )
                  );
         };
@@ -830,7 +814,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         this.showDecide = function() {
           return this.parentModel.getEditEnabled() &&
                  this.parentModel.isAdministrator() &&
-                 'SMT Review' == this.record.stage_type &&
+                 false && // TODO: change this for reviewers and SMT
                  !this.record.state;
         };
         this.decide = function( decision ) {
@@ -926,18 +910,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           } );
         };
 
-        this.showPrepare = function() {
-          return this.parentModel.isAdministrator() && 'Yes' == this.record.unprepared && !this.record.state;
-        };
-        this.prepare = function() {
-          return CnHttpFactory.instance( {
-            path: this.parentModel.getServiceResourcePath() + "?action=prepare"
-          } ).patch().then( function() {
-            self.record.unprepared = 'No';
-            return self.stageModel.listModel.onList( true );
-          } );
-        };
-
         this.onView = function( force ) {
           // reset tab values
           this.setTab( 0, this.parentModel.getQueryParameter( 't0' ), false );
@@ -987,7 +959,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           var mainInputGroup = module.inputGroupList.findByProperty( 'title', '' );
           mainInputGroup.inputList.stage_type.exclude = false;
           mainInputGroup.inputList.state.exclude = false;
-          mainInputGroup.inputList.unprepared.exclude = false;
         }
 
         this.getEditEnabled = function() {

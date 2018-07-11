@@ -24,12 +24,7 @@ define( function() {
       datetime: {
         title: 'Date & Time',
         type: 'datetime'
-      },
-      unprepared: {
-        title: 'Prep Required',
-        type: 'boolean'
-      },
-
+      }
     },
     defaultOrder: {
       column: 'datetime',

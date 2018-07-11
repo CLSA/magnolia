@@ -19,7 +19,7 @@ class post extends \cenozo\service\post
 
     $reference_class_name = lib::get_class_name( 'database\reference' );
 
-    // if the rank isn't set then make it the last
+    // if the reference's rank isn't set then make it the last
     $db_reference = $this->get_leaf_record();
     if( is_null( $db_reference->rank ) )
     {

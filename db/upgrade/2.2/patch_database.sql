@@ -34,9 +34,7 @@ SOURCE production.sql
 SOURCE stage_type.sql
 SOURCE stage_type_has_stage_type.sql
 SOURCE stage.sql
-SOURCE reqn_last_stage.sql
 
-SOURCE update_reqn_last_stage.sql
 SOURCE update_version_number.sql
 
 COMMIT;

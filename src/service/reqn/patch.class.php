@@ -44,9 +44,9 @@ class patch extends \cenozo\service\patch
       $applicant = 'applicant' == $db_role->name;
       $administrator = 'administrator' == $db_role->name;
       $db_reqn = $this->get_leaf_record();
-      $db_last_stage_type = $db_reqn->get_last_stage_type();
+      $db_current_stage_type = $db_reqn->get_current_stage_type();
       $state = $db_reqn->state;
-      $phase = $db_last_stage_type->phase;
+      $phase = $db_current_stage_type->phase;
       $code = NULL;
       if( 'abandon' == $action )
       {
@@ -59,10 +59,6 @@ class patch extends \cenozo\service\patch
       else if( 'reactivate' == $action )
       {
         if( !$administrator || ( 'abandoned' != $state && 'rejected' != $state ) ) $code = 403;
-      }
-      else if( 'prepare' == $action )
-      {
-        if( !$administrator || !is_null( $state ) ) $code = 403;
       }
       else if( 'reject' == $action )
       {
@@ -90,15 +86,15 @@ class patch extends \cenozo\service\patch
         if( $administrator )
         {
           if( !is_null( $state ) || (
-            ( 'review' != $phase || 'SMT Review' == $db_last_stage_type->name ) &&
-            ( 'agreement' != $phase || 'Report Required' == $db_last_stage_type->name )
+            ( 'review' != $phase || 'SMT Review' == $db_current_stage_type->name ) &&
+            ( 'agreement' != $phase || 'Report Required' == $db_current_stage_type->name )
           ) ) $code = 403;
         }
         else $code = 403;
       }
       else if( 'decide' == $action )
       {
-        if( !$administrator || 'SMT Review' != $db_last_stage_type->name ) $code = 403;
+        if( !$administrator || 'SMT Review' != $db_current_stage_type->name ) $code = 403;
         else
         {
           $approve = $this->get_argument( 'approve' );
@@ -166,12 +162,6 @@ class patch extends \cenozo\service\patch
         $db_reqn->state = NULL;
         $db_reqn->save();
       }
-      else if( 'prepare' == $action )
-      {
-        $db_last_stage = $db_reqn->get_last_stage();
-        $db_last_stage->unprepared = false;
-        $db_last_stage->save();
-      }
       else if( 'reject' == $action )
       {
         $db_reqn->state = 'rejected';
@@ -201,8 +191,8 @@ class patch extends \cenozo\service\patch
       }
       else if( 'next_stage' == $action )
       {
-        $db_last_stage_type = $db_reqn->get_last_stage_type();
-        if( 'DSAC Decision' == $db_last_stage_type->name )
+        $db_current_stage_type = $db_reqn->get_current_stage_type();
+        if( 'DSAC Decision' == $db_current_stage_type->name )
         {
           // determine the next stage based on the chair's recommendation
           $review_sel = lib::create( 'database\select' );

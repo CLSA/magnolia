@@ -89,13 +89,12 @@ class module extends \cenozo\service\module
       }
     }
 
-    if( $select->has_column( 'unprepared' ) )
-      $select->add_column( 'IF( stage.unprepared, "Yes", "No" )', 'unprepared', false );
-
     if( $select->has_table_columns( 'stage_type' ) )
     {
-      $modifier->join( 'reqn_last_stage', 'reqn.id', 'reqn_last_stage.reqn_id' );
-      $modifier->join( 'stage', 'reqn_last_stage.stage_id', 'stage.id' );
+      $join_mod = lib::create( 'database\modifier' );
+      $join_mod->where( 'reqn.id', '=', 'stage.reqn_id', false );
+      $join_mod->where( 'stage.datetime', '=', NULL );
+      $modifier->join_modifier( 'stage', $join_mod );
       $modifier->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
 
       if( $select->has_table_column( 'stage_type', 'status' ) )

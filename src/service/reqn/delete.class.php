@@ -13,12 +13,22 @@ class delete extends \cenozo\service\delete
   /**
    * Extends parent method
    */
+  protected function prepare()
+  {
+    parent::prepare();
+
+    $db_current_stage_type = $this->get_leaf_record()->get_current_stage_type();
+    if( !is_null( $db_current_stage_type ) ) $this->rank = $db_current_stage_type->rank;
+  }
+
+  /**
+   * Extends parent method
+   */
   protected function validate()
   {
     parent::validate();
 
-    $db_reqn = $this->get_leaf_record();
-    if( 1 < $db_reqn->get_current_rank() )
+    if( 1 < $this->rank )
       throw lib::create( 'exception\notice', 'Requisitions cannot be deleted once they have been submitted.', __METHOD__ );
   }
 
@@ -30,11 +40,15 @@ class delete extends \cenozo\service\delete
     parent::setup();
 
     // if the reqn's stage has the first rank then delete that stage
-    $db_reqn = $this->get_leaf_record();
-    if( 1 == $db_reqn->get_current_rank() )
+    if( 1 == $this->rank )
     {
-      $db_last_stage = $db_reqn->get_last_stage();
-      $db_last_stage->delete();
+      $db_current_stage = $db_reqn->get_current_stage();
+      $db_current_stage->delete();
     }
   }
+
+  /**
+   * The reqn's current rank
+   */
+  private $rank = NULL;
 }
