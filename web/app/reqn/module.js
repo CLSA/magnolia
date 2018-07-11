@@ -204,7 +204,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
   module.addExtraOperationGroup( 'view', {
     title: 'Apply Decision',
-    classes: 'btn-primary',
+    classes: 'btn-success',
     isIncluded: function( $state, model ) { return model.viewModel.showDecide(); },
     operations: [ {
       title: 'Approved',
