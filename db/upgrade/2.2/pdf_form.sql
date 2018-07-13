@@ -16,3 +16,7 @@ CREATE TABLE IF NOT EXISTS pdf_form (
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
+
+INSERT IGNORE INTO pdf_form( pdf_form_type_id, version, active )
+SELECT id, "2018-07-01", true
+FROM pdf_form_type;

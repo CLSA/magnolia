@@ -8,23 +8,23 @@ CREATE TABLE IF NOT EXISTS stage_type (
   rank INT UNSIGNED NOT NULL,
   name VARCHAR(45) NOT NULL,
   status VARCHAR(45) NOT NULL,
+  decision TINYINT(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (id),
   UNIQUE INDEX uq_name (name ASC),
   UNIQUE INDEX uq_rank (rank ASC))
 ENGINE = InnoDB;
 
-INSERT IGNORE INTO stage_type( phase, rank, name, status ) VALUES
-( "New", 1, "New", "New" ),
-( "Review", 2, "Admin Review", "Under Review" ),
-( "Review", 3, "SAC Review", "Under Review" ),
-( "Review", 4, "DSAC Selection", "Under Review" ),
-( "Review", 5, "DSAC Review", "Under Review" ),
-( "Review", 6, "DSAC Decision", "Under Review" ),
-( "Review", 7, "SMT Review", "Under Review" ),
-( "Review", 8, "Not Approved", "Notice of Decision" ),
-( "Review", 9, "Revise and Resubmit", "Notice of Decision" ),
-( "Agreement", 10, "Approved", "Agreement in Preparation" ),
-( "Agreement", 11, "Data Release", "Preparing Data" ),
-( "Agreement", 12, "Active", "Active" ),
-( "Agreement", 13, "Report Required", "Report Required" ),
-( "Complete", 14, "Complete", "Complete" );
+INSERT IGNORE INTO stage_type( phase, rank, name, status, decision ) VALUES
+( "New", 1, "New", "New", 0 ),
+( "Review", 2, "Admin Review", "Under Review", 0 ),
+( "Review", 3, "SAC Review", "Under Review", 0 ),
+( "Review", 4, "DSAC Selection", "Under Review", 1 ),
+( "Review", 5, "DSAC Review", "Under Review", 0 ),
+( "Review", 6, "DSAC Decision", "Under Review", 1 ),
+( "Review", 7, "SMT Decision", "Under Review", 1 ),
+( "Review", 8, "Not Approved", "Notice of Decision", 0 ),
+( "Agreement", 9, "Approved", "Agreement in Preparation", 0 ),
+( "Agreement", 10, "Data Release", "Preparing Data", 0 ),
+( "Agreement", 11, "Active", "Active", 0 ),
+( "Agreement", 12, "Report Required", "Report Required", 0 ),
+( "Complete", 13, "Complete", "Complete", 0 );

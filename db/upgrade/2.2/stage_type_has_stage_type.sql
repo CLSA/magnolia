@@ -30,6 +30,13 @@ UNION
 
 SELECT stage_type.id, next_stage_type.id
 FROM stage_type, stage_type AS next_stage_type
+WHERE stage_type.name = "DSAC Selection"
+AND next_stage_type.name = "Not Approved"
+
+UNION
+
+SELECT stage_type.id, next_stage_type.id
+FROM stage_type, stage_type AS next_stage_type
 WHERE stage_type.name = "DSAC Decision"
 AND next_stage_type.name = "Approved"
 
@@ -37,8 +44,8 @@ UNION
 
 SELECT stage_type.id, next_stage_type.id
 FROM stage_type, stage_type AS next_stage_type
-WHERE stage_type.name = "SMT Review"
-AND next_stage_type.name IN( "Revise and Resubmit", "Approved" )
+WHERE stage_type.name = "SMT Decision"
+AND next_stage_type.name IN( "Not Approved", "Approved" )
 
 UNION
 

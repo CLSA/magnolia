@@ -7,6 +7,8 @@ SET AUTOCOMMIT=0;
 INSERT IGNORE INTO cenozo.role( name, tier, all_sites ) VALUES
 ( "administrator", 3, true ),
 ( "applicant", 1, false ),
-( "reviewer", 1, false );
+( "reviewer", 1, true ),
+( "chair", 1, true ),
+( "director", 1, true );
 
 COMMIT;

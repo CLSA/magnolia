@@ -18,7 +18,6 @@ SOURCE pdf_form_type.sql
 SOURCE pdf_form.sql
 SOURCE deadline.sql
 SOURCE reqn.sql
-SOURCE review.sql
 SOURCE reqn_note.sql
 SOURCE notification_type.sql
 SOURCE notification.sql
@@ -34,6 +33,9 @@ SOURCE production.sql
 SOURCE stage_type.sql
 SOURCE stage_type_has_stage_type.sql
 SOURCE stage.sql
+SOURCE review_type.sql
+SOURCE role_has_review_type.sql
+SOURCE review.sql
 
 SOURCE update_version_number.sql
 

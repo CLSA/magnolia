@@ -13,5 +13,4 @@ ENGINE = InnoDB;
 INSERT IGNORE INTO notification_type( name, message ) VALUES
 ( "Action required", "TODO: This will be the message sent to the applicant to indicate that an action is required." ),
 ( "Notice of decision", "TODO: This will be the message sent to the applicant to indicate that a decision has been made regarding their requisition." ),
-( "Progress report required", "TODO: This will be the message sent to the applicant to indicate that a progress report is required." ),
-( "Rejection", "TODO: This will be the message sent to the applicant to indicate that the requisition has been rejected." );
+( "Progress report required", "TODO: This will be the message sent to the applicant to indicate that a progress report is required." );

@@ -27,7 +27,7 @@ CREATE PROCEDURE patch_stage()
           "reqn_id INT UNSIGNED NOT NULL, ",
           "stage_type_id INT UNSIGNED NOT NULL, ",
           "user_id INT UNSIGNED NULL DEFAULT NULL, ",
-          "datetime DATETIME NOT NULL, ",
+          "datetime DATETIME NULL DEFAULT NULL, ",
           "PRIMARY KEY (id), ",
           "INDEX fk_reqn_id (reqn_id ASC), ",
           "INDEX fk_stage_type_id (stage_type_id ASC), ",
@@ -59,3 +59,32 @@ DELIMITER ;
 
 CALL patch_stage();
 DROP PROCEDURE IF EXISTS patch_stage;
+
+
+DELIMITER $$
+
+DROP TRIGGER IF EXISTS stage_AFTER_INSERT $$
+CREATE DEFINER = CURRENT_USER TRIGGER stage_AFTER_INSERT AFTER INSERT ON stage FOR EACH ROW
+BEGIN
+  -- create any review associated with the stage_type
+  INSERT IGNORE INTO review( create_timestamp, reqn_id, review_type_id )
+  SELECT NULL, NEW.reqn_id, review_type.id
+  FROM review_type
+  JOIN stage_type ON review_type.stage_type_id = stage_type.id
+  WHERE stage_type.id = NEW.stage_type_id;
+END$$
+
+DROP TRIGGER IF EXISTS stage_AFTER_DELETE $$
+CREATE DEFINER = CURRENT_USER TRIGGER stage_AFTER_DELETE AFTER DELETE ON stage FOR EACH ROW
+BEGIN
+  -- delete all reviews associated with the stage_type
+  DELETE FROM review
+  WHERE review_type_id IN (
+    SELECT review_type.id
+    FROM review_type
+    JOIN stage_type ON review_type.stage_type_id = stage_type.id
+    WHERE stage_type.id = OLD.stage_type_id
+  );
+END$$
+
+DELIMITER ;

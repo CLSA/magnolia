@@ -52,13 +52,17 @@ CREATE PROCEDURE patch_access()
       SET @sql = CONCAT(
         "INSERT IGNORE INTO access ",
         "( user_id, role_id, site_id ) ",
-        "SELECT access.user_id, access.role_id, site.id ",
-        "FROM ", @cenozo, ".site, ", @mastodon, ".access ",
-        "JOIN ", @cenozo, ".role ON access.role_id = role.id ",
-        "JOIN ", @cenozo, ".site AS asite ON access.site_id = asite.id ",
-        "WHERE site.name = 'NCC' ",
+        "SELECT user.id, role.id, site.id ",
+        "FROM ", @cenozo, ".user, ", @cenozo, ".site, ", @cenozo, ".role ",
+        "WHERE user.name IN ( 'cheesem', 'imolnar', 'langss', 'patrick' ) ",
+        "AND role.name IN( 'administrator', 'applicant', 'chair', 'director', 'reviewer' ) ",
+        "AND site.name = 'NCC' ",
+        "UNION ",
+        "SELECT user.id, role.id, site.id ",
+        "FROM ", @cenozo, ".user, ", @cenozo, ".site, ", @cenozo, ".role ",
+        "WHERE user.name = 'cenozo' ",
         "AND role.name = 'administrator' ",
-        "AND asite.name = 'Sherbrooke CATI'" );
+        "AND site.name = 'NCC'" );
       PREPARE statement FROM @sql;
       EXECUTE statement;
       DEALLOCATE PREPARE statement;

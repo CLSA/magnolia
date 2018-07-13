@@ -58,11 +58,7 @@ class patch extends \cenozo\service\patch
       }
       else if( 'reactivate' == $action )
       {
-        if( !$administrator || ( 'abandoned' != $state && 'rejected' != $state ) ) $code = 403;
-      }
-      else if( 'reject' == $action )
-      {
-        if( !$administrator || ( 'review' != $phase && 'deferred' != $state ) ) $code = 403;
+        if( !$administrator || 'abandoned' != $state ) $code = 403;
       }
       else if( 'submit' == $action )
       {
@@ -86,7 +82,7 @@ class patch extends \cenozo\service\patch
         if( $administrator )
         {
           if( !is_null( $state ) || (
-            ( 'review' != $phase || 'SMT Review' == $db_current_stage_type->name ) &&
+            ( 'review' != $phase || 'SMT Decision' == $db_current_stage_type->name ) &&
             ( 'agreement' != $phase || 'Report Required' == $db_current_stage_type->name )
           ) ) $code = 403;
         }
@@ -94,16 +90,7 @@ class patch extends \cenozo\service\patch
       }
       else if( 'decide' == $action )
       {
-        if( !$administrator || 'SMT Review' != $db_current_stage_type->name ) $code = 403;
-        else
-        {
-          $approve = $this->get_argument( 'approve' );
-          if( !in_array( $approve, array( 'yes', 'revise', 'no' ) ) )
-          {
-            $this->set_data( 'Invalid approve type.' );
-            $code = 400;
-          }
-        }
+        if( !$administrator || !$db_current_stage_type->decision ) $code = 403;
       }
       else
       {
@@ -162,20 +149,6 @@ class patch extends \cenozo\service\patch
         $db_reqn->state = NULL;
         $db_reqn->save();
       }
-      else if( 'reject' == $action )
-      {
-        $db_reqn->state = 'rejected';
-        $db_reqn->save();
-
-        // send a notification
-        $db_notification = lib::create( 'database\notification' );
-        $db_notification->reqn_id = $db_reqn->id;
-        $db_notification->notification_type_id =
-          $notification_type_class_name::get_unique_record( 'name', 'Rejection' )->id;
-        $db_notification->email = $db_reqn->applicant_email;
-        $db_notification->datetime = util::get_datetime_object();
-        $db_notification->save();
-      }
       else if( 'submit' == $action )
       {
         if( 'deferred' == $db_reqn->state )
@@ -201,7 +174,7 @@ class patch extends \cenozo\service\patch
           $review_mod->where( 'type', '=', 'Chair' );
           $review_list = $db_reqn->get_review_list( $review_sel, $review_mod );
           $recommendation = current( $review_list )['recommendation'];
-          $stage_type = 'Approved' == $recommendation ? 'Approved' : 'SMT Review';
+          $stage_type = 'Approved' == $recommendation ? 'Approved' : 'SMT Decision';
           $db_reqn->add_to_stage( $stage_type );
         }
         else
@@ -212,11 +185,7 @@ class patch extends \cenozo\service\patch
       }
       else if( 'decide' == $action )
       {
-        $approve = $this->get_argument( 'approve' );
-        $stage_type = NULL;
-        if( 'yes' == $approve ) $stage_type = 'Approved';
-        else if( 'revise' == $approve ) $stage_type = 'Revise and Resubmit';
-        else if( 'no' == $approve ) $stage_type = 'Not Approved';
+        $stage_type = $this->get_argument( 'approve' ) ? 'Approved' : 'Not Approved';
         $db_reqn->add_to_stage( $stage_type );
 
         // send a notification

@@ -76,6 +76,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     // the following are for the form and will not appear in the view
     phase: { column: 'stage_type.phase', type: 'string', exclude: true },
     status: { column: 'stage_type.status', type: 'string', exclude: true },
+    decision: { column: 'stage_type.decision', type: 'boolean', exclude: true },
     language: { type: 'string', column: 'language.code', exclude: true },
     deadline: { type: 'date', column: 'deadline.date', exclude: true },
     applicant_name: { type: 'string', exclude: true },
@@ -160,23 +161,18 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     }
   } );
 
-  module.addExtraOperationGroup( 'view', {
-    title: 'Special Operation',
+  module.addExtraOperation( 'view', {
+    title: 'Defer to Applicant',
     classes: 'btn-warning',
-    isIncluded: function( $state, model ) { return model.viewModel.showDefer() || model.viewModel.showReject(); },
-    operations: [ {
-      title: 'Defer to Applicant',
-      isIncluded: function( $state, model ) { return model.viewModel.showDefer(); },
-      operation: function( $state, model ) { model.viewModel.defer(); }
-    }, {
-      title: 'Reject',
-      isIncluded: function( $state, model ) { return model.viewModel.showReject(); },
-      operation: function( $state, model ) { model.viewModel.reject(); }
-    }, {
-      title: 'Re-activate',
-      isIncluded: function( $state, model ) { return model.viewModel.showReactivate(); },
-      operation: function( $state, model ) { model.viewModel.reactivate(); }
-    } ]
+    isIncluded: function( $state, model ) { return model.viewModel.showDefer(); },
+    operation: function( $state, model ) { model.viewModel.defer(); }
+  } );
+  
+  module.addExtraOperation( 'view', {
+    title: 'Re-activate',
+    classes: 'btn-warning',
+    isIncluded: function( $state, model ) { return model.viewModel.showReactivate(); },
+    operation: function( $state, model ) { model.viewModel.reactivate(); }
   } );
 
   module.addExtraOperation( 'view', {
@@ -192,13 +188,32 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     isIncluded: function( $state, model ) { return model.viewModel.showDecide(); },
     operations: [ {
       title: 'Approved',
-      operation: function( $state, model ) { model.viewModel.decide( 'yes' ); }
-    }, {
-      title: 'Revise and Resubmit',
-      operation: function( $state, model ) { model.viewModel.decide( 'revise' ); }
+      isIncluded: function( $state, model ) {
+        return angular.isDefined( model.viewModel.record.stage_type ) &&
+               'Decision' == model.viewModel.record.stage_type.split( ' ' )[1];
+      },
+      operation: function( $state, model ) { model.viewModel.decide( 1 ); }
     }, {
       title: 'Not Approved',
-      operation: function( $state, model ) { model.viewModel.decide( 'no' ); }
+      isIncluded: function( $state, model ) {
+        return angular.isDefined( model.viewModel.record.stage_type ) &&
+               'Decision' == model.viewModel.record.stage_type.split( ' ' )[1];
+      },
+      operation: function( $state, model ) { model.viewModel.decide( 0 ); }
+    }, {
+      title: 'Proceed',
+      isIncluded: function( $state, model ) {
+        return angular.isDefined( model.viewModel.record.stage_type ) &&
+               'DSAC Selection' == model.viewModel.record.stage_type;
+      },
+      operation: function( $state, model ) { model.viewModel.nextStage(); }
+    }, {
+      title: 'Reject',
+      isIncluded: function( $state, model ) {
+        return angular.isDefined( model.viewModel.record.stage_type ) &&
+               'DSAC Selection' == model.viewModel.record.stage_type;
+      },
+      operation: function( $state, model ) { model.viewModel.decide( 0 ); }
     } ]
   } );
 
@@ -450,9 +465,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnReqnViewFactory', [
     'CnBaseViewFactory', 'CnCoapplicantModelFactory', 'CnReferenceModelFactory',
-    'CnHttpFactory', 'CnModalMessageFactory', 'CnModalConfirmFactory', '$q',
+    'CnSession', 'CnHttpFactory', 'CnModalMessageFactory', 'CnModalConfirmFactory', '$q',
     function( CnBaseViewFactory, CnCoapplicantModelFactory, CnReferenceModelFactory,
-              CnHttpFactory, CnModalMessageFactory, CnModalConfirmFactory, $q ) {
+              CnSession, CnHttpFactory, CnModalMessageFactory, CnModalConfirmFactory, $q ) {
       var object = function( parentModel, root ) {
         var self = this;
         CnBaseViewFactory.construct( this, parentModel, root );
@@ -689,12 +704,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           return add ? http.post() : http.delete();
         };
 
-        this.showDelete = function() {
-          return 'new' == this.record.phase && this.parentModel.getEditEnabled();
-        };
-
         this.showSubmit = function() {
-          return this.parentModel.isApplicant() && (
+          return 'applicant' == CnSession.role.name && (
             'new' == this.record.phase || 'deferred' == this.record.state
           ) && this.parentModel.getEditEnabled();
         };
@@ -779,7 +790,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         };
 
         this.showNextStage = function() {
-          return this.parentModel.isAdministrator() &&
+          return 'administrator' == CnSession.role.name &&
+                 !this.record.decision &&
                  !this.record.state && (
                    'review' == this.record.phase ||
                    ( 'agreement' == this.record.phase && 'Report Required' != this.record.stage_type )
@@ -796,7 +808,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           } ).show().then( function( response ) {
             if( response ) {
               return CnHttpFactory.instance( {
-                path: self.parentModel.getServiceResourcePath() + "?action=next_stage"
+                path: self.parentModel.getServiceResourcePath() + "?action=next_stage",
               } ).patch().then( function() {
                 self.transitionOnViewParent();
               } );
@@ -813,43 +825,20 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
         this.showDecide = function() {
           return this.parentModel.getEditEnabled() &&
-                 this.parentModel.isAdministrator() &&
-                 false && // TODO: change this for reviewers and SMT
-                 !this.record.state;
+                 'administrator' == CnSession.role.name &&
+                 !this.record.state &&
+                 this.record.decision;
         };
         this.decide = function( decision ) {
           return CnModalConfirmFactory.instance( {
-            message: 'Are you sure you wish to mark the ' + this.parentModel.module.name.singular + ' as ' + (
-              'yes' == decision ? 'approved' :
-              'revise' == decision ? 'revise and resubmit' :
-              'not approved'
-            ) + '?'
+            message: 'Are you sure you wish to ' + ( decision ? 'approve' : 'reject' ) +
+              ' the ' + this.parentModel.module.name.singular + '?'
           } ).show().then( function( response ) {
             if( response ) {
               return CnHttpFactory.instance( {
                 path: self.parentModel.getServiceResourcePath() + "?action=decide&approve=" + decision
               } ).patch().then( function() {
                 self.transitionOnViewParent();
-              } );
-            }
-          } );
-        };
-
-        this.showReject = function() {
-          return this.parentModel.isAdministrator() &&
-                 'rejected' != this.record.state &&
-                 ( 'review' == this.record.phase || 'deferred' == this.record.state );
-        };
-        this.reject = function() {
-          return CnModalConfirmFactory.instance( {
-            message: 'Please ensure that rejection information is ready for the applicant before proceeding.' +
-                     '\n\nDo you wish to proceed?'
-          } ).show().then( function( response ) {
-            if( response ) {
-              return CnHttpFactory.instance( {
-                path: self.parentModel.getServiceResourcePath() + "?action=reject"
-              } ).patch().then( function() {
-                self.record.state = 'rejected';
               } );
             }
           } );
@@ -892,13 +881,12 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         };
 
         this.showReactivate = function() {
-          return this.parentModel.isAdministrator() &&
-                 ( 'abandoned' == this.record.state || 'rejected' == this.record.state );
+          return 'administrator' == CnSession.role.name && 'abandoned' == this.record.state;
         };
         this.reactivate = function() {
           return CnModalConfirmFactory.instance( {
             message: 'Are you sure you want to re-activate the ' + this.parentModel.module.name.singular + '?' +
-              '\n\nThis will return to its previous "' + this.parentModel.viewModel.record.stage_type + '" stage.'
+              '\n\nThe applicant will be notified that it has been re-activated and they will be able to re-submit for review.'
           } ).show().then( function( response ) {
             if( response ) {
               return CnHttpFactory.instance( {
@@ -942,7 +930,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         this.listModel = CnReqnListFactory.instance( this );
         this.viewModel = CnReqnViewFactory.instance( this, root );
 
-        // override the service collection path so that applicants can view their requisitions from the home screen
+        // override the service collection path so that applicants can view their reqns from the home screen
         this.getServiceCollectionPath = function() {
           // ignore the parent if it is root
           return this.$$getServiceCollectionPath( 'root' == this.getSubjectFromState() );
@@ -953,9 +941,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         module.inputGroupList.forEach( group => Object.assign( self.inputList, group.inputList ) );
 
         this.isApplicant = function() { return 'applicant' == CnSession.role.name; }
-        this.isAdministrator = function() { return 'administrator' == CnSession.role.name; }
 
-        if( this.isAdministrator() ) {
+        if( 'administrator' == CnSession.role.name ) {
           var mainInputGroup = module.inputGroupList.findByProperty( 'title', '' );
           mainInputGroup.inputList.stage_type.exclude = false;
           mainInputGroup.inputList.state.exclude = false;
@@ -969,6 +956,12 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                         ? 'new' == phase || ( 'review' == phase && !this.viewModel.record.state )
                         : false;
           return this.$$getEditEnabled() && roleCheck;
+        };
+
+        this.getDeleteEnabled = function() {
+          return this.$$getDeleteEnabled() &&
+                 angular.isDefined( this.listModel.record ) &&
+                 'new' == this.listModel.record.phase;
         };
 
         // override transitionToAddState

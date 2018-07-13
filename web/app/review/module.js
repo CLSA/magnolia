@@ -16,7 +16,7 @@ define( function() {
     },
     columnList: {
       identifier: { column: 'reqn.identifier', title: 'Requisition' },
-      type: { title: 'Type' },
+      review_type: { column: 'review_type.name', title: 'Type' },
       user_full_name: { title: 'Reviewer' },
       recommendation: { title: 'Recommendation' }
     },

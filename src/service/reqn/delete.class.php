@@ -42,7 +42,7 @@ class delete extends \cenozo\service\delete
     // if the reqn's stage has the first rank then delete that stage
     if( 1 == $this->rank )
     {
-      $db_current_stage = $db_reqn->get_current_stage();
+      $db_current_stage = $this->get_leaf_record()->get_current_stage();
       $db_current_stage->delete();
     }
   }

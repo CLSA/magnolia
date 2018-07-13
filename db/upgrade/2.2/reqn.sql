@@ -20,7 +20,7 @@ CREATE PROCEDURE patch_reqn()
         "language_id INT UNSIGNED NOT NULL, ",
         "deadline_id INT UNSIGNED NOT NULL, ",
         "identifier VARCHAR(45) NOT NULL, ",
-        "state ENUM('deferred', 'rejected', 'abandoned') NULL DEFAULT NULL, ",
+        "state ENUM('deferred', 'abandoned') NULL DEFAULT NULL, ",
         "applicant_name VARCHAR(63) NULL, ",
         "applicant_position VARCHAR(255) NULL, ",
         "applicant_affiliation VARCHAR(255) NULL, ",
