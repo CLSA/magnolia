@@ -19,6 +19,8 @@ class stage extends \cenozo\database\record
    */
   public function check_if_complete()
   {
+    $stage_type_class_name = lib::get_class_name( 'database\stage_type' );
+
     $db_stage_type = $this->get_stage_type();
     $review_list = $this->get_review_list();
 
