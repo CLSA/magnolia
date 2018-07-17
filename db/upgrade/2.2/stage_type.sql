@@ -15,16 +15,16 @@ CREATE TABLE IF NOT EXISTS stage_type (
 ENGINE = InnoDB;
 
 INSERT IGNORE INTO stage_type( phase, rank, name, status, decision ) VALUES
-( "New", 1, "New", "New", 0 ),
-( "Review", 2, "Admin Review", "Under Review", 0 ),
-( "Review", 3, "SAC Review", "Under Review", 0 ),
-( "Review", 4, "DSAC Selection", "Under Review", 1 ),
-( "Review", 5, "DSAC Review", "Under Review", 0 ),
-( "Review", 6, "DSAC Decision", "Under Review", 1 ),
-( "Review", 7, "SMT Decision", "Under Review", 1 ),
-( "Review", 8, "Not Approved", "Notice of Decision", 0 ),
-( "Agreement", 9, "Approved", "Agreement in Preparation", 0 ),
-( "Agreement", 10, "Data Release", "Preparing Data", 0 ),
-( "Agreement", 11, "Active", "Active", 0 ),
-( "Agreement", 12, "Report Required", "Report Required", 0 ),
-( "Complete", 13, "Complete", "Complete", 0 );
+( "new", 1, "New", "New", 0 ),
+( "review", 2, "Admin Review", "Under Review", 0 ),
+( "review", 3, "SAC Review", "Under Review", 0 ),
+( "review", 4, "DSAC Selection", "Under Review", 1 ),
+( "review", 5, "DSAC Review", "Under Review", 0 ),
+( "review", 6, "DSAC Decision", "Under Review", 1 ),
+( "review", 7, "SMT Decision", "Under Review", 1 ),
+( "agreement", 8, "Approved", "Agreement in Preparation", 0 ),
+( "agreement", 9, "Data Release", "Preparing Data", 0 ),
+( "agreement", 10, "Active", "Active", 0 ),
+( "agreement", 11, "Report Required", "Report Required", 0 ),
+( "complete", 12, "Not Approved", "Not Approved", 0 ),
+( "complete", 13, "Complete", "Complete", 0 );

@@ -14,9 +14,6 @@ CREATE PROCEDURE patch_reqn()
         "update_timestamp TIMESTAMP NOT NULL, ",
         "create_timestamp TIMESTAMP NOT NULL, ",
         "user_id INT UNSIGNED NOT NULL, ",
-        "chair_user_id INT UNSIGNED NULL, ",
-        "reviewer1_user_id INT UNSIGNED NULL, ",
-        "reviewer2_user_id INT UNSIGNED NULL, ",
         "language_id INT UNSIGNED NOT NULL, ",
         "deadline_id INT UNSIGNED NOT NULL, ",
         "identifier VARCHAR(45) NOT NULL, ",
@@ -55,15 +52,16 @@ CREATE PROCEDURE patch_reqn()
         "physical_comment TEXT NULL, ",
         "biomarker TINYINT(1) NOT NULL DEFAULT 0, ",
         "biomarker_comment TEXT NULL, ",
-        "deferral_note_part1_a1 TEXT NULL DEFAULT NULL, "
-        "deferral_note_part1_a2 TEXT NULL DEFAULT NULL, "
-        "deferral_note_part1_a3 TEXT NULL DEFAULT NULL, "
-        "deferral_note_part1_a4 TEXT NULL DEFAULT NULL, "
-        "deferral_note_part1_a5 TEXT NULL DEFAULT NULL, "
-        "deferral_note_part1_a6 TEXT NULL DEFAULT NULL, "
-        "deferral_note_part2_a TEXT NULL DEFAULT NULL, "
-        "deferral_note_part2_b TEXT NULL DEFAULT NULL, "
-        "deferral_note_part2_c TEXT NULL DEFAULT NULL, "
+        "decision_notice TEXT NULL DEFAULT NULL, ",
+        "deferral_note_part1_a1 TEXT NULL DEFAULT NULL, ",
+        "deferral_note_part1_a2 TEXT NULL DEFAULT NULL, ",
+        "deferral_note_part1_a3 TEXT NULL DEFAULT NULL, ",
+        "deferral_note_part1_a4 TEXT NULL DEFAULT NULL, ",
+        "deferral_note_part1_a5 TEXT NULL DEFAULT NULL, ",
+        "deferral_note_part1_a6 TEXT NULL DEFAULT NULL, ",
+        "deferral_note_part2_a TEXT NULL DEFAULT NULL, ",
+        "deferral_note_part2_b TEXT NULL DEFAULT NULL, ",
+        "deferral_note_part2_c TEXT NULL DEFAULT NULL, ",
         "PRIMARY KEY (id), ",
         "INDEX fk_user_id (user_id ASC), ",
         "INDEX fk_chair_user_id (chair_user_id ASC), ",

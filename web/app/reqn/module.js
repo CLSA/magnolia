@@ -115,42 +115,46 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     biomarker_comment: { type: 'text', exclude: true },
   } );
 
-  module.addInputGroup( 'Deferral Notes', {
+  module.addInputGroup( 'Decision and Deferral Notes', {
+    decision_notice: {
+      title: 'Notice of Desision',
+      type: 'text'
+    },
     deferral_note_part1_a1: {
       title: 'Part1 A1',
-      type: 'text',
+      type: 'text'
     },
     deferral_note_part1_a2: {
       title: 'Part1 A2',
-      type: 'text',
+      type: 'text'
     },
     deferral_note_part1_a3: {
       title: 'Part1 A3',
-      type: 'text',
+      type: 'text'
     },
     deferral_note_part1_a4: {
       title: 'Part1 A4',
-      type: 'text',
+      type: 'text'
     },
     deferral_note_part1_a5: {
       title: 'Part1 A5',
-      type: 'text',
+      type: 'text'
     },
     deferral_note_part1_a6: {
       title: 'Part1 A6',
-      type: 'text',
+      type: 'text'
     },
     deferral_note_part2_a: {
       title: 'Part2 A',
-      type: 'text',
+      type: 'text'
     },
     deferral_note_part2_b: {
       title: 'Part2 B',
-      type: 'text',
+      type: 'text'
     },
     deferral_note_part2_c: {
       title: 'Part2 C',
-      type: 'text',
+      type: 'text'
     }
   } );
 
@@ -269,6 +273,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             // define the earliest date that the reqn may start
             scope.minStartDate = moment( scope.model.viewModel.record.deadline )
                                  .add( CnSession.application.startDateDelay, 'months' );
+
+            scope.model.viewModel.displayDecisionNotice();
           } );
 
           scope.$watch( 'model.viewModel.record.start_date', function( date ) {
@@ -465,9 +471,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnReqnViewFactory', [
     'CnBaseViewFactory', 'CnCoapplicantModelFactory', 'CnReferenceModelFactory',
-    'CnSession', 'CnHttpFactory', 'CnModalMessageFactory', 'CnModalConfirmFactory', '$q',
+    'CnSession', 'CnHttpFactory', 'CnModalMessageFactory', 'CnModalConfirmFactory', 'CnModalTextFactory', '$q',
     function( CnBaseViewFactory, CnCoapplicantModelFactory, CnReferenceModelFactory,
-              CnSession, CnHttpFactory, CnModalMessageFactory, CnModalConfirmFactory, $q ) {
+              CnSession, CnHttpFactory, CnModalMessageFactory, CnModalConfirmFactory, CnModalTextFactory, $q ) {
       var object = function( parentModel, root ) {
         var self = this;
         CnBaseViewFactory.construct( this, parentModel, root );
@@ -830,13 +836,16 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                  this.record.decision;
         };
         this.decide = function( decision ) {
-          return CnModalConfirmFactory.instance( {
-            message: 'Are you sure you wish to ' + ( decision ? 'approve' : 'reject' ) +
-              ' the ' + this.parentModel.module.name.singular + '?'
+          return CnModalTextFactory.instance( {
+            title: ( decision ? 'Approve' : 'Reject' ) + ' ' + this.parentModel.module.name.singular.ucWords(),
+            message: 'In order to ' + ( decision ? 'approve' : 'reject' ) + ' the ' + this.parentModel.module.name.singular +
+              ' you must provide a message which will be included as part of the formal notice to the applicant.',
+            minLength: 1
           } ).show().then( function( response ) {
             if( response ) {
               return CnHttpFactory.instance( {
-                path: self.parentModel.getServiceResourcePath() + "?action=decide&approve=" + decision
+                path: self.parentModel.getServiceResourcePath() + "?action=decide&approve=" + decision,
+                data: { decision_notice: response }
               } ).patch().then( function() {
                 self.transitionOnViewParent();
               } );
@@ -896,6 +905,21 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               } );
             }
           } );
+        };
+
+        this.displayDecisionNotice = function() {
+          if( 'applicant' == CnSession.role.name &&
+              this.record.decision_notice &&
+              ( 'Approved' == this.record.stage_type || 'Not Approved' == this.record.stage_type ) ) {
+
+            CnModalMessageFactory.instance( {
+              title: this.parentModel.module.name.singular.ucWords() + ' ' + this.record.identifier + ' ' + this.record.stage_type,
+              message: 'Dear ' + this.record.applicant_name + ',\n\n' +
+                'TODO: the generic header for notice of decision letters must be written\n\n' +
+                this.record.decision_notice + '\n\n' +
+                'TODO: the generic footer for notice of decision letters must be written'
+            } ).show();
+          }
         };
 
         this.onView = function( force ) {
