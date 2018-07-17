@@ -5,12 +5,13 @@ CREATE TABLE IF NOT EXISTS notification_type (
   update_timestamp TIMESTAMP NOT NULL,
   create_timestamp TIMESTAMP NOT NULL,
   name VARCHAR(45) NOT NULL,
-  message TEXT NOT NULL,
+  message_en TEXT NOT NULL,
+  message_fr TEXT NOT NULL,
   PRIMARY KEY (id),
   UNIQUE INDEX uq_name (name ASC))
 ENGINE = InnoDB;
 
-INSERT IGNORE INTO notification_type( name, message ) VALUES
-( "Action required", "TODO: This will be the message sent to the applicant to indicate that an action is required." ),
-( "Notice of decision", "TODO: This will be the message sent to the applicant to indicate that a decision has been made regarding their requisition." ),
-( "Progress report required", "TODO: This will be the message sent to the applicant to indicate that a progress report is required." );
+INSERT IGNORE INTO notification_type( name, message_en, message_fr ) VALUES
+( "Action required", "TODO: This will be the message sent to the applicant to indicate that an action is required.", "TRANSLATION REQUIRED" ),
+( "Notice of decision", "TODO: This will be the message sent to the applicant to indicate that a decision has been made regarding their requisition.", "TRANSLATION REQUIRED" ),
+( "Progress report required", "TODO: This will be the message sent to the applicant to indicate that a progress report is required.", "TRANSLATION REQUIRED" );

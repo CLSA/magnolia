@@ -29,9 +29,15 @@ define( function() {
       title: 'Name',
       type: 'string'
     },
-    message: {
-      title: 'Message',
-      type: 'text'
+    message_en: {
+      title: 'Message (English)',
+      type: 'text',
+      help: 'The message sent by email to English applicants when this notification is triggered.'
+    },
+    message_fr: {
+      title: 'Message (French)',
+      type: 'text',
+      help: 'The message sent by email to French applicants when this notification is triggered.'
     }
   } );
 
