@@ -270,10 +270,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               } ]
             );
 
-            // define the earliest date that the reqn may start
-            scope.minStartDate = moment( scope.model.viewModel.record.deadline )
-                                 .add( CnSession.application.startDateDelay, 'months' );
-
+            // display the decision notice (the function will determine whether this should be done or not)
             scope.model.viewModel.displayDecisionNotice();
           } );
 
@@ -877,9 +874,10 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           } );
         };
 
-        this.showAbandon = function() {
-          return 'deferred' == this.record.state && 'review' == this.record.phase;
-        };
+        this.showViewRecord = function() { return 'applicant' != CnSession.role.name; };
+        this.viewRecord = function() { return this.parentModel.transitionToViewState( this.record ); };
+
+        this.showAbandon = function() { return 'deferred' == this.record.state && 'review' == this.record.phase; };
         this.abandon = function() {
           return CnHttpFactory.instance( {
             path: this.parentModel.getServiceResourcePath() + "?action=abandon"
@@ -889,9 +887,16 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           } );
         };
 
-        this.showReactivate = function() {
-          return 'administrator' == CnSession.role.name && 'abandoned' == this.record.state;
+        this.showDelete = function() { return 'new' == this.record.phase; };
+        this.delete = function() {
+          return CnHttpFactory.instance( {
+            path: this.parentModel.getServiceResourcePath()
+          } ).delete().then( function() {
+            self.transitionOnViewParent();
+          } );
         };
+
+        this.showReactivate = function() { return 'administrator' == CnSession.role.name && 'abandoned' == this.record.state; };
         this.reactivate = function() {
           return CnModalConfirmFactory.instance( {
             message: 'Are you sure you want to re-activate the ' + this.parentModel.module.name.singular + '?' +
@@ -930,6 +935,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
           return $q.all( [
             this.$$onView( force ).then( function() {
+              // define the earliest date that the reqn may start
+              self.minStartDate = moment( self.record.deadline )
+                                 .add( CnSession.application.startDateDelay, 'months' );
               return self.updateEthicsFileSize();
             } ),
             this.getCoapplicantList(),

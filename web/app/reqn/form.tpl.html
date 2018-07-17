@@ -12,21 +12,28 @@
       <span ng-bind-html="getHeading()"></span>
     </h4>
   </div>
-  <div ng-if="model.viewModel.showSubmit() ||
+  <div ng-if="model.viewModel.showViewRecord() ||
+              model.viewModel.showSubmit() ||
               model.viewModel.showDelete() ||
               model.viewModel.showAbandon()"
        class="form-footer text-right bg-info"
        style="height:4.6em;">
-    <button class="btn btn-success"
-            ng-if="model.viewModel.showSubmit()"
-            ng-click="model.viewModel.submit()"
-            ng-bind-html="t( 'misc.submit' )"
-            type="button"></button>
+    <div class="btn-group">
+      <button class="btn btn-primary"
+              ng-if="model.viewModel.showViewRecord()"
+              ng-click="model.viewModel.viewRecord()"
+              type="button">Show Record</button>
+      <button class="btn btn-success"
+              ng-if="model.viewModel.showSubmit()"
+              ng-click="model.viewModel.submit()"
+              ng-bind-html="t( 'misc.submit' )"
+              type="button"></button>
+    </div>
     <div class="btn-group pull-left">
       <button class="btn btn-danger"
               ng-if="model.viewModel.showDelete()"
               cn-really-message="{{ t( 'misc.deleteWarning' ) }}"
-              cn-really-click="delete()"
+              cn-really-click="model.viewModel.delete()"
               ng-bind-html="t( 'misc.delete' )"
               type="button"></button>
       <button class="btn btn-danger"
@@ -341,12 +348,13 @@
                   }"
                   model="model">
                 </cn-view-input>
+                {{ model.viewModel.minStartDate }}
                 <cn-view-input
                   input="{
                     key: 'start_date',
                     title: t( 'part1.a3.start_date' ),
                     type: model.inputList.start_date.type,
-                    min: minStartDate
+                    min: model.viewModel.minStartDate
                   }"
                   model="model">
                 </cn-view-input>
