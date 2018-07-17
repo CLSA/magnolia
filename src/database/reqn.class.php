@@ -174,6 +174,11 @@ class reqn extends \cenozo\database\record
     if( is_null( $db_next_stage_type ) )
       throw lib::create( 'exception\argument', 'stage_type', $stage_type, __METHOD__ );
 
+    // Note: there is a special circumstanse where a reqn is being rejected during the DSAC selection stage (make note here)
+    $reject_selection = !is_null( $db_current_stage_type ) &&
+                             'DSAC Selection' == $db_current_stage_type->name &&
+                             'Not Approved' == $db_next_stage_type->name;
+
     // make sure the stage type is appropriate
     if( is_null( $db_current_stage_type ) )
     {
@@ -193,12 +198,13 @@ class reqn extends \cenozo\database\record
                    $db_current_stage_type->name ),
           __METHOD__ );
 
-      // determine whether we can safely proceed to the next stage
-      // TODO: DSAC Selection -> Not Approved should be allowed, but the following will fail
-      $result = $db_current_stage->check_if_complete();
-      if( true !== $result ) throw lib::create( 'exception\notice', $result, __METHOD__ );
+      // determine whether we can safely proceed to the next stage (ignoring if the DSAC selection stage has been rejected)
+      if( !$reject_selection )
+      {
+        $result = $db_current_stage->check_if_complete();
+        if( true !== $result ) throw lib::create( 'exception\notice', $result, __METHOD__ );
+      }
     }
-
 
     // save the user who completed the current stage
     if( !is_null( $db_current_stage ) )
@@ -222,15 +228,25 @@ class reqn extends \cenozo\database\record
       $this->save();
     }
 
-    // update the current stage's review's reviewer with the current user if it isn't already set
+
+    // manage any reviews associated with the current stage
     if( !is_null( $db_current_stage_type ) )
     {
       foreach( $db_current_stage_type->get_review_list( $this ) as $db_review )
       {
-        if( is_null( $db_review->user_id ) )
+        if( $reject_selection )
         {
-          $db_review->user_id = $db_user->id;
-          $db_review->save();
+          // remove all reviews
+          $db_review->delete();
+        }
+        else
+        {
+          // update the current stage's review's reviewer with the current user if it isn't already set
+          if( is_null( $db_review->user_id ) )
+          {
+            $db_review->user_id = $db_user->id;
+            $db_review->save();
+          }
         }
       }
     }

@@ -189,28 +189,28 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     operations: [ {
       title: 'Approved',
       isIncluded: function( $state, model ) {
-        return angular.isDefined( model.viewModel.record.stage_type ) &&
+        return model.viewModel.record.stage_type &&
                'Decision' == model.viewModel.record.stage_type.split( ' ' )[1];
       },
       operation: function( $state, model ) { model.viewModel.decide( 1 ); }
     }, {
       title: 'Not Approved',
       isIncluded: function( $state, model ) {
-        return angular.isDefined( model.viewModel.record.stage_type ) &&
+        return model.viewModel.record.stage_type &&
                'Decision' == model.viewModel.record.stage_type.split( ' ' )[1];
       },
       operation: function( $state, model ) { model.viewModel.decide( 0 ); }
     }, {
       title: 'Proceed',
       isIncluded: function( $state, model ) {
-        return angular.isDefined( model.viewModel.record.stage_type ) &&
+        return model.viewModel.record.stage_type &&
                'DSAC Selection' == model.viewModel.record.stage_type;
       },
       operation: function( $state, model ) { model.viewModel.nextStage(); }
     }, {
       title: 'Reject',
       isIncluded: function( $state, model ) {
-        return angular.isDefined( model.viewModel.record.stage_type ) &&
+        return model.viewModel.record.stage_type &&
                'DSAC Selection' == model.viewModel.record.stage_type;
       },
       operation: function( $state, model ) { model.viewModel.decide( 0 ); }
