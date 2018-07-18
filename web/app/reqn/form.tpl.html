@@ -12,32 +12,32 @@
       <span ng-bind-html="getHeading()"></span>
     </h4>
   </div>
-  <div ng-if="model.formModel.showViewRecord() ||
-              model.formModel.showSubmit() ||
-              model.formModel.showDelete() ||
-              model.formModel.showAbandon()"
+  <div ng-if="model.formModel.show( 'view' ) ||
+              model.formModel.show( 'submit' ) ||
+              model.formModel.show( 'delete' ) ||
+              model.formModel.show( 'abandon' )"
        class="form-footer text-right bg-info"
        style="height:4.6em;">
     <div class="btn-group">
       <button class="btn btn-primary"
-              ng-if="model.formModel.showViewRecord()"
+              ng-if="model.formModel.show( 'view' )"
               ng-click="model.formModel.viewRecord()"
               type="button">Show Record</button>
       <button class="btn btn-success"
-              ng-if="model.formModel.showSubmit()"
+              ng-if="model.formModel.show( 'submit' )"
               ng-click="model.formModel.submit()"
               ng-bind-html="t( 'misc.submit' )"
               type="button"></button>
     </div>
     <div class="btn-group pull-left">
       <button class="btn btn-danger"
-              ng-if="model.formModel.showDelete()"
+              ng-if="model.formModel.show( 'delete' )"
               cn-really-message="{{ t( 'misc.deleteWarning' ) }}"
               cn-really-click="model.formModel.delete()"
               ng-bind-html="t( 'misc.delete' )"
               type="button"></button>
       <button class="btn btn-danger"
-              ng-if="model.formModel.showAbandon()"
+              ng-if="model.formModel.show( 'abandon' )"
               cn-really-message="{{ t( 'misc.abandonWarning' ) }}"
               cn-really-click="model.formModel.abandon()"
               ng-bind-html="t( 'misc.abandon' )"

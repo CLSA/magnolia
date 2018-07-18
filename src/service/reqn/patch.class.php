@@ -167,15 +167,8 @@ class patch extends \cenozo\service\patch
         $db_current_stage_type = $db_reqn->get_current_stage_type();
         if( 'DSAC Decision' == $db_current_stage_type->name )
         {
-          // determine the next stage based on the chair's recommendation
-          $review_sel = lib::create( 'database\select' );
-          $review_sel->add_column( 'recommendation' );
-          $review_mod = lib::create( 'database\modifier' );
-          $review_mod->where( 'type', '=', 'Chair' );
-          $review_list = $db_reqn->get_review_list( $review_sel, $review_mod );
-          $recommendation = current( $review_list )['recommendation'];
-          $stage_type = 'Approved' == $recommendation ? 'Approved' : 'SMT Decision';
-          $db_reqn->add_to_stage( $stage_type );
+          // no decision is being made, so move to the SMT Decision stage, not the Approve stage
+          $db_reqn->add_to_stage( 'SMT Decision' );
         }
         else
         {

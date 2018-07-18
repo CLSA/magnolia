@@ -77,6 +77,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     phase: { column: 'stage_type.phase', type: 'string', exclude: true },
     status: { column: 'stage_type.status', type: 'string', exclude: true },
     decision: { column: 'stage_type.decision', type: 'boolean', exclude: true },
+    recommendation: { type: 'string', exclude: true },
+    stage_complete: { type: 'string', exclude: true },
     language: { type: 'string', column: 'language.code', exclude: true },
     deadline: { type: 'date', column: 'deadline.date', exclude: true },
     applicant_name: { type: 'string', exclude: true },
@@ -168,55 +170,51 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
   module.addExtraOperation( 'view', {
     title: 'Defer to Applicant',
     classes: 'btn-warning',
-    isIncluded: function( $state, model ) { return model.viewModel.showDefer(); },
+    isIncluded: function( $state, model ) { return model.viewModel.show( 'defer' ); },
+    isDisabled: function( $state, model ) { return !model.viewModel.enabled( 'defer' ); },
     operation: function( $state, model ) { model.viewModel.defer(); }
   } );
   
   module.addExtraOperation( 'view', {
     title: 'Re-activate',
     classes: 'btn-warning',
-    isIncluded: function( $state, model ) { return model.viewModel.showReactivate(); },
+    isIncluded: function( $state, model ) { return model.viewModel.show( 'reactivate' ); },
+    isDisabled: function( $state, model ) { return !model.viewModel.enabled( 'reactivate' ); },
     operation: function( $state, model ) { model.viewModel.reactivate(); }
   } );
 
   module.addExtraOperation( 'view', {
-    title: 'Next Stage',
+    title: 'Proceed',
     classes: 'btn-success',
-    isIncluded: function( $state, model ) { return model.viewModel.showNextStage(); },
-    operation: function( $state, model ) { model.viewModel.nextStage(); }
+    isIncluded: function( $state, model ) { return model.viewModel.show( 'proceed' ); },
+    isDisabled: function( $state, model ) { return !model.viewModel.enabled( 'proceed' ); },
+    operation: function( $state, model ) { model.viewModel.proceed(); }
   } );
 
   module.addExtraOperationGroup( 'view', {
     title: 'Apply Decision',
     classes: 'btn-success',
-    isIncluded: function( $state, model ) { return model.viewModel.showDecide(); },
+    isIncluded: function( $state, model ) { return model.viewModel.show( 'decide' ); },
+    isDisabled: function( $state, model ) { return !model.viewModel.enabled( 'decide' ); },
     operations: [ {
       title: 'Approved',
-      isIncluded: function( $state, model ) {
-        return model.viewModel.record.stage_type &&
-               'Decision' == model.viewModel.record.stage_type.split( ' ' )[1];
-      },
+      isIncluded: function( $state, model ) { return model.viewModel.show( 'approved' ); },
+      isDisabled: function( $state, model ) { return !model.viewModel.enabled( 'approved' ); },
       operation: function( $state, model ) { model.viewModel.decide( 1 ); }
     }, {
-      title: 'Not Approved',
-      isIncluded: function( $state, model ) {
-        return model.viewModel.record.stage_type &&
-               'Decision' == model.viewModel.record.stage_type.split( ' ' )[1];
-      },
-      operation: function( $state, model ) { model.viewModel.decide( 0 ); }
-    }, {
       title: 'Proceed',
-      isIncluded: function( $state, model ) {
-        return model.viewModel.record.stage_type &&
-               'DSAC Selection' == model.viewModel.record.stage_type;
-      },
-      operation: function( $state, model ) { model.viewModel.nextStage(); }
+      isIncluded: function( $state, model ) { return model.viewModel.show( 'apply proceed' ); },
+      isDisabled: function( $state, model ) { return !model.viewModel.enabled( 'apply proceed' ); },
+      operation: function( $state, model ) { model.viewModel.proceed(); }
+    }, {
+      title: 'Send to SMT',
+      isIncluded: function( $state, model ) { return model.viewModel.show( 'send to SMT' ); },
+      isDisabled: function( $state, model ) { return !model.viewModel.enabled( 'send to SMT' ); },
+      operation: function( $state, model ) { model.viewModel.proceed( true ); }
     }, {
       title: 'Reject',
-      isIncluded: function( $state, model ) {
-        return model.viewModel.record.stage_type &&
-               'DSAC Selection' == model.viewModel.record.stage_type;
-      },
+      isIncluded: function( $state, model ) { return model.viewModel.show( 'reject' ); },
+      isDisabled: function( $state, model ) { return !model.viewModel.enabled( 'reject' ); },
       operation: function( $state, model ) { model.viewModel.decide( 0 ); }
     } ]
   } );
@@ -480,123 +478,166 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           if( angular.isDefined( self.stageModel ) ) self.stageModel.listModel.heading = 'Stage History';
         } );
 
-        this.onView = function( force ) {
-          var formModel = this.parentModel.formModel;
+        angular.extend( this, {
+          onView: function( force ) {
+            var formModel = this.parentModel.formModel;
 
-          // reset tab values
-          formModel.setTab( 0, this.parentModel.getQueryParameter( 't0' ), false );
-          formModel.setTab( 1, this.parentModel.getQueryParameter( 't1' ), false );
-          formModel.setTab( 2, this.parentModel.getQueryParameter( 't2' ), false );
+            // reset tab values
+            formModel.setTab( 0, this.parentModel.getQueryParameter( 't0' ), false );
+            formModel.setTab( 1, this.parentModel.getQueryParameter( 't1' ), false );
+            formModel.setTab( 2, this.parentModel.getQueryParameter( 't2' ), false );
 
-          return $q.all( [
-            this.$$onView( force ).then( function() {
-              // define the earliest date that the reqn may start
-              formModel.minStartDate = moment( self.record.deadline ).add( CnSession.application.startDateDelay, 'months' );
-              return formModel.updateEthicsFileSize();
-            } ),
-            formModel.getCoapplicantList(),
-            formModel.getReferenceList(),
-            formModel.getDataOptionValueList()
-          ] );
-        }
+            return $q.all( [
+              this.$$onView( force ).then( function() {
+                // define the earliest date that the reqn may start
+                formModel.minStartDate = moment( self.record.deadline ).add( CnSession.application.startDateDelay, 'months' );
+                return formModel.updateEthicsFileSize();
+              } ),
+              formModel.getCoapplicantList(),
+              formModel.getReferenceList(),
+              formModel.getDataOptionValueList()
+            ] );
+          },
 
-        this.showNextStage = function() {
-          return 'administrator' == CnSession.role.name &&
-                 !this.record.decision &&
-                 !this.record.state && (
-                   'review' == this.record.phase ||
-                   ( 'agreement' == this.record.phase && 'Report Required' != this.record.stage_type )
-                 );
-        };
-        this.nextStage = function() {
-          var message = 'Are you sure you wish to proceed to the next stage?';
-          if( this.deferralNotesExist() ) {
-            message += '\n\nWARNING: there are deferral notes present, you may wish to remove them before ' +
-                       'proceeding to the next stage.';
+          deferralNotesExist: function() {
+            return this.record.deferral_note_part1_a1 || this.record.deferral_note_part1_a2 ||
+                   this.record.deferral_note_part1_a3 || this.record.deferral_note_part1_a4 ||
+                   this.record.deferral_note_part1_a5 || this.record.deferral_note_part1_a6 ||
+                   this.record.deferral_note_part2_a || this.record.deferral_note_part2_b ||
+                   this.record.deferral_note_part2_c;
+          },
+
+          show: function( subject ) {
+            var role = CnSession.role.name;
+            var phase = this.record.phase;
+            var state = this.record.state;
+            var stage_type = this.record.stage_type;
+            var decision = this.record.decision;
+
+            if( 'defer' == subject ) {
+              return 'administrator' == role && 'deferred' != state && 0 <= ['review','agreement'].indexOf( phase );
+            } else if( 'reactivate' == subject ) {
+              return 'administrator' == role && 'abandoned' == state;
+            } else if( 'proceed' == subject ) {
+              return 'administrator' == role && !decision && 0 <= ['review','agreement'].indexOf( phase );
+            } else if( 'decide' == subject ) {
+              return 0 <= ['administrator','chair','director'].indexOf( role ) && decision;
+            } else {
+              // the remainder are sub-actions belonging to the decide action
+              if( 'approved' == subject ) {
+                return 'DSAC Selection' != stage_type;
+              } else if( 'reject' == subject ) {
+                return 'DSAC Decision' != stage_type;
+              } else if( 'send to SMT' == subject ) {
+                return 'DSAC Decision' == stage_type;
+              } else if( 'apply proceed' == subject ) {
+                return 'DSAC Selection' == stage_type;
+              } else return false;
+            }
+          },
+
+          enabled: function( subject ) {
+            if( 'defer' == subject ) {
+              return true;
+            } else if( 'reactivate' == subject ) {
+              return true;
+            } else if( 'proceed' == subject ) {
+              return !this.record.state && this.record.stage_complete;
+            } else if( 'decide' == subject ) {
+              return !this.record.state && this.record.stage_complete;
+            } else {
+              // the remainder are sub-actions belonging to the decide action
+              if( 'approved' == subject ) {
+                return this.record.stage_complete && 'Approved' == this.record.recommendation;
+              } else if( 'send to SMT' == subject ) {
+                return this.record.stage_complete && 'Approved' != this.record.recommendation;
+              } else if( 'reject' == subject ) {
+                return this.record.stage_complete;
+              } else if( 'apply proceed' == subject ) {
+                return this.record.stage_complete;
+              } else return false;
+            }
+          },
+
+          proceed: function( smt ) {
+            if( angular.isUndefined( smt ) ) smt = false;
+            var message = 'Are you sure you wish to ' +
+              ( smt ? 'send the ' + this.parentModel.module.name.singular + ' to SMT for review?' : 'proceed to the next stage?' );
+            if( this.deferralNotesExist() ) {
+              message += '\n\nWARNING: there are deferral notes present, you may wish to remove them before proceeding.';
+            }
+            return CnModalConfirmFactory.instance( {
+              message: message
+            } ).show().then( function( response ) {
+              if( response ) {
+                return CnHttpFactory.instance( {
+                  path: self.parentModel.getServiceResourcePath() + "?action=next_stage",
+                } ).patch().then( function() {
+                  self.transitionOnViewParent();
+                } );
+              }
+            } );
+          },
+
+          downloadForm: function() {
+            return CnHttpFactory.instance( {
+              path: this.parentModel.getServiceResourcePath(),
+              format: 'pdf'
+            } ).file();
+          },
+
+          decide: function( decision ) {
+            return CnModalTextFactory.instance( {
+              title: ( decision ? 'Approve' : 'Reject' ) + ' ' + this.parentModel.module.name.singular.ucWords(),
+              message: 'In order to ' + ( decision ? 'approve' : 'reject' ) + ' the ' + this.parentModel.module.name.singular +
+                ' you must provide a message which will be included as part of the formal notice to the applicant.',
+              minLength: 1
+            } ).show().then( function( response ) {
+              if( response ) {
+                return CnHttpFactory.instance( {
+                  path: self.parentModel.getServiceResourcePath() + "?action=decide&approve=" + decision,
+                  data: { decision_notice: response }
+                } ).patch().then( function() {
+                  self.transitionOnViewParent();
+                } );
+              }
+            } );
+          },
+
+          defer: function() {
+            var message = 'Are you sure you wish to defer to the applicant?';
+            if( !this.deferralNotesExist() ) {
+              message += '\n\nWARNING: there are currently no deferral notes to instruct the applicant why ' +
+                         'their attention is required.';
+            }
+            return CnModalConfirmFactory.instance( {
+              message: message
+            } ).show().then( function( response ) {
+              if( response ) {
+                return CnHttpFactory.instance( {
+                  path: self.parentModel.getServiceResourcePath() + "?action=defer"
+                } ).patch().then( function() {
+                  self.record.state = 'deferred';
+                } );
+              }
+            } );
+          },
+
+          reactivate: function() {
+            return CnModalConfirmFactory.instance( {
+              message: 'Are you sure you want to re-activate the ' + this.parentModel.module.name.singular + '?' +
+                '\n\nThe applicant will be notified that it has been re-activated and they will be able to re-submit for review.'
+            } ).show().then( function( response ) {
+              if( response ) {
+                return CnHttpFactory.instance( {
+                  path: self.parentModel.getServiceResourcePath() + "?action=reactivate"
+                } ).patch().then( function() {
+                  self.record.state = '';
+                } );
+              }
+            } );
           }
-          return CnModalConfirmFactory.instance( {
-            message: message
-          } ).show().then( function( response ) {
-            if( response ) {
-              return CnHttpFactory.instance( {
-                path: self.parentModel.getServiceResourcePath() + "?action=next_stage",
-              } ).patch().then( function() {
-                self.transitionOnViewParent();
-              } );
-            }
-          } );
-        };
-
-        this.downloadForm = function() {
-          return CnHttpFactory.instance( {
-            path: this.parentModel.getServiceResourcePath(),
-            format: 'pdf'
-          } ).file();
-        };
-
-        this.showDecide = function() {
-          return this.parentModel.getEditEnabled() &&
-                 'administrator' == CnSession.role.name &&
-                 !this.record.state &&
-                 this.record.decision;
-        };
-        this.decide = function( decision ) {
-          return CnModalTextFactory.instance( {
-            title: ( decision ? 'Approve' : 'Reject' ) + ' ' + this.parentModel.module.name.singular.ucWords(),
-            message: 'In order to ' + ( decision ? 'approve' : 'reject' ) + ' the ' + this.parentModel.module.name.singular +
-              ' you must provide a message which will be included as part of the formal notice to the applicant.',
-            minLength: 1
-          } ).show().then( function( response ) {
-            if( response ) {
-              return CnHttpFactory.instance( {
-                path: self.parentModel.getServiceResourcePath() + "?action=decide&approve=" + decision,
-                data: { decision_notice: response }
-              } ).patch().then( function() {
-                self.transitionOnViewParent();
-              } );
-            }
-          } );
-        };
-
-        this.showDefer = function() {
-          return this.parentModel.getEditEnabled() &&
-                 'deferred' != this.record.state &&
-                 ( 'review' == this.record.phase || 'agreement' == this.record.phase );
-        };
-        this.defer = function() {
-          var message = 'Are you sure you wish to defer to the applicant?';
-          if( !this.deferralNotesExist() ) {
-            message += '\n\nWARNING: there are currently no deferral notes to instruct the applicant why ' +
-                       'their attention is required.';
-          }
-          return CnModalConfirmFactory.instance( {
-            message: message
-          } ).show().then( function( response ) {
-            if( response ) {
-              return CnHttpFactory.instance( {
-                path: self.parentModel.getServiceResourcePath() + "?action=defer"
-              } ).patch().then( function() {
-                self.record.state = 'deferred';
-              } );
-            }
-          } );
-        };
-
-        this.showReactivate = function() { return 'administrator' == CnSession.role.name && 'abandoned' == this.record.state; };
-        this.reactivate = function() {
-          return CnModalConfirmFactory.instance( {
-            message: 'Are you sure you want to re-activate the ' + this.parentModel.module.name.singular + '?' +
-              '\n\nThe applicant will be notified that it has been re-activated and they will be able to re-submit for review.'
-          } ).show().then( function( response ) {
-            if( response ) {
-              return CnHttpFactory.instance( {
-                path: self.parentModel.getServiceResourcePath() + "?action=reactivate"
-              } ).patch().then( function() {
-                self.record.state = '';
-              } );
-            }
-          } );
-        };
+        } );
       };
       return { instance: function( parentModel, root ) { return new object( parentModel, root ); } };
     }
@@ -610,375 +651,377 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               CnSession, CnHttpFactory, CnModalMessageFactory, CnModalConfirmFactory ) {
       var object = function( parentModel ) {
         var self = this;
-        this.parentModel = parentModel;
-        this.coapplicantModel = CnCoapplicantModelFactory.instance();
-        this.coapplicantModel.metadata.getPromise(); // needed to get the coapplicant's metadata
-        this.coapplicantList = [];
-        this.referenceModel = CnReferenceModelFactory.instance();
-        this.referenceModel.metadata.getPromise(); // needed to get the reference's metadata
-        this.referenceList = [];
-        this.dataOptionValueList = [];
-        this.charCount = { lay_summary: 0 };
-        this.wordCount = { background: 0, objectives: 0, methodology: 0, analysis: 0 };
-        this.uploadingEthicsFile = false;
-        this.ethicsFileSize = null;
-        this.minStartDate = null;
 
-        this.translate = function( value ) {
-          return cenozoApp.translate( value, this.parentModel.viewModel.record.language );
-        };
+        angular.extend( this, {
+          parentModel: parentModel,
+          coapplicantModel: CnCoapplicantModelFactory.instance(),
+          coapplicantList: [],
+          referenceModel: CnReferenceModelFactory.instance(),
+          referenceList: [],
+          dataOptionValueList: [],
+          charCount: { lay_summary: 0 },
+          wordCount: { background: 0, objectives: 0, methodology: 0, analysis: 0 },
+          uploadingEthicsFile: false,
+          ethicsFileSize: null,
+          minStartDate: null,
 
-        // setup language and tab state parameters
-        this.toggleLanguage = function() {
-          var record = this.parentModel.viewModel.record;
-          record.language = 'en' == record.language ? 'fr' : 'en';
-          return CnHttpFactory.instance( {
-            path: this.parentModel.getServiceResourcePath(),
-            data: { language: record.language }
-          } ).patch();
-        };
+          translate: function( value ) {
+            return cenozoApp.translate( value, this.parentModel.viewModel.record.language );
+          },
 
-        // the sequencial list of all tabs where every item has an array of the three indexed tab values
-        this.tab = [];
-        this.tabSectionList = [
-          [ 'instructions', null, null ],
-          [ 'part1', 'a1', null ],
-          [ 'part1', 'a2', null ],
-          [ 'part1', 'a3', null ],
-          [ 'part1', 'a4', null ],
-          [ 'part1', 'a5', null ],
-          [ 'part1', 'a6', null ],
-          [ 'part2', null, 'notes' ],
-          [ 'part2', null, 'a' ],
-          [ 'part2', null, 'b' ],
-          [ 'part2', null, 'c' ],
-          [ 'part3', null, null ]
-        ];
+          // setup language and tab state parameters
+          toggleLanguage: function() {
+            var record = this.parentModel.viewModel.record;
+            record.language = 'en' == record.language ? 'fr' : 'en';
+            return CnHttpFactory.instance( {
+              path: this.parentModel.getServiceResourcePath(),
+              data: { language: record.language }
+            } ).patch();
+          },
 
-        this.setTab = function( index, tab, transition ) {
-          if( angular.isUndefined( transition ) ) transition = true;
-          if( !( 0 <= index && index <= 2 ) ) index = 0;
+          // the sequencial list of all tabs where every item has an array of the three indexed tab values
+          tab: [],
+          tabSectionList: [
+            [ 'instructions', null, null ],
+            [ 'part1', 'a1', null ],
+            [ 'part1', 'a2', null ],
+            [ 'part1', 'a3', null ],
+            [ 'part1', 'a4', null ],
+            [ 'part1', 'a5', null ],
+            [ 'part1', 'a6', null ],
+            [ 'part2', null, 'notes' ],
+            [ 'part2', null, 'a' ],
+            [ 'part2', null, 'b' ],
+            [ 'part2', null, 'c' ],
+            [ 'part3', null, null ]
+          ],
 
-          // find the tab section
-          var selectedTabSection = null;
-          this.tabSectionList.some( function( tabSection ) {
-            if( tab == tabSection[index] ) {
-              selectedTabSection = tabSection;
-              return true;
-            }
-          } );
+          setTab: function( index, tab, transition ) {
+            if( angular.isUndefined( transition ) ) transition = true;
+            if( !( 0 <= index && index <= 2 ) ) index = 0;
 
-          // get the tab (or default of none was found)
-          tab = null != selectedTabSection && null != selectedTabSection[index]
-              ? selectedTabSection[index]
-              : ( 0 == index ? 'instructions' : 1 == index ? 'a1' : 'notes' );
-
-          self.tab[index] = tab;
-          self.parentModel.setQueryParameter( 't'+index, tab );
-
-          if( transition ) this.parentModel.reloadState( false, false, 'replace' );
-
-          // update all textarea sizes
-          angular.element( 'textarea[cn-elastic]' ).trigger( 'elastic' );
-        };
-
-        this.nextSection = function( reverse ) {
-          if( angular.isUndefined( reverse ) ) reverse = false;
-
-          var currentTabSectionIndex = null;
-          this.tabSectionList.some( function( tabSection, index ) {
-            if( self.tab[0] == tabSection[0] ) {
-              if( ( null == tabSection[1] || self.tab[1] == tabSection[1] ) &&
-                  ( null == tabSection[2] || self.tab[2] == tabSection[2] ) ) {
-                currentTabSectionIndex = index;
+            // find the tab section
+            var selectedTabSection = null;
+            this.tabSectionList.some( function( tabSection ) {
+              if( tab == tabSection[index] ) {
+                selectedTabSection = tabSection;
                 return true;
               }
-            }
-          } );
-
-          if( null != currentTabSectionIndex ) {
-            var tabSection = this.tabSectionList[currentTabSectionIndex + (reverse?-1:1)];
-            if( angular.isDefined( tabSection ) ) {
-              if( null != tabSection[2] ) this.setTab( 2, tabSection[2], false );
-              if( null != tabSection[1] ) this.setTab( 1, tabSection[1], false );
-              this.setTab( 0, tabSection[0] );
-            }
-          }
-        };
-
-        this.deferralNotesExist = function() {
-          var record = this.parentModel.viewModel.record;
-          return record.deferral_note_part1_a1 || record.deferral_note_part1_a2 ||
-                 record.deferral_note_part1_a3 || record.deferral_note_part1_a4 ||
-                 record.deferral_note_part1_a5 || record.deferral_note_part1_a6 ||
-                 record.deferral_note_part2_a || record.deferral_note_part2_b ||
-                 record.deferral_note_part2_c;
-        };
-
-        this.getCoapplicantList = function() {
-          return CnHttpFactory.instance( {
-            path: this.parentModel.getServiceResourcePath() + '/coapplicant',
-            data: {
-              select: { column: [ 'id', 'name', 'position', 'affiliation', 'email', 'role', 'access' ] },
-              modifier: { order: 'id', limit: 1000000 }
-            }
-          } ).query().then( function( response ) {
-            self.coapplicantList = response.data;
-          } );
-        }
-
-        this.removeCoapplicant = function( id ) {
-          return CnHttpFactory.instance( {
-            path: this.parentModel.getServiceResourcePath() + '/coapplicant/' + id
-          } ).delete().then( function() {
-            return self.getCoapplicantList();
-          } );
-        }
-
-        this.getReferenceList = function() {
-          return CnHttpFactory.instance( {
-            path: this.parentModel.getServiceResourcePath() + '/reference',
-            data: {
-              select: { column: [ 'id', 'rank', 'reference' ] },
-              modifier: { order: 'rank', limit: 1000000 }
-            }
-          } ).query().then( function( response ) {
-            self.referenceList = response.data;
-          } );
-        }
-
-        this.setReferenceRank = function( id, rank ) {
-          return CnHttpFactory.instance( {
-            path: this.parentModel.getServiceResourcePath() + '/reference/' + id,
-            data: { rank: rank }
-          } ).patch().then( function() {
-            return self.getReferenceList();
-          } );
-        }
-
-        this.removeReference = function( id ) {
-          return CnHttpFactory.instance( {
-            path: this.parentModel.getServiceResourcePath() + '/reference/' + id
-          } ).delete().then( function() {
-            return self.getReferenceList();
-          } );
-        }
-
-        this.updateEthicsFileSize = function() {
-          return CnHttpFactory.instance( {
-            path: this.parentModel.getServiceResourcePath() + '?letter=1'
-          } ).get().then( function( response ) {
-            self.ethicsFileSize = response.data;
-          } );
-        };
-
-        this.downloadEthicsFile = function() {
-          return CnHttpFactory.instance( {
-            path: this.parentModel.getServiceResourcePath() + '?letter=1',
-            format: 'unknown'
-          } ).file();
-        };
-
-        this.removeEthicsFile = function() {
-          return this.parentModel.viewModel.onPatch( { ethics_filename: null } ).then( function() {
-            return self.updateEthicsFileSize();
-          } );
-        };
-
-        this.uploadEthicsFile = function() {
-          this.uploadingEthicsFile = true;
-          var data = new FormData();
-          data.append( 'file', this.ethicsFile );
-          var fileDetails = data.get( 'file' );
-
-          // update the filename
-          return CnHttpFactory.instance( {
-            path: this.parentModel.getServiceResourcePath(),
-            data: { ethics_filename: fileDetails.name }
-          } ).patch().then( function() {
-            self.parentModel.viewModel.record.ethics_filename = fileDetails.name;
-
-            // upload the file
-            return CnHttpFactory.instance( {
-              path: self.parentModel.getServiceResourcePath() + '?letter=1',
-              data: self.ethicsFile,
-              format: 'unknown'
-            } ).patch()
-          } ).then( function() { return self.updateEthicsFileSize(); } )
-             .finally( function() { self.uploadingEthicsFile = false; } );
-        };
-
-        this.getDataOptionValueList = function() {
-          self.dataOptionValueList = [];
-          return CnHttpFactory.instance( {
-            path: 'data_option',
-            data: { select: { column: [ { column: 'MAX(id)', alias: 'maxId', table_prefix: false } ] } }
-          } ).get().then( function( response ) {
-            for( var i = 0; i <= response.data[0].maxId; i++ ) self.dataOptionValueList[i] = false;
-          } ).then( function() {
-            return CnHttpFactory.instance( {
-              path: self.parentModel.getServiceResourcePath() + '/data_option',
-              data: { select: { column: [ 'id' ] } }
-            } ).query().then( function( response ) {
-              response.data.forEach( function( dataOption ) { self.dataOptionValueList[dataOption.id] = true; } );
             } );
-          } );
-        }
 
-        this.setDataOptionValue = function( dataOptionId ) {
-          var add = this.dataOptionValueList[dataOptionId];
+            // get the tab (or default of none was found)
+            tab = null != selectedTabSection && null != selectedTabSection[index]
+                ? selectedTabSection[index]
+                : ( 0 == index ? 'instructions' : 1 == index ? 'a1' : 'notes' );
 
-          var http = CnHttpFactory.instance( {
-            path: this.parentModel.getServiceResourcePath() + '/data_option' + ( add ? '' : '/' + dataOptionId ),
-            data: add ? { add: dataOptionId } : undefined,
-            onError: function( response ) {
-              // 409 means the data option has already been added
-              // 404 means the data option has already been deleted
-              var ignoreCode = add ? 409 : 404;
-              if( ignoreCode != response.status ) {
-                self.dataOptionValueList[dataOptionId] = !self.dataOptionValueList[dataOptionId];
-                CnModalMessageFactory.httpError( response );
+            self.tab[index] = tab;
+            self.parentModel.setQueryParameter( 't'+index, tab );
+
+            if( transition ) this.parentModel.reloadState( false, false, 'replace' );
+
+            // update all textarea sizes
+            angular.element( 'textarea[cn-elastic]' ).trigger( 'elastic' );
+          },
+
+          nextSection: function( reverse ) {
+            if( angular.isUndefined( reverse ) ) reverse = false;
+
+            var currentTabSectionIndex = null;
+            this.tabSectionList.some( function( tabSection, index ) {
+              if( self.tab[0] == tabSection[0] ) {
+                if( ( null == tabSection[1] || self.tab[1] == tabSection[1] ) &&
+                    ( null == tabSection[2] || self.tab[2] == tabSection[2] ) ) {
+                  currentTabSectionIndex = index;
+                  return true;
+                }
+              }
+            } );
+
+            if( null != currentTabSectionIndex ) {
+              var tabSection = this.tabSectionList[currentTabSectionIndex + (reverse?-1:1)];
+              if( angular.isDefined( tabSection ) ) {
+                if( null != tabSection[2] ) this.setTab( 2, tabSection[2], false );
+                if( null != tabSection[1] ) this.setTab( 1, tabSection[1], false );
+                this.setTab( 0, tabSection[0] );
               }
             }
-          } );
-          return add ? http.post() : http.delete();
-        };
+          },
 
-        this.showSubmit = function() {
-          var record = this.parentModel.viewModel.record;
-          return 'applicant' == CnSession.role.name &&
-            ( 'new' == record.phase || 'deferred' == record.state ) &&
-            this.parentModel.getEditEnabled();
-        };
-        this.submit = function() {
-          var record = this.parentModel.viewModel.record;
-          return CnModalConfirmFactory.instance( {
-            title: this.translate( 'misc.pleaseConfirm' ),
-            message: this.translate( 'misc.submitWarning' )
-          } ).show().then( function( response ) {
-            if( response ) {
-              // make sure that certain properties have been defined, one tab at a time
-              var requiredTabList = {
-                a1: [ 'applicant_name', 'applicant_position', 'applicant_affiliation',
-                      'applicant_address', 'applicant_phone', 'applicant_email' ],
-                a3: [ 'start_date', 'duration' ],
-                a4: [ 'title', 'keywords', 'lay_summary', 'background', 'objectives', 'methodology', 'analysis' ],
-                a5: [ 'funding' ],
-                a6: [ 'ethics' ]
-              };
+          getCoapplicantList: function() {
+            return CnHttpFactory.instance( {
+              path: this.parentModel.getServiceResourcePath() + '/coapplicant',
+              data: {
+                select: { column: [ 'id', 'name', 'position', 'affiliation', 'email', 'role', 'access' ] },
+                modifier: { order: 'id', limit: 1000000 }
+              }
+            } ).query().then( function( response ) {
+              self.coapplicantList = response.data;
+            } );
+          },
 
-              var error = null;
-              var errorTab = null;
-              for( var tab in requiredTabList ) {
-                var firstProperty = null;
-                requiredTabList[tab].forEach( function( property ) {
-                  if( null === record[property] || '' === record[property] ) {
-                    var element = cenozo.getFormElement( property );
-                    element.$error.required = true;
+          removeCoapplicant: function( id ) {
+            return CnHttpFactory.instance( {
+              path: this.parentModel.getServiceResourcePath() + '/coapplicant/' + id
+            } ).delete().then( function() {
+              return self.getCoapplicantList();
+            } );
+          },
+
+          getReferenceList: function() {
+            return CnHttpFactory.instance( {
+              path: this.parentModel.getServiceResourcePath() + '/reference',
+              data: {
+                select: { column: [ 'id', 'rank', 'reference' ] },
+                modifier: { order: 'rank', limit: 1000000 }
+              }
+            } ).query().then( function( response ) {
+              self.referenceList = response.data;
+            } );
+          },
+
+          setReferenceRank: function( id, rank ) {
+            return CnHttpFactory.instance( {
+              path: this.parentModel.getServiceResourcePath() + '/reference/' + id,
+              data: { rank: rank }
+            } ).patch().then( function() {
+              return self.getReferenceList();
+            } );
+          },
+
+          removeReference: function( id ) {
+            return CnHttpFactory.instance( {
+              path: this.parentModel.getServiceResourcePath() + '/reference/' + id
+            } ).delete().then( function() {
+              return self.getReferenceList();
+            } );
+          },
+
+          updateEthicsFileSize: function() {
+            return CnHttpFactory.instance( {
+              path: this.parentModel.getServiceResourcePath() + '?letter=1'
+            } ).get().then( function( response ) {
+              self.ethicsFileSize = response.data;
+            } );
+          },
+
+          downloadEthicsFile: function() {
+            return CnHttpFactory.instance( {
+              path: this.parentModel.getServiceResourcePath() + '?letter=1',
+              format: 'unknown'
+            } ).file();
+          },
+
+          removeEthicsFile: function() {
+            return this.parentModel.viewModel.onPatch( { ethics_filename: null } ).then( function() {
+              return self.updateEthicsFileSize();
+            } );
+          },
+
+          uploadEthicsFile: function() {
+            thisx.uploadingEthicsFile = true;
+            var data = new FormData();
+            data.append( 'file', this.ethicsFile );
+            var fileDetails = data.get( 'file' );
+
+            // update the filename
+            return CnHttpFactory.instance( {
+              path: this.parentModel.getServiceResourcePath(),
+              data: { ethics_filename: fileDetails.name }
+            } ).patch().then( function() {
+              self.parentModel.viewModel.record.ethics_filename = fileDetails.name;
+
+              // upload the file
+              return CnHttpFactory.instance( {
+                path: self.parentModel.getServiceResourcePath() + '?letter=1',
+                data: self.ethicsFile,
+                format: 'unknown'
+              } ).patch()
+            } ).then( function() { return self.updateEthicsFileSize(); } )
+               .finally( function() { self.uploadingEthicsFile = false; } );
+          },
+
+          getDataOptionValueList: function() {
+            self.dataOptionValueList = [];
+            return CnHttpFactory.instance( {
+              path: 'data_option',
+              data: { select: { column: [ { column: 'MAX(id)', alias: 'maxId', table_prefix: false } ] } }
+            } ).get().then( function( response ) {
+              for( var i = 0; i <= response.data[0].maxId; i++ ) self.dataOptionValueList[i] = false;
+            } ).then( function() {
+              return CnHttpFactory.instance( {
+                path: self.parentModel.getServiceResourcePath() + '/data_option',
+                data: { select: { column: [ 'id' ] } }
+              } ).query().then( function( response ) {
+                response.data.forEach( function( dataOption ) { self.dataOptionValueList[dataOption.id] = true; } );
+              } );
+            } );
+          },
+
+          setDataOptionValue: function( dataOptionId ) {
+            var add = this.dataOptionValueList[dataOptionId];
+
+            var http = CnHttpFactory.instance( {
+              path: this.parentModel.getServiceResourcePath() + '/data_option' + ( add ? '' : '/' + dataOptionId ),
+              data: add ? { add: dataOptionId } : undefined,
+              onError: function( response ) {
+                // 409 means the data option has already been added
+                // 404 means the data option has already been deleted
+                var ignoreCode = add ? 409 : 404;
+                if( ignoreCode != response.status ) {
+                  self.dataOptionValueList[dataOptionId] = !self.dataOptionValueList[dataOptionId];
+                  CnModalMessageFactory.httpError( response );
+                }
+              }
+            } );
+            return add ? http.post() : http.delete();
+          },
+
+          show: function( subject ) {
+            var role = CnSession.role.name;
+            var phase = this.parentModel.viewModel.record.phase;
+            var state = this.parentModel.viewModel.record.state;
+            var decision = this.parentModel.viewModel.record.decision;
+
+            if( 'submit' == subject ) {
+              return 'applicant' == role && ( 'new' == phase || 'deferred' == state );
+            } else if( 'view' == subject ) {
+              return 'applicant' != role;
+            } else if( 'abandon' == subject ) {
+              return 'deferred' == state && 'review' == phase;
+            } else if( 'delete' == subject ) {
+              return 'new' == phase;
+            } return false;
+          },
+
+          submit: function() {
+            var record = this.parentModel.viewModel.record;
+            return CnModalConfirmFactory.instance( {
+              title: this.translate( 'misc.pleaseConfirm' ),
+              message: this.translate( 'misc.submitWarning' )
+            } ).show().then( function( response ) {
+              if( response ) {
+                // make sure that certain properties have been defined, one tab at a time
+                var requiredTabList = {
+                  a1: [ 'applicant_name', 'applicant_position', 'applicant_affiliation',
+                        'applicant_address', 'applicant_phone', 'applicant_email' ],
+                  a3: [ 'start_date', 'duration' ],
+                  a4: [ 'title', 'keywords', 'lay_summary', 'background', 'objectives', 'methodology', 'analysis' ],
+                  a5: [ 'funding' ],
+                  a6: [ 'ethics' ]
+                };
+
+                var error = null;
+                var errorTab = null;
+                for( var tab in requiredTabList ) {
+                  var firstProperty = null;
+                  requiredTabList[tab].forEach( function( property ) {
+                    if( null === record[property] || '' === record[property] ) {
+                      var element = cenozo.getFormElement( property );
+                      element.$error.required = true;
+                      cenozo.updateFormElement( element, true );
+                      if( null == errorTab ) errorTab = tab;
+                      if( null == error ) error = {
+                        title: self.translate( 'misc.missingFieldTitle' ),
+                        message: self.translate( 'misc.missingFieldMessage' ),
+                        error: true
+                      };
+                    }
+                  } );
+                }
+
+                // now check for limited inputs if there are no empty errors
+                if( null == error ) {
+                  if( null != record.lay_summary && 1000 < record.lay_summary.length ) {
+                    var element = cenozo.getFormElement( 'lay_summary' );
+                    element.$error.custom = self.translate( 'misc.tooManyCharactersTitle' );
                     cenozo.updateFormElement( element, true );
-                    if( null == errorTab ) errorTab = tab;
+                    if( null == errorTab ) errorTab = 'a4';
                     if( null == error ) error = {
-                      title: self.translate( 'misc.missingFieldTitle' ),
-                      message: self.translate( 'misc.missingFieldMessage' ),
+                      title: self.translate( 'misc.tooManyCharactersTitle' ),
+                      message: self.translate( 'misc.tooManyCharactersMessage' ),
                       error: true
                     };
                   }
-                } );
-              }
+                }
 
-              // now check for limited inputs if there are no empty errors
-              if( null == error ) {
-                if( null != record.lay_summary && 1000 < record.lay_summary.length ) {
+                if( null != error ) {
                   var element = cenozo.getFormElement( 'lay_summary' );
-                  element.$error.custom = self.translate( 'misc.tooManyCharactersTitle' );
-                  cenozo.updateFormElement( element, true );
-                  if( null == errorTab ) errorTab = 'a4';
-                  if( null == error ) error = {
-                    title: self.translate( 'misc.tooManyCharactersTitle' ),
-                    message: self.translate( 'misc.tooManyCharactersMessage' ),
-                    error: true
-                  };
+
+                  // if there was an error then display it now
+                  CnModalMessageFactory.instance( error ).show().then( function() {
+                    self.setTab( 0, 'part1' );
+                    self.setTab( 1, errorTab );
+                  } );
+                } else {
+                  return CnHttpFactory.instance( {
+                    path: self.parentModel.getServiceResourcePath() + "?action=submit",
+                    onError: function( response ) {
+                      if( 409 == response.status ) {
+                        CnModalMessageFactory.instance( {
+                          title: self.translate( 'misc.invalidStartDateTitle' ),
+                          message: self.translate( 'misc.invalidStartDateMessage' ),
+                          error: true
+                        } ).show().then( function() {
+                          var element = cenozo.getFormElement( 'start_date' );
+                          element.$error.custom = self.translate( 'misc.invalidStartDateTitle' );
+                          cenozo.updateFormElement( element, true );
+                          self.setTab( 0, 'part1' );
+                          self.setTab( 1, 'a3' );
+                        } );
+                      } else CnModalMessageFactory.httpError( response );
+                    }
+                  } ).patch().then( function() { self.parentModel.viewModel.transitionOnViewParent(); } );
                 }
               }
+            } );
+          },
 
-              if( null != error ) {
-                var element = cenozo.getFormElement( 'lay_summary' );
+          downloadForm: function() {
+            return CnHttpFactory.instance( {
+              path: this.parentModel.getServiceResourcePath(),
+              format: 'pdf'
+            } ).file();
+          },
 
-                // if there was an error then display it now
-                CnModalMessageFactory.instance( error ).show().then( function() {
-                  self.setTab( 0, 'part1' );
-                  self.setTab( 1, errorTab );
-                } );
-              } else {
-                return CnHttpFactory.instance( {
-                  path: self.parentModel.getServiceResourcePath() + "?action=submit",
-                  onError: function( response ) {
-                    if( 409 == response.status ) {
-                      CnModalMessageFactory.instance( {
-                        title: self.translate( 'misc.invalidStartDateTitle' ),
-                        message: self.translate( 'misc.invalidStartDateMessage' ),
-                        error: true
-                      } ).show().then( function() {
-                        var element = cenozo.getFormElement( 'start_date' );
-                        element.$error.custom = self.translate( 'misc.invalidStartDateTitle' );
-                        cenozo.updateFormElement( element, true );
-                        self.setTab( 0, 'part1' );
-                        self.setTab( 1, 'a3' );
-                      } );
-                    } else CnModalMessageFactory.httpError( response );
-                  }
-                } ).patch().then( function() { self.parentModel.viewModel.transitionOnViewParent(); } );
-              }
+          viewRecord: function() {
+            return this.parentModel.transitionToViewState( this.parentModel.viewModel.record );
+          },
+
+          abandon: function() {
+            return CnHttpFactory.instance( {
+              path: this.parentModel.getServiceResourcePath() + "?action=abandon"
+            } ).patch().then( function() {
+              self.parentModel.viewModel.record.state = 'abandoned';
+              self.parentModel.viewModel.transitionOnViewParent();
+            } );
+          },
+
+          delete: function() {
+            return CnHttpFactory.instance( {
+              path: this.parentModel.getServiceResourcePath()
+            } ).delete().then( function() {
+              self.parentModel.viewModel.transitionOnViewParent();
+            } );
+          },
+
+          displayDecisionNotice: function() {
+            var record = this.parentModel.viewModel.record;
+            if( 'applicant' == CnSession.role.name &&
+                record.decision_notice &&
+                ( 'Approved' == record.stage_type || 'Not Approved' == record.stage_type ) ) {
+              CnModalMessageFactory.instance( {
+                title: this.parentModel.module.name.singular.ucWords() + ' ' + record.identifier + ' ' + record.stage_type,
+                message: 'Dear ' + record.applicant_name + ',\n\n' +
+                  'TODO: the generic header for notice of decision letters must be written\n\n' +
+                  record.decision_notice + '\n\n' +
+                  'TODO: the generic footer for notice of decision letters must be written'
+              } ).show();
             }
-          } );
-        };
-
-        this.downloadForm = function() {
-          return CnHttpFactory.instance( {
-            path: this.parentModel.getServiceResourcePath(),
-            format: 'pdf'
-          } ).file();
-        };
-
-        this.showViewRecord = function() { return 'applicant' != CnSession.role.name; };
-        this.viewRecord = function() { return this.parentModel.transitionToViewState( this.parentModel.viewModel.record ); };
-
-        this.showAbandon = function() {
-          var record = this.parentModel.viewModel.record;
-          return 'deferred' == record.state && 'review' == record.phase;
-        };
-        this.abandon = function() {
-          return CnHttpFactory.instance( {
-            path: this.parentModel.getServiceResourcePath() + "?action=abandon"
-          } ).patch().then( function() {
-            self.parentModel.viewModel.record.state = 'abandoned';
-            self.parentModel.viewModel.transitionOnViewParent();
-          } );
-        };
-
-        this.showDelete = function() { return 'new' == this.parentModel.viewModel.record.phase; };
-        this.delete = function() {
-          return CnHttpFactory.instance( {
-            path: this.parentModel.getServiceResourcePath()
-          } ).delete().then( function() {
-            self.parentModel.viewModel.transitionOnViewParent();
-          } );
-        };
-
-        this.displayDecisionNotice = function() {
-          var record = this.parentModel.viewModel.record;
-          if( 'applicant' == CnSession.role.name &&
-              record.decision_notice &&
-              ( 'Approved' == record.stage_type || 'Not Approved' == record.stage_type ) ) {
-            CnModalMessageFactory.instance( {
-              title: this.parentModel.module.name.singular.ucWords() + ' ' + record.identifier + ' ' + record.stage_type,
-              message: 'Dear ' + record.applicant_name + ',\n\n' +
-                'TODO: the generic header for notice of decision letters must be written\n\n' +
-                record.decision_notice + '\n\n' +
-                'TODO: the generic footer for notice of decision letters must be written'
-            } ).show();
           }
-        };
+        } );
+
+        this.coapplicantModel.metadata.getPromise(); // needed to get the coapplicant's metadata
+        this.referenceModel.metadata.getPromise(); // needed to get the reference's metadata
       };
       return { instance: function( parentModel ) { return new object( parentModel ); } };
     }
@@ -1017,12 +1060,12 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
         this.getEditEnabled = function() {
           var phase = this.viewModel.record.phase;
-          var roleCheck = 'applicant' == CnSession.role.name
-                        ? 'new' == phase || ( 'review' == phase && 'deferred' == this.viewModel.record.state )
-                        : 'administrator' == CnSession.role.name
-                        ? 'new' == phase || ( 'review' == phase && !this.viewModel.record.state )
-                        : false;
-          return this.$$getEditEnabled() && roleCheck;
+          var state = this.viewModel.record.state;
+          return this.$$getEditEnabled() && (
+            'applicant' == CnSession.role.name ? ( 'new' == phase || ( 'review' == phase && 'deferred' == state ) ) :
+            'administrator' == CnSession.role.name ? ( 'new' == phase || ( 'review' == phase && 'abandoned' != state ) ) :
+            false
+          );
         };
 
         this.getDeleteEnabled = function() {
