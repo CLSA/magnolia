@@ -66,9 +66,8 @@ class get extends \cenozo\service\downloadable
    */
   public function execute()
   {
-    if( $this->get_argument( 'letter', false ) )
+    if( $this->get_argument( 'letter', false ) && 'application/json' == $this->get_mime_type() )
     {
-      $data = NULL;
       $db_reqn = $this->get_leaf_record();
       if( !is_null( $db_reqn ) && file_exists( $this->get_downloadable_file_path() ) )
         $this->set_data( stat( $this->get_downloadable_file_path() )['size'] );
