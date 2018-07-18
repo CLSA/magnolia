@@ -537,24 +537,32 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           },
 
           enabled: function( subject ) {
+            var state = this.record.state;
+            var recommendation = this.record.recommendation;
+            var stage_type = this.record.stage_type;
+            var stage_complete = this.record.stage_complete;
+
             if( 'defer' == subject ) {
               return true;
             } else if( 'reactivate' == subject ) {
               return true;
             } else if( 'proceed' == subject ) {
-              return !this.record.state && this.record.stage_complete;
+              return !state && stage_complete;
             } else if( 'decide' == subject ) {
-              return !this.record.state && this.record.stage_complete;
+              return !state;
             } else {
               // the remainder are sub-actions belonging to the decide action
               if( 'approved' == subject ) {
-                return this.record.stage_complete && 'Approved' == this.record.recommendation;
+                return stage_complete && (
+                  ( 'DSAC Decision' == stage_type && 'Approved' == recommendation ) ||
+                  ( 'SMT Decision' == stage_type && 'Not Approved' != recommendation )
+                );
               } else if( 'send to SMT' == subject ) {
-                return this.record.stage_complete && 'Approved' != this.record.recommendation;
+                return stage_complete && 'Approved' != recommendation;
               } else if( 'reject' == subject ) {
-                return this.record.stage_complete;
+                return stage_complete && 'Not Approved' == recommendation;
               } else if( 'apply proceed' == subject ) {
-                return this.record.stage_complete;
+                return stage_complete;
               } else return false;
             }
           },
@@ -562,7 +570,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           proceed: function( smt ) {
             if( angular.isUndefined( smt ) ) smt = false;
             var message = 'Are you sure you wish to ' +
-              ( smt ? 'send the ' + this.parentModel.module.name.singular + ' to SMT for review?' : 'proceed to the next stage?' );
+              ( smt ? 'send the ' + this.parentModel.module.name.singular + ' to the SMT for review?' : 'proceed to the next stage?' );
             if( this.deferralNotesExist() ) {
               message += '\n\nWARNING: there are deferral notes present, you may wish to remove them before proceeding.';
             }
