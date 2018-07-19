@@ -67,7 +67,7 @@ CREATE PROCEDURE patch_role_has_service()
       "FROM ", @cenozo, ".role, service ",
       "WHERE role.name = 'reviewer' ",
       "AND service.restricted = 1 ",
-      "AND service.subject = 'TODO'" );
+      "AND service.subject = 'review'" );
     PREPARE statement FROM @sql;
     EXECUTE statement;
     DEALLOCATE PREPARE statement;

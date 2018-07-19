@@ -16,18 +16,31 @@ define( function() {
     },
     columnList: {
       identifier: { column: 'reqn.identifier', title: 'Requisition' },
-      review_type: { column: 'review_type.name', title: 'Type' },
-      user_full_name: { title: 'Reviewer' },
-      recommendation: { title: 'Recommendation' }
+      review_type: {
+        column: 'review_type.name',
+        title: 'Type',
+        isIncluded: function( $state, model ) { return 'root.home' != $state.current.name; }
+      },
+      user_full_name: {
+        title: 'Reviewer',
+        isIncluded: function( $state, model ) { return !model.isReviewer(); }
+      },
+      date: { title: 'Created On' },
+      recommendation: { title: 'Recommendation' },
+      note: {
+        title: 'Note',
+        align: 'left',
+        isIncluded: function( $state, model ) { return 'root.home' != $state.current.name; }
+      }
     },
     defaultOrder: {
-      column: 'id',
-      reverse: false
+      column: 'date',
+      reverse: true
     }
   } );
 
   module.addInputGroup( '', {
-    reqn_id: {
+    identifier: {
       column: 'reqn.identifier',
       title: 'Requisition',
       type: 'lookup-typeahead',
@@ -58,6 +71,16 @@ define( function() {
       type: 'text',
       exclude: 'add'
     }
+  } );
+
+  module.addExtraOperation( 'view', {
+    title: 'View Form',
+    operation: function( $state, model ) { $state.go( 'reqn.form', model.getParentIdentifier() ); }
+  } );
+
+  module.addExtraOperation( 'view', {
+    title: 'Download',
+    operation: function( $state, model ) { model.viewModel.downloadForm(); }
   } );
 
   /* ######################################################################################################## */
@@ -125,25 +148,56 @@ define( function() {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnReviewViewFactory', [
-    'CnBaseViewFactory',
-    function( CnBaseViewFactory ) {
-      var object = function( parentModel, root ) { CnBaseViewFactory.construct( this, parentModel, root ); };
+    'CnBaseViewFactory', 'CnHttpFactory',
+    function( CnBaseViewFactory, CnHttpFactory ) {
+      var object = function( parentModel, root ) {
+        var self = this;
+        CnBaseViewFactory.construct( this, parentModel, root );
+
+        this.downloadForm = function() {
+          var parent = self.parentModel.getParentIdentifier();
+          return CnHttpFactory.instance( {
+            path: parent.subject + '/' + parent.identifier,
+            format: 'pdf'
+          } ).file();
+        };
+      };
       return { instance: function( parentModel, root ) { return new object( parentModel, root ); } };
     }
   ] );
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnReviewModelFactory', [
-    'CnBaseModelFactory',
-    'CnReviewAddFactory', 'CnReviewListFactory', 'CnReviewViewFactory',
-    function( CnBaseModelFactory,
-              CnReviewAddFactory, CnReviewListFactory, CnReviewViewFactory ) {
+    'CnBaseModelFactory', 'CnReviewAddFactory', 'CnReviewListFactory', 'CnReviewViewFactory', 'CnSession',
+    function( CnBaseModelFactory, CnReviewAddFactory, CnReviewListFactory, CnReviewViewFactory, CnSession ) {
       var object = function( root ) {
         var self = this;
         CnBaseModelFactory.construct( this, module );
         this.addModel = CnReviewAddFactory.instance( this );
         this.listModel = CnReviewListFactory.instance( this );
         this.viewModel = CnReviewViewFactory.instance( this, root );
+
+        // override the service collection path so that reviewers can view their reviews from the home screen
+        this.getServiceCollectionPath = function() {
+          // ignore the parent if it is root
+          return this.$$getServiceCollectionPath( 'root' == this.getSubjectFromState() );
+        };
+
+        this.isReviewer = function() { return 'reviewer' == CnSession.role.name; };
+
+        // override the service collection path so that reviewers can view their reviews from the home screen
+        this.getServiceData = function( type, columnRestrictLists ) {
+          var data = this.$$getServiceData( type, columnRestrictLists );
+          if( 'root' == this.getSubjectFromState() ) {
+            if( angular.isUndefined( data.modifier.where ) ) data.modifier.where = [];
+            data.modifier.where.push( {
+              column: 'review.recommendation',
+              operator: '=',
+              value: null
+            } );
+          }
+          return data;
+        };
       };
 
       return {

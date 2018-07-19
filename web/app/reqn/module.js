@@ -560,7 +560,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               } else if( 'send to SMT' == subject ) {
                 return stage_complete && 'Approved' != recommendation;
               } else if( 'reject' == subject ) {
-                return stage_complete && 'Not Approved' == recommendation;
+                return 'DSAC Selection' == stage_type || ( stage_complete && 'Not Approved' == recommendation );
               } else if( 'apply proceed' == subject ) {
                 return stage_complete;
               } else return false;

@@ -16,6 +16,7 @@ CREATE PROCEDURE patch_review()
         "create_timestamp TIMESTAMP NOT NULL, ",
         "reqn_id INT UNSIGNED NOT NULL, ",
         "user_id INT UNSIGNED NULL DEFAULT NULL, ",
+        "date DATE NOT NULL, ",
         "review_type_id INT UNSIGNED NOT NULL, ",
         "recommendation ENUM('Approved', 'Revise', 'Not Approved') NULL DEFAULT NULL, ",
         "note TEXT NULL DEFAULT NULL, ",
@@ -49,3 +50,16 @@ DELIMITER ;
 
 CALL patch_review();
 DROP PROCEDURE IF EXISTS patch_review;
+
+
+DELIMITER $$
+
+DROP TRIGGER IF EXISTS review_BEFORE_INSERT $$
+CREATE DEFINER = CURRENT_USER TRIGGER review_BEFORE_INSERT BEFORE INSERT ON review FOR EACH ROW
+BEGIN
+  IF !NEW.date THEN
+    SET NEW.date = NOW();
+  END IF;
+END$$
+
+DELIMITER ;
