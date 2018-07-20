@@ -73,7 +73,7 @@ class ui extends \cenozo\ui\ui
     $this->remove_listitem( 'Settings' );
     $this->remove_listitem( 'Sites' );
 
-//    if( 'applicant' == $db_role->name ) $this->remove_listitem( 'Requisitions' );
+    if( 'applicant' == $db_role->name ) $this->remove_listitem( 'Requisitions' );
     if( 'applicant' == $db_role->name || 'reviewer' == $db_role->name )
       $this->remove_listitem( 'Users' );
   }
