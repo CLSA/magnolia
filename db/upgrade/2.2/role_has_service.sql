@@ -61,13 +61,17 @@ CREATE PROCEDURE patch_role_has_service()
     EXECUTE statement;
     DEALLOCATE PREPARE statement;
 
+    -- chair and reviewer
     SET @sql = CONCAT(
       "INSERT INTO role_has_service( role_id, service_id ) ",
       "SELECT role.id, service.id ",
       "FROM ", @cenozo, ".role, service ",
-      "WHERE role.name = 'reviewer' ",
+      "WHERE role.name IN( 'chair', 'director', 'reviewer' ) ",
       "AND service.restricted = 1 ",
-      "AND service.subject = 'review'" );
+      "AND ( ",
+        "service.subject = 'review' OR ",
+        "( service.subject = 'reqn' AND service.method = 'PATCH' ) ",
+      ")" );
     PREPARE statement FROM @sql;
     EXECUTE statement;
     DEALLOCATE PREPARE statement;

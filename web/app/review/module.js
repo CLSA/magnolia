@@ -49,7 +49,7 @@ define( function() {
         select: 'reqn.identifier',
         where: 'reqn.identifier'
       },
-      constant: 'view'
+      constant: true
     },
     user_id: {
       column: 'reqn.user_id',
@@ -59,17 +59,21 @@ define( function() {
         table: 'user',
         select: 'CONCAT( user.first_name, " ", user.last_name, " (", user.name, ")" )',
         where: [ 'user.first_name', 'user.last_name', 'user.name' ]
-      }
+      },
+      constant: true
+    },
+    date: {
+      title: 'Created On',
+      type: 'date',
+      constant: true
     },
     recommendation: {
       title: 'Recommendation',
-      type: 'enum',
-      exclude: 'add'
+      type: 'enum'
     },
     note: {
       title: 'Note',
-      type: 'text',
-      exclude: 'add'
+      type: 'text'
     }
   } );
 
@@ -82,21 +86,6 @@ define( function() {
     title: 'Download',
     operation: function( $state, model ) { model.viewModel.downloadForm(); }
   } );
-
-  /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnReviewAdd', [
-    'CnReviewModelFactory',
-    function( CnReviewModelFactory ) {
-      return {
-        templateUrl: module.getFileUrl( 'add.tpl.html' ),
-        restrict: 'E',
-        scope: { model: '=?' },
-        controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnReviewModelFactory.root;
-        }
-      };
-    }
-  ] );
 
   /* ######################################################################################################## */
   cenozo.providers.directive( 'cnReviewList', [
@@ -125,15 +114,6 @@ define( function() {
           if( angular.isUndefined( $scope.model ) ) $scope.model = CnReviewModelFactory.root;
         }
       };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnReviewAddFactory', [
-    'CnBaseAddFactory',
-    function( CnBaseAddFactory ) {
-      var object = function( parentModel ) { CnBaseAddFactory.construct( this, parentModel ); };
-      return { instance: function( parentModel ) { return new object( parentModel ); } };
     }
   ] );
 
@@ -168,14 +148,21 @@ define( function() {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnReviewModelFactory', [
-    'CnBaseModelFactory', 'CnReviewAddFactory', 'CnReviewListFactory', 'CnReviewViewFactory', 'CnSession',
-    function( CnBaseModelFactory, CnReviewAddFactory, CnReviewListFactory, CnReviewViewFactory, CnSession ) {
+    'CnBaseModelFactory', 'CnReviewListFactory', 'CnReviewViewFactory', 'CnSession',
+    function( CnBaseModelFactory, CnReviewListFactory, CnReviewViewFactory, CnSession ) {
       var object = function( root ) {
         var self = this;
         CnBaseModelFactory.construct( this, module );
-        this.addModel = CnReviewAddFactory.instance( this );
         this.listModel = CnReviewListFactory.instance( this );
         this.viewModel = CnReviewViewFactory.instance( this, root );
+
+        // only allow editing user and date under particular roles
+        if( 0 <= ['administrator','chair'].indexOf( CnSession.role.name ) ) {
+          this.module.inputGroupList.findByProperty( 'title', '' ).inputList.user_id.constant = false;
+          this.module.inputGroupList.findByProperty( 'title', '' ).inputList.date.constant = false;
+        }
+
+        this.isReviewer = function() { return 'reviewer' == CnSession.role.name; };
 
         // override the service collection path so that reviewers can view their reviews from the home screen
         this.getServiceCollectionPath = function() {
@@ -183,12 +170,10 @@ define( function() {
           return this.$$getServiceCollectionPath( 'root' == this.getSubjectFromState() );
         };
 
-        this.isReviewer = function() { return 'reviewer' == CnSession.role.name; };
-
-        // override the service collection path so that reviewers can view their reviews from the home screen
+        // override the service data so that reviewers only see incomplete reviews from the home screen
         this.getServiceData = function( type, columnRestrictLists ) {
           var data = this.$$getServiceData( type, columnRestrictLists );
-          if( 'root' == this.getSubjectFromState() ) {
+          if( 'root' == this.getSubjectFromState() && 'reviewer' == CnSession.role.name ) {
             if( angular.isUndefined( data.modifier.where ) ) data.modifier.where = [];
             data.modifier.where.push( {
               column: 'review.recommendation',

@@ -41,8 +41,6 @@ class patch extends \cenozo\service\patch
     {
       // define whether the action is allowed
       $db_role = lib::create( 'business\session' )->get_role();
-      $applicant = 'applicant' == $db_role->name;
-      $administrator = 'administrator' == $db_role->name;
       $db_reqn = $this->get_leaf_record();
       $db_current_stage_type = $db_reqn->get_current_stage_type();
       $state = $db_reqn->state;
@@ -50,7 +48,7 @@ class patch extends \cenozo\service\patch
       $code = NULL;
       if( 'abandon' == $action )
       {
-        if( ( !$applicant && !$administrator ) || 'deferred' != $state ) $code = 403;
+        if( !in_array( $db_role->name, array( 'applicant', 'administrator' ) ) || 'deferred' != $state ) $code = 403;
       }
       else if( 'defer' == $action )
       {
@@ -58,11 +56,11 @@ class patch extends \cenozo\service\patch
       }
       else if( 'reactivate' == $action )
       {
-        if( !$administrator || 'abandoned' != $state ) $code = 403;
+        if( 'administrator' != $db_role->name || 'abandoned' != $state ) $code = 403;
       }
       else if( 'submit' == $action )
       {
-        if( $applicant )
+        if( 'applicant' == $db_role->name )
         {
           if( 'new' != $phase && 'deferred' != $state ) $code = 403;
           else
@@ -79,7 +77,7 @@ class patch extends \cenozo\service\patch
       }
       else if( 'next_stage' == $action )
       {
-        if( $administrator )
+        if( in_array( $db_role->name, array( 'administrator', 'chair' ) ) )
         {
           if( !is_null( $state ) || (
             ( 'review' != $phase || 'SMT Decision' == $db_current_stage_type->name ) &&
@@ -90,7 +88,7 @@ class patch extends \cenozo\service\patch
       }
       else if( 'decide' == $action )
       {
-        if( !$administrator || !$db_current_stage_type->decision ) $code = 403;
+        if( !in_array( $db_role->name, array( 'administrator', 'chair', 'director' ) ) || !$db_current_stage_type->decision ) $code = 403;
       }
       else
       {

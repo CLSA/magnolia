@@ -519,7 +519,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             } else if( 'reactivate' == subject ) {
               return 'administrator' == role && 'abandoned' == state;
             } else if( 'proceed' == subject ) {
-              return 'administrator' == role && !decision && 0 <= ['review','agreement'].indexOf( phase );
+              return 0 <= ['administrator','chair'].indexOf( role ) && !decision && 0 <= ['review','agreement'].indexOf( phase );
             } else if( 'decide' == subject ) {
               return 0 <= ['administrator','chair','director'].indexOf( role ) && decision;
             } else {
@@ -1052,6 +1052,28 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         this.getServiceCollectionPath = function() {
           // ignore the parent if it is root
           return this.$$getServiceCollectionPath( 'root' == this.getSubjectFromState() );
+        };
+
+        // override the service collection so that chairs only see DSAC reqns from the home screen
+        this.getServiceData = function( type, columnRestrictLists ) {
+          var data = this.$$getServiceData( type, columnRestrictLists );
+          if( 'root' == this.getSubjectFromState() ) {
+            if( angular.isUndefined( data.modifier.where ) ) data.modifier.where = [];
+            if( 'chair' == CnSession.role.name ) {
+              data.modifier.where.push( {
+                column: 'stage_type.name',
+                operator: 'LIKE',
+                value: 'DSAC%'
+              } );
+            } else if( 'director' == CnSession.role.name ) {
+              data.modifier.where.push( {
+                column: 'stage_type.name',
+                operator: 'LIKE',
+                value: 'SMT%'
+              } );
+            }
+          }
+          return data;
         };
 
         // make the input lists from all groups more accessible

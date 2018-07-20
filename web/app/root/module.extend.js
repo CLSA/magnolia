@@ -4,7 +4,8 @@ define( [ 'reqn', 'review', 'root' ].reduce( function( list, name ) {
 }, [] ), function() {
   'use strict';
 
-  var module = cenozoApp.module( 'root' );
+  var reqnModule = cenozoApp.module( 'reqn' );
+  var reviewModule = cenozoApp.module( 'review' );
 
   // extend the view factory
   cenozo.providers.decorator( 'cnHomeDirective', [
@@ -23,6 +24,25 @@ define( [ 'reqn', 'review', 'root' ].reduce( function( list, name ) {
             $scope.reqnModel = CnReqnModelFactory.instance();
           }
         } );
+      } else if( 0 <= ['chair','director'].indexOf( CnSession.role.name ) ) {
+        // show chairs the reqn list on their home page
+        angular.extend( $delegate[0], {
+          compile: function() {
+            return function( scope, element, attrs ) {
+              if( angular.isFunction( oldLink ) ) oldLink( scope, element, attrs );
+              angular.element( element[0].querySelector( '.inner-view-frame div' ) ).append(
+                '<cn-reqn-list model="reqnModel"></cn-reqn-list>'
+              );
+              $compile( element.contents() )( scope );
+            };
+          },
+          controller: function( $scope ) {
+            oldController( $scope );
+            $scope.reqnModel = CnReqnModelFactory.instance();
+            $scope.reqnModel.listModel.heading =
+              ( 'chair' == CnSession.role.name ? 'DSAC' : 'SMT' ) + ' ' + reqnModule.name.singular.ucWords() + ' List';
+          }
+        } );
       } else if( 'reviewer' == CnSession.role.name ) {
         // show reviewers the review list on their home page
         angular.extend( $delegate[0], {
@@ -30,7 +50,7 @@ define( [ 'reqn', 'review', 'root' ].reduce( function( list, name ) {
             return function( scope, element, attrs ) {
               if( angular.isFunction( oldLink ) ) oldLink( scope, element, attrs );
               angular.element( element[0].querySelector( '.inner-view-frame div' ) ).append(
-                '<cn-review-list model="reviewModel" remove-columns="recommendation"></cn-review-list>'
+                '<cn-review-list model="reviewModel"></cn-review-list>'
               );
               $compile( element.contents() )( scope );
             };
@@ -38,7 +58,7 @@ define( [ 'reqn', 'review', 'root' ].reduce( function( list, name ) {
           controller: function( $scope ) {
             oldController( $scope );
             $scope.reviewModel = CnReviewModelFactory.instance();
-            $scope.reviewModel.listModel.heading = 'Outstanding Review List';
+            $scope.reviewModel.listModel.heading = 'Outstanding ' + reviewModule.name.singular.ucWords() + ' List';
           }
         } );
       }
