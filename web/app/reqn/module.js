@@ -242,7 +242,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
   cenozo.providers.directive( 'cnReqnForm', [
     'CnReqnModelFactory', 'cnRecordViewDirective', 'CnSession', '$q',
     function( CnReqnModelFactory, cnRecordViewDirective, CnSession, $q ) {
-      // used to piggy-back on the basic view controller's functionality (but not used in the DOM)
+      // used to piggy-back on the basic view controller's functionality
       var cnRecordView = cnRecordViewDirective[0];
 
       return {
@@ -269,7 +269,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             );
 
             // display the decision notice (the function will determine whether this should be done or not)
-            scope.model.formModel.displayDecisionNotice();
+            scope.model.viewModel.displayDecisionNotice();
           } );
 
           // fill in the start date delay
@@ -285,19 +285,19 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             }
           } );
           scope.$watch( 'model.viewModel.record.lay_summary', function( text ) {
-            scope.model.formModel.charCount.lay_summary = text ? text.length : 0;
+            scope.model.viewModel.charCount.lay_summary = text ? text.length : 0;
           } );
           scope.$watch( 'model.viewModel.record.background', function( text ) {
-            scope.model.formModel.wordCount.background = text ? text.split( ' ' ).length : 0;
+            scope.model.viewModel.wordCount.background = text ? text.split( ' ' ).length : 0;
           } );
           scope.$watch( 'model.viewModel.record.objectives', function( text ) {
-            scope.model.formModel.wordCount.objectives = text ? text.split( ' ' ).length : 0;
+            scope.model.viewModel.wordCount.objectives = text ? text.split( ' ' ).length : 0;
           } );
           scope.$watch( 'model.viewModel.record.methodology', function( text ) {
-            scope.model.formModel.wordCount.methodology = text ? text.split( ' ' ).length : 0;
+            scope.model.viewModel.wordCount.methodology = text ? text.split( ' ' ).length : 0;
           } );
           scope.$watch( 'model.viewModel.record.analysis', function( text ) {
-            scope.model.formModel.wordCount.analysis = text ? text.split( ' ' ).length : 0;
+            scope.model.viewModel.wordCount.analysis = text ? text.split( ' ' ).length : 0;
           } );
         },
         controller: function( $scope ) {
@@ -305,7 +305,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           cnRecordView.controller[1]( $scope );
 
           // coapplicant resources
-          var coapplicantAddModel = $scope.model.formModel.coapplicantModel.addModel;
+          var coapplicantAddModel = $scope.model.viewModel.coapplicantModel.addModel;
           $scope.coapplicantRecord = {};
           coapplicantAddModel.onNew( $scope.coapplicantRecord );
 
@@ -321,12 +321,12 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           };
 
           $scope.addCoapplicant = function() {
-            if( $scope.model.formModel.coapplicantModel.getAddEnabled() ) {
+            if( $scope.model.viewModel.coapplicantModel.getAddEnabled() ) {
               var form = cenozo.getScopeByQuerySelector( '#part1a2Form' ).part1a2Form;
 
               // we need to check each add-input for errors
               var valid = true;
-              for( var property in $scope.model.formModel.coapplicantModel.module.inputGroupList[0].inputList ) {
+              for( var property in $scope.model.viewModel.coapplicantModel.module.inputGroupList[0].inputList ) {
                 // get the property's form element and remove any conflict errors, then see if it's invalid
                 var currentElement = cenozo.getFormElement( property );
                 currentElement.$error.conflict = false;
@@ -345,7 +345,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                   form.$setPristine();
                   return $q.all( [
                     coapplicantAddModel.onNew( $scope.coapplicantRecord ),
-                    $scope.model.formModel.getCoapplicantList()
+                    $scope.model.viewModel.getCoapplicantList()
                   ] );
                 } ).finally( function() { $scope.isAddingCoapplicant = false; } );
               }
@@ -353,22 +353,22 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           };
 
           $scope.removeCoapplicant = function( id ) {
-            if( $scope.model.formModel.coapplicantModel.getDeleteEnabled() ) {
+            if( $scope.model.viewModel.coapplicantModel.getDeleteEnabled() ) {
               if( 0 > $scope.isDeletingCoapplicant.indexOf( id ) ) $scope.isDeletingCoapplicant.push( id );
               var index = $scope.isDeletingCoapplicant.indexOf( id );
-              $scope.model.formModel.removeCoapplicant( id ).finally( function() {
+              $scope.model.viewModel.removeCoapplicant( id ).finally( function() {
                 if( 0 <= index ) $scope.isDeletingCoapplicant.splice( index, 1 );
               } );
             }
           };
 
           // reference resources
-          var referenceAddModel = $scope.model.formModel.referenceModel.addModel;
+          var referenceAddModel = $scope.model.viewModel.referenceModel.addModel;
           $scope.referenceRecord = {};
           referenceAddModel.onNew( $scope.referenceRecord );
 
           $scope.addReference = function() {
-            if( $scope.model.formModel.referenceModel.getAddEnabled() ) {
+            if( $scope.model.viewModel.referenceModel.getAddEnabled() ) {
               var form = cenozo.getScopeByQuerySelector( '#part1a4Form' ).part1a4Form;
               if( !form.$valid ) {
                 // dirty all inputs so we can find the problem
@@ -379,7 +379,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                   form.$setPristine();
                   return $q.all( [
                     referenceAddModel.onNew( $scope.referenceRecord ),
-                    $scope.model.formModel.getReferenceList()
+                    $scope.model.viewModel.getReferenceList()
                   ] );
                 } ).finally( function() { $scope.isAddingReference = false; } );
               }
@@ -387,17 +387,17 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           };
 
           $scope.removeReference = function( id ) {
-            if( $scope.model.formModel.referenceModel.getDeleteEnabled() ) {
+            if( $scope.model.viewModel.referenceModel.getDeleteEnabled() ) {
               if( 0 > $scope.isDeletingReference.indexOf( id ) ) $scope.isDeletingReference.push( id );
               var index = $scope.isDeletingReference.indexOf( id );
-              $scope.model.formModel.removeReference( id ).finally( function() {
+              $scope.model.viewModel.removeReference( id ).finally( function() {
                 if( 0 <= index ) $scope.isDeletingReference.splice( index, 1 );
               } );
             }
           };
 
           $scope.setReferenceRank = function( id, rank ) {
-            $scope.model.formModel.setReferenceRank( id, rank );
+            $scope.model.viewModel.setReferenceRank( id, rank );
           };
 
           $scope.check = function( property ) {
@@ -409,11 +409,11 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               // Both the coapplicant and reference cn-add-input directives share this method, so differentiate
               // by checking to see which module has the property
               if( null != coapplicantModule.getInput( property ) ) {
-                element.$error.format = !$scope.model.formModel.coapplicantModel.testFormat(
+                element.$error.format = !$scope.model.viewModel.coapplicantModel.testFormat(
                   property, $scope.coapplicantRecord[property]
                 );
               } else if( null != referenceModule.getInput( property ) ) {
-                element.$error.format = !$scope.model.formModel.referenceModel.testFormat(
+                element.$error.format = !$scope.model.viewModel.referenceModel.testFormat(
                   property, $scope.referenceRecord[property]
                 );
               }
@@ -421,7 +421,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             }
           };
 
-          $scope.t = function( value ) { return $scope.model.formModel.translate( value ); };
+          $scope.t = function( value ) { return $scope.model.viewModel.translate( value ); };
         }
       };
     }
@@ -468,8 +468,10 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnReqnViewFactory', [
+    'CnCoapplicantModelFactory', 'CnReferenceModelFactory',
     'CnBaseViewFactory', 'CnSession', 'CnHttpFactory', 'CnModalConfirmFactory', 'CnModalTextFactory', '$q',
-    function( CnBaseViewFactory, CnSession, CnHttpFactory, CnModalConfirmFactory, CnModalTextFactory, $q ) {
+    function( CnCoapplicantModelFactory, CnReferenceModelFactory,
+              CnBaseViewFactory, CnSession, CnHttpFactory, CnModalConfirmFactory, CnModalTextFactory, $q ) {
       var object = function( parentModel, root ) {
         var self = this;
         CnBaseViewFactory.construct( this, parentModel, root );
@@ -480,23 +482,27 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
         angular.extend( this, {
           onView: function( force ) {
-            var formModel = this.parentModel.formModel;
+            // we need to do some extra work when looking at the reqn form
+            if( 'reqn' == this.parentModel.getSubjectFromState() && 'form' == this.parentModel.getActionFromState() ) {
+              // reset tab values
+              this.setTab( 0, this.parentModel.getQueryParameter( 't0' ), false );
+              this.setTab( 1, this.parentModel.getQueryParameter( 't1' ), false );
+              this.setTab( 2, this.parentModel.getQueryParameter( 't2' ), false );
 
-            // reset tab values
-            formModel.setTab( 0, this.parentModel.getQueryParameter( 't0' ), false );
-            formModel.setTab( 1, this.parentModel.getQueryParameter( 't1' ), false );
-            formModel.setTab( 2, this.parentModel.getQueryParameter( 't2' ), false );
+              return $q.all( [
+                this.$$onView( force ).then( function() {
+                  // define the earliest date that the reqn may start
+                  self.minStartDate = moment( self.record.deadline ).add( CnSession.application.startDateDelay, 'months' );
+                  return self.updateEthicsFileSize();
+                } ),
+                this.getCoapplicantList(),
+                this.getReferenceList(),
+                this.getDataOptionValueList()
+              ] );
+            }
 
-            return $q.all( [
-              this.$$onView( force ).then( function() {
-                // define the earliest date that the reqn may start
-                formModel.minStartDate = moment( self.record.deadline ).add( CnSession.application.startDateDelay, 'months' );
-                return formModel.updateEthicsFileSize();
-              } ),
-              formModel.getCoapplicantList(),
-              formModel.getReferenceList(),
-              formModel.getDataOptionValueList()
-            ] );
+            return this.$$onView( force );
+
           },
 
           deferralNotesExist: function() {
@@ -644,24 +650,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                 } );
               }
             } );
-          }
-        } );
-      };
-      return { instance: function( parentModel, root ) { return new object( parentModel, root ); } };
-    }
-  ] );
+          },
 
-  /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnReqnFormFactory', [
-    'CnCoapplicantModelFactory', 'CnReferenceModelFactory',
-    'CnSession', 'CnHttpFactory', 'CnModalMessageFactory', 'CnModalConfirmFactory',
-    function( CnCoapplicantModelFactory, CnReferenceModelFactory,
-              CnSession, CnHttpFactory, CnModalMessageFactory, CnModalConfirmFactory ) {
-      var object = function( parentModel ) {
-        var self = this;
-
-        angular.extend( this, {
-          parentModel: parentModel,
           coapplicantModel: CnCoapplicantModelFactory.instance(),
           coapplicantList: [],
           referenceModel: CnReferenceModelFactory.instance(),
@@ -674,16 +664,15 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           minStartDate: null,
 
           translate: function( value ) {
-            return cenozoApp.translate( value, this.parentModel.viewModel.record.language );
+            return cenozoApp.translate( value, this.record.language );
           },
 
           // setup language and tab state parameters
           toggleLanguage: function() {
-            var record = this.parentModel.viewModel.record;
-            record.language = 'en' == record.language ? 'fr' : 'en';
+            this.record.language = 'en' == this.record.language ? 'fr' : 'en';
             return CnHttpFactory.instance( {
               path: this.parentModel.getServiceResourcePath(),
-              data: { language: record.language }
+              data: { language: this.record.language }
             } ).patch();
           },
 
@@ -820,7 +809,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           },
 
           removeEthicsFile: function() {
-            return this.parentModel.viewModel.onPatch( { ethics_filename: null } ).then( function() {
+            return this.onPatch( { ethics_filename: null } ).then( function() {
               return self.updateEthicsFileSize();
             } );
           },
@@ -836,7 +825,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               path: this.parentModel.getServiceResourcePath(),
               data: { ethics_filename: fileDetails.name }
             } ).patch().then( function() {
-              self.parentModel.viewModel.record.ethics_filename = fileDetails.name;
+              self.record.ethics_filename = fileDetails.name;
 
               // upload the file
               return CnHttpFactory.instance( {
@@ -886,9 +875,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
           show: function( subject ) {
             var role = CnSession.role.name;
-            var phase = this.parentModel.viewModel.record.phase;
-            var state = this.parentModel.viewModel.record.state;
-            var decision = this.parentModel.viewModel.record.decision;
+            var phase = this.record.phase;
+            var state = this.record.state;
+            var decision = this.record.decision;
 
             if( 'submit' == subject ) {
               return 'applicant' == role && ( 'new' == phase || 'deferred' == state );
@@ -902,7 +891,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           },
 
           submit: function() {
-            var record = this.parentModel.viewModel.record;
+            var record = this.record;
             return CnModalConfirmFactory.instance( {
               title: this.translate( 'misc.pleaseConfirm' ),
               message: this.translate( 'misc.submitWarning' )
@@ -978,7 +967,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                         } );
                       } else CnModalMessageFactory.httpError( response );
                     }
-                  } ).patch().then( function() { self.parentModel.viewModel.transitionOnViewParent(); } );
+                  } ).patch().then( function() { self.transitionOnViewParent(); } );
                 }
               }
             } );
@@ -992,15 +981,15 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           },
 
           viewRecord: function() {
-            return this.parentModel.transitionToViewState( this.parentModel.viewModel.record );
+            return this.parentModel.transitionToViewState( this.record );
           },
 
           abandon: function() {
             return CnHttpFactory.instance( {
               path: this.parentModel.getServiceResourcePath() + "?action=abandon"
             } ).patch().then( function() {
-              self.parentModel.viewModel.record.state = 'abandoned';
-              self.parentModel.viewModel.transitionOnViewParent();
+              self.record.state = 'abandoned';
+              self.transitionOnViewParent();
             } );
           },
 
@@ -1008,20 +997,19 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             return CnHttpFactory.instance( {
               path: this.parentModel.getServiceResourcePath()
             } ).delete().then( function() {
-              self.parentModel.viewModel.transitionOnViewParent();
+              self.transitionOnViewParent();
             } );
           },
 
           displayDecisionNotice: function() {
-            var record = this.parentModel.viewModel.record;
             if( 'applicant' == CnSession.role.name &&
-                record.decision_notice &&
-                ( 'Approved' == record.stage_type || 'Not Approved' == record.stage_type ) ) {
+                this.record.decision_notice &&
+                ( 'Approved' == this.record.stage_type || 'Not Approved' == this.record.stage_type ) ) {
               CnModalMessageFactory.instance( {
-                title: this.parentModel.module.name.singular.ucWords() + ' ' + record.identifier + ' ' + record.stage_type,
-                message: 'Dear ' + record.applicant_name + ',\n\n' +
+                title: this.parentModel.module.name.singular.ucWords() + ' ' + this.record.identifier + ' ' + this.record.stage_type,
+                message: 'Dear ' + this.record.applicant_name + ',\n\n' +
                   'TODO: the generic header for notice of decision letters must be written\n\n' +
-                  record.decision_notice + '\n\n' +
+                  this.record.decision_notice + '\n\n' +
                   'TODO: the generic footer for notice of decision letters must be written'
               } ).show();
             }
@@ -1031,22 +1019,21 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         this.coapplicantModel.metadata.getPromise(); // needed to get the coapplicant's metadata
         this.referenceModel.metadata.getPromise(); // needed to get the reference's metadata
       };
-      return { instance: function( parentModel ) { return new object( parentModel ); } };
+      return { instance: function( parentModel, root ) { return new object( parentModel, root ); } };
     }
   ] );
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnReqnModelFactory', [
-    'CnBaseModelFactory', 'CnReqnListFactory', 'CnReqnViewFactory', 'CnReqnFormFactory',
+    'CnBaseModelFactory', 'CnReqnListFactory', 'CnReqnViewFactory',
     'CnHttpFactory', 'CnSession', '$state', '$transitions', '$q',
-    function( CnBaseModelFactory, CnReqnListFactory, CnReqnViewFactory, CnReqnFormFactory,
+    function( CnBaseModelFactory, CnReqnListFactory, CnReqnViewFactory,
               CnHttpFactory, CnSession, $state, $transitions, $q ) {
       var object = function( root ) {
         var self = this;
         CnBaseModelFactory.construct( this, module );
         this.listModel = CnReqnListFactory.instance( this );
         this.viewModel = CnReqnViewFactory.instance( this, root );
-        this.formModel = CnReqnFormFactory.instance( this );
 
         // override the service collection path so that applicants can view their reqns from the home screen
         this.getServiceCollectionPath = function() {
