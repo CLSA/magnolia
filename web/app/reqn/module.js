@@ -176,6 +176,14 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
   } );
   
   module.addExtraOperation( 'view', {
+    title: 'Abandon',
+    classes: 'btn-warning',
+    isIncluded: function( $state, model ) { return model.viewModel.show( 'abandon' ); },
+    isDisabled: function( $state, model ) { return !model.viewModel.enabled( 'abandon' ); },
+    operation: function( $state, model ) { model.viewModel.abandon(); }
+  } );
+  
+  module.addExtraOperation( 'view', {
     title: 'Re-activate',
     classes: 'btn-warning',
     isIncluded: function( $state, model ) { return model.viewModel.show( 'reactivate' ); },
@@ -469,9 +477,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnReqnViewFactory', [
     'CnCoapplicantModelFactory', 'CnReferenceModelFactory',
-    'CnBaseViewFactory', 'CnSession', 'CnHttpFactory', 'CnModalConfirmFactory', 'CnModalTextFactory', '$q',
+    'CnBaseViewFactory', 'CnSession', 'CnHttpFactory', 'CnModalMessageFactory', 'CnModalConfirmFactory', 'CnModalTextFactory', '$q',
     function( CnCoapplicantModelFactory, CnReferenceModelFactory,
-              CnBaseViewFactory, CnSession, CnHttpFactory, CnModalConfirmFactory, CnModalTextFactory, $q ) {
+              CnBaseViewFactory, CnSession, CnHttpFactory, CnModalMessageFactory, CnModalConfirmFactory, CnModalTextFactory, $q ) {
       var object = function( parentModel, root ) {
         var self = this;
         CnBaseViewFactory.construct( this, parentModel, root );
@@ -502,7 +510,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             }
 
             return this.$$onView( force );
-
           },
 
           deferralNotesExist: function() {
@@ -520,8 +527,18 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             var stage_type = this.record.stage_type;
             var decision = this.record.decision;
 
-            if( 'defer' == subject ) {
-              return 'administrator' == role && 'deferred' != state && 0 <= ['review','agreement'].indexOf( phase );
+            if( 'submit' == subject ) {
+              return 'applicant' == role && ( 'new' == phase || 'deferred' == state );
+            } else if( 'view' == subject ) {
+              return 'applicant' != role;
+            } else if( 'abandon' == subject ) {
+              return 0 <= ['administrator','applicant'].indexOf( role ) && 'deferred' == state && 'review' == phase;
+            } else if( 'delete' == subject ) {
+              return 'new' == phase;
+            } else if( 'defer' == subject ) {
+              return 'administrator' == role &&
+                0 > ['abandoned','deferred'].indexOf( state ) &&
+                0 <= ['review','agreement'].indexOf( phase );
             } else if( 'reactivate' == subject ) {
               return 'administrator' == role && 'abandoned' == state;
             } else if( 'proceed' == subject ) {
@@ -548,12 +565,10 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             var stage_type = this.record.stage_type;
             var stage_complete = this.record.stage_complete;
 
-            if( 'defer' == subject ) {
-              return true;
-            } else if( 'reactivate' == subject ) {
+            if( 0 <= ['abandon','defer','reactivate'].indexOf( subject ) ) {
               return true;
             } else if( 'proceed' == subject ) {
-              return !state && stage_complete;
+              return !state && ( 'DSAC Review' == stage_type || stage_complete );
             } else if( 'decide' == subject ) {
               return !state;
             } else {
@@ -587,7 +602,10 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                 return CnHttpFactory.instance( {
                   path: self.parentModel.getServiceResourcePath() + "?action=next_stage",
                 } ).patch().then( function() {
-                  self.transitionOnViewParent();
+                  self.onView();
+                  if( angular.isDefined( self.reviewModel ) ) self.reviewModel.listModel.onList( true );
+                  if( angular.isDefined( self.stageModel ) ) self.stageModel.listModel.onList( true );
+                  if( angular.isDefined( self.notificationModel ) ) self.notificationModel.listModel.onList( true );
                 } );
               }
             } );
@@ -612,7 +630,10 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                   path: self.parentModel.getServiceResourcePath() + "?action=decide&approve=" + decision,
                   data: { decision_notice: response }
                 } ).patch().then( function() {
-                  self.transitionOnViewParent();
+                  self.onView();
+                  if( angular.isDefined( self.reviewModel ) ) self.reviewModel.listModel.onList( true );
+                  if( angular.isDefined( self.stageModel ) ) self.stageModel.listModel.onList( true );
+                  if( angular.isDefined( self.notificationModel ) ) self.notificationModel.listModel.onList( true );
                 } );
               }
             } );
@@ -632,6 +653,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                   path: self.parentModel.getServiceResourcePath() + "?action=defer"
                 } ).patch().then( function() {
                   self.record.state = 'deferred';
+                  if( angular.isDefined( self.notificationModel ) ) self.notificationModel.listModel.onList( true );
                 } );
               }
             } );
@@ -646,7 +668,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                 return CnHttpFactory.instance( {
                   path: self.parentModel.getServiceResourcePath() + "?action=reactivate"
                 } ).patch().then( function() {
-                  self.record.state = '';
+                  self.record.state = 'deferred';
+                  if( angular.isDefined( self.notificationModel ) ) self.notificationModel.listModel.onList( true );
                 } );
               }
             } );
@@ -873,23 +896,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             return add ? http.post() : http.delete();
           },
 
-          show: function( subject ) {
-            var role = CnSession.role.name;
-            var phase = this.record.phase;
-            var state = this.record.state;
-            var decision = this.record.decision;
-
-            if( 'submit' == subject ) {
-              return 'applicant' == role && ( 'new' == phase || 'deferred' == state );
-            } else if( 'view' == subject ) {
-              return 'applicant' != role;
-            } else if( 'abandon' == subject ) {
-              return 'deferred' == state && 'review' == phase;
-            } else if( 'delete' == subject ) {
-              return 'new' == phase;
-            } return false;
-          },
-
           submit: function() {
             var record = this.record;
             return CnModalConfirmFactory.instance( {
@@ -988,8 +994,12 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             return CnHttpFactory.instance( {
               path: this.parentModel.getServiceResourcePath() + "?action=abandon"
             } ).patch().then( function() {
-              self.record.state = 'abandoned';
-              self.transitionOnViewParent();
+              if( 'applicant' == CnSession.role.name ) {
+                self.transitionOnViewParent();
+              } else {
+                self.record.state = 'abandoned';
+                if( angular.isDefined( self.notificationModel ) ) self.notificationModel.listModel.onList( true );
+              }
             } );
           },
 
@@ -1069,7 +1079,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
         this.isApplicant = function() { return 'applicant' == CnSession.role.name; }
 
-        if( 'administrator' == CnSession.role.name ) {
+        if( 'applicant' != CnSession.role.name ) {
           var mainInputGroup = module.inputGroupList.findByProperty( 'title', '' );
           mainInputGroup.inputList.stage_type.exclude = false;
           mainInputGroup.inputList.state.exclude = false;

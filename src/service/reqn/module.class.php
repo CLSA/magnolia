@@ -27,11 +27,11 @@ class module extends \cenozo\service\module
 
     if( 300 > $this->get_status()->get_code() )
     {
-      // make sure to restrict applicants to their own reqns
+      // make sure to restrict applicants to their own reqns which are not abandoned
       $db_reqn = $this->get_resource();
       if( 'applicant' == $db_role->name && !is_null( $db_reqn ) )
       {
-        if( $db_reqn->user_id != $db_user->id )
+        if( $db_reqn->user_id != $db_user->id || 'abandoned' == $db_reqn->state )
         {
           $this->get_status()->set_code( 404 );
           return;
@@ -53,8 +53,12 @@ class module extends \cenozo\service\module
 
     $modifier->join( 'deadline', 'reqn.deadline_id', 'deadline.id' );
 
-    // only show applicants their own reqns
-    if( 'applicant' == $db_role->name ) $modifier->where( 'reqn.user_id', '=', $db_user->id );
+    // only show applicants their own reqns which aren't abandoned
+    if( 'applicant' == $db_role->name )
+    {
+      $modifier->where( 'reqn.user_id', '=', $db_user->id );
+      $modifier->where( 'IFNULL( reqn.state, "" )', '!=', 'abandoned' );
+    }
 
     if( $select->has_column( 'user_full_name' ) )
     {
@@ -102,15 +106,15 @@ class module extends \cenozo\service\module
         // show admin stages before deadline as waiting for review
         $select->add_table_column(
           'stage_type',
-          'IF( '.
-          '  "deferred" = state, "Action Required", '.
-          '  IF( state IS NOT NULL, CONCAT( UPPER( SUBSTRING( state, 1, 1 ) ), SUBSTRING( state, 2 ) ), '.
-          '    IF( '.
-          '      "review" = stage_type.phase AND deadline.date > DATE( UTC_TIMESTAMP() ), '.
-          '      "Waiting for Review", '.
-          '      stage_type.status '.
-          '    )'.
-          '  )'.
+          'IF( '."\n".
+          '  "deferred" = state, "Action Required", '."\n".
+          '  IF( state IS NOT NULL, CONCAT( UPPER( SUBSTRING( state, 1, 1 ) ), SUBSTRING( state, 2 ) ), '."\n".
+          '    IF( '."\n".
+          '      "review" = stage_type.phase AND deadline.date > DATE( UTC_TIMESTAMP() ), '."\n".
+          '      "Waiting for Review", '."\n".
+          '      stage_type.status '."\n".
+          '    )'."\n".
+          '  )'."\n".
           ')',
           'status',
           false

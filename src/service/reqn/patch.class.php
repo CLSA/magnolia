@@ -144,8 +144,17 @@ class patch extends \cenozo\service\patch
       }
       else if( 'reactivate' == $action )
       {
-        $db_reqn->state = NULL;
+        $db_reqn->state = 'deferred';
         $db_reqn->save();
+
+        // send a notification
+        $db_notification = lib::create( 'database\notification' );
+        $db_notification->reqn_id = $db_reqn->id;
+        $db_notification->notification_type_id =
+          $notification_type_class_name::get_unique_record( 'name', 'Requisition Reactivated' )->id;
+        $db_notification->email = $db_reqn->applicant_email;
+        $db_notification->datetime = util::get_datetime_object();
+        $db_notification->save();
       }
       else if( 'submit' == $action )
       {
