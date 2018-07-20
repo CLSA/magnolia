@@ -45,7 +45,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
       }
     },
     defaultOrder: {
-      column: 'reqn.identifier',
+      column: 'identifier',
       reverse: false
     }
   } );
