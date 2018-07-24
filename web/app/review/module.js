@@ -51,8 +51,14 @@ define( function() {
       },
       constant: true
     },
+    review_type: {
+      column: 'review_type.name',
+      title: 'Review Type',
+      type: 'string',
+      constant: true
+    },
     user_id: {
-      column: 'reqn.user_id',
+      column: 'review.user_id',
       title: 'Reviewer',
       type: 'lookup-typeahead',
       typeahead: {
@@ -128,11 +134,39 @@ define( function() {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnReviewViewFactory', [
-    'CnBaseViewFactory', 'CnHttpFactory',
-    function( CnBaseViewFactory, CnHttpFactory ) {
+    'CnBaseViewFactory', 'CnHttpFactory', 'CnSession',
+    function( CnBaseViewFactory, CnHttpFactory, CnSession ) {
       var object = function( parentModel, root ) {
         var self = this;
         CnBaseViewFactory.construct( this, parentModel, root );
+
+        // administrators can edit any review, but other roles only have access to specific reviews (updated after the record is loaded)
+        this.mayEdit = 'administrator' == CnSession.role.name;
+        this.onView = function( force ) {
+          self.mayEdit = 'administrator' == CnSession.role.name;
+          return self.$$onView( force ).then( function() {
+            if( !self.mayEdit ) {
+              if( self.record.user_id == CnSession.user.id ) {
+                self.mayEdit = true;
+              } else {
+                if( 'Admin' == self.record.review_type || 'SAC' == self.record.review_type ) {
+                  self.mayEdit = false;
+                } else if( 'Reviewer 1' == self.record.review_type || 'Reviewer 2' == self.record.review_type ) {
+                  self.mayEdit = 'reviewer' == CnSession.role.name || 'chair' == CnSession.role.name;
+                } else if( 'Chair' == self.record.review_type ) {
+                  self.mayEdit = 'chair' == CnSession.role.name;
+                } else if( 'SMT' == self.record.review_type ) {
+                  self.mayEdit = 'director' == CnSession.role.name;
+                }
+              }
+            }
+          } );
+        };
+
+        // add an additional check to see if the review is editable
+        this.parentModel.getEditEnabled = function() {
+          return self.parentModel.$$getEditEnabled() && self.mayEdit;
+        };
 
         this.downloadForm = function() {
           var parent = self.parentModel.getParentIdentifier();

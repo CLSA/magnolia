@@ -172,7 +172,7 @@ class patch extends \cenozo\service\patch
       else if( 'next_stage' == $action )
       {
         $db_current_stage_type = $db_reqn->get_current_stage_type();
-        if( 'DSAC Decision' == $db_current_stage_type->name )
+        if( 'DSAC Review' == $db_current_stage_type->name )
         {
           // no decision is being made, so move to the SMT Decision stage, not the Approve stage
           $db_reqn->add_to_stage( 'SMT Decision' );

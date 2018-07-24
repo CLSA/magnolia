@@ -37,7 +37,7 @@ UNION
 
 SELECT stage_type.id, next_stage_type.id
 FROM stage_type, stage_type AS next_stage_type
-WHERE stage_type.name = "DSAC Decision"
+WHERE stage_type.name = "DSAC Review"
 AND next_stage_type.name = "Approved"
 
 UNION

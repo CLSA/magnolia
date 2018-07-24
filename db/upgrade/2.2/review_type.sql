@@ -21,5 +21,5 @@ SELECT "Admin", id FROM stage_type WHERE name = "Admin Review" UNION
 SELECT "SAC", id FROM stage_type WHERE name = "SAC Review" UNION
 SELECT "Reviewer 1", id FROM stage_type WHERE name = "DSAC Selection" UNION
 SELECT "Reviewer 2", id FROM stage_type WHERE name = "DSAC Selection" UNION
-SELECT "Chair", id FROM stage_type WHERE name = "DSAC Decision" UNION
+SELECT "Chair", id FROM stage_type WHERE name = "DSAC Review" UNION
 SELECT "SMT", id FROM stage_type WHERE name = "SMT Decision";

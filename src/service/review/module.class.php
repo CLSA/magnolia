@@ -17,6 +17,46 @@ class module extends \cenozo\service\module
   /**
    * Extend parent method
    */
+  public function validate()
+  {
+    parent::validate();
+    $session = lib::create( 'business\session' );
+    $db_user = lib::create( 'business\session' )->get_user();
+    $db_role = lib::create( 'business\session' )->get_role();
+
+    // restrict some review-types to certain roles (except when explicitely set to the current user)
+    if( 300 > $this->get_status()->get_code() )
+    {
+      if( 'PATCH' == $this->get_method() )
+      {
+        $db_review = $this->get_resource();
+        if( !is_null( $db_review ) && $db_review->user_id != $db_user->id )
+        {
+          $review_type = $this->get_resource()->get_review_type()->name;
+          if( 'administrator' != $db_role->name )
+          {
+            if( 'Admin' == $review_type || 'SAC' == $review_type ) $this->get_status()->set_code( 403 );
+            else if( 'Reviewer 1' == $review_type || 'Reviewer 2' == $review_type )
+            {
+              if( 'reviewer' != $db_role->name && 'chair' != $db_role->name ) $this->get_status()->set_code( 403 );
+            }
+            else if( 'Chair' == $review_type )
+            {
+              if( 'chair' != $db_role->name ) $this->get_status()->set_code( 403 );
+            }
+            else if( 'SMT' == $review_type )
+            {
+              if( 'director' != $db_role->name ) $this->get_status()->set_code( 403 );
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Extend parent method
+   */
   public function prepare_read( $select, $modifier )
   {
     parent::prepare_read( $select, $modifier );

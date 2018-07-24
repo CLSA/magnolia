@@ -544,15 +544,19 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             } else if( 'proceed' == subject ) {
               return 0 <= ['administrator','chair'].indexOf( role ) && !decision && 0 <= ['review','agreement'].indexOf( phase );
             } else if( 'decide' == subject ) {
-              return 0 <= ['administrator','chair','director'].indexOf( role ) && decision;
+              return decision && (
+                'administrator' == role ||
+                ( 'chair' == role && 'DSAC' == stage_type.substring( 0, 4 ) ) ||
+                ( 'director' == role && 'SMT Decision' == stage_type )
+              );
             } else {
               // the remainder are sub-actions belonging to the decide action
               if( 'approved' == subject ) {
                 return 'DSAC Selection' != stage_type;
               } else if( 'reject' == subject ) {
-                return 'DSAC Decision' != stage_type;
+                return 'DSAC Review' != stage_type;
               } else if( 'send to SMT' == subject ) {
-                return 'DSAC Decision' == stage_type;
+                return 'DSAC Review' == stage_type;
               } else if( 'apply proceed' == subject ) {
                 return 'DSAC Selection' == stage_type;
               } else return false;
@@ -575,7 +579,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               // the remainder are sub-actions belonging to the decide action
               if( 'approved' == subject ) {
                 return stage_complete && (
-                  ( 'DSAC Decision' == stage_type && 'Approved' == recommendation ) ||
+                  ( 'DSAC Review' == stage_type && 'Approved' == recommendation ) ||
                   ( 'SMT Decision' == stage_type && 'Not Approved' != recommendation )
                 );
               } else if( 'send to SMT' == subject ) {
