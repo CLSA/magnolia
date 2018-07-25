@@ -509,6 +509,22 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               ] );
             }
 
+            // if we are a reviewer assigned to this reqn and haven't completed our review then show a reminder
+            if( 'reviewer' == CnSession.role.name ) {
+              CnHttpFactory.instance( {
+                path: this.parentModel.getServiceResourcePath() + '/review',
+                data: { modifier: { where: { column: 'recommendation', operator: '=', value: null } } }
+              } ).count().then( function( response ) {
+                if( 0 < parseInt( response.headers( 'Total' ) ) ) {
+                  CnModalMessageFactory.instance( {
+                    title: 'Outstanding Review',
+                    message: 'Please note: this ' + self.parentModel.module.name.singular +
+                      ' has an outstanding review which you must complete before it can proceed with the review process.'
+                  } ).show();
+                }
+              } );
+            }
+
             return this.$$onView( force );
           },
 
