@@ -956,7 +956,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
                   // if there was an error then display it now
                   CnModalMessageFactory.instance( error ).show().then( function() {
-                    self.setTab( 0, 'part1' );
+                    self.setTab( 0, 'part1', false );
                     self.setTab( 1, errorTab );
                   } );
                 } else {
@@ -972,7 +972,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                           var element = cenozo.getFormElement( 'start_date' );
                           element.$error.custom = self.translate( 'misc.invalidStartDateTitle' );
                           cenozo.updateFormElement( element, true );
-                          self.setTab( 0, 'part1' );
+                          self.setTab( 0, 'part1', false );
                           self.setTab( 1, 'a3' );
                         } );
                       } else CnModalMessageFactory.httpError( response );
