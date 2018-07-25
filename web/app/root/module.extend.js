@@ -24,7 +24,7 @@ define( [ 'reqn', 'review', 'root' ].reduce( function( list, name ) {
             $scope.reqnModel = CnReqnModelFactory.instance();
           }
         } );
-      } else if( 0 <= ['chair','director'].indexOf( CnSession.role.name ) ) {
+      } else if( 0 <= ['chair','smt'].indexOf( CnSession.role.name ) ) {
         // show chairs the reqn list on their home page
         angular.extend( $delegate[0], {
           compile: function() {

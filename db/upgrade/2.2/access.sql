@@ -55,7 +55,7 @@ CREATE PROCEDURE patch_access()
         "SELECT user.id, role.id, site.id ",
         "FROM ", @cenozo, ".user, ", @cenozo, ".site, ", @cenozo, ".role ",
         "WHERE user.name IN ( 'cheesem', 'imolnar', 'langss', 'patrick' ) ",
-        "AND role.name IN( 'administrator', 'applicant', 'chair', 'director', 'reviewer' ) ",
+        "AND role.name IN( 'administrator', 'applicant', 'chair', 'reviewer', 'smt' ) ",
         "AND site.name = 'NCC' ",
         "UNION ",
         "SELECT user.id, role.id, site.id ",

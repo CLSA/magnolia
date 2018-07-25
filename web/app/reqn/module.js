@@ -547,7 +547,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               return decision && (
                 'administrator' == role ||
                 ( 'chair' == role && 'DSAC' == stage_type.substring( 0, 4 ) ) ||
-                ( 'director' == role && 'SMT Decision' == stage_type )
+                ( 'smt' == role && 'SMT Decision' == stage_type )
               );
             } else {
               // the remainder are sub-actions belonging to the decide action
@@ -1066,7 +1066,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                 operator: 'LIKE',
                 value: 'DSAC%'
               } );
-            } else if( 'director' == CnSession.role.name ) {
+            } else if( 'smt' == CnSession.role.name ) {
               data.modifier.where.push( {
                 column: 'stage_type.name',
                 operator: 'LIKE',

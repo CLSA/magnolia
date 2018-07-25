@@ -44,7 +44,7 @@ CREATE PROCEDURE patch_role_has_review_type()
       "WHERE role.name = 'chair' AND review_type.name = 'Chair' ",
       "UNION ",
       "SELECT role.id, review_type.id FROM ", @cenozo, ".role, review_type ",
-      "WHERE role.name = 'director' AND review_type.name = 'SMT'" );
+      "WHERE role.name = 'smt' AND review_type.name = 'SMT'" );
     PREPARE statement FROM @sql;
     EXECUTE statement;
     DEALLOCATE PREPARE statement;

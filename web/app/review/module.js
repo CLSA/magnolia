@@ -156,7 +156,7 @@ define( function() {
                 } else if( 'Chair' == self.record.review_type ) {
                   self.mayEdit = 'chair' == CnSession.role.name;
                 } else if( 'SMT' == self.record.review_type ) {
-                  self.mayEdit = 'director' == CnSession.role.name;
+                  self.mayEdit = 'smt' == CnSession.role.name;
                 }
               }
             }

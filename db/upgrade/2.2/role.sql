@@ -10,7 +10,7 @@ DROP PROCEDURE IF EXISTS patch_role;
 
     SET @sql = CONCAT(
       "INSERT IGNORE INTO ", @cenozo, ".role( name, tier, all_sites ) ",
-      "VALUES ( 'applicant', 1, 0 ), ( 'reviewer', 1, 1 ), ( 'chair', 1, 1 ), ( 'director', 1, 1 )" );
+      "VALUES ( 'applicant', 1, 0 ), ( 'reviewer', 1, 1 ), ( 'chair', 1, 1 ), ( 'smt', 1, 1 )" );
     PREPARE statement FROM @sql;
     EXECUTE statement;
     DEALLOCATE PREPARE statement;

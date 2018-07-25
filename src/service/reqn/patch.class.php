@@ -88,7 +88,7 @@ class patch extends \cenozo\service\patch
       }
       else if( 'decide' == $action )
       {
-        if( !in_array( $db_role->name, array( 'administrator', 'chair', 'director' ) ) || !$db_current_stage_type->decision ) $code = 403;
+        if( !in_array( $db_role->name, array( 'administrator', 'chair', 'smt' ) ) || !$db_current_stage_type->decision ) $code = 403;
       }
       else
       {

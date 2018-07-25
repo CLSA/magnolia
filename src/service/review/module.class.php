@@ -46,7 +46,7 @@ class module extends \cenozo\service\module
             }
             else if( 'SMT' == $review_type )
             {
-              if( 'director' != $db_role->name ) $this->get_status()->set_code( 403 );
+              if( 'smt' != $db_role->name ) $this->get_status()->set_code( 403 );
             }
           }
         }
