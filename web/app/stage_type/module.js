@@ -10,15 +10,19 @@ define( function() {
       possessive: 'stage type\'s'
     },
     columnList: {
-      phase: {
-        title: 'Phase'
-      },
       rank: {
         title: 'Rank',
         type: 'rank'
       },
       name: {
         title: 'Name'
+      },
+      phase: {
+        title: 'Phase'
+      },
+      notification_type: {
+        column: 'notification_type.name',
+        title: 'Notification'
       },
       reqn_count: {
         title: 'Requisitions',
@@ -32,16 +36,21 @@ define( function() {
   } );
 
   module.addInputGroup( '', {
-    phase: {
-      title: 'Phase',
-      type: 'string'
-    },
     rank: {
       title: 'Rank',
       type: 'rank'
     },
     name: {
       title: 'Name',
+      type: 'string'
+    },
+    phase: {
+      title: 'Phase',
+      type: 'string'
+    },
+    notification_type: {
+      column: 'notification_type.name',
+      title: 'Notification',
       type: 'string'
     }
   } );

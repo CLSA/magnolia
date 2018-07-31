@@ -41,10 +41,10 @@ CREATE PROCEDURE patch_role_has_review_type()
       "WHERE role.name = 'reviewer' AND review_type.name IN( 'Reviewer 1', 'Reviewer 2' ) ",
       "UNION ",
       "SELECT role.id, review_type.id FROM ", @cenozo, ".role, review_type ",
-      "WHERE role.name = 'chair' AND review_type.name = 'Chair' ",
+      "WHERE role.name = 'chair' AND review_type.name IN( 'Chair', 'Second Chair' ) ",
       "UNION ",
       "SELECT role.id, review_type.id FROM ", @cenozo, ".role, review_type ",
-      "WHERE role.name = 'smt' AND review_type.name = 'SMT'" );
+      "WHERE role.name = 'smt' AND review_type.name IN( 'SMT', 'Second SMT' )" );
     PREPARE statement FROM @sql;
     EXECUTE statement;
     DEALLOCATE PREPARE statement;

@@ -75,6 +75,14 @@ class get extends \cenozo\service\downloadable
     else
     {
       parent::execute();
+
+      // add the next stage type
+      $db_reqn = $this->get_leaf_record();
+      $db_next_stage_type = $db_reqn->get_next_stage_type();
+
+      $data = $this->data;
+      $data['next_stage_type'] = is_null( $db_next_stage_type ) ? NULL : $db_next_stage_type->name;
+      $this->set_data( $data );
     }
   }
 }

@@ -275,6 +275,12 @@ cenozoApp.lookupData = {
     }
   },
   misc: {
+    no: { en: 'No', fr: 'Non' },
+    yes: { en: 'Yes', fr: 'Oui' },
+    close: { en: 'Close', fr: 'Ferme' },
+    none: { en: 'none', fr: 'aucun' },
+    choose: { en: '(choose)', fr: '(choisir)' },
+    requested: { en: 'requested', fr: 'demandé' },
     prevButton: { en: 'Return to the previous section', fr: 'TRANSLATION REQUIRED' },
     nextButton: { en: 'Proceed to the next section', fr: 'TRANSLATION REQUIRED' },
     pleaseConfirm: { en: 'Please confirm', fr: 'Veuillez confirmer' },
@@ -309,16 +315,24 @@ cenozoApp.lookupData = {
     },
     deleteWarning: {
       en: 'Are you sure you want to delete the application?\n\nThis will permanently destroy all details you have provided. Once this is done there will be no way to restore the application!',
-      fr: 'Êtes-vous sûr(e) de vouloir supprimer la demande d’accès? Toutes les informations fournies seront détruites et il vous sera impossible de les restaurer!'
+      fr: 'Êtes-vous sûr(e) de vouloir supprimer la demande d’accès?\n\nToutes les informations fournies seront détruites et il vous sera impossible de les restaurer!'
     },
     abandon: { en: 'Abandon', fr: 'Abandonner' },
     abandonWarning: {
       en: 'Are you sure you want to abandon the application?\n\nYou will no longer have access to the application and the review process will be discontinued.',
-      fr: 'Êtes-vous sûr(e) de vouloir abandonner la demande d’accès? Vous n’y aurez plus accès et le processus d’évaluation sera interrompu.'
+      fr: 'Êtes-vous sûr(e) de vouloir abandonner la demande d’accès?\n\nVous n’y aurez plus accès et le processus d’évaluation sera interrompu.'
     },
     email_text: {
       en: 'You must provide an institutional email.  Public email accounts such as @gmail.com are not allowed.',
       fr: 'TRANSLATION REQUIRED'
+    },
+    graduateFeeWaiver: {
+      en: 'Fee Waiver for Graduate student (MSc or PhD) for thesis only',
+      fr: 'Exonération pour un étudiant des cycles supérieurs (M. Sc. ou Ph. D.) pour la thèse seulement'
+    },
+    postdocFeeWaiver: {
+      en: 'Fee Waiver for Postdoctoral Fellow (limit 1 waiver for postdoctoral studies)',
+      fr: 'Exonération pour un boursier postdoctoral (limite d’une exonération pour les études postdoctorales)'
     }
   }
 };

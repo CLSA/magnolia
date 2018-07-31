@@ -93,7 +93,7 @@ class module extends \cenozo\service\module
       }
     }
 
-    if( $select->has_table_columns( 'stage_type' ) || $select->has_column( 'recommendation' ) )
+    if( $select->has_table_columns( 'stage_type' ) )
     {
       $join_mod = lib::create( 'database\modifier' );
       $join_mod->where( 'reqn.id', '=', 'stage.reqn_id', false );
@@ -119,35 +119,6 @@ class module extends \cenozo\service\module
           'status',
           false
         );
-      }
-
-      if( $select->has_column( 'stage_complete' ) || $select->has_column( 'recommendation' ) )
-      {
-        $modifier->left_join( 'review_type', 'stage_type.id', 'review_type.stage_type_id' );
-        $join_mod = lib::create( 'database\modifier' );
-        $join_mod->where( 'review_type.id', '=', 'review.review_type_id', false );
-        $join_mod->where( 'review.reqn_id', '=', 'reqn.id', false );
-        $modifier->join_modifier( 'review', $join_mod, 'left' );
-        $modifier->group( 'reqn.id' );
-
-        if( $select->has_column( 'stage_complete' ) )
-        {
-          $select->add_column(
-            'IF( "DSAC Selection" = stage_type.name, true, GROUP_CONCAT( review.recommendation ) IS NOT NULL )',
-            'stage_complete',
-            false,
-            'boolean'
-          );
-        }
-
-        if( $select->has_column( 'recommendation' ) )
-        {
-          $select->add_column(
-            'GROUP_CONCAT( review.recommendation )',
-            'recommendation',
-            false
-          );
-        }
       }
     }
   }

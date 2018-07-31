@@ -153,13 +153,19 @@ define( function() {
                   self.mayEdit = false;
                 } else if( 'Reviewer 1' == self.record.review_type || 'Reviewer 2' == self.record.review_type ) {
                   self.mayEdit = 'reviewer' == CnSession.role.name || 'chair' == CnSession.role.name;
-                } else if( 'Chair' == self.record.review_type ) {
+                } else if( 'Chair' == self.record.review_type || 'Second Chair' == self.record.review_type ) {
                   self.mayEdit = 'chair' == CnSession.role.name;
-                } else if( 'SMT' == self.record.review_type ) {
+                } else if( 'SMT' == self.record.review_type || 'Second SMT' == self.record.review_type ) {
                   self.mayEdit = 'smt' == CnSession.role.name;
                 }
               }
             }
+
+            // disable the Revise recommendation option if this is the second Chair or SMT review
+            self.parentModel.metadata.getPromise().then( function() {
+              self.parentModel.metadata.columnList.recommendation.enumList.findByProperty( 'name', 'Revise' ).disabled = 
+                'Second Chair' == self.record.review_type || 'Second SMT' == self.record.review_type;
+            } );
           } );
         };
 

@@ -24,28 +24,21 @@ INSERT IGNORE INTO stage_type_has_stage_type( stage_type_id, next_stage_type_id 
 SELECT stage_type.id, next_stage_type.id
 FROM stage_type
 JOIN stage_type AS next_stage_type ON stage_type.rank+1 = next_stage_type.rank
-WHERE stage_type.name != "Not Approved"
+WHERE stage_type.name NOT IN( "Complete", "Not Approved" )
 
 UNION
 
 SELECT stage_type.id, next_stage_type.id
 FROM stage_type, stage_type AS next_stage_type
-WHERE stage_type.name = "DSAC Selection"
+WHERE stage_type.decision = 1
+AND next_stage_type.name IN ( "Decision Made" )
+
+UNION
+
+SELECT stage_type.id, next_stage_type.id
+FROM stage_type, stage_type AS next_stage_type
+WHERE stage_type.name = "Decision Made"
 AND next_stage_type.name = "Not Approved"
-
-UNION
-
-SELECT stage_type.id, next_stage_type.id
-FROM stage_type, stage_type AS next_stage_type
-WHERE stage_type.name = "DSAC Review"
-AND next_stage_type.name = "Approved"
-
-UNION
-
-SELECT stage_type.id, next_stage_type.id
-FROM stage_type, stage_type AS next_stage_type
-WHERE stage_type.name = "SMT Decision"
-AND next_stage_type.name IN( "Not Approved", "Approved" )
 
 UNION
 

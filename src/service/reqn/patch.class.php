@@ -77,18 +77,17 @@ class patch extends \cenozo\service\patch
       }
       else if( 'next_stage' == $action )
       {
-        if( in_array( $db_role->name, array( 'administrator', 'chair' ) ) )
-        {
-          if( !is_null( $state ) || (
-            ( 'review' != $phase || 'SMT Decision' == $db_current_stage_type->name ) &&
-            ( 'agreement' != $phase || 'Report Required' == $db_current_stage_type->name )
-          ) ) $code = 403;
-        }
-        else $code = 403;
+        if( !is_null( $db_reqn->state ) || (
+            'administrator' != $db_role->name &&
+            ( 'chair' != $db_role->name || false === strpos( $db_current_stage_type->name, 'DSAC' ) ) &&
+            ( 'smt' != $db_role->name || false === strpos( $db_current_stage_type->name, 'SMT' ) )
+        ) ) $code = 403;
       }
-      else if( 'decide' == $action )
+      else if( 'reject' == $action )
       {
-        if( !in_array( $db_role->name, array( 'administrator', 'chair', 'smt' ) ) || !$db_current_stage_type->decision ) $code = 403;
+        if( !is_null( $db_reqn->state ) ||
+            !in_array( $db_role->name, array( 'administrator', 'chair' ) ) ||
+            'DSAC Selection' != $db_current_stage_type->name ) $code = 403;
       }
       else
       {
@@ -108,6 +107,7 @@ class patch extends \cenozo\service\patch
     parent::execute();
 
     $notification_type_class_name = lib::get_class_name( 'database\notification_type' );
+    $stage_type_class_name = lib::get_class_name( 'database\stage_type' );
 
     $headers = apache_request_headers();
     if( false !== strpos( $headers['Content-Type'], 'application/octet-stream' ) )
@@ -156,46 +156,40 @@ class patch extends \cenozo\service\patch
         $db_notification->datetime = util::get_datetime_object();
         $db_notification->save();
       }
-      else if( 'submit' == $action )
+      else if( 'submit' == $action || 'next_stage' == $action || 'reject' == $action )
       {
-        if( 'deferred' == $db_reqn->state )
+        try
         {
-          $db_reqn->state = NULL;
-          $db_reqn->save();
+          if( 'submit' == $action )
+          {
+            if( 'deferred' == $db_reqn->state )
+            {
+              $db_reqn->state = NULL;
+              $db_reqn->save();
+            }
+            else
+            {
+              // this will submit the reqn for the first time
+              $db_reqn->proceed_to_next_stage();
+            }
+          }
+          else if( 'next_stage' == $action )
+          {
+            $db_current_stage_type = $db_reqn->get_current_stage_type();
+            $db_reqn->proceed_to_next_stage();
+          }
+          else if( 'reject' == $action )
+          {
+            // send directly to the decision-made stage type
+            $db_stage_type = $stage_type_class_name::get_unique_record( 'name', 'Decision Made' );
+            $db_reqn->proceed_to_next_stage( $db_stage_type );
+          }
         }
-        else
+        catch( \cenozo\exception\runtime $e )
         {
-          // this will submit the reqn for the first time
-          $db_reqn->add_to_stage();
+          $this->status->set_code( 400 );
+          $this->set_data( $e->get_raw_message() );
         }
-      }
-      else if( 'next_stage' == $action )
-      {
-        $db_current_stage_type = $db_reqn->get_current_stage_type();
-        if( 'DSAC Review' == $db_current_stage_type->name )
-        {
-          // no decision is being made, so move to the SMT Decision stage, not the Approve stage
-          $db_reqn->add_to_stage( 'SMT Decision' );
-        }
-        else
-        {
-          // add the reqn to whatever the next stage is
-          $db_reqn->add_to_stage();
-        }
-      }
-      else if( 'decide' == $action )
-      {
-        $stage_type = $this->get_argument( 'approve' ) ? 'Approved' : 'Not Approved';
-        $db_reqn->add_to_stage( $stage_type );
-
-        // send a notification
-        $db_notification = lib::create( 'database\notification' );
-        $db_notification->reqn_id = $db_reqn->id;
-        $db_notification->notification_type_id =
-          $notification_type_class_name::get_unique_record( 'name', 'Notice of decision' )->id;
-        $db_notification->email = $db_reqn->applicant_email;
-        $db_notification->datetime = util::get_datetime_object();
-        $db_notification->save();
       }
       else
       {

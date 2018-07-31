@@ -17,6 +17,18 @@ class stage_type extends \cenozo\database\has_rank
   /**
    * TODO: document
    */
+  public function get_next_possible_stage_type_object_list()
+  {
+    $modifier = lib::create( 'database\modifier' );
+    $modifier->join( 'stage_type_has_stage_type', 'stage_type.id', 'stage_type_has_stage_type.next_stage_type_id' );
+    $modifier->where( 'stage_type_has_stage_type.stage_type_id', '=', $this->id );
+
+    return static::select_objects( $modifier );
+  }
+
+  /**
+   * TODO: document
+   */
   public function get_default_next_stage_type()
   {
     $select = lib::create( 'database\select' );
@@ -47,7 +59,7 @@ class stage_type extends \cenozo\database\has_rank
   /**
    * TODO: document
    */
-  public function get_review_list( $reqn )
+  public function get_review_object_list( $reqn )
   {
     // accept either a database\reqn object or a reqn ID
     $reqn_id = is_a( $reqn, lib::get_class_name( 'database\reqn' ) ) ? $reqn->id : $reqn;

@@ -21,6 +21,8 @@ class module extends \cenozo\service\module
   {
     parent::prepare_read( $select, $modifier );
 
+    $modifier->left_join( 'notification_type', 'stage_type.notification_type_id', 'notification_type.id' );
+
     // add the total number of reqns
     if( $select->has_column( 'reqn_count' ) )
     {

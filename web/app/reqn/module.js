@@ -77,8 +77,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     phase: { column: 'stage_type.phase', type: 'string', exclude: true },
     status: { column: 'stage_type.status', type: 'string', exclude: true },
     decision: { column: 'stage_type.decision', type: 'boolean', exclude: true },
-    recommendation: { type: 'string', exclude: true },
-    stage_complete: { type: 'string', exclude: true },
     language: { type: 'string', column: 'language.code', exclude: true },
     deadline: { type: 'date', column: 'deadline.date', exclude: true },
     applicant_name: { type: 'string', exclude: true },
@@ -174,7 +172,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     isDisabled: function( $state, model ) { return !model.viewModel.enabled( 'defer' ); },
     operation: function( $state, model ) { model.viewModel.defer(); }
   } );
-  
+
   module.addExtraOperation( 'view', {
     title: 'Abandon',
     classes: 'btn-warning',
@@ -182,7 +180,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     isDisabled: function( $state, model ) { return !model.viewModel.enabled( 'abandon' ); },
     operation: function( $state, model ) { model.viewModel.abandon(); }
   } );
-  
+
   module.addExtraOperation( 'view', {
     title: 'Re-activate',
     classes: 'btn-warning',
@@ -199,32 +197,12 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     operation: function( $state, model ) { model.viewModel.proceed(); }
   } );
 
-  module.addExtraOperationGroup( 'view', {
-    title: 'Apply Decision',
-    classes: 'btn-success',
-    isIncluded: function( $state, model ) { return model.viewModel.show( 'decide' ); },
-    isDisabled: function( $state, model ) { return !model.viewModel.enabled( 'decide' ); },
-    operations: [ {
-      title: 'Approved',
-      isIncluded: function( $state, model ) { return model.viewModel.show( 'approved' ); },
-      isDisabled: function( $state, model ) { return !model.viewModel.enabled( 'approved' ); },
-      operation: function( $state, model ) { model.viewModel.decide( 1 ); }
-    }, {
-      title: 'Proceed',
-      isIncluded: function( $state, model ) { return model.viewModel.show( 'apply proceed' ); },
-      isDisabled: function( $state, model ) { return !model.viewModel.enabled( 'apply proceed' ); },
-      operation: function( $state, model ) { model.viewModel.proceed(); }
-    }, {
-      title: 'Send to SMT',
-      isIncluded: function( $state, model ) { return model.viewModel.show( 'send to SMT' ); },
-      isDisabled: function( $state, model ) { return !model.viewModel.enabled( 'send to SMT' ); },
-      operation: function( $state, model ) { model.viewModel.proceed( true ); }
-    }, {
-      title: 'Reject',
-      isIncluded: function( $state, model ) { return model.viewModel.show( 'reject' ); },
-      isDisabled: function( $state, model ) { return !model.viewModel.enabled( 'reject' ); },
-      operation: function( $state, model ) { model.viewModel.decide( 0 ); }
-    } ]
+  module.addExtraOperation( 'view', {
+    title: 'Reject',
+    classes: 'btn-danger',
+    isIncluded: function( $state, model ) { return model.viewModel.show( 'reject' ); },
+    isDisabled: function( $state, model ) { return !model.viewModel.enabled( 'reject' ); },
+    operation: function( $state, model ) { model.viewModel.reject(); }
   } );
 
   module.addExtraOperation( 'view', {
@@ -528,6 +506,13 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             return this.$$onView( force );
           },
 
+          onPatch: function( data ) {
+            return self.$$onPatch( data ).then( function() {
+              // reload the view if we're changing the decision notice (the proceed button's enable state is affected by it)
+              if( angular.isDefined( data.decision_notice ) ) return self.onView();
+            } );
+          },
+
           deferralNotesExist: function() {
             return this.record.deferral_note_part1_a1 || this.record.deferral_note_part1_a2 ||
                    this.record.deferral_note_part1_a3 || this.record.deferral_note_part1_a4 ||
@@ -538,10 +523,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
           show: function( subject ) {
             var role = CnSession.role.name;
-            var phase = this.record.phase;
-            var state = this.record.state;
-            var stage_type = this.record.stage_type;
-            var decision = this.record.decision;
+            var phase = angular.isDefined( this.record.phase ) ? this.record.phase : '';
+            var state = angular.isDefined( this.record.state ) ? this.record.state : '';
+            var stage_type = angular.isDefined( this.record.stage_type ) ? this.record.stage_type : '';
 
             if( 'submit' == subject ) {
               return 'applicant' == role && ( 'new' == phase || 'deferred' == state );
@@ -558,61 +542,33 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             } else if( 'reactivate' == subject ) {
               return 'administrator' == role && 'abandoned' == state;
             } else if( 'proceed' == subject ) {
-              return 0 <= ['administrator','chair'].indexOf( role ) && !decision && 0 <= ['review','agreement'].indexOf( phase );
-            } else if( 'decide' == subject ) {
-              return decision && (
+              return 0 > ['Complete','Not Approved'].indexOf( stage_type ) && (
                 'administrator' == role ||
-                ( 'chair' == role && 'DSAC' == stage_type.substring( 0, 4 ) ) ||
-                ( 'smt' == role && 'SMT Decision' == stage_type )
+                ( 'chair' == role && 0 <= stage_type.indexOf( 'DSAC' ) ) ||
+                ( 'smt' == role && 0 <= stage_type.indexOf( 'SMT' ) )
               );
-            } else {
-              // the remainder are sub-actions belonging to the decide action
-              if( 'approved' == subject ) {
-                return 'DSAC Selection' != stage_type;
-              } else if( 'reject' == subject ) {
-                return 'DSAC Review' != stage_type;
-              } else if( 'send to SMT' == subject ) {
-                return 'DSAC Review' == stage_type;
-              } else if( 'apply proceed' == subject ) {
-                return 'DSAC Selection' == stage_type;
-              } else return false;
-            }
+            } else if( 'reject' == subject ) {
+              return 'DSAC Selection' == stage_type && 0 <= ['administrator','chair'].indexOf( role );
+            } else return false;
           },
 
           enabled: function( subject ) {
-            var state = this.record.state;
-            var recommendation = this.record.recommendation;
-            var stage_type = this.record.stage_type;
-            var stage_complete = this.record.stage_complete;
+            var state = angular.isDefined( this.record.state ) ? this.record.state : '';
+            var next_stage_type = angular.isDefined( this.record.next_stage_type ) ? this.record.next_stage_type : '';
 
             if( 0 <= ['abandon','defer','reactivate'].indexOf( subject ) ) {
               return true;
             } else if( 'proceed' == subject ) {
-              return !state && ( 'DSAC Review' == stage_type || stage_complete );
-            } else if( 'decide' == subject ) {
+              return !state && next_stage_type;
+            } else if( 'reject' == subject ) {
               return !state;
-            } else {
-              // the remainder are sub-actions belonging to the decide action
-              if( 'approved' == subject ) {
-                return stage_complete && (
-                  ( 'DSAC Review' == stage_type && 'Approved' == recommendation ) ||
-                  ( 'SMT Decision' == stage_type && 'Not Approved' != recommendation )
-                );
-              } else if( 'send to SMT' == subject ) {
-                return stage_complete && 'Approved' != recommendation;
-              } else if( 'reject' == subject ) {
-                return 'DSAC Selection' == stage_type || ( stage_complete && 'Not Approved' == recommendation );
-              } else if( 'apply proceed' == subject ) {
-                return stage_complete;
-              } else return false;
-            }
+            } else return false;
           },
 
-          proceed: function( smt ) {
-            if( angular.isUndefined( smt ) ) smt = false;
-            var message = 'Are you sure you wish to ' +
-              ( smt ? 'send the ' + this.parentModel.module.name.singular + ' to the SMT for review?' : 'proceed to the next stage?' );
-            if( this.deferralNotesExist() ) {
+          proceed: function() {
+            var message = 'Are you sure you wish to move this ' + this.parentModel.module.name.singular + ' to the "' +
+              this.record.next_stage_type + '" stage?';
+            if( 'administrator' == CnSession.role.name && this.deferralNotesExist() ) {
               message += '\n\nWARNING: there are deferral notes present, you may wish to remove them before proceeding.';
             }
             return CnModalConfirmFactory.instance( {
@@ -631,24 +587,14 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             } );
           },
 
-          downloadForm: function() {
-            return CnHttpFactory.instance( {
-              path: this.parentModel.getServiceResourcePath(),
-              format: 'pdf'
-            } ).file();
-          },
-
-          decide: function( decision ) {
-            return CnModalTextFactory.instance( {
-              title: ( decision ? 'Approve' : 'Reject' ) + ' ' + this.parentModel.module.name.singular.ucWords(),
-              message: 'In order to ' + ( decision ? 'approve' : 'reject' ) + ' the ' + this.parentModel.module.name.singular +
-                ' you must provide a message which will be included as part of the formal notice to the applicant.',
-              minLength: 1
+          reject: function() {
+            var message = 'Are you sure you wish to reject the ' + this.parentModel.module.name.singular + '?';
+            return CnModalConfirmFactory.instance( {
+              message: message
             } ).show().then( function( response ) {
               if( response ) {
                 return CnHttpFactory.instance( {
-                  path: self.parentModel.getServiceResourcePath() + "?action=decide&approve=" + decision,
-                  data: { decision_notice: response }
+                  path: self.parentModel.getServiceResourcePath() + "?action=reject",
                 } ).patch().then( function() {
                   self.onView();
                   if( angular.isDefined( self.reviewModel ) ) self.reviewModel.listModel.onList( true );
@@ -659,8 +605,16 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             } );
           },
 
+          downloadForm: function() {
+            return CnHttpFactory.instance( {
+              path: this.parentModel.getServiceResourcePath(),
+              format: 'pdf'
+            } ).file();
+          },
+
           defer: function() {
-            var message = 'Are you sure you wish to defer to the applicant?';
+            var message = 'Are you sure you wish to defer to the applicant?  ' +
+              'A notification will be sent indicating that an action is required by the applicant.'
             if( !this.deferralNotesExist() ) {
               message += '\n\nWARNING: there are currently no deferral notes to instruct the applicant why ' +
                          'their attention is required.';
@@ -681,7 +635,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
           reactivate: function() {
             return CnModalConfirmFactory.instance( {
-              message: 'Are you sure you want to re-activate the ' + this.parentModel.module.name.singular + '?' +
+              message: 'Are you sure you wish to re-activate the ' + this.parentModel.module.name.singular + '?' +
                 '\n\nThe applicant will be notified that it has been re-activated and they will be able to re-submit for review.'
             } ).show().then( function( response ) {
               if( response ) {
@@ -690,6 +644,49 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                 } ).patch().then( function() {
                   self.record.state = 'deferred';
                   if( angular.isDefined( self.notificationModel ) ) self.notificationModel.listModel.onList( true );
+                } );
+              }
+            } );
+          },
+
+          abandon: function() {
+            var message = 'applicant' == CnSession.role.name
+                        ? this.translate( 'misc.abandonWarning' )
+                        : 'Are you sure you wish to abandon the ' + this.parentModel.module.name.singular + '?'
+                          '\n\nThe applicant will no longer have access to the ' + this.parentModel.module.name.singular +
+                          ' and the review process will be discontinued. It is possible to re-activate the ' +
+                          this.parentModel.module.name.singular + ' at a later time.';
+            return CnModalConfirmFactory.instance( {
+              title: 'applicant' == CnSession.role.name ? this.translate( 'misc.pleaseConfirm' ) : 'Please Confirm',
+              noText: 'applicant' == CnSession.role.name ? this.translate( 'misc.no' ) : 'No',
+              yesText: 'applicant' == CnSession.role.name ? this.translate( 'misc.yes' ) : 'Yes',
+              message: message
+            } ).show().then( function( response ) {
+              if( response ) {
+                return CnHttpFactory.instance( {
+                  path: self.parentModel.getServiceResourcePath() + "?action=abandon"
+                } ).patch().then( function() {
+                  if( 'applicant' == CnSession.role.name ) {
+                    self.transitionOnViewParent();
+                  } else {
+                    self.record.state = 'abandoned';
+                    if( angular.isDefined( self.notificationModel ) ) self.notificationModel.listModel.onList( true );
+                  }
+                } );
+              }
+            } );
+          },
+
+          delete: function() {
+            return CnModalConfirmFactory.instance( {
+              title: 'applicant' == CnSession.role.name ? this.translate( 'misc.pleaseConfirm' ) : 'Please Confirm',
+              noText: 'applicant' == CnSession.role.name ? this.translate( 'misc.no' ) : 'No',
+              yesText: 'applicant' == CnSession.role.name ? this.translate( 'misc.yes' ) : 'Yes',
+              message: this.translate( 'misc.deleteWarning' )
+            } ).show().then( function( response ) {
+              if( response ) {
+                return CnHttpFactory.instance( { path: self.parentModel.getServiceResourcePath() } ).delete().then( function() {
+                  self.transitionOnViewParent();
                 } );
               }
             } );
@@ -920,6 +917,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             var record = this.record;
             return CnModalConfirmFactory.instance( {
               title: this.translate( 'misc.pleaseConfirm' ),
+              noText: 'applicant' == CnSession.role.name ? this.translate( 'misc.no' ) : 'No',
+              yesText: 'applicant' == CnSession.role.name ? this.translate( 'misc.yes' ) : 'Yes',
               message: this.translate( 'misc.submitWarning' )
             } ).show().then( function( response ) {
               if( response ) {
@@ -971,6 +970,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                   var element = cenozo.getFormElement( 'lay_summary' );
 
                   // if there was an error then display it now
+                  if( 'applicant' == CnSession.role.name ) error.closeText = self.translate( 'misc.close' );
                   CnModalMessageFactory.instance( error ).show().then( function() {
                     self.setTab( 0, 'part1', false );
                     self.setTab( 1, errorTab );
@@ -983,6 +983,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                         CnModalMessageFactory.instance( {
                           title: self.translate( 'misc.invalidStartDateTitle' ),
                           message: self.translate( 'misc.invalidStartDateMessage' ),
+                          closeText: 'applicant' == CnSession.role.name ? this.translate( 'misc.close' ) : 'Close',
                           error: true
                         } ).show().then( function() {
                           var element = cenozo.getFormElement( 'start_date' );
@@ -1010,33 +1011,13 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             return this.parentModel.transitionToViewState( this.record );
           },
 
-          abandon: function() {
-            return CnHttpFactory.instance( {
-              path: this.parentModel.getServiceResourcePath() + "?action=abandon"
-            } ).patch().then( function() {
-              if( 'applicant' == CnSession.role.name ) {
-                self.transitionOnViewParent();
-              } else {
-                self.record.state = 'abandoned';
-                if( angular.isDefined( self.notificationModel ) ) self.notificationModel.listModel.onList( true );
-              }
-            } );
-          },
-
-          delete: function() {
-            return CnHttpFactory.instance( {
-              path: this.parentModel.getServiceResourcePath()
-            } ).delete().then( function() {
-              self.transitionOnViewParent();
-            } );
-          },
-
           displayDecisionNotice: function() {
             if( 'applicant' == CnSession.role.name &&
                 this.record.decision_notice &&
                 ( 'Approved' == this.record.stage_type || 'Not Approved' == this.record.stage_type ) ) {
               CnModalMessageFactory.instance( {
                 title: this.parentModel.module.name.singular.ucWords() + ' ' + this.record.identifier + ' ' + this.record.stage_type,
+                closeText: 'applicant' == CnSession.role.name ? this.translate( 'misc.close' ) : 'Close',
                 message: 'Dear ' + this.record.applicant_name + ',\n\n' +
                   'TODO: the generic header for notice of decision letters must be written\n\n' +
                   this.record.decision_notice + '\n\n' +
@@ -1098,6 +1079,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         module.inputGroupList.forEach( group => Object.assign( self.inputList, group.inputList ) );
 
         this.isApplicant = function() { return 'applicant' == CnSession.role.name; }
+        this.isAdministrator = function() { return 'administrator' == CnSession.role.name; }
 
         if( 'applicant' != CnSession.role.name ) {
           var mainInputGroup = module.inputGroupList.findByProperty( 'title', '' );
@@ -1145,16 +1127,18 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         this.getMetadata = function() {
           return $q.all( [
             self.$$getMetadata().then( function() {
+              var misc = cenozoApp.lookupData.misc;
+
               // create coapplicant access enum
               self.metadata.accessEnumList = {
-                en: [ { value: true, name: 'Yes' }, { value: false, name: 'No' } ],
-                fr: [ { value: true, name: 'Oui' }, { value: false, name: 'Non' } ]
+                en: [ { value: true, name: misc.yes.en }, { value: false, name: misc.no.en } ],
+                fr: [ { value: true, name: misc.yes.fr }, { value: false, name: misc.no.fr } ]
               };
 
               // create ethics enum
               self.metadata.columnList.ethics.enumList = {
-                en: [ {value:'',name:'(choose)'}, {value:true,name:'Yes'}, {value:false,name:'No'} ],
-                fr: [ {value:'',name:'(choisir)'}, {value:true,name:'Oui'}, {value:false,name:'Non'} ]
+                en: [ { value: '', name: misc.choose.en }, { value: true, name: misc.yes.en }, { value: false, name: misc.no.en } ],
+                fr: [ {value: '', name: misc.choose.fr }, { value: true, name: misc.yes.fr }, { value: false, name: misc.no.fr } ]
               };
 
               // translate funding enum
@@ -1162,29 +1146,24 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                 en: self.metadata.columnList.funding.enumList,
                 fr: angular.copy( self.metadata.columnList.funding.enumList )
               };
-              self.metadata.columnList.funding.enumList.fr[0].name = 'oui';
-              self.metadata.columnList.funding.enumList.fr[1].name = 'non';
-              self.metadata.columnList.funding.enumList.fr[2].name = 'demandé';
+              self.metadata.columnList.funding.enumList.fr[0].name = misc.yes.fr.toLowerCase();
+              self.metadata.columnList.funding.enumList.fr[1].name = misc.no.fr.toLowerCase();
+              self.metadata.columnList.funding.enumList.fr[2].name = misc.requested.fr.toLowerCase();
 
-              self.metadata.columnList.funding.enumList.en.unshift( { value: '', name: '(choose)' } );
-              self.metadata.columnList.funding.enumList.fr.unshift( { value: '', name: '(choisir)' } );
+              self.metadata.columnList.funding.enumList.en.unshift( { value: '', name: misc.choose.en } );
+              self.metadata.columnList.funding.enumList.fr.unshift( { value: '', name: misc.choose.fr } );
 
               // translate waiver enum
-              self.metadata.columnList.waiver.enumList.unshift( { value: '', name: 'none' } );
+              self.metadata.columnList.waiver.enumList.unshift( { value: '', name: misc.none.en } );
               self.metadata.columnList.waiver.enumList = {
                 en: self.metadata.columnList.waiver.enumList,
                 fr: angular.copy( self.metadata.columnList.waiver.enumList )
               };
-              self.metadata.columnList.waiver.enumList.en[1].name =
-                 'Fee Waiver for Graduate student (MSc or PhD) for thesis only';
-              self.metadata.columnList.waiver.enumList.en[2].name =
-                 'Fee Waiver for Postdoctoral Fellow (limit 1 waiver for postdoctoral studies)';
-              self.metadata.columnList.waiver.enumList.fr[0].name = 'aucun';
-              self.metadata.columnList.waiver.enumList.fr[1].name =
-                'Exonération pour un étudiant des cycles supérieurs (M. Sc. ou Ph. D.) pour la thèse seulement';
-              self.metadata.columnList.waiver.enumList.fr[2].name =
-                'Exonération pour un boursier postdoctoral ' +
-                '(limite d’une exonération pour les études postdoctorales)';
+              self.metadata.columnList.waiver.enumList.en[1].name = misc.graduateFeeWaiver.en;
+              self.metadata.columnList.waiver.enumList.en[2].name = misc.postdocFeeWaiver.en;
+              self.metadata.columnList.waiver.enumList.fr[0].name = misc.none.fr;
+              self.metadata.columnList.waiver.enumList.fr[1].name = misc.graduateFeeWaiver.fr;
+              self.metadata.columnList.waiver.enumList.fr[2].name = misc.postdocFeeWaiver.fr;
 
               return CnHttpFactory.instance( {
                 path: 'language',

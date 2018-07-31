@@ -32,14 +32,12 @@
     <div class="btn-group pull-left">
       <button class="btn btn-danger"
               ng-if="model.viewModel.show( 'delete' )"
-              cn-really-message="{{ t( 'misc.deleteWarning' ) }}"
-              cn-really-click="model.viewModel.delete()"
+              ng-click="model.viewModel.delete()"
               ng-bind-html="t( 'misc.delete' )"
               type="button"></button>
       <button class="btn btn-danger"
               ng-if="model.viewModel.show( 'abandon' )"
-              cn-really-message="{{ t( 'misc.abandonWarning' ) }}"
-              cn-really-click="model.viewModel.abandon()"
+              ng-click="model.viewModel.abandon( false )"
               ng-bind-html="t( 'misc.abandon' )"
               type="button"></button>
     </div>

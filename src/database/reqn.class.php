@@ -35,7 +35,7 @@ class reqn extends \cenozo\database\record
     }
 
     // if this is a new reqn then assign it to the first stage
-    if( $is_new ) $this->add_to_stage( 1 );
+    if( $is_new ) $this->proceed_to_next_stage();
   }
 
   /**
@@ -103,7 +103,7 @@ class reqn extends \cenozo\database\record
   }
 
   /**
-   * Returns the reqns current stage type
+   * Returns the reqn's current stage type
    * @return database\stage_type
    * @access public
    */
@@ -127,15 +127,152 @@ class reqn extends \cenozo\database\record
   }
 
   /**
-   * Adds the reqn to a stage
-   * 
-   * The stage type may either be a stage_type object, the name of a stage_type, the rank of a
-   * stage_type or NULL.  NULL should only be used when the current stage_type only has one "next"
-   * stage_type, otherwise an exception will be thrown.
-   * @param mixed $stage_type A rank, name or stage_type record
+   * Returns the reqn's next stage type (NULL if there is no valid next stage type)
+   * @return database\stage_type
    * @access public
    */
-  public function add_to_stage( $stage_type = NULL )
+  public function get_next_stage_type()
+  {
+    $stage_type_class_name = lib::get_class_name( 'database\stage_type' );
+
+    if( is_null( $this->id ) )
+    {
+      log::warning( 'Tried to query reqn with no primary key.' );
+      return NULL;
+    }
+
+    $db_current_stage_type = $this->get_current_stage_type();
+    $db_next_stage_type = NULL;
+    if( is_null( $db_current_stage_type ) )
+    {
+      $db_next_stage_type = $stage_type_class_name::get_unique_record( 'rank', 1 );
+    }
+    else
+    {
+      $db_stage = $this->get_current_stage();
+      if( true === $db_stage->check_if_complete() )
+      {
+        $stage_type_list = $db_current_stage_type->get_next_possible_stage_type_object_list();
+        if( 1 == count( $stage_type_list ) )
+        {
+          $db_next_stage_type = current( $stage_type_list );
+        }
+        else if( 1 < count( $stage_type_list ) )
+        {
+          if( 'DSAC Selection' == $db_current_stage_type->name )
+          {
+            // the DSAC Selection stage type is special, if it is complete then the next stage is DSAC Review
+            foreach( $stage_type_list as $db_stage_type )
+            {
+              if( 'DSAC Review' == $db_stage_type->name )
+              {
+                $db_next_stage_type = $db_stage_type;
+                break;
+              }
+            }
+          }
+          else if( 'DSAC Review' == $db_current_stage_type->name )
+          {
+            $db_review = current( $db_stage->get_review_object_list() );
+            if( $db_review )
+            {
+              if( 'Approved' == $db_review->recommendation )
+              {
+                foreach( $stage_type_list as $db_stage_type )
+                {
+                  if( 'Decision Made' == $db_stage_type->name )
+                  {
+                    $db_next_stage_type = $db_stage_type;
+                    break;
+                  }
+                }
+              }
+              else if( !is_null( $db_review->recommendation ) )
+              {
+                foreach( $stage_type_list as $db_stage_type )
+                {
+                  if( 'SMT Decision' == $db_stage_type->name )
+                  {
+                    $db_next_stage_type = $db_stage_type;
+                    break;
+                  }
+                }
+              }
+            }
+          }
+          else if( 'SMT Decision' == $db_current_stage_type->name )
+          {
+            $db_review = current( $db_stage->get_review_object_list() );
+            if( $db_review )
+            {
+              if( 'Approved' == $db_review->recommendation || 'Not Approved' == $db_review->recommendation )
+              {
+                foreach( $stage_type_list as $db_stage_type )
+                {
+                  if( 'Decision Made' == $db_stage_type->name )
+                  {
+                    $db_next_stage_type = $db_stage_type;
+                    break;
+                  }
+                }
+              }
+              else if( 'Revise' == $db_review->recommendation )
+              {
+                foreach( $stage_type_list as $db_stage_type )
+                {
+                  if( 'Revision Required' == $db_stage_type->name )
+                  {
+                    $db_next_stage_type = $db_stage_type;
+                    break;
+                  }
+                }
+              }
+            }
+          }
+          else if( 'Decision Made' == $db_current_stage_type->name )
+          {
+            // the decision for this reqn depends on one of several possible reviews
+            $review_sel = lib::create( 'database\select' );
+            $review_sel->add_table_column( 'review_type', 'name' );
+            $review_sel->add_column( 'recommendation' );
+            $review_mod = lib::create( 'database\modifier' );
+            $review_mod->join( 'review_type', 'review.review_type_id', 'review_type.id' );
+            $review_list = array();
+            foreach( $this->get_review_list( $review_sel, $review_mod ) as $review )
+              $review_list[$review['name']] = $review['recommendation'];
+
+            // either the Second or First SMT review has made a decision or this reqn was rejected during the DSAC selection stage
+            $recommendation = NULL;
+            if( array_key_exists( 'Second SMT', $review_list ) ) $recommendation = $review_list['Second SMT'];
+            else if( array_key_exists( 'SMT', $review_list ) ) $recommendation = $review_list['SMT'];
+            else if( !array_key_exists( 'Chair', $review_list ) ) $recommendation = 'Not Approved';
+
+            if( !is_null( $recommendation ) )
+            {
+              foreach( $stage_type_list as $db_stage_type )
+              {
+                if( $recommendation == $db_stage_type->name )
+                {
+                  $db_next_stage_type = $db_stage_type;
+                  break;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return $db_next_stage_type;
+  }
+
+  /**
+   * Proceeds to the reqn to the next stage
+   * 
+   * The next stage is based on the current stage as well as the reqn's reviews
+   * @access public
+   */
+  public function proceed_to_next_stage( $stage_type = NULL )
   {
     // check the primary key value
     if( is_null( $this->id ) )
@@ -153,12 +290,16 @@ class reqn extends \cenozo\database\record
     $db_next_stage_type = NULL;
     if( is_null( $stage_type ) )
     {
-      $db_next_stage_type = $db_current_stage_type->get_default_next_stage_type();
+      $db_next_stage_type = $this->get_next_stage_type();
       if( is_null( $db_next_stage_type ) )
         throw lib::create( 'exception\runtime',
-          'Cannot add next default stage as more than one stage type is possible.', __METHOD__ );
+          'Unable to proceed to next stage since there is currently no valid stage type available.', __METHOD__ );
     }
-    else if( util::string_matches_int( $stage_type ) )
+    else if( is_object( $stage_type ) )
+    {
+      if( is_a( $stage_type, lib::get_class_name( 'database\stage_type' ) ) ) $db_next_stage_type = $stage_type;
+    }
+    else if( is_integer( $stage_type ) || ( is_string( $stage_type ) && util::string_matches_int( $stage_type ) ) )
     {
       $db_next_stage_type = $stage_type_class_name::get_unique_record( 'rank', $stage_type );
     }
@@ -166,18 +307,14 @@ class reqn extends \cenozo\database\record
     {
       $db_next_stage_type = $stage_type_class_name::get_unique_record( 'name', $stage_type );
     }
-    else if( is_a( $db_next_stage_type, lib::get_class_name( 'database\stage_type' ) ) )
-    {
-      $db_next_stage_type = $stage_type;
-    }
 
     if( is_null( $db_next_stage_type ) )
       throw lib::create( 'exception\argument', 'stage_type', $stage_type, __METHOD__ );
 
     // Note: there is a special circumstanse where a reqn is being rejected during the DSAC selection stage (make note here)
     $reject_selection = !is_null( $db_current_stage_type ) &&
-                             'DSAC Selection' == $db_current_stage_type->name &&
-                             'Not Approved' == $db_next_stage_type->name;
+                        'DSAC Selection' == $db_current_stage_type->name &&
+                        'Decision Made' == $db_next_stage_type->name;
 
     // make sure the stage type is appropriate
     if( is_null( $db_current_stage_type ) )
@@ -228,11 +365,10 @@ class reqn extends \cenozo\database\record
       $this->save();
     }
 
-
     // manage any reviews associated with the current stage
     if( !is_null( $db_current_stage_type ) )
     {
-      foreach( $db_current_stage_type->get_review_list( $this ) as $db_review )
+      foreach( $db_current_stage_type->get_review_object_list( $this ) as $db_review )
       {
         if( $reject_selection )
         {
