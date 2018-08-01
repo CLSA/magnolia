@@ -146,18 +146,14 @@ define( function() {
           self.mayEdit = 'administrator' == CnSession.role.name;
           return self.$$onView( force ).then( function() {
             if( !self.mayEdit ) {
-              if( self.record.user_id == CnSession.user.id ) {
-                self.mayEdit = true;
-              } else {
-                if( 'Admin' == self.record.review_type || 'SAC' == self.record.review_type ) {
-                  self.mayEdit = false;
-                } else if( 'Reviewer 1' == self.record.review_type || 'Reviewer 2' == self.record.review_type ) {
-                  self.mayEdit = 'reviewer' == CnSession.role.name || 'chair' == CnSession.role.name;
-                } else if( 'Chair' == self.record.review_type || 'Second Chair' == self.record.review_type ) {
-                  self.mayEdit = 'chair' == CnSession.role.name;
-                } else if( 'SMT' == self.record.review_type || 'Second SMT' == self.record.review_type ) {
-                  self.mayEdit = 'smt' == CnSession.role.name;
-                }
+              if( 'Admin' == self.record.review_type || 'SAC' == self.record.review_type ) {
+                self.mayEdit = false;
+              } else if( 'Reviewer 1' == self.record.review_type || 'Reviewer 2' == self.record.review_type ) {
+                self.mayEdit = 'reviewer' == CnSession.role.name || 'chair' == CnSession.role.name;
+              } else if( 'Chair' == self.record.review_type || 'Second Chair' == self.record.review_type ) {
+                self.mayEdit = 'chair' == CnSession.role.name;
+              } else if( 'SMT' == self.record.review_type || 'Second SMT' == self.record.review_type ) {
+                self.mayEdit = 'smt' == CnSession.role.name;
               }
             }
 

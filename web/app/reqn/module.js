@@ -523,9 +523,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
           show: function( subject ) {
             var role = CnSession.role.name;
-            var phase = angular.isDefined( this.record.phase ) ? this.record.phase : '';
-            var state = angular.isDefined( this.record.state ) ? this.record.state : '';
-            var stage_type = angular.isDefined( this.record.stage_type ) ? this.record.stage_type : '';
+            var phase = this.record.phase ? this.record.phase : '';
+            var state = this.record.state ? this.record.state : '';
+            var stage_type = this.record.stage_type ? this.record.stage_type : '';
 
             if( 'submit' == subject ) {
               return 'applicant' == role && ( 'new' == phase || 'deferred' == state );
@@ -553,8 +553,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           },
 
           enabled: function( subject ) {
-            var state = angular.isDefined( this.record.state ) ? this.record.state : '';
-            var next_stage_type = angular.isDefined( this.record.next_stage_type ) ? this.record.next_stage_type : '';
+            var state = this.record.state ? this.record.state : '';
+            var next_stage_type = this.record.next_stage_type ? this.record.next_stage_type : '';
 
             if( 0 <= ['abandon','defer','reactivate'].indexOf( subject ) ) {
               return true;
@@ -1061,13 +1061,13 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               data.modifier.where.push( {
                 column: 'stage_type.name',
                 operator: 'LIKE',
-                value: 'DSAC%'
+                value: '%DSAC%'
               } );
             } else if( 'smt' == CnSession.role.name ) {
               data.modifier.where.push( {
                 column: 'stage_type.name',
                 operator: 'LIKE',
-                value: 'SMT%'
+                value: '%SMT%'
               } );
             }
           }

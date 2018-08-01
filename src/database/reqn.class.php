@@ -241,10 +241,14 @@ class reqn extends \cenozo\database\record
             foreach( $this->get_review_list( $review_sel, $review_mod ) as $review )
               $review_list[$review['name']] = $review['recommendation'];
 
-            // either the Second or First SMT review has made a decision or this reqn was rejected during the DSAC selection stage
             $recommendation = NULL;
+            // if there is a second SMT review then use that decision
             if( array_key_exists( 'Second SMT', $review_list ) ) $recommendation = $review_list['Second SMT'];
+            // if there is a first SMT review then use that decision
             else if( array_key_exists( 'SMT', $review_list ) ) $recommendation = $review_list['SMT'];
+            // if the chair approved their review then approve
+            else if( array_key_exists( 'Chair', $review_list ) && 'Approved' == $review_list['Chair'] ) $recommendation = 'Approved';
+            // if there is no chair review then do not approve (rejected before DSAC review)
             else if( !array_key_exists( 'Chair', $review_list ) ) $recommendation = 'Not Approved';
 
             if( !is_null( $recommendation ) )
