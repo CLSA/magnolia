@@ -103,7 +103,7 @@ define( function() {
         CnBaseViewFactory.construct( this, parentModel, root );
 
         this.deferred.promise.then( function() {
-          self.stageModel.listModel.heading = 'Requisition List';
+          if( angular.isDefined( self.stageModel ) ) self.stageModel.listModel.heading = 'Requisition List';
         } );
       }
       return { instance: function( parentModel, root ) { return new object( parentModel, root ); } };

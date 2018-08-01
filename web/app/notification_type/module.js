@@ -85,7 +85,14 @@ define( function() {
   cenozo.providers.factory( 'CnNotificationTypeViewFactory', [
     'CnBaseViewFactory',
     function( CnBaseViewFactory ) {
-      var object = function( parentModel, root ) { CnBaseViewFactory.construct( this, parentModel, root ); }
+      var object = function( parentModel, root ) {
+        var self = this;
+        CnBaseViewFactory.construct( this, parentModel, root );
+
+        this.deferred.promise.then( function() {
+          if( angular.isDefined( self.stageTypeModel ) ) self.stageTypeModel.listModel.heading = 'Notified Stage Type List';
+        } );
+      }
       return { instance: function( parentModel, root ) { return new object( parentModel, root ); } };
     }
   ] );

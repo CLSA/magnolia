@@ -38,6 +38,7 @@ class ui extends \cenozo\ui\ui
     {
       $module->add_child( 'notification' );
       $module->add_child( 'notification_type_email' );
+      $module->add_child( 'stage_type' );
     }
 
     $module = $this->get_module( 'pdf_form_type' );
