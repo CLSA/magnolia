@@ -27,7 +27,8 @@ define( function() {
   module.addInputGroup( '', {
     name: {
       title: 'Name',
-      type: 'string'
+      type: 'string',
+      constant: true
     },
     message_en: {
       title: 'Message (English)',

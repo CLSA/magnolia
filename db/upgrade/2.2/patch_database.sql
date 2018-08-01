@@ -20,6 +20,7 @@ SOURCE deadline.sql
 SOURCE reqn.sql
 SOURCE reqn_note.sql
 SOURCE notification_type.sql
+SOURCE notification_type_email.sql
 SOURCE notification.sql
 SOURCE coapplicant.sql
 SOURCE reference.sql

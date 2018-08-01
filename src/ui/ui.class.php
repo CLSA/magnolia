@@ -34,7 +34,11 @@ class ui extends \cenozo\ui\ui
     }
 
     $module = $this->get_module( 'notification_type' );
-    if( !is_null( $module ) ) $module->add_child( 'notification' );
+    if( !is_null( $module ) )
+    {
+      $module->add_child( 'notification' );
+      $module->add_child( 'notification_type_email' );
+    }
 
     $module = $this->get_module( 'pdf_form_type' );
     if( !is_null( $module ) ) $module->add_child( 'pdf_form' );
