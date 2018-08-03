@@ -871,7 +871,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           },
 
           uploadEthicsFile: function() {
-            thisx.uploadingEthicsFile = true;
+            this.uploadingEthicsFile = true;
             var data = new FormData();
             data.append( 'file', this.ethicsFile );
             var fileDetails = data.get( 'file' );
