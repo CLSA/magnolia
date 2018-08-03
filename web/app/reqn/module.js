@@ -285,11 +285,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           scope.$watch( 'model.viewModel.record.analysis', function( text ) {
             scope.model.viewModel.wordCount.analysis = text ? text.split( ' ' ).length : 0;
           } );
-
-          // when leaving stop all ongoing http get requests
-          $transitions.onExit( {}, function( transition ) {
-            scope.model.viewModel.cancelLoadingForm( 'Exiting reqn.form state' );
-          } );
         },
         controller: function( $scope ) {
           if( angular.isUndefined( $scope.model ) ) $scope.model = CnReqnModelFactory.root;
@@ -471,9 +466,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           if( angular.isDefined( self.stageModel ) ) self.stageModel.listModel.heading = 'Stage History';
         } );
 
-        // create a canceller so that we can stop http requests on command
-        var canceller = null;
-
         angular.extend( this, {
           onView: function( force ) {
             // we need to do some extra work when looking at the reqn form
@@ -483,18 +475,15 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               this.setTab( 1, this.parentModel.getQueryParameter( 't1' ), false );
               this.setTab( 2, this.parentModel.getQueryParameter( 't2' ), false );
 
-              // create a new canceller
-              canceller = $q.defer();
-
               return $q.all( [
                 this.$$onView( force ).then( function() {
                   // define the earliest date that the reqn may start
                   self.minStartDate = moment( self.record.deadline ).add( CnSession.application.startDateDelay, 'months' );
-                  return self.updateEthicsFileSize( canceller );
+                  return self.updateEthicsFileSize();
                 } ),
-                this.getCoapplicantList( canceller ),
-                this.getReferenceList( canceller ),
-                this.getDataOptionValueList( canceller )
+                this.getCoapplicantList(),
+                this.getReferenceList(),
+                this.getDataOptionValueList()
               ] );
             }
 
@@ -516,8 +505,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
             return this.$$onView( force );
           },
-
-          cancelLoadingForm: function( reason ) { canceller.resolve( reason ); },
 
           onPatch: function( data ) {
             return self.$$onPatch( data ).then( function() {
@@ -797,10 +784,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             }
           },
 
-          getCoapplicantList: function( canceller ) {
+          getCoapplicantList: function() {
             return CnHttpFactory.instance( {
               path: this.parentModel.getServiceResourcePath() + '/coapplicant',
-              canceller: canceller,
               data: {
                 select: { column: [ 'id', 'name', 'position', 'affiliation', 'email', 'role', 'access' ] },
                 modifier: { order: 'id', limit: 1000000 }
@@ -818,10 +804,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             } );
           },
 
-          getReferenceList: function( canceller ) {
+          getReferenceList: function() {
             return CnHttpFactory.instance( {
               path: this.parentModel.getServiceResourcePath() + '/reference',
-              canceller: canceller,
               data: {
                 select: { column: [ 'id', 'rank', 'reference' ] },
                 modifier: { order: 'rank', limit: 1000000 }
@@ -848,10 +833,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             } );
           },
 
-          updateEthicsFileSize: function( canceller ) {
+          updateEthicsFileSize: function() {
             return CnHttpFactory.instance( {
               path: this.parentModel.getServiceResourcePath() + '?letter=1',
-              canceller: canceller,
             } ).get().then( function( response ) {
               self.ethicsFileSize = response.data;
             } );
@@ -893,18 +877,16 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                .finally( function() { self.uploadingEthicsFile = false; } );
           },
 
-          getDataOptionValueList: function( canceller ) {
+          getDataOptionValueList: function() {
             self.dataOptionValueList = [];
             return CnHttpFactory.instance( {
               path: 'data_option',
-              canceller: canceller,
               data: { select: { column: [ { column: 'MAX(id)', alias: 'maxId', table_prefix: false } ] } }
             } ).get().then( function( response ) {
               for( var i = 0; i <= response.data[0].maxId; i++ ) self.dataOptionValueList[i] = false;
             } ).then( function() {
               return CnHttpFactory.instance( {
                 path: self.parentModel.getServiceResourcePath() + '/data_option',
-                canceller: canceller,
                 data: { select: { column: [ 'id' ] } }
               } ).query().then( function( response ) {
                 response.data.forEach( function( dataOption ) { self.dataOptionValueList[dataOption.id] = true; } );
