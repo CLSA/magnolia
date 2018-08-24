@@ -107,12 +107,11 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     ethics_date: { type: 'date', exclude: true },
     ethics_filename: { type: 'string', exclude: true },
     waiver: { type: 'enum', exclude: true },
-    qnaire: { type: 'boolean', exclude: true },
-    qnaire_comment: { type: 'text', exclude: true },
-    physical: { type: 'boolean', exclude: true },
-    physical_comment: { type: 'text', exclude: true },
-    biomarker: { type: 'boolean', exclude: true },
-    biomarker_comment: { type: 'text', exclude: true },
+    part2_a_comment: { type: 'text', exclude: true },
+    part2_b_comment: { type: 'text', exclude: true },
+    part2_c_comment: { type: 'text', exclude: true },
+    part2_d_comment: { type: 'text', exclude: true },
+    part2_e_comment: { type: 'text', exclude: true }
   } );
 
   module.addInputGroup( 'Decision and Deferral Notes', {
@@ -154,6 +153,14 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     },
     deferral_note_part2_c: {
       title: 'Part2 C',
+      type: 'text'
+    },
+    deferral_note_part2_d: {
+      title: 'Part2 D',
+      type: 'text'
+    },
+    deferral_note_part2_e: {
+      title: 'Part2 E',
       type: 'text'
     }
   } );
@@ -518,7 +525,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                    this.record.deferral_note_part1_a3 || this.record.deferral_note_part1_a4 ||
                    this.record.deferral_note_part1_a5 || this.record.deferral_note_part1_a6 ||
                    this.record.deferral_note_part2_a || this.record.deferral_note_part2_b ||
-                   this.record.deferral_note_part2_c;
+                   this.record.deferral_note_part2_c || this.record.deferral_note_part2_d ||
+                   this.record.deferral_note_part2_e;
           },
 
           show: function( subject ) {
@@ -696,7 +704,10 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           coapplicantList: [],
           referenceModel: CnReferenceModelFactory.instance(),
           referenceList: [],
-          dataOptionValueList: [],
+          dataOptionValueList: {
+            comprehensive: [],
+            tracking: []
+          },
           charCount: { lay_summary: 0 },
           wordCount: { background: 0, objectives: 0, methodology: 0, analysis: 0 },
           uploadingEthicsFile: false,
@@ -730,6 +741,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             [ 'part2', null, 'a' ],
             [ 'part2', null, 'b' ],
             [ 'part2', null, 'c' ],
+            [ 'part2', null, 'd' ],
+            [ 'part2', null, 'e' ],
             [ 'part3', null, null ]
           ],
 
@@ -878,39 +891,56 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           },
 
           getDataOptionValueList: function() {
-            self.dataOptionValueList = [];
+            self.dataOptionValueList = {
+              comprehensive: [],
+              tracking: []
+            };
             return CnHttpFactory.instance( {
               path: 'data_option',
-              data: { select: { column: [ { column: 'MAX(id)', alias: 'maxId', table_prefix: false } ] } }
+              data: { select: { column: [ { column: 'MAX(data_option.id)', alias: 'maxId', table_prefix: false } ] } }
             } ).get().then( function( response ) {
-              for( var i = 0; i <= response.data[0].maxId; i++ ) self.dataOptionValueList[i] = false;
+              for( var i = 0; i <= response.data[0].maxId; i++ ) {
+                self.dataOptionValueList.comprehensive[i] = false;
+                self.dataOptionValueList.tracking[i] = false;
+              }
             } ).then( function() {
               return CnHttpFactory.instance( {
                 path: self.parentModel.getServiceResourcePath() + '/data_option',
-                data: { select: { column: [ 'id' ] } }
+                data: { select: { column: [ 'id', {
+                  table: 'reqn_has_data_option',
+                  column: 'comprehensive'
+                }, {
+                  table: 'reqn_has_data_option',
+                  column: 'tracking'
+                } ] } }
               } ).query().then( function( response ) {
-                response.data.forEach( function( dataOption ) { self.dataOptionValueList[dataOption.id] = true; } );
+                response.data.forEach( function( dataOption ) {
+                  self.dataOptionValueList.comprehensive[dataOption.id] = dataOption.comprehensive;
+                  self.dataOptionValueList.tracking[dataOption.id] = dataOption.tracking;
+                } );
               } );
             } );
           },
 
-          setDataOptionValue: function( dataOptionId ) {
-            var add = this.dataOptionValueList[dataOptionId];
+          toggleDataOptionValue: function( cohort, dataOptionId ) {
+            // toggle the option
+            this.dataOptionValueList[cohort][dataOptionId] = !this.dataOptionValueList[cohort][dataOptionId];
 
-            var http = CnHttpFactory.instance( {
-              path: this.parentModel.getServiceResourcePath() + '/data_option' + ( add ? '' : '/' + dataOptionId ),
-              data: add ? { add: dataOptionId } : undefined,
+            // send new value to the server
+            var data = { cohort: cohort };
+            data[ this.dataOptionValueList[cohort][dataOptionId] ? 'add' : 'remove' ] = dataOptionId;
+
+            return CnHttpFactory.instance( {
+              path: this.parentModel.getServiceResourcePath() + '/data_option',
+              data: data,
               onError: function( response ) {
                 // 409 means the data option has already been added
-                // 404 means the data option has already been deleted
-                var ignoreCode = add ? 409 : 404;
-                if( ignoreCode != response.status ) {
-                  self.dataOptionValueList[dataOptionId] = !self.dataOptionValueList[dataOptionId];
+                if( 409 != response.status ) {
+                  self.dataOptionValueList[cohort][dataOptionId] = !self.dataOptionValueList[cohort][dataOptionId];
                   CnModalMessageFactory.httpError( response );
                 }
               }
-            } );
-            return add ? http.post() : http.delete();
+            } ).post();
           },
 
           submit: function() {
@@ -1121,8 +1151,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           else this.$$transitionToViewState( record );
         };
 
-        this.dataOptionParentList = [];
-        this.dataOptionList = [];
+        this.dataOptionCategoryList = [];
+        this.footnoteList = {};
 
         this.getMetadata = function() {
           return $q.all( [
@@ -1185,112 +1215,121 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               } );
             } ),
 
-            CnHttpFactory.instance( {
-              path: 'data_option_parent',
-              data: {
-                select: { column: [ 'id', 'name_en', 'name_fr', 'note_en', 'note_fr' ] },
-                modifier: { limit: 1000000 }
-              }
-            } ).query().then( function( response ) {
-              response.data.forEach( function( dataOptionParent ) {
-                self.dataOptionParentList.push( {
-                  id: null,
-                  parentId: dataOptionParent.id,
-                  name: { en: dataOptionParent.name_en, fr: dataOptionParent.name_fr },
-                  note: { en: dataOptionParent.note_en, fr: dataOptionParent.note_fr },
-                  parent: true
-                } );
-              } );
-
-              return CnHttpFactory.instance( {
-                path: 'data_option_subcategory',
+            $q.all( [
+              CnHttpFactory.instance( {
+                path: 'data_option_category',
                 data: {
-                  select: { column: [
-                    'type', 'name_en', 'name_fr', 'note_en', 'note_fr', {
-                      column: 'id',
-                      alias: 'catId'
-                    }, {
-                      table: 'data_option',
-                      column: 'id',
-                      alias: 'optionId'
-                    }, {
-                      column: 'data_option_parent_id',
-                      alias: 'parentId'
-                    }, {
-                      table: 'data_option',
-                      column: 'type',
-                      alias: 'option_type'
-                    }, {
-                      table: 'data_option',
-                      column: 'replacement_en'
-                    }, {
-                      table: 'data_option',
-                      column: 'replacement_fr'
-                    }
-                  ] },
-                  modifier: {
-                    join: [ {
-                      table: 'data_option',
-                      onleft: 'data_option_subcategory.id',
-                      onright: 'data_option.data_option_subcategory_id'
-                    } ],
-                    order: [ 'data_option_subcategory.type', 'data_option_subcategory.rank' ],
-                    limit: 1000000
-                  }
+                  select: { column: [ 'id', 'name_en', 'name_fr', 'comprehensive', 'tracking', 'footnote_id_list' ] },
+                  modifier: { order: 'rank', limit: 1000000 }
                 }
               } ).query().then( function( response ) {
-                var currentType = null;
-                var currentCatId = null;
-                var currentParentId = null;
-                response.data.forEach( function( dataOption ) {
-                  var type = dataOption.type;
-                  if( currentType != type ) {
-                    // insert the new dataOption type if it doesn't already exist
-                    if( angular.isUndefined( self.dataOptionList[type] ) ) self.dataOptionList[type] = [];
-                    currentType = type;
-                  }
+                var letter = 'a';
+                self.dataOptionCategoryList = response.data;
+                self.dataOptionCategoryList.forEach( function( dataOptionCategory ) {
+                  dataOptionCategory.name = { en: dataOptionCategory.name_en, fr: dataOptionCategory.name_fr };
+                  delete dataOptionCategory.name_en;
+                  delete dataOptionCategory.name_fr;
+                  dataOptionCategory.optionList = [];
 
-                  if( currentParentId != dataOption.parentId ) {
-                    // insert the parent
-                    if( null != dataOption.parentId ) {
-                      self.dataOptionList[type].push(
-                        self.dataOptionParentList.findByProperty( 'parentId', dataOption.parentId )
-                      );
-                    } else {
-                      self.dataOptionList[type].push( {
-                        id: null,
-                        parentId: null,
-                        name: { en: '', fr: '' },
-                        note: { en: null, fr: null },
-                        parent: true
-                      } );
+                  cenozoApp.lookupData.part2[letter].tab = dataOptionCategory.name;
+                  letter = String.fromCharCode( letter.charCodeAt(0) + 1 );
+                } );
+
+                return CnHttpFactory.instance( {
+                  path: 'data_option',
+                  data: {
+                    select: { column: [ 'id', 'data_option_category_id', 'name_en', 'name_fr', 'footnote_id_list' ] },
+                    modifier: { order: [ 'data_option_category_id', 'data_option.rank' ], limit: 1000000 }
+                  }
+                } ).query().then( function( response ) {
+                  var category = null;
+                  response.data.forEach( function( option ) {
+                    if( null == category || option.data_option_category_id != category.id )
+                      category = self.dataOptionCategoryList.findByProperty( 'id', option.data_option_category_id );
+
+                    option.name = { en: option.name_en, fr: option.name_fr };
+                    delete option.name_en;
+                    delete option.name_fr;
+                    option.detailList = [];
+                    category.optionList.push( option );
+                  } );
+
+                  return CnHttpFactory.instance( {
+                    path: 'data_option_detail',
+                    data: {
+                      select: { column: [ 'id', 'data_option_id', 'name_en', 'name_fr', 'footnote_id_list', {
+                        table: 'data_option',
+                        column: 'data_option_category_id'
+                      } ] },
+                      modifier: { order: [ 'data_option_id', 'data_option_detail.rank' ], limit: 1000000 }
                     }
-                    currentParentId = dataOption.parentId;
-                  }
+                  } ).query().then( function( response ) {
+                    var category = null;
+                    var option = null;
+                    response.data.forEach( function( detail ) {
+                      if( null == category || detail.data_option_category_id != category.id )
+                        category = self.dataOptionCategoryList.findByProperty( 'id', detail.data_option_category_id );
+                      if( null == option || detail.data_option_id != option.id )
+                        option = category.optionList.findByProperty( 'id', detail.data_option_id );
 
-                  if( currentCatId != dataOption.catId ) {
-                    // insert the data option subcategory
-                    self.dataOptionList[type].push( {
-                      catId: dataOption.catId,
-                      parentId: dataOption.parentId,
-                      name: { en: dataOption.name_en, fr: dataOption.name_fr },
-                      note: { en: dataOption.note_en, fr: dataOption.note_fr },
-                      typeList: {},
-                      parent: false
+                        detail.name = { en: detail.name_en, fr: detail.name_fr };
+                        delete detail.name_en;
+                        delete detail.name_fr;
+                        option.detailList.push( detail );
                     } );
-                    currentCatId = dataOption.catId;
-                  }
+                  } );
+                } );
+              } ),
 
-                  // insert the data option
-                  self.dataOptionList[type]
-                      .findByProperty( 'catId', dataOption.catId )
-                      .typeList[dataOption.option_type] = {
-                    id: dataOption.optionId,
-                    replacement: { en: dataOption.replacement_en, fr: dataOption.replacement_fr }
+              CnHttpFactory.instance( {
+                path: 'footnote',
+                data: { select: { column: [ 'id', 'note_en', 'note_fr' ] } },
+                modifier: { limit: 1000000 }
+              } ).query().then( function( response ) {
+                response.data.forEach( function( footnote ) {
+                  self.footnoteList[ footnote.id ] = {
+                    en: footnote.note_en,
+                    fr: footnote.note_fr
                   };
                 } );
+              } )
+            ] ).then( function() {
+              self.dataOptionCategoryList.forEach( function( category ) {
+                var list = category.footnote_id_list;
+                delete category.footnote_id_list;
+                if( list ) {
+                  category.footnote = {
+                    en: list.split( ',' ).map( id => self.footnoteList[id].en ).join( '\n' ),
+                    fr: list.split( ',' ).map( id => self.footnoteList[id].fr ).join( '\n' )
+                  };
+                }
+                
+                category.optionList.forEach( function( option ) {
+                  var list = option.footnote_id_list;
+                  delete option.footnote_id_list;
+                  if( list ) {
+                    option.footnote = {
+                      en: list.split( ',' ).map( id => self.footnoteList[id].en ).join( '\n' ),
+                      fr: list.split( ',' ).map( id => self.footnoteList[id].fr ).join( '\n' )
+                    };
+                  }
+
+                  option.detailList.forEach( function( detail ) {
+                    var list = detail.footnote_id_list;
+                    delete detail.footnote_id_list;
+                    if( list ) {
+                      detail.footnote = {
+                        en: list.split( ',' ).map( id => self.footnoteList[id].en ).join( '\n' ),
+                        fr: list.split( ',' ).map( id => self.footnoteList[id].fr ).join( '\n' )
+                      };
+                    }
+                  } );
+                } );
               } );
+
+              console.log( self.dataOptionCategoryList );
             } )
+
           ] );
         };
 

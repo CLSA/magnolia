@@ -24,10 +24,14 @@ SOURCE notification_type_email.sql
 SOURCE notification.sql
 SOURCE coapplicant.sql
 SOURCE reference.sql
-SOURCE data_option_parent.sql
-SOURCE data_option_subcategory.sql
+SOURCE data_option_category.sql
 SOURCE data_option.sql
+SOURCE data_option_detail.sql
 SOURCE reqn_has_data_option.sql
+SOURCE footnote.sql
+SOURCE data_option_category_has_footnote.sql
+SOURCE data_option_has_footnote.sql
+SOURCE data_option_detail_has_footnote.sql
 SOURCE progress_report.sql
 SOURCE production_type.sql
 SOURCE production.sql

@@ -5,6 +5,8 @@ CREATE TABLE IF NOT EXISTS reqn_has_data_option (
   data_option_id INT UNSIGNED NOT NULL,
   update_timestamp TIMESTAMP NOT NULL,
   create_timestamp TIMESTAMP NOT NULL,
+  comprehensive TINYINT(1) NOT NULL DEFAULT 0,
+  tracking TINYINT(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (reqn_id, data_option_id),
   INDEX fk_data_option_id (data_option_id ASC),
   INDEX fk_reqn_id (reqn_id ASC),

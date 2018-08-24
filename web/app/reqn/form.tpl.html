@@ -62,7 +62,8 @@
            ng-class="{
              'text-warning flashing':
                model.viewModel.record.deferral_note_part2_a || model.viewModel.record.deferral_note_part2_b ||
-               model.viewModel.record.deferral_note_part2_c
+               model.viewModel.record.deferral_note_part2_c || model.viewMOdel.record.deferral_note_part2_d ||
+               model.viewModel.record.deferral_note_part2_e
            }"
            ng-bind-html="t( 'part2.tab' )"></a>
       </li>
@@ -647,110 +648,68 @@
               <li class="list-group-item" ng-bind-html="t( 'part2.notes.text2' )"></li>
               <li class="list-group-item" ng-bind-html="t( 'part2.notes.text3' )"></li>
               <li class="list-group-item" ng-bind-html="t( 'part2.notes.text4' )"></li>
+              <li class="list-group-item" ng-bind-html="t( 'part2.notes.text5' )"></li>
             </ul>
           </div>
         </div>
-        <div ng-show="'a'==model.viewModel.tab[2]"
+        <div ng-repeat="part in ['a','b','c','d','e']"
+             ng-init="partIndex = $index"
+             ng-show="part==model.viewModel.tab[2]"
              class="panel panel-default"
              style="border-top-left-radius: 0px;">
           <div class="panel-body">
-            <form id="part2aForm" name="part2aForm" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
-              <cn-reqn-deferral-note note="deferral_note_part2_a"></cn-reqn-deferral-note>
-              <div class="form-horizontal">
-                <div class="form-group">
-                  <label for="qnaire" class="col-sm-9 control-label"
-                         ng-bind-html="t( 'part2.a.question' )"></label>
-                  <div class="col-sm-3">
-                    <input id="qnaire"
-                           ng-model="model.viewModel.record.qnaire"
-                           ng-change="model.viewModel.onPatch( { qnaire: model.viewModel.record.qnaire } )"
-                           class="form-control"
-                           type="checkbox"></input>
-                  </div>
-                </div>
-                <div ng-if="model.viewModel.record.qnaire">
-                  <table class="table">
-                    <thead class="bg-info">
+            <form ng-attr-id="part2{{ part }}Form" ng-attr-name="part2{{ part }}Form" novalidate>
+              <fieldset ng-disabled="!model.getEditEnabled()">
+                <cn-reqn-deferral-note note="deferral_note_part2_{{ part }}"></cn-reqn-deferral-note>
+                <div class="form-horizontal">
+                  <table class="table table-hover">
+                    <thead ng-class="{ 'bg-info': t( 'part2.' + part + '.module' ) }">
                       <tr>
-                        <td ng-bind-html="t( 'part2.a.module' )"></td>
-                        <td ng-bind-html="t( 'part2.a.comprehensive' )"></td>
-                        <td ng-bind-html="t( 'part2.a.tracking' )"></td>
+                        <td width="33%" ng-bind-html="t( 'part2.' + part + '.module' )"></td>
+                        <td width="33%" ng-if="model.dataOptionCategoryList[partIndex].comprehensive"
+                            ng-bind-html="t( 'part2.' + part + '.comprehensive' )"></td>
+                        <td width="33%" ng-if="model.dataOptionCategoryList[partIndex].tracking"
+                            ng-bind-html="t( 'part2.' + part + '.tracking' )"></td>
                       </tr>
                     </thead>
                     <tbody>
-                      <tr ng-repeat="dataOptionCat in model.dataOptionList.baseline">
-                        <td ng-if="dataOptionCat.parent"
-                            colspan="3" class="text-left" ng-class="{ '': dataOptionCat.parentId }">
-                          <h4 uib-tooltip-html="dataOptionCat.note[model.viewModel.record.language]"
-                              tooltip-popup-delay="100">
-                            {{ dataOptionCat.name[model.viewModel.record.language] }}
-                            <sup ng-if="dataOptionCat.note[model.viewModel.record.language]">ⓘ</sup>
-                          </h4>
-                        </td>
-                        <td ng-if="!dataOptionCat.parent"
-                            class="text-right"
-                            ng-class="{ 'active': dataOptionCat.parentId }">
-                          <span uib-tooltip-html="dataOptionCat.note[model.viewModel.record.language]"
+                      <tr ng-repeat-start="dataOption in model.dataOptionCategoryList[partIndex].optionList">
+                        <td data-toggle="collapse" data-target="#accordion{{ dataOption.id }}" style="vertical-align: middle">
+                          <span uib-tooltip-html="dataOption.footnote[model.viewModel.record.language]"
                                 tooltip-popup-delay="100">
-                            {{ dataOptionCat.name[model.viewModel.record.language] }}
-                            <sup ng-if="dataOptionCat.note[model.viewModel.record.language]">ⓘ</sup>
+                            {{ dataOption.name[model.viewModel.record.language] }}<sup ng-if="dataOption.footnote">ⓘ</sup>
                           </span>
                         </td>
-                        <td ng-repeat="dataOption in dataOptionCat.typeList"
-                            ng-class="{ 'active': dataOptionCat.parentId }">
-                          <span ng-if="dataOption.replacement[model.viewModel.record.language]">
-                            {{ dataOption.replacement[model.viewModel.record.language] }}
-                          </span>
-                          <input id="{{ 'dataOption' + dataOption.id }}"
-                                 ng-if="!dataOption.replacement[model.viewModel.record.language]"
-                                 ng-model="model.viewModel.dataOptionValueList[dataOption.id]"
-                                 ng-change="model.viewModel.setDataOptionValue( dataOption.id )"
-                                 type="checkbox">
-                          </input>
+                        <td ng-if="model.dataOptionCategoryList[partIndex].comprehensive">
+                          <button class="btn full-width"
+                                  ng-class="model.viewModel.dataOptionValueList.comprehensive[dataOption.id] ?
+                                    'btn-success' : 'btn-default'"
+                                  ng-click="model.viewModel.toggleDataOptionValue( 'comprehensive', dataOption.id )">
+                            <i class="glyphicon"
+                               ng-class="model.viewModel.dataOptionValueList.comprehensive[dataOption.id] ?
+                                 'glyphicon-ok' : 'glyphicon-remove'"></i>
+                          </button>
+                        </td>
+                        <td ng-if="model.dataOptionCategoryList[partIndex].tracking">
+                          <button class="btn full-width"
+                                  ng-class="model.viewModel.dataOptionValueList.tracking[dataOption.id] ?
+                                    'btn-success' : 'btn-default'"
+                                  ng-click="model.viewModel.toggleDataOptionValue( 'tracking', dataOption.id )">
+                            <i class="glyphicon"
+                               ng-class="model.viewModel.dataOptionValueList.tracking[dataOption.id] ?
+                                 'glyphicon-ok' : 'glyphicon-remove'"></i>
+                          </button>
                         </td>
                       </tr>
-                    </tbody>
-                  </table>
-                  <hr/>
-                  <h4 class="text-center" ng-bind-html="t( 'part2.a.mcq' )"></h4>
-                  <table class="table">
-                    <thead class="bg-info">
-                      <tr>
-                        <td ng-bind-html="t( 'part2.a.module' )"></td>
-                        <td ng-bind-html="t( 'part2.a.comprehensive' )"></td>
-                        <td ng-bind-html="t( 'part2.a.tracking' )"></td>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr ng-repeat="dataOptionCat in model.dataOptionList.mcq">
-                        <td ng-if="dataOptionCat.parent"
-                            colspan="3" class="text-left" ng-class="{ '': dataOptionCat.parentId }">
-                          <h4 uib-tooltip-html="dataOptionCat.note[model.viewModel.record.language]"
-                              tooltip-popup-delay="100">
-                            {{ dataOptionCat.name[model.viewModel.record.language] }}
-                            <sup ng-if="dataOptionCat.note[model.viewModel.record.language]">ⓘ</sup>
-                          </h4>
-                        </td>
-                        <td ng-if="!dataOptionCat.parent"
-                            class="text-right"
-                            ng-class="{ 'active': dataOptionCat.parentId }">
-                          <span uib-tooltip-html="dataOptionCat.note[model.viewModel.record.language]"
-                                tooltip-popup-delay="100">
-                            {{ dataOptionCat.name[model.viewModel.record.language] }}
-                            <sup ng-if="dataOptionCat.note[model.viewModel.record.language]">ⓘ</sup>
-                          </span>
-                        </td>
-                        <td ng-repeat="dataOption in dataOptionCat.typeList"
-                            ng-class="{ 'active': dataOptionCat.parentId }">
-                          <span ng-if="dataOption.replacement[model.viewModel.record.language]">
-                            {{ dataOption.replacement[model.viewModel.record.language] }}
-                          </span>
-                          <input id="{{ 'dataOption' + dataOption.id }}"
-                                 ng-if="!dataOption.replacement[model.viewModel.record.language]"
-                                 ng-model="model.viewModel.dataOptionValueList[dataOption.id]"
-                                 ng-change="model.viewModel.setDataOptionValue( dataOption.id )"
-                                 type="checkbox">
-                          </input>
+                      <tr ng-repeat-end data-toggle="collapse" data-target="#accordion{{ dataOption.id }}" style="background: white">
+                        <td colspan="3">
+                          <div id="accordion{{ dataOption.id }}" class="collapse text-info">
+                            <span ng-repeat="detail in dataOption.detailList"
+                                  uib-tooltip-html="detail.footnote[model.viewModel.record.language]"
+                                  tooltip-popup-delay="100">
+                              {{ detail.name[model.viewModel.record.language] }}<sup ng-if="detail.footnote">ⓘ</sup>{{ $last ? '' : ';' }}
+                            </span>
+                          </div>
                         </td>
                       </tr>
                     </tbody>
@@ -759,164 +718,15 @@
                     <cn-view-input
                       no-cols=true
                       input="{
-                        key: 'baseline_comment',
+                        key: 'part2_' + part + '_comment',
                         title: t( 'misc.comments' ),
-                        type: model.inputList.baseline_comment.type
+                        type: model.inputList['part2_' + part + '_comment'].type
                       }"
                       model="model"></cn-view-input>
                   </div>
                 </div>
-              </div>
-            </fieldset></form>
-          </div>
-        </div>
-        <div ng-show="'b'==model.viewModel.tab[2]"
-             class="panel panel-default"
-             style="border-top-left-radius: 0px;">
-          <div class="panel-body">
-            <form id="part2bForm" name="part2bForm" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
-              <cn-reqn-deferral-note note="deferral_note_part2_b"></cn-reqn-deferral-note>
-              <div class="form-horizontal">
-                <div class="form-group">
-                  <label for="physical" class="col-sm-9 control-label"
-                         ng-bind-html="t( 'part2.b.question' )"></label>
-                  <div class="col-sm-3">
-                    <input id="physical"
-                           ng-model="model.viewModel.record.physical"
-                           ng-change="model.viewModel.onPatch( { physical: model.viewModel.record.physical } )"
-                           class="form-control"
-                           type="checkbox"></input>
-                  </div>
-                </div>
-                <div ng-if="model.viewModel.record.physical">
-                  <table class="table">
-                    <thead class="bg-info">
-                      <tr>
-                        <td ng-bind-html="t( 'part2.b.physical' )"></td>
-                        <td ng-bind-html="t( 'part2.b.data' )"></td>
-                        <td ng-bind-html="t( 'part2.b.image' )"></td>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr ng-repeat="dataOptionCat in model.dataOptionList.physical">
-                        <td ng-if="dataOptionCat.parent"
-                            colspan="3" class="text-left" ng-class="{ '': dataOptionCat.parentId }">
-                          <h4 uib-tooltip-html="dataOptionCat.note[model.viewModel.record.language]"
-                              tooltip-popup-delay="100">
-                            {{ dataOptionCat.name[model.viewModel.record.language] }}
-                            <sup ng-if="dataOptionCat.note[model.viewModel.record.language]">ⓘ</sup>
-                          </h4>
-                        </td>
-                        <td ng-if="!dataOptionCat.parent"
-                            class="text-right"
-                            ng-class="{ 'active': dataOptionCat.parentId }">
-                          <span uib-tooltip-html="dataOptionCat.note[model.viewModel.record.language]"
-                                tooltip-popup-delay="100">
-                            {{ dataOptionCat.name[model.viewModel.record.language] }}
-                            <sup ng-if="dataOptionCat.note[model.viewModel.record.language]">ⓘ</sup>
-                          </span>
-                        </td>
-                        <td ng-repeat="dataOption in dataOptionCat.typeList"
-                            ng-class="{ 'active': dataOptionCat.parentId }">
-                          <span ng-if="dataOption.replacement[model.viewModel.record.language]">
-                            {{ dataOption.replacement[model.viewModel.record.language] }}
-                          </span>
-                          <input id="{{ 'dataOption' + dataOption.id }}"
-                                 ng-if="!dataOption.replacement[model.viewModel.record.language]"
-                                 ng-model="model.viewModel.dataOptionValueList[dataOption.id]"
-                                 ng-change="model.viewModel.setDataOptionValue( dataOption.id )"
-                                 type="checkbox">
-                          </input>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                  <div class="container">
-                    <cn-view-input
-                      no-cols=true
-                      input="{
-                        key: 'physical_comment',
-                        title: t( 'misc.comments' ),
-                        type: model.inputList.physical_comment.type
-                      }"
-                      model="model"></cn-view-input>
-                  </div>
-                </div>
-              </div>
-            </fieldset></form>
-          </div>
-        </div>
-        <div ng-show="'c'==model.viewModel.tab[2]"
-             class="panel panel-default"
-             style="border-top-left-radius: 0px;">
-          <div class="panel-body">
-            <form id="part2cForm" name="part2cForm" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
-              <cn-reqn-deferral-note note="deferral_note_part2_c"></cn-reqn-deferral-note>
-              <div class="form-horizontal">
-                <div class="form-group">
-                  <label for="biomarker" class="col-sm-9 control-label"
-                         ng-bind-html="t( 'part2.c.question' )"></label>
-                  <div class="col-sm-3">
-                    <input id="biomarker"
-                           ng-model="model.viewModel.record.biomarker"
-                           ng-change="model.viewModel.onPatch( { biomarker: model.viewModel.record.biomarker } )"
-                           class="form-control"
-                           type="checkbox"></input>
-                  </div>
-                </div>
-                <div ng-if="model.viewModel.record.biomarker">
-                  <table class="table">
-                    <thead class="bg-info">
-                      <tr>
-                        <td ng-bind-html="t( 'part2.c.hematology' )"></td>
-                        <td ng-bind-html="t( 'part2.c.data' )"></td>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr ng-repeat="dataOptionCat in model.dataOptionList.biomarker">
-                        <td ng-if="dataOptionCat.parent"
-                            colspan="3" class="text-left" ng-class="{ '': dataOptionCat.parentId }">
-                          <h4 uib-tooltip-html="dataOptionCat.note[model.viewModel.record.language]"
-                              tooltip-popup-delay="100">
-                            {{ dataOptionCat.name[model.viewModel.record.language] }}
-                            <sup ng-if="dataOptionCat.note[model.viewModel.record.language]">ⓘ</sup>
-                          </h4>
-                        </td>
-                        <td ng-if="!dataOptionCat.parent" ng-class="{ 'active': dataOptionCat.parentId }">
-                          <span uib-tooltip-html="dataOptionCat.note[model.viewModel.record.language]"
-                                tooltip-popup-delay="100">
-                            {{ dataOptionCat.name[model.viewModel.record.language] }}
-                            <sup ng-if="dataOptionCat.note[model.viewModel.record.language]">ⓘ</sup>
-                          </span>
-                        </td>
-                        <td ng-repeat="dataOption in dataOptionCat.typeList"
-                            ng-class="{ 'active': dataOptionCat.parentId }">
-                          <span ng-if="dataOption.replacement[model.viewModel.record.language]">
-                            {{ dataOption.replacement[model.viewModel.record.language] }}
-                          </span>
-                          <input id="{{ 'dataOption' + dataOption.id }}"
-                                 ng-if="!dataOption.replacement[model.viewModel.record.language]"
-                                 ng-model="model.viewModel.dataOptionValueList[dataOption.id]"
-                                 ng-change="model.viewModel.setDataOptionValue( dataOption.id )"
-                                 type="checkbox">
-                          </input>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                  <div class="container">
-                    <cn-view-input
-                      no-cols=true
-                      input="{
-                        key: 'biomarker_comment',
-                        title: t( 'misc.comments' ),
-                        type: model.inputList.biomarker_comment.type
-                      }"
-                      model="model"></cn-view-input>
-                  </div>
-                </div>
-              </div>
-            </fieldset></form>
+              </fieldset>
+            </form>
           </div>
         </div>
       </div>

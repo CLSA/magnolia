@@ -6,7 +6,7 @@
  * @filesource
  */
 
-namespace magnolia\service\data_option_parent;
+namespace magnolia\service\footnote;
 use cenozo\lib, cenozo\log, magnolia\util;
 
 /**

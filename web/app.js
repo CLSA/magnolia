@@ -210,60 +210,52 @@ cenozoApp.lookupData = {
     notes: {
       tab: { en: 'Notes', fr: 'Remarques' },
       text1: {
+        en: 'Please mark with an “X” the checkbox for the sections containing the modules in the CLSA Baseline dataset that you are requesting.<br>In the <strong>Comments</strong> section, include other relevant information concerning your request, including rationale for the request of Additional Data (e.g. Images).<br>Please note that you cannot request data which are not listed on this Checklist.',
+        fr: 'Inscrivez un « X » dans la case à côté des modules contenant les variables de l’ensemble de données de l’ÉLCV que vous demandez.<br>Ajoutez toute autre information pertinente à votre demande à la section <strong>Commentaires</strong>, y compris une justification de la demande de données supplémentaires (par exemple, les images).<br>TRANSLATION REQUIRED'
+      },
+      text2: {
         en: '<strong>Included in all datasets</strong><ul><li>Sampling weights</li></ul>',
         fr: '<strong>Inclus dans tous les ensembles de données</strong><ul><li>Poids d’échantillonnage</li></ul>'
       },
-      text2: {
+      text3: {
         en: '<strong>Not included in datasets</strong><ul><li>Identifiable information collected (e.g. name, contact information, date of birth, health insurance number, and full postal code)</li></ul>',
         fr: '<strong>Exclus des ensembles de données</strong><ul><li>Informations d’identification recueillies (p. ex. nom, coordonnées, date de naissance, numéro d’assurance maladie et code postal complet)</li></ul>'
       },
-      text3: {
-        en: '<strong>Additional Data available</strong><ul><li>Air Pollution and Meteorological Exposure Measurements (for all 50,000 CLSA participants).</li><li>Forward Sortation Areas (A forward sortation area (FSA) is a geographical region in which all postal codes start with the same three characters.)</li><li>Community names (Determined using the Postal Code Conversion File (PCCF) from Statistics Canada.)</li></ul>',
-        fr: '<strong>Données supplémentaires disponibles</strong><ul><li>Les mesures de la pollution de l’air et de l’exposition météorologique (pour les 50 000 participants à l’ÉLCV).</li><li>Région de tri d’acheminement (Une région de tri d’acheminement (RTA) est une region géographique où tous les codes postaux ont les mêmes trois premiers caractères.)</li><li>Nom de la collectivité (Déterminé à l’aide du Fichier de conversion des codes postaux (FCCP) de Statistique Canada.</li></ul>'
-      },
       text4: {
+        en: '<strong>Additional Data available</strong><ul><li>Air Pollution and Meteorological Exposure Measurements (for all 50,000 CLSA participants).</li><li>Forward Sortation Areas (A forward sortation area (FSA) is a geographical region in which all postal codes start with the same three characters.)</li><li>Community names (Determined using the Postal Code Conversion File (PCCF) from Statistics Canada.)</li><li>Census Subdivision (CSD ; Codes and Names) / Subdivisions de recensement (Codes et noms)</li><li>Forward Sortation Areas (FSA) / Zones de tri d’acheminement</li></ul><br>Due to the sensitive nature of these geographic indicators, a special request must be made to receive CSDs and FSAs as part of your dataset.  Adequate justification must be provided within the project description (Application Part 1). By requesting these data, you also agree that you will not present in any form (presentation, publication, poster), an illustration of these geographic areas, when fewer than 50 CLSA participants.',
+        fr: '<strong>Données supplémentaires disponibles</strong><ul><li>Les mesures de la pollution de l’air et de l’exposition météorologique (pour les 50 000 participants à l’ÉLCV).</li><li>Région de tri d’acheminement (Une région de tri d’acheminement (RTA) est une region géographique où tous les codes postaux ont les mêmes trois premiers caractères.)</li><li>Nom de la collectivité (Déterminé à l’aide du Fichier de conversion des codes postaux (FCCP) de Statistique Canada.</li><li>TRANSLATION REQUIRED</li><li>TRANSLATION REQUIRED</li></ul><br>TRANSLATION REQUIRED'
+      },
+      text5: {
         en: 'For more information on these data, please contact <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>',
         fr: 'Pour en savoir plus sur ces données, veuillez écrire à <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>'
       }
     },
     a: {
-      tab: { en: 'Section A: Questionnaires', fr: 'Section A : Questionnaires' },
-      question: {
-        en: 'Please check if you are requesting questionnaire data from the CLSA BASELINE data collection',
-        fr: 'Veuillez vérifier si vous demandez des données de questionnaire à partir de la collecte INITIALE de données de l’ÉLCV'
-      },
-      mcq: { en: 'Maintaining Contact Interview', fr: 'Entrevue de mi-parcours' },
-      module: { en: 'Interview Module', fr: 'Module de l’entrevue' },
+      tab: { en: '', fr: '' },
+      module: { en: 'Data Module', fr: 'Module de données' },
       tracking: {
-        en: 'Tracking<br/>(Telephone Interview)',
-        fr: 'Évaluation de surveillance<br/>(Entrevue téléphonique)'
+        en: 'Tracking<br/>(Telephone Interview) (TRM)',
+        fr: 'Évaluation de surveillance<br/>(Entrevue téléphonique) (TRM)'
       },
       comprehensive: {
-        en: 'Comprehensive<br/>(Face-to-face Interview - In-home or DCS visit)',
-        fr: 'Évaluation globale<br/>(Entrevue en personne - à domicile ou au DCS)'
+        en: 'Comprehensive<br/>(Face-to-face Interview - In-home or DCS visit) (COM)',
+        fr: 'Évaluation globale<br/>(Entrevue en personne - à domicile ou au DCS) (COM)'
       }
     },
-    b: {
-      tab: { en: 'Section B: Physical Assessments', fr: 'Section B : Examens physiques' },
-      question: {
-        en: 'Please check if you are requesting physical assessments from the CLSA BASELINE data collection',
-        fr: 'Veuillez vérifier si vous demandez des données de examens physiques à partir de la collecte INITIALE de données de l’ÉLCV'
+    b: { tab: { en: '', fr: '' }, module: { en: '', fr: '' }, tracking: { en: '', fr: '' }, comprehensive: { en: '', fr: '' } },
+    c: { tab: { en: '', fr: '' }, module: { en: '', fr: '' }, tracking: { en: '', fr: '' }, comprehensive: { en: '', fr: '' } },
+    d: { tab: { en: '', fr: '' }, module: { en: '', fr: '' }, tracking: { en: '', fr: '' }, comprehensive: { en: '', fr: '' } },
+    e: {
+      tab: { en: '', fr: '' },
+      module: { en: 'Linked Data', fr: 'Données liées' },
+      tracking: {
+        en: 'Tracking<br/>(Telephone Interview) (TRM)',
+        fr: 'Évaluation de surveillance<br/>(Entrevue téléphonique) (TRM)'
       },
-      physical: { en: 'Physical Assessment', fr: 'Examen physique' },
-      data: { en: 'Data', fr: 'Données' },
-      image: { en: 'Image', fr: 'Image' }
-    },
-    c: {
-      tab: {
-        en: 'Section C: Biomarkers measured in blood',
-        fr: 'Section C : Biomarqueurs mesurés dans le sang'
-      },
-      question: {
-        en: 'Please check if you are requesting biomarkers measured in blood from the CLSA BASELINE data collection',
-        fr: 'Veuillez vérifier si vous demandez des données de biomarqueurs mesurés dans le sang à partir de la collecte INITIALE de données de l’ÉLCV'
-      },
-      hematology: { en: 'Hematology Report (N = 30,000)', fr: 'Rapport hématologique (N = 30,000)' },
-      data: { en: 'Data', fr: 'Données' }
+      comprehensive: {
+        en: 'Comprehensive<br/>(Face-to-face Interview - In-home or DCS visit) (COM)',
+        fr: 'Évaluation globale<br/>(Entrevue en personne - à domicile ou au DCS) (COM)'
+      }
     }
   },
   part3: {

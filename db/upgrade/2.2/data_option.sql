@@ -4,194 +4,55 @@ CREATE TABLE IF NOT EXISTS data_option (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   update_timestamp TIMESTAMP NOT NULL,
   create_timestamp TIMESTAMP NOT NULL,
-  data_option_subcategory_id INT UNSIGNED NOT NULL,
-  type ENUM('data', 'image', 'comprehensive', 'tracking') NOT NULL,
-  replacement_en VARCHAR(255) NULL,
-  replacement_fr VARCHAR(255) NULL,
+  data_option_category_id INT UNSIGNED NOT NULL,
+  rank INT UNSIGNED NOT NULL,
+  name_en VARCHAR(127) NOT NULL,
+  name_fr VARCHAR(127) NOT NULL,
   PRIMARY KEY (id),
-  INDEX fk_data_option_subcategory_id (data_option_subcategory_id ASC),
-  UNIQUE INDEX uq_data_option_subcategory_id_type (data_option_subcategory_id ASC, type ASC),
-  CONSTRAINT fk_data_option_data_option_subcategory_id
-    FOREIGN KEY (data_option_subcategory_id)
-    REFERENCES data_option_subcategory (id)
+  INDEX fk_data_option_category_id (data_option_category_id ASC),
+  UNIQUE INDEX uq_data_option_category_id_rank (data_option_category_id ASC, rank ASC),
+  CONSTRAINT fk_data_option_data_option_category_id
+    FOREIGN KEY (data_option_category_id)
+    REFERENCES data_option_category (id)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
-INSERT IGNORE INTO data_option( data_option_subcategory_id, type, replacement_en, replacement_fr )
-SELECT data_option_subcategory.id, temp.type, NULL, NULL
-FROM data_option_subcategory, (
-  SELECT "comprehensive" AS type UNION
-  SELECT "tracking" AS type
-) AS temp
-WHERE data_option_subcategory.type = "baseline"
-ORDER BY data_option_subcategory.rank, temp.type;
+SELECT id INTO @data_option_category_id FROM data_option_category WHERE rank = 1;
 
-UPDATE data_option
-JOIN data_option_subcategory ON data_option.data_option_subcategory_id = data_option_subcategory.id
-SET replacement_en = "See Section B: Physical Assessments (WGT, HGT)",
-    replacement_fr = "Voir Section B : évaluations physiques (WGT, HGT)"
-WHERE data_option.type = "comprehensive"
-AND data_option_subcategory.type = "baseline"
-AND data_option_subcategory.name_en = "Height and Weight (HWT)";
+INSERT IGNORE INTO data_option( data_option_category_id, rank, name_en, name_fr ) VALUES
+( @data_option_category_id, 1, "Socio-Demographic Characteristics", "Caractéristiques socio-démographiques" ),
+( @data_option_category_id, 2, "Lifestyle and Behaviour", "Style de vie et comportement" ),
+( @data_option_category_id, 3, "Physical Health I", "Santé physique I" ),
+( @data_option_category_id, 4, "Self-reported Chronic Conditions", "Problèmes de santé chroniques autodéclarés" ),
+( @data_option_category_id, 5, "Physical Health II", "Santé physique II" ),
+( @data_option_category_id, 6, "Psychological Health", "Santé mentale" ),
+( @data_option_category_id, 7, "Cognition - metadata & scores", "Cognition - métadonnées et cotation" ),
+( @data_option_category_id, 8, "Labour Force", "Population active" ),
+( @data_option_category_id, 9, "Social Health", "Santé sociale" );
 
-UPDATE data_option
-JOIN data_option_subcategory ON data_option.data_option_subcategory_id = data_option_subcategory.id
-SET replacement_en = "Not applicable",
-    replacement_fr = "Ne s’applique pas"
-WHERE data_option.type = "tracking"
-AND data_option_subcategory.type = "baseline"
-AND data_option_subcategory.name_en IN(
-  "Nutrition: Short Diet Questionnaire (NUT)",
-  "Medications (MEDI)",
-  "Life Space Index (LSI)",
-  "Sleep (SLE)",
-  "Time-Based (TMT)",
-  "Event-Based (PMT)",
-  "Stroop - Victoria Version (STP)",
-  "Controlled Oral Word Association (FAS)",
-  "Choice Reaction Time (CRT)",
-  "Diabetes (DIA)",
-  "Stroke/Cerebrovascular Event (STR)",
-  "Traumatic Brain Injury (TBI)",
-  "Hypo and Hyperthyroidism (HYP)",
-  "Hypertension (HBP)",
-  "Ischemic Heart Disease (IHD)",
-  "WHO Rose Questionnaire (ROS)",
-  "Osteoarthritis of the Hand (OSA)",
-  "Osteoarthritis of the Hip (OSH)",
-  "Osteoarthritis of the Knee (OSK)",
-  "Musculoskeletal: Other (OAR)",
-  "Osteoporosis (OST)",
-  "Neuro-psychiatric (DPR)",
-  "Chronic Airflow Obstruction (CAO)"
-);
+SELECT id INTO @data_option_category_id FROM data_option_category WHERE rank = 2;
 
-UPDATE data_option
-JOIN data_option_subcategory ON data_option.data_option_subcategory_id = data_option_subcategory.id
-SET replacement_en = "Refer to Maintaining Contact Interview",
-    replacement_fr = "Voir l’entrevue de mi-parcours"
-WHERE data_option.type = "tracking"
-AND data_option_subcategory.type = "baseline"
-AND data_option_subcategory.name_en = "Parkinsonism (PKD)";
+INSERT IGNORE INTO data_option( data_option_category_id, rank, name_en, name_fr ) VALUES
+( @data_option_category_id, 1, "Physical Assessments I", "Évaluations physiques I" ),
+( @data_option_category_id, 2, "Bio-Impedance by DEXA", "Bio-impédance par DEXA (DXA)" ),
+( @data_option_category_id, 3, "Physical Assessments II", "Évaluations physiques II" ),
+( @data_option_category_id, 4, "Bone Density by DEXA", "Densité osseuse par DEXA (DXA)" );
 
-UPDATE data_option
-JOIN data_option_subcategory ON data_option.data_option_subcategory_id = data_option_subcategory.id
-SET replacement_en = "Not yet available",
-    replacement_fr = "Pas encore disponible"
-WHERE data_option.type = "comprehensive"
-AND data_option_subcategory.type = "baseline"
-AND data_option_subcategory.name_en = "Medications (MEDI)";
+SELECT id INTO @data_option_category_id FROM data_option_category WHERE rank = 3;
 
+INSERT IGNORE INTO data_option( data_option_category_id, rank, name_en, name_fr ) VALUES
+( @data_option_category_id, 1, "Hematology Report", "Rapport hématologique" ),
+( @data_option_category_id, 2, "Chemistry Report", "Rapport de chimie" );
 
-INSERT IGNORE INTO data_option( data_option_subcategory_id, type, replacement_en, replacement_fr )
-SELECT data_option_subcategory.id, temp.type, NULL, NULL
-FROM data_option_subcategory, (
-  SELECT "comprehensive" AS type UNION
-  SELECT "tracking" AS type
-) AS temp
-WHERE data_option_subcategory.type = "mcq"
-ORDER BY data_option_subcategory.rank, temp.type;
+SELECT id INTO @data_option_category_id FROM data_option_category WHERE rank = 4;
 
-UPDATE data_option
-JOIN data_option_subcategory ON data_option.data_option_subcategory_id = data_option_subcategory.id
-SET replacement_en = "Not applicable",
-    replacement_fr = "Ne s’applique pas"
-WHERE data_option.type = "tracking"
-AND data_option_subcategory.type = "mcq"
-AND data_option_subcategory.name_en IN (
-  "Snoring (SNO)",
-  "Psychological Distress (K10)",
-  "Personality Traits (PER)"
-);
+INSERT IGNORE INTO data_option( data_option_category_id, rank, name_en, name_fr ) VALUES
+( @data_option_category_id, 1, "Genomics (N=9,896)", "Génomique (N=9,896)" );
 
-UPDATE data_option
-JOIN data_option_subcategory ON data_option.data_option_subcategory_id = data_option_subcategory.id
-SET replacement_en = "See Parkinsonism module above",
-    replacement_fr = "Voir le module sur le Parkinsonisme ci-dessus"
-WHERE data_option.type = "comprehensive"
-AND data_option_subcategory.type = "mcq"
-AND data_option_subcategory.name_en = "Parkinsonism (PKD)";
+SELECT id INTO @data_option_category_id FROM data_option_category WHERE rank = 5;
 
-UPDATE data_option
-JOIN data_option_subcategory ON data_option.data_option_subcategory_id = data_option_subcategory.id
-SET replacement_en = "Not applicable",
-    replacement_fr = "Ne s’applique pas"
-WHERE data_option.type = "comprehensive"
-AND data_option_subcategory.type = "mcq"
-AND data_option_subcategory.name_en = "Medication Use (MED)";
-
-
-INSERT IGNORE INTO data_option( data_option_subcategory_id, type, replacement_en, replacement_fr )
-SELECT data_option_subcategory.id, temp.type, NULL, NULL
-FROM data_option_subcategory, (
-  SELECT "data" AS type UNION
-  SELECT "image" AS type
-) AS temp
-WHERE data_option_subcategory.type = "physical"
-ORDER BY data_option_subcategory.rank, temp.type;
-
-UPDATE data_option
-JOIN data_option_subcategory ON data_option.data_option_subcategory_id = data_option_subcategory.id
-SET replacement_en = "Not applicable",
-    replacement_fr = "Ne s’applique pas"
-WHERE data_option.type = "image"
-AND data_option_subcategory.type = "physical"
-AND data_option_subcategory.name_en IN(
-  "Full Questionnaire",
-  "Weight (WGT)",
-  "Height (HGT)",
-  "Body Mass Index (HWT)",
-  "Hip and Waist Circumference (WHC)",
-  "Pulse rate (BP)",
-  "Blood Pressure (BP)",
-  "Electrocardiogram (ECG)",
-  "Spirometry (SPR)",
-  "Body Composition (Whole Body)",
-  "Body Composition (Body Parts)",
-  "Hearing (HRG)",
-  "4 Metre Walk (WLK)",
-  "Timed Get Up and Go (TUG)",
-  "Standing Balance (BAL)",
-  "Chair Rise: Balance and Coordination (CR)",
-  "Visual Acuity (VA)",
-  "Tonometry (TON)",
-  "Grip Strength (GS)"
-);
-
-UPDATE data_option
-JOIN data_option_subcategory ON data_option.data_option_subcategory_id = data_option_subcategory.id
-SET replacement_en = "Not yet available",
-    replacement_fr = "Pas encore disponible"
-WHERE data_option.type = "image"
-AND data_option_subcategory.type = "physical"
-AND data_option_subcategory.name_en IN(
-  "Carotid Intima",
-  "Plaque",
-  "Whole Body",
-  "Body Parts",
-  "Dual Hip",
-  "Forearm",
-  "IVA Lateral Bone",
-  "Aortic Calcification",
-  "Retinal Scan (RS)"
-);
-
-UPDATE data_option
-JOIN data_option_subcategory ON data_option.data_option_subcategory_id = data_option_subcategory.id
-SET replacement_en = "Not applicable",
-    replacement_fr = "Ne s’applique pas"
-WHERE data_option.type = "data"
-AND data_option_subcategory.type = "physical"
-AND data_option_subcategory.name_en IN(
-  "Plaque",
-  "IVA Lateral Bone",
-  "Aortic Calcification",
-  "Retinal Scan (RS)"
-);
-
-INSERT IGNORE INTO data_option( data_option_subcategory_id, type, replacement_en, replacement_fr )
-SELECT data_option_subcategory.id, "data", NULL, NULL
-FROM data_option_subcategory
-WHERE data_option_subcategory.type = "biomarker"
-ORDER BY data_option_subcategory.rank;
+INSERT IGNORE INTO data_option( data_option_category_id, rank, name_en, name_fr ) VALUES
+( @data_option_category_id, 1, "Air Quality", "Qualité de l'air" ),
+( @data_option_category_id, 2, "Neighborhood Factors", "Facteurs de voisinage" ),
+( @data_option_category_id, 3, "Greenness & Weather", "Verdure & Météo" );
