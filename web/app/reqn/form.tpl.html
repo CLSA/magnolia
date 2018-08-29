@@ -154,7 +154,7 @@
                     key: 'applicant_email',
                     title: t( 'part1.a1.applicant_email' )+'<sup>ⓘ</sup>',
                     type: model.inputList.applicant_email.type,
-                    help: t( 'misc.email_text' )
+                    help: t( 'misc.emailText' )
                   }"
                   model="model">
                 </cn-view-input>
@@ -207,7 +207,7 @@
                     key: 'graduate_email',
                     title: t( 'part1.a1.graduate_email' )+'<sup>ⓘ</sup>',
                     type: model.inputList.graduate_email.type,
-                    help: t( 'misc.email_text' )
+                    help: t( 'misc.emailText' )
                   }"
                   model="model">
                 </cn-view-input>
@@ -297,7 +297,7 @@
                       key: 'email',
                       title: t( 'part1.a2.email' )+'<sup>ⓘ</sup>',
                       type: 'string',
-                      help: t( 'misc.email_text' )
+                      help: t( 'misc.emailText' )
                     }"
                     record="coapplicantRecord"
                     model="model.viewModel.coapplicantModel"
@@ -685,9 +685,11 @@
                                   ng-class="model.viewModel.dataOptionValueList.comprehensive[dataOption.id] ?
                                     'btn-success' : 'btn-default'"
                                   ng-click="model.viewModel.toggleDataOptionValue( 'comprehensive', dataOption.id )">
-                            <i class="glyphicon"
-                               ng-class="model.viewModel.dataOptionValueList.comprehensive[dataOption.id] ?
-                                 'glyphicon-ok' : 'glyphicon-remove'"></i>
+                            <i class="glyphicon glyphicon-ok"
+                               ng-if="model.viewModel.dataOptionValueList.comprehensive[dataOption.id]"></i>
+                            <span style="font-weight: normal"
+                                  ng-if="!model.viewModel.dataOptionValueList.comprehensive[dataOption.id]"
+                                  ng-bind-html="t( 'misc.clickToSelect' )"></span>
                           </button>
                         </td>
                         <td ng-if="model.dataOptionCategoryList[partIndex].tracking">
@@ -695,9 +697,11 @@
                                   ng-class="model.viewModel.dataOptionValueList.tracking[dataOption.id] ?
                                     'btn-success' : 'btn-default'"
                                   ng-click="model.viewModel.toggleDataOptionValue( 'tracking', dataOption.id )">
-                            <i class="glyphicon"
-                               ng-class="model.viewModel.dataOptionValueList.tracking[dataOption.id] ?
-                                 'glyphicon-ok' : 'glyphicon-remove'"></i>
+                            <i class="glyphicon glyphicon-ok"
+                               ng-if="model.viewModel.dataOptionValueList.tracking[dataOption.id]"></i>
+                            <span style="font-weight: normal"
+                                  ng-if="!model.viewModel.dataOptionValueList.tracking[dataOption.id]"
+                                  ng-bind-html="t( 'misc.clickToSelect' )"></span>
                           </button>
                         </td>
                       </tr>

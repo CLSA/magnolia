@@ -314,7 +314,7 @@ cenozoApp.lookupData = {
       en: 'Are you sure you want to abandon the application?\n\nYou will no longer have access to the application and the review process will be discontinued.',
       fr: 'Êtes-vous sûr(e) de vouloir abandonner la demande d’accès?\n\nVous n’y aurez plus accès et le processus d’évaluation sera interrompu.'
     },
-    email_text: {
+    emailText: {
       en: 'You must provide an institutional email.  Public email accounts such as @gmail.com are not allowed.',
       fr: 'TRANSLATION REQUIRED'
     },
@@ -325,6 +325,10 @@ cenozoApp.lookupData = {
     postdocFeeWaiver: {
       en: 'Fee Waiver for Postdoctoral Fellow (limit 1 waiver for postdoctoral studies)',
       fr: 'Exonération pour un boursier postdoctoral (limite d’une exonération pour les études postdoctorales)'
+    },
+    clickToSelect: {
+      en: '(click to select)',
+      fr: 'TRANSLATION REQUIRED'
     }
   }
 };
