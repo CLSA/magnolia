@@ -1327,7 +1327,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                 } );
               } );
 
-              console.log( self.dataOptionCategoryList );
             } )
 
           ] );
