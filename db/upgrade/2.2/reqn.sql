@@ -45,6 +45,7 @@ CREATE PROCEDURE patch_reqn()
         "ethics TINYINT(1) NULL, ",
         "ethics_date DATE NULL, ",
         "ethics_filename VARCHAR(255) NULL, ",
+        "agreement_filename VARCHAR(255) NULL, ",
         "waiver ENUM('graduate', 'postdoc') NULL, ",
         "part2_a_comment TEXT NULL DEFAULT NULL, ",
         "part2_b_comment TEXT NULL DEFAULT NULL, ",

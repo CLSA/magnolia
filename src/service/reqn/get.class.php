@@ -13,7 +13,7 @@ class get extends \cenozo\service\downloadable
   /**
    * Replace parent method
    * 
-   * When the client calls for a file we return the reqn's ethics letter
+   * Letters use octet-stream, reqn forms use pdf
    */
   protected function get_downloadable_mime_type_list()
   {
@@ -27,10 +27,12 @@ class get extends \cenozo\service\downloadable
    */
   protected function get_downloadable_public_name()
   {
+    $file = $this->get_argument( 'file', NULL );
     $db_reqn = $this->get_leaf_record();
-    return $this->get_argument( 'letter', false ) ?
-      $db_reqn->ethics_filename :
-      sprintf( '%s.pdf', $db_reqn->identifier ); 
+    if( 'ethics_filename' == $file ) return $db_reqn->ethics_filename;
+    else if( 'agreement_filename' == $file ) return $db_reqn->agreement_filename;
+
+    return sprintf( '%s.pdf', $db_reqn->identifier );
   }
 
   /**
@@ -40,10 +42,12 @@ class get extends \cenozo\service\downloadable
    */
   protected function get_downloadable_file_path()
   {
+    $file = $this->get_argument( 'file', NULL );
     $db_reqn = $this->get_leaf_record();
-    return $this->get_argument( 'letter', false ) ?
-      sprintf( '%s/%s', ETHICS_LETTER_PATH, $db_reqn->id ) :
-      sprintf( '%s/%s.pdf', REQN_PATH, $db_reqn->id );
+    if( 'ethics_filename' == $file ) return sprintf( '%s/%s', ETHICS_LETTER_PATH, $db_reqn->id );
+    else if( 'agreement_filename' == $file ) return sprintf( '%s/%s', AGREEMENT_LETTER_PATH, $db_reqn->id );
+
+    return sprintf( '%s/%s.pdf', REQN_PATH, $db_reqn->id );
   }
 
   /**
@@ -54,7 +58,7 @@ class get extends \cenozo\service\downloadable
     parent::prepare();
 
     // if requesting the reqn as a PDF file then create it first
-    if( 'application/pdf' == $this->get_mime_type() && !$this->get_argument( 'letter', false ) )
+    if( 'application/pdf' == $this->get_mime_type() && !$this->get_argument( 'file', false ) )
     {
       $db_reqn = $this->get_leaf_record();
       $db_reqn->generate_pdf_form();
@@ -66,11 +70,11 @@ class get extends \cenozo\service\downloadable
    */
   public function execute()
   {
-    if( $this->get_argument( 'letter', false ) && 'application/json' == $this->get_mime_type() )
+    if( 'application/json' == $this->get_mime_type() && $this->get_argument( 'file', false ) )
     {
       $db_reqn = $this->get_leaf_record();
-      if( !is_null( $db_reqn ) && file_exists( $this->get_downloadable_file_path() ) )
-        $this->set_data( stat( $this->get_downloadable_file_path() )['size'] );
+      $path = $this->get_downloadable_file_path();
+      if( !is_null( $db_reqn ) && file_exists( $path ) ) $this->set_data( stat( $path )['size'] );
     }
     else
     {

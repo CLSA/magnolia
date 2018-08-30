@@ -72,6 +72,10 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
       constant: true,
       exclude: true // modified in the model
     },
+    agreement_filename: {
+      title: 'Agreement File',
+      type: 'file'
+    },
 
     // the following are for the form and will not appear in the view
     phase: { column: 'stage_type.phase', type: 'string', exclude: true },
@@ -473,6 +477,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           if( angular.isDefined( self.stageModel ) ) self.stageModel.listModel.heading = 'Stage History';
         } );
 
+        this.configureFileInput( 'ethics_filename' );
+        this.configureFileInput( 'agreement_filename' );
+
         angular.extend( this, {
           onView: function( force ) {
             // we need to do some extra work when looking at the reqn form
@@ -486,7 +493,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                 this.$$onView( force ).then( function() {
                   // define the earliest date that the reqn may start
                   self.minStartDate = moment( self.record.deadline ).add( CnSession.application.startDateDelay, 'months' );
-                  return self.updateEthicsFileSize();
                 } ),
                 this.getCoapplicantList(),
                 this.getReferenceList(),
@@ -710,8 +716,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           },
           charCount: { lay_summary: 0 },
           wordCount: { background: 0, objectives: 0, methodology: 0, analysis: 0 },
-          uploadingEthicsFile: false,
-          ethicsFileSize: null,
           minStartDate: null,
 
           translate: function( value ) {
@@ -844,50 +848,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             } ).delete().then( function() {
               return self.getReferenceList();
             } );
-          },
-
-          updateEthicsFileSize: function() {
-            return CnHttpFactory.instance( {
-              path: this.parentModel.getServiceResourcePath() + '?letter=1',
-            } ).get().then( function( response ) {
-              self.ethicsFileSize = response.data;
-            } );
-          },
-
-          downloadEthicsFile: function() {
-            return CnHttpFactory.instance( {
-              path: this.parentModel.getServiceResourcePath() + '?letter=1',
-              format: 'unknown'
-            } ).file();
-          },
-
-          removeEthicsFile: function() {
-            return this.onPatch( { ethics_filename: null } ).then( function() {
-              return self.updateEthicsFileSize();
-            } );
-          },
-
-          uploadEthicsFile: function() {
-            this.uploadingEthicsFile = true;
-            var data = new FormData();
-            data.append( 'file', this.ethicsFile );
-            var fileDetails = data.get( 'file' );
-
-            // update the filename
-            return CnHttpFactory.instance( {
-              path: this.parentModel.getServiceResourcePath(),
-              data: { ethics_filename: fileDetails.name }
-            } ).patch().then( function() {
-              self.record.ethics_filename = fileDetails.name;
-
-              // upload the file
-              return CnHttpFactory.instance( {
-                path: self.parentModel.getServiceResourcePath() + '?letter=1',
-                data: self.ethicsFile,
-                format: 'unknown'
-              } ).patch()
-            } ).then( function() { return self.updateEthicsFileSize(); } )
-               .finally( function() { self.uploadingEthicsFile = false; } );
           },
 
           getDataOptionValueList: function() {

@@ -109,95 +109,108 @@ class patch extends \cenozo\service\patch
     $notification_type_class_name = lib::get_class_name( 'database\notification_type' );
     $stage_type_class_name = lib::get_class_name( 'database\stage_type' );
 
+    $file = $this->get_argument( 'file', NULL );
     $headers = apache_request_headers();
-    if( false !== strpos( $headers['Content-Type'], 'application/octet-stream' ) )
+    if( false !== strpos( $headers['Content-Type'], 'application/octet-stream' ) && !is_null( $file ) )
     {
-      $filename = sprintf( '%s/%s', ETHICS_LETTER_PATH, $this->get_leaf_record()->id );
+      if( 'ethics_filename' == $file )
+      {
+        $directory = ETHICS_LETTER_PATH;
+      }
+      else if( 'agreement_filename' == $file )
+      {
+        $directory = AGREEMENT_LETTER_PATH;
+      }
+      else throw lib::create( 'exception\argument', 'file', $file );
+
+      $filename = sprintf( '%s/%s', $directory, $this->get_leaf_record()->id );
       if( false === file_put_contents( $filename, $this->get_file_as_raw() ) )
         throw lib::create( 'exception\runtime',
           sprintf( 'Unable to write file "%s"', $filename ),
           __METHOD__ );
     }
-
-    $action = $this->get_argument( 'action', false );
-    if( $action )
+    else
     {
-      $db_reqn = $this->get_leaf_record();
-      if( 'abandon' == $action )
+      $action = $this->get_argument( 'action', false );
+      if( $action )
       {
-        $db_reqn->state = 'abandoned';
-        $db_reqn->save();
-      }
-      else if( 'defer' == $action )
-      {
-        $db_reqn->state = 'deferred';
-        $db_reqn->save();
-
-        // send a notification
-        $db_notification = lib::create( 'database\notification' );
-        $db_notification->reqn_id = $db_reqn->id;
-        $db_notification->notification_type_id =
-          $notification_type_class_name::get_unique_record( 'name', 'Action required' )->id;
-        $db_notification->email = $db_reqn->applicant_email;
-        $db_notification->datetime = util::get_datetime_object();
-        $db_notification->save();
-      }
-      else if( 'reactivate' == $action )
-      {
-        $db_reqn->state = 'deferred';
-        $db_reqn->save();
-
-        // send a notification
-        $db_notification = lib::create( 'database\notification' );
-        $db_notification->reqn_id = $db_reqn->id;
-        $db_notification->notification_type_id =
-          $notification_type_class_name::get_unique_record( 'name', 'Requisition Reactivated' )->id;
-        $db_notification->email = $db_reqn->applicant_email;
-        $db_notification->datetime = util::get_datetime_object();
-        $db_notification->save();
-      }
-      else if( 'submit' == $action || 'next_stage' == $action || 'reject' == $action )
-      {
-        try
+        $db_reqn = $this->get_leaf_record();
+        if( 'abandon' == $action )
         {
-          if( 'submit' == $action )
+          $db_reqn->state = 'abandoned';
+          $db_reqn->save();
+        }
+        else if( 'defer' == $action )
+        {
+          $db_reqn->state = 'deferred';
+          $db_reqn->save();
+
+          // send a notification
+          $db_notification = lib::create( 'database\notification' );
+          $db_notification->reqn_id = $db_reqn->id;
+          $db_notification->notification_type_id =
+            $notification_type_class_name::get_unique_record( 'name', 'Action required' )->id;
+          $db_notification->email = $db_reqn->applicant_email;
+          $db_notification->datetime = util::get_datetime_object();
+          $db_notification->save();
+        }
+        else if( 'reactivate' == $action )
+        {
+          $db_reqn->state = 'deferred';
+          $db_reqn->save();
+
+          // send a notification
+          $db_notification = lib::create( 'database\notification' );
+          $db_notification->reqn_id = $db_reqn->id;
+          $db_notification->notification_type_id =
+            $notification_type_class_name::get_unique_record( 'name', 'Requisition Reactivated' )->id;
+          $db_notification->email = $db_reqn->applicant_email;
+          $db_notification->datetime = util::get_datetime_object();
+          $db_notification->save();
+        }
+        else if( 'submit' == $action || 'next_stage' == $action || 'reject' == $action )
+        {
+          try
           {
-            if( 'deferred' == $db_reqn->state )
+            if( 'submit' == $action )
             {
-              $db_reqn->state = NULL;
-              $db_reqn->save();
+              if( 'deferred' == $db_reqn->state )
+              {
+                $db_reqn->state = NULL;
+                $db_reqn->save();
+              }
+              else
+              {
+                // this will submit the reqn for the first time
+                $db_reqn->proceed_to_next_stage();
+              }
             }
-            else
+            else if( 'next_stage' == $action )
             {
-              // this will submit the reqn for the first time
+              $db_current_stage_type = $db_reqn->get_current_stage_type();
               $db_reqn->proceed_to_next_stage();
             }
+            else if( 'reject' == $action )
+            {
+              // send directly to the decision-made stage type
+              $db_stage_type = $stage_type_class_name::get_unique_record( 'name', 'Decision Made' );
+              $db_reqn->proceed_to_next_stage( $db_stage_type );
+            }
           }
-          else if( 'next_stage' == $action )
+          catch( \cenozo\exception\runtime $e )
           {
-            $db_current_stage_type = $db_reqn->get_current_stage_type();
-            $db_reqn->proceed_to_next_stage();
-          }
-          else if( 'reject' == $action )
-          {
-            // send directly to the decision-made stage type
-            $db_stage_type = $stage_type_class_name::get_unique_record( 'name', 'Decision Made' );
-            $db_reqn->proceed_to_next_stage( $db_stage_type );
+            $this->status->set_code( 400 );
+            $this->set_data( $e->get_raw_message() );
           }
         }
-        catch( \cenozo\exception\runtime $e )
+        else
         {
-          $this->status->set_code( 400 );
-          $this->set_data( $e->get_raw_message() );
+          log::warning( sprintf(
+            'Received PATCH:reqn/%d with unknown action "%s"',
+            $db_reqn->id,
+            $action
+          ) );
         }
-      }
-      else
-      {
-        log::warning( sprintf(
-          'Received PATCH:reqn/%d with unknown action "%s"',
-          $db_reqn->id,
-          $action
-        ) );
       }
     }
   }

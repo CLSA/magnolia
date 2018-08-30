@@ -585,40 +585,15 @@
                   }"
                   model="model">
                 </cn-view-input>
-                <div class="form-group" ng-if="true === model.viewModel.record.ethics">
-                  <label class="col-sm-3 control-label" ng-bind-html="t( 'part1.a6.letter' )"></label>
-                  <div class="col-sm-9">
-                    <div class="input-group">
-                      <div class="form-text">
-                        <span class="horizontal-spacer" ng-if="0 < model.viewModel.ethicsFileSize">
-                          <a href="#"
-                             ng-click="model.viewModel.downloadEthicsFile()"
-                             ng-bind-html="model.viewModel.record.ethics_filename"></a>
-                        </span>
-                        <span class="horizontal-spacer" ng-if="0 < model.viewModel.ethicsFileSize">
-                          <strong ng-bind-html="t( 'misc.fileSize' )+':'"></strong>
-                          {{ model.viewModel.ethicsFileSize | cnSize }}
-                        </span>
-                        <button class="btn btn-default"
-                                ng-if="model.getEditEnabled() && 0 < model.viewModel.ethicsFileSize"
-                                ng-class="{ 'pull-right':0 < model.viewModel.ethicsFileSize }"
-                                ng-click="model.viewModel.removeEthicsFile()"
-                                ng-bind-html="t( 'misc.remove' )">
-                        </button>
-                        <label class="btn btn-default"
-                               ng-disabled="model.viewModel.uploadingEthicsFile"
-                               ng-if="!model.viewModel.ethicsFileSize">
-                          {{ model.viewModel.uploadingEthicsFile ?
-                             t( 'misc.uploading' ) : t( 'misc.upload' ) }}...
-                          <input type="file"
-                                 ng-model="model.viewModel.ethicsFile"
-                                 cn-upload="model.viewModel.uploadEthicsFile()"
-                                 style="display:none;"></input>
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <cn-view-input
+                  ng-if="true === model.viewModel.record.ethics"
+                  input="{
+                    key: 'ethics_filename',
+                    title: t( 'part1.a6.letter' ),
+                    type: 'file'
+                  }"
+                  model="model">
+                </cn-view-input>
               </div>
             </fieldset></form>
           </div>

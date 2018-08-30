@@ -34,6 +34,13 @@ class reqn extends \cenozo\database\record
       if( file_exists( $filename ) ) unlink( $filename );
     }
 
+    // if we're changing the agreement_filename to null then delete the agreement_letter file
+    if( is_null( $this->agreement_filename ) )
+    {
+      $filename = sprintf( '%s/%s', AGREEMENT_LETTER_PATH, $this->id );
+      if( file_exists( $filename ) ) unlink( $filename );
+    }
+
     // if this is a new reqn then assign it to the first stage
     if( $is_new ) $this->proceed_to_next_stage();
   }

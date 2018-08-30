@@ -280,10 +280,6 @@ cenozoApp.lookupData = {
     words: { en: 'words', fr: 'mots' },
     chars: { en: 'characters', fr: 'TRANSLATION REQUIRED' },
     comments: { en: 'Comments', fr: 'Commentaires' },
-    upload: { en: 'upload', fr: 'téléverser' },
-    uploaded: { en: 'uploaded', fr: 'téléversé' },
-    uploading: { en: 'uploading', fr: 'téléversement' },
-    fileSize: { en: 'file size', fr: 'taille du fichier' },
     delete: { en: 'Delete', fr: 'Effacer' },
     submit: { en: 'Submit', fr: 'Soumettre' },
     submitWarning: {
