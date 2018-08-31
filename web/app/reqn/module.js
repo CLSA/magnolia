@@ -109,7 +109,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     grant_number: { type: 'string', exclude: true },
     ethics: { type: 'boolean', exclude: true },
     ethics_date: { type: 'date', exclude: true },
-    ethics_filename: { type: 'string', exclude: true },
     waiver: { type: 'enum', exclude: true },
     part2_a_comment: { type: 'text', exclude: true },
     part2_b_comment: { type: 'text', exclude: true },
@@ -253,6 +252,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           scope.isAddingReference = false;
           scope.isDeletingReference = [];
 
+          scope.liteModel.viewModel.onView();
+
           scope.model.viewModel.afterView( function() {
             // setup the breadcrumbtrail
             CnSession.setBreadcrumbTrail(
@@ -299,6 +300,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         },
         controller: function( $scope ) {
           if( angular.isUndefined( $scope.model ) ) $scope.model = CnReqnModelFactory.root;
+          if( angular.isUndefined( $scope.liteModel ) ) $scope.liteModel = CnReqnModelFactory.lite;
           cnRecordView.controller[1]( $scope );
 
           // coapplicant resources
@@ -1004,7 +1006,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           displayDecisionNotice: function() {
             if( 'applicant' == CnSession.role.name &&
                 this.record.decision_notice &&
-                ( 'Approved' == this.record.stage_type || 'Not Approved' == this.record.stage_type ) ) {
+                ( 'Agreement' == this.record.stage_type || 'Not Approved' == this.record.stage_type ) ) {
               CnModalMessageFactory.instance( {
                 title: this.parentModel.module.name.singular.ucWords() + ' ' + this.record.identifier + ' ' + this.record.stage_type,
                 closeText: 'applicant' == CnSession.role.name ? this.translate( 'misc.close' ) : 'Close',
@@ -1030,21 +1032,31 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     'CnHttpFactory', 'CnSession', '$state', '$transitions', '$q',
     function( CnBaseModelFactory, CnReqnListFactory, CnReqnViewFactory,
               CnHttpFactory, CnSession, $state, $transitions, $q ) {
-      var object = function( root ) {
+      var object = function( type ) {
         var self = this;
+
+        // convert type to root, lite or non-root instance
+        var root = false;
+        var lite = false;
+        if( 'root' === type ) root = true;
+        else if( 'lite' == type ) lite = true;
+
         CnBaseModelFactory.construct( this, module );
-        this.listModel = CnReqnListFactory.instance( this );
+        if( !lite ) this.listModel = CnReqnListFactory.instance( this );
         this.viewModel = CnReqnViewFactory.instance( this, root );
 
         // override the service collection path so that applicants can view their reqns from the home screen
         this.getServiceCollectionPath = function() {
-          // ignore the parent if it is root
+          // ignore the parent if it is the root state
           return this.$$getServiceCollectionPath( 'root' == this.getSubjectFromState() );
         };
 
-        // override the service collection so that chairs only see DSAC reqns from the home screen
+        // override the service collection
         this.getServiceData = function( type, columnRestrictLists ) {
-          var data = this.$$getServiceData( type, columnRestrictLists );
+          // only include the ethics_filename in the view type in the lite instance
+          var data = lite ? { select: { column: 'ethics_filename' } } : this.$$getServiceData( type, columnRestrictLists );
+
+          // chairs only see DSAC reqns from the home screen
           if( 'root' == this.getSubjectFromState() ) {
             if( angular.isUndefined( data.modifier.where ) ) data.modifier.where = [];
             if( 'chair' == CnSession.role.name ) {
@@ -1061,6 +1073,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               } );
             }
           }
+
           return data;
         };
 
@@ -1078,13 +1091,18 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         }
 
         this.getEditEnabled = function() {
-          var phase = this.viewModel.record.phase;
-          var state = this.viewModel.record.state;
-          return this.$$getEditEnabled() && (
-            'applicant' == CnSession.role.name ? ( 'new' == phase || ( 'review' == phase && 'deferred' == state ) ) :
-            'administrator' == CnSession.role.name ? ( 'new' == phase || ( 'review' == phase && 'abandoned' != state ) ) :
-            false
-          );
+          var phase = this.viewModel.record.phase ? this.viewModel.record.phase : '';
+          var state = this.viewModel.record.state ? this.viewModel.record.state : '';
+          var stage_type = this.viewModel.record.stage_type ? this.viewModel.record.stage_type : '';
+
+          var check = false;
+          if( 'applicant' == CnSession.role.name ) {
+            check = 'new' == phase || ( 'deferred' == state && ( 'review' == phase || ( lite && 'Agreement' == stage_type ) ) );
+          } else if( 'administrator' == CnSession.role.name ) {
+            check = 'new' == phase || ( 'abandoned' != state && ( 'review' == phase || ( lite && 'Agreement' == stage_type ) ) );
+          }
+
+          return this.$$getEditEnabled() && check;
         };
 
         this.getDeleteEnabled = function() {
@@ -1117,65 +1135,69 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         this.getMetadata = function() {
           return $q.all( [
             self.$$getMetadata().then( function() {
-              var misc = cenozoApp.lookupData.misc;
+              // only do the following for the root instance
+              if( root ) {
+                var misc = cenozoApp.lookupData.misc;
 
-              // create coapplicant access enum
-              self.metadata.accessEnumList = {
-                en: [ { value: true, name: misc.yes.en }, { value: false, name: misc.no.en } ],
-                fr: [ { value: true, name: misc.yes.fr }, { value: false, name: misc.no.fr } ]
-              };
+                // create coapplicant access enum
+                self.metadata.accessEnumList = {
+                  en: [ { value: true, name: misc.yes.en }, { value: false, name: misc.no.en } ],
+                  fr: [ { value: true, name: misc.yes.fr }, { value: false, name: misc.no.fr } ]
+                };
 
-              // create ethics enum
-              self.metadata.columnList.ethics.enumList = {
-                en: [ { value: '', name: misc.choose.en }, { value: true, name: misc.yes.en }, { value: false, name: misc.no.en } ],
-                fr: [ {value: '', name: misc.choose.fr }, { value: true, name: misc.yes.fr }, { value: false, name: misc.no.fr } ]
-              };
+                // create ethics enum
+                self.metadata.columnList.ethics.enumList = {
+                  en: [ { value: '', name: misc.choose.en }, { value: true, name: misc.yes.en }, { value: false, name: misc.no.en } ],
+                  fr: [ {value: '', name: misc.choose.fr }, { value: true, name: misc.yes.fr }, { value: false, name: misc.no.fr } ]
+                };
 
-              // translate funding enum
-              self.metadata.columnList.funding.enumList = {
-                en: self.metadata.columnList.funding.enumList,
-                fr: angular.copy( self.metadata.columnList.funding.enumList )
-              };
-              self.metadata.columnList.funding.enumList.fr[0].name = misc.yes.fr.toLowerCase();
-              self.metadata.columnList.funding.enumList.fr[1].name = misc.no.fr.toLowerCase();
-              self.metadata.columnList.funding.enumList.fr[2].name = misc.requested.fr.toLowerCase();
+                // translate funding enum
+                self.metadata.columnList.funding.enumList = {
+                  en: self.metadata.columnList.funding.enumList,
+                  fr: angular.copy( self.metadata.columnList.funding.enumList )
+                };
+                self.metadata.columnList.funding.enumList.fr[0].name = misc.yes.fr.toLowerCase();
+                self.metadata.columnList.funding.enumList.fr[1].name = misc.no.fr.toLowerCase();
+                self.metadata.columnList.funding.enumList.fr[2].name = misc.requested.fr.toLowerCase();
 
-              self.metadata.columnList.funding.enumList.en.unshift( { value: '', name: misc.choose.en } );
-              self.metadata.columnList.funding.enumList.fr.unshift( { value: '', name: misc.choose.fr } );
+                self.metadata.columnList.funding.enumList.en.unshift( { value: '', name: misc.choose.en } );
+                self.metadata.columnList.funding.enumList.fr.unshift( { value: '', name: misc.choose.fr } );
 
-              // translate waiver enum
-              self.metadata.columnList.waiver.enumList.unshift( { value: '', name: misc.none.en } );
-              self.metadata.columnList.waiver.enumList = {
-                en: self.metadata.columnList.waiver.enumList,
-                fr: angular.copy( self.metadata.columnList.waiver.enumList )
-              };
-              self.metadata.columnList.waiver.enumList.en[1].name = misc.graduateFeeWaiver.en;
-              self.metadata.columnList.waiver.enumList.en[2].name = misc.postdocFeeWaiver.en;
-              self.metadata.columnList.waiver.enumList.fr[0].name = misc.none.fr;
-              self.metadata.columnList.waiver.enumList.fr[1].name = misc.graduateFeeWaiver.fr;
-              self.metadata.columnList.waiver.enumList.fr[2].name = misc.postdocFeeWaiver.fr;
+                // translate waiver enum
+                self.metadata.columnList.waiver.enumList.unshift( { value: '', name: misc.none.en } );
+                self.metadata.columnList.waiver.enumList = {
+                  en: self.metadata.columnList.waiver.enumList,
+                  fr: angular.copy( self.metadata.columnList.waiver.enumList )
+                };
+                self.metadata.columnList.waiver.enumList.en[1].name = misc.graduateFeeWaiver.en;
+                self.metadata.columnList.waiver.enumList.en[2].name = misc.postdocFeeWaiver.en;
+                self.metadata.columnList.waiver.enumList.fr[0].name = misc.none.fr;
+                self.metadata.columnList.waiver.enumList.fr[1].name = misc.graduateFeeWaiver.fr;
+                self.metadata.columnList.waiver.enumList.fr[2].name = misc.postdocFeeWaiver.fr;
 
-              return CnHttpFactory.instance( {
-                path: 'language',
-                data: {
-                  select: { column: [ 'id', 'name' ] },
-                  modifier: {
-                    where: { column: 'active', operator: '=', value: true },
-                    order: 'name'
+                return CnHttpFactory.instance( {
+                  path: 'language',
+                  data: {
+                    select: { column: [ 'id', 'name' ] },
+                    modifier: {
+                      where: { column: 'active', operator: '=', value: true },
+                      order: 'name'
+                    }
                   }
-                }
-              } ).query().then( function success( response ) {
-                self.metadata.columnList.language_id.enumList = [];
-                response.data.forEach( function( item ) {
-                  self.metadata.columnList.language_id.enumList.push( {
-                    value: item.id,
-                    name: item.name
+                } ).query().then( function success( response ) {
+                  self.metadata.columnList.language_id.enumList = [];
+                  response.data.forEach( function( item ) {
+                    self.metadata.columnList.language_id.enumList.push( {
+                      value: item.id,
+                      name: item.name
+                    } );
                   } );
                 } );
-              } );
+              }
             } ),
 
-            $q.all( [
+            // only do the following for the root instance
+            !root ? $q.all() : $q.all( [
               CnHttpFactory.instance( {
                 path: 'data_option_category',
                 data: {
@@ -1295,8 +1317,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
       };
 
       return {
-        root: new object( true ),
-        instance: function() { return new object( false ); }
+        root: new object( 'root' ),
+        lite: new object( 'lite' ),
+        instance: function() { return new object(); }
       };
     }
   ] );

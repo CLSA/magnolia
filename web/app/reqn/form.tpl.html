@@ -556,46 +556,50 @@
             <cn-reqn-deferral-note note="deferral_note_part1_a6"></cn-reqn-deferral-note>
             <p class="text-primary" ng-bind-html="t( 'part1.a6.text' )"></p>
             <hr/>
-            <form id="part1a6Form" name="part1a6Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
+            <form id="part1a6Form" name="part1a6Form" novalidate>
               <div class="form-horizontal">
-                <cn-view-input
-                  input="{
-                    key: 'ethics',
-                    title: t( 'part1.a6.ethics' ),
-                    type: model.inputList.ethics.type,
-                    enumList: model.metadata.columnList.ethics.enumList[model.viewModel.record.language]
-                  }"
-                  model="model">
-                </cn-view-input>
-                <cn-view-input
-                  ng-if="true === model.viewModel.record.ethics"
-                  input="{
-                    key: 'ethics_date',
-                    title: t( 'part1.a6.expiration' ),
-                    type: model.inputList.ethics_date.type
-                  }"
-                  model="model">
-                </cn-view-input>
-                <cn-view-input
-                  ng-if="false === model.viewModel.record.ethics"
-                  input="{
-                    key: 'ethics_date',
-                    title: t( 'part1.a6.response' ),
-                    type: model.inputList.ethics_date.type
-                  }"
-                  model="model">
-                </cn-view-input>
-                <cn-view-input
-                  ng-if="true === model.viewModel.record.ethics"
-                  input="{
-                    key: 'ethics_filename',
-                    title: t( 'part1.a6.letter' ),
-                    type: 'file'
-                  }"
-                  model="model">
-                </cn-view-input>
+                <fieldset ng-disabled="!model.getEditEnabled()">
+                  <cn-view-input
+                    input="{
+                      key: 'ethics',
+                      title: t( 'part1.a6.ethics' ),
+                      type: model.inputList.ethics.type,
+                      enumList: model.metadata.columnList.ethics.enumList[model.viewModel.record.language]
+                    }"
+                    model="model">
+                  </cn-view-input>
+                  <cn-view-input
+                    ng-if="true === model.viewModel.record.ethics"
+                    input="{
+                      key: 'ethics_date',
+                      title: t( 'part1.a6.expiration' ),
+                      type: model.inputList.ethics_date.type
+                    }"
+                    model="model">
+                  </cn-view-input>
+                  <cn-view-input
+                    ng-if="false === model.viewModel.record.ethics"
+                    input="{
+                      key: 'ethics_date',
+                      title: t( 'part1.a6.response' ),
+                      type: model.inputList.ethics_date.type
+                    }"
+                    model="model">
+                  </cn-view-input>
+                </fieldset>
+                <fieldset ng-disabled="!liteModel.getEditEnabled()">
+                  <cn-view-input
+                    ng-if="true === model.viewModel.record.ethics"
+                    input="{
+                      key: 'ethics_filename',
+                      title: t( 'part1.a6.letter' ),
+                      type: 'file'
+                    }"
+                    model="liteModel">
+                  </cn-view-input>
+                </fieldset>
               </div>
-            </fieldset></form>
+            </form>
           </div>
         </div>
       </div>

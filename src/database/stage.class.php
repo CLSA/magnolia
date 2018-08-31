@@ -64,6 +64,15 @@ class stage extends \cenozo\database\record
       if( is_null( $this->get_reqn()->decision_notice ) )
         return 'The decision notice must be set before proceeding to the next stage.';
     }
+    else if( 'Agreement' == $db_stage_type->name )
+    {
+      // make sure both the agreement and ethics files have been attached
+      $db_reqn = $this->get_reqn();
+      if( is_null( $db_reqn->ethics_filename ) )
+        return 'The ethics letter must be attached before proceeding to the next stage.';
+      if( is_null( $db_reqn->agreement_filename ) )
+        return 'The agreement letter must be attached before proceeding to the next stage.';
+    }
     else
     {
       // DSAC review needs to use the list of reviews from the DSAC selection stage

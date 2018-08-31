@@ -32,7 +32,7 @@ INSERT IGNORE INTO stage_type( phase, rank, name, status, decision ) VALUES
 ( "review", 8, "Second DSAC Decision", "Under Review", 0 ),
 ( "review", 9, "Second SMT Decision", "Under Review", 1 ),
 ( "review", 10, "Decision Made", "Under Review", 0 ),
-( "agreement", 11, "Approved", "Agreement in Preparation", 0 ),
+( "agreement", 11, "Agreement", "Agreement in Preparation", 0 ),
 ( "agreement", 12, "Data Release", "Preparing Data", 0 ),
 ( "agreement", 13, "Active", "Active", 0 ),
 ( "agreement", 14, "Report Required", "Report Required", 0 ),
@@ -41,7 +41,7 @@ INSERT IGNORE INTO stage_type( phase, rank, name, status, decision ) VALUES
 
 UPDATE stage_type, notification_type
 SET notification_type_id = notification_type.id
-WHERE stage_type.name IN( "Approved", "Not Approved" )
+WHERE stage_type.name IN( "Agreement", "Not Approved" )
 AND notification_type.name = "Notice of decision";
 
 UPDATE stage_type, notification_type
