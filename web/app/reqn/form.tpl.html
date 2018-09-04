@@ -12,12 +12,7 @@
       <span ng-bind-html="getHeading()"></span>
     </h4>
   </div>
-  <div ng-if="model.viewModel.show( 'view' ) ||
-              model.viewModel.show( 'submit' ) ||
-              model.viewModel.show( 'delete' ) ||
-              model.viewModel.show( 'abandon' )"
-       class="form-footer text-right bg-info"
-       style="height:4.6em;">
+  <div class="form-footer text-right bg-info" style="height:4.6em;">
     <div class="btn-group">
       <button class="btn btn-primary"
               ng-if="model.viewModel.show( 'view' )"
@@ -40,6 +35,9 @@
               ng-click="model.viewModel.abandon( false )"
               ng-bind-html="t( 'misc.abandon' )"
               type="button"></button>
+      <button class="btn btn-default"
+              ng-click="model.viewModel.downloadForm()"
+              type="button">Download</button>
     </div>
   </div>
   <div class="container-fluid" style="padding-top: 1em;">
