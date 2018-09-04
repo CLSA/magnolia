@@ -47,4 +47,4 @@ AND notification_type.name = "Notice of decision";
 UPDATE stage_type, notification_type
 SET notification_type_id = notification_type.id
 WHERE stage_type.name = "Report Required"
-AND notification_type.name = "Progress report required";
+AND notification_type.name = "Final report required";

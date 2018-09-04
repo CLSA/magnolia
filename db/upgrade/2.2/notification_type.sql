@@ -15,4 +15,4 @@ INSERT IGNORE INTO notification_type( name, message_en, message_fr ) VALUES
 ( "Action required", "TODO: This will be the message sent to the applicant to indicate that an action is required.", "TRANSLATION REQUIRED" ),
 ( "Requisition Reactivated", "TODO: This will be the message sent to the applicant to indicate that an abandoned requisition has been reactivated and must be re-submitted.", "TRANSLATION REQUIRED" ),
 ( "Notice of decision", "TODO: This will be the message sent to the applicant to indicate that a decision has been made regarding their requisition.", "TRANSLATION REQUIRED" ),
-( "Progress report required", "TODO: This will be the message sent to the applicant to indicate that a progress report is required.", "TRANSLATION REQUIRED" );
+( "Final report required", "TODO: This will be the message sent to the applicant to indicate that a final report is required.", "TRANSLATION REQUIRED" );

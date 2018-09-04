@@ -44,9 +44,8 @@ class ui extends \cenozo\ui\ui
     $module = $this->get_module( 'pdf_form_type' );
     if( !is_null( $module ) ) $module->add_child( 'pdf_form' );
 
-    $module = $this->get_module( 'progress_report' );
-    if( !is_null( $module ) )
-      if( $module->has_action( 'view' ) ) $module->add_action( 'view', '/{identifier}?{t}' );
+    $module = $this->get_module( 'final_report' );
+    if( !is_null( $module ) ) $module->add_action( 'form', '/{identifier}?{t}' );
 
     $module = $this->get_module( 'stage_type' );
     if( !is_null( $module ) ) $module->add_child( 'stage' );

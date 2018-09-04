@@ -1,6 +1,6 @@
-SELECT "Creating new progress_report table" AS "";
+SELECT "Creating new final_report table" AS "";
 
-CREATE TABLE IF NOT EXISTS progress_report (
+CREATE TABLE IF NOT EXISTS final_report (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   update_timestamp TIMESTAMP NOT NULL,
   create_timestamp TIMESTAMP NOT NULL,
@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS progress_report (
   PRIMARY KEY (id),
   INDEX fk_reqn_id (reqn_id ASC),
   UNIQUE INDEX uq_reqn_id (reqn_id ASC),
-  CONSTRAINT fk_progress_report_reqn_id
+  CONSTRAINT fk_final_report_reqn_id
     FOREIGN KEY (reqn_id)
     REFERENCES reqn (id)
     ON DELETE NO ACTION

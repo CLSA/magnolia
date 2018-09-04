@@ -282,6 +282,8 @@ cenozoApp.lookupData = {
       chars: { en: 'characters', fr: 'TRANSLATION REQUIRED' },
       comments: { en: 'Comments', fr: 'Commentaires' },
       delete: { en: 'Delete', fr: 'Effacer' },
+      download: { en: 'Download', fr: 'TRANSLATION REQUIRED' },
+      finalReport: { en: 'Final Report', fr: 'Rapport final' },
       submit: { en: 'Submit', fr: 'Soumettre' },
       submitWarning: {
         en: 'Are you sure that all changes are complete and the application is ready to be submitted?',
@@ -329,42 +331,36 @@ cenozoApp.lookupData = {
       }
     }
   },
-  progressReport: {
+  finalReport: {
     heading: {
-      en: 'CLSA Approved User Research Progress Report - Final Report',
-      fr: 'Rapport d’avancement de la recherche pour les utilisateurs autorisés de l’ÉLCV - Rapport final'
+      en: 'CLSA Approved User Research Final Report',
+      fr: 'TRANSLATION REQUIRED'
     },
     instructions: {
+      tab: { en: 'Instructions', fr: 'Consignes' },
       title: {
-      en: 'Completing the CLSA Approved User Final Report',
-      fr: 'Remplir le rapport final pour les utilisateurs autorisés de l’ÉLCV'
+        en: 'Completing the CLSA Approved User Final Report',
+        fr: 'Remplir le rapport final pour les utilisateurs autorisés de l’ÉLCV'
       },
       text1: {
+        en: 'The information reported in this report allows the CLSA to assess what progress has been made toward accomplishing the objectives set out in the initial application and the impact of the project towards the advancement of knowledge.',
+        fr: 'TRANSLATION REQUIRED'
+      },
+      text2: {
         en: 'The Final Report must be submitted at the end of the project, 1 year after the Effective Date of the CLSA Access Agreement for projects with a 1-year term and 2 years after the Effective Date of the CLSA Access Agreement for projects with a 2-year term. The Final Report must be submitted within 60 days after the end date of the CLSA Access Agreement.',
         fr: 'Le rapport final doit être envoyé à la fin du projet, un an après la date d’entrée en vigueur de l’Entente d’accès de l’ÉLCV pour les projets d’une durée d’un ans ou deux ans après la date d’entrée en vigueur de l’Entente d’accès de l’ÉLCV pour les projets d’une durée de deux ans. Le rapport final doit être soumis dans les 60 jours suivant la fin de l’Entente d’accès de l’ÉLCV.'
       },
-      text2: {
+      text3: {
         en: 'Please ensure that you have completed <strong>all of the sections of the Final Report</strong>. Please attach additional pages if necessary, clearly noting which section your are expanding upon.',
         fr: 'Assurez-vous de bien remplir <strong>toutes les sections du rapport</strong>. Au besoin, veuillez ajouter des pages en vous assurant d’indiquer clairement à quelle section elles sont annexées.'
       },
-      text3: {
+      text4: {
         en: 'Consult us for any questions regarding the final report at <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.',
         fr: 'Veuillez adresser toute question relative au rapport final à <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.'
       }
     },
-    a1: {
-      tab: {
-        en: 'Final Report',
-        fr: 'Rapport final'
-      },
-      title: {
-        en: 'Accomplishments',
-        fr: 'Réalisations'
-      },
-      text: {
-        en: 'The information reported in this section allows the CLSA to assess what progress has been made toward accomplishing the objectives set out in the initial application and the impact of the project towards the advancement of knowledge.',
-        fr: 'Les informations transmises ci-dessous permettent à l’ÉLCV d’évaluer les progrès effectués qui mènent à l’atteinte des objectifs définis dans la demande initiale, et de mesurer l’impact du projet pour l’avancement des connaissances.'
-      },
+    part1: {
+      tab: { en: 'Part 1', fr: '1<sup>re</sup> partie' },
       a: {
         question: {
           en: 'What was accomplished in this study?',
@@ -385,8 +381,12 @@ cenozoApp.lookupData = {
       },
       b: {
         question: {
-          en: 'If this is a trainee project that has been granted a fee waiver, you must complete the information below. (Any publications must be reported in section ‘c’)',
-          fr: 'S’il s’agit du projet d’un stagiaire qui a bénéficié d’une exonération des frais, vous devez répondre au questions suivantes. (Les publications doivent être déclarées à la section « c »)'
+          en: 'What are the graduate thesis details?',
+          fr: 'TRANSLATION REQUIRED'
+        },
+        text: {
+          en: 'Since this is a trainee project that has been granted a fee waiver, you must complete the information below. (Any publications must be reported in the next section)',
+          fr: 'TRANSLATION REQUIRED'
         },
         thesis_title: {
           en: 'Thesis title (if graduate student trainee)',
@@ -396,7 +396,10 @@ cenozoApp.lookupData = {
           en: 'Thesis status (Proposal in preparation, thesis in progress, submitted, approved)',
           fr: 'État de la thèse (Proposition en cours de préparation, thèse en cours d’écriture, thèse déposée, thèse approuvée)'
         }
-      },
+      }
+    },
+    part2: {
+      tab: { en: 'Part 2', fr: '2<sup>e</sup> partie' },
       c: {
         question: {
           en: 'What has the project produced?',
@@ -465,6 +468,13 @@ cenozoApp.lookupData = {
           fr: 'Décrivez toutes les activités d’application des connaissances et de sensibilisation qui ont été réalisées.'
         }
       }
+    },
+    part3: {
+      tab: { en: 'Part 3', fr: '3<sup>e</sup> partie' }
+    },
+    misc: {
+      prevButton: { en: 'Return to the previous section', fr: 'TRANSLATION REQUIRED' },
+      nextButton: { en: 'Proceed to the next section', fr: 'TRANSLATION REQUIRED' }
     }
   }
 };

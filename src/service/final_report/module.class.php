@@ -6,7 +6,7 @@
  * @filesource
  */
 
-namespace magnolia\service\progress_report;
+namespace magnolia\service\final_report;
 use cenozo\lib, cenozo\log, magnolia\util;
 
 /**
@@ -21,7 +21,7 @@ class module extends \cenozo\service\module
   {
     parent::prepare_read( $select, $modifier );
 
-    $modifier->join( 'reqn', 'progress_report.reqn_id', 'reqn.id' );
+    $modifier->join( 'reqn', 'final_report.reqn_id', 'reqn.id' );
     $modifier->join( 'language', 'reqn.language_id', 'language.id' );
   }
 }

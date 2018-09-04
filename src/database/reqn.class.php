@@ -328,7 +328,8 @@ class reqn extends \cenozo\database\record
           {
             foreach( $stage_type_list as $db_stage_type )
             {
-              if( $recommendation == $db_stage_type->name )
+              if( ( 'Approved' == $recommendation && 'Agreement' == $db_stage_type->name ) ||
+                  ( 'Not Approved' == $recommendation && 'Not Approved' == $db_stage_type->name ) )
               {
                 $db_next_stage_type = $db_stage_type;
                 break;
@@ -461,6 +462,14 @@ class reqn extends \cenozo\database\record
           }
         }
       }
+    }
+
+    // if we have just entered the final report stage then create the final report
+    if( 'Admin Review' == $db_next_stage_type->name )
+    {
+      $base = $this->get_deadline()->date->format( 'ym' );
+      $this->identifier = $this->get_deadline()->get_next_identifier();
+      $this->save();
     }
   }
 

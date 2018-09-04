@@ -468,10 +468,10 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnReqnViewFactory', [
-    'CnCoapplicantModelFactory', 'CnReferenceModelFactory',
-    'CnBaseViewFactory', 'CnSession', 'CnHttpFactory', 'CnModalMessageFactory', 'CnModalConfirmFactory', 'CnModalTextFactory', '$q',
-    function( CnCoapplicantModelFactory, CnReferenceModelFactory,
-              CnBaseViewFactory, CnSession, CnHttpFactory, CnModalMessageFactory, CnModalConfirmFactory, CnModalTextFactory, $q ) {
+    'CnCoapplicantModelFactory', 'CnReferenceModelFactory', 'CnBaseViewFactory',
+    'CnSession', 'CnHttpFactory', 'CnModalMessageFactory', 'CnModalConfirmFactory', 'CnModalTextFactory', '$q', '$state',
+    function( CnCoapplicantModelFactory, CnReferenceModelFactory, CnBaseViewFactory,
+              CnSession, CnHttpFactory, CnModalMessageFactory, CnModalConfirmFactory, CnModalTextFactory, $q, $state ) {
       var object = function( parentModel, root ) {
         var self = this;
         CnBaseViewFactory.construct( this, parentModel, root );
@@ -562,6 +562,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                 0 <= ['review','active'].indexOf( phase );
             } else if( 'reactivate' == subject ) {
               return 'administrator' == role && 'abandoned' == state;
+            } else if( 'report' == subject ) {
+              return 0 <= ['Report Required','Complete'].indexOf( stage_type );
             } else if( 'proceed' == subject ) {
               return 0 > ['Complete','Not Approved'].indexOf( stage_type ) && (
                 ( 'administrator' == role && 'new' != phase ) ||
@@ -575,13 +577,10 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
           enabled: function( subject ) {
             var state = this.record.state ? this.record.state : '';
-            var next_stage_type = this.record.next_stage_type ? this.record.next_stage_type : '';
 
             if( 0 <= ['abandon','defer','reactivate'].indexOf( subject ) ) {
               return true;
-            } else if( 'proceed' == subject ) {
-              return !state && next_stage_type;
-            } else if( 'reject' == subject ) {
+            } else if( 0 <= ['proceed','reject'].indexOf( subject ) ) {
               return !state;
             } else return false;
           },
@@ -1006,6 +1005,10 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
           viewRecord: function() {
             return this.parentModel.transitionToViewState( this.record );
+          },
+
+          viewReport: function() {
+            return $state.go( 'final_report.form', { identifier: this.record.getIdentifier() } );
           },
 
           displayDecisionNotice: function() {

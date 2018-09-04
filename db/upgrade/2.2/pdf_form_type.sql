@@ -10,4 +10,4 @@ CREATE TABLE IF NOT EXISTS pdf_form_type (
 ENGINE = InnoDB;
 
 INSERT IGNORE INTO pdf_form_type( name )
-VALUES("Data Application"), ("Data Checklist"), ("Progress Report, Annual"), ("Progress Report, Final");
+VALUES("Data Application"), ("Data Checklist"), ("Final Reportl");

@@ -72,6 +72,13 @@ BEGIN
   FROM review_type
   JOIN stage_type ON review_type.stage_type_id = stage_type.id
   WHERE stage_type.id = NEW.stage_type_id;
+
+  -- create the final report if we just created the report required stage
+  SELECT name INTO @stage_type FROM stage_type WHERE id = NEW.stage_type_id;
+  IF @stage_type = "Report Required" THEN
+    INSERT IGNORE INTO final_report( create_timestamp, reqn_id )
+    SELECT NULL, NEW.reqn_id;
+  END IF;
 END$$
 
 DROP TRIGGER IF EXISTS stage_AFTER_DELETE $$

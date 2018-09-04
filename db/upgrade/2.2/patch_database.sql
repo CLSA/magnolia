@@ -32,7 +32,7 @@ SOURCE footnote.sql
 SOURCE data_option_category_has_footnote.sql
 SOURCE data_option_has_footnote.sql
 SOURCE data_option_detail_has_footnote.sql
-SOURCE progress_report.sql
+SOURCE final_report.sql
 SOURCE production_type.sql
 SOURCE production.sql
 SOURCE stage_type.sql
