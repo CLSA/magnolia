@@ -5,7 +5,6 @@ CREATE TABLE IF NOT EXISTS progress_report (
   update_timestamp TIMESTAMP NOT NULL,
   create_timestamp TIMESTAMP NOT NULL,
   reqn_id INT UNSIGNED NOT NULL,
-  type ENUM('annual', 'final') NOT NULL,
   thesis_title VARCHAR(511) NULL,
   thesis_status VARCHAR(127) NULL,
   activities TEXT NULL,
@@ -14,7 +13,7 @@ CREATE TABLE IF NOT EXISTS progress_report (
   date DATE NULL,
   PRIMARY KEY (id),
   INDEX fk_reqn_id (reqn_id ASC),
-  UNIQUE INDEX uq_reqn_id_type (reqn_id ASC, type ASC),
+  UNIQUE INDEX uq_reqn_id (reqn_id ASC),
   CONSTRAINT fk_progress_report_reqn_id
     FOREIGN KEY (reqn_id)
     REFERENCES reqn (id)

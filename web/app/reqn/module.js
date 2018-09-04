@@ -726,7 +726,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           minStartDate: null,
 
           translate: function( value ) {
-            return cenozoApp.translate( value, this.record.language );
+            return cenozoApp.translate( 'reqn', value, this.record.language );
           },
 
           // setup language and tab state parameters
@@ -1152,7 +1152,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             self.$$getMetadata().then( function() {
               // only do the following for the root instance
               if( root ) {
-                var misc = cenozoApp.lookupData.misc;
+                var misc = cenozoApp.lookupData.reqn.misc;
 
                 // create coapplicant access enum
                 self.metadata.accessEnumList = {
@@ -1228,7 +1228,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                   delete dataOptionCategory.name_fr;
                   dataOptionCategory.optionList = [];
 
-                  cenozoApp.lookupData.part2[letter].tab = dataOptionCategory.name;
+                  cenozoApp.lookupData.reqn.part2[letter].tab = dataOptionCategory.name;
                   letter = String.fromCharCode( letter.charCodeAt(0) + 1 );
                 } );
 
