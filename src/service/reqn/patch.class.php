@@ -52,7 +52,7 @@ class patch extends \cenozo\service\patch
       }
       else if( 'defer' == $action )
       {
-        if( 'review' != $phase && 'agreement' != $phase ) $code = 403;
+        if( 'review' != $phase && 'active' != $phase ) $code = 403;
       }
       else if( 'reactivate' == $action )
       {

@@ -225,116 +225,113 @@ class reqn extends \cenozo\database\record
     else
     {
       $db_stage = $this->get_current_stage();
-      if( true === $db_stage->check_if_complete() )
+      $stage_type_list = $db_current_stage_type->get_next_possible_stage_type_object_list();
+      if( 1 == count( $stage_type_list ) )
       {
-        $stage_type_list = $db_current_stage_type->get_next_possible_stage_type_object_list();
-        if( 1 == count( $stage_type_list ) )
+        $db_next_stage_type = current( $stage_type_list );
+      }
+      else if( 1 < count( $stage_type_list ) )
+      {
+        if( 'DSAC Selection' == $db_current_stage_type->name )
         {
-          $db_next_stage_type = current( $stage_type_list );
+          // the DSAC Selection stage type is special, if it is complete then the next stage is DSAC Review
+          foreach( $stage_type_list as $db_stage_type )
+          {
+            if( 'DSAC Review' == $db_stage_type->name )
+            {
+              $db_next_stage_type = $db_stage_type;
+              break;
+            }
+          }
         }
-        else if( 1 < count( $stage_type_list ) )
+        else if( 'DSAC Review' == $db_current_stage_type->name )
         {
-          if( 'DSAC Selection' == $db_current_stage_type->name )
+          $db_review = current( $db_stage->get_review_object_list() );
+          if( $db_review )
           {
-            // the DSAC Selection stage type is special, if it is complete then the next stage is DSAC Review
-            foreach( $stage_type_list as $db_stage_type )
-            {
-              if( 'DSAC Review' == $db_stage_type->name )
-              {
-                $db_next_stage_type = $db_stage_type;
-                break;
-              }
-            }
-          }
-          else if( 'DSAC Review' == $db_current_stage_type->name )
-          {
-            $db_review = current( $db_stage->get_review_object_list() );
-            if( $db_review )
-            {
-              if( 'Approved' == $db_review->recommendation )
-              {
-                foreach( $stage_type_list as $db_stage_type )
-                {
-                  if( 'Decision Made' == $db_stage_type->name )
-                  {
-                    $db_next_stage_type = $db_stage_type;
-                    break;
-                  }
-                }
-              }
-              else if( !is_null( $db_review->recommendation ) )
-              {
-                foreach( $stage_type_list as $db_stage_type )
-                {
-                  if( 'SMT Decision' == $db_stage_type->name )
-                  {
-                    $db_next_stage_type = $db_stage_type;
-                    break;
-                  }
-                }
-              }
-            }
-          }
-          else if( 'SMT Decision' == $db_current_stage_type->name )
-          {
-            $db_review = current( $db_stage->get_review_object_list() );
-            if( $db_review )
-            {
-              if( 'Approved' == $db_review->recommendation || 'Not Approved' == $db_review->recommendation )
-              {
-                foreach( $stage_type_list as $db_stage_type )
-                {
-                  if( 'Decision Made' == $db_stage_type->name )
-                  {
-                    $db_next_stage_type = $db_stage_type;
-                    break;
-                  }
-                }
-              }
-              else if( 'Revise' == $db_review->recommendation )
-              {
-                foreach( $stage_type_list as $db_stage_type )
-                {
-                  if( 'Revision Required' == $db_stage_type->name )
-                  {
-                    $db_next_stage_type = $db_stage_type;
-                    break;
-                  }
-                }
-              }
-            }
-          }
-          else if( 'Decision Made' == $db_current_stage_type->name )
-          {
-            // the decision for this reqn depends on one of several possible reviews
-            $review_sel = lib::create( 'database\select' );
-            $review_sel->add_table_column( 'review_type', 'name' );
-            $review_sel->add_column( 'recommendation' );
-            $review_mod = lib::create( 'database\modifier' );
-            $review_mod->join( 'review_type', 'review.review_type_id', 'review_type.id' );
-            $review_list = array();
-            foreach( $this->get_review_list( $review_sel, $review_mod ) as $review )
-              $review_list[$review['name']] = $review['recommendation'];
-
-            $recommendation = NULL;
-            // if there is a second SMT review then use that decision
-            if( array_key_exists( 'Second SMT', $review_list ) ) $recommendation = $review_list['Second SMT'];
-            // if there is a first SMT review then use that decision
-            else if( array_key_exists( 'SMT', $review_list ) ) $recommendation = $review_list['SMT'];
-            // if the chair approved their review then approve
-            else if( array_key_exists( 'Chair', $review_list ) && 'Approved' == $review_list['Chair'] ) $recommendation = 'Approved';
-            // if there is no chair review then do not approve (rejected before DSAC review)
-            else if( !array_key_exists( 'Chair', $review_list ) ) $recommendation = 'Not Approved';
-
-            if( !is_null( $recommendation ) )
+            if( 'Approved' == $db_review->recommendation )
             {
               foreach( $stage_type_list as $db_stage_type )
               {
-                if( $recommendation == $db_stage_type->name )
+                if( 'Decision Made' == $db_stage_type->name )
                 {
                   $db_next_stage_type = $db_stage_type;
                   break;
                 }
+              }
+            }
+            else if( !is_null( $db_review->recommendation ) )
+            {
+              foreach( $stage_type_list as $db_stage_type )
+              {
+                if( 'SMT Decision' == $db_stage_type->name )
+                {
+                  $db_next_stage_type = $db_stage_type;
+                  break;
+                }
+              }
+            }
+          }
+        }
+        else if( 'SMT Decision' == $db_current_stage_type->name )
+        {
+          $db_review = current( $db_stage->get_review_object_list() );
+          if( $db_review )
+          {
+            if( 'Approved' == $db_review->recommendation || 'Not Approved' == $db_review->recommendation )
+            {
+              foreach( $stage_type_list as $db_stage_type )
+              {
+                if( 'Decision Made' == $db_stage_type->name )
+                {
+                  $db_next_stage_type = $db_stage_type;
+                  break;
+                }
+              }
+            }
+            else if( 'Revise' == $db_review->recommendation )
+            {
+              foreach( $stage_type_list as $db_stage_type )
+              {
+                if( 'Revision Required' == $db_stage_type->name )
+                {
+                  $db_next_stage_type = $db_stage_type;
+                  break;
+                }
+              }
+            }
+          }
+        }
+        else if( 'Decision Made' == $db_current_stage_type->name )
+        {
+          // the decision for this reqn depends on one of several possible reviews
+          $review_sel = lib::create( 'database\select' );
+          $review_sel->add_table_column( 'review_type', 'name' );
+          $review_sel->add_column( 'recommendation' );
+          $review_mod = lib::create( 'database\modifier' );
+          $review_mod->join( 'review_type', 'review.review_type_id', 'review_type.id' );
+          $review_list = array();
+          foreach( $this->get_review_list( $review_sel, $review_mod ) as $review )
+            $review_list[$review['name']] = $review['recommendation'];
+
+          $recommendation = NULL;
+          // if there is a second SMT review then use that decision
+          if( array_key_exists( 'Second SMT', $review_list ) ) $recommendation = $review_list['Second SMT'];
+          // if there is a first SMT review then use that decision
+          else if( array_key_exists( 'SMT', $review_list ) ) $recommendation = $review_list['SMT'];
+          // if the chair approved their review then approve
+          else if( array_key_exists( 'Chair', $review_list ) && 'Approved' == $review_list['Chair'] ) $recommendation = 'Approved';
+          // if there is no chair review then do not approve (rejected before DSAC review)
+          else if( !array_key_exists( 'Chair', $review_list ) ) $recommendation = 'Not Approved';
+
+          if( !is_null( $recommendation ) )
+          {
+            foreach( $stage_type_list as $db_stage_type )
+            {
+              if( $recommendation == $db_stage_type->name )
+              {
+                $db_next_stage_type = $db_stage_type;
+                break;
               }
             }
           }

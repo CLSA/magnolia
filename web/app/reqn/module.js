@@ -74,7 +74,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     },
     agreement_filename: {
       title: 'Agreement File',
-      type: 'file'
+      type: 'file',
+      exclude: true // modified in the model
     },
 
     // the following are for the form and will not appear in the view
@@ -518,7 +519,11 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               } );
             }
 
-            return this.$$onView( force );
+            return this.$$onView( force ).then( function() {
+              // show the agreement file if we're past the review stage
+              var mainInputGroup = self.parentModel.module.inputGroupList.findByProperty( 'title', '' );
+              mainInputGroup.inputList.agreement_filename.exclude = 0 > ['active','complete'].indexOf( self.record.phase );
+            } );
           },
 
           onPatch: function( data ) {
@@ -554,12 +559,12 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             } else if( 'defer' == subject ) {
               return 'administrator' == role &&
                 0 > ['abandoned','deferred'].indexOf( state ) &&
-                0 <= ['review','agreement'].indexOf( phase );
+                0 <= ['review','active'].indexOf( phase );
             } else if( 'reactivate' == subject ) {
               return 'administrator' == role && 'abandoned' == state;
             } else if( 'proceed' == subject ) {
               return 0 > ['Complete','Not Approved'].indexOf( stage_type ) && (
-                'administrator' == role ||
+                ( 'administrator' == role && 'new' != phase ) ||
                 ( 'chair' == role && 0 <= stage_type.indexOf( 'DSAC' ) ) ||
                 ( 'smt' == role && 0 <= stage_type.indexOf( 'SMT' ) )
               );
@@ -1054,7 +1059,17 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         // override the service collection
         this.getServiceData = function( type, columnRestrictLists ) {
           // only include the ethics_filename in the view type in the lite instance
-          var data = lite ? { select: { column: 'ethics_filename' } } : this.$$getServiceData( type, columnRestrictLists );
+          var data = lite
+                   ? {
+                       select: {
+                         column: [
+                           'state', 'ethics_filename',
+                           { table: 'stage_type', column: 'phase' },
+                           { table: 'stage_type', column: 'name', alias: 'stage_type' }
+                         ]
+                       }
+                     }
+                   : this.$$getServiceData( type, columnRestrictLists );
 
           // chairs only see DSAC reqns from the home screen
           if( 'root' == this.getSubjectFromState() ) {
@@ -1099,7 +1114,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           if( 'applicant' == CnSession.role.name ) {
             check = 'new' == phase || ( 'deferred' == state && ( 'review' == phase || ( lite && 'Agreement' == stage_type ) ) );
           } else if( 'administrator' == CnSession.role.name ) {
-            check = 'new' == phase || ( 'abandoned' != state && ( 'review' == phase || ( lite && 'Agreement' == stage_type ) ) );
+            check = 'new' == phase || ( 'abandoned' != state && ( 'review' == phase || 'Agreement' == stage_type ) );
           }
 
           return this.$$getEditEnabled() && check;
@@ -1285,7 +1300,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                     fr: list.split( ',' ).map( id => self.footnoteList[id].fr ).join( '\n' )
                   };
                 }
-                
+
                 category.optionList.forEach( function( option ) {
                   var list = option.footnote_id_list;
                   delete option.footnote_id_list;

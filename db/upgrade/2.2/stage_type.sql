@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS stage_type (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   update_timestamp TIMESTAMP NOT NULL,
   create_timestamp TIMESTAMP NOT NULL,
-  phase ENUM('new', 'review', 'agreement', 'complete') NOT NULL,
+  phase ENUM('new', 'review', 'active', 'complete') NOT NULL,
   rank INT UNSIGNED NOT NULL,
   name VARCHAR(45) NOT NULL,
   status VARCHAR(45) NOT NULL,
@@ -32,10 +32,10 @@ INSERT IGNORE INTO stage_type( phase, rank, name, status, decision ) VALUES
 ( "review", 8, "Second DSAC Decision", "Under Review", 0 ),
 ( "review", 9, "Second SMT Decision", "Under Review", 1 ),
 ( "review", 10, "Decision Made", "Under Review", 0 ),
-( "agreement", 11, "Agreement", "Agreement in Preparation", 0 ),
-( "agreement", 12, "Data Release", "Preparing Data", 0 ),
-( "agreement", 13, "Active", "Active", 0 ),
-( "agreement", 14, "Report Required", "Report Required", 0 ),
+( "active", 11, "Agreement", "Agreement in Preparation", 0 ),
+( "active", 12, "Data Release", "Preparing Data", 0 ),
+( "active", 13, "Active", "Active", 0 ),
+( "active", 14, "Report Required", "Report Required", 0 ),
 ( "complete", 15, "Not Approved", "Not Approved", 0 ),
 ( "complete", 16, "Complete", "Complete", 0 );
 
