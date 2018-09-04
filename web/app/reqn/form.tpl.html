@@ -654,10 +654,12 @@
                     <tbody>
                       <tr ng-repeat-start="dataOption in model.dataOptionCategoryList[partIndex].optionList">
                         <td data-toggle="collapse" data-target="#accordion{{ dataOption.id }}" style="vertical-align: middle">
-                          <span uib-tooltip-html="dataOption.footnote[model.viewModel.record.language]"
-                                tooltip-popup-delay="100">
-                            {{ dataOption.name[model.viewModel.record.language] }}<sup ng-if="dataOption.footnote">ⓘ</sup>
-                          </span>
+                          <a uib-tooltip-html="dataOption.footnote[model.viewModel.record.language]"
+                             tooltip-popup-delay="100">
+                            <span style="text-decoration: underline">
+                              {{ dataOption.name[model.viewModel.record.language] }}
+                            </span><sup ng-if="dataOption.footnote">ⓘ</sup>
+                          </a>
                         </td>
                         <td ng-if="model.dataOptionCategoryList[partIndex].comprehensive">
                           <button class="btn full-width"
