@@ -419,7 +419,7 @@ cenozoApp.lookupData = {
     },
     part3: {
       tab: { en: 'Part 3', fr: '3<sup>e</sup> partie' },
-      d: {
+      a: {
         question: {
           en: 'What is the impact of the project?',
           fr: 'Quel est l’impact du projet?'
@@ -429,7 +429,7 @@ cenozoApp.lookupData = {
           fr: 'Décrivez les contributions marquantes, les réalisations, innovations, succès importants ou les changements dans la pratique ou les comportements qui ont émergé des conclusions de votre projet.'
         }
       },
-      e: {
+      b: {
         question: {
           en: 'What opportunities for training and professional development has the project provided?',
           fr: 'Quelles occasions de formation et de perfectionnement professionnel votre projet a-t-il offert?'
@@ -439,7 +439,7 @@ cenozoApp.lookupData = {
           fr: 'Énumérez toutes les occasions de formation et de perfectionnement professionnel que votre projet a offertes.'
         }
       },
-      f: {
+      c: {
         question: {
           en: 'How have the results been disseminated to communities of interest?',
           fr: 'Comment avez-vous diffusé les résultats aux groupes d’intérêt?'

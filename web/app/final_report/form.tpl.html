@@ -153,6 +153,44 @@
         </fieldset></form>
       </div>
     </div>
+    <div ng-if="'part3'==model.viewModel.tab"
+         class="panel panel-default"
+         style="border-top-left-radius: 0px;">
+      <div class="panel-body">
+        <form name="part3Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
+          <div class="container-fluid vertical-spacer">
+            <h4 ng-bind-html="t( 'part3.a.question' )"></h4>
+            <p class="text-primary" ng-bind-html="t( 'part3.a.text' )"></p>
+            <cn-view-input
+              input="{ key: 'impact', title: null, type: 'text' }"
+              no-cols="true"
+              model="model"
+              state="$state">
+            </cn-view-input>
+          </div>
+          <div class="container-fluid vertical-spacer">
+            <h4 ng-bind-html="t( 'part3.b.question' )"></h4>
+            <p class="text-primary" ng-bind-html="t( 'part3.b.text' )"></p>
+            <cn-view-input
+              input="{ key: 'opportunities', title: null, type: 'text' }"
+              no-cols="true"
+              model="model"
+              state="$state">
+            </cn-view-input>
+          </div>
+          <div class="container-fluid vertical-spacer">
+            <h4 ng-bind-html="t( 'part3.c.question' )"></h4>
+            <p class="text-primary" ng-bind-html="t( 'part3.c.text' )"></p>
+            <cn-view-input
+              input="{ key: 'dissemination', title: null, type: 'text' }"
+              no-cols="true"
+              model="model"
+              state="$state">
+            </cn-view-input>
+          </div>
+        </fieldset></form>
+      </div>
+    </div>
   </div>
   <div class="form-footer text-right rounded-bottom bg-info" style="height:4.6em;">
     <button class="btn btn-primary pull-left"

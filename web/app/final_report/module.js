@@ -34,11 +34,14 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
 
     // the following are for the form and will not appear in the view
     language: { column: 'language.code', type: 'string', exclude: true },
-    thesis_title: { type: 'string', exclude: true },
-    thesis_status: { type: 'string', exclude: true },
     activities: { type: 'text', exclude: true },
     findings: { type: 'text', exclude: true },
     outcomes: { type: 'text', exclude: true },
+    thesis_title: { type: 'text', exclude: true },
+    thesis_status: { type: 'text', exclude: true },
+    impact: { type: 'text', exclude: true },
+    opportunities: { type: 'text', exclude: true },
+    dissemination: { type: 'text', exclude: true },
     waiver: { column: 'reqn.waiver', type: 'string', exclude: true }
   } );
 
