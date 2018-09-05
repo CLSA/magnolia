@@ -44,7 +44,7 @@
          class="panel panel-default"
          style="border-top-left-radius: 0px;">
       <div class="panel-body">
-        <form name="part1Form" novalidate>
+        <form name="part1Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
           <div class="container-fluid vertical-spacer">
             <h4 ng-bind-html="t( 'part1.a.question' )"></h4>
             <cn-view-input
@@ -82,19 +82,75 @@
               state="$state">
             </cn-view-input>
           </div>
-        </form>
+        </fieldset></form>
       </div>
     </div>
     <div ng-if="'part2'==model.viewModel.tab"
          class="panel panel-default"
          style="border-top-left-radius: 0px;">
       <div class="panel-body">
-        <form name="part2Form" novalidate>
+        <form id="part2Form" name="part2Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
           <div class="container-fluid">
-            <h4 ng-bind-html="t( 'part2.c.question' )"></h4>
-            <p class="text-primary" ng-bind-html="t( 'part2.c.text' )"></p>
+            <h4 ng-bind-html="t( 'part2.question' )"></h4>
+            <p class="text-primary" ng-bind-html="t( 'part2.text' )"></p>
           </div>
-        </form>
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <span ng-show="0 == model.viewModel.productionList.length"
+                    ng-bind-html="t( 'part2.noProductions' )"></span>
+              <table class="table table-striped" ng-show="0 < model.viewModel.productionList.length">
+                <thead class="bg-info">
+                  <tr>
+                    <td ng-bind-html="t( 'part2.type' )"></td>
+                    <td ng-bind-html="t( 'part2.production' )"></td>
+                    <td ng-show="model.getEditEnabled()"></td>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr ng-repeat="production in model.viewModel.productionList | orderBy: 'rank'">
+                    <td>{{ production['name_'+model.viewModel.record.language] }}</td>
+                    <td class="text-left">{{ production.detail }}</td>
+                    <td ng-show="model.getEditEnabled()">
+                      <button class="btn btn-xs btn-danger"
+                              ng-disabled="0 <= isDeletingProduction.indexOf( production.id )"
+                              ng-click="removeProduction( production.id )"
+                              uib-tooltip-html="t( 'misc.remove' )">
+                        <i class="glyphicon glyphicon-remove"></i>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div ng-show="model.getEditEnabled()" class="form-horizontal">
+            <cn-add-input
+              input="{
+                key: 'production_type_id',
+                title: t( 'part2.productionType' ),
+                type: 'enum',
+                enumList: model.viewModel.productionTypeList[model.viewModel.record.language]
+              }"
+              record="productionRecord"
+              model="model.viewModel.productionModel"
+              first="true">
+            </cn-add-input>
+            <cn-add-input
+              input="{ key: 'detail', title: t( 'part2.details' ), type: 'string' }"
+              record="productionRecord"
+              model="model.viewModel.productionModel"
+              first="false">
+            </cn-add-input>
+            <div class="form-group" style="margin-top: -15px">
+              <div class="text-primary col-sm-offset-3 col-sm-9"
+                   ng-bind-html="model.viewModel.getProductionTypeNote( productionRecord.production_type_id )"></div>
+            </div>
+            <button class="btn btn-primary pull-right"
+                    ng-disabled="isAddingProduction"
+                    ng-click="addProduction()"
+                    ng-bind-html="t( 'part2.addProduction' )"></button>
+          </div>
+        </fieldset></form>
       </div>
     </div>
   </div>
@@ -105,7 +161,7 @@
             ng-bind-html="'<i class=\'glyphicon glyphicon-arrow-left\'></i> ' + t( 'misc.prevButton' )">
     </button>
     <button class="btn btn-primary"
-            ng-if="'part3' != model.viewModel.tab"
+            ng-if="'part2' != model.viewModel.tab"
             ng-click="model.viewModel.nextSection( false )"
             ng-bind-html="t( 'misc.nextButton' ) + ' <i class=\'glyphicon glyphicon-arrow-right\'></i>'">
     </button>

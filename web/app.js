@@ -400,44 +400,25 @@ cenozoApp.lookupData = {
     },
     part2: {
       tab: { en: 'Part 2', fr: '2<sup>e</sup> partie' },
-      c: {
-        question: {
-          en: 'What has the project produced?',
-          fr: 'Qu’est-ce que votre projet a produit?'
-        },
-        text: {
-          en: 'List any products resulting from the project during the reporting period. Please provide references where available, and for peer-reviewed publications please specify if ‘in press’, ‘submitted’ or ‘published’. If you have not yet done so, please provide a copy of peer-reviewed publications to the CLSA when submitting this report.',
-          fr: 'Énumérer les produits qui ont été développés dans le cadre de votre projet pendant la période en question.  Veuillez fournir les références lorsqu’elles sont disponibles. Pour les articles évalués par des pairs, veuillez spécifier s’ils sont « sous presse », « soumis » ou « publiés ». Si ce n’est pas déjà fait, veuillez fournir une copie des articles évalués par des pairs à l’ÉLCV en soumettant ce rapport.'
-        },
-        publication: {
-          en: 'Peer-reviewed publications - Format: Author, A. (Publication Year). Article title. Periodical Title, Volume (Issue), pp.-pp.',
-          fr: 'Publications évaluées par des pairs - Format : Auteur, A. (année de publication). Titre de l’article. Titre du périodique, Volume (numéro), pp.-pp.'
-        },
-        conference: {
-          en: 'Conference papers and presentations - Format: Author, A. (Publication Year). Title of Paper or Proceedings, Title of Conference, Location, Date.  Place of publication: Publisher.',
-          fr: 'Actes de conférence et présentations - Format : Auteur, A. (année de publication). Titre de l’article ou de l’acte, titre de la conférence, lieu, date.  Lieu de publication : Éditeur.'
-        },
-        mass_media: {
-          en: 'Mass media - Format: Author, A. (Publication Year). Article title. Retrieved from (URL) on (Date).',
-          fr: 'Médias - Format : Auteur, A. (année de publication). Titre de l’article. Tiré de (URL) le (Date).'
-        },
-        technology: {
-          en: 'Website(s), technologies, equipment or techniques',
-          fr: 'Site(s) Web, technologies, de l’équipement ou techniques'
-        },
-        invention: {
-          en: 'Inventions, patent applications,or licenses',
-          fr: 'Inventions, demandes de brevet ou de licence'
-        },
-        data: {
-          en: 'Derived variables, models, databases, audio or video products, software, educational aids or curricula',
-          fr: 'Variables dérivées, modèles, bases de données, documents audio ou vidéo, logiciels, outils ou programmes éducatifs'
-        },
-        collaboration: {
-          en: 'Collaborations - partnerships with academic institutions, non-profits, industrial or commercial firms, governments, or school systems.',
-          fr: 'Collaborations - partenariats avec des établissements universitaires, des organismes à but non lucratif, des entreprises industrielles ou commerciales, des gouvernements ou les milieux scolaires'
-        }
+      question: {
+        en: 'What has the project produced?',
+        fr: 'Qu’est-ce que votre projet a produit?'
       },
+      text: {
+        en: 'List any products resulting from the project during the reporting period. Please provide references where available, and for peer-reviewed publications please specify if ‘in press’, ‘submitted’ or ‘published’. If you have not yet done so, please provide a copy of peer-reviewed publications to the CLSA when submitting this report.',
+        fr: 'Énumérer les produits qui ont été développés dans le cadre de votre projet pendant la période en question.  Veuillez fournir les références lorsqu’elles sont disponibles. Pour les articles évalués par des pairs, veuillez spécifier s’ils sont « sous presse », « soumis » ou « publiés ». Si ce n’est pas déjà fait, veuillez fournir une copie des articles évalués par des pairs à l’ÉLCV en soumettant ce rapport.'
+      },
+      number: { en: 'Number', fr: 'Numéro' },
+      type: { en: 'Type', fr: 'TRANSLATION REQUIRED' },
+      production: { en: 'Production', fr: 'TRANSLATION REQUIRED' },
+      productionType: { en: 'Production Type', fr: 'TRANSLATION REQUIRED' },
+      details: { en: 'Details', fr: 'TRANSLATION REQUIRED' },
+      noProductions: { en: 'No productions have been added.', fr: 'TRANSLATION REQUIRED' },
+      addProduction: { en: 'Add Production', fr: 'TRANSLATION REQUIRED' },
+      attachment: { en: 'Attachment', fr: 'TRANSLATION REQUIRED' }
+    },
+    part3: {
+      tab: { en: 'Part 3', fr: '3<sup>e</sup> partie' },
       d: {
         question: {
           en: 'What is the impact of the project?',
@@ -469,10 +450,9 @@ cenozoApp.lookupData = {
         }
       }
     },
-    part3: {
-      tab: { en: 'Part 3', fr: '3<sup>e</sup> partie' }
-    },
     misc: {
+      choose: { en: '(choose)', fr: '(choisir)' },
+      remove: { en: 'Remove', fr: 'Supprimer' },
       prevButton: { en: 'Return to the previous section', fr: 'TRANSLATION REQUIRED' },
       nextButton: { en: 'Proceed to the next section', fr: 'TRANSLATION REQUIRED' }
     }

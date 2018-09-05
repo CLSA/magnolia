@@ -1166,7 +1166,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                 // create ethics enum
                 self.metadata.columnList.ethics.enumList = {
                   en: [ { value: '', name: misc.choose.en }, { value: true, name: misc.yes.en }, { value: false, name: misc.no.en } ],
-                  fr: [ {value: '', name: misc.choose.fr }, { value: true, name: misc.yes.fr }, { value: false, name: misc.no.fr } ]
+                  fr: [ { value: '', name: misc.choose.fr }, { value: true, name: misc.yes.fr }, { value: false, name: misc.no.fr } ]
                 };
 
                 // translate funding enum
