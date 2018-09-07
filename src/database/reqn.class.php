@@ -489,9 +489,8 @@ class reqn extends \cenozo\database\record
       throw lib::create( 'exception\runtime',
         'Cannot generate PDF form since there is no active Data Application PDF form.', __METHOD__ );
 
-    $language = $this->get_language()->code;
     $pdf_writer = lib::create( 'business\pdf_writer' );
-    $pdf_writer->set_template( sprintf( '%s/%d.%s.pdf', PDF_FORM_PATH, $db_pdf_form->id, $language ) );
+    $pdf_writer->set_template( sprintf( '%s/%d.pdf', PDF_FORM_PATH, $db_pdf_form->id ) );
 
     $data = array( 'identifier' => $this->identifier );
 

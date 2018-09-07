@@ -5,15 +5,13 @@
  * @author Patrick Emond <emondpd@mcmaster.ca>
  */
 
-namespace magnolia\service\pdf_form;
+namespace magnolia\service\final_report;
 use cenozo\lib, cenozo\log, magnolia\util;
 
 class get extends \cenozo\service\downloadable
 {
   /**
    * Replace parent method
-   * 
-   * When the client calls for a file we return the pdf_form's file
    */
   protected function get_downloadable_mime_type_list()
   {
@@ -22,22 +20,30 @@ class get extends \cenozo\service\downloadable
 
   /**
    * Replace parent method
-   * 
-   * When the client calls for a file we return the pdf_form's file
    */
   protected function get_downloadable_public_name()
   {
-    $db_pdf_form = $this->get_leaf_record();
-    return sprintf( '%s %s.pdf', $db_pdf_form->get_pdf_form_type()->name, $db_pdf_form->version->format( 'Y-m-d' ) );
+    return sprintf( 'Final Report %s.pdf', $this->get_leaf_record()->get_reqn()->identifier );
   }
 
   /**
    * Replace parent method
    * 
-   * When the client calls for a file we return the pdf_form's file
+   * When the client calls for a file we return the final_report's ethics letter
    */
   protected function get_downloadable_file_path()
   {
-    return sprintf( '%s/%d.pdf', PDF_FORM_PATH, $this->get_leaf_record()->id );
+    return sprintf( '%s/%s.pdf', REQN_PATH, $this->get_leaf_record()->id );
+  }
+
+  /**
+   * Extend parent method
+   */
+  public function prepare()
+  {
+    parent::prepare();
+
+    // create the PDF file
+    $this->get_leaf_record()->generate_pdf_form();
   }
 }

@@ -27,10 +27,6 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
       title: 'Identifier',
       type: 'string'
     },
-    date: {
-      title: 'Date',
-      type: 'date'
-    },
 
     // the following are for the form and will not appear in the view
     language: { column: 'language.code', type: 'string', exclude: true },

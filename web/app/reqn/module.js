@@ -216,9 +216,19 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     operation: function( $state, model ) { model.viewModel.reject(); }
   } );
 
-  module.addExtraOperation( 'view', {
+  module.addExtraOperationGroup( 'view', {
     title: 'Download',
-    operation: function( $state, model ) { model.viewModel.downloadForm(); }
+    operations: [ {
+      title: 'Application',
+      operation: function( $state, model ) { model.viewModel.downloadReqn(); }
+    }, {
+      title: 'Data Checklist',
+      operation: function( $state, model ) { model.viewModel.downloadDataChecklist(); }
+    }, {
+      title: 'Final Report',
+      operation: function( $state, model ) { model.viewModel.downloadFinalReport(); },
+      isIncluded: function( $state, model ) { return 0 <= ['Report Required', 'Complete'].indexOf( model.viewModel.record.stage_type ); }
+    } ]
   } );
 
   /* ######################################################################################################## */
@@ -625,13 +635,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             } );
           },
 
-          downloadForm: function() {
-            return CnHttpFactory.instance( {
-              path: this.parentModel.getServiceResourcePath(),
-              format: 'pdf'
-            } ).file();
-          },
-
           defer: function() {
             var message = 'Are you sure you wish to defer to the applicant?  ' +
               'A notification will be sent indicating that an action is required by the applicant.'
@@ -996,9 +999,23 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             } );
           },
 
-          downloadForm: function() {
+          downloadReqn: function() {
             return CnHttpFactory.instance( {
               path: this.parentModel.getServiceResourcePath(),
+              format: 'pdf'
+            } ).file();
+          },
+
+          downloadDataChecklist: function() {
+            return CnHttpFactory.instance( {
+              path: this.parentModel.getServiceResourcePath(),
+              format: 'pdf'
+            } ).file();
+          },
+
+          downloadFinalReport: function() {
+            return CnHttpFactory.instance( {
+              path: this.parentModel.getServiceResourcePath().replace( 'reqn', 'final_report' ),
               format: 'pdf'
             } ).file();
           },

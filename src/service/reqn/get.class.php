@@ -32,7 +32,7 @@ class get extends \cenozo\service\downloadable
     if( 'ethics_filename' == $file ) return $db_reqn->ethics_filename;
     else if( 'agreement_filename' == $file ) return $db_reqn->agreement_filename;
 
-    return sprintf( '%s.pdf', $db_reqn->identifier );
+    return sprintf( 'Requisition %s.pdf', $db_reqn->identifier );
   }
 
   /**

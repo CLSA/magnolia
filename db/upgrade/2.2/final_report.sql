@@ -5,7 +5,6 @@ CREATE TABLE IF NOT EXISTS final_report (
   update_timestamp TIMESTAMP NOT NULL,
   create_timestamp TIMESTAMP NOT NULL,
   reqn_id INT UNSIGNED NOT NULL,
-  date DATE NOT NULL,
   activities TEXT NULL DEFAULT NULL,
   findings TEXT NULL DEFAULT NULL,
   outcomes TEXT NULL DEFAULT NULL,
