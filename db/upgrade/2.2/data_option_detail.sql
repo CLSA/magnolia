@@ -102,8 +102,7 @@ INSERT IGNORE INTO data_option_detail ( data_option_id, rank, name_en, name_fr )
 ( @data_option_id, 14, "Neuro-psychiatric (DPR; COM)", "Neuropsychiatrique (DPR; COM)" ),
 ( @data_option_id, 15, "Parkinsonism (PKD)", "Parkinsonisme (PKD)" ),
 ( @data_option_id, 16, "Chronic Airflow Obstruction (CAO; COM)", "Obstruction chronique des voies respiratoires (CAO" ),
-( @data_option_id, 17, "Medication Use (MED; TRM)", "Consommation de médicaments (MED; TRM)" ),
-( @data_option_id, 18, "Medications (MEDI; not yet available)", "Médicaments (MEDI; pas encore disponible)" );
+( @data_option_id, 17, "Medication Use (MED; TRM)", "Consommation de médicaments (MED; TRM)" );
 
 SELECT id INTO @data_option_id FROM data_option WHERE name_en = "Psychological Health";
 
@@ -119,7 +118,7 @@ SELECT id INTO @data_option_id FROM data_option WHERE name_en = "Cognition - met
 INSERT IGNORE INTO data_option_detail ( data_option_id, rank, name_en, name_fr ) VALUES
 ( @data_option_id, 1, "REYI / REYI (COG)", "REYI / REYI (COG)" ),
 ( @data_option_id, 2, "REYII / REYII (COG)", "REYII / REYII (COG)" ),
-( @data_option_id, 3, "Animal Fluency Test (animaux) (COG)", "Test de fluence (animaux) (COG)" ),
+( @data_option_id, 3, "Animal Fluency Test (COG)", "Test de fluence (animaux) (COG)" ),
 ( @data_option_id, 4, "Mental Alternation Test (COG)", "Test d’alternance mentale (COG)" ),
 ( @data_option_id, 5, "Time-Based Prospective Memory Test (TMT; COM)", "Test de mémoire prospective en fonction du temps (TMT; COM)" ),
 ( @data_option_id, 6, "Event-Based Prospective Memory Test (PMT; COM)", "Test de mémoire prospective en fonction d’un événement (PMT; COM)" ),
@@ -187,9 +186,7 @@ SELECT id INTO @data_option_id FROM data_option WHERE name_en = "Bone Density by
 
 INSERT IGNORE INTO data_option_detail ( data_option_id, rank, name_en, name_fr ) VALUES
 ( @data_option_id, 1, "Whole Body", "Corps entire" ),
-( @data_option_id, 2, "Body Parts", "Parties du corps" ),
-( @data_option_id, 3, "Dual Hip (not yet available)", "Deux hanches (pas encore disponible)" ),
-( @data_option_id, 4, "Forearm (not yet available)", "Avant-bras (pas encore disponible)" );
+( @data_option_id, 2, "Body Parts", "Parties du corps" );
 
 SELECT id INTO @data_option_id FROM data_option WHERE name_en = "Hematology Report";
 

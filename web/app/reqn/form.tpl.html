@@ -401,7 +401,7 @@
                 <cn-view-input
                   input="{
                     key: 'lay_summary',
-                    title: t( 'part1.a4.lay_summary' ) + '<br><span class=text-info>(' +
+                    title: t( 'part1.a4.lay_summary' ) + '<sup>ⓘ</sup><br><span class=text-info>(' +
                            model.viewModel.charCount.lay_summary + ' ' + t( 'misc.chars' ) + ')</span>',
                     type: 'text',
                     help: t( 'part1.a4.lay_summary_text' )
@@ -648,11 +648,20 @@
                   <table class="table table-hover">
                     <thead ng-class="{ 'bg-info': t( 'part2.' + part + '.module' ) }">
                       <tr>
-                        <td width="33%" ng-bind-html="t( 'part2.' + part + '.module' )"></td>
-                        <td width="33%" ng-if="model.dataOptionCategoryList[partIndex].comprehensive"
-                            ng-bind-html="t( 'part2.' + part + '.comprehensive' )"></td>
-                        <td width="33%" ng-if="model.dataOptionCategoryList[partIndex].tracking"
+                        <td width="33%"
+                            style="vertical-align: middle;"
+                            uib-tooltip-html="model.dataOptionCategoryList[partIndex].footnote[model.viewModel.record.language]"
+                            tooltip-popup-delay="100"> 
+                          {{ t( 'part2.' + part + '.module' ) }}<sup ng-if="model.dataOptionCategoryList[partIndex].footnote">ⓘ</sup>
+                        </td>
+                        <td width="33%"
+                            style="vertical-align: middle;"
+                            ng-if="model.dataOptionCategoryList[partIndex].tracking"
                             ng-bind-html="t( 'part2.' + part + '.tracking' )"></td>
+                        <td width="33%"
+                            style="vertical-align: middle;"
+                            ng-if="model.dataOptionCategoryList[partIndex].comprehensive"
+                            ng-bind-html="t( 'part2.' + part + '.comprehensive' )"></td>
                       </tr>
                     </thead>
                     <tbody>
@@ -665,18 +674,6 @@
                             </span><sup ng-if="dataOption.footnote">ⓘ</sup>
                           </a>
                         </td>
-                        <td ng-if="model.dataOptionCategoryList[partIndex].comprehensive">
-                          <button class="btn full-width"
-                                  ng-class="model.viewModel.dataOptionValueList.comprehensive[dataOption.id] ?
-                                    'btn-success' : 'btn-default'"
-                                  ng-click="model.viewModel.toggleDataOptionValue( 'comprehensive', dataOption.id )">
-                            <i class="glyphicon glyphicon-ok"
-                               ng-if="model.viewModel.dataOptionValueList.comprehensive[dataOption.id]"></i>
-                            <span style="font-weight: normal"
-                                  ng-if="!model.viewModel.dataOptionValueList.comprehensive[dataOption.id]"
-                                  ng-bind-html="t( 'misc.clickToSelect' )"></span>
-                          </button>
-                        </td>
                         <td ng-if="model.dataOptionCategoryList[partIndex].tracking">
                           <button class="btn full-width"
                                   ng-class="model.viewModel.dataOptionValueList.tracking[dataOption.id] ?
@@ -686,6 +683,18 @@
                                ng-if="model.viewModel.dataOptionValueList.tracking[dataOption.id]"></i>
                             <span style="font-weight: normal"
                                   ng-if="!model.viewModel.dataOptionValueList.tracking[dataOption.id]"
+                                  ng-bind-html="t( 'misc.clickToSelect' )"></span>
+                          </button>
+                        </td>
+                        <td ng-if="model.dataOptionCategoryList[partIndex].comprehensive">
+                          <button class="btn full-width"
+                                  ng-class="model.viewModel.dataOptionValueList.comprehensive[dataOption.id] ?
+                                    'btn-success' : 'btn-default'"
+                                  ng-click="model.viewModel.toggleDataOptionValue( 'comprehensive', dataOption.id )">
+                            <i class="glyphicon glyphicon-ok"
+                               ng-if="model.viewModel.dataOptionValueList.comprehensive[dataOption.id]"></i>
+                            <span style="font-weight: normal"
+                                  ng-if="!model.viewModel.dataOptionValueList.comprehensive[dataOption.id]"
                                   ng-bind-html="t( 'misc.clickToSelect' )"></span>
                           </button>
                         </td>
@@ -703,7 +712,7 @@
                       </tr>
                     </tbody>
                   </table>
-                  <div class="container">
+                  <div class="container-fluid">
                     <cn-view-input
                       no-cols=true
                       input="{

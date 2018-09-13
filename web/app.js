@@ -51,12 +51,12 @@ cenozoApp.lookupData = {
         fr: 'La demande est séparée en trois parties :<ul><li>1<sup>re</sup> partie : Renseignements généraux</li><li>2<sup>e</sup> partie : Sélection des données</li><li>3<sup>e</sup> partie : Sélection des échantillons biologiques</li></ul>'
       },
       text4: {
-        en: 'Additional information or instructions are available anywhere that the ⓘ symbol appears.  Hover your mouse cursor over the text to see the additional details.',
+        en: 'Additional information or instructions are available anywhere that the ⓘ symbol appears. Hover your mouse cursor over the text to see the additional details.',
         fr: 'TRANSLATION REQUIRED'
       },
       text5: {
         en: 'Please ensure that you have completed <strong>all of the sections of the application</strong> form that are relevant to your application. Incomplete applications may result in processing delays or refusal of your application.',
-        fr: 'Assurez-vous de bien remplir <strong>toutes les sections pertinentes du formulaire de demande d’accès</strong>.  Les demandes incomplètes pourront causer un retard dans le traitement de votre demande ou entraîner un refus.'
+        fr: 'Assurez-vous de bien remplir <strong>toutes les sections pertinentes du formulaire de demande d’accès</strong>. Les demandes incomplètes pourront causer un retard dans le traitement de votre demande ou entraîner un refus.'
       }
     },
     part1: {
@@ -100,8 +100,8 @@ cenozoApp.lookupData = {
       a2: {
         tab: { en: 'A2. Project Team', fr: 'A2. Équipe de projet' },
         text: {
-          en: 'All Co-Applicants and Other Personnel must be listed in the table below. Please note that changes to the project team, including change of Primary Applicant and addition or removal of Co-Applicants and Support Personnel <strong>require an amendment</strong>. To request an Amendment Form, please email <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.',
-          fr: 'Tous les codemandeurs et les membres du personnel de soutien doivent être identifiés dans le tableau suivant. Veuillez noter que tout changement à l’équipe de projet y compris un changement de demandeur principal et l’ajout ou le retrait d’un codemandeur ou d’un membre du personnel de soutien <strong>nécessite une modification</strong>. Pour obtenir le formulaire de modification, écrivez àeilto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.'
+          en: 'All Co-Applicants and Other Personnel must be listed below. Please note that changes to the project team, including change of Primary Applicant and addition or removal of Co-Applicants and Support Personnel <strong>require an amendment</strong>. To request an Amendment Form, please email <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.',
+          fr: 'Tous les codemandeurs et les membres du personnel de soutien doivent être identifiés ci-dessous. Veuillez noter que tout changement à l’équipe de projet y compris un changement de demandeur principal et l’ajout ou le retrait d’un codemandeur ou d’un membre du personnel de soutien <strong>nécessite une modification</strong>. Pour obtenir le formulaire de modification, écrivez àeilto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.'
         },
         noCoapplicants: {
           en: 'No co-applicants have been added.',
@@ -118,12 +118,12 @@ cenozoApp.lookupData = {
       a3: {
         tab: { en: 'A3. Timeline', fr: 'A3. Échéancier' },
         text1: {
-          en: 'What is the anticipated time frame for this proposed project? In planning for your project, please consider in your time frame at least',
-          fr: 'Quel est l’échéancier prévu du projet proposé? Lors de la planification de votre projet, veuillez prévoir au moins'
+          en: 'What is the anticipated time frame for this proposed project? In planning for your project, please consider in your time frame at least ',
+          fr: 'Quel est l’échéancier prévu du projet proposé? Lors de la planification de votre projet, veuillez prévoir au moins '
         },
         text2: {
-          en: 'months from the application submission deadline to the time you receive your dataset.',
-          fr: 'mois à compter de la date limite de soumission de votre candidature pour recevoir votre ensemble de données.'
+          en: ' months from the application submission deadline to the time you receive your dataset.',
+          fr: ' mois à compter de la date limite de soumission de votre candidature pour recevoir votre ensemble de données.'
         },
         deadline: { en: 'Application submission deadline', fr: 'Date limite de soumission' },
         start_date: { en: 'Anticipated start date', fr: 'Date prévue de début' },
@@ -132,8 +132,8 @@ cenozoApp.lookupData = {
       a4: {
         tab: { en: 'A4. Description', fr: 'A4. Description' },
         text1: {
-          en: 'Please adhere to word count and page limits.',
-          fr: 'Veuillez respecter le nombre de mots et la limite de pages.'
+          en: 'Please adhere to word count.',
+          fr: 'Veuillez respecter le nombre de mots.'
         },
         title: { en: 'Project Title', fr: 'Titre du projet' },
         keywords: { en: 'Keywords', fr: 'Mots clés' },
@@ -223,7 +223,7 @@ cenozoApp.lookupData = {
           fr: '<strong>Exclus des ensembles de données</strong><ul><li>Informations d’identification recueillies (p. ex. nom, coordonnées, date de naissance, numéro d’assurance maladie et code postal complet)</li></ul>'
         },
         text4: {
-          en: '<strong>Additional Data available</strong><ul><li>Air Pollution and Meteorological Exposure Measurements (for all 50,000 CLSA participants).</li><li>Forward Sortation Areas (A forward sortation area (FSA) is a geographical region in which all postal codes start with the same three characters.)</li><li>Community names (Determined using the Postal Code Conversion File (PCCF) from Statistics Canada.)</li><li>Census Subdivision (CSD ; Codes and Names) / Subdivisions de recensement (Codes et noms)</li><li>Forward Sortation Areas (FSA) / Zones de tri d’acheminement</li></ul><br>Due to the sensitive nature of these geographic indicators, a special request must be made to receive CSDs and FSAs as part of your dataset.  Adequate justification must be provided within the project description (Application Part 1). By requesting these data, you also agree that you will not present in any form (presentation, publication, poster), an illustration of these geographic areas, when fewer than 50 CLSA participants.',
+          en: '<strong>Additional Data available</strong><ul><li>Air Pollution and Meteorological Exposure Measurements (for all 50,000 CLSA participants).</li><li>Forward Sortation Areas (A forward sortation area (FSA) is a geographical region in which all postal codes start with the same three characters.)</li><li>Community names (Determined using the Postal Code Conversion File (PCCF) from Statistics Canada.)</li><li>Census Subdivision (CSD; Codes and Names) / Subdivisions de recensement (Codes et noms)</li><li>Forward Sortation Areas (FSA) / Zones de tri d’acheminement</li></ul><br>Due to the sensitive nature of these geographic indicators, a special request must be made to receive CSDs and FSAs as part of your dataset. Adequate justification must be provided within the project description (Application Part 1). By requesting these data, you also agree that you will not present in any form (presentation, publication, poster), an illustration of these geographic areas, when fewer than 50 CLSA participants.',
           fr: '<strong>Données supplémentaires disponibles</strong><ul><li>Les mesures de la pollution de l’air et de l’exposition météorologique (pour les 50 000 participants à l’ÉLCV).</li><li>Région de tri d’acheminement (Une région de tri d’acheminement (RTA) est une region géographique où tous les codes postaux ont les mêmes trois premiers caractères.)</li><li>Nom de la collectivité (Déterminé à l’aide du Fichier de conversion des codes postaux (FCCP) de Statistique Canada.</li><li>TRANSLATION REQUIRED</li><li>TRANSLATION REQUIRED</li></ul><br>TRANSLATION REQUIRED'
         },
         text5: {
@@ -291,17 +291,17 @@ cenozoApp.lookupData = {
       },
       missingFieldTitle: { en: 'Missing mandatory field', fr: 'Champ obligatoire manquant' },
       missingFieldMessage: {
-        en: 'There are mandatory fields which are missing. You will now be redirected to where the incomplete fields can be found.  Please try re-submitting once all mandatory fields have been filled out.',
+        en: 'There are mandatory fields which are missing. You will now be redirected to where the incomplete fields can be found. Please try re-submitting once all mandatory fields have been filled out.',
         fr: 'Des champs obligatoires sont manquants. Vous serez redirigé vers l’endroit où se trouvent les champs incomplets. Veuillez soumettre la demande d’accès à nouveau quand tous les champs obligatoires auront été remplis.'
       },
       tooManyCharactersTitle: { en: 'Too many characters', fr: 'TRANSLATION REQUIRED' },
       tooManyCharactersMessage: {
-        en: 'Some of your descriptions are too long.  You will now be redirected to the general project information details.  Please try re-submitting once all descriptions are within the maximum limits.',
+        en: 'Some of your descriptions are too long. You will now be redirected to the general project information details. Please try re-submitting once all descriptions are within the maximum limits.',
         fr: 'TRANSLATION REQUIRED'
       },
       invalidStartDateTitle: { en: 'Invalid start date', fr: 'TRANSLATION REQUIRED' },
       invalidStartDateMessage: {
-        en: 'The start date you have provided is not acceptible.  You will now be redirected to where the start date field can be found.  Please try re-submitting once the start date has been corrected.',
+        en: 'The start date you have provided is not acceptible. You will now be redirected to where the start date field can be found. Please try re-submitting once the start date has been corrected.',
         fr: 'TRANSLATION REQUIRED'
       },
       deleteWarning: {
@@ -314,7 +314,7 @@ cenozoApp.lookupData = {
         fr: 'Êtes-vous sûr(e) de vouloir abandonner la demande d’accès?\n\nVous n’y aurez plus accès et le processus d’évaluation sera interrompu.'
       },
       emailText: {
-        en: 'You must provide an institutional email.  Public email accounts such as @gmail.com are not allowed.',
+        en: 'You must provide an institutional email. Public email accounts such as @gmail.com are not allowed.',
         fr: 'TRANSLATION REQUIRED'
       },
       graduateFeeWaiver: {
@@ -406,7 +406,7 @@ cenozoApp.lookupData = {
       },
       text: {
         en: 'List any products resulting from the project during the reporting period. Please provide references where available, and for peer-reviewed publications please specify if ‘in press’, ‘submitted’ or ‘published’. If you have not yet done so, please provide a copy of peer-reviewed publications to the CLSA when submitting this report.',
-        fr: 'Énumérer les produits qui ont été développés dans le cadre de votre projet pendant la période en question.  Veuillez fournir les références lorsqu’elles sont disponibles. Pour les articles évalués par des pairs, veuillez spécifier s’ils sont « sous presse », « soumis » ou « publiés ». Si ce n’est pas déjà fait, veuillez fournir une copie des articles évalués par des pairs à l’ÉLCV en soumettant ce rapport.'
+        fr: 'Énumérer les produits qui ont été développés dans le cadre de votre projet pendant la période en question. Veuillez fournir les références lorsqu’elles sont disponibles. Pour les articles évalués par des pairs, veuillez spécifier s’ils sont « sous presse », « soumis » ou « publiés ». Si ce n’est pas déjà fait, veuillez fournir une copie des articles évalués par des pairs à l’ÉLCV en soumettant ce rapport.'
       },
       number: { en: 'Number', fr: 'Numéro' },
       type: { en: 'Type', fr: 'TRANSLATION REQUIRED' },

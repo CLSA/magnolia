@@ -3,22 +3,22 @@
     <div class="row">
       <div class="col-sm-10">
         <h3 class="text-primary">
-          Welcome to {{ session.application.title }} version {{ session.application.version }}
+          Welcome to {{ session.application.title }}, the CLSA online data and biospecimen application.<br/>
+          TRANSLATION REQUIRED
         </h3>
         <div class="container-fluid">
-          You are currently logged on as <strong>{{ session.user.firstName }} {{ session.user.lastName }}</strong>.<br/>
+          You are currently logged on as / TRANSLATION REQUIRED <strong>{{ session.user.firstName }} {{ session.user.lastName }}</strong>.<br/>
           <span class="text-warning">
             Use of any account other than your own is prohibited.
             If this is not you please <a style="cursor:pointer" ng-click="session.logout()">click here</a>
-            to log in.
+            to log in.<br>
+            TRANSLATION REQUIRED
           </span>
         </div>
         <div class="vertical-spacer"></div>
-        <div ng-if="session.user.lastActivity" class="container-fluid">
-          You were last logged in from
-          <strong>{{ session.user.lastActivity.start_datetime | cnDatetime:'datetimesecond' }}</strong>
-          until
-          <strong>{{ session.user.lastActivity.end_datetime | cnDatetime:'datetimesecond' }}</strong>.
+        <div class="container-fluid vertical-spacer">
+          Once you have created a new requisition (data access application), the requisition and all subsequent changes will be automatically saved within the program. To begin the online process, please click on the “+ Add” button on the lower right.<br/>
+          TRANSLATION REQUIRED
         </div>
         <div class="vertical-spacer"></div>
       </div>

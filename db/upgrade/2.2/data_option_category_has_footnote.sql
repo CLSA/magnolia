@@ -23,10 +23,4 @@ ENGINE = InnoDB;
 INSERT IGNORE INTO data_option_category_has_footnote( data_option_category_id, footnote_id )
 SELECT data_option_category.id, footnote.id
 FROM data_option_category, footnote
-WHERE (
-  data_option_category.rank = 4
-  AND footnote.id = 12
-) OR (
-  data_option_category.rank = 5
-  AND footnote.id IN( 13, 1 )
-);
+WHERE data_option_category.rank = 5 AND footnote.id IN( 13, 1 );
