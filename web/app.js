@@ -147,7 +147,7 @@ cenozoApp.lookupData = {
           fr: 'Veuillez fournir un résumé non scientifique de votre projet (<strong>TRANSLATION REQUIRED</strong>) pouvant être publié sur le site Web de l’ÉLCV si votre demande est approuvée. Assurez-vous de fournir un résumé détaillé et complet de votre projet.'
         },
         text2: {
-          en: 'Please provide a description of the proposed project. The proposal should be informative and specific and <strong>no more than 750 words per section. Non-compliant applications will be returned.</strong>',
+          en: 'Please provide a description of the proposed project. The proposal should be informative and specific and <strong>no more than 4500 characters per section. Non-compliant applications will be returned.</strong>',
           fr: 'TRANSLATION REQUIRED'
         },
         background: { en: 'Background and Study Relevance', fr: 'Contexte et pertinence de l’étude' },
@@ -278,7 +278,6 @@ cenozoApp.lookupData = {
       nextButton: { en: 'Proceed to the next section', fr: 'TRANSLATION REQUIRED' },
       pleaseConfirm: { en: 'Please confirm', fr: 'Veuillez confirmer' },
       remove: { en: 'Remove', fr: 'Supprimer' },
-      words: { en: 'words', fr: 'mots' },
       chars: { en: 'characters', fr: 'TRANSLATION REQUIRED' },
       comments: { en: 'Comments', fr: 'Commentaires' },
       delete: { en: 'Delete', fr: 'Effacer' },

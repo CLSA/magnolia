@@ -297,16 +297,16 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             scope.model.viewModel.charCount.lay_summary = text ? text.length : 0;
           } );
           scope.$watch( 'model.viewModel.record.background', function( text ) {
-            scope.model.viewModel.wordCount.background = text ? text.split( ' ' ).length : 0;
+            scope.model.viewModel.charCount.background = text ? text.length : 0;
           } );
           scope.$watch( 'model.viewModel.record.objectives', function( text ) {
-            scope.model.viewModel.wordCount.objectives = text ? text.split( ' ' ).length : 0;
+            scope.model.viewModel.charCount.objectives = text ? text.length : 0;
           } );
           scope.$watch( 'model.viewModel.record.methodology', function( text ) {
-            scope.model.viewModel.wordCount.methodology = text ? text.split( ' ' ).length : 0;
+            scope.model.viewModel.charCount.methodology = text ? text.length : 0;
           } );
           scope.$watch( 'model.viewModel.record.analysis', function( text ) {
-            scope.model.viewModel.wordCount.analysis = text ? text.split( ' ' ).length : 0;
+            scope.model.viewModel.charCount.analysis = text ? text.length : 0;
           } );
         },
         controller: function( $scope ) {
@@ -723,8 +723,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             comprehensive: [],
             tracking: []
           },
-          charCount: { lay_summary: 0 },
-          wordCount: { background: 0, objectives: 0, methodology: 0, analysis: 0 },
+          charCount: { lay_summary: 0, background: 0, objectives: 0, methodology: 0, analysis: 0 },
           minStartDate: null,
 
           translate: function( value ) {
