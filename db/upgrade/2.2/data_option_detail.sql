@@ -102,7 +102,8 @@ INSERT IGNORE INTO data_option_detail ( data_option_id, rank, name_en, name_fr )
 ( @data_option_id, 14, "Neuro-psychiatric (DPR; COM)", "Neuropsychiatrique (DPR; COM)" ),
 ( @data_option_id, 15, "Parkinsonism (PKD)", "Parkinsonisme (PKD)" ),
 ( @data_option_id, 16, "Chronic Airflow Obstruction (CAO; COM)", "Obstruction chronique des voies respiratoires (CAO" ),
-( @data_option_id, 17, "Medication Use (MED; TRM)", "Consommation de médicaments (MED; TRM)" );
+( @data_option_id, 17, "Medication Use (MED; TRM)", "Consommation de médicaments (MED; TRM)" ),
+( @data_option_id, 18, "Medications (MEDI; not yet available)", "Médicaments (MEDI; pas encore disponible)" );
 
 SELECT id INTO @data_option_id FROM data_option WHERE name_en = "Psychological Health";
 

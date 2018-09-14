@@ -115,7 +115,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     part2_b_comment: { type: 'text', exclude: true },
     part2_c_comment: { type: 'text', exclude: true },
     part2_d_comment: { type: 'text', exclude: true },
-    part2_e_comment: { type: 'text', exclude: true }
+    part2_e_comment: { type: 'text', exclude: true },
+    part2_f_comment: { type: 'text', exclude: true }
   } );
 
   module.addInputGroup( 'Decision and Deferral Notes', {
@@ -282,7 +283,10 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           } );
 
           // fill in the start date delay
-          CnSession.promise.then( function() { scope.startDateDelay = CnSession.application.startDateDelay; } );
+          CnSession.promise.then( function() {
+            scope.startDateDelay = CnSession.application.startDateDelay;
+            scope.maxReferencesPerReqn = CnSession.application.maxReferencesPerReqn;
+          } );
 
           scope.$watch( 'model.viewModel.record.start_date', function( date ) {
             var element = cenozo.getFormElement( 'start_date' );
@@ -755,6 +759,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             [ 'part2', null, 'c' ],
             [ 'part2', null, 'd' ],
             [ 'part2', null, 'e' ],
+            [ 'part2', null, 'f' ],
             [ 'part3', null, null ]
           ],
 

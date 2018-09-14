@@ -33,4 +33,27 @@ class post extends \cenozo\service\post
       ) + 1;
     }
   }
+  /**
+   * Replace parent method
+   */
+  protected function execute()
+  {
+    try
+    {
+      parent::execute();
+    }
+    catch( \cenozo\exception\argument $e )
+    {
+      // an argument exception is thrown when there are too many references
+      $setting_manager = lib::create( 'business\setting_manager' );
+      $language = $this->get_leaf_record()->get_reqn()->get_language()->code;
+      throw lib::create( 'exception\notice',
+        sprintf(
+          'en' == $language ? 'You may only provide a maximum of %d references.' : 'TRANSLATION REQUIRED',
+          $setting_manager->get_setting( 'general', 'max_references_per_reqn' )
+        ),
+        __METHOD__
+      );
+    }
+  }
 }

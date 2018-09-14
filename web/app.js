@@ -66,14 +66,14 @@ cenozoApp.lookupData = {
         fr: 'Partie 1 de 3 : Renseignements généraux'
       },
       a1: {
-        tab: { en: 'A1. Applicant', fr: 'A1. Demandeur' },
+        tab: { en: 'Applicant', fr: 'Demandeur' },
         text1: {
           en: '<strong>Primary Applicant</strong>: The primary applicant will be the contact person for the CLSA Access Agreement as well as for the data release and any relevant updates.',
           fr: '<strong>Demandeur principal</strong> : Le demandeur principal sera la personne-ressource pour l’Entente d’accès de l’ÉLCV, ainsi que pour la transmission des données et toute mise à jour pertinente.'
         },
         text2: {
           en: 'For <strong>Graduate student</strong> (MSc, PhD) applications, the primary applicant must be the supervisor and the student must be clearly identified. <strong>Postdoctoral Fellows</strong> are permitted to apply as a primary applicant, but the application must be co-signed by their supervisor. If requesting a Fee Waiver, the Postdoctoral Fellow must be listed as the primary applicant.',
-          fr: 'Pour les <strong>demandes faites par des étudiants des cycles supérieurs</strong> (M. Sc., Ph. D.), le demandeur principal doit être le superviseur et l’étudiant doit être clairement identifié. Les <strong>boursiers postdoctoraux</strong> peuvent soumettre une demande à titre de demandeur principal, mais celle-ci doit être cosignée par leur superviseur (voir les sections A7 et A8). Le boursier postdoctoral doit être le demandeur principal pour bénéficier d’une exonération des frais.'
+          fr: 'Pour les <strong>demandes faites par des étudiants des cycles supérieurs</strong> (M. Sc., Ph. D.), le demandeur principal doit être le superviseur et l’étudiant doit être clairement identifié. TRANSLATION REQUIRED'
         },
         applicant_name: { en: 'Name', fr: 'Nom' },
         applicant_position: { en: 'Position', fr: 'Poste' },
@@ -93,12 +93,12 @@ cenozoApp.lookupData = {
         graduate_email: { en: 'E-mail', fr: 'Courriel' },
         text4: {
           en: 'In order to be eligible for the Fee Waiver for Graduate students, the application must clearly indicate that the proposed project forms part of a thesis. In order to be eligible for the Fee Waiver for Postdoctoral Fellows, the Fellow must be the primary applicant and the supervisor must sign the application.',
-          fr: 'Pour que les étudiants des cycles supérieurs soient admissibles à l’exonération des frais, la demande doit indiquer clairement que le projet proposé s’inscrit dans une thèse (voir la section A1). Pour que les boursiers postdoctoraux soient admissibles à l’exonération des frais, le boursier doit être le demandeur principal et le superviseur doit signer la demande.'
+          fr: 'Pour que les étudiants des cycles supérieurs soient admissibles à l’exonération des frais, la demande doit indiquer clairement que le projet proposé s’inscrit dans une thèse. Pour que les boursiers postdoctoraux soient admissibles à l’exonération des frais, le boursier doit être le demandeur principal et le superviseur doit signer la demande.'
         },
         waiver: { en: 'Fee Waiver Type', fr: 'Type d’exemption de frais' }
       },
       a2: {
-        tab: { en: 'A2. Project Team', fr: 'A2. Équipe de projet' },
+        tab: { en: 'Project Team', fr: 'Équipe de projet' },
         text: {
           en: 'All Co-Applicants and Other Personnel must be listed below. Please note that changes to the project team, including change of Primary Applicant and addition or removal of Co-Applicants and Support Personnel <strong>require an amendment</strong>. To request an Amendment Form, please email <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.',
           fr: 'Tous les codemandeurs et les membres du personnel de soutien doivent être identifiés ci-dessous. Veuillez noter que tout changement à l’équipe de projet y compris un changement de demandeur principal et l’ajout ou le retrait d’un codemandeur ou d’un membre du personnel de soutien <strong>nécessite une modification</strong>. Pour obtenir le formulaire de modification, écrivez àeilto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.'
@@ -116,7 +116,7 @@ cenozoApp.lookupData = {
         addCoapplicant: { en: 'Add Co-Applicant', fr: 'Ajouter codemandeurs' }
       },
       a3: {
-        tab: { en: 'A3. Timeline', fr: 'A3. Échéancier' },
+        tab: { en: 'Timeline', fr: 'Échéancier' },
         text1: {
           en: 'What is the anticipated time frame for this proposed project? In planning for your project, please consider in your time frame at least ',
           fr: 'Quel est l’échéancier prévu du projet proposé? Lors de la planification de votre projet, veuillez prévoir au moins '
@@ -130,7 +130,7 @@ cenozoApp.lookupData = {
         duration: { en: 'Proposed project duration', fr: 'Durée proposée du projet' }
       },
       a4: {
-        tab: { en: 'A4. Description', fr: 'A4. Description' },
+        tab: { en: 'Description', fr: 'Description' },
         text1: {
           en: 'Please adhere to word count.',
           fr: 'Veuillez respecter le nombre de mots.'
@@ -166,8 +166,12 @@ cenozoApp.lookupData = {
           fr: 'Brève description de l’analyse de données proposée (cette section devrait inclure la justification de la taille d’échantillon demandée). Les demandes de petits sous-groupes de participants doivent être justifiées.'
         },
         text3: {
-          en: 'Please include a list of the most relevant references',
-          fr: 'Veuillez présenter une liste des références les plus pertinentes'
+          en: 'Please include a list of the most relevant references (maximum ',
+          fr: 'Veuillez présenter une liste des références les plus pertinentes (TRANSLATION REQUIRED '
+        },
+        text4: {
+          en: ')',
+          fr: ')'
         },
         number: { en: 'Number', fr: 'Numéro' },
         reference: { en: 'Reference', fr: 'Référence' },
@@ -178,7 +182,7 @@ cenozoApp.lookupData = {
         addReference: { en: 'Add Reference', fr: 'Ajouter référence' }
       },
       a5: {
-        tab: { en: 'A5. Scientific Review', fr: 'A5. Évaluation scientifique' },
+        tab: { en: 'Scientific Review', fr: 'Évaluation scientifique' },
         text: {
           en: 'Evidence of peer reviewed funding will be considered evidence of scientific review. If there are no plans to submit an application for financial support for this project please provide evidence of peer review (e.g. internal departmental review, thesis protocol defense, etc.) if available. If no evidence of scientific peer review is provided with this application then the project will undergo scientific review by the DSAC.',
           fr: 'Les documents attestant l’attribution du financement seront considérés comme une preuve d’évaluation par les pairs. Si vous ne planifiez pas demander de l’aide financière pour ce projet, veuillez fournir la preuve qu’une évaluation par les pairs a été réalisée (p. ex. évaluation départementale, défense du protocole de thèse, etc.) si disponible. Si aucune preuve d’évaluation scientifique par les pairs n’est soumise avec la demande, le DSAC procédera à l’évaluation scientifique du projet.'
@@ -188,7 +192,7 @@ cenozoApp.lookupData = {
         grant_number: { en: 'Grant Number', fr: 'Numéro de la subvention' }
       },
       a6: {
-        tab: { en: 'A6. Ethics', fr: 'A6. Éthique' },
+        tab: { en: 'Ethics', fr: 'Éthique' },
         text: {
           en: 'Please note that ethics approval is NOT required at the time of this application, but <strong>no data or biospecimens will be released until proof of ethics approval has been received by the CLSA.</strong>',
           fr: 'Notez que l’approbation éthique n’est PAS requise à cette étape de la demande, mais <strong>aucune donnée ou aucun échantillon ne seront transmis avant que l’ÉLCV ait reçu une preuve d’approbation éthique.</strong>'
@@ -211,8 +215,8 @@ cenozoApp.lookupData = {
       notes: {
         tab: { en: 'Notes', fr: 'Remarques' },
         text1: {
-          en: 'Please mark with an “X” the checkbox for the sections containing the modules in the CLSA Baseline dataset that you are requesting.<br>In the <strong>Comments</strong> section, include other relevant information concerning your request, including rationale for the request of Additional Data (e.g. Images).<br>Please note that you cannot request data which are not listed on this Checklist.',
-          fr: 'Inscrivez un « X » dans la case à côté des modules contenant les variables de l’ensemble de données de l’ÉLCV que vous demandez.<br>Ajoutez toute autre information pertinente à votre demande à la section <strong>Commentaires</strong>, y compris une justification de la demande de données supplémentaires (par exemple, les images).<br>TRANSLATION REQUIRED'
+          en: 'Please mark the sections containing the modules in the CLSA Baseline dataset that you are requesting.  Please note that you cannot request data which are not listed on this Checklist.',
+          fr: ''
         },
         text2: {
           en: '<strong>Included in all datasets</strong><ul><li>Sampling weights</li></ul>',
@@ -223,10 +227,6 @@ cenozoApp.lookupData = {
           fr: '<strong>Exclus des ensembles de données</strong><ul><li>Informations d’identification recueillies (p. ex. nom, coordonnées, date de naissance, numéro d’assurance maladie et code postal complet)</li></ul>'
         },
         text4: {
-          en: '<strong>Additional Data available</strong><ul><li>Air Pollution and Meteorological Exposure Measurements (for all 50,000 CLSA participants).</li><li>Forward Sortation Areas (A forward sortation area (FSA) is a geographical region in which all postal codes start with the same three characters.)</li><li>Community names (Determined using the Postal Code Conversion File (PCCF) from Statistics Canada.)</li><li>Census Subdivision (CSD; Codes and Names) / Subdivisions de recensement (Codes et noms)</li><li>Forward Sortation Areas (FSA) / Zones de tri d’acheminement</li></ul><br>Due to the sensitive nature of these geographic indicators, a special request must be made to receive CSDs and FSAs as part of your dataset. Adequate justification must be provided within the project description (Application Part 1). By requesting these data, you also agree that you will not present in any form (presentation, publication, poster), an illustration of these geographic areas, when fewer than 50 CLSA participants.',
-          fr: '<strong>Données supplémentaires disponibles</strong><ul><li>Les mesures de la pollution de l’air et de l’exposition météorologique (pour les 50 000 participants à l’ÉLCV).</li><li>Région de tri d’acheminement (Une région de tri d’acheminement (RTA) est une region géographique où tous les codes postaux ont les mêmes trois premiers caractères.)</li><li>Nom de la collectivité (Déterminé à l’aide du Fichier de conversion des codes postaux (FCCP) de Statistique Canada.</li><li>TRANSLATION REQUIRED</li><li>TRANSLATION REQUIRED</li></ul><br>TRANSLATION REQUIRED'
-        },
-        text5: {
           en: 'For more information on these data, please contact <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>',
           fr: 'Pour en savoir plus sur ces données, veuillez écrire à <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>'
         }
@@ -257,7 +257,32 @@ cenozoApp.lookupData = {
           en: 'Comprehensive<br/>(Face-to-face Interview - In-home or DCS visit) (COM)',
           fr: 'Évaluation globale<br/>(Entrevue en personne - à domicile ou au DCS) (COM)'
         }
-      }
+      },
+      f: {
+        tab: { en: '', fr: '' },
+        module: { en: '', fr: '' },
+        tracking: { en: '', fr: '' },
+        comprehensive: { en: '', fr: '' },
+        title1: { en: 'Images', fr: 'TRANSLATION REQUIRED' },
+        text1: {
+          en: 'Images are available by special request for Carotid Intima Media Thickness (cIMT), IVA Lateral Spine (DXA), Retinal Scan (RS), Electrocardiogram (ECG; tracings) and Spirometry (SPR, flow curves). To request image data, please use the ‘Comments’ box below and explain in Part 1 of the Application, why your project requires use of images. Please note that a request to receive image data from the CLSA will incur additional costs, beyond the current data access fee; it may prolong processing time of your application, and  the time to receive your image data may be longer than the 6 months to receive alphanumeric data. For more information, please contact <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.',
+          fr: 'Il est possible d’obtenir les données en format image sur demande spéciale pour les mesures suivantes : épaisseur de l’intima-média carotidienne (cIMT), analyse intervertébrale (IVA) de la colonne vertébrale (DXA), balayage de la rétine (RS), électrocardiogramme (ECG, tracés) et spirométrie (SPR, courbes de débit). Pour demander des données en format images, utilisez la case « Commentaires » ci-dessous et, à la Partie 1 de la demande, expliquez pourquoi ces images seront utiles à votre projet. Veuillez noter qu’une demande d’obtention d’images de l’ÉLCV entraînera des coûts supplémentaires, au-delà des frais d’accès aux données actuels. Cette demande peut prolonger le temps nécessaire au traitement de votre demande et le délai de réception de vos images peut être plus long que les six mois prévus pour les données alphanumériques. Pour en savoir plus sur ces demandes, veuillez contacter <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.'
+        },
+        title2: { en: 'Raw Data', fr: 'TRANSLATION REQUIRED' },
+        text2: {
+          en: 'Raw data are available by special request for Cognition (COG), Bone Density by DEXA (DXA), Bio-Impedance by DEXA (DXA) and Tonometry (TON). For more information and for details on how to request these data, please contact <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.',
+          fr: 'Les données brutes sont disponibles sur demande spéciale pour les mesures suivantes : Cognition (COG), Densité osseuse par DEXA (DXA), Bio-impédance par DEXA (DXA) et Tonométrie (TON). Pour en savoir plus sur ces données et comment en faire la demande, veuillez écrire à <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.'
+        },
+        title3: { en: 'Geographic Indicators', fr: 'TRANSLATION REQUIRED' },
+        text3: {
+          en: '<ol><li>Forward Sortation Areas (A forward sortation area (FSA) is a geographical region in which all postal codes start with the same three characters.)</li><li>Census Subdivision Codes and Names - determined using the Postal Code Conversion File (PCCF) from Statistics Canada. (A census subdivision (CSD) is a geographic unit defined by Statistics Canada, roughly corresponding to municipalities, whose unique codes can be linked to other sociodemographic or census data)</li></ol>Due to the sensitive nature of these geographic indicators, a special request must be made to receive CSDs and FSAs as part of your dataset.  Adequate justification must be provided within the project description (Application Part 1) as well as in the Comments box below. By requesting these data, you also agree that you will not present in any form (presentation, publication, poster), an illustration of these geographic areas with fewer than 50 CLSA participants per FSA or CSD. For more information, please contact <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.',
+          fr: '<ol><li>Région de tri d’acheminement (Une région de tri d’acheminement (RTA) est une region géographique où tous les codes postaux ont les mêmes trois premiers caractères.)</li><li>Codes et noms des subdivisions de recensement déterminé à l’aide du Fichier de conversion des codes postaux (FCCP) de Statistique Canada. Une subdivision de recensement (SDR) est une unité géographique définie par Statistique Canada correspondant approximativement aux municipalités, dont les codes uniques peuvent être liés à d’autres données sociodémographiques ou de recensement.</li></ol>TRANSLATION REQUIRED'
+        },
+        text4: {
+          en: 'In the Comments, include other relevant information concerning your request, including rationale for the request of Additional Data (e.g. Images).',
+          fr: 'Ajoutez toute autre information pertinente à votre demande à la section Commentaires, y compris une justification de la demande de données supplémentaires (par exemple, les images).'
+        }
+      },
     },
     part3: {
       tab: { en: 'Part 3', fr: '3<sup>e</sup> partie' },

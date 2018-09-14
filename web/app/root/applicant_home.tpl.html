@@ -1,9 +1,9 @@
 <div class="inner-view-frame">
   <div class="container-fluid bg-white allow-select">
     <div class="row">
-      <div class="col-sm-10">
+      <div class="col-sm-8">
         <h3 class="text-primary">
-          Welcome to {{ session.application.title }}, the CLSA online data and biospecimen application.<br/>
+          Welcome to {{ session.application.title }}, the CLSA online data and biospecimen application system.<br/>
           TRANSLATION REQUIRED
         </h3>
         <div class="container-fluid">
@@ -16,21 +16,23 @@
           </span>
         </div>
         <div class="vertical-spacer"></div>
-        <div class="container-fluid vertical-spacer">
-          Once you have created a new requisition (data access application), the requisition and all subsequent changes will be automatically saved within the program. To begin the online process, please click on the “+ Add” button on the lower right.<br/>
-          TRANSLATION REQUIRED
-        </div>
-        <div class="vertical-spacer"></div>
       </div>
-      <div class="col-sm-2 hidden-xs">
+      <div class="col-sm-4 hidden-xs">
         <h3>
-          <img ng-src="{{ cenozoUrl }}/img/branding.small.png"
+          <img ng-src="{{ cenozoUrl }}/img/branding.png"
                class="img-responsive"
                onerror="this.style.display='none'"
                alt="" />
         </h3>
       </div>
     </div>
+    <div class="vertical-spacer"></div>
+    <h3 class="text-primary">Instructions</h3>
+    <div class="container-fluid vertical-spacer">
+      To begin the online process, please click on the “+ Add” button on the lower right to create a new requisition (Data and Biospecimen Access Application).  Once created the requisition and all subsequent changes are automatically saved.  Do not click “submit” until you have completely finished filling in the form.<br/>
+      TRANSLATION REQUIRED
+    </div>
+    <div class="vertical-spacer"></div>
     <h3 class="text-primary">Messages</h3>
     <div class="container-fluid" ng-repeat="message in session.messageList">
       <h4>

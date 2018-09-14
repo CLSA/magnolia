@@ -13,7 +13,7 @@ global $SETTINGS;
 $SETTINGS['general']['application_name'] = 'magnolia';
 $SETTINGS['general']['instance_name'] = $SETTINGS['general']['application_name'];
 $SETTINGS['general']['version'] = '2.2';
-$SETTINGS['general']['build'] = '6dfdef6';
+$SETTINGS['general']['build'] = '0c181be';
 
 // the location of magnolia internal path
 $SETTINGS['path']['APPLICATION'] = str_replace( '/settings.ini.php', '', __FILE__ );
@@ -35,3 +35,6 @@ $SETTINGS['module']['pdf'] = true;
 
 // how many months past a requisition's deadline must its start date be?
 $SETTINGS['general']['start_date_delay'] = 6;
+
+// how many months past a requisition's deadline must its start date be?
+$SETTINGS['general']['max_references_per_reqn'] = 15;

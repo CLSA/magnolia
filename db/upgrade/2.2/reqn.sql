@@ -52,6 +52,7 @@ CREATE PROCEDURE patch_reqn()
         "part2_c_comment TEXT NULL DEFAULT NULL, ",
         "part2_d_comment TEXT NULL DEFAULT NULL, ",
         "part2_e_comment TEXT NULL DEFAULT NULL, ",
+        "part2_f_comment TEXT NULL DEFAULT NULL, ",
         "decision_notice TEXT NULL DEFAULT NULL, ",
         "deferral_note_part1_a1 TEXT NULL DEFAULT NULL, ",
         "deferral_note_part1_a2 TEXT NULL DEFAULT NULL, ",

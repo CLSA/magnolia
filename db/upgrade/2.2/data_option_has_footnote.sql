@@ -34,8 +34,12 @@ WHERE (
   AND footnote.id = 8
 ) OR (
   data_option_category.rank = 2
-  AND data_option.rank IN( 2, 4 )
-  AND footnote.id = 10
+  AND data_option.rank = 2
+  AND footnote.id = 17
+) OR (
+  data_option_category.rank = 2
+  AND data_option.rank = 4
+  AND footnote.id = 6
 ) OR (
   data_option_category.rank = 2
   AND data_option.rank = 4
@@ -43,5 +47,5 @@ WHERE (
 ) OR (
   data_option_category.rank = 4
   AND data_option.rank = 1
-  AND footnote.id = 12
+  AND footnote.id = 11
 );

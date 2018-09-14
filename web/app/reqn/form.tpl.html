@@ -7,7 +7,7 @@
       <button class="btn btn-menu btn-header btn-info pull-right"
               style="margin-top:-4px;"
               ng-click="model.viewModel.toggleLanguage()">
-        {{ 'en'==model.viewModel.record.language ? 'Version Française' : 'English Version' }}
+        {{ 'en'==model.viewModel.record.language ? 'Version française' : 'English Version' }}
       </button>
       <span ng-bind-html="getHeading()"></span>
     </h4>
@@ -47,7 +47,7 @@
     </div>
   </div>
   <div class="container-fluid" style="padding-top: 1em;">
-    <ul class="nav nav-tabs nav-justified">
+    <ul class="nav nav-tabs">
       <li ng-class="{'active':'instructions'==model.viewModel.tab[0]}">
         <a ng-click="model.viewModel.setTab(0,'instructions')" ng-bind-html="t( 'instructions.tab' )"></a>
       </li>
@@ -75,9 +75,7 @@
         <a ng-click="model.viewModel.setTab(0,'part3')" ng-bind-html="t( 'part3.tab' )"></a>
       </li>
     </ul>
-    <div ng-show="'instructions'==model.viewModel.tab[0]"
-         class="panel panel-default"
-         style="border-top-left-radius: 0px;">
+    <div ng-show="'instructions'==model.viewModel.tab[0]" class="panel panel-default" style="border-top-left-radius: 0px;">
       <div class="panel-body" style="padding-bottom: 0px;">
         <h4 ng-bind-html="t( 'instructions.title' )"></h4>
         <ul class="list-group">
@@ -89,9 +87,7 @@
         </ul>
       </div>
     </div>
-    <div ng-show="'part1'==model.viewModel.tab[0]"
-         class="panel panel-default"
-         style="border-top-left-radius: 0px;">
+    <div ng-show="'part1'==model.viewModel.tab[0]" class="panel panel-default">
       <div class="panel-body" style="padding-bottom: 0px;">
         <h4 style="margin-top: 0; margin-bottom: 1em;" ng-bind-html="t( 'part1.title' )"></h4>
         <ul class="nav nav-tabs">
@@ -103,9 +99,7 @@
                ng-bind-html="t( 'part1.'+section[1]+'.tab' )"></a>
           </li>
         </ul>
-        <div ng-show="'a1'==model.viewModel.tab[1]"
-             class="panel panel-default"
-             style="border-top-left-radius: 0px;">
+        <div ng-show="'a1'==model.viewModel.tab[1]" class="panel panel-default" style="border-top-left-radius: 0px;">
           <div class="panel-body">
             <cn-reqn-deferral-note note="deferral_note_part1_a1" class="bg-info"></cn-reqn-deferral-note>
             <p class="text-primary" ng-bind-html="t( 'part1.a1.text1' )"></p>
@@ -232,9 +226,7 @@
             </fieldset></form>
           </div>
         </div>
-        <div ng-show="'a2'==model.viewModel.tab[1]"
-             class="panel panel-default"
-             style="border-top-left-radius: 0px;">
+        <div ng-show="'a2'==model.viewModel.tab[1]" class="panel panel-default">
           <div class="panel-body">
             <cn-reqn-deferral-note note="deferral_note_part1_a2"></cn-reqn-deferral-note>
             <p class="text-primary" ng-bind-html="t( 'part1.a2.text' )"></p>
@@ -333,9 +325,7 @@
             </form>
           </div>
         </div>
-        <div ng-show="'a3'==model.viewModel.tab[1]"
-             class="panel panel-default"
-             style="border-top-left-radius: 0px;">
+        <div ng-show="'a3'==model.viewModel.tab[1]" class="panel panel-default">
           <div class="panel-body">
             <cn-reqn-deferral-note note="deferral_note_part1_a3"></cn-reqn-deferral-note>
             <p class="text-primary" ng-bind-html="t( 'part1.a3.text1' ) + startDateDelay + t( 'part1.a3.text2' )"></p>
@@ -372,9 +362,7 @@
             </fieldset></form>
           </div>
         </div>
-        <div ng-show="'a4'==model.viewModel.tab[1]"
-             class="panel panel-default"
-             style="border-top-left-radius: 0px;">
+        <div ng-show="'a4'==model.viewModel.tab[1]" class="panel panel-default">
           <div class="panel-body">
             <cn-reqn-deferral-note note="deferral_note_part1_a4"></cn-reqn-deferral-note>
             <p class="text-primary" ng-bind-html="t( 'part1.a4.text1' )"></p>
@@ -449,7 +437,7 @@
                   model="model">
                 </cn-view-input>
                 <hr/>
-                <p class="text-primary" ng-bind-html="t( 'part1.a4.text3' )"></p>
+                <p class="text-primary" ng-bind-html="t( 'part1.a4.text3' ) + maxReferencesPerReqn + t( 'part1.a4.text4' )"></p>
                 <div class="panel panel-default">
                   <div class="panel-body">
                     <span ng-show="0 == model.viewModel.referenceList.length"
@@ -513,9 +501,7 @@
             </fieldset></form>
           </div>
         </div>
-        <div ng-show="'a5'==model.viewModel.tab[1]"
-             class="panel panel-default"
-             style="border-top-left-radius: 0px;">
+        <div ng-show="'a5'==model.viewModel.tab[1]" class="panel panel-default">
           <div class="panel-body">
             <cn-reqn-deferral-note note="deferral_note_part1_a5"></cn-reqn-deferral-note>
             <p class="text-primary" ng-bind-html="t( 'part1.a5.text' )"></p>
@@ -553,9 +539,7 @@
             </fieldset></form>
           </div>
         </div>
-        <div ng-show="'a6'==model.viewModel.tab[1]"
-             class="panel panel-default"
-             style="border-top-left-radius: 0px;">
+        <div ng-show="'a6'==model.viewModel.tab[1]" class="panel panel-default">
           <div class="panel-body">
             <cn-reqn-deferral-note note="deferral_note_part1_a6"></cn-reqn-deferral-note>
             <p class="text-primary" ng-bind-html="t( 'part1.a6.text' )"></p>
@@ -608,9 +592,7 @@
         </div>
       </div>
     </div>
-    <div ng-show="'part2'==model.viewModel.tab[0]"
-         class="panel panel-default"
-         style="border-top-left-radius: 0px;">
+    <div ng-show="'part2'==model.viewModel.tab[0]" class="panel panel-default">
       <div class="panel-body" style="padding-bottom: 0px;">
         <h4 style="margin-top: 0; margin-bottom: 1em;" ng-bind-html="t( 'part2.title' )"></h4>
         <ul class="nav nav-tabs">
@@ -622,29 +604,42 @@
                ng-bind-html="t( 'part2.'+section[2]+'.tab' )"></a>
           </li>
         </ul>
-        <div ng-show="'notes'==model.viewModel.tab[2]"
-             class="panel panel-default"
-             style="border-top-left-radius: 0px;">
+        <div ng-show="'notes'==model.viewModel.tab[2]" class="panel panel-default" style="border-top-left-radius: 0px;">
           <div class="panel-body" style="padding-bottom: 0px;">
             <ul class="list-group">
               <li class="list-group-item" ng-bind-html="t( 'part2.notes.text1' )"></li>
               <li class="list-group-item" ng-bind-html="t( 'part2.notes.text2' )"></li>
               <li class="list-group-item" ng-bind-html="t( 'part2.notes.text3' )"></li>
               <li class="list-group-item" ng-bind-html="t( 'part2.notes.text4' )"></li>
-              <li class="list-group-item" ng-bind-html="t( 'part2.notes.text5' )"></li>
             </ul>
           </div>
         </div>
-        <div ng-repeat="part in ['a','b','c','d','e']"
+        <div ng-repeat="part in ['a','b','c','d','e','f']"
              ng-init="partIndex = $index"
              ng-show="part==model.viewModel.tab[2]"
-             class="panel panel-default"
-             style="border-top-left-radius: 0px;">
+             class="panel panel-default">
           <div class="panel-body">
             <form ng-attr-id="part2{{ part }}Form" ng-attr-name="part2{{ part }}Form" novalidate>
               <fieldset ng-disabled="!model.getEditEnabled()">
                 <cn-reqn-deferral-note note="deferral_note_part2_{{ part }}"></cn-reqn-deferral-note>
                 <div class="form-horizontal">
+                  <ul class="list-group" ng-if="'f'==part">
+                    <li class="list-group-item">
+                      <h4 ng-bind-html="t( 'part2.f.title1' )"></h4>
+                      <div ng-bind-html="t( 'part2.f.text1' )"></div>
+                    </li>
+                    <li class="list-group-item">
+                      <h4 ng-bind-html="t( 'part2.f.title2' )"></h4>
+                      <div ng-bind-html="t( 'part2.f.text2' )"></div>
+                    </li>
+                    <li class="list-group-item">
+                      <h4 ng-bind-html="t( 'part2.f.title3' )"></h4>
+                      <div ng-bind-html="t( 'part2.f.text3' )"></div>
+                    </li>
+                    <li class="list-group-item">
+                      <div class="vertical-spacer" ng-bind-html="t( 'part2.f.text4' )"></div>
+                    </li>
+                  </ul>
                   <table class="table table-hover">
                     <thead ng-class="{ 'bg-info': t( 'part2.' + part + '.module' ) }">
                       <tr>
@@ -729,9 +724,7 @@
         </div>
       </div>
     </div>
-    <div ng-show="'part3'==model.viewModel.tab[0]"
-         class="panel panel-default"
-         style="border-top-left-radius: 0px;">
+    <div ng-show="'part3'==model.viewModel.tab[0]" class="panel panel-default">
       <div class="panel-body" style="padding-bottom: 0px;">
         <h4 style="margin-top: 0; margin-bottom: 1em;" ng-bind-html="t( 'part3.title' )"></h4>
         <p class="text-primary" ng-bind-html="t( 'part3.text' )"></p>

@@ -49,31 +49,51 @@ WHERE (
   AND data_option_detail.rank IN( 2, 3, 4, 5, 6, 7, 13, 14, 15, 16 )
   AND footnote.id = 2
 ) OR (
+  data_option.name_en = "Physical Health II"
+  AND data_option_detail.rank = 18
+  AND footnote.id = 14
+) OR (
+  data_option.name_en = "Cognition - metadata & scores"
+  AND data_option_detail.rank IN( 1, 2, 3, 4 )
+  AND footnote.id = 6
+) OR (
   data_option.name_en = "Labour Force"
   AND data_option_detail.rank IN( 3, 4 )
   AND footnote.id = 7
 ) OR (
+  data_option.name_en = "Bio-Impedance by DEXA"
+  AND data_option_detail.rank = 1
+  AND footnote.id = 6
+) OR (
   data_option.name_en = "Physical Assessments II"
-  AND data_option_detail.rank IN( 1, 5, 6 )
+  AND data_option_detail.rank IN( 6 )
   AND footnote.id = 9
 ) OR (
   data_option.name_en = "Physical Assessments II"
   AND data_option_detail.rank = 4
-  AND footnote.id = 10
+  AND footnote.id = 6
 ) OR (
   data_option.name_en = "Physical Assessments II"
   AND data_option_detail.rank = 6
-  AND footnote.id = 11
+  AND footnote.id = 10
+) OR (
+  data_option.name_en = "Physical Assessments II"
+  AND data_option_detail.rank = 5
+  AND footnote.id = 15
+) OR (
+  data_option.name_en = "Physical Assessments II"
+  AND data_option_detail.rank = 1
+  AND footnote.id = 16
 ) OR (
   data_option.name_en = "Air Quality"
-  AND data_option_detail.rank IN( 1, 2, 3 )
-  AND footnote.id = 14
+  AND data_option_detail.rank IN( 2, 3 )
+  AND footnote.id = 13
 ) OR (
   data_option.name_en = "Neighborhood Factors"
   AND data_option_detail.rank IN( 1, 2, 3 )
-  AND footnote.id = 14
+  AND footnote.id = 13
 ) OR (
   data_option.name_en = "Greenness & Weather"
   AND data_option_detail.rank IN( 1, 2 )
-  AND footnote.id = 14
+  AND footnote.id = 13
 );

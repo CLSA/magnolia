@@ -14,8 +14,9 @@ CREATE TABLE IF NOT EXISTS data_option_category (
 ENGINE = InnoDB;
 
 INSERT IGNORE INTO data_option_category( rank, name_en, name_fr, comprehensive, tracking ) VALUES
-( 1, "A: Questionnaires", "A: Questionnaires", 1, 1 ),
-( 2, "B: Physical Assessment", "B: Évaluations physiques", 1, 0 ),
-( 3, "C: Biomarkers", "C: Biomarqueurs", 1, 0),
-( 4, "D: Genomics", "D: Genomique", 1, 0 ),
-( 5, "E: Linked Data", "E: Données liées", 1, 1 );
+( 1, "Questionnaires", "Questionnaires", 1, 1 ),
+( 2, "Physical Assessment", "Évaluations physiques", 1, 0 ),
+( 3, "Biomarkers", "Biomarqueurs", 1, 0),
+( 4, "Genomics", "Genomique", 1, 0 ),
+( 5, "Linked Data", "Données liées", 1, 1 ),
+( 6, "Additional Data", "Données supplémentaires", 1, 1 );
