@@ -32,3 +32,6 @@ $SETTINGS['path']['REQN'] = str_replace( 'settings.ini.php', 'doc/reqn', __FILE_
 
 // add modules used by the application
 $SETTINGS['module']['pdf'] = true;
+
+// how many months past a requisition's deadline must its start date be?
+$SETTINGS['general']['start_date_delay'] = 6;

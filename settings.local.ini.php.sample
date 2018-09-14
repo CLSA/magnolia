@@ -17,6 +17,3 @@ $SETTINGS['path']['LOG_FILE'] = $SETTINGS['path']['APPLICATION'].'/log';
 // database settings (the driver, server and prefixes are set in the framework's settings)
 $SETTINGS['db']['username'] = 'put your database username here';
 $SETTINGS['db']['password'] = 'put your database password here';
-
-// how many months past a requisition's deadline must its start date be?
-$SETTINGS['general']['start_date_delay'] = 5;
