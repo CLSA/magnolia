@@ -43,7 +43,7 @@ class get extends \cenozo\service\downloadable
   {
     parent::prepare();
 
-    // create the PDF file
-    $this->get_leaf_record()->generate_pdf_form();
+    // if requesting the final_report as a PDF file then create it first
+    if( 'application/pdf' == $this->get_mime_type() ) $this->get_leaf_record()->generate_pdf_form();
   }
 }
