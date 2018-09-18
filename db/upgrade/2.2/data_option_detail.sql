@@ -225,7 +225,8 @@ INSERT IGNORE INTO data_option_detail ( data_option_id, rank, name_en, name_fr )
 ( @data_option_id, 11, "Thyroid Stimulating Hormone (TSH)", "Thyréostimuline (TSH)" ),
 ( @data_option_id, 12, "Triglycerides (TRIG)", "Triglycérides (TRIG)" ),
 ( @data_option_id, 13, "25 - Hydroxyvitamin D (VITD)", "25 - hydroxyvitamine D (VITD)" ),
-( @data_option_id, 14, "Hemoglobin A1c (HBA1c; N = 26,961)", "Hémoglobine A1c (HBA1c; N = 26,961)" );
+( @data_option_id, 14, "Hemoglobin A1c (HBA1c; N = 26,961)", "Hémoglobine A1c (HBA1c; N = 26,961)" ),
+( @data_option_id, 15, "Glomerular Filtration Rate estimate (eGFR)", "Estimation du débit de filtration glomérulaire (eGFR)" );
 
 SELECT id INTO @data_option_id FROM data_option WHERE name_en = "Genomics (N=9,896)";
 
