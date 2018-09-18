@@ -49,7 +49,7 @@ class post extends \cenozo\service\post
       $language = $this->get_leaf_record()->get_reqn()->get_language()->code;
       throw lib::create( 'exception\notice',
         sprintf(
-          'en' == $language ? 'You may only provide a maximum of %d references.' : 'TRANSLATION REQUIRED',
+          'en' == $language ? 'You may only provide a maximum of %d references.' : 'Vous ne pouvez pas fournir plus de %d références.',
           $setting_manager->get_setting( 'general', 'max_references_per_reqn' )
         ),
         __METHOD__

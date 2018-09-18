@@ -263,12 +263,12 @@ cenozoApp.lookupData = {
         module: { en: '', fr: '' },
         tracking: { en: '', fr: '' },
         comprehensive: { en: '', fr: '' },
-        title1: { en: 'Images', fr: 'TRANSLATION REQUIRED' },
+        title1: { en: 'Images', fr: 'Images' },
         text1: {
           en: 'Images are available by special request for Carotid Intima Media Thickness (cIMT), IVA Lateral Spine (DXA), Retinal Scan (RS), Electrocardiogram (ECG; tracings) and Spirometry (SPR, flow curves). To request image data, please use the ‘Comments’ box below and explain in Part 1 of the Application, why your project requires use of images. Please note that a request to receive image data from the CLSA will incur additional costs, beyond the current data access fee; it may prolong processing time of your application, and  the time to receive your image data may be longer than the 6 months to receive alphanumeric data. For more information, please contact <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.',
           fr: 'Il est possible d’obtenir les données en format image sur demande spéciale pour les mesures suivantes : épaisseur de l’intima-média carotidienne (cIMT), analyse intervertébrale (IVA) de la colonne vertébrale (DXA), balayage de la rétine (RS), électrocardiogramme (ECG, tracés) et spirométrie (SPR, courbes de débit). Pour demander des données en format images, utilisez la case « Commentaires » ci-dessous et, à la Partie 1 de la demande, expliquez pourquoi ces images seront utiles à votre projet. Veuillez noter qu’une demande d’obtention d’images de l’ÉLCV entraînera des coûts supplémentaires, au-delà des frais d’accès aux données actuels. Cette demande peut prolonger le temps nécessaire au traitement de votre demande et le délai de réception de vos images peut être plus long que les six mois prévus pour les données alphanumériques. Pour en savoir plus sur ces demandes, veuillez contacter <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.'
         },
-        title2: { en: 'Raw Data', fr: 'TRANSLATION REQUIRED' },
+        title2: { en: 'Raw Data', fr: 'Données brutes' },
         text2: {
           en: 'Raw data are available by special request for Cognition (COG), Bone Density by DEXA (DXA), Bio-Impedance by DEXA (DXA) and Tonometry (TON). For more information and for details on how to request these data, please contact <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.',
           fr: 'Les données brutes sont disponibles sur demande spéciale pour les mesures suivantes : Cognition (COG), Densité osseuse par DEXA (DXA), Bio-impédance par DEXA (DXA) et Tonométrie (TON). Pour en savoir plus sur ces données et comment en faire la demande, veuillez écrire à <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.'
