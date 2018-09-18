@@ -33,7 +33,7 @@ class get extends \cenozo\service\downloadable
    */
   protected function get_downloadable_file_path()
   {
-    return sprintf( '%s/%s.pdf', REQN_PATH, $this->get_leaf_record()->id );
+    return sprintf( '%s/%s.pdf', FINAL_REPORT_PATH, $this->get_leaf_record()->id );
   }
 
   /**

@@ -1005,14 +1005,14 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
           downloadReqn: function() {
             return CnHttpFactory.instance( {
-              path: this.parentModel.getServiceResourcePath(),
+              path: this.parentModel.getServiceResourcePath() + '?file=application',
               format: 'pdf'
             } ).file();
           },
 
           downloadDataChecklist: function() {
             return CnHttpFactory.instance( {
-              path: this.parentModel.getServiceResourcePath(),
+              path: this.parentModel.getServiceResourcePath() + '?file=checklist',
               format: 'pdf'
             } ).file();
           },

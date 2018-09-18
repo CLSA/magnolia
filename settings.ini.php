@@ -18,17 +18,23 @@ $SETTINGS['general']['build'] = 'eb41c90';
 // the location of magnolia internal path
 $SETTINGS['path']['APPLICATION'] = str_replace( '/settings.ini.php', '', __FILE__ );
 
+// the location of data application forms (defaults to magnolia/doc/data_application)
+$SETTINGS['path']['DATA_APPLICATION'] = str_replace( 'settings.ini.php', 'doc/data_application', __FILE__ );
+
+// the location of data checklist forms (defaults to magnolia/doc/data_checklist)
+$SETTINGS['path']['DATA_CHECKLIST'] = str_replace( 'settings.ini.php', 'doc/data_checklist', __FILE__ );
+
 // the location of deployment reports (defaults to magnolia/doc/ethics_letter)
 $SETTINGS['path']['ETHICS_LETTER'] = str_replace( 'settings.ini.php', 'doc/ethics_letter', __FILE__ );
 
 // the location of agreement letters (defaults to magnolia/doc/agreement_letter)
 $SETTINGS['path']['AGREEMENT_LETTER'] = str_replace( 'settings.ini.php', 'doc/agreement_letter', __FILE__ );
 
+// the location of final report forms (defaults to magnolia/doc/final_report)
+$SETTINGS['path']['FINAL_REPORT'] = str_replace( 'settings.ini.php', 'doc/final_report', __FILE__ );
+
 // the location of PDF form templates (defaults to magnolia/doc/pdf_form)
 $SETTINGS['path']['PDF_FORM'] = str_replace( 'settings.ini.php', 'doc/pdf_form', __FILE__ );
-
-// the location of reqn forms (defaults to magnolia/doc/reqn)
-$SETTINGS['path']['REQN'] = str_replace( 'settings.ini.php', 'doc/reqn', __FILE__ );
 
 // add modules used by the application
 $SETTINGS['module']['pdf'] = true;
