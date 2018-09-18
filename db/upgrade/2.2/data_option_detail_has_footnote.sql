@@ -86,7 +86,7 @@ WHERE (
   AND footnote.id = 16
 ) OR (
   data_option.name_en = "Air Quality"
-  AND data_option_detail.rank IN( 2, 3 )
+  AND data_option_detail.rank IN( 2, 3, 4 )
   AND footnote.id = 13
 ) OR (
   data_option.name_en = "Neighborhood Factors"

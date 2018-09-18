@@ -72,7 +72,7 @@ cenozoApp.lookupData = {
           fr: '<strong>Demandeur principal</strong> : Le demandeur principal sera la personne-ressource pour l’Entente d’accès de l’ÉLCV, ainsi que pour la transmission des données et toute mise à jour pertinente.'
         },
         text2: {
-          en: 'For <strong>Graduate student</strong> (MSc, PhD) applications, the primary applicant must be the supervisor and the student must be clearly identified. <strong>Postdoctoral Fellows</strong> are permitted to apply as a primary applicant, but the application must be co-signed by their supervisor. If requesting a Fee Waiver, the Postdoctoral Fellow must be listed as the primary applicant.',
+          en: 'For <strong>Graduate student</strong> (MSc, PhD) applications, the primary applicant must be the supervisor and the student must be clearly identified. <strong>Postdoctoral Fellows</strong> are permitted to apply as a primary applicant, but the supervisor must accept responsibility for the data and will be required to sign the CLSA Access agreement. If requesting a Fee Waiver, the Postdoctoral Fellow must be listed as the primary applicant.',
           fr: 'Pour les <strong>demandes faites par des étudiants des cycles supérieurs</strong> (M. Sc., Ph. D.), le demandeur principal doit être le superviseur et l’étudiant doit être clairement identifié. TRANSLATION REQUIRED'
         },
         applicant_name: { en: 'Name', fr: 'Nom' },
@@ -92,8 +92,8 @@ cenozoApp.lookupData = {
         graduate_phone: { en: 'Phone', fr: 'Téléphone' },
         graduate_email: { en: 'E-mail', fr: 'Courriel' },
         text4: {
-          en: 'In order to be eligible for the Fee Waiver for Graduate students, the application must clearly indicate that the proposed project forms part of a thesis. In order to be eligible for the Fee Waiver for Postdoctoral Fellows, the Fellow must be the primary applicant and the supervisor must sign the application.',
-          fr: 'Pour que les étudiants des cycles supérieurs soient admissibles à l’exonération des frais, la demande doit indiquer clairement que le projet proposé s’inscrit dans une thèse. Pour que les boursiers postdoctoraux soient admissibles à l’exonération des frais, le boursier doit être le demandeur principal et le superviseur doit signer la demande.'
+          en: 'In order to be eligible for the Fee Waiver for Graduate students, the application must clearly indicate that the proposed project forms part of a thesis. In order to be eligible for the Fee Waiver for Postdoctoral Fellows, the Fellow must be the primary applicant and the supervisor must sign the CLSA Access Agreement.',
+          fr: 'Pour que les étudiants des cycles supérieurs soient admissibles à l’exonération des frais, la demande doit indiquer clairement que le projet proposé s’inscrit dans une thèse. Pour que les boursiers postdoctoraux soient admissibles à l’exonération des frais, le boursier doit être le demandeur principal et le superviseur doit signer l’Entente d’accès de l’ÉLCV.'
         },
         waiver: { en: 'Fee Waiver Type', fr: 'Type d’exemption de frais' }
       },
@@ -132,7 +132,7 @@ cenozoApp.lookupData = {
       a4: {
         tab: { en: 'Description', fr: 'Description' },
         text1: {
-          en: 'Please adhere to word count.',
+          en: 'Please adhere to character count limits.',
           fr: 'Veuillez respecter le nombre de mots.'
         },
         title: { en: 'Project Title', fr: 'Titre du projet' },
@@ -325,7 +325,7 @@ cenozoApp.lookupData = {
       },
       invalidStartDateTitle: { en: 'Invalid start date', fr: 'TRANSLATION REQUIRED' },
       invalidStartDateMessage: {
-        en: 'The start date you have provided is not acceptible. You will now be redirected to where the start date field can be found. Please try re-submitting once the start date has been corrected.',
+        en: 'The start date you have provided is not acceptable. You will now be redirected to where the start date field can be found. Please try re-submitting once the start date has been corrected.',
         fr: 'TRANSLATION REQUIRED'
       },
       deleteWarning: {
