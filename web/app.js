@@ -52,7 +52,7 @@ cenozoApp.lookupData = {
       },
       text4: {
         en: 'Additional information or instructions are available anywhere that the ⓘ symbol appears. Hover your mouse cursor over the text to see the additional details.',
-        fr: 'TRANSLATION REQUIRED'
+        fr: 'Des informations ou des instructions supplémentaires sont disponibles partout où le symbole ⓘ apparaît. Passez le curseur sur le texte pour voir les informations supplémentaires.'
       },
       text5: {
         en: 'Please ensure that you have completed <strong>all of the sections of the application</strong> form that are relevant to your application. Incomplete applications may result in processing delays or refusal of your application.',
@@ -73,7 +73,7 @@ cenozoApp.lookupData = {
         },
         text2: {
           en: 'For <strong>Graduate student</strong> (MSc, PhD) applications, the primary applicant must be the supervisor and the student must be clearly identified. <strong>Postdoctoral Fellows</strong> are permitted to apply as a primary applicant, but the supervisor must accept responsibility for the data and will be required to sign the CLSA Access agreement. If requesting a Fee Waiver, the Postdoctoral Fellow must be listed as the primary applicant.',
-          fr: 'Pour les <strong>demandes faites par des étudiants des cycles supérieurs</strong> (M. Sc., Ph. D.), le demandeur principal doit être le superviseur et l’étudiant doit être clairement identifié. TRANSLATION REQUIRED'
+          fr: 'Pour les <strong>demandes faites par des étudiants des cycles supérieurs</strong> (M. Sc., Ph. D.), le demandeur principal doit être le superviseur et l’étudiant doit être clairement identifié. Les <strong>boursiers postdoctoraux</strong> peuvent soumettre une demande à titre de demandeur principal, mais le superviseur doit accepter la responsabilité des données et signer l’Entente d’accès de l’ÉLCV. En cas de demande d’exonération des frais, le boursier postdoctoral doit être le demandeur principal.'
         },
         applicant_name: { en: 'Name', fr: 'Nom' },
         applicant_position: { en: 'Position', fr: 'Poste' },
@@ -105,7 +105,7 @@ cenozoApp.lookupData = {
         },
         noCoapplicants: {
           en: 'No co-applicants have been added.',
-          fr: 'TRANSLATION REQUIRED'
+          fr: 'Aucun codemandeur n’a été ajouté.'
         },
         name: { en: 'Name', fr: 'Nom' },
         position: { en: 'Position', fr: 'Poste' },
@@ -133,7 +133,7 @@ cenozoApp.lookupData = {
         tab: { en: 'Description', fr: 'Description' },
         text1: {
           en: 'Please adhere to character count limits.',
-          fr: 'Veuillez respecter le nombre de mots.'
+          fr: 'Veuillez respecter les limites de caractères.'
         },
         title: { en: 'Project Title', fr: 'Titre du projet' },
         keywords: { en: 'Keywords', fr: 'Mots clés' },
@@ -144,11 +144,11 @@ cenozoApp.lookupData = {
         lay_summary: { en: 'Lay Summary', fr: 'Résumé non scientifique' },
         lay_summary_text: {
           en: 'Please provide a lay language summary of your project (<strong>maximum 1000 characters</strong>) suitable for posting on the CLSA website if your application is approved. Please ensure that the lay summary provides a stand-alone, informative description of your project.',
-          fr: 'Veuillez fournir un résumé non scientifique de votre projet (<strong>TRANSLATION REQUIRED</strong>) pouvant être publié sur le site Web de l’ÉLCV si votre demande est approuvée. Assurez-vous de fournir un résumé détaillé et complet de votre projet.'
+          fr: 'Veuillez fournir un résumé non scientifique de votre projet (<strong>maximum 1000 caractères</strong>) pouvant être publié sur le site Web de l’ÉLCV si votre demande est approuvée. Assurez-vous de fournir un résumé détaillé et complet de votre projet.'
         },
         text2: {
           en: 'Please provide a description of the proposed project. The proposal should be informative and specific and <strong>no more than 4500 characters per section. Non-compliant applications will be returned.</strong>',
-          fr: 'TRANSLATION REQUIRED'
+          fr: 'Veuillez fournir une description du projet proposé. La proposition doit être informative et précise sans dépasser 4500 caractères par section. Les demandes non conformes seront renvoyées au demandeur.'
         },
         background: { en: 'Background and Study Relevance', fr: 'Contexte et pertinence de l’étude' },
         objectives: {
@@ -167,7 +167,7 @@ cenozoApp.lookupData = {
         },
         text3: {
           en: 'Please include a list of the most relevant references (maximum ',
-          fr: 'Veuillez présenter une liste des références les plus pertinentes (TRANSLATION REQUIRED '
+          fr: 'Veuillez présenter une liste des références les plus pertinentes (maximum '
         },
         text4: {
           en: ')',
@@ -177,7 +177,7 @@ cenozoApp.lookupData = {
         reference: { en: 'Reference', fr: 'Référence' },
         noReferences: {
           en: 'No references have been added.',
-          fr: 'TRANSLATION REQUIRED'
+          fr: 'Aucune référence n’a été ajoutée.'
         },
         addReference: { en: 'Add Reference', fr: 'Ajouter référence' }
       },
@@ -273,10 +273,10 @@ cenozoApp.lookupData = {
           en: 'Raw data are available by special request for Cognition (COG), Bone Density by DEXA (DXA), Bio-Impedance by DEXA (DXA) and Tonometry (TON). For more information and for details on how to request these data, please contact <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.',
           fr: 'Les données brutes sont disponibles sur demande spéciale pour les mesures suivantes : Cognition (COG), Densité osseuse par DEXA (DXA), Bio-impédance par DEXA (DXA) et Tonométrie (TON). Pour en savoir plus sur ces données et comment en faire la demande, veuillez écrire à <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.'
         },
-        title3: { en: 'Geographic Indicators', fr: 'TRANSLATION REQUIRED' },
+        title3: { en: 'Geographic Indicators', fr: 'Indicateurs géographiques' },
         text3: {
           en: '<ol><li>Forward Sortation Areas (A forward sortation area (FSA) is a geographical region in which all postal codes start with the same three characters.)</li><li>Census Subdivision Codes and Names - determined using the Postal Code Conversion File (PCCF) from Statistics Canada. (A census subdivision (CSD) is a geographic unit defined by Statistics Canada, roughly corresponding to municipalities, whose unique codes can be linked to other sociodemographic or census data)</li></ol>Due to the sensitive nature of these geographic indicators, a special request must be made to receive CSDs and FSAs as part of your dataset.  Adequate justification must be provided within the project description (Application Part 1) as well as in the Comments box below. By requesting these data, you also agree that you will not present in any form (presentation, publication, poster), an illustration of these geographic areas with fewer than 50 CLSA participants per FSA or CSD. For more information, please contact <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.',
-          fr: '<ol><li>Région de tri d’acheminement (Une région de tri d’acheminement (RTA) est une region géographique où tous les codes postaux ont les mêmes trois premiers caractères.)</li><li>Codes et noms des subdivisions de recensement déterminé à l’aide du Fichier de conversion des codes postaux (FCCP) de Statistique Canada. Une subdivision de recensement (SDR) est une unité géographique définie par Statistique Canada correspondant approximativement aux municipalités, dont les codes uniques peuvent être liés à d’autres données sociodémographiques ou de recensement.</li></ol>TRANSLATION REQUIRED'
+          fr: '<ol><li>Région de tri d’acheminement (Une région de tri d’acheminement (RTA) est une region géographique où tous les codes postaux ont les mêmes trois premiers caractères.)</li><li>Codes et noms des subdivisions de recensement déterminé à l’aide du Fichier de conversion des codes postaux (FCCP) de Statistique Canada. Une subdivision de recensement (SDR) est une unité géographique définie par Statistique Canada correspondant approximativement aux municipalités, dont les codes uniques peuvent être liés à d’autres données sociodémographiques ou de recensement.</li></ol>En raison de la nature de ces indicateurs géographiques, une demande spéciale doit être faite pour que les SDR et les RTA soient incluses dans votre ensemble de données. Une justification adéquate doit être fournie dans la description du projet (partie 1 de la demande). En demandant ces données, vous acceptez également de ne pas présenter sous quelque forme que ce soit (présentation, publication, affiche) une illustration des zones géographiques habitées par moins de 50 participants à l’ÉLCV.'
         },
         text4: {
           en: 'In the Comments, include other relevant information concerning your request, including rationale for the request of Additional Data (e.g. Images).',
@@ -299,14 +299,14 @@ cenozoApp.lookupData = {
       none: { en: 'none', fr: 'aucun' },
       choose: { en: '(choose)', fr: '(choisir)' },
       requested: { en: 'requested', fr: 'demandé' },
-      prevButton: { en: 'Return to the previous section', fr: 'TRANSLATION REQUIRED' },
-      nextButton: { en: 'Proceed to the next section', fr: 'TRANSLATION REQUIRED' },
+      prevButton: { en: 'Return to the previous section', fr: 'Retourner à la section précédente' },
+      nextButton: { en: 'Proceed to the next section', fr: 'Passez à la section suivante' },
       pleaseConfirm: { en: 'Please confirm', fr: 'Veuillez confirmer' },
       remove: { en: 'Remove', fr: 'Supprimer' },
-      chars: { en: 'characters', fr: 'TRANSLATION REQUIRED' },
+      chars: { en: 'characters', fr: 'caractères' },
       comments: { en: 'Comments', fr: 'Commentaires' },
       delete: { en: 'Delete', fr: 'Effacer' },
-      download: { en: 'Download', fr: 'TRANSLATION REQUIRED' },
+      download: { en: 'Download', fr: 'Télécharger' },
       finalReport: { en: 'Final Report', fr: 'Rapport final' },
       submit: { en: 'Submit', fr: 'Soumettre' },
       submitWarning: {
@@ -318,15 +318,15 @@ cenozoApp.lookupData = {
         en: 'There are mandatory fields which are missing. You will now be redirected to where the incomplete fields can be found. Please try re-submitting once all mandatory fields have been filled out.',
         fr: 'Des champs obligatoires sont manquants. Vous serez redirigé vers l’endroit où se trouvent les champs incomplets. Veuillez soumettre la demande d’accès à nouveau quand tous les champs obligatoires auront été remplis.'
       },
-      tooManyCharactersTitle: { en: 'Too many characters', fr: 'TRANSLATION REQUIRED' },
+      tooManyCharactersTitle: { en: 'Too many characters', fr: 'Trop de caractères' },
       tooManyCharactersMessage: {
         en: 'Some of your descriptions are too long. You will now be redirected to the general project information details. Please try re-submitting once all descriptions are within the maximum limits.',
-        fr: 'TRANSLATION REQUIRED'
+        fr: 'Certaines descriptions sont trop longues. Vous serez redirigé vers la section contenant les informations générales sur le projet. Veuillez essayer de soumettre la demande à nouveau quand toutes les descriptions respecteront les limites de caractères.'
       },
-      invalidStartDateTitle: { en: 'Invalid start date', fr: 'TRANSLATION REQUIRED' },
+      invalidStartDateTitle: { en: 'Invalid start date', fr: 'Date de début non valide' },
       invalidStartDateMessage: {
         en: 'The start date you have provided is not acceptable. You will now be redirected to where the start date field can be found. Please try re-submitting once the start date has been corrected.',
-        fr: 'TRANSLATION REQUIRED'
+        fr: 'La date de début indiquée n’est pas acceptable. Vous serez redirigé à l’endroit où se trouve le champ de date de début. Veuillez essayer de soumettre à nouveau une fois la date de début corrigée.'
       },
       deleteWarning: {
         en: 'Are you sure you want to delete the application?\n\nThis will permanently destroy all details you have provided. Once this is done there will be no way to restore the application!',
@@ -339,7 +339,7 @@ cenozoApp.lookupData = {
       },
       emailText: {
         en: 'You must provide an institutional email. Public email accounts such as @gmail.com are not allowed.',
-        fr: 'TRANSLATION REQUIRED'
+        fr: 'Vous devez fournir un courriel institutionnel. Les comptes de messagerie publics tels que @gmail.com ne sont pas autorisés.'
       },
       graduateFeeWaiver: {
         en: 'Fee Waiver for Graduate student (MSc or PhD) for thesis only',
@@ -351,14 +351,14 @@ cenozoApp.lookupData = {
       },
       clickToSelect: {
         en: '(click to select)',
-        fr: 'TRANSLATION REQUIRED'
+        fr: '(cliquez pour sélectionner)'
       }
     }
   },
   finalReport: {
     heading: {
       en: 'CLSA Approved User Research Final Report',
-      fr: 'TRANSLATION REQUIRED'
+      fr: 'Rapport final de la recherche pour les utilisateurs autorisés par l’ÉLCV'
     },
     instructions: {
       tab: { en: 'Instructions', fr: 'Consignes' },
@@ -368,7 +368,7 @@ cenozoApp.lookupData = {
       },
       text1: {
         en: 'The information reported in this report allows the CLSA to assess what progress has been made toward accomplishing the objectives set out in the initial application and the impact of the project towards the advancement of knowledge.',
-        fr: 'TRANSLATION REQUIRED'
+        fr: 'Les informations transmises dans ce rapport permettent à l’ÉLCV d’évaluer les progrès effectués qui mènent à l’atteinte des objectifs définis dans la demande initiale, et de mesurer l’impact du projet sur l’avancement des connaissances.'
       },
       text2: {
         en: 'The Final Report must be submitted at the end of the project, 1 year after the Effective Date of the CLSA Access Agreement for projects with a 1-year term and 2 years after the Effective Date of the CLSA Access Agreement for projects with a 2-year term. The Final Report must be submitted within 60 days after the end date of the CLSA Access Agreement.',
@@ -405,12 +405,12 @@ cenozoApp.lookupData = {
       },
       b: {
         question: {
-          en: 'What are the graduate thesis details?',
-          fr: 'TRANSLATION REQUIRED'
+          en: 'Graduate thesis details',
+          fr: 'Informations sur la these'
         },
         text: {
           en: 'Since this is a trainee project that has been granted a fee waiver, you must complete the information below. (Any publications must be reported in the next section)',
-          fr: 'TRANSLATION REQUIRED'
+          fr: 'Comme il s’agit d’un projet de stagiaire auquel une exonération des frais a été accordée, vous devez remplir les informations ci-dessous. (Toute publication doit être rapportée à la section suivante)'
         },
         thesis_title: {
           en: 'Thesis title (if graduate student trainee)',
@@ -433,13 +433,13 @@ cenozoApp.lookupData = {
         fr: 'Énumérer les produits qui ont été développés dans le cadre de votre projet pendant la période en question. Veuillez fournir les références lorsqu’elles sont disponibles. Pour les articles évalués par des pairs, veuillez spécifier s’ils sont « sous presse », « soumis » ou « publiés ». Si ce n’est pas déjà fait, veuillez fournir une copie des articles évalués par des pairs à l’ÉLCV en soumettant ce rapport.'
       },
       number: { en: 'Number', fr: 'Numéro' },
-      type: { en: 'Type', fr: 'TRANSLATION REQUIRED' },
-      production: { en: 'Production', fr: 'TRANSLATION REQUIRED' },
-      productionType: { en: 'Production Type', fr: 'TRANSLATION REQUIRED' },
-      details: { en: 'Details', fr: 'TRANSLATION REQUIRED' },
-      noProductions: { en: 'No productions have been added.', fr: 'TRANSLATION REQUIRED' },
-      addProduction: { en: 'Add Production', fr: 'TRANSLATION REQUIRED' },
-      attachment: { en: 'Attachment', fr: 'TRANSLATION REQUIRED' }
+      type: { en: 'Type', fr: 'Type' },
+      production: { en: 'Production', fr: 'Produit' },
+      productionType: { en: 'Production Type', fr: 'Type de produit' },
+      details: { en: 'Details', fr: 'Description' },
+      noProductions: { en: 'No productions have been added.', fr: 'Aucun produit n’a été ajouté' },
+      addProduction: { en: 'Add Production', fr: 'Ajouter un produit' },
+      attachment: { en: 'Attachment', fr: 'Pièce jointe' }
     },
     part3: {
       tab: { en: 'Part 3', fr: '3<sup>e</sup> partie' },
@@ -477,8 +477,8 @@ cenozoApp.lookupData = {
     misc: {
       choose: { en: '(choose)', fr: '(choisir)' },
       remove: { en: 'Remove', fr: 'Supprimer' },
-      prevButton: { en: 'Return to the previous section', fr: 'TRANSLATION REQUIRED' },
-      nextButton: { en: 'Proceed to the next section', fr: 'TRANSLATION REQUIRED' }
+      prevButton: { en: 'Return to the previous section', fr: 'Retourner à la section précédente' },
+      nextButton: { en: 'Proceed to the next section', fr: 'Passez à la section suivante' }
     }
   }
 };
