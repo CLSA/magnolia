@@ -986,7 +986,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                         CnModalMessageFactory.instance( {
                           title: self.translate( 'misc.invalidStartDateTitle' ),
                           message: self.translate( 'misc.invalidStartDateMessage' ),
-                          closeText: 'applicant' == CnSession.role.name ? this.translate( 'misc.close' ) : 'Close',
+                          closeText: 'applicant' == CnSession.role.name ? self.translate( 'misc.close' ) : 'Close',
                           error: true
                         } ).show().then( function() {
                           var element = cenozo.getFormElement( 'start_date' );
@@ -997,7 +997,16 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                         } );
                       } else CnModalMessageFactory.httpError( response );
                     }
-                  } ).patch().then( function() { self.transitionOnViewParent(); } );
+                  } ).patch().then( function() {
+
+                    return CnModalMessageFactory.instance( {
+                      title: self.translate( 'deferred' == record.state ? 'misc.resubmitTitle' : 'misc.submitTitle' ),
+                      message: self.translate( 'deferred' == record.state ? 'misc.resubmitMessage' : 'misc.submitMessage' ),
+                      closeText: 'applicant' == CnSession.role.name ? self.translate( 'misc.close' ) : 'Close'
+                    } ).show().then( function() {
+                      return self.transitionOnViewParent();
+                    } );
+                  } );
                 }
               }
             } );

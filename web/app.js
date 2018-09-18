@@ -309,6 +309,22 @@ cenozoApp.lookupData = {
       download: { en: 'Download', fr: 'Télécharger' },
       finalReport: { en: 'Final Report', fr: 'Rapport final' },
       submit: { en: 'Submit', fr: 'Soumettre' },
+      submitTitle: {
+        en: 'Application Submitted',
+        fr: 'TRANSLATION REQUIRED'
+      },
+      submitMessage: {
+        en: 'You have successfully submitted your CLSA Data and Biospecimen Request Application, and it will now be reviewed. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your application. For timelines of the anticipated notice of decision, please check the Data Access Application Process page of our website.',
+        fr: 'TRANSLATION REQUIRED'
+      },
+      resubmitTitle: {
+        en: 'Application Resubmitted',
+        fr: 'TRANSLATION REQUIRED'
+      },
+      resubmitMessage: {
+        en: 'You have successfully resubmitted your CLSA Data and Biospecimen Request Application. You will receive an email with further instructions if your further attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your application. For timelines of the anticipated notice of decision, please check the Data Access Application Process page of our website.',
+        fr: 'TRANSLATION REQUIRED'
+      },
       submitWarning: {
         en: 'Are you sure that all changes are complete and the application is ready to be submitted?',
         fr: 'Êtes-vous sûr(e) d’avoir apporté tous les changements souhaités à la demande d’accès et qu’elle est prête à être soumise?'
