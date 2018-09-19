@@ -121,7 +121,7 @@ class patch extends \cenozo\service\patch
       {
         $directory = AGREEMENT_LETTER_PATH;
       }
-      else throw lib::create( 'exception\argument', 'file', $file );
+      else throw lib::create( 'exception\argument', 'file', $file, __METHOD__ );
 
       $filename = sprintf( '%s/%s', $directory, $this->get_leaf_record()->id );
       if( false === file_put_contents( $filename, $this->get_file_as_raw() ) )
