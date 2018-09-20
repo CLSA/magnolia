@@ -88,9 +88,15 @@ define( function() {
     operation: function( $state, model ) { $state.go( 'reqn.form', model.getParentIdentifier() ); }
   } );
 
-  module.addExtraOperation( 'view', {
+  module.addExtraOperationGroup( 'view', {
     title: 'Download',
-    operation: function( $state, model ) { model.viewModel.downloadForm(); }
+    operations: [ {
+      title: 'Application',
+      operation: function( $state, model ) { model.viewModel.downloadReqn(); }
+    }, {
+      title: 'Data Checklist',
+      operation: function( $state, model ) { model.viewModel.downloadDataChecklist(); }
+    } ]
   } );
 
   /* ######################################################################################################## */
@@ -141,42 +147,50 @@ define( function() {
         CnBaseViewFactory.construct( this, parentModel, root );
 
         // administrators can edit any review, but other roles only have access to specific reviews (updated after the record is loaded)
-        this.mayEdit = 'administrator' == CnSession.role.name;
-        this.onView = function( force ) {
-          self.mayEdit = 'administrator' == CnSession.role.name;
-          return self.$$onView( force ).then( function() {
-            if( !self.mayEdit ) {
-              if( 'Admin' == self.record.review_type || 'SAC' == self.record.review_type ) {
-                self.mayEdit = false;
-              } else if( 'Reviewer 1' == self.record.review_type || 'Reviewer 2' == self.record.review_type ) {
-                self.mayEdit = 'reviewer' == CnSession.role.name || 'chair' == CnSession.role.name;
-              } else if( 'Chair' == self.record.review_type || 'Second Chair' == self.record.review_type ) {
-                self.mayEdit = 'chair' == CnSession.role.name;
-              } else if( 'SMT' == self.record.review_type || 'Second SMT' == self.record.review_type ) {
-                self.mayEdit = 'smt' == CnSession.role.name;
+        angular.extend( this, {
+          mayEdit: 'administrator' == CnSession.role.name,
+          onView: function( force ) {
+            self.mayEdit = 'administrator' == CnSession.role.name;
+            return self.$$onView( force ).then( function() {
+              if( !self.mayEdit ) {
+                if( 'Admin' == self.record.review_type || 'SAC' == self.record.review_type ) {
+                  self.mayEdit = false;
+                } else if( 'Reviewer 1' == self.record.review_type || 'Reviewer 2' == self.record.review_type ) {
+                  self.mayEdit = 'reviewer' == CnSession.role.name || 'chair' == CnSession.role.name;
+                } else if( 'Chair' == self.record.review_type || 'Second Chair' == self.record.review_type ) {
+                  self.mayEdit = 'chair' == CnSession.role.name;
+                } else if( 'SMT' == self.record.review_type || 'Second SMT' == self.record.review_type ) {
+                  self.mayEdit = 'smt' == CnSession.role.name;
+                }
               }
-            }
 
-            // disable the Revise recommendation option if this is the second Chair or SMT review
-            self.parentModel.metadata.getPromise().then( function() {
-              self.parentModel.metadata.columnList.recommendation.enumList.findByProperty( 'name', 'Revise' ).disabled = 
-                'Second Chair' == self.record.review_type || 'Second SMT' == self.record.review_type;
+              // disable the Revise recommendation option if this is the second Chair or SMT review
+              self.parentModel.metadata.getPromise().then( function() {
+                self.parentModel.metadata.columnList.recommendation.enumList.findByProperty( 'name', 'Revise' ).disabled = 
+                  'Second Chair' == self.record.review_type || 'Second SMT' == self.record.review_type;
+              } );
             } );
-          } );
-        };
+          },
+
+          downloadReqn: function() {
+            var parent = self.parentModel.getParentIdentifier();
+            return CnHttpFactory.instance( {
+              path: parent.subject + '/' + parent.identifier + '?file=application',
+              format: 'pdf'
+            } ).file();
+          },
+
+          downloadDataChecklist: function() {
+            var parent = self.parentModel.getParentIdentifier();
+            return CnHttpFactory.instance( {
+              path: parent.subject + '/' + parent.identifier + '?file=checklist',
+              format: 'pdf'
+            } ).file();
+          }
+        } );
 
         // add an additional check to see if the review is editable
-        this.parentModel.getEditEnabled = function() {
-          return self.parentModel.$$getEditEnabled() && self.mayEdit;
-        };
-
-        this.downloadForm = function() {
-          var parent = self.parentModel.getParentIdentifier();
-          return CnHttpFactory.instance( {
-            path: parent.subject + '/' + parent.identifier,
-            format: 'pdf'
-          } ).file();
-        };
+        this.parentModel.getEditEnabled = function() { return self.parentModel.$$getEditEnabled() && self.mayEdit; };
       };
       return { instance: function( parentModel, root ) { return new object( parentModel, root ); } };
     }

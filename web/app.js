@@ -118,12 +118,12 @@ cenozoApp.lookupData = {
       a3: {
         tab: { en: 'Timeline', fr: 'Échéancier' },
         text1: {
-          en: 'What is the anticipated time frame for this proposed project? In planning for your project, please consider in your time frame at least ',
-          fr: 'Quel est l’échéancier prévu du projet proposé? Lors de la planification de votre projet, veuillez prévoir au moins '
+          en: 'What is the anticipated time frame for this proposed project? In planning for your project, please consider in your time frame <strong>at least ',
+          fr: 'Quel est l’échéancier prévu du projet proposé? Lors de la planification de votre projet, veuillez prévoir <strong>au moins '
         },
         text2: {
-          en: ' months from the application submission deadline to the time you receive your dataset.',
-          fr: ' mois à compter de la date limite de soumission de votre candidature pour recevoir votre ensemble de données.'
+          en: ' months from the application submission deadline</strong> to the time you receive your dataset.',
+          fr: ' mois à compter de la date limite de soumission</strong> de votre candidature pour recevoir votre ensemble de données.'
         },
         deadline: { en: 'Application submission deadline', fr: 'Date limite de soumission' },
         start_date: { en: 'Anticipated start date', fr: 'Date prévue de début' },
@@ -307,6 +307,8 @@ cenozoApp.lookupData = {
       comments: { en: 'Comments', fr: 'Commentaires' },
       delete: { en: 'Delete', fr: 'Effacer' },
       download: { en: 'Download', fr: 'Télécharger' },
+      application: { en: 'Application', fr: 'Soumission' },
+      dataChecklist: { en: 'Data Checklist', fr: 'Sélection des données' },
       finalReport: { en: 'Final Report', fr: 'Rapport final' },
       submit: { en: 'Submit', fr: 'Soumettre' },
       submitTitle: {
