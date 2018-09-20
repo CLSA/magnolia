@@ -29,6 +29,10 @@ define( function() {
       datetime: {
         title: 'Date & Time',
         type: 'datetime'
+      },
+      sent: {
+        title: 'Sent',
+        type: 'boolean'
       }
     },
     defaultOrder: {

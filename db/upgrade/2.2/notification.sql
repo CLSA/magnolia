@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS notification (
   notification_type_id INT UNSIGNED NOT NULL,
   email VARCHAR(127) NOT NULL,
   datetime DATETIME NOT NULL,
+  sent TINYINT(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (id),
   INDEX fk_reqn_id (reqn_id ASC),
   INDEX fk_notification_type_id (notification_type_id ASC),

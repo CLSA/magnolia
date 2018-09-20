@@ -30,6 +30,16 @@ define( function() {
       type: 'string',
       constant: true
     },
+    title_en: {
+      title: 'Message (English)',
+      type: 'string',
+      help: 'The title of the email to English applicants when this notification is triggered.'
+    },
+    title_fr: {
+      title: 'Message (French)',
+      type: 'string',
+      help: 'The title of the email to French applicants when this notification is triggered.'
+    },
     message_en: {
       title: 'Message (English)',
       type: 'text',
