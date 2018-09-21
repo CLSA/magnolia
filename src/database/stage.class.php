@@ -42,7 +42,7 @@ class stage extends \cenozo\database\record
   }
 
   /**
-   * TODO: document
+   * Determines whether the stage is complete and may proceed to the next stage-type
    */
   public function check_if_complete()
   {
@@ -100,7 +100,7 @@ class stage extends \cenozo\database\record
   }
 
   /**
-   * TODO: document
+   * Convenience method for getting this stage's review list as objects
    */
   public function get_review_object_list()
   {

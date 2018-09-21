@@ -15,7 +15,7 @@ use cenozo\lib, cenozo\log, magnolia\util;
 class stage_type extends \cenozo\database\has_rank
 {
   /**
-   * TODO: document
+   * Convenience method
    */
   public function get_next_possible_stage_type_object_list()
   {
@@ -27,7 +27,7 @@ class stage_type extends \cenozo\database\has_rank
   }
 
   /**
-   * TODO: document
+   * Convenience method
    */
   public function get_default_next_stage_type()
   {
@@ -43,7 +43,7 @@ class stage_type extends \cenozo\database\has_rank
   }
 
   /**
-   * TODO: document
+   * Determines whether the stage-type comes after the given stage-type
    */
   public function comes_after( $db_stage_type )
   {
@@ -57,7 +57,7 @@ class stage_type extends \cenozo\database\has_rank
   }
 
   /**
-   * TODO: document
+   * Convenience method
    */
   public function get_review_object_list( $reqn )
   {
