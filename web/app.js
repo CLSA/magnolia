@@ -47,8 +47,8 @@ cenozoApp.lookupData = {
         fr: 'Veuillez nous transmettre toute question relative aux demandes d’accès aux données de l’ÉLCV en écrivant à <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.'
       },
       text3: {
-        en: 'The application is composed of 3 parts:<ul><li>Part 1: General Project Information</li><li>Part 2: Data Checklist</li><li>Part 3: Biospecimen Checklist</li></ul>',
-        fr: 'La demande est séparée en trois parties :<ul><li>1<sup>re</sup> partie : Renseignements généraux</li><li>2<sup>e</sup> partie : Sélection des données</li><li>3<sup>e</sup> partie : Sélection des échantillons biologiques</li></ul>'
+        en: 'The application is composed of 3 parts:<ul><li>Part 1: General Project Information</li><li>Part 2: Data Checklist</li><li>Part 3: Biospecimen Checklist (forthcoming)</li></ul>',
+        fr: 'La demande est séparée en trois parties :<ul><li>1<sup>re</sup> partie : Renseignements généraux</li><li>2<sup>e</sup> partie : Sélection des données</li><li>3<sup>e</sup> partie : Sélection des échantillons biologiques (à venir)</li></ul>'
       },
       text4: {
         en: 'Additional information or instructions are available anywhere that the ⓘ symbol appears. Hover your mouse cursor over the text to see the additional details.',
@@ -101,7 +101,7 @@ cenozoApp.lookupData = {
         tab: { en: 'Project Team', fr: 'Équipe de projet' },
         text: {
           en: 'All Co-Applicants and Other Personnel must be listed below. Please note that changes to the project team, including change of Primary Applicant and addition or removal of Co-Applicants and Support Personnel <strong>require an amendment</strong>. To request an Amendment Form, please email <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.',
-          fr: 'Tous les codemandeurs et les membres du personnel de soutien doivent être identifiés ci-dessous. Veuillez noter que tout changement à l’équipe de projet y compris un changement de demandeur principal et l’ajout ou le retrait d’un codemandeur ou d’un membre du personnel de soutien <strong>nécessite une modification</strong>. Pour obtenir le formulaire de modification, écrivez àeilto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.'
+          fr: 'Tous les codemandeurs et les membres du personnel de soutien doivent être identifiés ci-dessous. Veuillez noter que tout changement à l’équipe de projet y compris un changement de demandeur principal et l’ajout ou le retrait d’un codemandeur ou d’un membre du personnel de soutien <strong>nécessite une modification</strong>. Pour obtenir le formulaire de modification, écrivez à <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.'
         },
         noCoapplicants: {
           en: 'No co-applicants have been added.',
@@ -227,8 +227,8 @@ cenozoApp.lookupData = {
           fr: '<strong>Exclus des ensembles de données</strong><ul><li>Informations d’identification recueillies (p. ex. nom, coordonnées, date de naissance, numéro d’assurance maladie et code postal complet)</li></ul>'
         },
         text4: {
-          en: 'For more information on these data, please contact <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>',
-          fr: 'Pour en savoir plus sur ces données, veuillez écrire à <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>'
+          en: 'For more information on these data, please visit our website: <a href="https://www.clsa-elcv.ca" target="clsa">www.clsa-elcv.ca</a>.',
+          fr: 'Pour en savoir plus sur ces données, veuillez consulter notre site Web: <a href="https://www.clsa-elcv.ca" target="clsa">www.clsa-elcv.ca</a>.'
         }
       },
       a: {

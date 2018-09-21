@@ -19,8 +19,3 @@ CREATE TABLE IF NOT EXISTS data_option_category_has_footnote (
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
-
-INSERT IGNORE INTO data_option_category_has_footnote( data_option_category_id, footnote_id )
-SELECT data_option_category.id, footnote.id
-FROM data_option_category, footnote
-WHERE data_option_category.rank = 5 AND footnote.id IN( 12, 1 );

@@ -58,12 +58,8 @@ WHERE (
   AND footnote.id = 6
 ) OR (
   data_option.name_en = "Labour Force"
-  AND data_option_detail.rank IN( 3, 4 )
+  AND data_option_detail.rank IN( 3, 5 )
   AND footnote.id = 7
-) OR (
-  data_option.name_en = "Bio-Impedance by DEXA"
-  AND data_option_detail.rank = 1
-  AND footnote.id = 6
 ) OR (
   data_option.name_en = "Physical Assessments II"
   AND data_option_detail.rank IN( 6 )

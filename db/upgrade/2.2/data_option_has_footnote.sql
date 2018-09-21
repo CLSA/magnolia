@@ -35,15 +35,11 @@ WHERE (
 ) OR (
   data_option_category.rank = 2
   AND data_option.rank = 2
-  AND footnote.id = 17
-) OR (
-  data_option_category.rank = 2
-  AND data_option.rank = 4
   AND footnote.id = 6
 ) OR (
   data_option_category.rank = 2
   AND data_option.rank = 4
-  AND footnote.id = 9
+  AND footnote.id = 17
 ) OR (
   data_option_category.rank = 4
   AND data_option.rank = 1
