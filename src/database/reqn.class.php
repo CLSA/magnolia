@@ -249,25 +249,29 @@ class reqn extends \cenozo\database\record
           $db_review = current( $db_stage->get_review_object_list() );
           if( $db_review )
           {
-            if( 'Approved' == $db_review->recommendation )
+            $db_recommendation_type = $db_review->get_recommendation_type();
+            if( !is_null( $db_recommendation_type ) )
             {
-              foreach( $stage_type_list as $db_stage_type )
+              if( 'Approved' == $db_recommendation_type->name )
               {
-                if( 'Decision Made' == $db_stage_type->name )
+                foreach( $stage_type_list as $db_stage_type )
                 {
-                  $db_next_stage_type = $db_stage_type;
-                  break;
+                  if( 'Decision Made' == $db_stage_type->name )
+                  {
+                    $db_next_stage_type = $db_stage_type;
+                    break;
+                  }
                 }
               }
-            }
-            else if( !is_null( $db_review->recommendation ) )
-            {
-              foreach( $stage_type_list as $db_stage_type )
+              else
               {
-                if( 'SMT Decision' == $db_stage_type->name )
+                foreach( $stage_type_list as $db_stage_type )
                 {
-                  $db_next_stage_type = $db_stage_type;
-                  break;
+                  if( 'SMT Decision' == $db_stage_type->name )
+                  {
+                    $db_next_stage_type = $db_stage_type;
+                    break;
+                  }
                 }
               }
             }
@@ -278,25 +282,29 @@ class reqn extends \cenozo\database\record
           $db_review = current( $db_stage->get_review_object_list() );
           if( $db_review )
           {
-            if( 'Approved' == $db_review->recommendation || 'Not Approved' == $db_review->recommendation )
+            $db_recommendation_type = $db_review->get_recommendation_type();
+            if( !is_null( $db_recommendation_type ) )
             {
-              foreach( $stage_type_list as $db_stage_type )
+              if( 'Approved' == $db_recommendation_type->name || 'Not Approved' == $db_recommendation_type->name )
               {
-                if( 'Decision Made' == $db_stage_type->name )
+                foreach( $stage_type_list as $db_stage_type )
                 {
-                  $db_next_stage_type = $db_stage_type;
-                  break;
+                  if( 'Decision Made' == $db_stage_type->name )
+                  {
+                    $db_next_stage_type = $db_stage_type;
+                    break;
+                  }
                 }
               }
-            }
-            else if( 'Revise' == $db_review->recommendation )
-            {
-              foreach( $stage_type_list as $db_stage_type )
+              else if( 'Revise' == $db_recommendation_type->name )
               {
-                if( 'Revision Required' == $db_stage_type->name )
+                foreach( $stage_type_list as $db_stage_type )
                 {
-                  $db_next_stage_type = $db_stage_type;
-                  break;
+                  if( 'Revision Required' == $db_stage_type->name )
+                  {
+                    $db_next_stage_type = $db_stage_type;
+                    break;
+                  }
                 }
               }
             }
@@ -307,9 +315,10 @@ class reqn extends \cenozo\database\record
           // the decision for this reqn depends on one of several possible reviews
           $review_sel = lib::create( 'database\select' );
           $review_sel->add_table_column( 'review_type', 'name' );
-          $review_sel->add_column( 'recommendation' );
+          $review_sel->add_table_column( 'recommendation_type', 'name', 'recommendation' );
           $review_mod = lib::create( 'database\modifier' );
           $review_mod->join( 'review_type', 'review.review_type_id', 'review_type.id' );
+          $review_mod->join( 'recommendation_type', 'review.recommendation_type_id', 'recommendation_type.id' );
           $review_list = array();
           foreach( $this->get_review_list( $review_sel, $review_mod ) as $review )
             $review_list[$review['name']] = $review['recommendation'];

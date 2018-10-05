@@ -86,7 +86,7 @@ class stage extends \cenozo\database\record
       // make sure all reviews associated with this stage are complete
       foreach( $review_list as $db_review )
       {
-        if( is_null( $db_review->recommendation ) )
+        if( is_null( $db_review->recommendation_type_id ) )
         {
           return sprintf(
             'The %s Review\'s recommendation must be chosen before proceeding to the next stage.',

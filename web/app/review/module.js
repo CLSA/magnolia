@@ -26,7 +26,10 @@ define( function() {
         isIncluded: function( $state, model ) { return !model.isReviewer(); }
       },
       date: { title: 'Created On' },
-      recommendation: { title: 'Recommendation' },
+      recommendation: {
+        column: 'recommendation_type.name',
+        title: 'Recommendation'
+      },
       note: {
         title: 'Note',
         align: 'left',
@@ -73,14 +76,15 @@ define( function() {
       type: 'date',
       constant: true
     },
-    recommendation: {
+    recommendation_type_id: {
       title: 'Recommendation',
       type: 'enum'
     },
     note: {
       title: 'Note',
       type: 'text'
-    }
+    },
+    review_type_id: { type: 'hidden' }
   } );
 
   module.addExtraOperation( 'view', {
@@ -164,11 +168,10 @@ define( function() {
                 }
               }
 
-              // disable the Revise recommendation option if this is the second Chair or SMT review
-              self.parentModel.metadata.getPromise().then( function() {
-                self.parentModel.metadata.columnList.recommendation.enumList.findByProperty( 'name', 'Revise' ).disabled = 
-                  'Second Chair' == self.record.review_type || 'Second SMT' == self.record.review_type;
-              } );
+              // determine which recommendation_type enum list to use based on the review type
+              self.parentModel.metadata.columnList.recommendation_type_id.enumList =
+                self.parentModel.recommendationList[self.record.review_type_id];
+              console.log( self.record.review_type_id );
             } );
           },
 
@@ -198,13 +201,15 @@ define( function() {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnReviewModelFactory', [
-    'CnBaseModelFactory', 'CnReviewListFactory', 'CnReviewViewFactory', 'CnSession',
-    function( CnBaseModelFactory, CnReviewListFactory, CnReviewViewFactory, CnSession ) {
+    'CnBaseModelFactory', 'CnReviewListFactory', 'CnReviewViewFactory', 'CnSession', 'CnHttpFactory',
+    function( CnBaseModelFactory, CnReviewListFactory, CnReviewViewFactory, CnSession, CnHttpFactory ) {
       var object = function( root ) {
         var self = this;
         CnBaseModelFactory.construct( this, module );
         this.listModel = CnReviewListFactory.instance( this );
         this.viewModel = CnReviewViewFactory.instance( this, root );
+
+        this.recommendationList = {};
 
         // only allow editing user and date under particular roles
         if( 0 <= ['administrator','chair'].indexOf( CnSession.role.name ) ) {
@@ -226,12 +231,36 @@ define( function() {
           if( 'root' == this.getSubjectFromState() && 'reviewer' == CnSession.role.name ) {
             if( angular.isUndefined( data.modifier.where ) ) data.modifier.where = [];
             data.modifier.where.push( {
-              column: 'review.recommendation',
+              column: 'review.recommendation_type_id',
               operator: '=',
               value: null
             } );
           }
           return data;
+        };
+      
+        // extend getMetadata
+        this.getMetadata = function() {
+          return this.$$getMetadata().then( function() {
+            return CnHttpFactory.instance( {
+              path: 'recommendation_type',
+              data: {
+                select: { column: [ 'id', 'name', 'review_type_id_list' ] },
+                modifier: { order: 'id' }
+              }
+            } ).query().then( function success( response ) { 
+              self.metadata.columnList.recommendation_type_id = { 
+                required: false,
+                enumList: [],
+              };
+              response.data.forEach( function( item ) { 
+                item.review_type_id_list.split( ',' ).forEach( function( reviewTypeId ) {
+                  if( angular.isUndefined( self.recommendationList[reviewTypeId] ) ) self.recommendationList[reviewTypeId] = [];
+                  self.recommendationList[reviewTypeId].push( { value: item.id, name: item.name } );
+                } );
+              } );
+            } );
+          } );
         };
       };
 

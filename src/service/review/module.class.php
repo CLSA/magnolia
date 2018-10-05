@@ -66,6 +66,7 @@ class module extends \cenozo\service\module
     $db_role = $session->get_role();
 
     $modifier->left_join( 'user', 'review.user_id', 'user.id' );
+    $modifier->left_join( 'recommendation_type', 'review.recommendation_type_id', 'recommendation_type.id' );
 
     if( !is_null( $this->get_resource() ) )
     {

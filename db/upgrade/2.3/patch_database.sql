@@ -2,6 +2,11 @@
 
 SET AUTOCOMMIT=0;
 
+SOURCE recommendation_type.sql
+SOURCE review_type_has_recommendation_type.sql
+SOURCE review.sql
+SOURCE service.sql
+
 SOURCE update_version_number.sql
 
 COMMIT;

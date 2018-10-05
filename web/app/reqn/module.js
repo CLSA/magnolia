@@ -521,7 +521,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             if( 'reviewer' == CnSession.role.name ) {
               CnHttpFactory.instance( {
                 path: this.parentModel.getServiceResourcePath() + '/review',
-                data: { modifier: { where: { column: 'recommendation', operator: '=', value: null } } }
+                data: { modifier: { where: { column: 'recommendation_type_id', operator: '=', value: null } } }
               } ).count().then( function( response ) {
                 if( 0 < parseInt( response.headers( 'Total' ) ) ) {
                   CnModalMessageFactory.instance( {
