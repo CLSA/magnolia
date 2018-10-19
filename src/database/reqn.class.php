@@ -17,13 +17,27 @@ class reqn extends \cenozo\database\record
   /**
    * Override the parent method
    */
+  public function load()
+  {
+    parent::load();
+
+    if( !is_null( $this->id ) )
+    {
+      $this->assert_deadline();
+      $this->save();
+    }
+  }
+
+  /**
+   * Override the parent method
+   */
   public function save()
   {
     // track if this is a new reqn
     $is_new = is_null( $this->id );
 
     // make sure the deadline is appropriate
-    $this->assert_deadline();
+    if( $is_new ) $this->assert_deadline();
 
     parent::save();
 
