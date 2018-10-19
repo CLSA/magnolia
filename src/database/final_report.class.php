@@ -55,7 +55,6 @@ class final_report extends \cenozo\database\record
 
     $pdf_writer = lib::create( 'business\pdf_writer' );
     $pdf_writer->set_template( sprintf( '%s/%d.pdf', PDF_FORM_PATH, $db_pdf_form->id ) );
-    log::debug( sprintf( '%s/%d.pdf', PDF_FORM_PATH, $db_pdf_form->id ) );
 
     $db_reqn = $this->get_reqn();
     $data = array( 'identifier' => $db_reqn->identifier );
