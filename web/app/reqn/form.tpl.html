@@ -629,105 +629,105 @@
              class="panel panel-default">
           <div class="panel-body">
             <form ng-attr-id="part2{{ part }}Form" ng-attr-name="part2{{ part }}Form" novalidate>
-              <fieldset ng-disabled="!model.getEditEnabled()">
-                <cn-reqn-deferral-note note="deferral_note_part2_{{ part }}"></cn-reqn-deferral-note>
-                <div class="form-horizontal">
-                  <ul class="list-group" ng-if="'f'==part">
-                    <li class="list-group-item">
-                      <h4 ng-bind-html="t( 'part2.f.title1' )"></h4>
-                      <div ng-bind-html="t( 'part2.f.text1' )"></div>
-                    </li>
-                    <li class="list-group-item">
-                      <h4 ng-bind-html="t( 'part2.f.title2' )"></h4>
-                      <div ng-bind-html="t( 'part2.f.text2' )"></div>
-                    </li>
-                    <li class="list-group-item">
-                      <h4 ng-bind-html="t( 'part2.f.title3' )"></h4>
-                      <div ng-bind-html="t( 'part2.f.text3' )"></div>
-                    </li>
-                    <li class="list-group-item">
-                      <div class="vertical-spacer" ng-bind-html="t( 'part2.f.text4' )"></div>
-                    </li>
-                  </ul>
-                  <table class="table table-hover">
-                    <thead ng-class="{ 'bg-info': t( 'part2.' + part + '.module' ) }">
-                      <tr>
-                        <td width="33%"
-                            style="vertical-align: middle;"
-                            uib-tooltip-html="model.dataOptionCategoryList[partIndex].footnote[model.viewModel.record.language]"
-                            tooltip-popup-delay="100"> 
-                          {{ t( 'part2.' + part + '.module' ) }}<sup ng-if="model.dataOptionCategoryList[partIndex].footnote">ⓘ</sup>
-                        </td>
-                        <td width="33%"
-                            style="vertical-align: middle;"
-                            ng-if="model.dataOptionCategoryList[partIndex].tracking"
-                            ng-bind-html="t( 'part2.' + part + '.tracking' )"></td>
-                        <td width="33%"
-                            style="vertical-align: middle;"
-                            ng-if="model.dataOptionCategoryList[partIndex].comprehensive"
-                            ng-bind-html="t( 'part2.' + part + '.comprehensive' )"></td>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr ng-repeat-start="dataOption in model.dataOptionCategoryList[partIndex].optionList">
-                        <td data-toggle="collapse" data-target="#accordion{{ dataOption.id }}" style="vertical-align: middle">
-                          <a uib-tooltip-html="dataOption.footnote[model.viewModel.record.language]"
-                             tooltip-popup-delay="100">
-                            <span style="text-decoration: underline">
-                              {{ dataOption.name[model.viewModel.record.language] }}
-                            </span><sup ng-if="dataOption.footnote">ⓘ</sup>
-                          </a>
-                        </td>
-                        <td ng-if="model.dataOptionCategoryList[partIndex].tracking">
-                          <button class="btn full-width"
-                                  ng-class="model.viewModel.dataOptionValueList.tracking[dataOption.id] ?
-                                    'btn-success' : 'btn-default'"
-                                  ng-click="model.viewModel.toggleDataOptionValue( 'tracking', dataOption.id )">
-                            <i class="glyphicon glyphicon-ok"
-                               ng-if="model.viewModel.dataOptionValueList.tracking[dataOption.id]"></i>
-                            <span style="font-weight: normal"
-                                  ng-if="!model.viewModel.dataOptionValueList.tracking[dataOption.id]"
-                                  ng-bind-html="t( 'misc.clickToSelect' )"></span>
-                          </button>
-                        </td>
-                        <td ng-if="model.dataOptionCategoryList[partIndex].comprehensive">
-                          <button class="btn full-width"
-                                  ng-class="model.viewModel.dataOptionValueList.comprehensive[dataOption.id] ?
-                                    'btn-success' : 'btn-default'"
-                                  ng-click="model.viewModel.toggleDataOptionValue( 'comprehensive', dataOption.id )">
-                            <i class="glyphicon glyphicon-ok"
-                               ng-if="model.viewModel.dataOptionValueList.comprehensive[dataOption.id]"></i>
-                            <span style="font-weight: normal"
-                                  ng-if="!model.viewModel.dataOptionValueList.comprehensive[dataOption.id]"
-                                  ng-bind-html="t( 'misc.clickToSelect' )"></span>
-                          </button>
-                        </td>
-                      </tr>
-                      <tr ng-repeat-end data-toggle="collapse" data-target="#accordion{{ dataOption.id }}" style="background: white">
-                        <td colspan="3">
-                          <div id="accordion{{ dataOption.id }}" class="collapse text-primary text-left">
-                            <span ng-repeat="detail in dataOption.detailList"
-                                  uib-tooltip-html="detail.footnote[model.viewModel.record.language]"
-                                  tooltip-popup-delay="100">
-                              {{ detail.name[model.viewModel.record.language] }}<sup ng-if="detail.footnote">ⓘ</sup>{{ $last ? '' : ';' }}
-                            </span>
-                          </div>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                  <div class="container-fluid">
-                    <cn-view-input
-                      no-cols=true
-                      input="{
-                        key: 'part2_' + part + '_comment',
-                        title: t( 'misc.comments' ),
-                        type: model.inputList['part2_' + part + '_comment'].type
-                      }"
-                      model="model"></cn-view-input>
-                  </div>
+              <cn-reqn-deferral-note note="deferral_note_part2_{{ part }}"></cn-reqn-deferral-note>
+              <div class="form-horizontal">
+                <ul class="list-group" ng-if="'f'==part">
+                  <li class="list-group-item">
+                    <h4 ng-bind-html="t( 'part2.f.title1' )"></h4>
+                    <div ng-bind-html="t( 'part2.f.text1' )"></div>
+                  </li>
+                  <li class="list-group-item">
+                    <h4 ng-bind-html="t( 'part2.f.title2' )"></h4>
+                    <div ng-bind-html="t( 'part2.f.text2' )"></div>
+                  </li>
+                  <li class="list-group-item">
+                    <h4 ng-bind-html="t( 'part2.f.title3' )"></h4>
+                    <div ng-bind-html="t( 'part2.f.text3' )"></div>
+                  </li>
+                  <li class="list-group-item">
+                    <div class="vertical-spacer" ng-bind-html="t( 'part2.f.text4' )"></div>
+                  </li>
+                </ul>
+                <table class="table table-hover">
+                  <thead ng-class="{ 'bg-info': t( 'part2.' + part + '.module' ) }">
+                    <tr>
+                      <td width="33%"
+                          style="vertical-align: middle;"
+                          uib-tooltip-html="model.dataOptionCategoryList[partIndex].footnote[model.viewModel.record.language]"
+                          tooltip-popup-delay="100"> 
+                        {{ t( 'part2.' + part + '.module' ) }}<sup ng-if="model.dataOptionCategoryList[partIndex].footnote">ⓘ</sup>
+                      </td>
+                      <td width="33%"
+                          style="vertical-align: middle;"
+                          ng-if="model.dataOptionCategoryList[partIndex].tracking"
+                          ng-bind-html="t( 'part2.' + part + '.tracking' )"></td>
+                      <td width="33%"
+                          style="vertical-align: middle;"
+                          ng-if="model.dataOptionCategoryList[partIndex].comprehensive"
+                          ng-bind-html="t( 'part2.' + part + '.comprehensive' )"></td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr ng-repeat-start="dataOption in model.dataOptionCategoryList[partIndex].optionList">
+                      <td data-toggle="collapse" data-target="#accordion{{ dataOption.id }}" style="vertical-align: middle">
+                        <a uib-tooltip-html="dataOption.footnote[model.viewModel.record.language]"
+                           tooltip-popup-delay="100">
+                          <span style="text-decoration: underline">
+                            {{ dataOption.name[model.viewModel.record.language] }}
+                          </span><sup ng-if="dataOption.footnote">ⓘ</sup>
+                        </a>
+                      </td>
+                      <td ng-if="model.dataOptionCategoryList[partIndex].tracking">
+                        <button class="btn full-width"
+                                ng-class="model.viewModel.dataOptionValueList.tracking[dataOption.id] ?
+                                  'btn-success' : 'btn-default'"
+                                ng-disabled="!model.getEditEnabled()"
+                                ng-click="model.viewModel.toggleDataOptionValue( 'tracking', dataOption.id )">
+                          <i class="glyphicon glyphicon-ok"
+                             ng-if="model.viewModel.dataOptionValueList.tracking[dataOption.id]"></i>
+                          <span style="font-weight: normal"
+                                ng-if="!model.viewModel.dataOptionValueList.tracking[dataOption.id]"
+                                ng-bind-html="t( 'misc.clickToSelect' )"></span>
+                        </button>
+                      </td>
+                      <td ng-if="model.dataOptionCategoryList[partIndex].comprehensive">
+                        <button class="btn full-width"
+                                ng-class="model.viewModel.dataOptionValueList.comprehensive[dataOption.id] ?
+                                  'btn-success' : 'btn-default'"
+                                ng-disabled="!model.getEditEnabled()"
+                                ng-click="model.viewModel.toggleDataOptionValue( 'comprehensive', dataOption.id )">
+                          <i class="glyphicon glyphicon-ok"
+                             ng-if="model.viewModel.dataOptionValueList.comprehensive[dataOption.id]"></i>
+                          <span style="font-weight: normal"
+                                ng-if="!model.viewModel.dataOptionValueList.comprehensive[dataOption.id]"
+                                ng-bind-html="t( 'misc.clickToSelect' )"></span>
+                        </button>
+                      </td>
+                    </tr>
+                    <tr ng-repeat-end data-toggle="collapse" data-target="#accordion{{ dataOption.id }}" style="background: white">
+                      <td colspan="3">
+                        <div id="accordion{{ dataOption.id }}" class="collapse text-primary text-left">
+                          <span ng-repeat="detail in dataOption.detailList"
+                                uib-tooltip-html="detail.footnote[model.viewModel.record.language]"
+                                tooltip-popup-delay="100">
+                            {{ detail.name[model.viewModel.record.language] }}<sup ng-if="detail.footnote">ⓘ</sup>{{ $last ? '' : ';' }}
+                          </span>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div class="container-fluid">
+                  <cn-view-input
+                    no-cols=true
+                    input="{
+                      key: 'part2_' + part + '_comment',
+                      title: t( 'misc.comments' ),
+                      type: model.inputList['part2_' + part + '_comment'].type
+                    }"
+                    model="model"></cn-view-input>
                 </div>
-              </fieldset>
+              </div>
             </form>
           </div>
         </div>
