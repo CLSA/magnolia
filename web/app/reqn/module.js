@@ -595,7 +595,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             if( 0 <= ['abandon','defer','reactivate'].indexOf( subject ) ) {
               return true;
             } else if( 0 <= ['proceed','reject'].indexOf( subject ) ) {
-              return !state;
+              return !state && null != this.record.next_stage_type;
             } else return false;
           },
 
