@@ -261,6 +261,16 @@ define( function() {
             } );
           } );
         };
+
+        // extend getTypeaheadData
+        this.getTypeaheadData = function( input, viewValue ) {
+          var data = this.$$getTypeaheadData( input, viewValue );
+
+          // only include active reviewers (reviewer_only parameter handled by the service)
+          if( 'user' == input.typeahead.table ) data.reviewer_only = true;
+
+          return data;
+        };
       };
 
       return {
