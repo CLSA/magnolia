@@ -20,6 +20,12 @@ class module extends \cenozo\service\user\module
   {
     parent::prepare_read( $select, $modifier );
 
+    if( $select->has_column( 'newsletter' ) )
+    {
+      $modifier->left_join( 'applicant', 'user.id', 'applicant.user_id' );
+      $select->add_column( 'IFNULL( applicant.newsletter, false )', 'newsletter', false );
+    }
+
     if( $this->get_argument( 'reviewer_only', false ) )
     {
       $join_sel = lib::create( 'database\select' );

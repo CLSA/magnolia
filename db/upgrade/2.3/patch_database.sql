@@ -2,6 +2,7 @@
 
 SET AUTOCOMMIT=0;
 
+SOURCE applicant.sql
 SOURCE recommendation_type.sql
 SOURCE review_type_has_recommendation_type.sql
 SOURCE review.sql

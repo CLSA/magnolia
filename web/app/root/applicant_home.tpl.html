@@ -25,6 +25,13 @@
       </div>
     </div>
     <div class="vertical-spacer"></div>
+    <h3 class="text-primary">Newsletter</h3>
+    <div class="container-fluid vertical-spacer">
+      <label style="font-weight: normal">
+        I consent to receiving monthly email newsletters from the Canadian Longitudinal Study on Aging:
+        <input type="checkbox" ng-change="toggleNewsletter()" ng-model="user.newsletter"></input>
+      </label>
+    </div>
     <h3 class="text-primary">Instructions</h3>
     <div class="container-fluid vertical-spacer">
       To begin the online process, please click on the “+ Add” button on the lower right to create a new requisition (Data and Biospecimen Access Application).  Once created the requisition and all subsequent changes are automatically saved.  Do not click “submit” until you have completely finished filling in the form.<br/>

@@ -19,11 +19,12 @@ class get extends \cenozo\service\self\get
   protected function create_resource( $index )
   {
     $setting_manager = lib::create( 'business\setting_manager' );
-    $session = lib::create( 'business\session' );
+    $db_user = lib::create( 'business\session' )->get_user();
 
     $resource = parent::create_resource( $index );
     $resource['application']['start_date_delay'] = $setting_manager->get_setting( 'general', 'start_date_delay' );
     $resource['application']['max_references_per_reqn'] = $setting_manager->get_setting( 'general', 'max_references_per_reqn' );
+    $resource['user']['newsletter'] = $db_user->get_newsletter();
     return $resource;
   }
 }

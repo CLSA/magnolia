@@ -16,12 +16,22 @@ define( [ 'reqn', 'review', 'root' ].reduce( function( list, name ) {
       var oldLink = $delegate[0].link;
 
       if( 'applicant' == CnSession.role.name ) {
-        // override the template for applicants
         angular.extend( $delegate[0], {
+          // override the template for applicants
           templateUrl: cenozoApp.getFileUrl( 'root', 'applicant_home.tpl.html' ),
           controller: function( $scope ) {
             oldController( $scope );
             $scope.reqnModel = CnReqnModelFactory.instance();
+            $scope.user = CnSession.user;
+
+            // add the newsletter signup button event handler
+            $scope.toggleNewsletter = function() {
+              CnHttpFactory.instance( {
+                path: 'self/0',
+                data: { applicant: { newsletter: $scope.user.newsletter } },
+                onError: function( response ) { $scope.user.newsletter = !$scope.user.newsletter; }
+              } ).patch();
+            };
           }
         } );
       } else if( 0 <= ['chair','smt'].indexOf( CnSession.role.name ) ) {
