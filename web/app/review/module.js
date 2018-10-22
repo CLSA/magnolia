@@ -171,7 +171,6 @@ define( function() {
               // determine which recommendation_type enum list to use based on the review type
               self.parentModel.metadata.columnList.recommendation_type_id.enumList =
                 self.parentModel.recommendationList[self.record.review_type_id];
-              console.log( self.record.review_type_id );
             } );
           },
 
