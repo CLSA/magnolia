@@ -20,17 +20,15 @@ class module extends \cenozo\service\module
   public function validate()
   {
     parent::validate();
-    $session = lib::create( 'business\session' );
-    $db_user = lib::create( 'business\session' )->get_user();
     $db_role = lib::create( 'business\session' )->get_role();
 
-    // restrict some review-types to certain roles (except when explicitely set to the current user)
+    // restrict some review-types to certain roles
     if( 300 > $this->get_status()->get_code() )
     {
       if( 'PATCH' == $this->get_method() )
       {
         $db_review = $this->get_resource();
-        if( !is_null( $db_review ) && $db_review->user_id != $db_user->id )
+        if( !is_null( $db_review ) )
         {
           $review_type = $this->get_resource()->get_review_type()->name;
           if( 'administrator' != $db_role->name )
@@ -65,6 +63,7 @@ class module extends \cenozo\service\module
     $db_user = $session->get_user();
     $db_role = $session->get_role();
 
+    $modifier->join( 'review_type', 'review.review_type_id', 'review_type.id' );
     $modifier->left_join( 'user', 'review.user_id', 'user.id' );
     $modifier->left_join( 'recommendation_type', 'review.recommendation_type_id', 'recommendation_type.id' );
 
@@ -78,7 +77,11 @@ class module extends \cenozo\service\module
     if( $select->has_column( 'user_full_name' ) )
       $select->add_column( 'CONCAT( user.first_name, " ", user.last_name )', 'user_full_name', false );
 
-    // restrict reviewers to seeing their own reviews only
-    if( 'reviewer' == $db_role->name ) $modifier->where( 'review.user_id', '=', $db_user->id );
+    // restrict reviewers to seeing their own "reviewer" reviews only
+    if( 'reviewer' == $db_role->name )
+    {
+      $modifier->where( 'review_type.name', 'LIKE', 'Reviewer %' );
+      $modifier->where( 'review.user_id', '=', $db_user->id );
+    }
   }
 }
