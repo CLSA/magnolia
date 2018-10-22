@@ -267,7 +267,8 @@ define( function() {
           var data = this.$$getTypeaheadData( input, viewValue );
 
           // only include active reviewers (reviewer_only parameter handled by the service)
-          if( 'user' == input.typeahead.table ) data.reviewer_only = true;
+          if( 'user' == input.typeahead.table && null != this.viewModel.record.review_type.match( /Reviewer [0-9]/ ) )
+            data.reviewer_only = true;
 
           return data;
         };
