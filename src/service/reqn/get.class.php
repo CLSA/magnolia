@@ -17,7 +17,7 @@ class get extends \cenozo\service\downloadable
    */
   protected function get_downloadable_mime_type_list()
   {
-    return array( 'application/octet-stream', 'application/pdf' );
+    return array( 'application/octet-stream', 'application/pdf', 'text/plain' );
   }
 
   /**
@@ -33,6 +33,7 @@ class get extends \cenozo\service\downloadable
     else if( 'agreement_filename' == $file ) return $db_reqn->agreement_filename;
     else if( 'checklist' == $file ) return sprintf( 'Data Checklist %s.pdf', $db_reqn->identifier );
     else if( 'application' == $file ) return sprintf( 'Data Application %s.pdf', $db_reqn->identifier );
+    else if( 'reviews' == $file ) return sprintf( 'Reviews %s.txt', $db_reqn->identifier );
 
     throw lib::create( 'exception\argument', 'file', $file, __METHOD__ );
   }
@@ -50,6 +51,7 @@ class get extends \cenozo\service\downloadable
     else if( 'agreement_filename' == $file ) return sprintf( '%s/%s', AGREEMENT_LETTER_PATH, $db_reqn->id );
     else if( 'checklist' == $file ) return sprintf( '%s/%s.pdf', DATA_CHECKLIST_PATH, $db_reqn->id );
     else if( 'application' == $file ) return sprintf( '%s/%s.pdf', DATA_APPLICATION_PATH, $db_reqn->id );
+    else if( 'reviews' == $file ) return sprintf( '%s/%s.txt', DATA_REVIEWS_PATH, $db_reqn->id );
 
     throw lib::create( 'exception\argument', 'file', $file, __METHOD__ );
   }
@@ -61,12 +63,21 @@ class get extends \cenozo\service\downloadable
   {
     parent::prepare();
 
+    $mime_type = $this->get_mime_type();
+
     // if requesting the reqn's application or checklist PDF file then create it first
-    if( 'application/pdf' == $this->get_mime_type() )
+    if( 'application/pdf' == $mime_type )
     {
       $db_reqn = $this->get_leaf_record();
       $file = $this->get_argument( 'file', NULL );
       if( 'application' == $file || 'checklist' == $file ) $db_reqn->generate_pdf_form( $file );
+    }
+    // if requesting the reqn's review list TXT file then create it first
+    else if( 'text/plain' == $mime_type )
+    {
+      $db_reqn = $this->get_leaf_record();
+      $file = $this->get_argument( 'file', NULL );
+      if( 'reviews' == $file ) $db_reqn->generate_reviews_file();
     }
   }
 

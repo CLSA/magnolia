@@ -628,6 +628,74 @@ class reqn extends \cenozo\database\record
   }
 
   /**
+   * Generates a text file listing this reqn's reviews
+   * 
+   * @access public
+   */
+  public function generate_reviews_file()
+  {
+    $text = sprintf(
+      "Requisition: %s\n".
+      "Title: %s\n".
+      "Applicant: %s\n".
+      "Lay Summary:\n".
+      "%s\n",
+      $this->identifier,
+      $this->title,
+      $this->applicant_name,
+      $this->lay_summary
+    );
+
+    $review_sel = lib::create( 'database\select' );
+    $review_sel->add_table_column( 'user', 'first_name' );
+    $review_sel->add_table_column( 'user', 'last_name' );
+    $review_sel->add_column( 'date' );
+    $review_sel->add_table_column( 'review_type', 'name', 'type' );
+    $review_sel->add_table_column( 'recommendation_type', 'name', 'recommendation' );
+    $review_sel->add_column( 'note' );
+
+    $review_mod = lib::create( 'database\modifier' );
+    $review_mod->left_join( 'user', 'review.user_id', 'user.id' );
+    $review_mod->join( 'review_type', 'review.review_type_id', 'review_type.id' );
+    $review_mod->join( 'recommendation_type', 'review.recommendation_type_id', 'recommendation_type.id' );
+    $review_mod->order( 'date' );
+    $review_mod->order( 'stage_type_id' );
+
+    foreach( $this->get_review_list( $review_sel, $review_mod ) as $review )
+    {
+      $text .= sprintf(
+        "\n\nType: %s\n".
+        "Reviewer: %s\n".
+        "Created On: %s\n".
+        "Recommendation: %s\n".
+        "Notes:\n".
+        "%s\n",
+        $review['type'],
+        is_null( $review['first_name'] ) ? '(none)' : $review['first_name'].' '.$review['last_name'],
+        $review['date'],
+        is_null( $review['recommendation'] ) ? '(none)' : $review['recommendation'],
+        is_null( $review['note'] ) ? '(none)' : $review['note']
+      );
+    }
+
+    // convert for Windows
+    $text = iconv( 'UTF-8', 'Windows-1252//TRANSLIT', str_replace( "\n", "\r\n", $text ) );
+
+    $filename = sprintf( '%s/%s.txt', DATA_REVIEWS_PATH, $this->id );
+    if( false === file_put_contents( $filename, $text, LOCK_EX ) )
+    {
+      throw lib::create( 'exception\runtime',
+        sprintf(
+          'Failed to generate reviews text file "%s" for requisition %s',
+          $filename,
+          $this->identifier
+        ),
+        __METHOD__
+      );
+    }
+  }
+
+  /**
    * Provides a new temporary identifier which doesn't already exist
    * 
    * @access public

@@ -242,6 +242,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
       title: 'Data Checklist',
       operation: function( $state, model ) { model.viewModel.downloadDataChecklist(); }
     }, {
+      title: 'Reviews',
+      operation: function( $state, model ) { model.viewModel.downloadReviews(); }
+    }, {
       title: 'Final Report',
       operation: function( $state, model ) { model.viewModel.downloadFinalReport(); },
       isIncluded: function( $state, model ) { return 0 <= ['Report Required', 'Complete'].indexOf( model.viewModel.record.stage_type ); }
@@ -499,9 +502,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnReqnViewFactory', [
     'CnCoapplicantModelFactory', 'CnReferenceModelFactory', 'CnBaseViewFactory',
-    'CnSession', 'CnHttpFactory', 'CnModalMessageFactory', 'CnModalConfirmFactory', 'CnModalTextFactory', '$q', '$state',
+    'CnSession', 'CnHttpFactory', 'CnModalMessageFactory', 'CnModalConfirmFactory', 'CnModalTextFactory', '$q', '$state', '$window',
     function( CnCoapplicantModelFactory, CnReferenceModelFactory, CnBaseViewFactory,
-              CnSession, CnHttpFactory, CnModalMessageFactory, CnModalConfirmFactory, CnModalTextFactory, $q, $state ) {
+              CnSession, CnHttpFactory, CnModalMessageFactory, CnModalConfirmFactory, CnModalTextFactory, $q, $state, $window ) {
       var object = function( parentModel, root ) {
         var self = this;
         CnBaseViewFactory.construct( this, parentModel, root );
@@ -1039,6 +1042,13 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             return CnHttpFactory.instance( {
               path: this.parentModel.getServiceResourcePath() + '?file=checklist',
               format: 'pdf'
+            } ).file();
+          },
+
+          downloadReviews: function() {
+            return CnHttpFactory.instance( {
+              path: this.parentModel.getServiceResourcePath() + '?file=reviews',
+              format: 'txt'
             } ).file();
           },
 
