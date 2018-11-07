@@ -582,7 +582,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             var stage_type = this.record.stage_type ? this.record.stage_type : '';
 
             if( 'submit' == subject ) {
-              return 'applicant' == role && ( 'new' == phase || 'deferred' == state );
+              return ( 'applicant' == role || 'administrator' == role ) && ( 'new' == phase || 'deferred' == state );
             } else if( 'view' == subject ) {
               return 'applicant' != role;
             } else if( 'abandon' == subject ) {

@@ -60,7 +60,7 @@ class patch extends \cenozo\service\patch
       }
       else if( 'submit' == $action )
       {
-        if( 'applicant' == $db_role->name )
+        if( 'applicant' == $db_role->name || 'administrator' == $db_role->name )
         {
           if( 'new' != $phase && 'deferred' != $state ) $code = 403;
           else
