@@ -57,7 +57,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     },
     language_id: {
       title: 'Language',
-      type: 'enum'
+      type: 'enum',
+      exclude: true // modified in the model
     },
     stage_type: {
       title: 'Current Stage',
@@ -69,6 +70,24 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     state: {
       title: 'State',
       type: 'enum',
+      constant: true,
+      exclude: true // modified in the model
+    },
+    title: {
+      title: 'Title',
+      type: 'string',
+      constant: true,
+      exclude: true // modified in the model
+    },
+    applicant_name: {
+      title: 'Applicant',
+      type: 'string',
+      constant: true,
+      exclude: true // modified in the model
+    },
+    lay_summary: {
+      title: 'Lay Summary',
+      type: 'text',
       constant: true,
       exclude: true // modified in the model
     },
@@ -84,7 +103,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     decision: { column: 'stage_type.decision', type: 'boolean', exclude: true },
     language: { type: 'string', column: 'language.code', exclude: true },
     deadline: { type: 'date', column: 'deadline.date', exclude: true },
-    applicant_name: { type: 'string', exclude: true },
     applicant_position: { type: 'string', exclude: true },
     applicant_affiliation: { type: 'string', exclude: true },
     applicant_address: { type: 'string', exclude: true },
@@ -98,9 +116,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     graduate_email: { type: 'string', format: 'email', exclude: true },
     start_date: { type: 'date', exclude: true },
     duration: { type: 'string', exclude: true },
-    title: { type: 'string', exclude: true },
     keywords: { type: 'string', exclude: true },
-    lay_summary: { type: 'string', exclude: true },
     background: { type: 'text', exclude: true },
     objectives: { type: 'text', exclude: true },
     methodology: { type: 'text', exclude: true },
@@ -1132,10 +1148,15 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         this.isApplicant = function() { return 'applicant' == CnSession.role.name; }
         this.isAdministrator = function() { return 'administrator' == CnSession.role.name; }
 
-        if( 'applicant' != CnSession.role.name ) {
-          var mainInputGroup = module.inputGroupList.findByProperty( 'title', '' );
+        var mainInputGroup = module.inputGroupList.findByProperty( 'title', '' );
+        if( 'administrator' == CnSession.role.name ) {
+          mainInputGroup.inputList.language_id.exclude = false;
           mainInputGroup.inputList.stage_type.exclude = false;
           mainInputGroup.inputList.state.exclude = false;
+        } else {
+          mainInputGroup.inputList.title.exclude = false;
+          mainInputGroup.inputList.applicant_name.exclude = false;
+          mainInputGroup.inputList.lay_summary.exclude = false;
         }
 
         this.getEditEnabled = function() {
