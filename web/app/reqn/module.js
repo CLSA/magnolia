@@ -121,7 +121,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
   module.addInputGroup( 'Decision and Deferral Notes', {
     decision_notice: {
-      title: 'Notice of Desision',
+      title: 'Notice of Decision',
       type: 'text'
     },
     deferral_note_part1_a1: {
