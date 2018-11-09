@@ -40,6 +40,7 @@ CREATE PROCEDURE patch_reqn()
         "methodology TEXT NULL, ",
         "analysis TEXT NULL, ",
         "funding ENUM('yes', 'no', 'requested') NULL, ",
+        "funding_filename VARCHAR(255) NULL, ",
         "funding_agency VARCHAR(255) NULL, ",
         "grant_number VARCHAR(45) NULL, ",
         "ethics TINYINT(1) NULL, ",

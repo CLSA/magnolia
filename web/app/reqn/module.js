@@ -513,6 +513,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           if( angular.isDefined( self.stageModel ) ) self.stageModel.listModel.heading = 'Stage History';
         } );
 
+        this.configureFileInput( 'funding_filename' );
         this.configureFileInput( 'ethics_filename' );
         this.configureFileInput( 'agreement_filename' );
 
@@ -1117,12 +1118,12 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
         // override the service collection
         this.getServiceData = function( type, columnRestrictLists ) {
-          // only include the ethics_filename in the view type in the lite instance
+          // only include the funding and ethics filenames in the view type in the lite instance
           var data = lite
                    ? {
                        select: {
                          column: [
-                           'state', 'ethics_filename',
+                           'state', 'funding_filename', 'ethics_filename',
                            { table: 'stage_type', column: 'phase' },
                            { table: 'stage_type', column: 'name', alias: 'stage_type' }
                          ]

@@ -22,14 +22,13 @@ class get extends \cenozo\service\downloadable
 
   /**
    * Replace parent method
-   * 
-   * When the client calls for a file we return the reqn's ethics letter
    */
   protected function get_downloadable_public_name()
   {
     $file = $this->get_argument( 'file', NULL );
     $db_reqn = $this->get_leaf_record();
-    if( 'ethics_filename' == $file ) return $db_reqn->ethics_filename;
+    if( 'funding_filename' == $file ) return $db_reqn->funding_filename;
+    else if( 'ethics_filename' == $file ) return $db_reqn->ethics_filename;
     else if( 'agreement_filename' == $file ) return $db_reqn->agreement_filename;
     else if( 'checklist' == $file ) return sprintf( 'Data Checklist %s.pdf', $db_reqn->identifier );
     else if( 'application' == $file ) return sprintf( 'Data Application %s.pdf', $db_reqn->identifier );
@@ -40,14 +39,13 @@ class get extends \cenozo\service\downloadable
 
   /**
    * Replace parent method
-   * 
-   * When the client calls for a file we return the reqn's ethics letter
    */
   protected function get_downloadable_file_path()
   {
     $file = $this->get_argument( 'file', NULL );
     $db_reqn = $this->get_leaf_record();
-    if( 'ethics_filename' == $file ) return sprintf( '%s/%s', ETHICS_LETTER_PATH, $db_reqn->id );
+    if( 'funding_filename' == $file ) return sprintf( '%s/%s', FUNDING_LETTER_PATH, $db_reqn->id );
+    else if( 'ethics_filename' == $file ) return sprintf( '%s/%s', ETHICS_LETTER_PATH, $db_reqn->id );
     else if( 'agreement_filename' == $file ) return sprintf( '%s/%s', AGREEMENT_LETTER_PATH, $db_reqn->id );
     else if( 'checklist' == $file ) return sprintf( '%s/%s.pdf', DATA_CHECKLIST_PATH, $db_reqn->id );
     else if( 'application' == $file ) return sprintf( '%s/%s.pdf', DATA_APPLICATION_PATH, $db_reqn->id );

@@ -544,6 +544,17 @@
                   ng-if="'no' != model.viewModel.record.funding"
                   model="model">
                 </cn-view-input>
+                <fieldset ng-disabled="!liteModel.getEditEnabled()">
+                  <cn-view-input
+                    ng-if="'yes' === model.viewModel.record.funding"
+                    input="{
+                      key: 'funding_filename',
+                      title: t( 'part1.a5.letter' ),
+                      type: 'file'
+                    }"
+                    model="liteModel">
+                  </cn-view-input>
+                </fieldset>
               </div>
             </fieldset></form>
           </div>

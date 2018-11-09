@@ -113,7 +113,11 @@ class patch extends \cenozo\service\patch
     $headers = apache_request_headers();
     if( false !== strpos( $headers['Content-Type'], 'application/octet-stream' ) && !is_null( $file ) )
     {
-      if( 'ethics_filename' == $file )
+      if( 'funding_filename' == $file )
+      {
+        $directory = FUNDING_LETTER_PATH;
+      }
+      else if( 'ethics_filename' == $file )
       {
         $directory = ETHICS_LETTER_PATH;
       }

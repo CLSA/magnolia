@@ -41,6 +41,13 @@ class reqn extends \cenozo\database\record
 
     parent::save();
 
+    // if we're changing the funding_filename to null then delete the funding_letter file
+    if( is_null( $this->funding_filename ) )
+    {
+      $filename = sprintf( '%s/%s', FUNDING_LETTER_PATH, $this->id );
+      if( file_exists( $filename ) ) unlink( $filename );
+    }
+
     // if we're changing the ethics_filename to null then delete the ethics_letter file
     if( is_null( $this->ethics_filename ) )
     {
@@ -551,7 +558,6 @@ class reqn extends \cenozo\database\record
       if( !is_null( $this->grant_number ) ) $data['grant_number'] = $this->grant_number;
       if( !is_null( $this->ethics ) ) $data['ethics'] = $this->ethics ? 'yes' : 'no';
       if( !is_null( $this->ethics_date ) ) $data['ethics_date'] = $this->ethics_date->format( 'Y-m-d' );
-      if( !is_null( $this->ethics_filename ) ) $data['ethics_filename'] = $this->ethics_filename;
       if( !is_null( $this->waiver ) )
       {
         if( 'graduate' == $this->waiver ) $data['waiver_graduate'] = 'Yes';

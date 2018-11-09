@@ -189,7 +189,11 @@ cenozoApp.lookupData = {
         },
         funding: { en: 'Peer Reviewed Funding', fr: 'Financement évalué par les pairs' },
         funding_agency: { en: 'Funding agency', fr: 'L’Organisme de financement' },
-        grant_number: { en: 'Grant Number', fr: 'Numéro de la subvention' }
+        grant_number: { en: 'Grant Number', fr: 'Numéro de la subvention' },
+        letter: {
+          en: 'Digital copy of funding letter',
+          fr: 'TRANSLATION REQUIRED'
+        },
       },
       a6: {
         tab: { en: 'Ethics', fr: 'Éthique' },
