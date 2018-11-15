@@ -29,11 +29,13 @@ class notification extends \cenozo\database\record
    */
   protected function mail()
   {
+    $setting_manager = lib::create( 'business\setting_manager' );
+    $mail_manager = lib::create( 'business\mail_manager' );
+
     $db_reqn = $this->get_reqn();
     $language = $db_reqn->get_language()->code;
     $db_notification_type = $this->get_notification_type();
 
-    $mail_manager = lib::create( 'business\mail_manager' );
     $mail_manager->to( $this->email, $db_reqn->applicant_name );
     $mail_manager->set_title( 'en' == $language ? $db_notification_type->title_en : $db_notification_type->title_fr );
     $mail_manager->set_body( 'en' == $language ? $db_notification_type->message_en : $db_notification_type->message_fr );
@@ -48,6 +50,6 @@ class notification extends \cenozo\database\record
       else $mail_manager->set_cc( $email['email'] );
     }
 
-    $this->sent = $mail_manager->send();
+    $this->sent = $setting_manager->get_setting( 'mail', 'enabled' ) && $mail_manager->send();
   }
 }
