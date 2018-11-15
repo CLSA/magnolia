@@ -14,4 +14,6 @@ SOURCE notification_type.sql
 
 SOURCE update_version_number.sql
 
+SELECT "PLEASE NOTE: Make sure to run ./set_data_directories.php script if it hasn't already been run" AS "";
+
 COMMIT;

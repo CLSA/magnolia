@@ -36,6 +36,16 @@ function write_log( $message )
 }
 
 /**
+ * Remove all exipired links to data
+ */
+write_log( 'Removing all expired study data' );
+exec( sprintf(
+  'find -L %s/web/*/ -type f -mtime +%d -exec rm {} +',
+  STUDY_DATA_PATH,
+  $settings['general']['study_data_expiry']
+) );
+
+/**
  * Send a command to run all scheduled reports
  */
 write_log( 'Updating all scheduled reports' );

@@ -98,6 +98,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     },
 
     // the following are for the form and will not appear in the view
+    data_directory: { type: 'string', exclude: true },
     phase: { column: 'stage_type.phase', type: 'string', exclude: true },
     status: { column: 'stage_type.status', type: 'string', exclude: true },
     decision: { column: 'stage_type.decision', type: 'boolean', exclude: true },
@@ -248,6 +249,10 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
       title: 'Final Report',
       operation: function( $state, model ) { model.viewModel.downloadFinalReport(); },
       isIncluded: function( $state, model ) { return 0 <= ['Report Required', 'Complete'].indexOf( model.viewModel.record.stage_type ); }
+    }, {
+      title: 'Study Data',
+      operation: function( $state, model ) { model.viewModel.viewData(); },
+      isIncluded: function( $state, model ) { return model.viewModel.canViewData(); }
     } ]
   } );
 
@@ -518,6 +523,14 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         this.configureFileInput( 'agreement_filename' );
 
         angular.extend( this, {
+          viewData: function() {
+            $window.open( CnSession.application.studyDataUrl + '/' + self.record.data_directory, 'studyData' + self.record.id );
+          },
+          canViewData: function() {
+            // administrators and applicants can view data when in the active stage
+            var stage_type = this.record.stage_type ? this.record.stage_type : '';
+            return 0 <= ['administrator','applicant'].indexOf( CnSession.role.name ) && 'Active' == stage_type;
+          },
           onView: function( force ) {
             // we need to do some extra work when looking at the reqn form
             if( 'reqn' == this.parentModel.getSubjectFromState() && 'form' == this.parentModel.getActionFromState() ) {

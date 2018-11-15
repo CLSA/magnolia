@@ -313,6 +313,7 @@ cenozoApp.lookupData = {
       download: { en: 'Download', fr: 'Télécharger' },
       application: { en: 'Application', fr: 'Soumission' },
       dataChecklist: { en: 'Data Checklist', fr: 'Sélection des données' },
+      studyData: { en: 'Study Data', fr: 'Données d’étude' },
       finalReport: { en: 'Final Report', fr: 'Rapport final' },
       submit: { en: 'Submit', fr: 'Soumettre' },
       submitTitle: {

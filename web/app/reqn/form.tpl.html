@@ -25,6 +25,9 @@
         <ul class="dropdown-menu full-width" aria-labelledby="downloadForms">
           <li><a ng-click="model.viewModel.downloadReqn()" ng-bind-html="t( 'misc.application' )"></a></li>
           <li><a ng-click="model.viewModel.downloadDataChecklist()" ng-bind-html="t( 'misc.dataChecklist' )"></a></li>
+          <li ng-if="model.viewModel.canViewData()">
+            <a ng-click="model.viewModel.viewData()" ng-bind-html="t( 'misc.studyData' )"></a>
+          </li>
         </ul>
       </div>
       <button class="btn btn-default"

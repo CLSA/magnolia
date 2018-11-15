@@ -37,7 +37,11 @@ class reqn extends \cenozo\database\record
     $is_new = is_null( $this->id );
 
     // make sure the deadline is appropriate
-    if( $is_new ) $this->assert_deadline();
+    if( $is_new )
+    {
+      $this->assert_deadline();
+      $this->data_directory = static::generate_data_directory();
+    }
 
     parent::save();
 
@@ -724,5 +728,47 @@ class reqn extends \cenozo\database\record
     } while( static::count( $modifier ) );
 
     return $identifier;
+  }
+
+  /**
+   * Creates a unique directory for study data and returns the directory name
+   * 
+   * @access public
+   * @return string
+   */
+  public static function generate_data_directory()
+  {
+    $count = 0;
+    while( 100 > $count++ )
+    {
+      $name = sprintf(
+        '%s-%s-%s-%s',
+        bin2hex( openssl_random_pseudo_bytes( 2 ) ),
+        bin2hex( openssl_random_pseudo_bytes( 2 ) ),
+        bin2hex( openssl_random_pseudo_bytes( 2 ) ),
+        bin2hex( openssl_random_pseudo_bytes( 2 ) )
+      );
+
+      // create the data directory
+      $path = sprintf( '%s/data/%s', STUDY_DATA_PATH, $name );
+      if( !file_exists( $path ) )
+      {
+        if( !mkdir( $path ) )
+          throw lib::create( 'exception\runtime', sprintf( 'Unable to create data directory "%s"', $path ), __METHOD__ );
+        return $name;
+      }
+
+      // create the web directory
+      $path = sprintf( '%s/web/%s', STUDY_DATA_PATH, $name );
+      if( !file_exists( $path ) )
+      {
+        if( !mkdir( $path ) )
+          throw lib::create( 'exception\runtime', sprintf( 'Unable to create data directory "%s"', $path ), __METHOD__ );
+        return $name;
+      }
+    }
+
+    // if we get here then something is wrong
+    throw lib::create( 'exception\runtime', 'Unable to create unique data directory.', __METHOD__ );
   }
 }

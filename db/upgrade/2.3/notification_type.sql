@@ -1,5 +1,12 @@
 SELECT "Adding missing text to notification types" AS "";
 
+INSERT IGNORE INTO notification_type SET
+name = "Data Available",
+title_en = "TODO: title",
+title_fr = "TRANSLATION REQUIRED",
+message_en = "TODO: This will be the message sent to the applicant to indicate that their study data is available for download.",
+message_fr = "TRANSLATION REQUIRED";
+
 UPDATE notification_type
 SET title_en = "CLSA Data Access Application – ACTION REQUIRED",
 message_en = "Dear Applicant,

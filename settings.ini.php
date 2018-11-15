@@ -13,7 +13,7 @@ global $SETTINGS;
 $SETTINGS['general']['application_name'] = 'magnolia';
 $SETTINGS['general']['instance_name'] = $SETTINGS['general']['application_name'];
 $SETTINGS['general']['version'] = '2.3';
-$SETTINGS['general']['build'] = 'b9924ac';
+$SETTINGS['general']['build'] = 'bed4e5c';
 
 // the location of magnolia internal path
 $SETTINGS['path']['APPLICATION'] = str_replace( '/settings.ini.php', '', __FILE__ );
@@ -42,6 +42,12 @@ $SETTINGS['path']['FINAL_REPORT'] = str_replace( 'settings.ini.php', 'doc/final_
 // the location of PDF form templates (defaults to magnolia/doc/pdf_form)
 $SETTINGS['path']['PDF_FORM'] = str_replace( 'settings.ini.php', 'doc/pdf_form', __FILE__ );
 
+// the location of study data documents (defaults to magnolia/doc/study_data)
+$SETTINGS['path']['STUDY_DATA'] = str_replace( 'settings.ini.php', 'doc/study_data', __FILE__ );
+
+// the location of study data documents (relative to the base magnolia URL)
+$SETTINGS['url']['STUDY_DATA'] = 'study_data';
+
 // add modules used by the application
 $SETTINGS['module']['pdf'] = true;
 
@@ -50,3 +56,6 @@ $SETTINGS['general']['start_date_delay'] = 6;
 
 // how many months past a requisition's deadline must its start date be?
 $SETTINGS['general']['max_references_per_reqn'] = 15;
+
+// how many days that study data remains available to the user
+$SETTINGS['general']['study_data_expiry'] = 7;
