@@ -46,7 +46,11 @@ class patch extends \cenozo\service\patch
       $state = $db_reqn->state;
       $phase = $db_current_stage_type->phase;
       $code = NULL;
-      if( 'abandon' == $action )
+      if( 'reset_data' == $action )
+      {
+        if( 'administrator' != $db_role->name || 'Active' != $db_current_stage_type->name ) $code = 403;
+      }
+      else if( 'abandon' == $action )
       {
         if( !in_array( $db_role->name, array( 'applicant', 'administrator' ) ) || 'deferred' != $state ) $code = 403;
       }
@@ -109,6 +113,11 @@ class patch extends \cenozo\service\patch
     $notification_type_class_name = lib::get_class_name( 'database\notification_type' );
     $stage_type_class_name = lib::get_class_name( 'database\stage_type' );
 
+    // reset the reqn's study data if requested to
+    if( $this->get_argument( 'reset_data', false ) )
+    {
+    }
+
     $file = $this->get_argument( 'file', NULL );
     $headers = apache_request_headers();
     if( false !== strpos( $headers['Content-Type'], 'application/octet-stream' ) && !is_null( $file ) )
@@ -139,7 +148,11 @@ class patch extends \cenozo\service\patch
       if( $action )
       {
         $db_reqn = $this->get_leaf_record();
-        if( 'abandon' == $action )
+        if( 'reset_data' == $action )
+        {
+          $db_reqn->refresh_study_data_files();
+        }
+        else if( 'abandon' == $action )
         {
           $db_reqn->state = 'abandoned';
           $db_reqn->save();

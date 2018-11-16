@@ -475,6 +475,11 @@ class reqn extends \cenozo\database\record
       $this->identifier = $this->get_deadline()->get_next_identifier();
       $this->save();
     }
+    // if we have just entered the active stage then create symbolic links to all data files and update file timestamps
+    else if( 'Active' == $db_next_stage_type->name )
+    {
+      $this->refresh_study_data_files();
+    }
 
     // manage any reviews associated with the current stage
     if( !is_null( $db_current_stage_type ) )
@@ -728,6 +733,107 @@ class reqn extends \cenozo\database\record
     } while( static::count( $modifier ) );
 
     return $identifier;
+  }
+
+  /**
+   * Returns the requisition's study-data paths
+   * 
+   * @param string $type One of "data" or "web"
+   * @return string
+   */
+  public function get_study_data_path( $type )
+  {
+    if( !in_array( $type, array( 'data', 'web' ) ) ) throw lib::create( 'exception\argument', 'type', $type, __METHOD__ );
+    return sprintf( '%s/%s/%s', STUDY_DATA_PATH, $type, $this->data_directory );
+  }
+
+  /**
+   * Returns the number of days left before the reqn's study-data will expire
+   * 
+   * @return integer
+   */
+  public function get_study_data_expiry()
+  {
+    $util_class_name = lib::get_class_name( 'util' );
+    $setting_manager = lib::create( 'business\setting_manager' );
+    
+    // get any file in the reqn's data directory
+    $list = glob( $this->get_study_data_path( 'data' ).'/*' );
+    if( false == $list )
+    {
+      log::warning( sprintf( 'Unable to list contents of the data directory belonging to requisition "%s" (%s)',
+        $this->identifier,
+        $data_path
+      ) );
+      return 0;
+    }
+
+    $filename = NULL;
+    foreach( $list as $file )
+    {
+      if( is_file( $file ) )
+      {
+        $filename = $file;
+        break;
+      }
+    }
+
+    if( is_null( $filename ) ) return 0;
+
+    $timestamp = filemtime( $filename );
+    if( false === $timestamp )
+    {
+      log::warning( sprintf( 'Unable to get modification time of data file belonging to requisition "%s" (%s)',
+        $this->identifier,
+        $filename
+      ) );
+      return 0;
+    }
+
+    $now = $util_class_name::get_datetime_object();
+    $datetime_obj = $util_class_name::get_datetime_object();
+    $datetime_obj->setTimestamp( $timestamp );
+    $days = $setting_manager->get_setting( 'general', 'study_data_expiry' ) - $datetime_obj->diff( $now )->days;
+    return 0 > $days ? 0 : $days;
+  }
+
+  /**
+   * Refreshes links to all study data files and resets the file-removal countdown timer
+   */
+  public function refresh_study_data_files()
+  {
+    $data_path = $this->get_study_data_path( 'data' );
+    $web_path = $this->get_study_data_path( 'web' );
+
+    $list = glob( $data_path.'/*' );
+    if( false == $list )
+    {
+      throw lib::create( 'exception\runtime', sprintf(
+        'There was an error while trying to read the study data path for requisition "%s" (%s)',
+        $this->identifier,
+        $data_path
+      ) );
+    }
+
+    foreach( $list as $file )
+    {
+      if( is_file( $file ) )
+      {
+        // update the file's timestamp to reset the link removal counter
+        touch( $file );
+        
+        // create a link if one doesn't already exist
+        $link_file = str_replace( $data_path, $web_path, $file );
+        if( !is_link( $link_file ) )
+        {
+          // create a relative link to the data file
+          symlink(
+            sprintf( '../../data/%s%s', $this->data_directory, str_replace( $data_path, '', $file ) ),
+            $link_file
+          );
+        }
+      }
+    }
   }
 
   /**

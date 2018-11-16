@@ -121,5 +121,16 @@ class module extends \cenozo\service\module
         );
       }
     }
+
+    $db_reqn = $this->get_resource();
+
+    if( $db_reqn && $select->has_column( 'data_available' ) )
+    {
+      $days = $db_reqn->get_study_data_expiry();
+      $value = 'No';
+      if( 1 == $days ) $value = '1 day remaining';
+      else if( 1 < $days ) $value = $days.' days remaining';
+      $select->add_constant( $value, 'data_available' );
+    }
   }
 }

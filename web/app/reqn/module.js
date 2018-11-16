@@ -73,6 +73,12 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
       constant: true,
       exclude: true // modified in the model
     },
+    data_available: {
+      title: 'Study Data Available',
+      type: 'string',
+      constant: true,
+      exclude: true // modified in the model
+    },
     title: {
       title: 'Title',
       type: 'string',
@@ -192,6 +198,12 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     operation: function( $state, model ) {
       $state.go( 'reqn.form', { identifier: model.viewModel.record.getIdentifier() } );
     }
+  } );
+
+  module.addExtraOperation( 'view', {
+    title: 'Reset Study Data',
+    isIncluded: function( $state, model ) { return model.viewModel.canResetData(); },
+    operation: function( $state, model ) { model.viewModel.resetData(); }
   } );
 
   module.addExtraOperation( 'view', {
@@ -523,6 +535,24 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         this.configureFileInput( 'agreement_filename' );
 
         angular.extend( this, {
+          resetData: function() {
+            CnHttpFactory.instance( {
+              path: self.parentModel.getServiceResourcePath() + '?action=reset_data'
+            } ).patch().then( function() {
+              self.onView();
+              CnModalMessageFactory.instance( {
+                title: 'Study Data Reset',
+                message: 'This ' + self.parentModel.module.name.possessive +
+                  ' study data has been made available and will automatically expire in ' +
+                  CnSession.application.studyDataExpiry + ' days.'
+              } ).show();
+            } );
+          },
+          canResetData: function() {
+            // administrators and applicants can view data when in the active stage
+            var stage_type = this.record.stage_type ? this.record.stage_type : '';
+            return 'administrator' == CnSession.role.name && 'Active' == stage_type;
+          },
           viewData: function() {
             $window.open( CnSession.application.studyDataUrl + '/' + self.record.data_directory, 'studyData' + self.record.id );
           },
@@ -1177,6 +1207,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           mainInputGroup.inputList.language_id.exclude = false;
           mainInputGroup.inputList.stage_type.exclude = false;
           mainInputGroup.inputList.state.exclude = false;
+          mainInputGroup.inputList.data_available.exclude = false;
         } else {
           mainInputGroup.inputList.title.exclude = false;
           mainInputGroup.inputList.applicant_name.exclude = false;

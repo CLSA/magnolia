@@ -24,6 +24,7 @@ class get extends \cenozo\service\self\get
     $resource = parent::create_resource( $index );
     $resource['application']['start_date_delay'] = $setting_manager->get_setting( 'general', 'start_date_delay' );
     $resource['application']['max_references_per_reqn'] = $setting_manager->get_setting( 'general', 'max_references_per_reqn' );
+    $resource['application']['study_data_expiry'] = $setting_manager->get_setting( 'general', 'study_data_expiry' );
     $resource['application']['study_data_url'] = sprintf( '%s/%s', str_replace( '/api', '', ROOT_URL ), STUDY_DATA_URL );
     $resource['user']['newsletter'] = $db_user->get_newsletter();
     return $resource;
