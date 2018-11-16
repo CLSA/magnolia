@@ -597,9 +597,13 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             }
 
             return this.$$onView( force ).then( function() {
-              // show the agreement file if we're past the review stage
               var mainInputGroup = self.parentModel.module.inputGroupList.findByProperty( 'title', '' );
+
+              // show the agreement file if we're past the review stage
               mainInputGroup.inputList.agreement_filename.exclude = 0 > ['active','complete'].indexOf( self.record.phase );
+
+              // show the study data available if we're in the active phase
+              mainInputGroup.inputList.data_available.exclude = 'active' != self.record.phase;
             } );
           },
 

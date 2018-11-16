@@ -757,9 +757,11 @@ class reqn extends \cenozo\database\record
     $util_class_name = lib::get_class_name( 'util' );
     $setting_manager = lib::create( 'business\setting_manager' );
     
+    $data_path = $this->get_study_data_path( 'data' );
+
     // get any file in the reqn's data directory
-    $list = glob( $this->get_study_data_path( 'data' ).'/*' );
-    if( false == $list )
+    $list = glob( $data_path.'/*' );
+    if( false === $list )
     {
       log::warning( sprintf( 'Unable to list contents of the data directory belonging to requisition "%s" (%s)',
         $this->identifier,
