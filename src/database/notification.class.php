@@ -36,9 +36,16 @@ class notification extends \cenozo\database\record
     $language = $db_reqn->get_language()->code;
     $db_notification_type = $this->get_notification_type();
 
+    // fill in dynamic details in the message body
+    $message = str_replace(
+      array( '{{identifier}}', '{{title}}' ),
+      array( $db_reqn->identifier, $db_reqn->title ),
+      'en' == $language ? $db_notification_type->message_en : $db_notification_type->message_fr
+    );
+
     $mail_manager->to( $this->email, $db_reqn->applicant_name );
     $mail_manager->set_title( 'en' == $language ? $db_notification_type->title_en : $db_notification_type->title_fr );
-    $mail_manager->set_body( 'en' == $language ? $db_notification_type->message_en : $db_notification_type->message_fr );
+    $mail_manager->set_body( $message );
 
     // add cc and bcc recipients
     $select = lib::create( 'database\select' );
