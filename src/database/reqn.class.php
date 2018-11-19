@@ -800,13 +800,19 @@ class reqn extends \cenozo\database\record
   }
 
   /**
-   * Refreshes links to all study data files and resets the file-removal countdown timer
+   * Refreshes links to all study data files, resets the file-removal countdown timer, and copies supplemental files
    */
   public function refresh_study_data_files()
   {
+    $util_class_name = lib::get_class_name( 'util' );
+    $supplemental_file_class_name = lib::get_class_name( 'database\supplemental_file' );
     $data_path = $this->get_study_data_path( 'data' );
     $web_path = $this->get_study_data_path( 'web' );
 
+    // delete all existing links
+    $util_class_name::exec_timeout( sprintf( 'rm -rf %s/*', $web_path ) );
+
+    // refresh links
     $list = glob( $data_path.'/*' );
     if( false == $list )
     {
@@ -826,15 +832,26 @@ class reqn extends \cenozo\database\record
         
         // create a link if one doesn't already exist
         $link_file = str_replace( $data_path, $web_path, $file );
-        if( !is_link( $link_file ) )
-        {
-          // create a relative link to the data file
-          symlink(
-            sprintf( '../../data/%s%s', $this->data_directory, str_replace( $data_path, '', $file ) ),
-            $link_file
-          );
-        }
+
+        // create a relative link to the data file
+        symlink(
+          sprintf( '../../data/%s%s', $this->data_directory, str_replace( $data_path, '', $file ) ),
+          $link_file
+        );
       }
+    }
+
+    // add all supplemental files
+    $lang = $this->get_language()->code;
+    foreach( $supplemental_file_class_name::select_objects() as $db_supplemental_file )
+    {
+      $name = sprintf( 'name_%s', $lang );
+      $filename = $db_supplemental_file->get_filename( $lang );
+
+      if( is_file( $filename ) ) symlink(
+        $filename,
+        sprintf( '%s/%s', $web_path, $db_supplemental_file->$name )
+      );
     }
   }
 

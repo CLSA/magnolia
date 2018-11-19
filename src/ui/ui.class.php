@@ -69,6 +69,7 @@ class ui extends \cenozo\ui\ui
     $this->add_listitem( 'Requisitions', 'reqn' );
     $this->add_listitem( 'Reviews', 'review' );
     $this->add_listitem( 'Stage Types', 'stage_type' );
+    $this->add_listitem( 'Supplemental Files', 'supplemental_file' );
 
     $this->remove_listitem( 'Availability Types' );
     $this->remove_listitem( 'Consent Types' );
