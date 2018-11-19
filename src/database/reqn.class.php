@@ -66,6 +66,13 @@ class reqn extends \cenozo\database\record
       if( file_exists( $filename ) ) unlink( $filename );
     }
 
+    // if we're changing the instruction_filename to null then delete the instruction_letter file
+    if( is_null( $this->instruction_filename ) )
+    {
+      $filename = sprintf( '%s/%s', INSTRUCTION_FILE_PATH, $this->id );
+      if( file_exists( $filename ) ) unlink( $filename );
+    }
+
     // if this is a new reqn then assign it to the first stage
     if( $is_new ) $this->proceed_to_next_stage();
   }
@@ -840,6 +847,13 @@ class reqn extends \cenozo\database\record
         );
       }
     }
+
+    // add the instructions
+    $filename = sprintf( '%s/%s', INSTRUCTION_FILE_PATH, $this->id );
+    if( is_file( $filename ) ) symlink(
+      $filename,
+      sprintf( '%s/%s', $web_path, $this->instruction_filename )
+    );
 
     // add all supplemental files
     $lang = $this->get_language()->code;

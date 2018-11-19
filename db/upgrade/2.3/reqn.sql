@@ -16,6 +16,19 @@ CREATE PROCEDURE patch_applicant()
       ADD COLUMN funding_filename VARCHAR(255) NULL DEFAULT NULL AFTER funding;
     END IF;
 
+    SELECT "Adding in new reqn.instruction_filename column" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "instruction_filename";
+
+    IF @test = 0 THEN
+      ALTER TABLE reqn
+      ADD COLUMN instruction_filename VARCHAR(255) NULL DEFAULT NULL AFTER agreement_filename;
+    END IF;
+
     SELECT "Adding in new reqn.data_directory column" AS "";
 
     SELECT COUNT(*) INTO @test

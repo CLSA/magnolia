@@ -102,6 +102,11 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
       type: 'file',
       exclude: true // modified in the model
     },
+    instruction_filename: {
+      title: 'Instruction File',
+      type: 'file',
+      exclude: true // modified in the model
+    },
 
     // the following are for the form and will not appear in the view
     data_directory: { type: 'string', exclude: true },
@@ -533,6 +538,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         this.configureFileInput( 'funding_filename' );
         this.configureFileInput( 'ethics_filename' );
         this.configureFileInput( 'agreement_filename' );
+        this.configureFileInput( 'instruction_filename' );
 
         angular.extend( this, {
           resetData: function() {
@@ -599,8 +605,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             return this.$$onView( force ).then( function() {
               var mainInputGroup = self.parentModel.module.inputGroupList.findByProperty( 'title', '' );
 
-              // show the agreement file if we're past the review stage
+              // show the agreement and instruction files if we're past the review stage
               mainInputGroup.inputList.agreement_filename.exclude = 0 > ['active','complete'].indexOf( self.record.phase );
+              mainInputGroup.inputList.instruction_filename.exclude = 0 > ['active','complete'].indexOf( self.record.phase );
 
               // show the study data available if we're in the active phase
               mainInputGroup.inputList.data_available.exclude = 'active' != self.record.phase;
@@ -1225,9 +1232,13 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
           var check = false;
           if( 'applicant' == CnSession.role.name ) {
-            check = 'new' == phase || ( 'deferred' == state && ( 'review' == phase || ( lite && 'Agreement' == stage_type ) ) );
+            check = 'new' == phase || (
+              'deferred' == state && ( 'review' == phase || ( lite && 'Agreement' == stage_type ) )
+            );
           } else if( 'administrator' == CnSession.role.name ) {
-            check = 'new' == phase || ( 'abandoned' != state && ( 'review' == phase || 'Agreement' == stage_type ) );
+            check = 'new' == phase || (
+              'abandoned' != state && ( 'review' == phase || 'Agreement' == stage_type || 'Data Release' == stage_type )
+            );
           }
 
           return this.$$getEditEnabled() && check;

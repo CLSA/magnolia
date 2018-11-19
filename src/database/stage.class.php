@@ -73,6 +73,13 @@ class stage extends \cenozo\database\record
       if( is_null( $db_reqn->agreement_filename ) )
         return 'The agreement letter must be attached before proceeding to the next stage.';
     }
+    else if( 'Data Release' == $db_stage_type->name )
+    {
+      // make sure both the instruction file has been attached
+      $db_reqn = $this->get_reqn();
+      if( is_null( $db_reqn->instruction_filename ) )
+        return 'The instruction letter must be attached before proceeding to the next stage.';
+    }
     else
     {
       // DSAC review needs to use the list of reviews from the DSAC selection stage
