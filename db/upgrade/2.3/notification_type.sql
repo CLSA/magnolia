@@ -1,72 +1,80 @@
 SELECT "Adding missing text to notification types" AS "";
 
-UPDATE notification_type
-SET title_en = "CLSA Data Access - ACTION REQUIRED",
-message_en = "Dear Applicant,
+REPLACE INTO notification_type ( name, title_en, title_fr, message_en, message_fr ) VALUES (
+  "",
+  "CLSA Data Access - ACTION REQUIRED",
+  "",
+  "Dear Dr. {{applicant_name}},
 
-An action is required on your application number {{identifier}}, entitled \"{{title}}\".
+  An action is required on your application number {{identifier}}, entitled {{title}}.
 
-Please log in to the CLSA online data application software, Magnolia (https://magnolia.clsa-elcv.ca/live/gl/). Please look for the flashing heading(s) within the requisition and then the “Attention” box on the page(s). Follow the instructions given to remedy the issue. Once you are sure you have made ALL the revisions, please re-submit the application.
+  Please log in to the CLSA online data application software, Magnolia (https://magnolia.clsa-elcv.ca/live/gl/). Look for the flashing heading(s) within the requisition and then the “Attention” box on the page(s). Follow the instructions given to remedy the issue. Once you are sure you have made all the revisions, re-submit the application.
 
-Your re-submitted application will continue through the review process and you will be contacted with the outcome at a later date.
+  Your application will continue through the review process and you will be contacted with the outcome at a later date.
 
-If you have any questions related to data access, please contact us at access@clsa-elcv.ca.
+  If you have any questions, please contact us at access@clsa-elcv.ca.
 
-The CLSA Data Access Team"
-WHERE name = "Action required";
+  The CLSA Data Access Team",
+  ""
+), (
+  "",
+  "CLSA Data Access - Reactivated",
+  "",
+  "Dear Dr. {{applicant_name}},
 
-UPDATE notification_type
-SET title_en = "CLSA Data Access - Reactivated",
-message_en = "Dear Applicant,
+  Your application number {{identifier}}, entitled {{title}}, has been reactivated.
 
-Your application number {{identifier}}, entitled \"{{title}}\", has been reactivated.
+  Please log in to the CLSA online data application software, Magnolia (https://magnolia.clsa-elcv.ca/live/gl/) to access your application.
 
-Please log in to the CLSA online data application software, Magnolia (https://magnolia.clsa-elcv.ca/live/gl/) to access your application.
+  If you have any questions, please contact us at access@clsa-elcv.ca. 
 
-If you have any questions related to data access, please contact us at access@clsa-elcv.ca. 
+  The CLSA Data Access Team",
+  ""
+), (
+  "",
+  "CLSA Data Access - Notice of Decision",
+  "",
+  "Dear Dr. {{applicant_name}},
 
-The CLSA Data Access Team"
-WHERE name = "Requisition Reactivated";
+  The Notice of Decision is ready for your application number {{identifier}}, entitled {{title}}.
 
-UPDATE notification_type
-SET title_en = "CLSA Data Access - Notice of Decision",
-message_en = "Dear Applicant,
+  Please log in to the CLSA online data application software, Magnolia (https://magnolia.clsa-elcv.ca/live/gl/), where you will be able to consult the Notice.
 
-The Notice of Decision is ready for your application number {{identifier}}, entitled \"{{title}}\".
+  If you have any questions, please contact us at access@clsa-elcv.ca. 
 
-Please log in to the CLSA online data application software, Magnolia (https://magnolia.clsa-elcv.ca/live/gl/) to access your application.
+  The CLSA Data Access Team",
+  ""
+), (
+  "",
+  "CLSA Data Access - Final Report Required",
+  "",
+  "Dear Dr. {{applicant_name}},
 
-If you have any questions related to data access, please contact us at access@clsa-elcv.ca. 
+  As per your CLSA Access Agreement, you are required to submit a Final Report for your application number {{identifier}}, entitled {{title}}.
 
-The CLSA Data Access Team"
-WHERE name = "Notice of decision";
+  Please log in to the CLSA online data application software, Magnolia (https://magnolia.clsa-elcv.ca/live/gl/), where you will be able to complete the Final Report.
 
-UPDATE notification_type
-SET title_en = "CLSA Data Access - Final Report Required",
-message_en = "Dear Applicant,
+  If you have any questions, please contact us at access@clsa-elcv.ca. 
 
-As per your CLSA Access Agreement for the above-noted project, you are required to submit a Final Report for your application number {{identifier}}, entitled \"{{title}}\".
+  The CLSA Data Access Team",
+  ""
+), (
+  "",
+  "CLSA Data Access - Data is Available",
+  "",
+  "Dear Dr. {{applicant_name}},
 
-Please log in to the CLSA online data application software, Magnolia (https://magnolia.clsa-elcv.ca/live/gl/) to access your application where you will be able to fill in Final Report.
+  The download link to your dataset for the application number {{identifier}}, entitled {{title}}, isnow available.
+  As per your CLSA Access Agreement, only those members of the project team who have signed Schedule F or an approved Amendment of the CLSA Access Agreement are permitted to have direct access to the dataset. Do not forward this link to anyone who has not signed Schedule F or an approved Amendment.
 
-If you have any questions related to data access, please contact us at access@clsa-elcv.ca. 
+  Please log in to the CLSA online data application software, Magnolia (https://magnolia.clsa-elcv.ca/live/gl/) to access your application where you will find the  download link to your dataset.
+  We have also included:
+      1) An Instruction document on how to share the dataset with approved members of your Project Team
+      2) An Information document to help you make the most of your dataset and 
+      3) A Guidance document on the use of the access@clsa-elcv.ca email. 
 
-The CLSA Data Access Team"
-WHERE name = "Final report required";
+  On behalf of the CLSA, we wish you much success with your project. If you have any questions, please contact us at access@clsa-elcv.ca.
 
-INSERT IGNORE INTO notification_type SET
-name = "Data Available",
-title_en = "CLSA Data Access - Data is Available",
-title_fr = "TRANSLATION REQUIRED",
-message_en = "Dear Applicant,
-
-The download link to your dataset for the application number {{identifier}}, entitled \"{{title}}\", is ready.
-
-As per your CLSA Access Agreement, only those members of the project team who have signed Schedule F or an approved Amendment of the CLSA Access Agreement are permitted to have direct access to the dataset. Do not forward this link to anyone who has not signed Schedule F or an approved Amendment.
-
-Please log in to the CLSA online data application software, Magnolia (https://magnolia.clsa-elcv.ca/live/gl/) to access your application where you will find your download link.
-
-If you have any questions related to data access, please contact us at access@clsa-elcv.ca. 
-
-The CLSA Data Access Team",
-message_fr = "TRANSLATION REQUIRED";
+  The CLSA Data Access Team",
+  ""
+);
