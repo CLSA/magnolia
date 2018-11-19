@@ -11,6 +11,7 @@ SOURCE service.sql
 SOURCE stage_type.sql
 SOURCE stage_type_has_stage_type.sql
 SOURCE notification_type.sql
+SOURCE footnote.sql
 
 SOURCE update_version_number.sql
 

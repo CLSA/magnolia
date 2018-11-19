@@ -185,14 +185,14 @@ cenozoApp.lookupData = {
         tab: { en: 'Scientific Review', fr: 'Évaluation scientifique' },
         text: {
           en: 'Evidence of peer reviewed funding will be considered evidence of scientific review. <strong>If you have selected "yes", please upload proof of funding notification.</strong> If there are no plans to submit an application for financial support for this project please provide evidence of peer review (e.g. internal departmental review, thesis protocol defense, etc.) if available. If no evidence of scientific peer review is provided with this application then the project will undergo scientific review by the DSAC.',
-          fr: 'Les documents attestant l’attribution du financement seront considérés comme une preuve d’évaluation par les pairs. <strong>TRANSLATION REQUIRED.</strong> Si vous ne planifiez pas demander de l’aide financière pour ce projet, veuillez fournir la preuve qu’une évaluation par les pairs a été réalisée (p. ex. évaluation départementale, défense du protocole de thèse, etc.) si disponible. Si aucune preuve d’évaluation scientifique par les pairs n’est soumise avec la demande, le DSAC procédera à l’évaluation scientifique du projet.'
+          fr: 'Les documents attestant l’attribution du financement seront considérés comme une preuve d’évaluation par les pairs. <strong>Si vous avez sélectionné « oui », veuillez télécharger une preuve de l’avis de financement.</strong> Si vous ne planifiez pas demander de l’aide financière pour ce projet, veuillez fournir la preuve qu’une évaluation par les pairs a été réalisée (p. ex. évaluation départementale, défense du protocole de thèse, etc.) si disponible. Si aucune preuve d’évaluation scientifique par les pairs n’est soumise avec la demande, le DSAC procédera à l’évaluation scientifique du projet.'
         },
         funding: { en: 'Peer Reviewed Funding', fr: 'Financement évalué par les pairs' },
         funding_agency: { en: 'Funding agency', fr: 'L’Organisme de financement' },
         grant_number: { en: 'Grant Number', fr: 'Numéro de la subvention' },
         letter: {
           en: 'Digital copy of funding letter',
-          fr: 'TRANSLATION REQUIRED'
+          fr: 'Copie numérique de la lettre de financement'
         },
       },
       a6: {
@@ -318,19 +318,19 @@ cenozoApp.lookupData = {
       submit: { en: 'Submit', fr: 'Soumettre' },
       submitTitle: {
         en: 'Application Submitted',
-        fr: 'TRANSLATION REQUIRED'
+        fr: 'Demande soumise'
       },
       submitMessage: {
         en: 'You have successfully submitted your CLSA Data and Biospecimen Request Application, and it will now be reviewed. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your application. For timelines of the anticipated notice of decision, please check the Data Access Application Process page of our website.',
-        fr: 'TRANSLATION REQUIRED'
+        fr: 'Votre demande d’accès aux données et aux échantillons biologiques de l’ÉLCV a bien été soumise. Elle sera maintenant évaluée. Vous recevrez un courriel avec des instructions supplémentaires si nous avons besoin d’autre information et lorsque le processus d’évaluation sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour consulter le statut de votre demande. Pour connaître les dates approximatives d’envoi de l’avis de décision, veuillez consulter la page Processus de demande d’accès aux données de notre site Web.'
       },
       resubmitTitle: {
         en: 'Application Resubmitted',
-        fr: 'TRANSLATION REQUIRED'
+        fr: 'Demande resoumise',
       },
       resubmitMessage: {
         en: 'You have successfully resubmitted your CLSA Data and Biospecimen Request Application. You will receive an email with further instructions if your further attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your application. For timelines of the anticipated notice of decision, please check the Data Access Application Process page of our website.',
-        fr: 'TRANSLATION REQUIRED'
+        fr: 'Votre demande d’accès aux données et aux échantillons biologiques de l’ÉLCV a bien été resoumise. Vous recevrez un courriel avec des instructions supplémentaires si nous avons besoin d’autre information et lorsque le processus d’évaluation sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour consulter le statut de votre demande. Pour connaître les dates approximatives d’envoi de l’avis de décision, veuillez consulter la page Processus de demande d’accès aux données de notre site Web.'
       },
       submitWarning: {
         en: 'Are you sure that all changes are complete and the application is ready to be submitted?',
