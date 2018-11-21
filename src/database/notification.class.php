@@ -38,8 +38,8 @@ class notification extends \cenozo\database\record
 
     // fill in dynamic details in the message body
     $message = str_replace(
-      array( '{{identifier}}', '{{title}}' ),
-      array( $db_reqn->identifier, $db_reqn->title ),
+      array( '{{identifier}}', '{{title}}', '{{applicant_name}}' ),
+      array( $db_reqn->identifier, $db_reqn->title, $db_reqn->applicant_name ),
       'en' == $language ? $db_notification_type->message_en : $db_notification_type->message_fr
     );
 

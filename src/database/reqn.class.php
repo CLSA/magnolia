@@ -763,7 +763,7 @@ class reqn extends \cenozo\database\record
   {
     $util_class_name = lib::get_class_name( 'util' );
     $setting_manager = lib::create( 'business\setting_manager' );
-    
+
     $data_path = $this->get_study_data_path( 'data' );
 
     // get any file in the reqn's data directory
@@ -821,39 +821,48 @@ class reqn extends \cenozo\database\record
 
     // refresh links
     $list = glob( $data_path.'/*' );
-    if( false == $list )
+    if( false !== $list )
     {
-      throw lib::create( 'exception\runtime', sprintf(
-        'There was an error while trying to read the study data path for requisition "%s" (%s)',
-        $this->identifier,
-        $data_path
-      ) );
-    }
-
-    foreach( $list as $file )
-    {
-      if( is_file( $file ) )
+      foreach( $list as $file )
       {
-        // update the file's timestamp to reset the link removal counter
-        touch( $file );
-        
-        // create a link if one doesn't already exist
-        $link_file = str_replace( $data_path, $web_path, $file );
+        if( is_file( $file ) )
+        {
+          // update the file's timestamp to reset the link removal counter
+          touch( $file );
 
-        // create a relative link to the data file
-        symlink(
-          sprintf( '../../data/%s%s', $this->data_directory, str_replace( $data_path, '', $file ) ),
-          $link_file
-        );
+          // create a link if one doesn't already exist
+          $filename = sprintf( '../../data/%s%s', $this->data_directory, str_replace( $data_path, '', $file ) );
+          $link = str_replace( $data_path, $web_path, $file );
+
+          // create a relative link to the data file
+          $result = symlink( $filename, $link );
+          if( !$result )
+          {
+            throw lib::create( 'exception\runtime', sprintf(
+              'Unable to create link to "%s" named "%s".',
+              $link,
+              $filename
+            ), __METHOD__ );
+          }
+        }
       }
     }
 
     // add the instructions
     $filename = sprintf( '%s/%s', INSTRUCTION_FILE_PATH, $this->id );
-    if( is_file( $filename ) ) symlink(
-      $filename,
-      sprintf( '%s/%s', $web_path, $this->instruction_filename )
-    );
+    if( is_file( $filename ) )
+    {
+      $link = sprintf( '%s/%s', $web_path, $this->instruction_filename );
+      $result = symlink( $filename, $link );
+      if( !$result )
+      {
+        throw lib::create( 'exception\runtime', sprintf(
+          'Unable to create link to "%s" named "%s".',
+          $link,
+          $filename
+        ), __METHOD__ );
+      }
+    }
 
     // add all supplemental files
     $lang = $this->get_language()->code;
@@ -861,11 +870,20 @@ class reqn extends \cenozo\database\record
     {
       $name = sprintf( 'name_%s', $lang );
       $filename = $db_supplemental_file->get_filename( $lang );
+      $link = sprintf( '%s/%s', $web_path, $db_supplemental_file->$name );
 
-      if( is_file( $filename ) ) symlink(
-        $filename,
-        sprintf( '%s/%s', $web_path, $db_supplemental_file->$name )
-      );
+      if( is_file( $filename ) )
+      {
+        $result = symlink( $filename, $link );
+        if( !$result )
+        {
+          throw lib::create( 'exception\runtime', sprintf(
+            'Unable to create link to "%s" named "%s".',
+            $link,
+            $filename
+          ), __METHOD__ );
+        }
+      }
     }
   }
 

@@ -186,37 +186,29 @@ class patch extends \cenozo\service\patch
         }
         else if( 'submit' == $action || 'next_stage' == $action || 'reject' == $action )
         {
-          try
+          if( 'submit' == $action )
           {
-            if( 'submit' == $action )
+            if( 'deferred' == $db_reqn->state )
             {
-              if( 'deferred' == $db_reqn->state )
-              {
-                $db_reqn->state = NULL;
-                $db_reqn->save();
-              }
-              else
-              {
-                // this will submit the reqn for the first time
-                $db_reqn->proceed_to_next_stage();
-              }
+              $db_reqn->state = NULL;
+              $db_reqn->save();
             }
-            else if( 'next_stage' == $action )
+            else
             {
-              $db_current_stage_type = $db_reqn->get_current_stage_type();
+              // this will submit the reqn for the first time
               $db_reqn->proceed_to_next_stage();
             }
-            else if( 'reject' == $action )
-            {
-              // send directly to the decision-made stage type
-              $db_stage_type = $stage_type_class_name::get_unique_record( 'name', 'Decision Made' );
-              $db_reqn->proceed_to_next_stage( $db_stage_type );
-            }
           }
-          catch( \cenozo\exception\runtime $e )
+          else if( 'next_stage' == $action )
           {
-            $this->status->set_code( 400 );
-            $this->set_data( $e->get_raw_message() );
+            $db_current_stage_type = $db_reqn->get_current_stage_type();
+            $db_reqn->proceed_to_next_stage();
+          }
+          else if( 'reject' == $action )
+          {
+            // send directly to the decision-made stage type
+            $db_stage_type = $stage_type_class_name::get_unique_record( 'name', 'Decision Made' );
+            $db_reqn->proceed_to_next_stage( $db_stage_type );
           }
         }
         else
