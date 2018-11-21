@@ -113,29 +113,12 @@ class patch extends \cenozo\service\patch
     $notification_type_class_name = lib::get_class_name( 'database\notification_type' );
     $stage_type_class_name = lib::get_class_name( 'database\stage_type' );
 
+    $db_reqn = $this->get_leaf_record();
     $file = $this->get_argument( 'file', NULL );
     $headers = apache_request_headers();
     if( false !== strpos( $headers['Content-Type'], 'application/octet-stream' ) && !is_null( $file ) )
     {
-      if( 'funding_filename' == $file )
-      {
-        $directory = FUNDING_LETTER_PATH;
-      }
-      else if( 'ethics_filename' == $file )
-      {
-        $directory = ETHICS_LETTER_PATH;
-      }
-      else if( 'agreement_filename' == $file )
-      {
-        $directory = AGREEMENT_LETTER_PATH;
-      }
-      else if( 'instruction_filename' == $file )
-      {
-        $directory = INSTRUCTION_FILE_PATH;
-      }
-      else throw lib::create( 'exception\argument', 'file', $file, __METHOD__ );
-
-      $filename = sprintf( '%s/%s', $directory, $this->get_leaf_record()->id );
+      $filename = $db_reqn->get_filename( str_replace( '_filename', '', $file ) );
       if( false === file_put_contents( $filename, $this->get_file_as_raw() ) )
         throw lib::create( 'exception\runtime',
           sprintf( 'Unable to write file "%s"', $filename ),
@@ -146,7 +129,6 @@ class patch extends \cenozo\service\patch
       $action = $this->get_argument( 'action', false );
       if( $action )
       {
-        $db_reqn = $this->get_leaf_record();
         if( 'reset_data' == $action )
         {
           $db_reqn->refresh_study_data_files();

@@ -45,36 +45,61 @@ class reqn extends \cenozo\database\record
 
     parent::save();
 
-    // if we're changing the funding_filename to null then delete the funding_letter file
+    // delete files if they are being set to null
     if( is_null( $this->funding_filename ) )
     {
-      $filename = sprintf( '%s/%s', FUNDING_LETTER_PATH, $this->id );
+      $filename = $this->get_filename( 'funding' );
       if( file_exists( $filename ) ) unlink( $filename );
     }
-
-    // if we're changing the ethics_filename to null then delete the ethics_letter file
     if( is_null( $this->ethics_filename ) )
     {
-      $filename = sprintf( '%s/%s', ETHICS_LETTER_PATH, $this->id );
+      $filename = $this->get_filename( 'ethics' );
       if( file_exists( $filename ) ) unlink( $filename );
     }
-
-    // if we're changing the agreement_filename to null then delete the agreement_letter file
     if( is_null( $this->agreement_filename ) )
     {
-      $filename = sprintf( '%s/%s', AGREEMENT_LETTER_PATH, $this->id );
+      $filename = $this->get_filename( 'agreement' );
       if( file_exists( $filename ) ) unlink( $filename );
     }
-
-    // if we're changing the instruction_filename to null then delete the instruction_letter file
     if( is_null( $this->instruction_filename ) )
     {
-      $filename = sprintf( '%s/%s', INSTRUCTION_FILE_PATH, $this->id );
+      $filename = $this->get_filename( 'instruction' );
       if( file_exists( $filename ) ) unlink( $filename );
     }
 
     // if this is a new reqn then assign it to the first stage
     if( $is_new ) $this->proceed_to_next_stage();
+  }
+
+  public function delete()
+  {
+    $file_list = array();
+    if( !is_null( $this->funding_filename ) ) $file_list[] = $this->get_filename( 'funding' );
+    if( !is_null( $this->ethics_filename ) ) $file_list[] = $this->get_filename( 'ethics' );
+    if( !is_null( $this->agreement_filename ) ) $file_list[] = $this->get_filename( 'agreement' );
+    if( !is_null( $this->instruction_filename ) ) $file_list[] = $this->get_filename( 'instruction' );
+
+    parent::delete();
+
+    foreach( $file_list as $file ) unlink( $file );
+  }
+
+  /**
+   * Returns the path to various files associated with the reqn
+   * 
+   * @param string $type Should be 'funding', 'ethics', 'agreement', 'instruction'
+   * @return string
+   * @access public
+   */
+  public function get_filename( $type )
+  {
+    $directory = '';
+    if( 'funding' == $type ) $directory = FUNDING_LETTER_PATH;
+    else if( 'ethics' == $type ) $directory = ETHICS_LETTER_PATH;
+    else if( 'agreement' == $type ) $directory = AGREEMENT_LETTER_PATH;
+    else if( 'instruction' == $type ) $directory = INSTRUCTION_FILE_PATH;
+    else throw lib::create( 'exception\argument', 'type', $type, __METHOD__ );
+    return sprintf( '%s/%s', $directory, $this->id );
   }
 
   /**
@@ -849,7 +874,7 @@ class reqn extends \cenozo\database\record
     }
 
     // add the instructions
-    $filename = sprintf( '%s/%s', INSTRUCTION_FILE_PATH, $this->id );
+    $filename = $this->get_filename( 'instruction' );
     if( is_file( $filename ) )
     {
       $link = sprintf( '%s/%s', $web_path, $this->instruction_filename );
