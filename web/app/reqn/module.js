@@ -1126,14 +1126,24 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             if( 'applicant' == CnSession.role.name &&
                 this.record.decision_notice &&
                 ( 'Agreement' == this.record.stage_type || 'Not Approved' == this.record.stage_type ) ) {
-              CnModalMessageFactory.instance( {
-                title: this.parentModel.module.name.singular.ucWords() + ' ' + this.record.identifier + ' ' + this.record.stage_type,
-                closeText: 'applicant' == CnSession.role.name ? this.translate( 'misc.close' ) : 'Close',
-                message: 'Dear ' + this.record.applicant_name + ',\n\n' +
-                  'TODO: the generic header for notice of decision letters must be written\n\n' +
-                  this.record.decision_notice + '\n\n' +
-                  'TODO: the generic footer for notice of decision letters must be written'
-              } ).show();
+              // get the name of the user who did the chair review
+              CnHttpFactory.instance( {
+                path: this.parentModel.getServiceResourcePath(),
+                data: { select: { column: 'chair_name' } }
+              } ).get().then( function( response ) {
+                // get the notice text and fill in the details
+                var text = self.translate(
+                  'Agreement' == self.record.stage_type ? 'decisionNotice.approved' : 'decisionNotice.notApproved'
+                ).replace( /{{applicant_name}}/g, self.record.applicant_name )
+                 .replace( /{{decision_notice}}/g, self.record.decision_notice )
+                 .replace( /{{chair_full_name}}/g, null === response.data.chair_name ? '' : response.data.chair_name );
+
+                CnModalMessageFactory.instance( {
+                  title: self.parentModel.module.name.singular.ucWords() + ' ' + self.record.identifier + ' ' + self.record.stage_type,
+                  closeText: 'applicant' == CnSession.role.name ? self.translate( 'misc.close' ) : 'Close',
+                  message: text
+                } ).show();
+              } );
             }
           }
         } );

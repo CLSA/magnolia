@@ -123,14 +123,38 @@ class module extends \cenozo\service\module
     }
 
     $db_reqn = $this->get_resource();
-
-    if( $db_reqn && $select->has_column( 'data_available' ) )
+    if( $db_reqn )
     {
-      $days = $db_reqn->get_study_data_expiry();
-      $value = 'No';
-      if( 1 == $days ) $value = '1 day remaining';
-      else if( 1 < $days ) $value = $days.' days remaining';
-      $select->add_constant( $value, 'data_available' );
+      if( $select->has_column( 'data_available' ) )
+      {
+        $days = $db_reqn->get_study_data_expiry();
+        $value = 'No';
+        if( 1 == $days ) $value = '1 day remaining';
+        else if( 1 < $days ) $value = $days.' days remaining';
+        $select->add_constant( $value, 'data_available' );
+      }
+
+      if( $select->has_column( 'chair_name' ) )
+      {
+        $chair_name = NULL;
+
+        // get the reqn's chair name
+        $review_sel = lib::create( 'database\select' );
+        $review_sel->add_table_column( 'user', 'first_name' );
+        $review_sel->add_table_column( 'user', 'last_name' );
+        $review_mod = lib::create( 'database\modifier' );
+        $review_mod->join( 'review_type', 'review.review_type_id', 'review_type.id' );
+        $review_mod->join( 'user', 'review.user_id', 'user.id' );
+        $review_mod->where( 'review_type.name', '=', 'Chair' );
+        $list = $db_reqn->get_review_list( $review_sel, $review_mod );
+        if( 0 < $list )
+        {
+          $user = current( $list );
+          $chair_name = sprintf( '%s %s', $user['first_name'], $user['last_name'] );
+        }
+
+        $select->add_constant( $chair_name, 'chair_name' );
+      }
     }
   }
 }
