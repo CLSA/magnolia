@@ -139,6 +139,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     ethics: { type: 'boolean', exclude: true },
     ethics_date: { type: 'date', exclude: true },
     waiver: { type: 'enum', exclude: true },
+    tracking: { type: 'boolean', exclude: true },
+    comprehensive: { type: 'boolean', exclude: true },
     part2_a_comment: { type: 'text', exclude: true },
     part2_b_comment: { type: 'text', exclude: true },
     part2_c_comment: { type: 'text', exclude: true },
@@ -828,6 +830,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             [ 'part1', 'a5', null ],
             [ 'part1', 'a6', null ],
             [ 'part2', null, 'notes' ],
+            [ 'part2', null, 'cohort' ],
             [ 'part2', null, 'a' ],
             [ 'part2', null, 'b' ],
             [ 'part2', null, 'c' ],
@@ -1006,7 +1009,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                   a3: [ 'start_date', 'duration' ],
                   a4: [ 'title', 'keywords', 'lay_summary', 'background', 'objectives', 'methodology', 'analysis' ],
                   a5: [ 'funding' ],
-                  a6: [ 'ethics' ]
+                  a6: [ 'ethics' ],
+                  cohort: [ 'tracking', 'comprehensive' ]
                 };
 
                 var error = null;
@@ -1049,8 +1053,13 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                   // if there was an error then display it now
                   if( 'applicant' == CnSession.role.name ) error.closeText = self.translate( 'misc.close' );
                   CnModalMessageFactory.instance( error ).show().then( function() {
-                    self.setTab( 0, 'part1', false );
-                    self.setTab( 1, errorTab );
+                    if( 'cohort' == errorTab ) {
+                      self.setTab( 0, 'part2', false );
+                      self.setTab( 2, errorTab );
+                    } else {
+                      self.setTab( 0, 'part1', false );
+                      self.setTab( 1, errorTab );
+                    }
                   } );
                 } else {
                   return CnHttpFactory.instance( {
@@ -1323,6 +1332,18 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                 self.metadata.columnList.waiver.enumList.fr[0].name = misc.none.fr;
                 self.metadata.columnList.waiver.enumList.fr[1].name = misc.graduateFeeWaiver.fr;
                 self.metadata.columnList.waiver.enumList.fr[2].name = misc.postdocFeeWaiver.fr;
+
+                // create tracking enum
+                self.metadata.columnList.tracking.enumList = {
+                  en: [ { value: '', name: misc.choose.en }, { value: true, name: misc.yes.en }, { value: false, name: misc.no.en } ],
+                  fr: [ { value: '', name: misc.choose.fr }, { value: true, name: misc.yes.fr }, { value: false, name: misc.no.fr } ]
+                };
+
+                // create comprehensive enum
+                self.metadata.columnList.comprehensive.enumList = {
+                  en: [ { value: '', name: misc.choose.en }, { value: true, name: misc.yes.en }, { value: false, name: misc.no.en } ],
+                  fr: [ { value: '', name: misc.choose.fr }, { value: true, name: misc.yes.fr }, { value: false, name: misc.no.fr } ]
+                };
 
                 return CnHttpFactory.instance( {
                   path: 'language',

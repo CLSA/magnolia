@@ -235,6 +235,13 @@ cenozoApp.lookupData = {
           fr: 'Pour en savoir plus sur ces données, veuillez consulter notre site Web: <a href="https://www.clsa-elcv.ca" target="clsa">www.clsa-elcv.ca</a>.'
         }
       },
+      cohort: {
+        tab: { en: 'Cohort', fr: 'Évaluation' },
+        text1: { en: 'Please select the cohort (Tracking and/or Comprehensive) for which you are requesting data:', fr: 'TRANSLATION REQUIRED' },
+        text2: { en: 'You will be able to make your selection of the wave of data collection (Baseline and/or Follow-up 1) within the Data Checklist.', fr: 'TRANSLATION REQUIRED' },
+        tracking: { en: 'Tracking Cohort (Telephone Interview) (TRM)', fr: 'Évaluation de surveillance (Entrevue téléphonique) (TRM)' },
+        comprehensive: { en: 'Comprehensive Cohort (In-home Interview & DCS visit) (COM)', fr: 'Évaluation globale (Entrevue à domicile et au site) (COM)' }
+      },
       a: {
         tab: { en: '', fr: '' },
         module: { en: 'Data Module', fr: 'Module de données' },

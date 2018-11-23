@@ -47,6 +47,32 @@ CREATE PROCEDURE patch_applicant()
       ADD UNIQUE INDEX uq_data_directory (data_directory ASC);
     END IF;
 
+    SELECT "Adding in new reqn.comprehensive column" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "comprehensive";
+
+    IF @test = 0 THEN
+      ALTER TABLE reqn
+      ADD COLUMN comprehensive TINYINT(1) NULL DEFAULT NULL AFTER waiver;
+    END IF;
+
+    SELECT "Adding in new reqn.tracking column" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "tracking";
+
+    IF @test = 0 THEN
+      ALTER TABLE reqn
+      ADD COLUMN tracking TINYINT(1) NULL DEFAULT NULL AFTER comprehensive;
+    END IF;
+
   END //
 DELIMITER ;
 
