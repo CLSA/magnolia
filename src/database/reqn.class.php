@@ -534,14 +534,6 @@ class reqn extends \cenozo\database\record
         }
       }
     }
-
-    // if we have just entered the final report stage then create the final report
-    if( 'Admin Review' == $db_next_stage_type->name )
-    {
-      $base = $this->get_deadline()->date->format( 'ym' );
-      $this->identifier = $this->get_deadline()->get_next_identifier();
-      $this->save();
-    }
   }
 
   /**
