@@ -1142,7 +1142,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                  .replace( /{{chair_full_name}}/g, null === response.data.chair_name ? '' : response.data.chair_name );
 
                 CnModalMessageFactory.instance( {
-                  title: self.parentModel.module.name.singular.ucWords() + ' ' + self.record.identifier + ' ' + self.record.stage_type,
+                  title: self.parentModel.module.name.singular.ucWords() + ' ' +
+                    self.record.identifier + ' ' + self.translate( 'decisionNotice.title' ),
                   closeText: 'applicant' == CnSession.role.name ? self.translate( 'misc.close' ) : 'Close',
                   message: text
                 } ).show();

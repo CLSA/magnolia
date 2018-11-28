@@ -378,13 +378,17 @@ cenozoApp.lookupData = {
       }
     },
     decisionNotice: {
+      title: {
+        en: 'Notice of Decision',
+        fr: 'Avis de décision'
+      },
       approved: {
         en: 'Dear Dr. {{applicant_name}},\n\nWe are delighted to officially inform you that the CLSA Scientific Management Team has accepted the Data and Sample Access Committee’s (DSAC) recommendation that your application for access to the CLSA data be approved.\n\n{{decision_notice}}\n\nNext Steps:\n  1.  You will be contacted soon by Roxanne Cheeseman (CLSA Contracts Manager) at the CLSA National Coordinating Centre at McMaster University to work with you and your institution to complete the CLSA Access Agreement. (NOTE: This part of the process can take a variable length of time, up to 12 weeks, and is not under the control of the CLSA. Please be aware that this will affect the length of time that it takes for the data to be released to you.)\n  2.  Following completion of the CLSA Access Agreement, with all required signatures, the Statistical Analysis Centre should be able to release the data to you within 7-10 working days provided proof of ethics approval has been received by the CLSA.\n\nFrom the perspective of the CLSA, we are extremely pleased that you have chosen to use CLSA data in your research and wish you all the best in this pursuit.\n\nOn behalf of {{chair_full_name}}, DSAC Chair',
         fr: 'TRANSLATION REQUIRED'
       },
       notApproved: {
         en: 'Dear Dr. {{applicant_name}},\n\nOn behalf of the Data and Sample Access Committee, we are providing an update on your application to access CLSA data.\n\nUnfortunately, we are not able to approve your application as submitted. The Committee has provided some comments below. \n\n{{decision_notice}}\n\nAs a result, the Data and Sample Access Committee found that this project is not feasible at this time.\n\nOn behalf of {{chair_full_name}}, DSAC Chair',
-        fr: ''
+        fr: 'TRANSLATION REQUIRED'
       }
     }
   },
