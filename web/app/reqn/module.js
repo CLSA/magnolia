@@ -20,6 +20,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         title: 'Identifier'
       },
       user_full_name: {
+        title: 'Owner',
+      },
+      applicant_name: {
         title: 'Applicant',
       },
       deadline: {
