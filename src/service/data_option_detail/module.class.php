@@ -32,7 +32,24 @@ class module extends \cenozo\service\module
       );
       $modifier->group( 'data_option_detail.id' );
 
-      $select->add_column( 'GROUP_CONCAT( data_option_detail_has_footnote.footnote_id )', 'footnote_id_list', false );
+      $select->add_column( 'GROUP_CONCAT( DISTINCT data_option_detail_has_footnote.footnote_id )', 'footnote_id_list', false );
+    }
+
+    if( $select->has_column( 'study_phase_list' ) )
+    {
+      $modifier->join(
+        'data_option_detail_has_study_phase',
+        'data_option_detail.id',
+        'data_option_detail_has_study_phase.data_option_detail_id'
+      );
+      $modifier->join(
+        'study_phase',
+        'data_option_detail_has_study_phase.study_phase_id',
+        'study_phase.id'
+      );
+      $modifier->group( 'data_option_detail.id' );
+
+      $select->add_column( 'GROUP_CONCAT( DISTINCT study_phase.name ORDER BY study_phase.rank )', 'study_phase_list', false );
     }
   }
 }

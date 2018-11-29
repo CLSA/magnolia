@@ -103,74 +103,6 @@ class reqn extends \cenozo\database\record
   }
 
   /**
-   * Override the parent method
-   * 
-   * This is done so that we can fill in the cohort columns which are part of the reqn_has_data_option table
-   */
-  public function add_data_option( $ids, $db_cohort )
-  {
-    // if ids is not an array then create a single-element array with it
-    if( !is_array( $ids ) ) $ids = array( $ids );
-
-    $values = '';
-    $first = true;
-    foreach( $ids as $id )
-    {
-      if( !$first ) $values .= ', ';
-      $values .= sprintf(
-        '(%s%s, %s, 1 )',
-        $this->write_timestamps ? 'NULL, ' : '',
-        static::db()->format_string( $this->id ),
-        static::db()->format_string( $id )
-      );
-      $first = false;
-    }
-
-    static::db()->execute( sprintf(
-      'INSERT INTO reqn_has_data_option (%sreqn_id, data_option_id, %s) '."\n".
-      'VALUES %s'."\n".
-      'ON DUPLICATE KEY UPDATE %s = 1',
-      $this->write_timestamps ? 'create_timestamp, ' : '',
-      $db_cohort->name,
-      $values,
-      $db_cohort->name
-    ) );
-  }
-
-  /**
-   * Override the parent method
-   */
-  public function remove_data_option( $ids, $db_cohort )
-  {
-    // if ids is not an array then create a single-element array with it
-    if( !is_array( $ids ) ) $ids = array( $ids );
-
-    $modifier = lib::create( 'database\modifier' );
-    $modifier->where( 'reqn_id', '=', $this->id );
-    $modifier->where( 'data_option_id', 'IN', $ids );
-
-    static::db()->execute(
-      sprintf(
-        'UPDATE reqn_has_data_option '."\n".
-        'SET %s = 0'."\n".
-        '%s',
-        $db_cohort->name,
-        $modifier->get_sql()
-      )
-    );
-
-    // delete any row which may now have all cohorts = 0
-    $modifier = lib::create( 'database\modifier' );
-    $modifier->where( 'comprehensive', '=', false );
-    $modifier->where( 'tracking', '=', false );
-
-    static::db()->execute( sprintf(
-      'DELETE FROM reqn_has_data_option %s',
-      $modifier->get_sql()
-    ) );
-  }
-
-  /**
    * Check the reqn's deadline and change it to the next available deadline if needed
    * NOTE: This method will change the deadline_id column but not save the record
    * @access public
@@ -534,14 +466,6 @@ class reqn extends \cenozo\database\record
         }
       }
     }
-
-    // if we have just entered the final report stage then create the final report
-    if( 'Admin Review' == $db_next_stage_type->name )
-    {
-      $base = $this->get_deadline()->date->format( 'ym' );
-      $this->identifier = $this->get_deadline()->get_next_identifier();
-      $this->save();
-    }
   }
 
   /**
@@ -621,7 +545,7 @@ class reqn extends \cenozo\database\record
       $reference_sel->add_column( 'reference' );
       $reference_mod = lib::create( 'database\modifier' );
       $reference_mod->order( 'rank' );
-      foreach( $this->get_reference_list( $reference_sel, $reference_mod ) as $index => $reference )
+      foreach( $this->get_reference_list( $reference_sel, $reference_mod ) as $reference )
         $reference_list[] = sprintf( '%s.  %s', $reference['rank'], $reference['reference'] );
       $data['references'] = implode( "\n", $reference_list );
     }
@@ -632,6 +556,8 @@ class reqn extends \cenozo\database\record
       $db_pdf_form = $db_pdf_form_type->get_active_pdf_form();
       $filename = sprintf( '%s/%s.pdf', DATA_CHECKLIST_PATH, $this->id );
 
+      if( $this->comprehensive ) $data['comprehensive'] = 'Yes';
+      if( $this->tracking ) $data['tracking'] = 'Yes';
       if( !is_null( $this->part2_a_comment ) ) $data['part2_a_comment'] = $this->part2_a_comment;
       if( !is_null( $this->part2_b_comment ) ) $data['part2_b_comment'] = $this->part2_b_comment;
       if( !is_null( $this->part2_c_comment ) ) $data['part2_c_comment'] = $this->part2_c_comment;
@@ -639,18 +565,14 @@ class reqn extends \cenozo\database\record
       if( !is_null( $this->part2_e_comment ) ) $data['part2_e_comment'] = $this->part2_e_comment;
       if( !is_null( $this->part2_f_comment ) ) $data['part2_f_comment'] = $this->part2_f_comment;
 
-      $data_option_list = array();
-      $data_option_sel = lib::create( 'database\select' );
-      $data_option_sel->add_column( 'id' );
-      $data_option_sel->add_table_column( 'reqn_has_data_option', 'comprehensive' );
-      $data_option_sel->add_table_column( 'reqn_has_data_option', 'tracking' );
-      $data_option_mod = lib::create( 'database\modifier' );
-      $data_option_mod->order( 'rank' );
-      foreach( $this->get_data_option_list( $data_option_sel, $data_option_mod ) as $index => $data_option )
-      {
-        if( $data_option['comprehensive'] ) $data[sprintf( 'data_option_%d_comprehensive', $data_option['id'] )] = 'Yes';
-        if( $data_option['tracking'] ) $data[sprintf( 'data_option_%d_tracking', $data_option['id'] )] = 'Yes';
-      }
+      $reqn_data_option_list = array();
+      $reqn_data_option_sel = lib::create( 'database\select' );
+      $reqn_data_option_sel->add_column( 'data_option_id' );
+      $reqn_data_option_sel->add_table_column( 'study_phase', 'code' );
+      $reqn_data_option_mod = lib::create( 'database\modifier' );
+      $reqn_data_option_mod->join( 'study_phase', 'reqn_data_option.study_phase_id', 'study_phase.id' );
+      foreach( $this->get_reqn_data_option_list( $reqn_data_option_sel, $reqn_data_option_mod ) as $reqn_data_option )
+        $data[sprintf( 'data_option_%s_%s', $reqn_data_option['data_option_id'], $reqn_data_option['code'] )] = 'Yes';
     }
 
     if( is_null( $db_pdf_form ) )

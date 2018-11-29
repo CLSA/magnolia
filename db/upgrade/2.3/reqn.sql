@@ -1,6 +1,6 @@
-DROP PROCEDURE IF EXISTS patch_applicant;
+DROP PROCEDURE IF EXISTS patch_reqn;
 DELIMITER //
-CREATE PROCEDURE patch_applicant()
+CREATE PROCEDURE patch_reqn()
   BEGIN
 
     SELECT "Adding in new reqn.funding_filename column" AS "";
@@ -76,5 +76,5 @@ CREATE PROCEDURE patch_applicant()
   END //
 DELIMITER ;
 
-CALL patch_applicant();
-DROP PROCEDURE IF EXISTS patch_applicant;
+CALL patch_reqn();
+DROP PROCEDURE IF EXISTS patch_reqn;

@@ -32,7 +32,43 @@ class module extends \cenozo\service\module
       );
       $modifier->group( 'data_option.id' );
 
-      $select->add_column( 'GROUP_CONCAT( data_option_has_footnote.footnote_id )', 'footnote_id_list', false );
+      $select->add_column( 'GROUP_CONCAT( DISTINCT data_option_has_footnote.footnote_id )', 'footnote_id_list', false );
+    }
+
+    if( $select->has_column( 'bl' ) )
+    {
+      $join_sel = lib::create( 'database\select' );
+      $join_sel->from( 'data_option_has_study_phase' );
+      $join_sel->add_column( 'data_option_id' );
+
+      $join_mod = lib::create( 'database\modifier' );
+      $join_mod->join( 'study_phase', 'data_option_has_study_phase.study_phase_id', 'study_phase.id' );
+      $join_mod->where( 'study_phase.name', '=', 'Baseline' );
+      
+      $modifier->left_join(
+        sprintf( '( %s %s ) AS data_option_has_bl', $join_sel->get_sql(), $join_mod->get_sql() ),
+        'data_option.id',
+        'data_option_has_bl.data_option_id'
+      );
+      $select->add_column( 'data_option_has_bl.data_option_id IS NOT NULL', 'bl', false, 'boolean' );
+    }
+
+    if( $select->has_column( 'f1' ) )
+    {
+      $join_sel = lib::create( 'database\select' );
+      $join_sel->from( 'data_option_has_study_phase' );
+      $join_sel->add_column( 'data_option_id' );
+
+      $join_mod = lib::create( 'database\modifier' );
+      $join_mod->join( 'study_phase', 'data_option_has_study_phase.study_phase_id', 'study_phase.id' );
+      $join_mod->where( 'study_phase.name', '=', 'Follow-up 1' );
+      
+      $modifier->left_join(
+        sprintf( '( %s %s ) AS data_option_has_f1', $join_sel->get_sql(), $join_mod->get_sql() ),
+        'data_option.id',
+        'data_option_has_f1.data_option_id'
+      );
+      $select->add_column( 'data_option_has_f1.data_option_id IS NOT NULL', 'f1', false, 'boolean' );
     }
   }
 }

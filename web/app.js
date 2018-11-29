@@ -220,7 +220,7 @@ cenozoApp.lookupData = {
         tab: { en: 'Notes', fr: 'Remarques' },
         text1: {
           en: 'Please mark the sections containing the modules in the CLSA Baseline dataset that you are requesting.  Please note that you cannot request data which are not listed on this Checklist.',
-          fr: ''
+          fr: 'TRANSLATION REQUIRED'
         },
         text2: {
           en: '<strong>Included in all datasets</strong><ul><li>Sampling weights</li></ul>',
@@ -322,6 +322,7 @@ cenozoApp.lookupData = {
       dataChecklist: { en: 'Data Checklist', fr: 'Sélection des données' },
       studyData: { en: 'Study Data', fr: 'Données d’étude' },
       finalReport: { en: 'Final Report', fr: 'Rapport final' },
+      notAvailable: { en: 'not yet available', fr: 'pas encore disponible' },
       submit: { en: 'Submit', fr: 'Soumettre' },
       submitTitle: {
         en: 'Application Submitted',
@@ -391,7 +392,7 @@ cenozoApp.lookupData = {
       },
       notApproved: {
         en: 'Dear Dr. {{applicant_name}},\n\nOn behalf of the Data and Sample Access Committee, we are providing an update on your application to access CLSA data.\n\nUnfortunately, we are not able to approve your application as submitted. The Committee has provided some comments below. \n\n{{decision_notice}}\n\nAs a result, the Data and Sample Access Committee found that this project is not feasible at this time.\n\nOn behalf of {{chair_full_name}}, DSAC Chair',
-        fr: ''
+        fr: 'TRANSLATION REQUIRED'
       }
     }
   },
