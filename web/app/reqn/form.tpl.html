@@ -22,7 +22,7 @@
                 aria-haspopup="true"
                 aria-expanded="false"
                 ng-bind-html="t( 'misc.download' ) + ' <span class=\'caret\' ng-if=\'op.operations\'></span>'"></button>
-        <ul class="dropdown-menu full-width" aria-labelledby="downloadForms">
+        <ul class="dropdown-menu full-width" style="width: 180px !important" aria-labelledby="downloadForms">
           <li><a ng-click="model.viewModel.downloadReqn()" ng-bind-html="t( 'misc.application' )"></a></li>
           <li><a ng-click="model.viewModel.downloadDataChecklist()" ng-bind-html="t( 'misc.dataChecklist' )"></a></li>
           <li ng-if="model.viewModel.canViewData()">
@@ -703,8 +703,8 @@
                           tooltip-popup-delay="100"> 
                         {{ t( 'part2.' + part + '.module' ) }}<sup ng-if="model.dataOptionCategoryList[partIndex].footnote">ⓘ</sup>
                       </td>
-                      <td width="33%" style="vertical-align: middle;">Baseline</td>
-                      <td width="33%" style="vertical-align: middle;">Follow-up 1</td>
+                      <td width="33%" style="vertical-align: middle;" ng-bind-html="t( 'misc.baseline' )"></td>
+                      <td width="33%" style="vertical-align: middle;" ng-bind-html="t( 'misc.followup1' )"></td>
                     </tr>
                   </thead>
                   <tbody>

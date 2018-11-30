@@ -43,7 +43,7 @@ class module extends \cenozo\service\module
 
       $join_mod = lib::create( 'database\modifier' );
       $join_mod->join( 'study_phase', 'data_option_has_study_phase.study_phase_id', 'study_phase.id' );
-      $join_mod->where( 'study_phase.name', '=', 'Baseline' );
+      $join_mod->where( 'study_phase.code', '=', 'bl' );
       
       $modifier->left_join(
         sprintf( '( %s %s ) AS data_option_has_bl', $join_sel->get_sql(), $join_mod->get_sql() ),
@@ -61,7 +61,7 @@ class module extends \cenozo\service\module
 
       $join_mod = lib::create( 'database\modifier' );
       $join_mod->join( 'study_phase', 'data_option_has_study_phase.study_phase_id', 'study_phase.id' );
-      $join_mod->where( 'study_phase.name', '=', 'Follow-up 1' );
+      $join_mod->where( 'study_phase.code', '=', 'f1' );
       
       $modifier->left_join(
         sprintf( '( %s %s ) AS data_option_has_f1', $join_sel->get_sql(), $join_mod->get_sql() ),

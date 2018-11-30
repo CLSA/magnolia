@@ -236,7 +236,7 @@ cenozoApp.lookupData = {
         }
       },
       cohort: {
-        tab: { en: 'Cohort', fr: 'Évaluation' },
+        tab: { en: 'Cohort', fr: 'Cohorte' },
         text1: {
           en: 'Please select the cohort (Tracking and/or Comprehensive) for which you are requesting data:',
           fr: 'Veuillez sélectionner la cohorte (surveillance et/ou globale) visée par votre demande de données:'
@@ -329,6 +329,8 @@ cenozoApp.lookupData = {
       studyData: { en: 'Study Data', fr: 'Données d’étude' },
       finalReport: { en: 'Final Report', fr: 'Rapport final' },
       notAvailable: { en: 'not yet available', fr: 'pas encore disponible' },
+      baseline: { en: 'Baseline', fr: 'Départ' },
+      followup1: { en: 'Follow-up 1', fr: '1er suivi' },
       submit: { en: 'Submit', fr: 'Soumettre' },
       submitTitle: {
         en: 'Application Submitted',
