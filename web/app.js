@@ -220,7 +220,7 @@ cenozoApp.lookupData = {
         tab: { en: 'Notes', fr: 'Remarques' },
         text1: {
           en: 'Please mark the sections containing the modules in the CLSA Baseline dataset that you are requesting.  Please note that you cannot request data which are not listed on this Checklist.',
-          fr: ''
+          fr: 'Veuillez sélectionner la cohorte (surveillance et/ou globale) visée par votre demande de données. Ensuite, veuillez sélectionner chaque module de l’ensemble de données de l’ÉLCV que vous demandez, et ce, pour chacune des vagues (départ et/ou 1er suivi) de collecte de données qui vous intéresse.'
         },
         text2: {
           en: '<strong>Included in all datasets</strong><ul><li>Sampling weights</li></ul>',
@@ -234,6 +234,19 @@ cenozoApp.lookupData = {
           en: 'For more information on these data, please visit our website: <a href="https://www.clsa-elcv.ca" target="clsa">www.clsa-elcv.ca</a>.',
           fr: 'Pour en savoir plus sur ces données, veuillez consulter notre site Web: <a href="https://www.clsa-elcv.ca" target="clsa">www.clsa-elcv.ca</a>.'
         }
+      },
+      cohort: {
+        tab: { en: 'Cohort', fr: 'Cohorte' },
+        text1: {
+          en: 'Please select the cohort (Tracking and/or Comprehensive) for which you are requesting data:',
+          fr: 'Veuillez sélectionner la cohorte (surveillance et/ou globale) visée par votre demande de données:'
+        },
+        text2: {
+          en: 'You will be able to make your selection of the wave of data collection (Baseline and/or Follow-up 1) within the Data Checklist.',
+          fr: 'Vous pourrez sélectionner la vague de collecte de données (départ et/ou 1er suivi) dans le tableau de sélection de données.'
+        },
+        tracking: { en: 'Tracking Cohort (Telephone Interview) (TRM)', fr: 'Évaluation de surveillance (Entrevue téléphonique) (TRM)' },
+        comprehensive: { en: 'Comprehensive Cohort (In-home Interview & DCS visit) (COM)', fr: 'Évaluation globale (Entrevue à domicile et au site) (COM)' }
       },
       a: {
         tab: { en: '', fr: '' },
@@ -267,20 +280,20 @@ cenozoApp.lookupData = {
         module: { en: '', fr: '' },
         tracking: { en: '', fr: '' },
         comprehensive: { en: '', fr: '' },
-        title1: { en: 'Images', fr: 'Images' },
+        title1: { en: 'Baseline Images', fr: 'Images de départ' },
         text1: {
-          en: 'Images are available by special request for Carotid Intima Media Thickness (cIMT), IVA Lateral Spine (DXA), Retinal Scan (RS), Electrocardiogram (ECG; tracings) and Spirometry (SPR, flow curves). To request image data, please use the ‘Comments’ box below and explain in Part 1 of the Application, why your project requires use of images. Please note that a request to receive image data from the CLSA will incur additional costs, beyond the current data access fee; it may prolong processing time of your application, and  the time to receive your image data may be longer than the 6 months to receive alphanumeric data. For more information, please contact <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.',
+          en: 'Baseline images are available by special request for Carotid Intima Media Thickness (cIMT), IVA Lateral Spine (DXA), Retinal Scan (RS), Electrocardiogram (ECG; tracings) and Spirometry (SPR, flow curves). To request image data, please use the ‘Comments’ box below and explain in Part 1 of the Application, why your project requires use of images. Please note that a request to receive image data from the CLSA will incur additional costs, beyond the current data access fee; it may prolong processing time of your application, and  the time to receive your image data may be longer than the 6 months to receive alphanumeric data. For more information, please contact <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.',
           fr: 'Il est possible d’obtenir les données en format image sur demande spéciale pour les mesures suivantes : épaisseur de l’intima-média carotidienne (cIMT), analyse intervertébrale (IVA) de la colonne vertébrale (DXA), balayage de la rétine (RS), électrocardiogramme (ECG, tracés) et spirométrie (SPR, courbes de débit). Pour demander des données en format images, utilisez la case « Commentaires » ci-dessous et, à la Partie 1 de la demande, expliquez pourquoi ces images seront utiles à votre projet. Veuillez noter qu’une demande d’obtention d’images de l’ÉLCV entraînera des coûts supplémentaires, au-delà des frais d’accès aux données actuels. Cette demande peut prolonger le temps nécessaire au traitement de votre demande et le délai de réception de vos images peut être plus long que les six mois prévus pour les données alphanumériques. Pour en savoir plus sur ces demandes, veuillez contacter <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.'
         },
-        title2: { en: 'Raw Data', fr: 'Données brutes' },
+        title2: { en: 'Baseline Raw Data', fr: 'Données brutes de départ' },
         text2: {
-          en: 'Raw data are available by special request for Cognition (COG), Bone Density by DEXA (DXA), Bio-Impedance by DEXA (DXA) and Tonometry (TON). For more information and for details on how to request these data, please contact <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.',
-          fr: 'Les données brutes sont disponibles sur demande spéciale pour les mesures suivantes : Cognition (COG), Densité osseuse par DEXA (DXA), Bio-impédance par DEXA (DXA) et Tonométrie (TON). Pour en savoir plus sur ces données et comment en faire la demande, veuillez écrire à <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.'
+          en: 'Baseline raw data are available by special request for Cognition (COG), Bone Density by DEXA (DXA), Bio-Impedance by DEXA (DXA) and Tonometry (TON). For more information and for details on how to request these data, please contact <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.',
+          fr: 'Les données brutes de départ sont disponibles sur demande spéciale pour les mesures suivantes : Cognition (COG), Densité osseuse par DEXA (DXA), Bio-impédance par DEXA (DXA) et Tonométrie (TON). Pour en savoir plus sur ces données et comment en faire la demande, veuillez écrire à <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.'
         },
         title3: { en: 'Geographic Indicators', fr: 'Indicateurs géographiques' },
         text3: {
-          en: '<ol><li>Forward Sortation Areas (A forward sortation area (FSA) is a geographical region in which all postal codes start with the same three characters.)</li><li>Census Subdivision Codes and Names - determined using the Postal Code Conversion File (PCCF) from Statistics Canada. (A census subdivision (CSD) is a geographic unit defined by Statistics Canada, roughly corresponding to municipalities, whose unique codes can be linked to other sociodemographic or census data)</li></ol>Due to the sensitive nature of these geographic indicators, a special request must be made to receive CSDs and FSAs as part of your dataset.  Adequate justification must be provided within the project description (Application Part 1) as well as in the Comments box below. By requesting these data, you also agree that you will not present in any form (presentation, publication, poster), an illustration of these geographic areas with fewer than 50 CLSA participants per FSA or CSD. For more information, please contact <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.',
-          fr: '<ol><li>Région de tri d’acheminement (Une région de tri d’acheminement (RTA) est une region géographique où tous les codes postaux ont les mêmes trois premiers caractères.)</li><li>Codes et noms des subdivisions de recensement déterminé à l’aide du Fichier de conversion des codes postaux (FCCP) de Statistique Canada. Une subdivision de recensement (SDR) est une unité géographique définie par Statistique Canada correspondant approximativement aux municipalités, dont les codes uniques peuvent être liés à d’autres données sociodémographiques ou de recensement.</li></ol>En raison de la nature de ces indicateurs géographiques, une demande spéciale doit être faite pour que les SDR et les RTA soient incluses dans votre ensemble de données. Une justification adéquate doit être fournie dans la description du projet (partie 1 de la demande). En demandant ces données, vous acceptez également de ne pas présenter sous quelque forme que ce soit (présentation, publication, affiche) une illustration des zones géographiques habitées par moins de 50 participants à l’ÉLCV.'
+          en: '<ol><li>Forward Sortation Areas (A forward sortation area (FSA) is a geographic region in which all postal codes start with the same three characters.)</li><li>Census Subdivision Codes and Names - determined using the Postal Code Conversion File (PCCF) from Statistics Canada. (A census subdivision (CSD) is a geographic unit defined by Statistics Canada, roughly corresponding to municipalities, whose unique codes can be linked to other sociodemographic or census data)</li></ol>Due to the sensitive nature of these geographic indicators, a special request must be made to receive CSDs and FSAs as part of your dataset.  Adequate justification must be provided within the project description (Application Part 1) as well as in the Comments box below. By requesting these data, you also agree that you will not present in any form (presentation, publication, poster), an illustration of these geographic areas with fewer than 50 CLSA participants per FSA or CSD. For more information, please contact <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.',
+          fr: '<ol><li>Région de tri d’acheminement (Une région de tri d’acheminement (RTA) est une region géographique où tous les codes postaux ont les mêmes trois premiers caractères.)</li><li>Codes et noms des subdivisions de recensement déterminé à l’aide du Fichier de conversion des codes postaux (FCCP) de Statistique Canada. Une subdivision de recensement (SDR) est une unité géographique définie par Statistique Canada correspondant approximativement aux municipalités, dont les codes uniques peuvent être liés à d’autres données sociodémographiques ou de recensement.</li></ol>En raison de la nature de ces indicateurs géographiques, une demande spéciale doit être faite pour que les SDR et les RTA soient incluses dans votre ensemble de données. Une justification adéquate doit être fournie dans la description du projet (partie 1 de la demande). En demandant ces données, vous acceptez également de ne pas présenter sous quelque forme que ce soit (présentation, publication, affiche) une illustration des zones géographiques habitées par moins de 50 participants à l’ÉLCV. Pour toute information supplémentaire, veuillez écrire à <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.'
         },
         text4: {
           en: 'In the Comments, include other relevant information concerning your request, including rationale for the request of Additional Data (e.g. Images).',
@@ -315,6 +328,9 @@ cenozoApp.lookupData = {
       dataChecklist: { en: 'Data Checklist', fr: 'Sélection des données' },
       studyData: { en: 'Study Data', fr: 'Données d’étude' },
       finalReport: { en: 'Final Report', fr: 'Rapport final' },
+      notAvailable: { en: 'not yet available', fr: 'pas encore disponible' },
+      baseline: { en: 'Baseline', fr: 'Départ' },
+      followup1: { en: 'Follow-up 1', fr: '1er suivi' },
       submit: { en: 'Submit', fr: 'Soumettre' },
       submitTitle: {
         en: 'Application Submitted',
@@ -384,11 +400,11 @@ cenozoApp.lookupData = {
       },
       approved: {
         en: 'Dear Dr. {{applicant_name}},\n\nWe are delighted to officially inform you that the CLSA Scientific Management Team has accepted the Data and Sample Access Committee’s (DSAC) recommendation that your application for access to the CLSA data be approved.\n\n{{decision_notice}}\n\nNext Steps:\n  1.  You will be contacted soon by Roxanne Cheeseman (CLSA Contracts Manager) at the CLSA National Coordinating Centre at McMaster University to work with you and your institution to complete the CLSA Access Agreement. (NOTE: This part of the process can take a variable length of time, up to 12 weeks, and is not under the control of the CLSA. Please be aware that this will affect the length of time that it takes for the data to be released to you.)\n  2.  Following completion of the CLSA Access Agreement, with all required signatures, the Statistical Analysis Centre should be able to release the data to you within 7-10 working days provided proof of ethics approval has been received by the CLSA.\n\nFrom the perspective of the CLSA, we are extremely pleased that you have chosen to use CLSA data in your research and wish you all the best in this pursuit.\n\nOn behalf of {{chair_full_name}}, DSAC Chair',
-        fr: 'TRANSLATION REQUIRED'
+        fr: 'Bonjour Dr {{applicant_name}},\n\nNous sommes ravis de vous informer officiellement que l’Équipe de gestion scientifique de l’ÉLCV a accepté la recommandation du Comité chargé de l’accès aux données et aux échantillons d’approuver votre demande d’accès aux données de l’ÉLCV.\n\n{{décision_notice}}\n\nVoici les prochaines étapes :\n    1. La gestionnaire des contrats de l’ÉLCV, Roxanne Cheeseman, du Centre national de coordination de l’ÉLCV à l’Université McMaster vous contactera pour vous aider et aider votre établissement à remplir l’Entente d’accès aux données de l’ÉLCV. (REMARQUE : La durée de cette étape peut varier et prendre jusqu’à 12 semaines. L’ÉLCV n’a aucun contrôle sur celle-ci. Veuillez noter que ce délai influencera le temps nécessaire pour que les données vous soient transmises.)\n    2. Une fois l’Entente d’accès aux données de l’ÉLCV complétée, avec toutes les signatures requises, le Centre d’analyse statistique devrait être en mesure de vous transmettre les données dans un délai de 7 à 10 jours ouvrables, à condition que l’ÉLCV ait reçu une preuve d’approbation éthique.\n\nAu nom de l’ÉLCV, nous sommes extrêmement heureux que vous ayez choisi(e) d’utiliser les données de l’ÉLCV pour votre projet et vous souhaitons beaucoup de succès.\n\nDe la part de {{chair_full_name}}, présidente du Comité chargé de l’accès aux données et aux échantillons'
       },
       notApproved: {
         en: 'Dear Dr. {{applicant_name}},\n\nOn behalf of the Data and Sample Access Committee, we are providing an update on your application to access CLSA data.\n\nUnfortunately, we are not able to approve your application as submitted. The Committee has provided some comments below. \n\n{{decision_notice}}\n\nAs a result, the Data and Sample Access Committee found that this project is not feasible at this time.\n\nOn behalf of {{chair_full_name}}, DSAC Chair',
-        fr: 'TRANSLATION REQUIRED'
+        fr: 'Bonjour Dr {{applicant_name}},\n\nVoici une mise à jour concernant votre demande d’accès aux données de l’ÉLCV de la part du Comité chargé de l’accès aux données et aux échantillons.\n\nMalheureusement, nous ne pouvons pas approuver votre demande telle que soumise. Le comité vous transmet quelques commentaires ci-dessous.\n\n{{décision_notice}}\n\nEn conséquence, le Comité chargé de l’accès aux données et aux échantillons a estimé que ce projet n’était pas réalisable pour le moment.\n\nDe la part de {{chair_full_name}}, présidente du Comité chargé de l’accès aux données et aux échantillons\n'
       }
     }
   },

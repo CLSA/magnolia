@@ -1,6 +1,6 @@
-DROP PROCEDURE IF EXISTS patch_applicant;
+DROP PROCEDURE IF EXISTS patch_reqn;
 DELIMITER //
-CREATE PROCEDURE patch_applicant()
+CREATE PROCEDURE patch_reqn()
   BEGIN
 
     SELECT "Adding in new reqn.funding_filename column" AS "";
@@ -47,8 +47,34 @@ CREATE PROCEDURE patch_applicant()
       ADD UNIQUE INDEX uq_data_directory (data_directory ASC);
     END IF;
 
+    SELECT "Adding in new reqn.comprehensive column" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "comprehensive";
+
+    IF @test = 0 THEN
+      ALTER TABLE reqn
+      ADD COLUMN comprehensive TINYINT(1) NULL DEFAULT NULL AFTER waiver;
+    END IF;
+
+    SELECT "Adding in new reqn.tracking column" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "tracking";
+
+    IF @test = 0 THEN
+      ALTER TABLE reqn
+      ADD COLUMN tracking TINYINT(1) NULL DEFAULT NULL AFTER comprehensive;
+    END IF;
+
   END //
 DELIMITER ;
 
-CALL patch_applicant();
-DROP PROCEDURE IF EXISTS patch_applicant;
+CALL patch_reqn();
+DROP PROCEDURE IF EXISTS patch_reqn;

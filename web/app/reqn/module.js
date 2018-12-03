@@ -142,6 +142,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     ethics: { type: 'boolean', exclude: true },
     ethics_date: { type: 'date', exclude: true },
     waiver: { type: 'enum', exclude: true },
+    tracking: { type: 'boolean', exclude: true },
+    comprehensive: { type: 'boolean', exclude: true },
     part2_a_comment: { type: 'text', exclude: true },
     part2_b_comment: { type: 'text', exclude: true },
     part2_c_comment: { type: 'text', exclude: true },
@@ -578,15 +580,22 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               this.setTab( 1, this.parentModel.getQueryParameter( 't1' ), false );
               this.setTab( 2, this.parentModel.getQueryParameter( 't2' ), false );
 
-              return $q.all( [
+              var promiseList = [
                 this.$$onView( force ).then( function() {
                   // define the earliest date that the reqn may start
                   self.minStartDate = moment( self.record.deadline ).add( CnSession.application.startDateDelay, 'months' );
-                } ),
-                this.getCoapplicantList(),
-                this.getReferenceList(),
-                this.getDataOptionValueList()
-              ] );
+                } )
+              ];
+
+              if( 'lite' != this.parentModel.type ) {
+                promiseList = promiseList.concat( 
+                  this.getCoapplicantList(),
+                  this.getReferenceList(),
+                  this.getDataOptionValueList()
+                );
+              }
+
+              return $q.all( promiseList );
             }
 
             // if we are a reviewer assigned to this reqn and haven't completed our review then show a reminder
@@ -800,10 +809,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           coapplicantList: [],
           referenceModel: CnReferenceModelFactory.instance(),
           referenceList: [],
-          dataOptionValueList: {
-            comprehensive: [],
-            tracking: []
-          },
+          dataOptionValueList: {},
           charCount: { lay_summary: 0, background: 0, objectives: 0, methodology: 0, analysis: 0 },
           minStartDate: null,
 
@@ -831,6 +837,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             [ 'part1', 'a5', null ],
             [ 'part1', 'a6', null ],
             [ 'part2', null, 'notes' ],
+            [ 'part2', null, 'cohort' ],
             [ 'part2', null, 'a' ],
             [ 'part2', null, 'b' ],
             [ 'part2', null, 'c' ],
@@ -941,56 +948,51 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           },
 
           getDataOptionValueList: function() {
-            self.dataOptionValueList = {
-              comprehensive: [],
-              tracking: []
-            };
+            self.dataOptionValueList = { bl: [], f1: [] };
             return CnHttpFactory.instance( {
               path: 'data_option',
               data: { select: { column: [ { column: 'MAX(data_option.id)', alias: 'maxId', table_prefix: false } ] } }
             } ).get().then( function( response ) {
               for( var i = 0; i <= response.data[0].maxId; i++ ) {
-                self.dataOptionValueList.comprehensive[i] = false;
-                self.dataOptionValueList.tracking[i] = false;
+                self.dataOptionValueList.bl[i] = false;
+                self.dataOptionValueList.f1[i] = false;
               }
             } ).then( function() {
               return CnHttpFactory.instance( {
-                path: self.parentModel.getServiceResourcePath() + '/data_option',
-                data: { select: { column: [ 'id', {
-                  table: 'reqn_has_data_option',
-                  column: 'comprehensive'
-                }, {
-                  table: 'reqn_has_data_option',
-                  column: 'tracking'
-                } ] } }
+                path: self.parentModel.getServiceResourcePath() + '/reqn_data_option',
+                data: { select: { column: [ 'data_option_id', { table: 'study_phase', column: 'code', alias: 'phase' } ] } }
               } ).query().then( function( response ) {
                 response.data.forEach( function( dataOption ) {
-                  self.dataOptionValueList.comprehensive[dataOption.id] = dataOption.comprehensive;
-                  self.dataOptionValueList.tracking[dataOption.id] = dataOption.tracking;
+                  if( angular.isDefined( self.dataOptionValueList[dataOption.phase] ) )
+                    self.dataOptionValueList[dataOption.phase][dataOption.data_option_id] = true;
                 } );
               } );
             } );
           },
 
-          toggleDataOptionValue: function( cohort, dataOptionId ) {
+          toggleDataOptionValue: function( studyPhaseCode, dataOptionId ) {
             // toggle the option
-            this.dataOptionValueList[cohort][dataOptionId] = !this.dataOptionValueList[cohort][dataOptionId];
+            this.dataOptionValueList[studyPhaseCode][dataOptionId] = !this.dataOptionValueList[studyPhaseCode][dataOptionId];
 
-            // send new value to the server
-            var data = { cohort: cohort };
-            data[ this.dataOptionValueList[cohort][dataOptionId] ? 'add' : 'remove' ] = dataOptionId;
-
-            return CnHttpFactory.instance( {
-              path: this.parentModel.getServiceResourcePath() + '/data_option',
-              data: data,
-              onError: function( response ) {
-                // 409 means the data option has already been added
-                if( 409 != response.status ) {
-                  self.dataOptionValueList[cohort][dataOptionId] = !self.dataOptionValueList[cohort][dataOptionId];
-                  CnModalMessageFactory.httpError( response );
+            if( this.dataOptionValueList[studyPhaseCode][dataOptionId] ) {
+              // add the data-option
+              return CnHttpFactory.instance( {
+                path: self.parentModel.getServiceResourcePath() + '/reqn_data_option',
+                data: { data_option_id: dataOptionId, study_phase_code: studyPhaseCode },
+                onError: function( response ) {
+                  self.dataOptionValueList[studyPhaseCode][dataOptionId] = !self.dataOptionValueList[studyPhaseCode][dataOptionId];
                 }
-              }
-            } ).post();
+              } ).post();
+            } else {
+              // delete the data-option
+              return CnHttpFactory.instance( {
+                path: self.parentModel.getServiceResourcePath() +
+                  '/reqn_data_option/data_option_id=' + dataOptionId + ';study_phase_code=' + studyPhaseCode,
+                onError: function( response ) {
+                  self.dataOptionValueList[studyPhaseCode][dataOptionId] = !self.dataOptionValueList[studyPhaseCode][dataOptionId];
+                }
+              } ).delete();
+            }
           },
 
           submit: function() {
@@ -1009,7 +1011,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                   a3: [ 'start_date', 'duration' ],
                   a4: [ 'title', 'keywords', 'lay_summary', 'background', 'objectives', 'methodology', 'analysis' ],
                   a5: [ 'funding' ],
-                  a6: [ 'ethics' ]
+                  a6: [ 'ethics' ],
+                  cohort: [ 'tracking', 'comprehensive' ]
                 };
 
                 var error = null;
@@ -1052,8 +1055,13 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                   // if there was an error then display it now
                   if( 'applicant' == CnSession.role.name ) error.closeText = self.translate( 'misc.close' );
                   CnModalMessageFactory.instance( error ).show().then( function() {
-                    self.setTab( 0, 'part1', false );
-                    self.setTab( 1, errorTab );
+                    if( 'cohort' == errorTab ) {
+                      self.setTab( 0, 'part2', false );
+                      self.setTab( 2, errorTab );
+                    } else {
+                      self.setTab( 0, 'part1', false );
+                      self.setTab( 1, errorTab );
+                    }
                   } );
                 } else {
                   return CnHttpFactory.instance( {
@@ -1168,15 +1176,10 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
       var object = function( type ) {
         var self = this;
 
-        // convert type to root, lite or non-root instance
-        var root = false;
-        var lite = false;
-        if( 'root' === type ) root = true;
-        else if( 'lite' == type ) lite = true;
-
         CnBaseModelFactory.construct( this, module );
-        if( !lite ) this.listModel = CnReqnListFactory.instance( this );
-        this.viewModel = CnReqnViewFactory.instance( this, root );
+        this.type = type;
+        if( 'lite' != this.type ) this.listModel = CnReqnListFactory.instance( this );
+        this.viewModel = CnReqnViewFactory.instance( this, 'root' == this.type );
 
         // override the service collection path so that applicants can view their reqns from the home screen
         this.getServiceCollectionPath = function() {
@@ -1187,7 +1190,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         // override the service collection
         this.getServiceData = function( type, columnRestrictLists ) {
           // only include the funding and ethics filenames in the view type in the lite instance
-          var data = lite
+          var data = 'lite' == this.type
                    ? {
                        select: {
                          column: [
@@ -1247,7 +1250,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           var check = false;
           if( 'applicant' == CnSession.role.name ) {
             check = 'new' == phase || (
-              'deferred' == state && ( 'review' == phase || ( lite && 'Agreement' == stage_type ) )
+              'deferred' == state && ( 'review' == phase || ( 'lite' == this.type && 'Agreement' == stage_type ) )
             );
           } else if( 'administrator' == CnSession.role.name ) {
             check = 'new' == phase || (
@@ -1289,7 +1292,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           return $q.all( [
             self.$$getMetadata().then( function() {
               // only do the following for the root instance
-              if( root ) {
+              if( 'root' == self.type ) {
                 var misc = cenozoApp.lookupData.reqn.misc;
 
                 // create coapplicant access enum
@@ -1328,6 +1331,18 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                 self.metadata.columnList.waiver.enumList.fr[1].name = misc.graduateFeeWaiver.fr;
                 self.metadata.columnList.waiver.enumList.fr[2].name = misc.postdocFeeWaiver.fr;
 
+                // create tracking enum
+                self.metadata.columnList.tracking.enumList = {
+                  en: [ { value: '', name: misc.choose.en }, { value: true, name: misc.yes.en }, { value: false, name: misc.no.en } ],
+                  fr: [ { value: '', name: misc.choose.fr }, { value: true, name: misc.yes.fr }, { value: false, name: misc.no.fr } ]
+                };
+
+                // create comprehensive enum
+                self.metadata.columnList.comprehensive.enumList = {
+                  en: [ { value: '', name: misc.choose.en }, { value: true, name: misc.yes.en }, { value: false, name: misc.no.en } ],
+                  fr: [ { value: '', name: misc.choose.fr }, { value: true, name: misc.yes.fr }, { value: false, name: misc.no.fr } ]
+                };
+
                 return CnHttpFactory.instance( {
                   path: 'language',
                   data: {
@@ -1350,11 +1365,11 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             } ),
 
             // only do the following for the root instance
-            !root ? $q.all() : $q.all( [
+            'root' != self.type ? $q.all() : $q.all( [
               CnHttpFactory.instance( {
                 path: 'data_option_category',
                 data: {
-                  select: { column: [ 'id', 'name_en', 'name_fr', 'comprehensive', 'tracking', 'footnote_id_list' ] },
+                  select: { column: [ 'id', 'name_en', 'name_fr', 'footnote_id_list' ] },
                   modifier: { order: 'rank', limit: 1000000 }
                 }
               } ).query().then( function( response ) {
@@ -1373,7 +1388,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                 return CnHttpFactory.instance( {
                   path: 'data_option',
                   data: {
-                    select: { column: [ 'id', 'data_option_category_id', 'name_en', 'name_fr', 'footnote_id_list' ] },
+                    select: { column: [ 'id', 'data_option_category_id', 'name_en', 'name_fr', 'footnote_id_list', 'bl', 'f1' ] },
                     modifier: { order: [ 'data_option_category_id', 'data_option.rank' ], limit: 1000000 }
                   }
                 } ).query().then( function( response ) {
@@ -1385,14 +1400,14 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                     option.name = { en: option.name_en, fr: option.name_fr };
                     delete option.name_en;
                     delete option.name_fr;
-                    option.detailList = [];
+                    option.detailCategoryList = [];
                     category.optionList.push( option );
                   } );
 
                   return CnHttpFactory.instance( {
                     path: 'data_option_detail',
                     data: {
-                      select: { column: [ 'id', 'data_option_id', 'name_en', 'name_fr', 'footnote_id_list', {
+                      select: { column: [ 'id', 'data_option_id', 'name_en', 'name_fr', 'footnote_id_list', 'study_phase_list', {
                         table: 'data_option',
                         column: 'data_option_category_id'
                       } ] },
@@ -1402,15 +1417,23 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                     var category = null;
                     var option = null;
                     response.data.forEach( function( detail ) {
+                      var detailList = {};
                       if( null == category || detail.data_option_category_id != category.id )
                         category = self.dataOptionCategoryList.findByProperty( 'id', detail.data_option_category_id );
                       if( null == option || detail.data_option_id != option.id )
                         option = category.optionList.findByProperty( 'id', detail.data_option_id );
 
-                        detail.name = { en: detail.name_en, fr: detail.name_fr };
-                        delete detail.name_en;
-                        delete detail.name_fr;
-                        option.detailList.push( detail );
+                      detail.name = { en: detail.name_en, fr: detail.name_fr };
+                      delete detail.name_en;
+                      delete detail.name_fr;
+                      var studyPhaseList = detail.study_phase_list.split( ',' )
+                      delete detail.study_phase_list;
+
+                      studyPhaseList.forEach( function( study_phase ) {
+                        var detailCategory = option.detailCategoryList.findByProperty( 'name', study_phase );
+                        if( detailCategory ) detailCategory.detailList.push( detail );
+                        else option.detailCategoryList.push( { name: study_phase, detailList: [ detail ] } );
+                      } );
                     } );
                   } );
                 } );
@@ -1449,15 +1472,17 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                     };
                   }
 
-                  option.detailList.forEach( function( detail ) {
-                    var list = detail.footnote_id_list;
-                    delete detail.footnote_id_list;
-                    if( list ) {
-                      detail.footnote = {
-                        en: list.split( ',' ).map( id => self.footnoteList[id].en ).join( '\n' ),
-                        fr: list.split( ',' ).map( id => self.footnoteList[id].fr ).join( '\n' )
-                      };
-                    }
+                  option.detailCategoryList.forEach( function( detailCat ) {
+                    detailCat.detailList.forEach( function( detail ) {
+                      var list = detail.footnote_id_list;
+                      delete detail.footnote_id_list;
+                      if( list ) {
+                        detail.footnote = {
+                          en: list.split( ',' ).map( id => self.footnoteList[id].en ).join( '\n' ),
+                          fr: list.split( ',' ).map( id => self.footnoteList[id].fr ).join( '\n' )
+                        };
+                      }
+                    } );
                   } );
                 } );
               } );
