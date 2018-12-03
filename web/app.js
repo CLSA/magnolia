@@ -219,7 +219,7 @@ cenozoApp.lookupData = {
       notes: {
         tab: { en: 'Notes', fr: 'Remarques' },
         text1: {
-          en: 'Please mark the sections containing the modules in the CLSA Baseline dataset that you are requesting.  Please note that you cannot request data which are not listed on this Checklist.',
+          en: 'Please mark the sections containing the modules in the CLSA dataset that you are requesting.  Please note that if you would like to request data that are currently indicated as "Not yet available", you will need to submit an Amendment request and updated Data Checklist when these data do become available.',
           fr: 'Veuillez sélectionner la cohorte (surveillance et/ou globale) visée par votre demande de données. Ensuite, veuillez sélectionner chaque module de l’ensemble de données de l’ÉLCV que vous demandez, et ce, pour chacune des vagues (départ et/ou 1er suivi) de collecte de données qui vous intéresse.'
         },
         text2: {
