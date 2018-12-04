@@ -694,8 +694,8 @@
                     <div class="vertical-spacer" ng-bind-html="t( 'part2.f.text4' )"></div>
                   </li>
                 </ul>
-                <table class="table table-hover">
-                  <thead ng-class="{ 'bg-info': t( 'part2.' + part + '.module' ) }">
+                <table class="table table-hover" ng-if="model.dataOptionCategoryList[partIndex].optionList.length">
+                  <thead class="bg-info">
                     <tr>
                       <td width="33%"
                           style="vertical-align: middle;"
