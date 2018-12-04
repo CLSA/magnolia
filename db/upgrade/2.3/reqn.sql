@@ -73,6 +73,19 @@ CREATE PROCEDURE patch_reqn()
       ADD COLUMN tracking TINYINT(1) NULL DEFAULT NULL AFTER comprehensive;
     END IF;
 
+    SELECT "Adding in new reqn.deferral_note_part2_f column" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "deferral_note_part2_f";
+
+    IF @test = 0 THEN
+      ALTER TABLE reqn
+      ADD COLUMN deferral_note_part2_f TEXT NULL DEFAULT NULL AFTER deferral_note_part2_e;
+    END IF;
+
   END //
 DELIMITER ;
 

@@ -158,47 +158,51 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
       type: 'text'
     },
     deferral_note_part1_a1: {
-      title: 'Part1 A1',
+      title: 'Part1: A1',
       type: 'text'
     },
     deferral_note_part1_a2: {
-      title: 'Part1 A2',
+      title: 'Part1: A2',
       type: 'text'
     },
     deferral_note_part1_a3: {
-      title: 'Part1 A3',
+      title: 'Part1: A3',
       type: 'text'
     },
     deferral_note_part1_a4: {
-      title: 'Part1 A4',
+      title: 'Part1: A4',
       type: 'text'
     },
     deferral_note_part1_a5: {
-      title: 'Part1 A5',
+      title: 'Part1: A5',
       type: 'text'
     },
     deferral_note_part1_a6: {
-      title: 'Part1 A6',
+      title: 'Part1: A6',
       type: 'text'
     },
     deferral_note_part2_a: {
-      title: 'Part2 A',
+      title: 'Part2: Questionnaires',
       type: 'text'
     },
     deferral_note_part2_b: {
-      title: 'Part2 B',
+      title: 'Part2: Physical Assessment',
       type: 'text'
     },
     deferral_note_part2_c: {
-      title: 'Part2 C',
+      title: 'Part2: Biomarkers',
       type: 'text'
     },
     deferral_note_part2_d: {
-      title: 'Part2 D',
+      title: 'Part2: Genomics',
       type: 'text'
     },
     deferral_note_part2_e: {
-      title: 'Part2 E',
+      title: 'Part2: Linked Data',
+      type: 'text'
+    },
+    deferral_note_part2_f: {
+      title: 'Part2: Additional Data',
       type: 'text'
     }
   } );
@@ -639,7 +643,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                    this.record.deferral_note_part1_a5 || this.record.deferral_note_part1_a6 ||
                    this.record.deferral_note_part2_a || this.record.deferral_note_part2_b ||
                    this.record.deferral_note_part2_c || this.record.deferral_note_part2_d ||
-                   this.record.deferral_note_part2_e;
+                   this.record.deferral_note_part2_e || this.record.deferral_note_part2_f;
           },
 
           show: function( subject ) {
