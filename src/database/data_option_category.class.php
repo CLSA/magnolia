@@ -12,4 +12,4 @@ use cenozo\lib, cenozo\log, magnolia\util;
 /**
  * data_option_category: record
  */
-class data_option_category extends \cenozo\database\record {}
+class data_option_category extends \cenozo\database\has_rank {}

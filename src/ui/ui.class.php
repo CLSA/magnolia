@@ -21,6 +21,12 @@ class ui extends \cenozo\ui\ui
   {
     parent::build_module_list();
 
+    $module = $this->get_module( 'data_option_category' );
+    if( !is_null( $module ) ) $module->add_child( 'data_option' );
+
+    $module = $this->get_module( 'data_option' );
+    if( !is_null( $module ) ) $module->add_child( 'data_option_detail' );
+
     $module = $this->get_module( 'deadline' );
     if( !is_null( $module ) ) $module->add_child( 'reqn' );
 
@@ -80,6 +86,7 @@ class ui extends \cenozo\ui\ui
 
     if( 'applicant' == $db_role->name ) $this->remove_listitem( 'Requisitions' );
     if( 'administrator' != $db_role->name ) $this->remove_listitem( 'Users' );
+    if( 'administrator' == $db_role->name ) $this->add_listitem( 'Data Option Categories', 'data_option_category' );
   }
 
   /**

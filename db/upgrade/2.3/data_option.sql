@@ -41,6 +41,63 @@ CREATE PROCEDURE delete_data_option( name VARCHAR(127) )
   END //
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS patch_data_option;
+DELIMITER //
+CREATE PROCEDURE patch_data_option()
+  BEGIN
+
+    SET SESSION group_concat_max_len = 1000000;
+
+    SELECT "Adding new note_en columns to the data_option table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "data_option"
+    AND column_name = "note_en";
+
+    IF @test = 0 THEN
+      ALTER TABLE data_option ADD COLUMN note_en TEXT NULL DEFAULT NULL;
+
+      UPDATE data_option
+      JOIN (
+        SELECT data_option.id, REPLACE( GROUP_CONCAT( footnote.note_en order by footnote.id separator "\n" ), "<br>", "\n" ) AS note_en
+        FROM data_option
+        JOIN data_option_has_footnote ON data_option.id = data_option_has_footnote.data_option_id
+        JOIN footnote ON data_option_has_footnote.footnote_id = footnote.id
+        GROUP BY data_option.id
+      ) AS note USING( id )
+      SET data_option.note_en = note.note_en;
+    END IF;
+
+    SELECT "Adding new note_fr columns to the data_option table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "data_option"
+    AND column_name = "note_fr";
+
+    IF @test = 0 THEN
+      ALTER TABLE data_option ADD COLUMN note_fr TEXT NULL DEFAULT NULL;
+
+      UPDATE data_option
+      JOIN (
+        SELECT data_option.id, REPLACE( GROUP_CONCAT( footnote.note_fr order by footnote.id separator "\n" ), "<br>", "\n" ) AS note_fr
+        FROM data_option
+        JOIN data_option_has_footnote ON data_option.id = data_option_has_footnote.data_option_id
+        JOIN footnote ON data_option_has_footnote.footnote_id = footnote.id
+        GROUP BY data_option.id
+      ) AS note USING( id )
+      SET data_option.note_fr = note.note_fr;
+    END IF;
+
+  END //
+DELIMITER ;
+
+CALL patch_data_option();
+DROP PROCEDURE IF EXISTS patch_data_option;
+
 SELECT "Removing defunct data_option records" AS "";
 CALL delete_data_option( "Self-reported Chronic Conditions" );
 CALL delete_data_option( "Bio-Impedance by DEXA" );

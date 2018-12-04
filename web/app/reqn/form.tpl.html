@@ -699,9 +699,9 @@
                     <tr>
                       <td width="33%"
                           style="vertical-align: middle;"
-                          uib-tooltip-html="model.dataOptionCategoryList[partIndex].footnote[model.viewModel.record.language]"
+                          uib-tooltip-html="model.dataOptionCategoryList[partIndex].note[model.viewModel.record.language] | cnNewlines"
                           tooltip-popup-delay="100"> 
-                        {{ t( 'part2.' + part + '.module' ) }}<sup ng-if="model.dataOptionCategoryList[partIndex].footnote">ⓘ</sup>
+                        {{ t( 'part2.' + part + '.module' ) }}<sup ng-if="model.dataOptionCategoryList[partIndex].note[model.viewModel.record.language]">ⓘ</sup>
                       </td>
                       <td width="33%" style="vertical-align: middle;" ng-bind-html="t( 'misc.baseline' )"></td>
                       <td width="33%" style="vertical-align: middle;" ng-bind-html="t( 'misc.followup1' )"></td>
@@ -710,11 +710,11 @@
                   <tbody>
                     <tr ng-repeat-start="dataOption in model.dataOptionCategoryList[partIndex].optionList">
                       <td data-toggle="collapse" data-target="#accordion{{ dataOption.id }}" style="vertical-align: middle">
-                        <a uib-tooltip-html="dataOption.footnote[model.viewModel.record.language]"
+                        <a uib-tooltip-html="dataOption.note[model.viewModel.record.language] | cnNewlines"
                            tooltip-popup-delay="100">
                           <span style="text-decoration: underline">
                             {{ dataOption.name[model.viewModel.record.language] }}
-                          </span><sup ng-if="dataOption.footnote">ⓘ</sup>
+                          </span><sup ng-if="dataOption.note[model.viewModel.record.language]">ⓘ</sup>
                         </a>
                       </td>
                       <td ng-if="dataOption.bl">
@@ -755,9 +755,9 @@
                             <div class="col-sm-2 vertical-spacer">{{ detailCat.name }}</div>
                             <div class="col-sm-10 vertical-spacer">
                               <span ng-repeat="detail in detailCat.detailList"
-                                    uib-tooltip-html="detail.footnote[model.viewModel.record.language]"
+                                    uib-tooltip-html="detail.note[model.viewModel.record.language] | cnNewlines"
                                     tooltip-popup-delay="100">
-                                {{ detail.name[model.viewModel.record.language] }}<sup ng-if="detail.footnote">ⓘ</sup>{{ $last ? '' : ';' }}
+                                {{ detail.name[model.viewModel.record.language] }}<sup ng-if="detail.note[model.viewModel.record.language]">ⓘ</sup>{{ $last ? '' : ';' }}
                               </span>
                             </div>
                           </div>

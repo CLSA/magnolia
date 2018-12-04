@@ -1290,7 +1290,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         };
 
         this.dataOptionCategoryList = [];
-        this.footnoteList = {};
 
         this.getMetadata = function() {
           return $q.all( [
@@ -1373,7 +1372,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               CnHttpFactory.instance( {
                 path: 'data_option_category',
                 data: {
-                  select: { column: [ 'id', 'name_en', 'name_fr', 'footnote_id_list' ] },
+                  select: { column: [ 'id', 'name_en', 'name_fr', 'note_en', 'note_fr' ] },
                   modifier: { order: 'rank', limit: 1000000 }
                 }
               } ).query().then( function( response ) {
@@ -1383,6 +1382,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                   dataOptionCategory.name = { en: dataOptionCategory.name_en, fr: dataOptionCategory.name_fr };
                   delete dataOptionCategory.name_en;
                   delete dataOptionCategory.name_fr;
+                  dataOptionCategory.note = { en: dataOptionCategory.note_en, fr: dataOptionCategory.note_fr };
+                  delete dataOptionCategory.note_en;
+                  delete dataOptionCategory.note_fr;
                   dataOptionCategory.optionList = [];
 
                   cenozoApp.lookupData.reqn.part2[letter].tab = dataOptionCategory.name;
@@ -1392,7 +1394,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                 return CnHttpFactory.instance( {
                   path: 'data_option',
                   data: {
-                    select: { column: [ 'id', 'data_option_category_id', 'name_en', 'name_fr', 'footnote_id_list', 'bl', 'f1' ] },
+                    select: { column: [ 'id', 'data_option_category_id', 'name_en', 'name_fr', 'note_en', 'note_fr', 'bl', 'f1' ] },
                     modifier: { order: [ 'data_option_category_id', 'data_option.rank' ], limit: 1000000 }
                   }
                 } ).query().then( function( response ) {
@@ -1404,6 +1406,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                     option.name = { en: option.name_en, fr: option.name_fr };
                     delete option.name_en;
                     delete option.name_fr;
+                    option.note = { en: option.note_en, fr: option.note_fr };
+                    delete option.note_en;
+                    delete option.note_fr;
                     option.detailCategoryList = [];
                     category.optionList.push( option );
                   } );
@@ -1411,7 +1416,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                   return CnHttpFactory.instance( {
                     path: 'data_option_detail',
                     data: {
-                      select: { column: [ 'id', 'data_option_id', 'name_en', 'name_fr', 'footnote_id_list', 'study_phase_list', {
+                      select: { column: [ 'id', 'data_option_id', 'name_en', 'name_fr', 'note_en', 'note_fr', 'study_phase_list', {
                         table: 'data_option',
                         column: 'data_option_category_id'
                       } ] },
@@ -1430,6 +1435,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                       detail.name = { en: detail.name_en, fr: detail.name_fr };
                       delete detail.name_en;
                       delete detail.name_fr;
+                      detail.note = { en: detail.note_en, fr: detail.note_fr };
+                      delete detail.note_en;
+                      delete detail.note_fr;
                       var studyPhaseList = detail.study_phase_list.split( ',' )
                       delete detail.study_phase_list;
 
@@ -1441,57 +1449,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                     } );
                   } );
                 } );
-              } ),
-
-              CnHttpFactory.instance( {
-                path: 'footnote',
-                data: { select: { column: [ 'id', 'note_en', 'note_fr' ] } },
-                modifier: { limit: 1000000 }
-              } ).query().then( function( response ) {
-                response.data.forEach( function( footnote ) {
-                  self.footnoteList[ footnote.id ] = {
-                    en: footnote.note_en,
-                    fr: footnote.note_fr
-                  };
-                } );
               } )
-            ] ).then( function() {
-              self.dataOptionCategoryList.forEach( function( category ) {
-                var list = category.footnote_id_list;
-                delete category.footnote_id_list;
-                if( list ) {
-                  category.footnote = {
-                    en: list.split( ',' ).map( id => self.footnoteList[id].en ).join( '\n' ),
-                    fr: list.split( ',' ).map( id => self.footnoteList[id].fr ).join( '\n' )
-                  };
-                }
 
-                category.optionList.forEach( function( option ) {
-                  var list = option.footnote_id_list;
-                  delete option.footnote_id_list;
-                  if( list ) {
-                    option.footnote = {
-                      en: list.split( ',' ).map( id => self.footnoteList[id].en ).join( '\n' ),
-                      fr: list.split( ',' ).map( id => self.footnoteList[id].fr ).join( '\n' )
-                    };
-                  }
-
-                  option.detailCategoryList.forEach( function( detailCat ) {
-                    detailCat.detailList.forEach( function( detail ) {
-                      var list = detail.footnote_id_list;
-                      delete detail.footnote_id_list;
-                      if( list ) {
-                        detail.footnote = {
-                          en: list.split( ',' ).map( id => self.footnoteList[id].en ).join( '\n' ),
-                          fr: list.split( ',' ).map( id => self.footnoteList[id].fr ).join( '\n' )
-                        };
-                      }
-                    } );
-                  } );
-                } );
-              } );
-
-            } )
+            ] )
 
           ] );
         };

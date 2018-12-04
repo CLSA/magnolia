@@ -1,43 +1,61 @@
-SELECT "Adding new footnotes to data_option_detail records" AS "";
+DROP PROCEDURE IF EXISTS data_option_detail_has_footnote;
+DELIMITER //
+CREATE PROCEDURE data_option_detail_has_footnote()
+  BEGIN
 
-INSERT IGNORE INTO data_option_detail_has_footnote( data_option_detail_id, footnote_id )
-SELECT data_option_detail.id, footnote.id
-FROM data_option_detail, footnote
-WHERE data_option_detail.name_en LIKE "%(CCT/CCC)"
-AND footnote.note_en = "Self-reported Chronic Condition";
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.TABLES
+    WHERE table_schema = DATABASE()
+    AND table_name = "data_option_detail_has_footnote";
 
-SELECT id INTO @data_option_id FROM data_option WHERE name_en = "Bio-Impedance by DEXA";
+    IF @test THEN
+      SELECT "Adding new footnotes to data_option_detail records" AS "";
 
-INSERT IGNORE INTO data_option_detail_has_footnote( data_option_detail_id, footnote_id )
-SELECT data_option_detail.id, footnote.id
-FROM data_option_detail, footnote
-WHERE data_option_detail.data_option_id = @data_option_id
-AND (
-  footnote.note_en = "Bio-Impedance by DEXA." OR
-  footnote.note_en LIKE "Raw data are available %"
-)
-ORDER BY footnote.note_en;
+      INSERT IGNORE INTO data_option_detail_has_footnote( data_option_detail_id, footnote_id )
+      SELECT data_option_detail.id, footnote.id
+      FROM data_option_detail, footnote
+      WHERE data_option_detail.name_en LIKE "%(CCT/CCC)"
+      AND footnote.note_en = "Self-reported Chronic Condition";
 
-SELECT id INTO @data_option_id FROM data_option WHERE name_en = "Bone Density by DEXA";
+      SELECT id INTO @data_option_id FROM data_option WHERE name_en = "Bio-Impedance by DEXA";
 
-INSERT IGNORE INTO data_option_detail_has_footnote( data_option_detail_id, footnote_id )
-SELECT data_option_detail.id, footnote.id
-FROM data_option_detail, footnote
-WHERE data_option_detail.data_option_id = @data_option_id
-AND (
-  footnote.note_en = "Bone Density by DEXA." OR
-  footnote.note_en LIKE "Images and raw data are available %"
-)
-ORDER BY footnote.note_en;
+      INSERT IGNORE INTO data_option_detail_has_footnote( data_option_detail_id, footnote_id )
+      SELECT data_option_detail.id, footnote.id
+      FROM data_option_detail, footnote
+      WHERE data_option_detail.data_option_id = @data_option_id
+      AND (
+        footnote.note_en = "Bio-Impedance by DEXA." OR
+        footnote.note_en LIKE "Raw data are available %"
+      )
+      ORDER BY footnote.note_en;
 
-SELECT id INTO @data_option_id FROM data_option WHERE name_en = "Physical Health II";
+      SELECT id INTO @data_option_id FROM data_option WHERE name_en = "Bone Density by DEXA";
 
-INSERT IGNORE INTO data_option_detail_has_footnote( data_option_detail_id, footnote_id )
-SELECT data_option_detail.id, footnote.id
-FROM data_option_detail, footnote
-WHERE data_option_detail.data_option_id = @data_option_id
-AND data_option_detail.name_en NOT LIKE "Medication%"
-AND footnote.note_en LIKE "Disease Algorithms and Disease Symptoms - %";
+      INSERT IGNORE INTO data_option_detail_has_footnote( data_option_detail_id, footnote_id )
+      SELECT data_option_detail.id, footnote.id
+      FROM data_option_detail, footnote
+      WHERE data_option_detail.data_option_id = @data_option_id
+      AND (
+        footnote.note_en = "Bone Density by DEXA." OR
+        footnote.note_en LIKE "Images and raw data are available %"
+      )
+      ORDER BY footnote.note_en;
 
-DELETE FROM data_option_detail_has_footnote
-WHERE data_option_detail_id = ( SELECT id FROM data_option_detail where name_en = "Medications (MEDI; not yet available)" );
+      SELECT id INTO @data_option_id FROM data_option WHERE name_en = "Physical Health II";
+
+      INSERT IGNORE INTO data_option_detail_has_footnote( data_option_detail_id, footnote_id )
+      SELECT data_option_detail.id, footnote.id
+      FROM data_option_detail, footnote
+      WHERE data_option_detail.data_option_id = @data_option_id
+      AND data_option_detail.name_en NOT LIKE "Medication%"
+      AND footnote.note_en LIKE "Disease Algorithms and Disease Symptoms - %";
+
+      DELETE FROM data_option_detail_has_footnote
+      WHERE data_option_detail_id = ( SELECT id FROM data_option_detail where name_en = "Medications (MEDI; not yet available)" );
+    END IF;
+
+  END //
+DELIMITER ;
+
+CALL data_option_detail_has_footnote();
+DROP PROCEDURE IF EXISTS data_option_detail_has_footnote;

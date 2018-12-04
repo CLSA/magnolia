@@ -53,6 +53,63 @@ CREATE PROCEDURE move_data_option_details( old_data_option VARCHAR(127), new_dat
   END //
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS patch_data_option_detail;
+DELIMITER //
+CREATE PROCEDURE patch_data_option_detail()
+  BEGIN
+
+    SET SESSION group_concat_max_len = 1000000;
+
+    SELECT "Adding new note_en columns to the data_option_detail table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "data_option_detail"
+    AND column_name = "note_en";
+
+    IF @test = 0 THEN
+      ALTER TABLE data_option_detail ADD COLUMN note_en TEXT NULL DEFAULT NULL;
+
+      UPDATE data_option_detail
+      JOIN (
+        SELECT data_option_detail.id, REPLACE( GROUP_CONCAT( footnote.note_en order by footnote.id separator "\n" ), "<br>", "\n" ) AS note_en
+        FROM data_option_detail
+        JOIN data_option_detail_has_footnote ON data_option_detail.id = data_option_detail_has_footnote.data_option_detail_id
+        JOIN footnote ON data_option_detail_has_footnote.footnote_id = footnote.id
+        GROUP BY data_option_detail.id
+      ) AS note USING( id )
+      SET data_option_detail.note_en = note.note_en;
+    END IF;
+
+    SELECT "Adding new note_fr columns to the data_option_detail table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "data_option_detail"
+    AND column_name = "note_fr";
+
+    IF @test = 0 THEN
+      ALTER TABLE data_option_detail ADD COLUMN note_fr TEXT NULL DEFAULT NULL;
+
+      UPDATE data_option_detail
+      JOIN (
+        SELECT data_option_detail.id, REPLACE( GROUP_CONCAT( footnote.note_fr order by footnote.id separator "\n" ), "<br>", "\n" ) AS note_fr
+        FROM data_option_detail
+        JOIN data_option_detail_has_footnote ON data_option_detail.id = data_option_detail_has_footnote.data_option_detail_id
+        JOIN footnote ON data_option_detail_has_footnote.footnote_id = footnote.id
+        GROUP BY data_option_detail.id
+      ) AS note USING( id )
+      SET data_option_detail.note_fr = note.note_fr;
+    END IF;
+
+  END //
+DELIMITER ;
+
+CALL patch_data_option_detail();
+DROP PROCEDURE IF EXISTS patch_data_option_detail;
+
 DELETE FROM data_option_detail WHERE name_en = "Disease Algorithms and Disease Symptoms";
 
 CALL add_data_option_detail( "Socio-Demographic Characteristics", "Gender Identity (GED)", "Identité de genre (GED)" );
