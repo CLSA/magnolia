@@ -13,7 +13,7 @@ CREATE PROCEDURE patch_role_has_service()
       "FROM ", @cenozo, ".role, service ",
       "WHERE role.name = 'administrator' ",
       "AND service.restricted = 1 ",
-      "AND service.subject = 'supplemental_file'" );
+      "AND service.subject IN ( 'data_option', 'data_option_category', 'data_option_detail', 'study_phase', 'supplemental_file' )" );
     PREPARE statement FROM @sql;
     EXECUTE statement;
     DEALLOCATE PREPARE statement;

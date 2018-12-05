@@ -17,15 +17,17 @@ SOURCE footnote.sql
 SOURCE reqn_data_option.sql
 SOURCE reqn_has_data_option.sql
 SOURCE data_option_detail_has_footnote.sql
+SOURCE data_option_detail_has_study_phase.sql
 SOURCE data_option_detail.sql
 SOURCE data_option_detail_has_footnote2.sql
+SOURCE data_option_detail_has_study_phase2.sql
 SOURCE data_option_has_study_phase.sql
 SOURCE data_option.sql
 SOURCE data_option_has_footnote.sql
 SOURCE data_option_category.sql
 SOURCE data_option_category_has_footnote.sql
-SOURCE data_option_detail_has_study_phase.sql
 SOURCE footnote2.sql
+SOURCE reqn_note.sql
 
 SOURCE update_version_number.sql
 

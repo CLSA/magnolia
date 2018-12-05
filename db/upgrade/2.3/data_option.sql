@@ -92,6 +92,30 @@ CREATE PROCEDURE patch_data_option()
       SET data_option.note_fr = note.note_fr;
     END IF;
 
+    SELECT "Adding new unique key on name_en column in the data_option table" AS "";
+
+    SELECT COLUMN_KEY INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "data_option"
+    AND column_name = "name_en";
+
+    IF @test != "UNI" THEN
+      ALTER TABLE data_option ADD UNIQUE KEY uq_name_en (name_en);
+    END IF;
+
+    SELECT "Adding new unique key on name_fr column in the data_option table" AS "";
+
+    SELECT COLUMN_KEY INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "data_option"
+    AND column_name = "name_fr";
+
+    IF @test != "UNI" THEN
+      ALTER TABLE data_option ADD UNIQUE KEY uq_name_fr (name_fr);
+    END IF;
+
   END //
 DELIMITER ;
 

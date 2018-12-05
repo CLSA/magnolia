@@ -23,9 +23,6 @@ class module extends \cenozo\service\module
 
     $modifier->join( 'data_option_category', 'data_option.data_option_category_id', 'data_option_category.id' );
 
-    if( $select->has_column( 'category' ) )
-      $select->add_column( 'CONCAT( data_option_category.rank, ") ", data_option_category.name_en )', 'category', false );
-
     if( $select->has_column( 'bl' ) )
     {
       $join_sel = lib::create( 'database\select' );

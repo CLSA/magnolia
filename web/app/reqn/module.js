@@ -1416,11 +1416,15 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                   return CnHttpFactory.instance( {
                     path: 'data_option_detail',
                     data: {
-                      select: { column: [ 'id', 'data_option_id', 'name_en', 'name_fr', 'note_en', 'note_fr', 'study_phase_list', {
+                      select: { column: [ 'id', 'data_option_id', 'name_en', 'name_fr', 'note_en', 'note_fr', {
+                        table: 'study_phase',
+                        column: 'name',
+                        alias: 'study_phase'
+                      }, {
                         table: 'data_option',
                         column: 'data_option_category_id'
                       } ] },
-                      modifier: { order: [ 'data_option_id', 'data_option_detail.rank' ], limit: 1000000 }
+                      modifier: { order: [ 'data_option_id', 'study_phase_id', 'data_option_detail.rank' ], limit: 1000000 }
                     }
                   } ).query().then( function( response ) {
                     var category = null;
@@ -1438,14 +1442,12 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                       detail.note = { en: detail.note_en, fr: detail.note_fr };
                       delete detail.note_en;
                       delete detail.note_fr;
-                      var studyPhaseList = detail.study_phase_list.split( ',' )
-                      delete detail.study_phase_list;
-
-                      studyPhaseList.forEach( function( study_phase ) {
-                        var detailCategory = option.detailCategoryList.findByProperty( 'name', study_phase );
-                        if( detailCategory ) detailCategory.detailList.push( detail );
-                        else option.detailCategoryList.push( { name: study_phase, detailList: [ detail ] } );
-                      } );
+                      var studyPhase = detail.study_phase;
+                      delete detail.study_phase;
+                      
+                      var detailCategory = option.detailCategoryList.findByProperty( 'name', studyPhase );
+                      if( detailCategory ) detailCategory.detailList.push( detail );
+                      else option.detailCategoryList.push( { name: studyPhase, detailList: [ detail ] } );
                     } );
                   } );
                 } );

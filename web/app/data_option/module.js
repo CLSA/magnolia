@@ -4,9 +4,10 @@ define( function() {
   try { var module = cenozoApp.module( 'data_option', true ); } catch( err ) { console.warn( err ); return; }
   angular.extend( module, {
     identifier: {
+      column: 'name_en',
       parent: {
         subject: 'data_option_category',
-        column: 'data_option_category.rank'
+        column: 'data_option_category.name_en'
       }
     },
     name: {
@@ -24,14 +25,16 @@ define( function() {
   } );
 
   module.addInputGroup( '', {
-    category: {
+    data_option_category_name_en: {
+      column: 'data_option_category.name_en',
       title: 'Category',
       type: 'string',
-      contant: true
+      constant: true
     },
     rank: {
       title: 'Rank',
-      type: 'rank'
+      type: 'rank',
+      constant: true
     },
     name_en: {
       title: 'Name (English)',

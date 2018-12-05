@@ -3,7 +3,7 @@ define( function() {
 
   try { var module = cenozoApp.module( 'data_option_category', true ); } catch( err ) { console.warn( err ); return; }
   angular.extend( module, {
-    identifier: { column: 'rank' },
+    identifier: { column: 'name_en' },
     name: {
       singular: 'data-option category',
       plural: 'data-option categories',
@@ -19,7 +19,8 @@ define( function() {
   module.addInputGroup( '', {
     rank: {
       title: 'Rank',
-      type: 'rank'
+      type: 'rank',
+      constant: true
     },
     name_en: {
       title: 'Name (English)',
