@@ -13,24 +13,19 @@ SOURCE stage_type.sql
 SOURCE stage_type_has_stage_type.sql
 SOURCE notification_type.sql
 SOURCE supplemental_file.sql
-SOURCE footnote.sql
 SOURCE reqn_data_option.sql
 SOURCE reqn_has_data_option.sql
+SOURCE data_option_detail.sql
 SOURCE data_option_detail_has_footnote.sql
 SOURCE data_option_detail_has_study_phase.sql
-SOURCE data_option_detail.sql
-SOURCE data_option_detail_has_footnote2.sql
-SOURCE data_option_detail_has_study_phase2.sql
 SOURCE data_option_has_study_phase.sql
 SOURCE data_option.sql
 SOURCE data_option_has_footnote.sql
 SOURCE data_option_category.sql
 SOURCE data_option_category_has_footnote.sql
-SOURCE footnote2.sql
+SOURCE footnote.sql
 SOURCE reqn_note.sql
 
 SOURCE update_version_number.sql
-
-SELECT "PLEASE NOTE: Make sure to run ./set_data_directories.php script if it hasn't already been run" AS "";
 
 COMMIT;
