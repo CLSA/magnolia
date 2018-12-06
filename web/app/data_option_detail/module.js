@@ -23,7 +23,7 @@ define( [ 'data_option' ].reduce( function( list, name ) {
       rank: { title: 'Rank', type: 'rank' },
       name_en: { title: 'Name' }
     },
-    defaultOrder: { column: 'study_phase.name', reverse: false }
+    defaultOrder: { column: 'rank', reverse: false }
   } );
 
   module.addInputGroup( '', {
