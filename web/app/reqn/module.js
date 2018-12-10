@@ -1289,6 +1289,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           else this.$$transitionToViewState( record );
         };
 
+        var misc = cenozoApp.lookupData.reqn.misc;
         this.dataOptionCategoryList = [];
 
         this.getMetadata = function() {
@@ -1296,8 +1297,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             self.$$getMetadata().then( function() {
               // only do the following for the root instance
               if( 'root' == self.type ) {
-                var misc = cenozoApp.lookupData.reqn.misc;
-
                 // create coapplicant access enum
                 self.metadata.accessEnumList = {
                   en: [ { value: true, name: misc.yes.en }, { value: false, name: misc.no.en } ],
@@ -1416,7 +1415,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                   return CnHttpFactory.instance( {
                     path: 'data_option_detail',
                     data: {
-                      select: { column: [ 'id', 'data_option_id', 'name_en', 'name_fr', 'note_en', 'note_fr', {
+                      select: { column: [ 'id', 'data_option_id', 'name_en', 'name_fr', 'note_en', 'note_fr', 'study_phase_id', {
                         table: 'study_phase',
                         column: 'name',
                         alias: 'study_phase'
@@ -1442,12 +1441,25 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                       detail.note = { en: detail.note_en, fr: detail.note_fr };
                       delete detail.note_en;
                       delete detail.note_fr;
+                      var studyPhaseId = detail.study_phase_id;
                       var studyPhase = detail.study_phase;
                       delete detail.study_phase;
+                      delete detail.study_phase_id;
+
+                      var studyPhaseFr = misc.baseline.fr;
+                      var match = studyPhase.match( /Follow-up ([0-9]+)/ );
+                      if( null != match ) {
+                        var lookup = 'followup' + match[1];
+                        studyPhaseFr = misc[lookup].fr;
+                      }
                       
-                      var detailCategory = option.detailCategoryList.findByProperty( 'name', studyPhase );
+                      var detailCategory = option.detailCategoryList.findByProperty( 'study_phase_id', studyPhaseId );
                       if( detailCategory ) detailCategory.detailList.push( detail );
-                      else option.detailCategoryList.push( { name: studyPhase, detailList: [ detail ] } );
+                      else option.detailCategoryList.push( {
+                        study_phase_id: studyPhaseId,
+                        name: { en: studyPhase, fr: studyPhaseFr },
+                        detailList: [ detail ]
+                      } );
                     } );
                   } );
                 } );
