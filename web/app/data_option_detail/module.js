@@ -21,7 +21,8 @@ define( [ 'data_option' ].reduce( function( list, name ) {
       parent_name_en: { column: 'data_option.name_en', title: 'Data Option Name' },
       study_phase: { column: 'study_phase.name', title: 'Study Phase' },
       rank: { title: 'Rank', type: 'rank' },
-      name_en: { title: 'Name' }
+      name_en: { title: 'Name' },
+      note_en: { title: 'Note', type: 'text', limit: 20 }
     },
     defaultOrder: { column: 'rank', reverse: false }
   } );

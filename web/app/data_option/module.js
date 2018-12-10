@@ -19,7 +19,8 @@ define( function() {
       category_rank: { column: 'data_option_category.rank', title: 'Category Rank', type: 'rank' },
       category_name_en: { column: 'data_option_category.name_en', title: 'Category Name' },
       rank: { title: 'Rank', type: 'rank' },
-      name_en: { title: 'Name' }
+      name_en: { title: 'Name' },
+      note_en: { title: 'Note', type: 'text', limit: 20 }
     },
     defaultOrder: { column: 'rank', reverse: false }
   } );

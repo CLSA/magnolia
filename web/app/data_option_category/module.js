@@ -11,7 +11,8 @@ define( function() {
     },
     columnList: {
       rank: { title: 'Rank', type: 'rank' },
-      name_en: { title: 'Name' }
+      name_en: { title: 'Name' },
+      note_en: { title: 'Note', type: 'text', limit: 20 }
     },
     defaultOrder: { column: 'rank', reverse: false }
   } );
