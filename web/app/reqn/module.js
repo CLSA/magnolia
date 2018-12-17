@@ -23,6 +23,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         title: 'Owner',
       },
       applicant_name: {
+        column: 'reqn_version.applicant_name',
         title: 'Applicant',
       },
       deadline: {
@@ -83,73 +84,79 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
       exclude: true // modified in the model
     },
     title: {
+      column: 'reqn_version.title',
       title: 'Title',
       type: 'string',
       constant: true,
       exclude: true // modified in the model
     },
     applicant_name: {
+      column: 'reqn_version.applicant_name',
       title: 'Applicant',
       type: 'string',
       constant: true,
       exclude: true // modified in the model
     },
     lay_summary: {
+      column: 'reqn_version.lay_summary',
       title: 'Lay Summary',
       type: 'text',
       constant: true,
       exclude: true // modified in the model
     },
     agreement_filename: {
+      column: 'reqn_version.agreement_filename',
       title: 'Agreement File',
       type: 'file',
       exclude: true // modified in the model
     },
     instruction_filename: {
+      column: 'reqn_version.instruction_filename',
       title: 'Instruction File',
       type: 'file',
       exclude: true // modified in the model
     },
 
     // the following are for the form and will not appear in the view
+    reqn_version_id: { column: 'reqn_version.id', type: 'string', exclude: true },
     data_directory: { type: 'string', exclude: true },
     phase: { column: 'stage_type.phase', type: 'string', exclude: true },
     status: { column: 'stage_type.status', type: 'string', exclude: true },
     decision: { column: 'stage_type.decision', type: 'boolean', exclude: true },
     language: { type: 'string', column: 'language.code', exclude: true },
     deadline: { type: 'date', column: 'deadline.date', exclude: true },
-    applicant_position: { type: 'string', exclude: true },
-    applicant_affiliation: { type: 'string', exclude: true },
-    applicant_address: { type: 'string', exclude: true },
-    applicant_phone: { type: 'string', exclude: true },
-    applicant_email: { type: 'string', format: 'email', exclude: true },
-    graduate_name: { type: 'string', exclude: true },
-    graduate_program: { type: 'string', exclude: true },
-    graduate_institution: { type: 'string', exclude: true },
-    graduate_address: { type: 'string', exclude: true },
-    graduate_phone: { type: 'string', exclude: true },
-    graduate_email: { type: 'string', format: 'email', exclude: true },
-    start_date: { type: 'date', exclude: true },
-    duration: { type: 'string', exclude: true },
-    keywords: { type: 'string', exclude: true },
-    background: { type: 'text', exclude: true },
-    objectives: { type: 'text', exclude: true },
-    methodology: { type: 'text', exclude: true },
-    analysis: { type: 'text', exclude: true },
-    funding: { type: 'enum', exclude: true },
-    funding_agency: { type: 'string', exclude: true },
-    grant_number: { type: 'string', exclude: true },
-    ethics: { type: 'boolean', exclude: true },
-    ethics_date: { type: 'date', exclude: true },
-    waiver: { type: 'enum', exclude: true },
-    tracking: { type: 'boolean', exclude: true },
-    comprehensive: { type: 'boolean', exclude: true },
-    part2_a_comment: { type: 'text', exclude: true },
-    part2_b_comment: { type: 'text', exclude: true },
-    part2_c_comment: { type: 'text', exclude: true },
-    part2_d_comment: { type: 'text', exclude: true },
-    part2_e_comment: { type: 'text', exclude: true },
-    part2_f_comment: { type: 'text', exclude: true }
+    applicant_position: { column: 'reqn_version.applicant_position', type: 'string', exclude: true },
+    applicant_affiliation: { column: 'reqn_version.applicant_affiliation', type: 'string', exclude: true },
+    applicant_address: { column: 'reqn_version.applicant_address', type: 'string', exclude: true },
+    applicant_phone: { column: 'reqn_version.applicant_phone', type: 'string', exclude: true },
+    applicant_email: { column: 'reqn_version.applicant_email', type: 'string', format: 'email', exclude: true },
+    graduate_name: { column: 'reqn_version.graduate_name', type: 'string', exclude: true },
+    graduate_program: { column: 'reqn_version.graduate_program', type: 'string', exclude: true },
+    graduate_institution: { column: 'reqn_version.graduate_institution', type: 'string', exclude: true },
+    graduate_address: { column: 'reqn_version.graduate_address', type: 'string', exclude: true },
+    graduate_phone: { column: 'reqn_version.graduate_phone', type: 'string', exclude: true },
+    graduate_email: { column: 'reqn_version.graduate_email', type: 'string', format: 'email', exclude: true },
+    start_date: { column: 'reqn_version.start_date', type: 'date', exclude: true },
+    duration: { column: 'reqn_version.duration', type: 'string', exclude: true },
+    keywords: { column: 'reqn_version.keywords', type: 'string', exclude: true },
+    background: { column: 'reqn_version.background', type: 'text', exclude: true },
+    objectives: { column: 'reqn_version.objectives', type: 'text', exclude: true },
+    methodology: { column: 'reqn_version.methodology', type: 'text', exclude: true },
+    analysis: { column: 'reqn_version.analysis', type: 'text', exclude: true },
+    funding: { column: 'reqn_version.funding', type: 'enum', exclude: true },
+    funding_agency: { column: 'reqn_version.funding_agency', type: 'string', exclude: true },
+    grant_number: { column: 'reqn_version.grant_number', type: 'string', exclude: true },
+    ethics: { column: 'reqn_version.ethics', type: 'boolean', exclude: true },
+    ethics_date: { column: 'reqn_version.ethics_date', type: 'date', exclude: true },
+    waiver: { column: 'reqn_version.waiver', type: 'enum', exclude: true },
+    tracking: { column: 'reqn_version.tracking', type: 'boolean', exclude: true },
+    comprehensive: { column: 'reqn_version.comprehensive', type: 'boolean', exclude: true },
+    part2_a_comment: { column: 'reqn_version.part2_a_comment', type: 'text', exclude: true },
+    part2_b_comment: { column: 'reqn_version.part2_b_comment', type: 'text', exclude: true },
+    part2_c_comment: { column: 'reqn_version.part2_c_comment', type: 'text', exclude: true },
+    part2_d_comment: { column: 'reqn_version.part2_d_comment', type: 'text', exclude: true },
+    part2_e_comment: { column: 'reqn_version.part2_e_comment', type: 'text', exclude: true },
+    part2_f_comment: { column: 'reqn_version.part2_f_comment', type: 'text', exclude: true }
   } );
 
   module.addInputGroup( 'Decision and Deferral Notes', {
@@ -584,22 +591,18 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               this.setTab( 1, this.parentModel.getQueryParameter( 't1' ), false );
               this.setTab( 2, this.parentModel.getQueryParameter( 't2' ), false );
 
-              var promiseList = [
-                this.$$onView( force ).then( function() {
-                  // define the earliest date that the reqn may start
-                  self.minStartDate = moment( self.record.deadline ).add( CnSession.application.startDateDelay, 'months' );
-                } )
-              ];
+              return this.$$onView( force ).then( function() {
+                // define the earliest date that the reqn may start
+                self.minStartDate = moment( self.record.deadline ).add( CnSession.application.startDateDelay, 'months' );
 
-              if( 'lite' != this.parentModel.type ) {
-                promiseList = promiseList.concat( 
-                  this.getCoapplicantList(),
-                  this.getReferenceList(),
-                  this.getDataOptionValueList()
-                );
-              }
-
-              return $q.all( promiseList );
+                if( 'lite' != self.parentModel.type ) {
+                  return $q.all( [
+                    self.getCoapplicantList(),
+                    self.getReferenceList(),
+                    self.getDataOptionValueList()
+                  ] );
+                }
+              } );
             }
 
             // if we are a reviewer assigned to this reqn and haven't completed our review then show a reminder
@@ -904,7 +907,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
           getCoapplicantList: function() {
             return CnHttpFactory.instance( {
-              path: this.parentModel.getServiceResourcePath() + '/coapplicant',
+              path: 'reqn_version/' + this.record.reqn_version_id + '/coapplicant',
               data: {
                 select: { column: [ 'id', 'name', 'position', 'affiliation', 'email', 'role', 'access' ] },
                 modifier: { order: 'id', limit: 1000000 }
@@ -916,7 +919,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
           removeCoapplicant: function( id ) {
             return CnHttpFactory.instance( {
-              path: this.parentModel.getServiceResourcePath() + '/coapplicant/' + id
+              path: 'reqn_version/' + this.record.reqn_version_id + '/coapplicant/' + id
             } ).delete().then( function() {
               return self.getCoapplicantList();
             } );
@@ -924,7 +927,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
           getReferenceList: function() {
             return CnHttpFactory.instance( {
-              path: this.parentModel.getServiceResourcePath() + '/reference',
+              path: 'reqn_version/' + this.record.reqn_version_id + '/reference',
               data: {
                 select: { column: [ 'id', 'rank', 'reference' ] },
                 modifier: { order: 'rank', limit: 1000000 }
@@ -936,7 +939,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
           setReferenceRank: function( id, rank ) {
             return CnHttpFactory.instance( {
-              path: this.parentModel.getServiceResourcePath() + '/reference/' + id,
+              path: 'reqn_version/' + this.record.reqn_version_id + '/reference/' + id,
               data: { rank: rank }
             } ).patch().then( function() {
               return self.getReferenceList();
@@ -945,7 +948,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
           removeReference: function( id ) {
             return CnHttpFactory.instance( {
-              path: this.parentModel.getServiceResourcePath() + '/reference/' + id
+              path: 'reqn_version/' + this.record.reqn_version_id + '/reference/' + id
             } ).delete().then( function() {
               return self.getReferenceList();
             } );
@@ -963,7 +966,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               }
             } ).then( function() {
               return CnHttpFactory.instance( {
-                path: self.parentModel.getServiceResourcePath() + '/reqn_data_option',
+                path: 'reqn_version/' + self.record.reqn_version_id + '/reqn_version_data_option',
                 data: { select: { column: [ 'data_option_id', { table: 'study_phase', column: 'code', alias: 'phase' } ] } }
               } ).query().then( function( response ) {
                 response.data.forEach( function( dataOption ) {
@@ -981,7 +984,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             if( this.dataOptionValueList[studyPhaseCode][dataOptionId] ) {
               // add the data-option
               return CnHttpFactory.instance( {
-                path: self.parentModel.getServiceResourcePath() + '/reqn_data_option',
+                path: 'reqn_version/' + this.record.reqn_version_id + '/reqn_version_data_option',
                 data: { data_option_id: dataOptionId, study_phase_code: studyPhaseCode },
                 onError: function( response ) {
                   self.dataOptionValueList[studyPhaseCode][dataOptionId] = !self.dataOptionValueList[studyPhaseCode][dataOptionId];
@@ -990,8 +993,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             } else {
               // delete the data-option
               return CnHttpFactory.instance( {
-                path: self.parentModel.getServiceResourcePath() +
-                  '/reqn_data_option/data_option_id=' + dataOptionId + ';study_phase_code=' + studyPhaseCode,
+                path: 'reqn_version/' + this.record.reqn_version_id +
+                  '/reqn_version_data_option/data_option_id=' + dataOptionId + ';study_phase_code=' + studyPhaseCode,
                 onError: function( response ) {
                   self.dataOptionValueList[studyPhaseCode][dataOptionId] = !self.dataOptionValueList[studyPhaseCode][dataOptionId];
                 }
@@ -1198,7 +1201,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                    ? {
                        select: {
                          column: [
-                           'state', 'funding_filename', 'ethics_filename',
+                           'state',
+                           { table: 'reqn_version', column: 'funding_filename' },
+                           { table: 'reqn_version', column: 'ethics_filename' },
                            { table: 'stage_type', column: 'phase' },
                            { table: 'stage_type', column: 'name', alias: 'stage_type' }
                          ]
@@ -1294,7 +1299,26 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
         this.getMetadata = function() {
           return $q.all( [
-            self.$$getMetadata().then( function() {
+            $q.all( [
+              self.$$getMetadata(),
+              CnHttpFactory.instance( {
+                path: 'reqn_version'
+              } ).head().then( function( response ) {
+                var columnList = angular.fromJson( response.headers( 'Columns' ) ); 
+                for( var column in columnList ) {
+                  columnList[column].required = '1' == columnList[column].required;
+                  if( 'enum' == columnList[column].data_type ) { // parse out the enum values
+                    columnList[column].enumList = [];
+                    cenozo.parseEnumList( columnList[column] ).forEach( function( item ) {
+                      columnList[column].enumList.push( { value: item, name: item } ); 
+                    } );
+                  }
+                  if( angular.isUndefined( self.metadata.columnList[column] ) )
+                    self.metadata.columnList[column] = {};
+                  angular.extend( self.metadata.columnList[column], columnList[column] );
+                }
+              } )
+            ] ).then( function() {
               // only do the following for the root instance
               if( 'root' == self.type ) {
                 // create coapplicant access enum

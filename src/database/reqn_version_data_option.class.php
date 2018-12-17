@@ -1,6 +1,6 @@
 <?php
 /**
- * reqn_data_option.class.php
+ * reqn_version_data_option.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
  * @filesource
@@ -10,9 +10,9 @@ namespace magnolia\database;
 use cenozo\lib, cenozo\log, magnolia\util;
 
 /**
- * reqn_data_option: record
+ * reqn_version_data_option: record
  */
-class reqn_data_option extends \cenozo\database\record
+class reqn_version_data_option extends \cenozo\database\record
 {
   /**
    * Override parent method

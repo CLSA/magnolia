@@ -32,5 +32,5 @@ class reference extends \cenozo\database\has_rank
    * @access protected
    * @static
    */
-  protected static $rank_parent = 'reqn';
+  protected static $rank_parent = 'reqn_version';
 }

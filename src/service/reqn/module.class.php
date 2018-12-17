@@ -51,6 +51,8 @@ class module extends \cenozo\service\module
     $db_user = $session->get_user();
     $db_role = $session->get_role();
 
+    $modifier->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
+    $modifier->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
     $modifier->join( 'deadline', 'reqn.deadline_id', 'deadline.id' );
 
     // only show applicants their own reqns which aren't abandoned

@@ -5,8 +5,8 @@ define( function() {
   angular.extend( module, {
     identifier: {
       parent: {
-        subject: 'reqn',
-        column: 'identifier'
+        subject: 'reqn_version',
+        column: 'id'
       }
     },
     name: {
