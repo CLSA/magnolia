@@ -57,15 +57,18 @@ class final_report extends \cenozo\database\record
     $pdf_writer->set_template( sprintf( '%s/%d.pdf', PDF_FORM_PATH, $db_pdf_form->id ) );
 
     $db_reqn = $this->get_reqn();
+    $db_reqn_version = $db_reqn->get_current_reqn_version();
     $data = array( 'identifier' => $db_reqn->identifier );
 
-    if( !is_null( $db_reqn->applicant_name ) ) $data['applicant_name'] = $db_reqn->applicant_name;
-    if( !is_null( $db_reqn->applicant_affiliation ) ) $data['applicant_affiliation'] = $db_reqn->applicant_affiliation;
-    if( !is_null( $db_reqn->applicant_address ) ) $data['applicant_address'] = $db_reqn->applicant_address;
-    if( !is_null( $db_reqn->applicant_phone ) ) $data['applicant_phone'] = $db_reqn->applicant_phone;
-    if( !is_null( $db_reqn->applicant_email ) ) $data['applicant_email'] = $db_reqn->applicant_email;
-    if( !is_null( $db_reqn->title ) ) $data['title'] = $db_reqn->title;
-    if( !is_null( $db_reqn->lay_summary ) ) $data['lay_summary'] = $db_reqn->lay_summary;
+    if( !is_null( $db_reqn_version->applicant_name ) ) $data['applicant_name'] = $db_reqn_version->applicant_name;
+    if( !is_null( $db_reqn_version->applicant_affiliation ) )
+      $data['applicant_affiliation'] = $db_reqn_version->applicant_affiliation;
+    if( !is_null( $db_reqn_version->applicant_address ) )
+      $data['applicant_address'] = $db_reqn_version->applicant_address;
+    if( !is_null( $db_reqn_version->applicant_phone ) ) $data['applicant_phone'] = $db_reqn_version->applicant_phone;
+    if( !is_null( $db_reqn_version->applicant_email ) ) $data['applicant_email'] = $db_reqn_version->applicant_email;
+    if( !is_null( $db_reqn_version->title ) ) $data['title'] = $db_reqn_version->title;
+    if( !is_null( $db_reqn_version->lay_summary ) ) $data['lay_summary'] = $db_reqn_version->lay_summary;
     if( !is_null( $this->activities ) || !is_null( $this->findings ) || !is_null( $this->outcomes ) )
     {
       $data['accomplishments'] = $accomplishments = sprintf(
@@ -75,13 +78,13 @@ class final_report extends \cenozo\database\record
         $this->outcomes
       );
     }
-    if( !is_null( $db_reqn->graduate_name ) ) $data['graduate_name'] = $db_reqn->graduate_name;
+    if( !is_null( $db_reqn_version->graduate_name ) ) $data['graduate_name'] = $db_reqn_version->graduate_name;
     if( !is_null( $this->thesis_title ) ) $data['thesis_title'] = $this->thesis_title;
     if( !is_null( $this->thesis_status ) ) $data['thesis_status'] = $this->thesis_status;
     if( !is_null( $this->impact ) ) $data['impact'] = $this->impact;
     if( !is_null( $this->opportunities ) ) $data['opportunities'] = $this->opportunities;
     if( !is_null( $this->dissemination ) ) $data['dissemination'] = $this->dissemination;
-    if( !is_null( $db_reqn->applicant_name ) ) $data['signature_name'] = $db_reqn->applicant_name;
+    if( !is_null( $db_reqn_version->applicant_name ) ) $data['signature_name'] = $db_reqn_version->applicant_name;
     $data['signature_date'] = util::get_datetime_object()->format( 'd-m-Y' );
 
     $production_sel = lib::create( 'database\select' );

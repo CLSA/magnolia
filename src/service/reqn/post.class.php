@@ -27,9 +27,5 @@ class post extends \cenozo\service\post
     // if the language_id isn't set then default to English
     if( is_null( $db_reqn->language_id ) )
       $db_reqn->language_id = $language_class_name::get_unique_record( 'code', 'en' )->id;
-
-    // fill in the applicant's email
-    if( is_null( $db_reqn->applicant_email ) )
-      $db_reqn->applicant_email = lib::create( 'business\session' )->get_user()->email;
   }
 }

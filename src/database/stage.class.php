@@ -34,7 +34,7 @@ class stage extends \cenozo\database\record
         $db_notification = lib::create( 'database\notification' );
         $db_notification->reqn_id = $db_reqn->id;
         $db_notification->notification_type_id = $db_notification_type->id;
-        $db_notification->email = $db_reqn->applicant_email;
+        $db_notification->email = $db_reqn->get_current_reqn_version()->applicant_email;
         $db_notification->datetime = util::get_datetime_object();
         $db_notification->save();
       }
@@ -68,7 +68,8 @@ class stage extends \cenozo\database\record
     {
       // make sure both the agreement and ethics files have been attached
       $db_reqn = $this->get_reqn();
-      if( is_null( $db_reqn->ethics_filename ) )
+      $db_reqn_version = $db_reqn->get_current_reqn_version();
+      if( is_null( $db_reqn_version->ethics_filename ) )
         return 'The ethics letter must be attached before proceeding to the next stage.';
       if( is_null( $db_reqn->agreement_filename ) )
         return 'The agreement letter must be attached before proceeding to the next stage.';

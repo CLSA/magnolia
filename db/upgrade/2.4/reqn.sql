@@ -339,30 +339,6 @@ CREATE PROCEDURE patch_reqn()
       ALTER TABLE reqn DROP COLUMN ethics_filename;
     END IF;
 
-    SELECT "Removing reqn.agreement_filename column" AS "";
-
-    SELECT COUNT(*) INTO @test
-    FROM information_schema.COLUMNS
-    WHERE table_schema = DATABASE()
-    AND table_name = "reqn"
-    AND column_name = "agreement_filename";
-
-    IF @test THEN
-      ALTER TABLE reqn DROP COLUMN agreement_filename;
-    END IF;
-
-    SELECT "Removing reqn.instruction_filename column" AS "";
-
-    SELECT COUNT(*) INTO @test
-    FROM information_schema.COLUMNS
-    WHERE table_schema = DATABASE()
-    AND table_name = "reqn"
-    AND column_name = "instruction_filename";
-
-    IF @test THEN
-      ALTER TABLE reqn DROP COLUMN instruction_filename;
-    END IF;
-
     SELECT "Removing reqn.waiver column" AS "";
 
     SELECT COUNT(*) INTO @test

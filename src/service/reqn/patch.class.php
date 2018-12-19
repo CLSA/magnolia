@@ -74,7 +74,7 @@ class patch extends \cenozo\service\patch
             $db_reqn->save(); // this will make sure the deadline is appropriate
             $deadline = util::get_datetime_object( $db_reqn->get_deadline()->date );
             $deadline->add( new \DateInterval( sprintf( 'P%dM', $delay ) ) );
-            if( $db_reqn->start_date < $deadline ) $code = 409;
+            if( $db_reqn->get_current_reqn_version()->start_date < $deadline ) $code = 409;
           }
         }
         else $code = 403;
@@ -114,6 +114,7 @@ class patch extends \cenozo\service\patch
     $stage_type_class_name = lib::get_class_name( 'database\stage_type' );
 
     $db_reqn = $this->get_leaf_record();
+    $db_reqn_version = $db_reqn->get_current_reqn_version();
     $file = $this->get_argument( 'file', NULL );
     $headers = apache_request_headers();
     if( false !== strpos( $headers['Content-Type'], 'application/octet-stream' ) && !is_null( $file ) )
@@ -143,12 +144,15 @@ class patch extends \cenozo\service\patch
           $db_reqn->state = 'deferred';
           $db_reqn->save();
 
+          // create a new reqn version
+          $db_reqn->create_version();
+
           // send a notification
           $db_notification = lib::create( 'database\notification' );
           $db_notification->reqn_id = $db_reqn->id;
           $db_notification->notification_type_id =
             $notification_type_class_name::get_unique_record( 'name', 'Action required' )->id;
-          $db_notification->email = $db_reqn->applicant_email;
+          $db_notification->email = $db_reqn_version->applicant_email;
           $db_notification->datetime = util::get_datetime_object();
           $db_notification->save();
         }
@@ -162,7 +166,7 @@ class patch extends \cenozo\service\patch
           $db_notification->reqn_id = $db_reqn->id;
           $db_notification->notification_type_id =
             $notification_type_class_name::get_unique_record( 'name', 'Requisition Reactivated' )->id;
-          $db_notification->email = $db_reqn->applicant_email;
+          $db_notification->email = $db_reqn_version->applicant_email;
           $db_notification->datetime = util::get_datetime_object();
           $db_notification->save();
         }
@@ -174,6 +178,10 @@ class patch extends \cenozo\service\patch
             {
               $db_reqn->state = NULL;
               $db_reqn->save();
+              
+              // when resubmitting set the version's datetime
+              $db_reqn_version->datetime = util::get_datetime_object();
+              $db_reqn_version->save();
             }
             else
             {

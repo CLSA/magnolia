@@ -33,17 +33,18 @@ class notification extends \cenozo\database\record
     $mail_manager = lib::create( 'business\mail_manager' );
 
     $db_reqn = $this->get_reqn();
+    $db_reqn_version = $db_reqn->get_current_reqn_version();
     $language = $db_reqn->get_language()->code;
     $db_notification_type = $this->get_notification_type();
 
     // fill in dynamic details in the message body
     $message = str_replace(
       array( '{{identifier}}', '{{title}}', '{{applicant_name}}' ),
-      array( $db_reqn->identifier, $db_reqn->title, $db_reqn->applicant_name ),
+      array( $db_reqn->identifier, $db_reqn_version->title, $db_reqn_version->applicant_name ),
       'en' == $language ? $db_notification_type->message_en : $db_notification_type->message_fr
     );
 
-    $mail_manager->to( $this->email, $db_reqn->applicant_name );
+    $mail_manager->to( $this->email, $db_reqn_version->applicant_name );
     $mail_manager->set_title( 'en' == $language ? $db_notification_type->title_en : $db_notification_type->title_fr );
     $mail_manager->set_body( $message );
 

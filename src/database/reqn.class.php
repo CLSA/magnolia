@@ -33,6 +33,8 @@ class reqn extends \cenozo\database\record
    */
   public function save()
   {
+    $db_user = lib::create( 'business\session' )->get_user();
+
     // track if this is a new reqn
     $is_new = is_null( $this->id );
 
@@ -45,8 +47,117 @@ class reqn extends \cenozo\database\record
 
     parent::save();
 
-    // if this is a new reqn then assign it to the first stage
-    if( $is_new ) $this->proceed_to_next_stage();
+    if( $is_new )
+    {
+      // add the first reqn version
+      $db_reqn_version = lib::create( 'database\reqn_version' );
+      $db_reqn_version->reqn_id = $this->id;
+      $db_reqn_version->version = 1;
+      $db_reqn_version->datetime = util::get_datetime_object();
+      $db_reqn_version->applicant_name = $db_user->first_name.' '.$db_user->last_name;
+      $db_reqn_version->applicant_email = $db_user->email;
+      $db_reqn_version->save();
+
+      // assign new reqns to the first stage
+      $this->proceed_to_next_stage();
+    }
+
+    // delete files if they are being set to null
+    if( is_null( $this->agreement_filename ) )
+    {
+      $filename = $this->get_filename( 'agreement' );
+      if( file_exists( $filename ) ) unlink( $filename );
+    }
+    if( is_null( $this->instruction_filename ) )
+    {
+      $filename = $this->get_filename( 'instruction' );
+      if( file_exists( $filename ) ) unlink( $filename );
+    }
+  }
+
+  /**
+   * Override the parent method
+   */
+  public function delete()
+  {
+    $file_list = array();
+    if( !is_null( $this->agreement_filename ) ) $file_list[] = $this->get_filename( 'agreement' );
+    if( !is_null( $this->instruction_filename ) ) $file_list[] = $this->get_filename( 'instruction' );
+
+    parent::delete();
+
+    foreach( $file_list as $file ) unlink( $file );
+  }
+
+  /**
+   * Creates a new version of the requisition
+   * 
+   * If no version exists then the first (empty) version will be created.  Otherwise the current version
+   * will be copied exactly into a new version
+   */
+  public function create_version()
+  {
+    $db_current_reqn_version = $this->get_current_reqn_version();
+
+    $db_reqn_version = lib::create( 'database\reqn_version' );
+    if( is_null( $db_current_reqn_version ) )
+    {
+      $db_reqn_version->reqn_id = $this->id;
+      $db_reqn_version->version = 1;
+      $db_reqn_version->applicant_name = $db_user->first_name.' '.$db_user->last_name;
+      $db_reqn_version->applicant_email = $db_user->email;
+    }
+    else
+    {
+      $db_reqn_version->copy( $db_current_reqn_version );
+      $db_reqn_version->datetime = util::get_datetime_object();
+      $db_reqn_version->version = $db_current_reqn_version->version + 1;
+    }
+
+    $db_reqn_version->save();
+
+    // copy coapplicant records
+    foreach( $db_current_reqn_version->get_coapplicant_object_list() as $db_coapplicant )
+    {
+      $db_new_coapplicant = lib::create( 'database\coapplicant' );
+      $db_new_coapplicant->copy( $db_coapplicant );
+      $db_new_coapplicant->reqn_version_id = $db_reqn_version->id;
+      $db_new_coapplicant->save();
+    }
+
+    // copy reference records
+    foreach( $db_current_reqn_version->get_reference_object_list() as $db_reference )
+    {
+      $db_new_reference = lib::create( 'database\reference' );
+      $db_new_reference->copy( $db_reference );
+      $db_new_reference->reqn_version_id = $db_reqn_version->id;
+      $db_new_reference->save();
+    }
+
+    // copy reqn_version_data_option records
+    foreach( $db_current_reqn_version->get_reqn_version_data_option_object_list() as $db_reqn_version_data_option )
+    {
+      $db_new_reqn_version_data_option = lib::create( 'database\reqn_version_data_option' );
+      $db_new_reqn_version_data_option->copy( $db_reqn_version_data_option );
+      $db_new_reqn_version_data_option->reqn_version_id = $db_reqn_version->id;
+      $db_new_reqn_version_data_option->save();
+    }
+  }
+
+  /**
+   * Returns the path to various files associated with the reqn
+   * 
+   * @param string $type Should be 'agreement' or 'instruction'
+   * @return string
+   * @access public
+   */
+  public function get_filename( $type )
+  {
+    $directory = '';
+    if( 'agreement' == $type ) $directory = AGREEMENT_LETTER_PATH;
+    else if( 'instruction' == $type ) $directory = INSTRUCTION_FILE_PATH;
+    else throw lib::create( 'exception\argument', 'type', $type, __METHOD__ );
+    return sprintf( '%s/%s', $directory, $this->id );
   }
 
   /**
@@ -379,12 +490,16 @@ class reqn extends \cenozo\database\record
     $db_next_stage->stage_type_id = $db_next_stage_type->id;
     $db_next_stage->save();
 
-    // if we have just entered the admin review stage then set the identifier
+    // if we have just entered the admin review stage then set the identifier and mark the version datetime
     if( 'Admin Review' == $db_next_stage_type->name )
     {
       $base = $this->get_deadline()->date->format( 'ym' );
       $this->identifier = $this->get_deadline()->get_next_identifier();
       $this->save();
+
+      $db_reqn_version = $this->get_current_reqn_version();
+      $db_reqn_version->datetime = util::get_datetime_object();
+      $db_reqn_version->save();
     }
     // if we have just entered the active stage then create symbolic links to all data files and update file timestamps
     else if( 'Active' == $db_next_stage_type->name )
@@ -437,136 +552,6 @@ class reqn extends \cenozo\database\record
 
     $reqn_version_id = static::db()->get_one( sprintf( '%s %s', $select->get_sql(), $modifier->get_sql() ) );
     return $reqn_version_id ? lib::create( 'database\reqn_version', $reqn_version_id ) : NULL;
-  }
-
-  /**
-   * Generates a PDF form version of the reqn (overwritting the previous version)
-   * 
-   * @param string $type One of "application" or "checklist" which determines which form to generate
-   * @access public
-   */
-  public function generate_pdf_form( $type )
-  {
-    $pdf_form_type_class_name = lib::get_class_name( 'database\pdf_form_type' );
-    $db_reqn_version = $this->get_current_reqn_version();
-
-    $db_pdf_form = NULL;
-    $data = array( 'identifier' => $this->identifier );
-    $filename = NULL;
-
-    if( !is_null( $db_reqn_version->applicant_name ) ) $data['applicant_name'] = $db_reqn_version->applicant_name;
-    if( !is_null( $db_reqn_version->title ) ) $data['title'] = $db_reqn_version->title;
-
-    if( 'application' == $type )
-    {
-      // get the data application and filename
-      $db_pdf_form_type = $pdf_form_type_class_name::get_unique_record( 'name', 'Data Application' );
-      $db_pdf_form = $db_pdf_form_type->get_active_pdf_form();
-      $filename = sprintf( '%s/%s.pdf', DATA_APPLICATION_PATH, $this->id );
-
-      if( !is_null( $db_reqn_version->applicant_position ) ) $data['applicant_position'] = $db_reqn_version->applicant_position;
-      if( !is_null( $db_reqn_version->applicant_affiliation ) ) $data['applicant_affiliation'] = $db_reqn_version->applicant_affiliation;
-      if( !is_null( $db_reqn_version->applicant_address ) ) $data['applicant_address'] = $db_reqn_version->applicant_address;
-      if( !is_null( $db_reqn_version->applicant_phone ) ) $data['applicant_phone'] = $db_reqn_version->applicant_phone;
-      if( !is_null( $db_reqn_version->applicant_email ) ) $data['applicant_email'] = $db_reqn_version->applicant_email;
-      if( !is_null( $db_reqn_version->graduate_name ) ) $data['graduate_name'] = $db_reqn_version->graduate_name;
-      if( !is_null( $db_reqn_version->graduate_program ) ) $data['graduate_program'] = $db_reqn_version->graduate_program;
-      if( !is_null( $db_reqn_version->graduate_institution ) ) $data['graduate_institution'] = $db_reqn_version->graduate_institution;
-      if( !is_null( $db_reqn_version->graduate_address ) ) $data['graduate_address'] = $db_reqn_version->graduate_address;
-      if( !is_null( $db_reqn_version->graduate_phone ) ) $data['graduate_phone'] = $db_reqn_version->graduate_phone;
-      if( !is_null( $db_reqn_version->graduate_email ) ) $data['graduate_email'] = $db_reqn_version->graduate_email;
-      if( !is_null( $db_reqn_version->start_date ) ) $data['start_date'] = $db_reqn_version->start_date->format( 'Y-m-d' );
-      if( !is_null( $db_reqn_version->duration ) ) $data['duration'] = $db_reqn_version->duration;
-      if( !is_null( $db_reqn_version->keywords ) ) $data['keywords'] = $db_reqn_version->keywords;
-      if( !is_null( $db_reqn_version->lay_summary ) ) $data['lay_summary'] = $db_reqn_version->lay_summary;
-      $data['word_count'] = is_null( $db_reqn_version->lay_summary ) ? 0 : count( explode( ' ', $db_reqn_version->lay_summary ) );
-      if( !is_null( $db_reqn_version->background ) ) $data['background'] = $db_reqn_version->background;
-      if( !is_null( $db_reqn_version->objectives ) ) $data['objectives'] = $db_reqn_version->objectives;
-      if( !is_null( $db_reqn_version->methodology ) ) $data['methodology'] = $db_reqn_version->methodology;
-      if( !is_null( $db_reqn_version->analysis ) ) $data['analysis'] = $db_reqn_version->analysis;
-
-      if( !is_null( $db_reqn_version->funding ) )
-      {
-        if( 'yes' == $db_reqn_version->funding ) $data['funding_yes'] = 'Yes';
-        else if( 'no' == $db_reqn_version->funding ) $data['funding_no'] = 'Yes';
-        else if( 'requested' == $db_reqn_version->funding ) $data['funding_requested'] = 'Yes';
-      }
-      if( !is_null( $db_reqn_version->funding_agency ) ) $data['funding_agency'] = $db_reqn_version->funding_agency;
-      if( !is_null( $db_reqn_version->grant_number ) ) $data['grant_number'] = $db_reqn_version->grant_number;
-      if( !is_null( $db_reqn_version->ethics ) ) $data['ethics'] = $db_reqn_version->ethics ? 'yes' : 'no';
-      if( !is_null( $db_reqn_version->ethics_date ) ) $data['ethics_date'] = $db_reqn_version->ethics_date->format( 'Y-m-d' );
-      if( !is_null( $db_reqn_version->waiver ) )
-      {
-        if( 'graduate' == $db_reqn_version->waiver ) $data['waiver_graduate'] = 'Yes';
-        else if( 'postdoc' == $db_reqn_version->waiver ) $data['waiver_postdoc'] = 'Yes';
-      }
-      if( !is_null( $db_reqn_version->applicant_name ) ) $data['signature_applicant_name'] = $db_reqn_version->applicant_name;
-
-      foreach( $this->get_coapplicant_list() as $index => $coapplicant )
-      {
-        $data[sprintf( 'coapplicant%d_name', $index+1 )] = $coapplicant['name'];
-        $data[sprintf( 'coapplicant%d_position', $index+1 )] =
-          sprintf( "%s\n%s\n%s", $coapplicant['position'], $coapplicant['affiliation'], $coapplicant['email'] );
-        $data[sprintf( 'coapplicant%d_role', $index+1 )] = $coapplicant['role'];
-        $data[sprintf( 'coapplicant%d_%s', $index+1, $coapplicant['access'] ? 'yes' : 'no' )] = 'Yes';
-      }
-
-      $reference_list = array();
-      $reference_sel = lib::create( 'database\select' );
-      $reference_sel->add_column( 'rank' );
-      $reference_sel->add_column( 'reference' );
-      $reference_mod = lib::create( 'database\modifier' );
-      $reference_mod->order( 'rank' );
-      foreach( $this->get_reference_list( $reference_sel, $reference_mod ) as $reference )
-        $reference_list[] = sprintf( '%s.  %s', $reference['rank'], $reference['reference'] );
-      $data['references'] = implode( "\n", $reference_list );
-    }
-    else if( 'checklist' == $type )
-    {
-      // get the data application and filename
-      $db_pdf_form_type = $pdf_form_type_class_name::get_unique_record( 'name', 'Data Checklist' );
-      $db_pdf_form = $db_pdf_form_type->get_active_pdf_form();
-      $filename = sprintf( '%s/%s.pdf', DATA_CHECKLIST_PATH, $this->id );
-
-      if( $db_reqn_version->comprehensive ) $data['comprehensive'] = 'Yes';
-      if( $db_reqn_version->tracking ) $data['tracking'] = 'Yes';
-      if( !is_null( $db_reqn_version->part2_a_comment ) ) $data['part2_a_comment'] = $db_reqn_version->part2_a_comment;
-      if( !is_null( $db_reqn_version->part2_b_comment ) ) $data['part2_b_comment'] = $db_reqn_version->part2_b_comment;
-      if( !is_null( $db_reqn_version->part2_c_comment ) ) $data['part2_c_comment'] = $db_reqn_version->part2_c_comment;
-      if( !is_null( $db_reqn_version->part2_d_comment ) ) $data['part2_d_comment'] = $db_reqn_version->part2_d_comment;
-      if( !is_null( $db_reqn_version->part2_e_comment ) ) $data['part2_e_comment'] = $db_reqn_version->part2_e_comment;
-      if( !is_null( $db_reqn_version->part2_f_comment ) ) $data['part2_f_comment'] = $db_reqn_version->part2_f_comment;
-
-      $reqn_version_data_option_list = array();
-      $reqn_version_data_option_sel = lib::create( 'database\select' );
-      $reqn_version_data_option_sel->add_column( 'data_option_id' );
-      $reqn_version_data_option_sel->add_table_column( 'study_phase', 'code' );
-      $reqn_version_data_option_mod = lib::create( 'database\modifier' );
-      $reqn_version_data_option_mod->join( 'study_phase', 'reqn_version_data_option.study_phase_id', 'study_phase.id' );
-      $list = $db_reqn_version->get_reqn_version_data_option_list( $reqn_version_data_option_sel, $reqn_version_data_option_mod );
-      foreach( $list as $reqn_version_data_option )
-        $data[sprintf( 'data_option_%s_%s', $reqn_version_data_option['data_option_id'], $reqn_version_data_option['code'] )] = 'Yes';
-    }
-
-    if( is_null( $db_pdf_form ) )
-      throw lib::create( 'exception\runtime',
-        'Cannot generate PDF form since there is no active Data Application PDF form.', __METHOD__ );
-
-    $pdf_writer = lib::create( 'business\pdf_writer' );
-    $pdf_writer->set_template( sprintf( '%s/%d.pdf', PDF_FORM_PATH, $db_pdf_form->id ) );
-    $pdf_writer->fill_form( $data );
-    if( !$pdf_writer->save( $filename ) )
-    {
-      throw lib::create( 'exception\runtime',
-        sprintf(
-          'Failed to generate PDF form "%s" for requisition %s%s',
-          $filename,
-          $this->identifier,
-          "\n".$pdf_writer->get_error()
-        ),
-        __METHOD__
-      );
-    }
   }
 
   /**
@@ -683,7 +668,6 @@ class reqn extends \cenozo\database\record
    */
   public function get_study_data_expiry()
   {
-    $util_class_name = lib::get_class_name( 'util' );
     $setting_manager = lib::create( 'business\setting_manager' );
 
     $data_path = $this->get_study_data_path( 'data' );
@@ -721,8 +705,8 @@ class reqn extends \cenozo\database\record
       return 0;
     }
 
-    $now = $util_class_name::get_datetime_object();
-    $datetime_obj = $util_class_name::get_datetime_object();
+    $now = util::get_datetime_object();
+    $datetime_obj = util::get_datetime_object();
     $datetime_obj->setTimestamp( $timestamp );
     $days = $setting_manager->get_setting( 'general', 'study_data_expiry' ) - $datetime_obj->diff( $now )->days;
     return 0 > $days ? 0 : $days;
@@ -733,14 +717,13 @@ class reqn extends \cenozo\database\record
    */
   public function refresh_study_data_files()
   {
-    $util_class_name = lib::get_class_name( 'util' );
     $supplemental_file_class_name = lib::get_class_name( 'database\supplemental_file' );
     $data_path = $this->get_study_data_path( 'data' );
     $web_path = $this->get_study_data_path( 'web' );
     $db_reqn_version = $this->get_current_reqn_version();
 
     // delete all existing links
-    $util_class_name::exec_timeout( sprintf( 'rm -rf %s/*', $web_path ) );
+    util::exec_timeout( sprintf( 'rm -rf %s/*', $web_path ) );
 
     // refresh links
     $list = glob( $data_path.'/*' );

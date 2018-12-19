@@ -33,11 +33,6 @@ define( function() {
         var self = this;
         CnBaseModelFactory.construct( this, module );
         this.addModel = CnReferenceAddFactory.instance( this );
-
-        // reference lists are sometimes viewed from the reqn path, so convert to the correct parent
-        this.getServiceCollectionPath = function( ignoreParent ) {
-          return this.$$getServiceCollectionPath( ignoreParent ).replace( /reqn/, 'reqn_version' );
-        };
       };
 
       return { instance: function() { return new object( false ); } };

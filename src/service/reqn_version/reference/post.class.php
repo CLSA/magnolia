@@ -5,7 +5,7 @@
  * @author Patrick Emond <emondpd@mcmaster.ca>
  */
 
-namespace magnolia\service\reqn\reference;
+namespace magnolia\service\reqn_version\reference;
 use cenozo\lib, cenozo\log, magnolia\util;
 
 class post extends \cenozo\service\post
@@ -27,7 +27,7 @@ class post extends \cenozo\service\post
       $reference_sel->from( 'reference' );
       $reference_sel->add_column( 'MAX( rank )', 'max', false );
       $reference_mod = lib::create( 'database\modifier' );
-      $reference_mod->where( 'reqn_id', '=', $db_reference->reqn_id );
+      $reference_mod->where( 'reqn_version_id', '=', $db_reference->reqn_version_id );
       $db_reference->rank = $reference_class_name::db()->get_one(
         sprintf( '%s %s', $reference_sel->get_sql(), $reference_mod->get_sql() )
       ) + 1;
@@ -46,7 +46,7 @@ class post extends \cenozo\service\post
     {
       // an argument exception is thrown when there are too many references
       $setting_manager = lib::create( 'business\setting_manager' );
-      $language = $this->get_leaf_record()->get_reqn()->get_language()->code;
+      $language = $this->get_leaf_record()->get_reqn_version()->get_reqn()->get_language()->code;
       throw lib::create( 'exception\notice',
         sprintf(
           'en' == $language ? 'You may only provide a maximum of %d references.' : 'Vous ne pouvez pas fournir plus de %d références.',

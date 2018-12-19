@@ -33,11 +33,14 @@ class ui extends \cenozo\ui\ui
     $module = $this->get_module( 'reqn' );
     if( !is_null( $module ) )
     {
-      $module->add_action( 'form', '/{identifier}?{t0}&{t1}&{t2}' );
+      $module->add_child( 'reqn_version' );
       $module->add_child( 'review' );
       $module->add_child( 'stage' );
       $module->add_child( 'notification' );
     }
+
+    $module = $this->get_module( 'reqn_version' );
+    if( !is_null( $module ) ) $module->append_action_query( 'view', '?{t0}&{t1}&{t2}' );
 
     $module = $this->get_module( 'notification_type' );
     if( !is_null( $module ) )

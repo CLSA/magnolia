@@ -18,6 +18,7 @@ CREATE PROCEDURE patch_reqn_version()
         create_timestamp TIMESTAMP NOT NULL,
         reqn_id INT UNSIGNED NOT NULL,
         version INT UNSIGNED NOT NULL DEFAULT 1,
+        datetime DATETIME NOT NULL,
         applicant_name VARCHAR(63) NULL DEFAULT NULL,
         applicant_position VARCHAR(255) NULL DEFAULT NULL,
         applicant_affiliation VARCHAR(255) NULL DEFAULT NULL,
@@ -46,8 +47,6 @@ CREATE PROCEDURE patch_reqn_version()
         ethics TINYINT(1) NULL DEFAULT NULL,
         ethics_date DATE NULL DEFAULT NULL,
         ethics_filename VARCHAR(255) NULL DEFAULT NULL,
-        agreement_filename VARCHAR(255) NULL DEFAULT NULL,
-        instruction_filename VARCHAR(255) NULL DEFAULT NULL,
         waiver ENUM('graduate', 'postdoc') NULL DEFAULT NULL,
         comprehensive TINYINT(1) NULL DEFAULT NULL,
         tracking TINYINT(1) NULL DEFAULT NULL,
@@ -69,7 +68,7 @@ CREATE PROCEDURE patch_reqn_version()
 
       -- transfer reqn data into first version
       INSERT INTO reqn_version( 
-        reqn_id, version,
+        reqn_id, version, datetime,
         applicant_name, applicant_position, applicant_affiliation, applicant_address, applicant_phone, applicant_email,
         graduate_name, graduate_program, graduate_institution, graduate_address, graduate_phone, graduate_email,
         start_date, duration,
@@ -77,12 +76,11 @@ CREATE PROCEDURE patch_reqn_version()
         funding, funding_filename, funding_agency,
         grant_number,
         ethics, ethics_date, ethics_filename,
-        agreement_filename, instruction_filename,
         waiver,
         comprehensive, tracking,
         part2_a_comment, part2_b_comment, part2_c_comment, part2_d_comment, part2_e_comment, part2_f_comment )
       SELECT 
-        id, 1,
+        id, 1, UTC_TIMESTAMP(),
         applicant_name, applicant_position, applicant_affiliation, applicant_address, applicant_phone, applicant_email,
         graduate_name, graduate_program, graduate_institution, graduate_address, graduate_phone, graduate_email,
         start_date, duration,
@@ -90,7 +88,6 @@ CREATE PROCEDURE patch_reqn_version()
         funding, funding_filename, funding_agency,
         grant_number,
         ethics, ethics_date, ethics_filename,
-        agreement_filename, instruction_filename,
         waiver,
         comprehensive, tracking,
         part2_a_comment, part2_b_comment, part2_c_comment, part2_d_comment, part2_e_comment, part2_f_comment

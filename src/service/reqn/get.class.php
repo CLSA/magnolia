@@ -27,12 +27,8 @@ class get extends \cenozo\service\downloadable
   {
     $file = $this->get_argument( 'file', NULL );
     $db_reqn = $this->get_leaf_record();
-    if( 'funding_filename' == $file ) return $db_reqn->funding_filename;
-    else if( 'ethics_filename' == $file ) return $db_reqn->ethics_filename;
-    else if( 'agreement_filename' == $file ) return $db_reqn->agreement_filename;
+    if( 'agreement_filename' == $file ) return $db_reqn->agreement_filename;
     else if( 'instruction_filename' == $file ) return $db_reqn->instruction_filename;
-    else if( 'checklist' == $file ) return sprintf( 'Data Checklist %s.pdf', $db_reqn->identifier );
-    else if( 'application' == $file ) return sprintf( 'Data Application %s.pdf', $db_reqn->identifier );
     else if( 'reviews' == $file ) return sprintf( 'Reviews %s.txt', $db_reqn->identifier );
 
     throw lib::create( 'exception\argument', 'file', $file, __METHOD__ );
@@ -45,12 +41,8 @@ class get extends \cenozo\service\downloadable
   {
     $file = $this->get_argument( 'file', NULL );
     $db_reqn = $this->get_leaf_record();
-    if( 'funding_filename' == $file ) return sprintf( '%s/%s', FUNDING_LETTER_PATH, $db_reqn->id );
-    else if( 'ethics_filename' == $file ) return sprintf( '%s/%s', ETHICS_LETTER_PATH, $db_reqn->id );
-    else if( 'agreement_filename' == $file ) return sprintf( '%s/%s', AGREEMENT_LETTER_PATH, $db_reqn->id );
+    if( 'agreement_filename' == $file ) return sprintf( '%s/%s', AGREEMENT_LETTER_PATH, $db_reqn->id );
     else if( 'instruction_filename' == $file ) return sprintf( '%s/%s', INSTRUCTION_FILE_PATH, $db_reqn->id );
-    else if( 'checklist' == $file ) return sprintf( '%s/%s.pdf', DATA_CHECKLIST_PATH, $db_reqn->id );
-    else if( 'application' == $file ) return sprintf( '%s/%s.pdf', DATA_APPLICATION_PATH, $db_reqn->id );
     else if( 'reviews' == $file ) return sprintf( '%s/%s.txt', DATA_REVIEWS_PATH, $db_reqn->id );
 
     throw lib::create( 'exception\argument', 'file', $file, __METHOD__ );
@@ -65,15 +57,8 @@ class get extends \cenozo\service\downloadable
 
     $mime_type = $this->get_mime_type();
 
-    // if requesting the reqn's application or checklist PDF file then create it first
-    if( 'application/pdf' == $mime_type )
-    {
-      $db_reqn = $this->get_leaf_record();
-      $file = $this->get_argument( 'file', NULL );
-      if( 'application' == $file || 'checklist' == $file ) $db_reqn->generate_pdf_form( $file );
-    }
     // if requesting the reqn's review list TXT file then create it first
-    else if( 'text/plain' == $mime_type )
+    if( 'text/plain' == $mime_type )
     {
       $db_reqn = $this->get_leaf_record();
       $file = $this->get_argument( 'file', NULL );
