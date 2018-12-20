@@ -66,20 +66,22 @@
       <li ng-class="{'active':'part1'==model.viewModel.tab[0]}">
         <a ng-click="model.viewModel.setTab(0,'part1')"
            ng-class="{
-             'text-warning flashing':
+             'text-warning flashing': model.getEditEnabled() && (
                model.viewModel.record.deferral_note_part1_a1 || model.viewModel.record.deferral_note_part1_a2 ||
                model.viewModel.record.deferral_note_part1_a3 || model.viewModel.record.deferral_note_part1_a4 ||
                model.viewModel.record.deferral_note_part1_a5 || model.viewModel.record.deferral_note_part1_a6
+             )
            }"
            ng-bind-html="t( 'part1.tab' )"></a>
       </li>
       <li ng-class="{'active':'part2'==model.viewModel.tab[0]}">
         <a ng-click="model.viewModel.setTab(0,'part2')"
            ng-class="{
-             'text-warning flashing':
+             'text-warning flashing': model.getEditEnabled() && (
                model.viewModel.record.deferral_note_part2_a || model.viewModel.record.deferral_note_part2_b ||
                model.viewModel.record.deferral_note_part2_c || model.viewMOdel.record.deferral_note_part2_d ||
                model.viewModel.record.deferral_note_part2_e || model.viewModel.record.deferral_note_part2_f
+             )
            }"
            ng-bind-html="t( 'part2.tab' )"></a>
       </li>
@@ -107,13 +109,13 @@
               ng-if="'part1' == section[0]"
               ng-class="{'active':section[1] == model.viewModel.tab[1]}">
             <a ng-click="model.viewModel.setTab(1,section[1])"
-               ng-class="{'text-warning flashing':model.viewModel.record['deferral_note_part1_'+section[1]]}"
+               ng-class="{'text-warning flashing':model.getEditEnabled() && model.viewModel.record['deferral_note_part1_'+section[1]]}"
                ng-bind-html="t( 'part1.'+section[1]+'.tab' )"></a>
           </li>
         </ul>
         <div ng-show="'a1'==model.viewModel.tab[1]" class="panel panel-default" style="border-top-left-radius: 0px;">
           <div class="panel-body">
-            <cn-reqn-deferral-note note="deferral_note_part1_a1" class="bg-info"></cn-reqn-deferral-note>
+            <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_part1_a1" class="bg-info"></cn-reqn-deferral-note>
             <p class="text-primary" ng-bind-html="t( 'part1.a1.text1' )"></p>
             <p class="text-primary" ng-bind-html="t( 'part1.a1.text2' )"></p>
             <hr/>
@@ -240,7 +242,7 @@
         </div>
         <div ng-show="'a2'==model.viewModel.tab[1]" class="panel panel-default">
           <div class="panel-body">
-            <cn-reqn-deferral-note note="deferral_note_part1_a2"></cn-reqn-deferral-note>
+            <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_part1_a2"></cn-reqn-deferral-note>
             <p class="text-primary" ng-bind-html="t( 'part1.a2.text' )"></p>
             <div class="panel panel-default">
               <div class="panel-body">
@@ -339,7 +341,7 @@
         </div>
         <div ng-show="'a3'==model.viewModel.tab[1]" class="panel panel-default">
           <div class="panel-body">
-            <cn-reqn-deferral-note note="deferral_note_part1_a3"></cn-reqn-deferral-note>
+            <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_part1_a3"></cn-reqn-deferral-note>
             <p class="text-primary" ng-bind-html="t( 'part1.a3.text1' ) + startDateDelay + t( 'part1.a3.text2' )"></p>
             <hr/>
             <form id="part1a3Form" name="part1a3Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
@@ -376,7 +378,7 @@
         </div>
         <div ng-show="'a4'==model.viewModel.tab[1]" class="panel panel-default">
           <div class="panel-body">
-            <cn-reqn-deferral-note note="deferral_note_part1_a4"></cn-reqn-deferral-note>
+            <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_part1_a4"></cn-reqn-deferral-note>
             <p class="text-primary" ng-bind-html="t( 'part1.a4.text1' )"></p>
             <hr/>
             <form id="part1a4Form" name="part1a4Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
@@ -515,7 +517,7 @@
         </div>
         <div ng-show="'a5'==model.viewModel.tab[1]" class="panel panel-default">
           <div class="panel-body">
-            <cn-reqn-deferral-note note="deferral_note_part1_a5"></cn-reqn-deferral-note>
+            <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_part1_a5"></cn-reqn-deferral-note>
             <p class="text-primary" ng-bind-html="t( 'part1.a5.text' )"></p>
             <hr/>
             <form id="part1a5Form" name="part1a5Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
@@ -564,7 +566,7 @@
         </div>
         <div ng-show="'a6'==model.viewModel.tab[1]" class="panel panel-default">
           <div class="panel-body">
-            <cn-reqn-deferral-note note="deferral_note_part1_a6"></cn-reqn-deferral-note>
+            <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_part1_a6"></cn-reqn-deferral-note>
             <p class="text-primary" ng-bind-html="t( 'part1.a6.text' )"></p>
             <hr/>
             <form id="part1a6Form" name="part1a6Form" novalidate>
@@ -623,7 +625,7 @@
               ng-if="'part2' == section[0]"
               ng-class="{'active':section[2] == model.viewModel.tab[2]}">
             <a ng-click="model.viewModel.setTab(2,section[2])"
-               ng-class="{'text-warning flashing':model.viewModel.record['deferral_note_part2_'+section[2]]}"
+               ng-class="{'text-warning flashing':model.getEditEnabled() && model.viewModel.record['deferral_note_part2_'+section[2]]}"
                ng-bind-html="t( 'part2.'+section[2]+'.tab' )"></a>
           </li>
         </ul>
@@ -675,7 +677,7 @@
              class="panel panel-default">
           <div class="panel-body">
             <form ng-attr-id="part2{{ part }}Form" ng-attr-name="part2{{ part }}Form" novalidate>
-              <cn-reqn-deferral-note note="deferral_note_part2_{{ part }}"></cn-reqn-deferral-note>
+              <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_part2_{{ part }}"></cn-reqn-deferral-note>
               <div class="form-horizontal">
                 <ul class="list-group" ng-if="'f'==part">
                   <li class="list-group-item">
