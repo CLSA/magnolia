@@ -66,6 +66,8 @@ CREATE PROCEDURE patch_reqn_version()
           ON UPDATE CASCADE)
       ENGINE = InnoDB;
 
+      ALTER TABLE reqn_version AUTO_INCREMENT = 1001;
+
       -- transfer reqn data into first version
       INSERT INTO reqn_version( 
         reqn_id, version, datetime,
