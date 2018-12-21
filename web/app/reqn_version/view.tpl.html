@@ -36,7 +36,7 @@
               ng-bind-html="t( 'misc.finalReport' )"
               type="button"></button>
 
-      <div class="btn-group dropdown" ng-if="1 < model.viewModel.versionList.length">
+      <div class="btn-group dropdown" ng-if="model.viewModel.show( 'compare' ) && 1 < model.viewModel.versionList.length">
         <button type="button"
                 class="btn btn-info dropdown-toggle"
                 id="versionList"
@@ -265,7 +265,7 @@
             <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_part1_a2"></cn-reqn-deferral-note>
             <p class="text-primary" ng-bind-html="t( 'part1.a2.text' )"></p>
             <div class="panel panel-default">
-              <div class="panel-body">
+              <div class="panel-body" ng-class="{ 'bg-warning': compare( 'coapplicant' ) }">
                 <span ng-show="0 == model.viewModel.coapplicantList.length"
                       ng-bind-html="t( 'part1.a2.noCoapplicants' )"></span>
                 <table class="table table-striped" ng-show="0 < model.viewModel.coapplicantList.length">
@@ -299,6 +299,33 @@
                     </tr>
                   </tbody>
                 </table>
+                <div ng-if="compare( 'coapplicant' )">
+                  <h4>Version {{ model.viewModel.compareRecord.version }} List</h4>
+                  <span ng-show="0 == model.viewModel.compareRecord.coapplicantList.length"
+                        ng-bind-html="t( 'part1.a2.noCoapplicants' )"></span>
+                  <table class="table table-striped" ng-show="0 < model.viewModel.compareRecord.coapplicantList.length">
+                    <thead class="bg-info">
+                      <tr>
+                        <td ng-bind-html="t( 'part1.a2.name' )"></td>
+                        <td ng-bind-html="t( 'part1.a2.position' )"></td>
+                        <td ng-bind-html="t( 'part1.a2.affiliation' )"></td>
+                        <td ng-bind-html="t( 'part1.a2.email' )"></td>
+                        <td ng-bind-html="t( 'part1.a2.role' )"></td>
+                        <td ng-bind-html="t( 'part1.a2.access' )"></td>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr ng-repeat="coapplicant in model.viewModel.compareRecord.coapplicantList">
+                        <td>{{ coapplicant.name }}</td>
+                        <td>{{ coapplicant.position }}</td>
+                        <td>{{ coapplicant.affiliation }}</td>
+                        <td>{{ coapplicant.email }}</td>
+                        <td>{{ coapplicant.role }}</td>
+                        <td>{{ coapplicant.access ? 'Yes' : 'No' }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
             <form id="part1a2Form" name="part1a2Form" ng-show="model.getEditEnabled()" novalidate>

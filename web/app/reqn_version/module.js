@@ -113,8 +113,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           $scope.directive = 'cnReqnViewInput';
           $scope.compare = function( property ) {
             var viewModel = $scope.model.viewModel;
-            if( !viewModel.show( 'difference' ) || null == viewModel.compareRecord ) return false;
-            
+            if( !viewModel.show( 'compare' ) || null == viewModel.compareRecord ) return false;
+
             var recordValue = viewModel.record[property] ? viewModel.record[property] : null;
             var compareValue = viewModel.compareRecord[property] ? viewModel.compareRecord[property] : null;
             return recordValue != compareValue;
@@ -223,6 +223,21 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             ].join( ' ' );
           };
 
+          $scope.compare = function( property ) {
+            var viewModel = $scope.model.viewModel;
+            if( !viewModel.show( 'compare' ) || null == viewModel.compareRecord ) return false;
+
+            if( 'coapplicant' == property ) {
+              return viewModel.compareRecord.coapplicantDiff;
+            } else if( 'reference' == property ) {
+              return viewModel.compareRecord.referenceDiff;
+            } else if( 'data_option_value' == property ) {
+              return viewModel.dataOptionValueDiff;
+            }
+
+            throw new Error( 'Tried to compare for property "' + property + '" which is invalid.' );
+          };
+
           $scope.addCoapplicant = function() {
             if( $scope.model.viewModel.coapplicantModel.getAddEnabled() ) {
               var form = cenozo.getScopeByQuerySelector( '#part1a2Form' ).part1a2Form;
@@ -248,7 +263,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                   form.$setPristine();
                   return $q.all( [
                     coapplicantAddModel.onNew( $scope.coapplicantRecord ),
-                    $scope.model.viewModel.getCoapplicantList()
+                    $scope.model.viewModel.getCoapplicantList().then( function() {
+                      $scope.model.viewModel.determineCoapplicantDiffs();
+                    } )
                   ] );
                 } ).finally( function() { $scope.isAddingCoapplicant = false; } );
               }
@@ -388,18 +405,28 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               if( 'lite' != self.parentModel.type ) {
                 var parent = self.parentModel.getParentIdentifier();
                 return $q.all( [
+                  self.getCoapplicantList(),
+                  self.getReferenceList(),
+                  self.getDataOptionValueList()
+                ] ).then( function() {
                   // get all other versions
                   CnHttpFactory.instance( {
                     path: parent.subject + '/' + parent.identifier + '/reqn_version'
                   } ).query().then( function( response ) {
-                    self.versionList = response.data;
-                    self.versionList.unshift( null );
-                  } ),
+                    response.data.forEach( function( version ) {
+                      self.getCoapplicantList( version.id, version ).then( function() {
+                        // see if there is a difference between this list and the view's list
+                        self.setCoapplicantDiff( version );
+                      } );
+                      self.getReferenceList( version.id, version );
+                      self.getDataOptionValueList( version.id, version );
+                      self.versionList.push( version );
+                    } );
 
-                  self.getCoapplicantList(),
-                  self.getReferenceList(),
-                  self.getDataOptionValueList()
-                ] );
+                    // add a null object to the version list so we can turn off comparisons
+                    self.versionList.unshift( null );
+                  } );
+                } );
               }
             } );
           },
@@ -514,15 +541,39 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             }
           },
 
-          getCoapplicantList: function() {
+          determineCoapplicantDiffs: function() {
+            this.versionList.forEach( version => self.setCoapplicantDiff( version ) );
+          },
+
+          setCoapplicantDiff: function( version ) {
+            if( null != version ) {
+              // see if there is a difference between this list and the view's list
+              version.coapplicantDiff =
+                version.coapplicantList.length != self.coapplicantList.length ||
+                version.coapplicantList.some(
+                  c1 => !self.coapplicantList.some(
+                    c2 => ![ 'name', 'position', 'affiliation', 'email', 'role', 'access' ].some(
+                      prop => c1[prop] != c2[prop]
+                    )
+                  )
+                );
+            }
+          },
+
+          getCoapplicantList: function( reqnVersionId, object ) {
+            var basePath = angular.isDefined( reqnVersionId )
+                         ? 'reqn_version/' + reqnVersionId
+                         : this.parentModel.getServiceResourcePath()
+            if( angular.isUndefined( object ) ) object = self;
+
             return CnHttpFactory.instance( {
-              path: this.parentModel.getServiceResourcePath() + '/coapplicant',
+              path: basePath + '/coapplicant',
               data: {
                 select: { column: [ 'id', 'name', 'position', 'affiliation', 'email', 'role', 'access' ] },
                 modifier: { order: 'id', limit: 1000000 }
               }
             } ).query().then( function( response ) {
-              self.coapplicantList = response.data;
+              object.coapplicantList = response.data;
             } );
           },
 
@@ -530,19 +581,24 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             return CnHttpFactory.instance( {
               path: this.parentModel.getServiceResourcePath() + '/coapplicant/' + id
             } ).delete().then( function() {
-              return self.getCoapplicantList();
+              return self.getCoapplicantList().then( function() { self.determineCoapplicantDiffs(); } );
             } );
           },
 
-          getReferenceList: function() {
+          getReferenceList: function( reqnVersionId, object ) {
+            var basePath = angular.isDefined( reqnVersionId )
+                         ? 'reqn_version/' + reqnVersionId
+                         : this.parentModel.getServiceResourcePath()
+            if( angular.isUndefined( object ) ) object = self;
+
             return CnHttpFactory.instance( {
-              path: this.parentModel.getServiceResourcePath() + '/reference',
+              path: basePath + '/reference',
               data: {
                 select: { column: [ 'id', 'rank', 'reference' ] },
                 modifier: { order: 'rank', limit: 1000000 }
               }
             } ).query().then( function( response ) {
-              self.referenceList = response.data;
+              object.referenceList = response.data;
             } );
           },
 
@@ -563,24 +619,29 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             } );
           },
 
-          getDataOptionValueList: function() {
-            self.dataOptionValueList = { bl: [], f1: [] };
+          getDataOptionValueList: function( reqnVersionId, object ) {
+            var basePath = angular.isDefined( reqnVersionId )
+                         ? 'reqn_version/' + reqnVersionId
+                         : this.parentModel.getServiceResourcePath()
+            if( angular.isUndefined( object ) ) object = self;
+
+            object.dataOptionValueList = { bl: [], f1: [] };
             return CnHttpFactory.instance( {
               path: 'data_option',
               data: { select: { column: [ { column: 'MAX(data_option.id)', alias: 'maxId', table_prefix: false } ] } }
             } ).get().then( function( response ) {
               for( var i = 0; i <= response.data[0].maxId; i++ ) {
-                self.dataOptionValueList.bl[i] = false;
-                self.dataOptionValueList.f1[i] = false;
+                object.dataOptionValueList.bl[i] = false;
+                object.dataOptionValueList.f1[i] = false;
               }
             } ).then( function() {
               return CnHttpFactory.instance( {
-                path: self.parentModel.getServiceResourcePath() + '/reqn_version_data_option',
+                path: basePath + '/reqn_version_data_option',
                 data: { select: { column: [ 'data_option_id', { table: 'study_phase', column: 'code', alias: 'phase' } ] } }
               } ).query().then( function( response ) {
                 response.data.forEach( function( dataOption ) {
-                  if( angular.isDefined( self.dataOptionValueList[dataOption.phase] ) )
-                    self.dataOptionValueList[dataOption.phase][dataOption.data_option_id] = true;
+                  if( angular.isDefined( object.dataOptionValueList[dataOption.phase] ) )
+                    object.dataOptionValueList[dataOption.phase][dataOption.data_option_id] = true;
                 } );
               } );
             } );
@@ -624,7 +685,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           submit: function() {
             // used below
             function submitReqn() {
-              var parent = self.parentModel.getParentIdentifier(); 
+              var parent = self.parentModel.getParentIdentifier();
               return CnHttpFactory.instance( {
                 path: parent.subject + '/' + parent.identifier + "?action=submit",
                 onError: function( response ) {
@@ -742,7 +803,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                         if( response ) return submitReqn();
                       } );
                   } );
-                  
+
                 }
               }
             } );
