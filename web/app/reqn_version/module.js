@@ -378,6 +378,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             this.setTab( 1, this.parentModel.getQueryParameter( 't1' ), false );
             this.setTab( 2, this.parentModel.getQueryParameter( 't2' ), false );
 
+            // stop comparing to any other version
+            this.compareRecord = null;
+
             return this.$$onView( force ).then( function() {
               // define the earliest date that the reqn may start
               self.minStartDate = moment( self.record.deadline ).add( CnSession.application.startDateDelay, 'months' );
@@ -389,7 +392,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                   CnHttpFactory.instance( {
                     path: parent.subject + '/' + parent.identifier + '/reqn_version'
                   } ).query().then( function( response ) {
-                    self.versionList = response.data.filter( version => version.id != self.record.id );
+                    self.versionList = response.data;
                     self.versionList.unshift( null );
                   } ),
 
@@ -803,7 +806,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           var data = 'lite' == this.type
                    ? {
                        select: {
-                         column: [ 'funding_filename', 'ethics_filename',
+                         column: [ 'is_current_version', 'funding_filename', 'ethics_filename',
                            { table: 'reqn', column: 'state' },
                            { table: 'stage_type', column: 'phase' },
                            { table: 'stage_type', column: 'name', alias: 'stage_type' }

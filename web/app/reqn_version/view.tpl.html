@@ -48,8 +48,8 @@
         </button>
         <ul class="dropdown-menu full-width" aria-labelledby="versionList">
           <li ng-repeat="version in model.viewModel.versionList">
-            <a ng-if="model.viewModel.compareRecord != version"
-               ng-click="model.viewModel.compareRecord = version">
+            <a ng-if="version.id != model.viewModel.record.id && model.viewModel.compareRecord != version"
+               ng-click="model.viewModel.compareRecord = version; liteModel.viewModel.compareRecord = version;">
               {{ null == version ? 'none' : 'Version ' + version.version }}
             </a>
           </li>
