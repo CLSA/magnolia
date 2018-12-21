@@ -1,0 +1,13 @@
+<div style="margin: 0;" class="row" ng-class="{ 'bg-warning': compare( input.key ) }">
+  <cn-view-input input="input" condensed="compare( input.key )" model="model"></cn-view-input>
+  <div style="line-height: 3em; margin-top: -0.5em;"
+       class="col-slim col-sm-9 col-sm-offset-3"
+       ng-if="compare( input.key )">
+    {{ model.viewModel.compareRecord[input.key] ?
+         'date' == input.type ? (model.viewModel.compareRecord[input.key]|cnDatetime:'date') :
+         'boolean' == input.type ? (model.viewModel.compareRecord[input.key]|cnYesNo|cnUCWords) :
+         model.viewModel.compareRecord[input.key] :
+       '(empty)'
+    }}
+  </div>
+</div>

@@ -38,42 +38,43 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
   module.addInputGroup( '', {
     reqn_id: { column: 'reqn.id', type: 'string' },
-    version: { column: 'version', type: 'string' },
-    applicant_name: { column: 'applicant_name', type: 'string' },
-    applicant_position: { column: 'applicant_position', type: 'string' },
-    applicant_affiliation: { column: 'applicant_affiliation', type: 'string' },
-    applicant_address: { column: 'applicant_address', type: 'string' },
-    applicant_phone: { column: 'applicant_phone', type: 'string' },
-    applicant_email: { column: 'applicant_email', type: 'string', format: 'email' },
-    graduate_name: { column: 'graduate_name', type: 'string' },
-    graduate_program: { column: 'graduate_program', type: 'string' },
-    graduate_institution: { column: 'graduate_institution', type: 'string' },
-    graduate_address: { column: 'graduate_address', type: 'string' },
-    graduate_phone: { column: 'graduate_phone', type: 'string' },
-    graduate_email: { column: 'graduate_email', type: 'string', format: 'email' },
-    start_date: { column: 'start_date', type: 'date' },
-    duration: { column: 'duration', type: 'string' },
-    title: { column: 'title', type: 'string' },
-    keywords: { column: 'keywords', type: 'string' },
-    lay_summary: { column: 'lay_summary', type: 'text' },
-    background: { column: 'background', type: 'text' },
-    objectives: { column: 'objectives', type: 'text' },
-    methodology: { column: 'methodology', type: 'text' },
-    analysis: { column: 'analysis', type: 'text' },
-    funding: { column: 'funding', type: 'enum' },
-    funding_agency: { column: 'funding_agency', type: 'string' },
-    grant_number: { column: 'grant_number', type: 'string' },
-    ethics: { column: 'ethics', type: 'boolean' },
-    ethics_date: { column: 'ethics_date', type: 'date' },
-    waiver: { column: 'waiver', type: 'enum' },
-    comprehensive: { column: 'comprehensive', type: 'boolean' },
-    tracking: { column: 'tracking', type: 'boolean' },
-    part2_a_comment: { column: 'part2_a_comment', type: 'text' },
-    part2_b_comment: { column: 'part2_b_comment', type: 'text' },
-    part2_c_comment: { column: 'part2_c_comment', type: 'text' },
-    part2_d_comment: { column: 'part2_d_comment', type: 'text' },
-    part2_e_comment: { column: 'part2_e_comment', type: 'text' },
-    part2_f_comment: { column: 'part2_f_comment', type: 'text' },
+    version: { type: 'string' },
+    is_current_version: { type: 'boolean' },
+    applicant_name: { type: 'string' },
+    applicant_position: { type: 'string' },
+    applicant_affiliation: { type: 'string' },
+    applicant_address: { type: 'string' },
+    applicant_phone: { type: 'string' },
+    applicant_email: { type: 'string', format: 'email' },
+    graduate_name: { type: 'string' },
+    graduate_program: { type: 'string' },
+    graduate_institution: { type: 'string' },
+    graduate_address: { type: 'string' },
+    graduate_phone: { type: 'string' },
+    graduate_email: { type: 'string', format: 'email' },
+    start_date: { type: 'date' },
+    duration: { type: 'string' },
+    title: { type: 'string' },
+    keywords: { type: 'string' },
+    lay_summary: { type: 'text' },
+    background: { type: 'text' },
+    objectives: { type: 'text' },
+    methodology: { type: 'text' },
+    analysis: { type: 'text' },
+    funding: { type: 'enum' },
+    funding_agency: { type: 'string' },
+    grant_number: { type: 'string' },
+    ethics: { type: 'boolean' },
+    ethics_date: { type: 'date' },
+    waiver: { type: 'enum' },
+    comprehensive: { type: 'boolean' },
+    tracking: { type: 'boolean' },
+    part2_a_comment: { type: 'text' },
+    part2_b_comment: { type: 'text' },
+    part2_c_comment: { type: 'text' },
+    part2_d_comment: { type: 'text' },
+    part2_e_comment: { type: 'text' },
+    part2_f_comment: { type: 'text' },
 
     identifier: { column: 'reqn.identifier', type: 'string' },
     state: { column: 'reqn.state', type: 'string' },
@@ -97,6 +98,31 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     deferral_note_part2_e: { column: 'reqn.deferral_note_part2_e', type: 'text' },
     deferral_note_part2_f: { column: 'reqn.deferral_note_part2_f', type: 'text' }
   } );
+
+  /* ######################################################################################################## */
+  cenozo.providers.directive( 'cnReqnViewInput',
+    function() {
+      return {
+        templateUrl: module.getFileUrl( 'reqn-view-input.tpl.html' ),
+        restrict: 'E',
+        scope: {
+          model: '=',
+          input: '='
+        },
+        controller: [ '$scope', function( $scope ) {
+          $scope.directive = 'cnReqnViewInput';
+          $scope.compare = function( property ) {
+            var viewModel = $scope.model.viewModel;
+            if( !viewModel.show( 'difference' ) || null == viewModel.compareRecord ) return false;
+            
+            var recordValue = viewModel.record[property] ? viewModel.record[property] : null;
+            var compareValue = viewModel.compareRecord[property] ? viewModel.compareRecord[property] : null;
+            return recordValue != compareValue;
+          };
+        } ]
+      };
+    }
+  );
 
   /* ######################################################################################################## */
   cenozo.providers.directive( 'cnReqnVersionList', [
@@ -331,6 +357,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         this.configureFileInput( 'ethics_filename' );
 
         angular.extend( this, {
+          compareRecord: null,
+          versionList: [],
           show: function( subject ) { return CnReqnHelper.showAction( subject, this.record ); },
           abandon: function() {
             return CnReqnHelper.abandon( 'identifier=' + this.record.identifier, this.record.lang ).then( function() {
@@ -355,7 +383,16 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               self.minStartDate = moment( self.record.deadline ).add( CnSession.application.startDateDelay, 'months' );
 
               if( 'lite' != self.parentModel.type ) {
+                var parent = self.parentModel.getParentIdentifier();
                 return $q.all( [
+                  // get all other versions
+                  CnHttpFactory.instance( {
+                    path: parent.subject + '/' + parent.identifier + '/reqn_version'
+                  } ).query().then( function( response ) {
+                    self.versionList = response.data.filter( version => version.id != self.record.id );
+                    self.versionList.unshift( null );
+                  } ),
+
                   self.getCoapplicantList(),
                   self.getReferenceList(),
                   self.getDataOptionValueList()
@@ -804,6 +841,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         this.isAdministrator = function() { return 'administrator' == CnSession.role.name; }
 
         this.getEditEnabled = function() {
+          var is_current_version = this.viewModel.record.is_current_version ? this.viewModel.record.is_current_version : '';
           var phase = this.viewModel.record.phase ? this.viewModel.record.phase : '';
           var state = this.viewModel.record.state ? this.viewModel.record.state : '';
           var stage_type = this.viewModel.record.stage_type ? this.viewModel.record.stage_type : '';
@@ -819,7 +857,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             );
           }
 
-          return this.$$getEditEnabled() && check;
+          return this.$$getEditEnabled() && is_current_version && check;
         };
 
         this.getDeleteEnabled = function() {

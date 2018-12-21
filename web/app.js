@@ -44,6 +44,8 @@ cenozo.service( 'CnReqnHelper', [
           );
         } else if( 'reject' == subject ) {
           return 'DSAC Selection' == stage_type && 0 <= ['administrator','chair'].indexOf( role );
+        } else if( 'difference' == subject ) {
+          return 'applicant' != role && 1 < record.version;
         } else return false;
       },
 

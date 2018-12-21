@@ -63,11 +63,26 @@ class module extends \cenozo\service\module
       $modifier->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
     }
 
-    if( $select->has_column( 'has_changed' ) )
+    if( $select->has_column( 'is_current_version' ) )
     {
-      $db_reqn_version = $this->get_resource();
-      if( !is_null( $db_reqn_version ) )
+      $modifier->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
+      $modifier->join(
+        'reqn_version',
+        'reqn_current_reqn_version.reqn_version_id',
+        'current_reqn_version.id',
+        '',
+        'current_reqn_version'
+      );
+      $select->add_column( 'reqn_version.version = current_reqn_version.version', 'is_current_version', false, 'boolean' );
+    }
+
+    $db_reqn_version = $this->get_resource();
+    if( !is_null( $db_reqn_version ) )
+    {
+      if( $select->has_column( 'has_changed' ) )
+      {
         $select->add_constant( $db_reqn_version->has_changed(), 'has_changed', 'boolean' );
+      }
     }
   }
 }

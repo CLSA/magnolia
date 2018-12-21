@@ -35,6 +35,26 @@
               ng-click="model.viewModel.viewReport()"
               ng-bind-html="t( 'misc.finalReport' )"
               type="button"></button>
+
+      <div class="btn-group dropdown" ng-if="1 < model.viewModel.versionList.length">
+        <button type="button"
+                class="btn btn-info dropdown-toggle"
+                id="versionList"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false">
+          Compare {{ null == model.viewModel.compareRecord ? '' : 'Version ' + model.viewModel.compareRecord.version }}
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu full-width" aria-labelledby="versionList">
+          <li ng-repeat="version in model.viewModel.versionList">
+            <a ng-if="model.viewModel.compareRecord != version"
+               ng-click="model.viewModel.compareRecord = version">
+              {{ null == version ? 'none' : 'Version ' + version.version }}
+            </a>
+          </li>
+        </ul>
+      </div>
       <button class="btn btn-primary"
               ng-if="model.viewModel.show( 'view' )"
               ng-click="model.viewModel.viewReqn()"
@@ -121,47 +141,47 @@
             <hr/>
             <form id="part1a1Form" name="part1a1Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
               <div class="form-horizontal">
-                <cn-view-input
+                <cn-reqn-view-input
                   input="{
                     key: 'applicant_name',
                     title: t( 'part1.a1.applicant_name' ),
                     type: model.inputList.applicant_name.type
                   }"
                   model="model">
-                </cn-view-input>
-                <cn-view-input
+                </cn-reqn-view-input>
+                <cn-reqn-view-input
                   input="{
                     key: 'applicant_position',
                     title: t( 'part1.a1.applicant_position' ),
                     type: model.inputList.applicant_position.type
                   }"
                   model="model">
-                </cn-view-input>
-                <cn-view-input
+                </cn-reqn-view-input>
+                <cn-reqn-view-input
                   input="{
                     key: 'applicant_affiliation',
                     title: t( 'part1.a1.applicant_affiliation' ),
                     type: model.inputList.applicant_affiliation.type
                   }"
                   model="model">
-                </cn-view-input>
-                <cn-view-input
+                </cn-reqn-view-input>
+                <cn-reqn-view-input
                   input="{
                     key: 'applicant_address',
                     title: t( 'part1.a1.applicant_address' ),
                     type: model.inputList.applicant_address.type
                   }"
                   model="model">
-                </cn-view-input>
-                <cn-view-input
+                </cn-reqn-view-input>
+                <cn-reqn-view-input
                   input="{
                     key: 'applicant_phone',
                     title: t( 'part1.a1.applicant_phone' ),
                     type: model.inputList.applicant_phone.type
                   }"
                   model="model">
-                </cn-view-input>
-                <cn-view-input
+                </cn-reqn-view-input>
+                <cn-reqn-view-input
                   input="{
                     key: 'applicant_email',
                     title: t( 'part1.a1.applicant_email' )+'<sup>ⓘ</sup>',
@@ -169,52 +189,52 @@
                     help: t( 'misc.emailText' )
                   }"
                   model="model">
-                </cn-view-input>
+                </cn-reqn-view-input>
               </div>
               <hr/>
               <p class="text-primary" ng-bind-html="t( 'part1.a1.text3' )"></p>
               <div class="form-horizontal">
-                <cn-view-input
+                <cn-reqn-view-input
                   input="{
                     key: 'graduate_name',
                     title: t( 'part1.a1.graduate_name' ),
                     type: model.inputList.graduate_name.type
                   }"
                   model="model">
-                </cn-view-input>
-                <cn-view-input
+                </cn-reqn-view-input>
+                <cn-reqn-view-input
                   input="{
                     key: 'graduate_program',
                     title: t( 'part1.a1.graduate_program' ),
                     type: model.inputList.graduate_program.type
                   }"
                   model="model">
-                </cn-view-input>
-                <cn-view-input
+                </cn-reqn-view-input>
+                <cn-reqn-view-input
                   input="{
                     key: 'graduate_institution',
                     title: t( 'part1.a1.graduate_institution' ),
                     type: 'string'
                   }"
                   model="model">
-                </cn-view-input>
-                <cn-view-input
+                </cn-reqn-view-input>
+                <cn-reqn-view-input
                   input="{
                     key: 'graduate_address',
                     title: t( 'part1.a1.graduate_address' ),
                     type: model.inputList.graduate_address.type
                   }"
                   model="model">
-                </cn-view-input>
-                <cn-view-input
+                </cn-reqn-view-input>
+                <cn-reqn-view-input
                   input="{
                     key: 'graduate_phone',
                     title: t( 'part1.a1.graduate_phone' ),
                     type: model.inputList.graduate_phone.type
                   }"
                   model="model">
-                </cn-view-input>
-                <cn-view-input
+                </cn-reqn-view-input>
+                <cn-reqn-view-input
                   input="{
                     key: 'graduate_email',
                     title: t( 'part1.a1.graduate_email' )+'<sup>ⓘ</sup>',
@@ -222,12 +242,12 @@
                     help: t( 'misc.emailText' )
                   }"
                   model="model">
-                </cn-view-input>
+                </cn-reqn-view-input>
               </div>
               <hr/>
               <p class="text-primary" ng-bind-html="t( 'part1.a1.text4' )"></p>
               <div class="form-horizontal">
-                <cn-view-input
+                <cn-reqn-view-input
                   input="{
                     key: 'waiver',
                     title: t( 'part1.a1.waiver' ),
@@ -235,7 +255,7 @@
                     enumList: model.metadata.columnList.waiver.enumList[model.viewModel.record.lang]
                   }"
                   model="model">
-                </cn-view-input>
+                </cn-reqn-view-input>
               </div>
             </fieldset></form>
           </div>
@@ -355,7 +375,7 @@
                   }"
                   model="model">
                 </cn-view-input>
-                <cn-view-input
+                <cn-reqn-view-input
                   input="{
                     key: 'start_date',
                     title: t( 'part1.a3.start_date' ),
@@ -363,15 +383,15 @@
                     min: model.viewModel.minStartDate
                   }"
                   model="model">
-                </cn-view-input>
-                <cn-view-input
+                </cn-reqn-view-input>
+                <cn-reqn-view-input
                   input="{
                     key: 'duration',
                     title: t( 'part1.a3.duration' ),
                     type: model.inputList.duration.type
                   }"
                   model="model">
-                </cn-view-input>
+                </cn-reqn-view-input>
               </div>
             </fieldset></form>
           </div>
@@ -383,15 +403,15 @@
             <hr/>
             <form id="part1a4Form" name="part1a4Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
               <div class="form-horizontal">
-                <cn-view-input
+                <cn-reqn-view-input
                   input="{
                     key: 'title',
                     title: t( 'part1.a4.title' ),
                     type: model.inputList.title.type
                   }"
                   model="model">
-                </cn-view-input>
-                <cn-view-input
+                </cn-reqn-view-input>
+                <cn-reqn-view-input
                   input="{
                     key: 'keywords',
                     title: t( 'part1.a4.keywords' )+'<sup>ⓘ</sup>',
@@ -399,8 +419,8 @@
                     help: t( 'part1.a4.keywords_text' )
                   }"
                   model="model">
-                </cn-view-input>
-                <cn-view-input
+                </cn-reqn-view-input>
+                <cn-reqn-view-input
                   input="{
                     key: 'lay_summary',
                     title: t( 'part1.a4.lay_summary' ) + '<sup>ⓘ</sup><br><span class=text-info>(' +
@@ -409,10 +429,10 @@
                     help: t( 'part1.a4.lay_summary_text' )
                   }"
                   model="model">
-                </cn-view-input>
+                </cn-reqn-view-input>
                 <hr/>
                 <p class="text-primary" ng-bind-html="t( 'part1.a4.text2' )"></p>
-                <cn-view-input
+                <cn-reqn-view-input
                   input="{
                     key: 'background',
                     title: t( 'part1.a4.background' ) + '<br><span class=text-info>(' +
@@ -420,8 +440,8 @@
                     type: model.inputList.background.type
                   }"
                   model="model">
-                </cn-view-input>
-                <cn-view-input
+                </cn-reqn-view-input>
+                <cn-reqn-view-input
                   input="{
                     key: 'objectives',
                     title: t( 'part1.a4.objectives' ) + '<br><span class=text-info>(' +
@@ -429,8 +449,8 @@
                     type: model.inputList.objectives.type
                   }"
                   model="model">
-                </cn-view-input>
-                <cn-view-input
+                </cn-reqn-view-input>
+                <cn-reqn-view-input
                   input="{
                     key: 'methodology',
                     title: t( 'part1.a4.methodology' )+'<sup>ⓘ</sup>' + '<br><span class=text-info>(' +
@@ -439,8 +459,8 @@
                     help: t( 'part1.a4.methodology_text' )
                   }"
                   model="model">
-                </cn-view-input>
-                <cn-view-input
+                </cn-reqn-view-input>
+                <cn-reqn-view-input
                   input="{
                     key: 'analysis',
                     title: t( 'part1.a4.analysis' )+'<sup>ⓘ</sup>' + '<br><span class=text-info>(' +
@@ -449,7 +469,7 @@
                     help: t( 'part1.a4.analysis_text' )
                   }"
                   model="model">
-                </cn-view-input>
+                </cn-reqn-view-input>
                 <hr/>
                 <p class="text-primary" ng-bind-html="t( 'part1.a4.text3' ) + maxReferencesPerReqn + t( 'part1.a4.text4' )"></p>
                 <div class="panel panel-default">
@@ -522,7 +542,7 @@
             <hr/>
             <form id="part1a5Form" name="part1a5Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
               <div class="form-horizontal">
-                <cn-view-input
+                <cn-reqn-view-input
                   input="{
                     key: 'funding',
                     title: t( 'part1.a5.funding' ),
@@ -530,8 +550,8 @@
                     enumList: model.metadata.columnList.funding.enumList[model.viewModel.record.lang]
                   }"
                   model="model">
-                </cn-view-input>
-                <cn-view-input
+                </cn-reqn-view-input>
+                <cn-reqn-view-input
                   input="{
                     key: 'funding_agency',
                     title: t( 'part1.a5.funding_agency' ),
@@ -539,8 +559,8 @@
                   }"
                   ng-if="'no' != model.viewModel.record.funding"
                   model="model">
-                </cn-view-input>
-                <cn-view-input
+                </cn-reqn-view-input>
+                <cn-reqn-view-input
                   input="{
                     key: 'grant_number',
                     title: t( 'part1.a5.grant_number' ),
@@ -548,9 +568,9 @@
                   }"
                   ng-if="'no' != model.viewModel.record.funding"
                   model="model">
-                </cn-view-input>
+                </cn-reqn-view-input>
                 <fieldset ng-disabled="!liteModel.getEditEnabled()">
-                  <cn-view-input
+                  <cn-reqn-view-input
                     ng-if="'yes' === model.viewModel.record.funding"
                     input="{
                       key: 'funding_filename',
@@ -558,7 +578,7 @@
                       type: 'file'
                     }"
                     model="liteModel">
-                  </cn-view-input>
+                  </cn-reqn-view-input>
                 </fieldset>
               </div>
             </fieldset></form>
@@ -572,7 +592,7 @@
             <form id="part1a6Form" name="part1a6Form" novalidate>
               <div class="form-horizontal">
                 <fieldset ng-disabled="!model.getEditEnabled()">
-                  <cn-view-input
+                  <cn-reqn-view-input
                     input="{
                       key: 'ethics',
                       title: t( 'part1.a6.ethics' ),
@@ -580,8 +600,8 @@
                       enumList: model.metadata.columnList.ethics.enumList[model.viewModel.record.lang]
                     }"
                     model="model">
-                  </cn-view-input>
-                  <cn-view-input
+                  </cn-reqn-view-input>
+                  <cn-reqn-view-input
                     ng-if="true === model.viewModel.record.ethics"
                     input="{
                       key: 'ethics_date',
@@ -589,8 +609,8 @@
                       type: model.inputList.ethics_date.type
                     }"
                     model="model">
-                  </cn-view-input>
-                  <cn-view-input
+                  </cn-reqn-view-input>
+                  <cn-reqn-view-input
                     ng-if="false === model.viewModel.record.ethics"
                     input="{
                       key: 'ethics_date',
@@ -598,10 +618,10 @@
                       type: model.inputList.ethics_date.type
                     }"
                     model="model">
-                  </cn-view-input>
+                  </cn-reqn-view-input>
                 </fieldset>
                 <fieldset ng-disabled="!liteModel.getEditEnabled()">
-                  <cn-view-input
+                  <cn-reqn-view-input
                     ng-if="true === model.viewModel.record.ethics"
                     input="{
                       key: 'ethics_filename',
@@ -609,7 +629,7 @@
                       type: 'file'
                     }"
                     model="liteModel">
-                  </cn-view-input>
+                  </cn-reqn-view-input>
                 </fieldset>
               </div>
             </form>
@@ -645,7 +665,7 @@
             <form ng-attr-id="part2CohortForm" ng-attr-name="part2CohortForm" novalidate>
               <div class="container-fluid form-horizontal">
                 <fieldset ng-disabled="!model.getEditEnabled()">
-                  <cn-view-input
+                  <cn-reqn-view-input
                     no-cols=true
                     input="{
                       key: 'tracking',
@@ -654,8 +674,8 @@
                       enumList: model.metadata.columnList.tracking.enumList[model.viewModel.record.lang]
                     }"
                     model="model">
-                  </cn-view-input>
-                  <cn-view-input
+                  </cn-reqn-view-input>
+                  <cn-reqn-view-input
                     no-cols=true
                     input="{
                       key: 'comprehensive',
@@ -664,7 +684,7 @@
                       enumList: model.metadata.columnList.comprehensive.enumList[model.viewModel.record.lang]
                     }"
                     model="model">
-                  </cn-view-input>
+                  </cn-reqn-view-input>
                 </fieldset>
               </div>
             </form>
@@ -769,7 +789,7 @@
                   </tbody>
                 </table>
                 <div class="container-fluid">
-                  <cn-view-input
+                  <cn-reqn-view-input
                     no-cols=true
                     input="{
                       key: 'part2_' + part + '_comment',
@@ -777,7 +797,7 @@
                       type: model.inputList['part2_' + part + '_comment'].type
                     }"
                     model="model">
-                  </cn-view-input>
+                  </cn-reqn-view-input>
                 </div>
               </div>
             </form>

@@ -26,6 +26,11 @@ define( function() {
         column: 'deadline.name',
         title: 'Deadline'
       },
+      version: {
+        column: 'reqn_version.version',
+        title: 'Version',
+        type: 'rank'
+      },
       status: {
         column: 'stage_type.status',
         title: 'Status',
