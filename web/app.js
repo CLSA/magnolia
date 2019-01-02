@@ -162,7 +162,7 @@ cenozo.service( 'CnReqnHelper', [
               en: 'Part 1 of 3: General Project Information',
               fr: 'Partie 1 de 3 : Renseignements généraux'
             },
-            a1: {
+            a: {
               tab: { en: 'Applicant', fr: 'Demandeur' },
               text1: {
                 en: '<strong>Primary Applicant</strong>: The primary applicant will be the contact person for the CLSA Access Agreement as well as for the data release and any relevant updates.',
@@ -194,7 +194,7 @@ cenozo.service( 'CnReqnHelper', [
               },
               waiver: { en: 'Fee Waiver Type', fr: 'Type d’exemption de frais' }
             },
-            a2: {
+            b: {
               tab: { en: 'Project Team', fr: 'Équipe de projet' },
               text: {
                 en: 'All Co-Applicants and Other Personnel must be listed below. Please note that changes to the project team, including change of Primary Applicant and addition or removal of Co-Applicants and Support Personnel <strong>require an amendment</strong>. To request an Amendment Form, please email <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.',
@@ -212,7 +212,7 @@ cenozo.service( 'CnReqnHelper', [
               access: { en: 'Requires Access to Data', fr: 'Doit avoir accès aux données' },
               addCoapplicant: { en: 'Add Co-Applicant', fr: 'Ajouter codemandeurs' }
             },
-            a3: {
+            c: {
               tab: { en: 'Timeline', fr: 'Échéancier' },
               text1: {
                 en: 'What is the anticipated time frame for this proposed project? In planning for your project, please consider in your time frame <strong>at least ',
@@ -226,7 +226,7 @@ cenozo.service( 'CnReqnHelper', [
               start_date: { en: 'Anticipated start date', fr: 'Date prévue de début' },
               duration: { en: 'Proposed project duration', fr: 'Durée proposée du projet' }
             },
-            a4: {
+            d: {
               tab: { en: 'Description', fr: 'Description' },
               text1: {
                 en: 'Please adhere to character count limits.',
@@ -278,7 +278,7 @@ cenozo.service( 'CnReqnHelper', [
               },
               addReference: { en: 'Add Reference', fr: 'Ajouter référence' }
             },
-            a5: {
+            e: {
               tab: { en: 'Scientific Review', fr: 'Évaluation scientifique' },
               text: {
                 en: 'Evidence of peer reviewed funding will be considered evidence of scientific review. <strong>If you have selected "yes", please upload proof of funding notification.</strong> If there are no plans to submit an application for financial support for this project please provide evidence of peer review (e.g. internal departmental review, thesis protocol defense, etc.) if available. If no evidence of scientific peer review is provided with this application then the project will undergo scientific review by the DSAC.',
@@ -292,7 +292,7 @@ cenozo.service( 'CnReqnHelper', [
                 fr: 'Copie numérique de la lettre de financement'
               },
             },
-            a6: {
+            f: {
               tab: { en: 'Ethics', fr: 'Éthique' },
               text: {
                 en: 'Please note that ethics approval is NOT required at the time of this application, but <strong>no data or biospecimens will be released until proof of ethics approval has been received by the CLSA.</strong>',

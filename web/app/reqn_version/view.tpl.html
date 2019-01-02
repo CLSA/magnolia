@@ -87,9 +87,9 @@
         <a ng-click="model.viewModel.setTab(0,'part1')"
            ng-class="{
              'text-warning flashing': model.getEditEnabled() && (
-               model.viewModel.record.deferral_note_part1_a1 || model.viewModel.record.deferral_note_part1_a2 ||
-               model.viewModel.record.deferral_note_part1_a3 || model.viewModel.record.deferral_note_part1_a4 ||
-               model.viewModel.record.deferral_note_part1_a5 || model.viewModel.record.deferral_note_part1_a6
+               model.viewModel.record.deferral_note_1a || model.viewModel.record.deferral_note_1b ||
+               model.viewModel.record.deferral_note_1c || model.viewModel.record.deferral_note_1d ||
+               model.viewModel.record.deferral_note_1e || model.viewModel.record.deferral_note_1f
              )
            }"
            ng-bind-html="t( 'part1.tab' )"></a>
@@ -98,9 +98,9 @@
         <a ng-click="model.viewModel.setTab(0,'part2')"
            ng-class="{
              'text-warning flashing': model.getEditEnabled() && (
-               model.viewModel.record.deferral_note_part2_a || model.viewModel.record.deferral_note_part2_b ||
-               model.viewModel.record.deferral_note_part2_c || model.viewMOdel.record.deferral_note_part2_d ||
-               model.viewModel.record.deferral_note_part2_e || model.viewModel.record.deferral_note_part2_f
+               model.viewModel.record.deferral_note_2a || model.viewModel.record.deferral_note_2b ||
+               model.viewModel.record.deferral_note_2c || model.viewMOdel.record.deferral_note_2d ||
+               model.viewModel.record.deferral_note_2e || model.viewModel.record.deferral_note_2f
              )
            }"
            ng-bind-html="t( 'part2.tab' )"></a>
@@ -129,22 +129,22 @@
               ng-if="'part1' == section[0]"
               ng-class="{'active':section[1] == model.viewModel.tab[1]}">
             <a ng-click="model.viewModel.setTab(1,section[1])"
-               ng-class="{'text-warning flashing':model.getEditEnabled() && model.viewModel.record['deferral_note_part1_'+section[1]]}"
+               ng-class="{'text-warning flashing':model.getEditEnabled() && model.viewModel.record['deferral_note_1'+section[1]]}"
                ng-bind-html="t( 'part1.'+section[1]+'.tab' )"></a>
           </li>
         </ul>
-        <div ng-show="'a1'==model.viewModel.tab[1]" class="panel panel-default" style="border-top-left-radius: 0px;">
+        <div ng-show="'a'==model.viewModel.tab[1]" class="panel panel-default" style="border-top-left-radius: 0px;">
           <div class="panel-body">
-            <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_part1_a1" class="bg-info"></cn-reqn-deferral-note>
-            <p class="text-primary" ng-bind-html="t( 'part1.a1.text1' )"></p>
-            <p class="text-primary" ng-bind-html="t( 'part1.a1.text2' )"></p>
+            <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_1a" class="bg-info"></cn-reqn-deferral-note>
+            <p class="text-primary" ng-bind-html="t( 'part1.a.text1' )"></p>
+            <p class="text-primary" ng-bind-html="t( 'part1.a.text2' )"></p>
             <hr/>
-            <form id="part1a1Form" name="part1a1Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
+            <form id="part1aForm" name="part1aForm" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
               <div class="form-horizontal">
                 <cn-reqn-view-input
                   input="{
                     key: 'applicant_name',
-                    title: t( 'part1.a1.applicant_name' ),
+                    title: t( 'part1.a.applicant_name' ),
                     type: model.inputList.applicant_name.type
                   }"
                   model="model">
@@ -152,7 +152,7 @@
                 <cn-reqn-view-input
                   input="{
                     key: 'applicant_position',
-                    title: t( 'part1.a1.applicant_position' ),
+                    title: t( 'part1.a.applicant_position' ),
                     type: model.inputList.applicant_position.type
                   }"
                   model="model">
@@ -160,7 +160,7 @@
                 <cn-reqn-view-input
                   input="{
                     key: 'applicant_affiliation',
-                    title: t( 'part1.a1.applicant_affiliation' ),
+                    title: t( 'part1.a.applicant_affiliation' ),
                     type: model.inputList.applicant_affiliation.type
                   }"
                   model="model">
@@ -168,7 +168,7 @@
                 <cn-reqn-view-input
                   input="{
                     key: 'applicant_address',
-                    title: t( 'part1.a1.applicant_address' ),
+                    title: t( 'part1.a.applicant_address' ),
                     type: model.inputList.applicant_address.type
                   }"
                   model="model">
@@ -176,7 +176,7 @@
                 <cn-reqn-view-input
                   input="{
                     key: 'applicant_phone',
-                    title: t( 'part1.a1.applicant_phone' ),
+                    title: t( 'part1.a.applicant_phone' ),
                     type: model.inputList.applicant_phone.type
                   }"
                   model="model">
@@ -184,7 +184,7 @@
                 <cn-reqn-view-input
                   input="{
                     key: 'applicant_email',
-                    title: t( 'part1.a1.applicant_email' )+'<sup>ⓘ</sup>',
+                    title: t( 'part1.a.applicant_email' )+'<sup>ⓘ</sup>',
                     type: model.inputList.applicant_email.type,
                     help: t( 'misc.emailText' )
                   }"
@@ -192,12 +192,12 @@
                 </cn-reqn-view-input>
               </div>
               <hr/>
-              <p class="text-primary" ng-bind-html="t( 'part1.a1.text3' )"></p>
+              <p class="text-primary" ng-bind-html="t( 'part1.a.text3' )"></p>
               <div class="form-horizontal">
                 <cn-reqn-view-input
                   input="{
                     key: 'graduate_name',
-                    title: t( 'part1.a1.graduate_name' ),
+                    title: t( 'part1.a.graduate_name' ),
                     type: model.inputList.graduate_name.type
                   }"
                   model="model">
@@ -205,7 +205,7 @@
                 <cn-reqn-view-input
                   input="{
                     key: 'graduate_program',
-                    title: t( 'part1.a1.graduate_program' ),
+                    title: t( 'part1.a.graduate_program' ),
                     type: model.inputList.graduate_program.type
                   }"
                   model="model">
@@ -213,7 +213,7 @@
                 <cn-reqn-view-input
                   input="{
                     key: 'graduate_institution',
-                    title: t( 'part1.a1.graduate_institution' ),
+                    title: t( 'part1.a.graduate_institution' ),
                     type: 'string'
                   }"
                   model="model">
@@ -221,7 +221,7 @@
                 <cn-reqn-view-input
                   input="{
                     key: 'graduate_address',
-                    title: t( 'part1.a1.graduate_address' ),
+                    title: t( 'part1.a.graduate_address' ),
                     type: model.inputList.graduate_address.type
                   }"
                   model="model">
@@ -229,7 +229,7 @@
                 <cn-reqn-view-input
                   input="{
                     key: 'graduate_phone',
-                    title: t( 'part1.a1.graduate_phone' ),
+                    title: t( 'part1.a.graduate_phone' ),
                     type: model.inputList.graduate_phone.type
                   }"
                   model="model">
@@ -237,7 +237,7 @@
                 <cn-reqn-view-input
                   input="{
                     key: 'graduate_email',
-                    title: t( 'part1.a1.graduate_email' )+'<sup>ⓘ</sup>',
+                    title: t( 'part1.a.graduate_email' )+'<sup>ⓘ</sup>',
                     type: model.inputList.graduate_email.type,
                     help: t( 'misc.emailText' )
                   }"
@@ -245,12 +245,12 @@
                 </cn-reqn-view-input>
               </div>
               <hr/>
-              <p class="text-primary" ng-bind-html="t( 'part1.a1.text4' )"></p>
+              <p class="text-primary" ng-bind-html="t( 'part1.a.text4' )"></p>
               <div class="form-horizontal">
                 <cn-reqn-view-input
                   input="{
                     key: 'waiver',
-                    title: t( 'part1.a1.waiver' ),
+                    title: t( 'part1.a.waiver' ),
                     type: 'enum',
                     enumList: model.metadata.columnList.waiver.enumList[model.viewModel.record.lang]
                   }"
@@ -260,24 +260,24 @@
             </fieldset></form>
           </div>
         </div>
-        <div ng-show="'a2'==model.viewModel.tab[1]" class="panel panel-default">
+        <div ng-show="'b'==model.viewModel.tab[1]" class="panel panel-default">
           <div class="panel-body">
-            <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_part1_a2"></cn-reqn-deferral-note>
-            <p class="text-primary" ng-bind-html="t( 'part1.a2.text' )"></p>
+            <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_1b"></cn-reqn-deferral-note>
+            <p class="text-primary" ng-bind-html="t( 'part1.b.text' )"></p>
             <div class="panel panel-default">
               <div class="panel-body" ng-class="{ 'bg-warning': compare( 'coapplicant' ) }">
                 <h4 ng-if="compare( 'coapplicant' )">Current Version List</h4>
                 <span ng-show="0 == model.viewModel.coapplicantList.length"
-                      ng-bind-html="t( 'part1.a2.noCoapplicants' )"></span>
+                      ng-bind-html="t( 'part1.b.noCoapplicants' )"></span>
                 <table class="table table-striped" ng-show="0 < model.viewModel.coapplicantList.length">
                   <thead class="bg-info">
                     <tr>
-                      <td ng-bind-html="t( 'part1.a2.name' )"></td>
-                      <td ng-bind-html="t( 'part1.a2.position' )"></td>
-                      <td ng-bind-html="t( 'part1.a2.affiliation' )"></td>
-                      <td ng-bind-html="t( 'part1.a2.email' )"></td>
-                      <td ng-bind-html="t( 'part1.a2.role' )"></td>
-                      <td ng-bind-html="t( 'part1.a2.access' )"></td>
+                      <td ng-bind-html="t( 'part1.b.name' )"></td>
+                      <td ng-bind-html="t( 'part1.b.position' )"></td>
+                      <td ng-bind-html="t( 'part1.b.affiliation' )"></td>
+                      <td ng-bind-html="t( 'part1.b.email' )"></td>
+                      <td ng-bind-html="t( 'part1.b.role' )"></td>
+                      <td ng-bind-html="t( 'part1.b.access' )"></td>
                       <td ng-show="model.getEditEnabled()"></td>
                     </tr>
                   </thead>
@@ -304,16 +304,16 @@
                   <hr style="border-top-color: gray;"/>
                   <h4>Version {{ model.viewModel.compareRecord.version }} List</h4>
                   <span ng-show="0 == model.viewModel.compareRecord.coapplicantList.length"
-                        ng-bind-html="t( 'part1.a2.noCoapplicants' )"></span>
+                        ng-bind-html="t( 'part1.b.noCoapplicants' )"></span>
                   <table class="table table-striped" ng-show="0 < model.viewModel.compareRecord.coapplicantList.length">
                     <thead class="bg-info">
                       <tr>
-                        <td ng-bind-html="t( 'part1.a2.name' )"></td>
-                        <td ng-bind-html="t( 'part1.a2.position' )"></td>
-                        <td ng-bind-html="t( 'part1.a2.affiliation' )"></td>
-                        <td ng-bind-html="t( 'part1.a2.email' )"></td>
-                        <td ng-bind-html="t( 'part1.a2.role' )"></td>
-                        <td ng-bind-html="t( 'part1.a2.access' )"></td>
+                        <td ng-bind-html="t( 'part1.b.name' )"></td>
+                        <td ng-bind-html="t( 'part1.b.position' )"></td>
+                        <td ng-bind-html="t( 'part1.b.affiliation' )"></td>
+                        <td ng-bind-html="t( 'part1.b.email' )"></td>
+                        <td ng-bind-html="t( 'part1.b.role' )"></td>
+                        <td ng-bind-html="t( 'part1.b.access' )"></td>
                       </tr>
                     </thead>
                     <tbody>
@@ -330,23 +330,23 @@
                 </div>
               </div>
             </div>
-            <form id="part1a2Form" name="part1a2Form" ng-show="model.getEditEnabled()" novalidate>
+            <form id="part1bForm" name="part1bForm" ng-show="model.getEditEnabled()" novalidate>
               <fieldset ng-disabled="!model.getEditEnabled()">
                 <div class="form-horizontal">
                   <cn-add-input
-                    input="{ key: 'name', title: t( 'part1.a2.name' ), type: 'string' }"
+                    input="{ key: 'name', title: t( 'part1.b.name' ), type: 'string' }"
                     record="coapplicantRecord"
                     model="model.viewModel.coapplicantModel"
                     first="true">
                   </cn-add-input>
                   <cn-add-input
-                    input="{ key: 'position', title: t( 'part1.a2.position' ), type: 'string' }"
+                    input="{ key: 'position', title: t( 'part1.b.position' ), type: 'string' }"
                     record="coapplicantRecord"
                     model="model.viewModel.coapplicantModel"
                     first="false">
                   </cn-add-input>
                   <cn-add-input
-                    input="{ key: 'affiliation', title: t( 'part1.a2.affiliation' ), type: 'string' }"
+                    input="{ key: 'affiliation', title: t( 'part1.b.affiliation' ), type: 'string' }"
                     record="coapplicantRecord"
                     model="model.viewModel.coapplicantModel"
                     first="false">
@@ -354,7 +354,7 @@
                   <cn-add-input
                     input="{
                       key: 'email',
-                      title: t( 'part1.a2.email' )+'<sup>ⓘ</sup>',
+                      title: t( 'part1.b.email' )+'<sup>ⓘ</sup>',
                       type: 'string',
                       help: t( 'misc.emailText' )
                     }"
@@ -363,7 +363,7 @@
                     first="false">
                   </cn-add-input>
                   <cn-add-input
-                    input="{ key: 'role', title: t( 'part1.a2.role' ), type: 'string' }"
+                    input="{ key: 'role', title: t( 'part1.b.role' ), type: 'string' }"
                     record="coapplicantRecord"
                     model="model.viewModel.coapplicantModel"
                     first="false">
@@ -371,7 +371,7 @@
                   <cn-add-input
                     input="{
                       key: 'access',
-                      title: t( 'part1.a2.access' ),
+                      title: t( 'part1.b.access' ),
                       type: 'boolean',
                       enumList: model.metadata.accessEnumList[model.viewModel.record.lang]
                     }"
@@ -382,23 +382,23 @@
                   <button class="btn btn-primary pull-right"
                           ng-disabled="isAddingCoapplicant"
                           ng-click="addCoapplicant()"
-                          ng-bind-html="t( 'part1.a2.addCoapplicant' )"></button>
+                          ng-bind-html="t( 'part1.b.addCoapplicant' )"></button>
                 </div>
               </fieldset>
             </form>
           </div>
         </div>
-        <div ng-show="'a3'==model.viewModel.tab[1]" class="panel panel-default">
+        <div ng-show="'c'==model.viewModel.tab[1]" class="panel panel-default">
           <div class="panel-body">
-            <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_part1_a3"></cn-reqn-deferral-note>
-            <p class="text-primary" ng-bind-html="t( 'part1.a3.text1' ) + startDateDelay + t( 'part1.a3.text2' )"></p>
+            <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_1c"></cn-reqn-deferral-note>
+            <p class="text-primary" ng-bind-html="t( 'part1.c.text1' ) + startDateDelay + t( 'part1.c.text2' )"></p>
             <hr/>
-            <form id="part1a3Form" name="part1a3Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
+            <form id="part1cForm" name="part1cForm" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
               <div class="form-horizontal">
                 <cn-view-input
                   input="{
                     key: 'deadline',
-                    title: t( 'part1.a3.deadline' ),
+                    title: t( 'part1.c.deadline' ),
                     type: 'date',
                     constant: true
                   }"
@@ -407,7 +407,7 @@
                 <cn-reqn-view-input
                   input="{
                     key: 'start_date',
-                    title: t( 'part1.a3.start_date' ),
+                    title: t( 'part1.c.start_date' ),
                     type: model.inputList.start_date.type,
                     min: model.viewModel.minStartDate
                   }"
@@ -416,7 +416,7 @@
                 <cn-reqn-view-input
                   input="{
                     key: 'duration',
-                    title: t( 'part1.a3.duration' ),
+                    title: t( 'part1.c.duration' ),
                     type: model.inputList.duration.type
                   }"
                   model="model">
@@ -425,17 +425,17 @@
             </fieldset></form>
           </div>
         </div>
-        <div ng-show="'a4'==model.viewModel.tab[1]" class="panel panel-default">
+        <div ng-show="'d'==model.viewModel.tab[1]" class="panel panel-default">
           <div class="panel-body">
-            <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_part1_a4"></cn-reqn-deferral-note>
-            <p class="text-primary" ng-bind-html="t( 'part1.a4.text1' )"></p>
+            <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_1d"></cn-reqn-deferral-note>
+            <p class="text-primary" ng-bind-html="t( 'part1.d.text1' )"></p>
             <hr/>
-            <form id="part1a4Form" name="part1a4Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
+            <form id="part1dForm" name="part1dForm" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
               <div class="form-horizontal">
                 <cn-reqn-view-input
                   input="{
                     key: 'title',
-                    title: t( 'part1.a4.title' ),
+                    title: t( 'part1.d.title' ),
                     type: model.inputList.title.type
                   }"
                   model="model">
@@ -443,28 +443,28 @@
                 <cn-reqn-view-input
                   input="{
                     key: 'keywords',
-                    title: t( 'part1.a4.keywords' )+'<sup>ⓘ</sup>',
+                    title: t( 'part1.d.keywords' )+'<sup>ⓘ</sup>',
                     type: 'string',
-                    help: t( 'part1.a4.keywords_text' )
+                    help: t( 'part1.d.keywords_text' )
                   }"
                   model="model">
                 </cn-reqn-view-input>
                 <cn-reqn-view-input
                   input="{
                     key: 'lay_summary',
-                    title: t( 'part1.a4.lay_summary' ) + '<sup>ⓘ</sup><br><span class=text-info>(' +
+                    title: t( 'part1.d.lay_summary' ) + '<sup>ⓘ</sup><br><span class=text-info>(' +
                            model.viewModel.charCount.lay_summary + ' ' + t( 'misc.chars' ) + ')</span>',
                     type: 'text',
-                    help: t( 'part1.a4.lay_summary_text' )
+                    help: t( 'part1.d.lay_summary_text' )
                   }"
                   model="model">
                 </cn-reqn-view-input>
                 <hr/>
-                <p class="text-primary" ng-bind-html="t( 'part1.a4.text2' )"></p>
+                <p class="text-primary" ng-bind-html="t( 'part1.d.text2' )"></p>
                 <cn-reqn-view-input
                   input="{
                     key: 'background',
-                    title: t( 'part1.a4.background' ) + '<br><span class=text-info>(' +
+                    title: t( 'part1.d.background' ) + '<br><span class=text-info>(' +
                            model.viewModel.charCount.background + ' ' + t( 'misc.chars' ) + ')</span>',
                     type: model.inputList.background.type
                   }"
@@ -473,7 +473,7 @@
                 <cn-reqn-view-input
                   input="{
                     key: 'objectives',
-                    title: t( 'part1.a4.objectives' ) + '<br><span class=text-info>(' +
+                    title: t( 'part1.d.objectives' ) + '<br><span class=text-info>(' +
                            model.viewModel.charCount.objectives + ' ' + t( 'misc.chars' ) + ')</span>',
                     type: model.inputList.objectives.type
                   }"
@@ -482,35 +482,35 @@
                 <cn-reqn-view-input
                   input="{
                     key: 'methodology',
-                    title: t( 'part1.a4.methodology' )+'<sup>ⓘ</sup>' + '<br><span class=text-info>(' +
+                    title: t( 'part1.d.methodology' )+'<sup>ⓘ</sup>' + '<br><span class=text-info>(' +
                            model.viewModel.charCount.methodology + ' ' + t( 'misc.chars' ) + ')</span>',
                     type: 'text',
-                    help: t( 'part1.a4.methodology_text' )
+                    help: t( 'part1.d.methodology_text' )
                   }"
                   model="model">
                 </cn-reqn-view-input>
                 <cn-reqn-view-input
                   input="{
                     key: 'analysis',
-                    title: t( 'part1.a4.analysis' )+'<sup>ⓘ</sup>' + '<br><span class=text-info>(' +
+                    title: t( 'part1.d.analysis' )+'<sup>ⓘ</sup>' + '<br><span class=text-info>(' +
                            model.viewModel.charCount.analysis + ' ' + t( 'misc.chars' ) + ')</span>',
                     type: 'text',
-                    help: t( 'part1.a4.analysis_text' )
+                    help: t( 'part1.d.analysis_text' )
                   }"
                   model="model">
                 </cn-reqn-view-input>
                 <hr/>
-                <p class="text-primary" ng-bind-html="t( 'part1.a4.text3' ) + maxReferencesPerReqn + t( 'part1.a4.text4' )"></p>
+                <p class="text-primary" ng-bind-html="t( 'part1.d.text3' ) + maxReferencesPerReqn + t( 'part1.d.text4' )"></p>
                 <div class="panel panel-default">
                   <div class="panel-body" ng-class="{ 'bg-warning': compare( 'reference' ) }">
                     <h4 ng-if="compare( 'reference' )">Current Version List</h4>
                     <span ng-show="0 == model.viewModel.referenceList.length"
-                          ng-bind-html="t( 'part1.a2.noReferences' )"></span>
+                          ng-bind-html="t( 'part1.b.noReferences' )"></span>
                     <table class="table table-striped" ng-show="0 < model.viewModel.referenceList.length">
                       <thead class="bg-info">
                         <tr>
-                          <td ng-bind-html="t( 'part1.a4.number' )"></td>
-                          <td ng-bind-html="t( 'part1.a4.reference' )"></td>
+                          <td ng-bind-html="t( 'part1.d.number' )"></td>
+                          <td ng-bind-html="t( 'part1.d.reference' )"></td>
                           <td ng-show="model.getEditEnabled()"></td>
                         </tr>
                       </thead>
@@ -550,12 +550,12 @@
                       <hr style="border-top-color: gray;"/>
                       <h4>Version {{ model.viewModel.compareRecord.version }} List</h4>
                       <span ng-show="0 == model.viewModel.compareRecord.referenceList.length"
-                            ng-bind-html="t( 'part1.a2.noReferences' )"></span>
+                            ng-bind-html="t( 'part1.b.noReferences' )"></span>
                       <table class="table table-striped" ng-show="0 < model.viewModel.compareRecord.referenceList.length">
                         <thead class="bg-info">
                           <tr>
-                            <td ng-bind-html="t( 'part1.a4.number' )"></td>
-                            <td ng-bind-html="t( 'part1.a4.reference' )"></td>
+                            <td ng-bind-html="t( 'part1.d.number' )"></td>
+                            <td ng-bind-html="t( 'part1.d.reference' )"></td>
                           </tr>
                         </thead>
                         <tbody>
@@ -571,7 +571,7 @@
                 <div ng-show="model.getEditEnabled()">
                   <cn-add-input
                     class="col-sm-10"
-                    input="{ key: 'reference', title: t( 'part1.a4.reference' ), type: 'string' }"
+                    input="{ key: 'reference', title: t( 'part1.d.reference' ), type: 'string' }"
                     record="referenceRecord"
                     model="model.viewModel.referenceModel"
                     first="false">
@@ -579,23 +579,23 @@
                   <button class="btn btn-primary col-sm-2"
                           ng-disabled="isAddingReference"
                           ng-click="addReference()"
-                          ng-bind-html="t( 'part1.a4.addReference' )"></button>
+                          ng-bind-html="t( 'part1.d.addReference' )"></button>
                 </div>
               </div>
             </fieldset></form>
           </div>
         </div>
-        <div ng-show="'a5'==model.viewModel.tab[1]" class="panel panel-default">
+        <div ng-show="'e'==model.viewModel.tab[1]" class="panel panel-default">
           <div class="panel-body">
-            <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_part1_a5"></cn-reqn-deferral-note>
-            <p class="text-primary" ng-bind-html="t( 'part1.a5.text' )"></p>
+            <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_1e"></cn-reqn-deferral-note>
+            <p class="text-primary" ng-bind-html="t( 'part1.e.text' )"></p>
             <hr/>
-            <form id="part1a5Form" name="part1a5Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
+            <form id="part1eForm" name="part1eForm" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
               <div class="form-horizontal">
                 <cn-reqn-view-input
                   input="{
                     key: 'funding',
-                    title: t( 'part1.a5.funding' ),
+                    title: t( 'part1.e.funding' ),
                     type: 'enum',
                     enumList: model.metadata.columnList.funding.enumList[model.viewModel.record.lang]
                   }"
@@ -604,7 +604,7 @@
                 <cn-reqn-view-input
                   input="{
                     key: 'funding_agency',
-                    title: t( 'part1.a5.funding_agency' ),
+                    title: t( 'part1.e.funding_agency' ),
                     type: model.inputList.funding_agency.type
                   }"
                   ng-if="'no' != model.viewModel.record.funding"
@@ -613,7 +613,7 @@
                 <cn-reqn-view-input
                   input="{
                     key: 'grant_number',
-                    title: t( 'part1.a5.grant_number' ),
+                    title: t( 'part1.e.grant_number' ),
                     type: model.inputList.grant_number.type
                   }"
                   ng-if="'no' != model.viewModel.record.funding"
@@ -624,7 +624,7 @@
                     ng-if="'yes' === model.viewModel.record.funding"
                     input="{
                       key: 'funding_filename',
-                      title: t( 'part1.a5.letter' ),
+                      title: t( 'part1.e.letter' ),
                       type: 'file'
                     }"
                     model="liteModel">
@@ -634,18 +634,18 @@
             </fieldset></form>
           </div>
         </div>
-        <div ng-show="'a6'==model.viewModel.tab[1]" class="panel panel-default">
+        <div ng-show="'f'==model.viewModel.tab[1]" class="panel panel-default">
           <div class="panel-body">
-            <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_part1_a6"></cn-reqn-deferral-note>
-            <p class="text-primary" ng-bind-html="t( 'part1.a6.text' )"></p>
+            <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_1f"></cn-reqn-deferral-note>
+            <p class="text-primary" ng-bind-html="t( 'part1.f.text' )"></p>
             <hr/>
-            <form id="part1a6Form" name="part1a6Form" novalidate>
+            <form id="part1fForm" name="part1fForm" novalidate>
               <div class="form-horizontal">
                 <fieldset ng-disabled="!model.getEditEnabled()">
                   <cn-reqn-view-input
                     input="{
                       key: 'ethics',
-                      title: t( 'part1.a6.ethics' ),
+                      title: t( 'part1.f.ethics' ),
                       type: model.inputList.ethics.type,
                       enumList: model.metadata.columnList.ethics.enumList[model.viewModel.record.lang]
                     }"
@@ -655,7 +655,7 @@
                     ng-if="true === model.viewModel.record.ethics"
                     input="{
                       key: 'ethics_date',
-                      title: t( 'part1.a6.expiration' ),
+                      title: t( 'part1.f.expiration' ),
                       type: model.inputList.ethics_date.type
                     }"
                     model="model">
@@ -664,7 +664,7 @@
                     ng-if="false === model.viewModel.record.ethics"
                     input="{
                       key: 'ethics_date',
-                      title: t( 'part1.a6.response' ),
+                      title: t( 'part1.f.response' ),
                       type: model.inputList.ethics_date.type
                     }"
                     model="model">
@@ -675,7 +675,7 @@
                     ng-if="true === model.viewModel.record.ethics"
                     input="{
                       key: 'ethics_filename',
-                      title: t( 'part1.a6.letter' ),
+                      title: t( 'part1.f.letter' ),
                       type: 'file'
                     }"
                     model="liteModel">
@@ -695,7 +695,7 @@
               ng-if="'part2' == section[0]"
               ng-class="{'active':section[2] == model.viewModel.tab[2]}">
             <a ng-click="model.viewModel.setTab(2,section[2])"
-               ng-class="{'text-warning flashing':model.getEditEnabled() && model.viewModel.record['deferral_note_part2_'+section[2]]}"
+               ng-class="{'text-warning flashing':model.getEditEnabled() && model.viewModel.record['deferral_note_2'+section[2]]}"
                ng-bind-html="t( 'part2.'+section[2]+'.tab' )"></a>
           </li>
         </ul>
@@ -747,7 +747,7 @@
              class="panel panel-default">
           <div class="panel-body">
             <form ng-attr-id="part2{{ part }}Form" ng-attr-name="part2{{ part }}Form" novalidate>
-              <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_part2_{{ part }}"></cn-reqn-deferral-note>
+              <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_2{{ part }}"></cn-reqn-deferral-note>
               <div class="form-horizontal">
                 <ul class="list-group" ng-if="'f'==part">
                   <li class="list-group-item">

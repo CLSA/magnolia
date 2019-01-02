@@ -85,18 +85,18 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     phase: { column: 'stage_type.phase', type: 'string' },
     lang: { column: 'language.code', type: 'string' },
     deadline: { column: 'deadline.date', type: 'date' },
-    deferral_note_part1_a1: { column: 'reqn.deferral_note_part1_a1', type: 'text' },
-    deferral_note_part1_a2: { column: 'reqn.deferral_note_part1_a2', type: 'text' },
-    deferral_note_part1_a3: { column: 'reqn.deferral_note_part1_a3', type: 'text' },
-    deferral_note_part1_a4: { column: 'reqn.deferral_note_part1_a4', type: 'text' },
-    deferral_note_part1_a5: { column: 'reqn.deferral_note_part1_a5', type: 'text' },
-    deferral_note_part1_a6: { column: 'reqn.deferral_note_part1_a6', type: 'text' },
-    deferral_note_part2_a: { column: 'reqn.deferral_note_part2_a', type: 'text' },
-    deferral_note_part2_b: { column: 'reqn.deferral_note_part2_b', type: 'text' },
-    deferral_note_part2_c: { column: 'reqn.deferral_note_part2_c', type: 'text' },
-    deferral_note_part2_d: { column: 'reqn.deferral_note_part2_d', type: 'text' },
-    deferral_note_part2_e: { column: 'reqn.deferral_note_part2_e', type: 'text' },
-    deferral_note_part2_f: { column: 'reqn.deferral_note_part2_f', type: 'text' }
+    deferral_note_1a: { column: 'reqn.deferral_note_1a', type: 'text' },
+    deferral_note_1b: { column: 'reqn.deferral_note_1b', type: 'text' },
+    deferral_note_1c: { column: 'reqn.deferral_note_1c', type: 'text' },
+    deferral_note_1d: { column: 'reqn.deferral_note_1d', type: 'text' },
+    deferral_note_1e: { column: 'reqn.deferral_note_1e', type: 'text' },
+    deferral_note_1f: { column: 'reqn.deferral_note_1f', type: 'text' },
+    deferral_note_2a: { column: 'reqn.deferral_note_2a', type: 'text' },
+    deferral_note_2b: { column: 'reqn.deferral_note_2b', type: 'text' },
+    deferral_note_2c: { column: 'reqn.deferral_note_2c', type: 'text' },
+    deferral_note_2d: { column: 'reqn.deferral_note_2d', type: 'text' },
+    deferral_note_2e: { column: 'reqn.deferral_note_2e', type: 'text' },
+    deferral_note_2f: { column: 'reqn.deferral_note_2f', type: 'text' }
   } );
 
   /* ######################################################################################################## */
@@ -241,7 +241,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
           $scope.addCoapplicant = function() {
             if( $scope.model.viewModel.coapplicantModel.getAddEnabled() ) {
-              var form = cenozo.getScopeByQuerySelector( '#part1a2Form' ).part1a2Form;
+              var form = cenozo.getScopeByQuerySelector( '#part1bForm' ).part1bForm;
 
               // we need to check each add-input for errors
               var valid = true;
@@ -257,7 +257,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               }
               if( !valid ) {
                 // dirty all inputs so we can find the problem
-                cenozo.forEachFormElement( 'part1a2Form', function( element ) { element.$dirty = true; } );
+                cenozo.forEachFormElement( 'part1bForm', function( element ) { element.$dirty = true; } );
               } else {
                 $scope.isAddingCoapplicant = true;
                 coapplicantAddModel.onAdd( $scope.coapplicantRecord ).then( function( response ) {
@@ -290,10 +290,10 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
           $scope.addReference = function() {
             if( $scope.model.viewModel.referenceModel.getAddEnabled() ) {
-              var form = cenozo.getScopeByQuerySelector( '#part1a4Form' ).part1a4Form;
+              var form = cenozo.getScopeByQuerySelector( '#part1dForm' ).part1dForm;
               if( !form.$valid ) {
                 // dirty all inputs so we can find the problem
-                cenozo.forEachFormElement( 'part1a4Form', function( element ) { element.$dirty = true; } );
+                cenozo.forEachFormElement( 'part1dForm', function( element ) { element.$dirty = true; } );
               } else {
                 $scope.isAddingReference = true;
                 referenceAddModel.onAdd( $scope.referenceRecord ).then( function( response ) {
@@ -479,12 +479,12 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           tab: [],
           tabSectionList: [
             [ 'instructions', null, null ],
-            [ 'part1', 'a1', null ],
-            [ 'part1', 'a2', null ],
-            [ 'part1', 'a3', null ],
-            [ 'part1', 'a4', null ],
-            [ 'part1', 'a5', null ],
-            [ 'part1', 'a6', null ],
+            [ 'part1', 'a', null ],
+            [ 'part1', 'b', null ],
+            [ 'part1', 'c', null ],
+            [ 'part1', 'd', null ],
+            [ 'part1', 'e', null ],
+            [ 'part1', 'f', null ],
             [ 'part2', null, 'notes' ],
             [ 'part2', null, 'cohort' ],
             [ 'part2', null, 'a' ],
@@ -512,7 +512,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             // get the tab (or default of none was found)
             tab = null != selectedTabSection && null != selectedTabSection[index]
                 ? selectedTabSection[index]
-                : ( 0 == index ? 'instructions' : 1 == index ? 'a1' : 'notes' );
+                : ( 0 == index ? 'instructions' : 1 == index ? 'a' : 'notes' );
 
             self.tab[index] = tab;
             self.parentModel.setQueryParameter( 't'+index, tab );
@@ -725,7 +725,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                       element.$error.custom = self.translate( 'misc.invalidStartDateTitle' );
                       cenozo.updateFormElement( element, true );
                       self.setTab( 0, 'part1', false );
-                      self.setTab( 1, 'a3' );
+                      self.setTab( 1, 'c' );
                     } );
                   } else CnModalMessageFactory.httpError( response );
                 }
@@ -752,12 +752,12 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               if( response ) {
                 // make sure that certain properties have been defined, one tab at a time
                 var requiredTabList = {
-                  a1: [ 'applicant_name', 'applicant_position', 'applicant_affiliation',
-                        'applicant_address', 'applicant_phone', 'applicant_email' ],
-                  a3: [ 'start_date', 'duration' ],
-                  a4: [ 'title', 'keywords', 'lay_summary', 'background', 'objectives', 'methodology', 'analysis' ],
-                  a5: [ 'funding' ],
-                  a6: [ 'ethics' ],
+                  a: [ 'applicant_name', 'applicant_position', 'applicant_affiliation',
+                       'applicant_address', 'applicant_phone', 'applicant_email' ],
+                  c: [ 'start_date', 'duration' ],
+                  d: [ 'title', 'keywords', 'lay_summary', 'background', 'objectives', 'methodology', 'analysis' ],
+                  e: [ 'funding' ],
+                  f: [ 'ethics' ],
                   cohort: [ 'tracking', 'comprehensive' ]
                 };
 
@@ -786,7 +786,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                     var element = cenozo.getFormElement( 'lay_summary' );
                     element.$error.custom = self.translate( 'misc.tooManyCharactersTitle' );
                     cenozo.updateFormElement( element, true );
-                    if( null == errorTab ) errorTab = 'a4';
+                    if( null == errorTab ) errorTab = 'd';
                     if( null == error ) error = {
                       title: self.translate( 'misc.tooManyCharactersTitle' ),
                       message: self.translate( 'misc.tooManyCharactersMessage' ),

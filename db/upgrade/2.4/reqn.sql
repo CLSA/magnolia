@@ -447,6 +447,150 @@ CREATE PROCEDURE patch_reqn()
       ALTER TABLE reqn DROP COLUMN part2_f_comment;
     END IF;
 
+    SELECT "Renaming deferral_note_part1_a1 column to deferral_note_1a in reqn table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "deferral_note_part1_a1";
+
+    IF @test THEN
+      ALTER TABLE reqn CHANGE deferral_note_part1_a1 deferral_note_1a text;
+    END IF;
+
+    SELECT "Renaming deferral_note_part1_a2 column to deferral_note_1b in reqn table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "deferral_note_part1_a2";
+
+    IF @test THEN
+      ALTER TABLE reqn CHANGE deferral_note_part1_a2 deferral_note_1b text;
+    END IF;
+
+    SELECT "Renaming deferral_note_part1_a3 column to deferral_note_1c in reqn table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "deferral_note_part1_a3";
+
+    IF @test THEN
+      ALTER TABLE reqn CHANGE deferral_note_part1_a3 deferral_note_1c text;
+    END IF;
+
+    SELECT "Renaming deferral_note_part1_a4 column to deferral_note_1d in reqn table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "deferral_note_part1_a4";
+
+    IF @test THEN
+      ALTER TABLE reqn CHANGE deferral_note_part1_a4 deferral_note_1d text;
+    END IF;
+
+    SELECT "Renaming deferral_note_part1_a5 column to deferral_note_1e in reqn table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "deferral_note_part1_a5";
+
+    IF @test THEN
+      ALTER TABLE reqn CHANGE deferral_note_part1_a5 deferral_note_1e text;
+    END IF;
+
+    SELECT "Renaming deferral_note_part1_a6 column to deferral_note_1f in reqn table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "deferral_note_part1_a6";
+
+    IF @test THEN
+      ALTER TABLE reqn CHANGE deferral_note_part1_a6 deferral_note_1f text;
+    END IF;
+
+    SELECT "Renaming deferral_note_part2_a column to deferral_note_2a in reqn table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "deferral_note_part2_a";
+
+    IF @test THEN
+      ALTER TABLE reqn CHANGE deferral_note_part2_a deferral_note_2a text;
+    END IF;
+
+    SELECT "Renaming deferral_note_part2_b column to deferral_note_2b in reqn table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "deferral_note_part2_b";
+
+    IF @test THEN
+      ALTER TABLE reqn CHANGE deferral_note_part2_b deferral_note_2b text;
+    END IF;
+
+    SELECT "Renaming deferral_note_part2_c column to deferral_note_2c in reqn table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "deferral_note_part2_c";
+
+    IF @test THEN
+      ALTER TABLE reqn CHANGE deferral_note_part2_c deferral_note_2c text;
+    END IF;
+
+    SELECT "Renaming deferral_note_part2_d column to deferral_note_2d in reqn table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "deferral_note_part2_d";
+
+    IF @test THEN
+      ALTER TABLE reqn CHANGE deferral_note_part2_d deferral_note_2d text;
+    END IF;
+
+    SELECT "Renaming deferral_note_part2_e column to deferral_note_2e in reqn table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "deferral_note_part2_e";
+
+    IF @test THEN
+      ALTER TABLE reqn CHANGE deferral_note_part2_e deferral_note_2e text;
+    END IF;
+
+    SELECT "Renaming deferral_note_part2_f column to deferral_note_2f in reqn table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "deferral_note_part2_f";
+
+    IF @test THEN
+      ALTER TABLE reqn CHANGE deferral_note_part2_f deferral_note_2f text;
+    END IF;
+
   END //
 DELIMITER ;
 

@@ -136,51 +136,51 @@ define( function() {
       title: 'Notice of Decision',
       type: 'text'
     },
-    deferral_note_part1_a1: {
+    deferral_note_1a: {
       title: 'Part1: A1',
       type: 'text'
     },
-    deferral_note_part1_a2: {
+    deferral_note_1b: {
       title: 'Part1: A2',
       type: 'text'
     },
-    deferral_note_part1_a3: {
+    deferral_note_1c: {
       title: 'Part1: A3',
       type: 'text'
     },
-    deferral_note_part1_a4: {
+    deferral_note_1d: {
       title: 'Part1: A4',
       type: 'text'
     },
-    deferral_note_part1_a5: {
+    deferral_note_1e: {
       title: 'Part1: A5',
       type: 'text'
     },
-    deferral_note_part1_a6: {
+    deferral_note_1f: {
       title: 'Part1: A6',
       type: 'text'
     },
-    deferral_note_part2_a: {
+    deferral_note_2a: {
       title: 'Part2: Questionnaires',
       type: 'text'
     },
-    deferral_note_part2_b: {
+    deferral_note_2b: {
       title: 'Part2: Physical Assessment',
       type: 'text'
     },
-    deferral_note_part2_c: {
+    deferral_note_2c: {
       title: 'Part2: Biomarkers',
       type: 'text'
     },
-    deferral_note_part2_d: {
+    deferral_note_2d: {
       title: 'Part2: Genomics',
       type: 'text'
     },
-    deferral_note_part2_e: {
+    deferral_note_2e: {
       title: 'Part2: Linked Data',
       type: 'text'
     },
-    deferral_note_part2_f: {
+    deferral_note_2f: {
       title: 'Part2: Additional Data',
       type: 'text'
     }
@@ -408,12 +408,12 @@ define( function() {
           },
 
           deferralNotesExist: function() {
-            return this.record.deferral_note_part1_a1 || this.record.deferral_note_part1_a2 ||
-                   this.record.deferral_note_part1_a3 || this.record.deferral_note_part1_a4 ||
-                   this.record.deferral_note_part1_a5 || this.record.deferral_note_part1_a6 ||
-                   this.record.deferral_note_part2_a || this.record.deferral_note_part2_b ||
-                   this.record.deferral_note_part2_c || this.record.deferral_note_part2_d ||
-                   this.record.deferral_note_part2_e || this.record.deferral_note_part2_f;
+            return this.record.deferral_note_1a || this.record.deferral_note_1b ||
+                   this.record.deferral_note_1c || this.record.deferral_note_1d ||
+                   this.record.deferral_note_1e || this.record.deferral_note_1f ||
+                   this.record.deferral_note_2a || this.record.deferral_note_2b ||
+                   this.record.deferral_note_2c || this.record.deferral_note_2d ||
+                   this.record.deferral_note_2e || this.record.deferral_note_2f;
           },
 
           enabled: function( subject ) {
