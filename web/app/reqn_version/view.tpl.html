@@ -789,7 +789,7 @@
                           </span><sup ng-if="dataOption.note[model.viewModel.record.lang]">ⓘ</sup>
                         </a>
                       </td>
-                      <td ng-if="dataOption.bl">
+                      <td ng-if="dataOption.bl" ng-class="{ 'bg-warning': compare( 'data_option_value', 'bl', dataOption.id ) }">
                         <button class="btn full-width"
                                 ng-class="model.viewModel.dataOptionValueList.bl[dataOption.id] ?
                                   'btn-success' : 'btn-default'"
@@ -803,7 +803,7 @@
                         </button>
                       </td>
                       <td ng-if="!dataOption.bl" ng-bind-html="t( 'misc.notAvailable' )"></td>
-                      <td ng-if="dataOption.f1">
+                      <td ng-if="dataOption.f1" ng-class="{ 'bg-warning': compare( 'data_option_value', 'f1', dataOption.id ) }">
                         <button class="btn full-width"
                                 ng-class="model.viewModel.dataOptionValueList.f1[dataOption.id] ?
                                   'btn-success' : 'btn-default'"

@@ -223,7 +223,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             ].join( ' ' );
           };
 
-          $scope.compare = function( property ) {
+          $scope.compare = function( property, studyPhase, id ) {
+            // note that studyPhase and id are only used when comparing data_option_values
             var viewModel = $scope.model.viewModel;
             if( !viewModel.show( 'compare' ) || null == viewModel.compareRecord ) return false;
 
@@ -232,7 +233,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             } else if( 'reference' == property ) {
               return viewModel.compareRecord.referenceDiff;
             } else if( 'data_option_value' == property ) {
-              return viewModel.dataOptionValueDiff;
+              return viewModel.compareRecord.dataOptionValueList[studyPhase][id] != viewModel.dataOptionValueList[studyPhase][id];
             }
 
             throw new Error( 'Tried to compare for property "' + property + '" which is invalid.' );
