@@ -299,7 +299,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                   form.$setPristine();
                   return $q.all( [
                     referenceAddModel.onNew( $scope.referenceRecord ),
-                    $scope.model.viewModel.getReferenceList()
+                    $scope.model.viewModel.getReferenceList().then( function() {
+                      $scope.model.viewModel.determineReferenceDiffs();
+                    } )
                   ] );
                 } ).finally( function() { $scope.isAddingReference = false; } );
               }
@@ -418,7 +420,10 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                         // see if there is a difference between this list and the view's list
                         self.setCoapplicantDiff( version );
                       } );
-                      self.getReferenceList( version.id, version );
+                      self.getReferenceList( version.id, version ).then( function() {
+                        // see if there is a difference between this list and the view's list
+                        self.setReferenceDiff( version );
+                      } );
                       self.getDataOptionValueList( version.id, version );
                       self.versionList.push( version );
                     } );
@@ -585,6 +590,25 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             } );
           },
 
+          determineReferenceDiffs: function() {
+            this.versionList.forEach( version => self.setReferenceDiff( version ) );
+          },
+
+          setReferenceDiff: function( version ) {
+            if( null != version ) {
+              // see if there is a difference between this list and the view's list
+              version.referenceDiff =
+                version.referenceList.length != self.referenceList.length ||
+                version.referenceList.some(
+                  c1 => !self.referenceList.some(
+                    c2 => ![ 'rank', 'reference' ].some(
+                      prop => c1[prop] != c2[prop]
+                    )
+                  )
+                );
+            }
+          },
+
           getReferenceList: function( reqnVersionId, object ) {
             var basePath = angular.isDefined( reqnVersionId )
                          ? 'reqn_version/' + reqnVersionId
@@ -607,7 +631,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               path: this.parentModel.getServiceResourcePath() + '/reference/' + id,
               data: { rank: rank }
             } ).patch().then( function() {
-              return self.getReferenceList();
+              return self.getReferenceList().then( function() { self.determineReferenceDiffs(); } );
             } );
           },
 
@@ -615,7 +639,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             return CnHttpFactory.instance( {
               path: this.parentModel.getServiceResourcePath() + '/reference/' + id
             } ).delete().then( function() {
-              return self.getReferenceList();
+              return self.getReferenceList().then( function() { self.determineReferenceDiffs(); } );
             } );
           },
 

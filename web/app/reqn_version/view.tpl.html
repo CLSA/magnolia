@@ -266,6 +266,7 @@
             <p class="text-primary" ng-bind-html="t( 'part1.a2.text' )"></p>
             <div class="panel panel-default">
               <div class="panel-body" ng-class="{ 'bg-warning': compare( 'coapplicant' ) }">
+                <h4 ng-if="compare( 'coapplicant' )">Current Version List</h4>
                 <span ng-show="0 == model.viewModel.coapplicantList.length"
                       ng-bind-html="t( 'part1.a2.noCoapplicants' )"></span>
                 <table class="table table-striped" ng-show="0 < model.viewModel.coapplicantList.length">
@@ -300,6 +301,7 @@
                   </tbody>
                 </table>
                 <div ng-if="compare( 'coapplicant' )">
+                  <hr style="border-top-color: gray;"/>
                   <h4>Version {{ model.viewModel.compareRecord.version }} List</h4>
                   <span ng-show="0 == model.viewModel.compareRecord.coapplicantList.length"
                         ng-bind-html="t( 'part1.a2.noCoapplicants' )"></span>
@@ -500,9 +502,10 @@
                 <hr/>
                 <p class="text-primary" ng-bind-html="t( 'part1.a4.text3' ) + maxReferencesPerReqn + t( 'part1.a4.text4' )"></p>
                 <div class="panel panel-default">
-                  <div class="panel-body">
+                  <div class="panel-body" ng-class="{ 'bg-warning': compare( 'reference' ) }">
+                    <h4 ng-if="compare( 'reference' )">Current Version List</h4>
                     <span ng-show="0 == model.viewModel.referenceList.length"
-                          ng-bind-html="t( 'part1.a4.noReferences' )"></span>
+                          ng-bind-html="t( 'part1.a2.noReferences' )"></span>
                     <table class="table table-striped" ng-show="0 < model.viewModel.referenceList.length">
                       <thead class="bg-info">
                         <tr>
@@ -543,6 +546,26 @@
                         </tr>
                       </tbody>
                     </table>
+                    <div ng-if="compare( 'reference' )">
+                      <hr style="border-top-color: gray;"/>
+                      <h4>Version {{ model.viewModel.compareRecord.version }} List</h4>
+                      <span ng-show="0 == model.viewModel.compareRecord.referenceList.length"
+                            ng-bind-html="t( 'part1.a2.noReferences' )"></span>
+                      <table class="table table-striped" ng-show="0 < model.viewModel.compareRecord.referenceList.length">
+                        <thead class="bg-info">
+                          <tr>
+                            <td ng-bind-html="t( 'part1.a4.number' )"></td>
+                            <td ng-bind-html="t( 'part1.a4.reference' )"></td>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr ng-repeat="reference in model.viewModel.compareRecord.referenceList | orderBy: 'rank'">
+                            <td>{{ reference.rank }}</td>
+                            <td class="text-left">{{ reference.reference }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 </div>
                 <div ng-show="model.getEditEnabled()">
