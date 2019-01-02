@@ -111,7 +111,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         },
         controller: [ '$scope', function( $scope ) {
           $scope.directive = 'cnReqnViewInput';
-          $scope.compare = function( property ) {
+          $scope.isDifferent = function( property ) {
             var viewModel = $scope.model.viewModel;
             if( !viewModel.show( 'compare' ) || null == viewModel.compareRecord ) return false;
 
@@ -223,7 +223,14 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             ].join( ' ' );
           };
 
-          $scope.compare = function( property, studyPhase, id ) {
+          $scope.compareTo = function( version ) {
+            $scope.model.viewModel.compareRecord = version;
+            $scope.liteModel.viewModel.compareRecord = version;
+            $scope.model.setQueryParameter( 'c', null == version ? undefined : version.version );
+            $scope.model.reloadState( false, false, 'replace' );
+          };
+
+          $scope.isDifferent = function( property, studyPhase, id ) {
             // note that studyPhase and id are only used when comparing data_option_values
             var viewModel = $scope.model.viewModel;
             if( !viewModel.show( 'compare' ) || null == viewModel.compareRecord ) return false;
@@ -398,7 +405,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             this.setTab( 1, this.parentModel.getQueryParameter( 't1' ), false );
             this.setTab( 2, this.parentModel.getQueryParameter( 't2' ), false );
 
-            // stop comparing to any other version
+            // reset compare version
             this.compareRecord = null;
 
             return this.$$onView( force ).then( function() {
@@ -428,6 +435,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                       self.getDataOptionValueList( version.id, version );
                       self.versionList.push( version );
                     } );
+
+                    var version = self.parentModel.getQueryParameter( 'c' );
+                    if( angular.isDefined( version ) ) self.compareRecord = self.versionList.findByProperty( 'version', version );
 
                     // add a null object to the version list so we can turn off comparisons
                     self.versionList.unshift( null );

@@ -40,7 +40,7 @@ class ui extends \cenozo\ui\ui
     }
 
     $module = $this->get_module( 'reqn_version' );
-    if( !is_null( $module ) ) $module->append_action_query( 'view', '?{t0}&{t1}&{t2}' );
+    if( !is_null( $module ) ) $module->append_action_query( 'view', '?{t0}&{t1}&{t2}&{c}' );
 
     $module = $this->get_module( 'notification_type' );
     if( !is_null( $module ) )
