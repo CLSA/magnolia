@@ -188,6 +188,15 @@ class patch extends \cenozo\service\patch
               // this will submit the reqn for the first time
               $db_reqn->proceed_to_next_stage();
             }
+
+            // send a notification
+            $db_notification = lib::create( 'database\notification' );
+            $db_notification->reqn_id = $db_reqn->id;
+            $db_notification->notification_type_id =
+              $notification_type_class_name::get_unique_record( 'name', 'Requisition Submitted' )->id;
+            $db_notification->email = lib::create( 'business\setting_manager' )->get_setting( 'general', 'admin_email' );
+            $db_notification->datetime = util::get_datetime_object();
+            $db_notification->save();
           }
           else if( 'next_stage' == $action )
           {
