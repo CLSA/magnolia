@@ -19,6 +19,7 @@ class post extends \cenozo\service\post
 
     $reqn_class_name = lib::get_class_name( 'database\reqn' );
     $language_class_name = lib::get_class_name( 'database\language' );
+    $graduate_class_name = lib::get_class_name( 'database\graduate' );
     $db_reqn = $this->get_leaf_record();
 
     // generate a random identifier if none exists
@@ -27,5 +28,13 @@ class post extends \cenozo\service\post
     // if the language_id isn't set then default to English
     if( is_null( $db_reqn->language_id ) )
       $db_reqn->language_id = $language_class_name::get_unique_record( 'code', 'en' )->id;
+
+    // if the current user has a supervisor then make them the owner
+    $db_graduate = $graduate_class_name::get_unique_record( 'graduate_user_id', $db_reqn->user_id );
+    if( !is_null( $db_graduate ) )
+    {
+      $db_reqn->user_id = $db_graduate->user_id;
+      $db_reqn->graduate_id = $db_graduate->id;
+    }
   }
 }

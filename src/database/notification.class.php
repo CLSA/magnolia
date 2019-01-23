@@ -14,20 +14,39 @@ use cenozo\lib, cenozo\log, magnolia\util;
 class notification extends \cenozo\database\record
 {
   /**
-   * Extend parent method
+   * Adds an email address to the notification
+   * @param string $email
+   * @param string $name
    */
-  public function save()
+  public function add_email( $email, $name )
   {
-    // mail the notification if this is a new record
-    if( is_null( $this->id ) ) $this->mail();
-
-    parent::save();
+    $db_notification_email = lib::create( 'database\notification_email' );
+    $db_notification_email->notification_id = $this->id;
+    $db_notification_email->email = $email;
+    $db_notification_email->name = $name;
+    $db_notification_email->save();
   }
+
+  /**
+   * Sets up the notification to send to the owner and graduate of a reqn
+   * @param database\reqn $db_reqn
+   */
+   public function set_reqn( $db_reqn )
+   {
+     $db_reqn_version = $db_reqn->get_current_reqn_version();
+     $this->reqn_id = $db_reqn->id;
+     $this->datetime = util::get_datetime_object();
+     $this->save();
+
+     $this->add_email( $db_reqn_version->applicant_email, $db_reqn_version->applicant_name );
+     if( !is_null( $db_reqn_version->graduate_email ) )
+       $this->add_email( $db_reqn_version->graduate_email, $db_reqn_version->graduate_name );
+   }
 
   /**
    * Sends all emails associated with this notification
    */
-  protected function mail()
+  public function mail()
   {
     $setting_manager = lib::create( 'business\setting_manager' );
     $mail_manager = lib::create( 'business\mail_manager' );
@@ -44,7 +63,11 @@ class notification extends \cenozo\database\record
       'en' == $language ? $db_notification_type->message_en : $db_notification_type->message_fr
     );
 
-    $mail_manager->to( $this->email, $db_reqn_version->applicant_name );
+    $select = lib::create( 'database\select' );
+    $select->add_column( 'email' );
+    $select->add_column( 'name' );
+    foreach( $this->get_notification_email_list() as $email ) $mail_manager->to( $email['email'], $email['name'] );
+
     $mail_manager->set_title( 'en' == $language ? $db_notification_type->title_en : $db_notification_type->title_fr );
     $mail_manager->set_body( $message );
 

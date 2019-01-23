@@ -18,6 +18,9 @@ define( function() {
         title: 'Owner',
         isIncluded: function( $state, model ) { return !model.isApplicant(); }
       },
+      graduate_full_name: {
+        title: 'Graduate'
+      },
       applicant_name: {
         column: 'reqn_version.applicant_name',
         title: 'Applicant',
@@ -63,6 +66,15 @@ define( function() {
     identifier: {
       title: 'Identifier',
       type: 'string'
+    },
+    user_full_name: {
+      title: 'Owner',
+      type: 'string',
+      constant: true
+    },
+    graduate_id: {
+      title: 'Graduate',
+      type: 'enum'
     },
     language_id: {
       title: 'Language',
@@ -122,6 +134,7 @@ define( function() {
       exclude: true // modified in the model
     },
 
+    user_id: { type: 'string', exclude: true },
     current_reqn_version_id: { column: 'reqn_version.id', type: 'string', exclude: true },
     data_directory: { type: 'string', exclude: true },
     phase: { column: 'stage_type.phase', type: 'string', exclude: true },
@@ -397,6 +410,25 @@ define( function() {
 
               // show the study data available if we're in the active phase
               mainInputGroup.inputList.data_available.exclude = 'active' != self.record.phase;
+
+              return CnHttpFactory.instance( {
+                path: 'user/' + self.record.user_id + '/graduate',
+                data: {
+                  select: { column: [ 'id', 'graduate_full_name' ] },
+                  modifier: {
+                    where: { column: 'user.active', operator: '=', value: true },
+                    order: 'user.first_name'
+                  }
+                }
+              } ).query().then( function success( response ) {
+                self.parentModel.metadata.columnList.graduate_id.enumList = [];
+                response.data.forEach( function( item ) {
+                  self.parentModel.metadata.columnList.graduate_id.enumList.push( {
+                    value: item.id,
+                    name: item.graduate_full_name
+                  } );
+                } );
+              } )
             } );
           },
 
@@ -526,8 +558,10 @@ define( function() {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnReqnModelFactory', [
-    'CnReqnHelper', 'CnBaseModelFactory', 'CnReqnListFactory', 'CnReqnViewFactory', 'CnHttpFactory', 'CnSession', '$state',
-    function( CnReqnHelper, CnBaseModelFactory, CnReqnListFactory, CnReqnViewFactory, CnHttpFactory, CnSession, $state ) {
+    'CnReqnHelper', 'CnBaseModelFactory', 'CnReqnListFactory', 'CnReqnViewFactory',
+    'CnHttpFactory', 'CnSession', '$state',
+    function( CnReqnHelper, CnBaseModelFactory, CnReqnListFactory, CnReqnViewFactory,
+              CnHttpFactory, CnSession, $state ) {
       var object = function( root ) {
         var self = this;
 
@@ -603,8 +637,6 @@ define( function() {
           else this.$$transitionToViewState( record );
         };
 
-        var misc = CnReqnHelper.lookupData.reqn.misc;
-
         this.getMetadata = function() {
           return self.$$getMetadata().then( function() {
             return CnHttpFactory.instance( {
@@ -627,7 +659,6 @@ define( function() {
             } );
           } );
         };
-
       };
 
       return {

@@ -149,12 +149,10 @@ class patch extends \cenozo\service\patch
 
           // send a notification
           $db_notification = lib::create( 'database\notification' );
-          $db_notification->reqn_id = $db_reqn->id;
           $db_notification->notification_type_id =
             $notification_type_class_name::get_unique_record( 'name', 'Action required' )->id;
-          $db_notification->email = $db_reqn_version->applicant_email;
-          $db_notification->datetime = util::get_datetime_object();
-          $db_notification->save();
+          $db_notification->set_reqn( $db_reqn ); // this saves the record
+          $db_notification->mail();
         }
         else if( 'reactivate' == $action )
         {
@@ -163,12 +161,10 @@ class patch extends \cenozo\service\patch
 
           // send a notification
           $db_notification = lib::create( 'database\notification' );
-          $db_notification->reqn_id = $db_reqn->id;
           $db_notification->notification_type_id =
             $notification_type_class_name::get_unique_record( 'name', 'Requisition Reactivated' )->id;
-          $db_notification->email = $db_reqn_version->applicant_email;
-          $db_notification->datetime = util::get_datetime_object();
-          $db_notification->save();
+          $db_notification->set_reqn( $db_reqn ); // this saves the record
+          $db_notification->mail();
         }
         else if( 'submit' == $action || 'next_stage' == $action || 'reject' == $action )
         {
@@ -194,9 +190,15 @@ class patch extends \cenozo\service\patch
             $db_notification->reqn_id = $db_reqn->id;
             $db_notification->notification_type_id =
               $notification_type_class_name::get_unique_record( 'name', 'Requisition Submitted' )->id;
-            $db_notification->email = lib::create( 'business\setting_manager' )->get_setting( 'general', 'admin_email' );
             $db_notification->datetime = util::get_datetime_object();
             $db_notification->save();
+
+            $db_notification->add_email(
+              lib::create( 'business\setting_manager' )->get_setting( 'general', 'admin_email' ),
+              'Magnolia Administration'
+            );
+
+            $db_notification->mail();
           }
           else if( 'next_stage' == $action )
           {

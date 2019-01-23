@@ -61,6 +61,13 @@ class ui extends \cenozo\ui\ui
 
     // make sure the review module exists even if there is no access to it (this is needed by web/app/root/module.extend.js)
     if( is_null( $this->get_module( 'review' ) ) ) $this->assert_module( 'review' );
+
+    $module = $this->get_module( 'user' );
+    if( !is_null( $module ) )
+    {
+      $module->add_child( 'reqn', 'access' );
+      $module->add_child( 'graduate', 'access' );
+    }
   }
 
   /**

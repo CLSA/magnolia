@@ -34,7 +34,9 @@ class module extends \cenozo\service\module
         $db_reqn = $db_reqn_version->get_reqn();
         if( 'applicant' == $db_role->name && !is_null( $db_reqn ) )
         {
-          if( $db_reqn->user_id != $db_user->id || 'abandoned' == $db_reqn->state )
+          $db_graduate = $db_reqn->get_graduate();
+          $is_graduate = !is_null( $db_graduate ) && $db_graduate->graduate_user_id == $db_user->id;
+          if( ( $db_reqn->user_id != $db_user->id && !$is_graduate ) || 'abandoned' == $db_reqn->state )
           {
             $this->get_status()->set_code( 404 );
             return;

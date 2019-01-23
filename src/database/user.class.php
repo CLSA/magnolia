@@ -39,4 +39,26 @@ class user extends \cenozo\database\user
       static::db()->format_string( $newsletter )
     ) );
   }
+
+  /**
+   * Determines whether the user is a graduate (has a supervisor)
+   */
+  public function is_graduate()
+  {
+    $graduate_class_name = lib::get_class_name( 'database\graduate' );
+
+    $modifier = lib::create( 'database\modifier' );
+    $modifier->where( 'graduate_user_id', '=', $this->id );
+    return 0 < $graduate_class_name::count( $modifier );
+  }
+
+  /**
+   * Returns this user's graduate record (if it exists)
+   * @return database\graduate
+   */
+  public function get_graduate()
+  {
+    $graduate_class_name = lib::get_class_name( 'database\graduate' );
+    return $graduate_class_name::get_unique_record( 'graduate_user_id', $this->id );
+  }
 }

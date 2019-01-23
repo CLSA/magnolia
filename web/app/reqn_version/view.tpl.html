@@ -505,7 +505,7 @@
                   <div class="panel-body" ng-class="{ 'bg-warning': isDifferent( 'reference' ) }">
                     <h4 ng-if="isDifferent( 'reference' )">Current Version List</h4>
                     <span ng-show="0 == model.viewModel.referenceList.length"
-                          ng-bind-html="t( 'part1.b.noReferences' )"></span>
+                          ng-bind-html="t( 'part1.d.noReferences' )"></span>
                     <table class="table table-striped" ng-show="0 < model.viewModel.referenceList.length">
                       <thead class="bg-info">
                         <tr>
@@ -550,7 +550,7 @@
                       <hr style="border-top-color: gray;"/>
                       <h4>Version {{ model.viewModel.compareRecord.version }} List</h4>
                       <span ng-show="0 == model.viewModel.compareRecord.referenceList.length"
-                            ng-bind-html="t( 'part1.b.noReferences' )"></span>
+                            ng-bind-html="t( 'part1.d.noReferences' )"></span>
                       <table class="table table-striped" ng-show="0 < model.viewModel.compareRecord.referenceList.length">
                         <thead class="bg-info">
                           <tr>

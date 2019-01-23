@@ -2,6 +2,7 @@
 
 SET AUTOCOMMIT=0;
 
+SOURCE graduate.sql
 SOURCE reqn_version.sql
 SOURCE reqn.sql
 SOURCE reqn_current_reqn_version.sql
@@ -16,6 +17,9 @@ SOURCE report_restriction.sql
 SOURCE application_type_has_report_type.sql
 SOURCE role_has_report_type.sql
 SOURCE notification_type.sql
+SOURCE notification_email.sql
+SOURCE notification.sql
+SOURCE user_has_graduate.sql
 
 SOURCE update_version_number.sql
 

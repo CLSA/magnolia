@@ -26,6 +26,17 @@ class module extends \cenozo\service\user\module
       $select->add_column( 'IFNULL( applicant.newsletter, false )', 'newsletter', false );
     }
 
+    if( $select->has_column( 'supervisor' ) )
+    {
+      $modifier->left_join( 'graduate', 'user.id', 'graduate.graduate_user_id' );
+      $modifier->left_join( 'user', 'graduate.user_id', 'supervisor.id', 'supervisor' );
+      $select->add_column(
+        'IF( supervisor.id IS NULL, "(none)", CONCAT( supervisor.first_name, " ", supervisor.last_name ) )',
+        'supervisor',
+        false
+      );
+    }
+
     if( $this->get_argument( 'reviewer_only', false ) )
     {
       $join_sel = lib::create( 'database\select' );

@@ -8,15 +8,4 @@
 namespace magnolia\service\reqn_version\reference;
 use cenozo\lib, cenozo\log, magnolia\util;
 
-class get extends \cenozo\service\get
-{
-  /**
-   * Extend parent method
-   */
-  public function prepare()
-  {
-    parent::prepare();
-
-    log::debug( $this->select, $this->modifier );
-  }
-}
+class get extends \cenozo\service\get {}

@@ -6,7 +6,17 @@ CREATE PROCEDURE patch_role_has_service()
     -- determine the @cenozo database name
     SET @cenozo = ( SELECT REPLACE( DATABASE(), "magnolia", "cenozo" ) );
 
-    -- administrator
+    SET @sql = CONCAT(
+      "INSERT IGNORE INTO role_has_service( role_id, service_id ) ",
+      "SELECT role.id, service.id ",
+      "FROM ", @cenozo, ".role, service ",
+      "WHERE role.name = 'administrator' ",
+      "AND service.restricted = 1 ",
+      "AND service.subject = 'graduate'" );
+    PREPARE statement FROM @sql;
+    EXECUTE statement;
+    DEALLOCATE PREPARE statement;
+
     SET @sql = CONCAT(
       "INSERT IGNORE INTO role_has_service( role_id, service_id ) ",
       "SELECT role.id, service.id ",

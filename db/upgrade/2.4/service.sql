@@ -5,6 +5,11 @@ DELETE FROM service WHERE subject = "report_restriction" and method != "GET";
 SELECT "Adding new services" AS "";
 
 INSERT IGNORE INTO service ( subject, method, resource, restricted ) VALUES
+( 'graduate', 'DELETE', 1, 1 ),
+( 'graduate', 'GET', 0, 1 ),
+( 'graduate', 'GET', 1, 1 ),
+( 'graduate', 'PATCH', 1, 1 ),
+( 'graduate', 'POST', 0, 1 ),
 ( 'reqn_version', 'GET', 0, 0 ),
 ( 'reqn_version', 'GET', 1, 0 ),
 ( 'reqn_version', 'PATCH', 1, 1 );

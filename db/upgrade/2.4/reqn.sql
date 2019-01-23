@@ -3,6 +3,9 @@ DELIMITER //
 CREATE PROCEDURE patch_reqn()
   BEGIN
 
+    -- determine the @cenozo database name
+    SET @cenozo = ( SELECT REPLACE( DATABASE(), "magnolia", "cenozo" ) );
+
     SELECT "Removing reqn.applicant_name column" AS "";
 
     SELECT COUNT(*) INTO @test
@@ -589,6 +592,25 @@ CREATE PROCEDURE patch_reqn()
 
     IF @test THEN
       ALTER TABLE reqn CHANGE deferral_note_part2_f deferral_note_2f text;
+    END IF;
+
+    SELECT "Adding new graduate_id column to reqn table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "graduate_id";
+
+    IF @test = 0 THEN
+      ALTER TABLE reqn
+      ADD COLUMN graduate_id INT UNSIGNED NULL DEFAULT NULL AFTER user_id,
+      ADD INDEX fk_graduate_id (graduate_id ASC),
+      ADD CONSTRAINT fk_graduate_id
+          FOREIGN KEY (graduate_id)
+          REFERENCES graduate (id)
+          ON DELETE NO ACTION
+          ON UPDATE NO ACTION;
     END IF;
 
   END //

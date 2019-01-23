@@ -30,13 +30,10 @@ class stage extends \cenozo\database\record
       $db_notification_type = $this->get_stage_type()->get_notification_type();
       if( !is_null( $db_notification_type ) )
       {
-        $db_reqn = $this->get_reqn();
         $db_notification = lib::create( 'database\notification' );
-        $db_notification->reqn_id = $db_reqn->id;
         $db_notification->notification_type_id = $db_notification_type->id;
-        $db_notification->email = $db_reqn->get_current_reqn_version()->applicant_email;
-        $db_notification->datetime = util::get_datetime_object();
-        $db_notification->save();
+        $db_notification->set_reqn( $this->get_reqn() ); // this saves the record
+        $db_notification->mail();
       }
     }
   }

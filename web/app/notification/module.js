@@ -19,7 +19,7 @@ define( function() {
         column: 'reqn.identifier',
         title: 'Requisition'
       },
-      email: {
+      emails: {
         title: 'Email'
       },
       type: {

@@ -33,8 +33,6 @@ class reqn extends \cenozo\database\record
    */
   public function save()
   {
-    $db_user = lib::create( 'business\session' )->get_user();
-
     // track if this is a new reqn
     $is_new = is_null( $this->id );
 
@@ -49,16 +47,7 @@ class reqn extends \cenozo\database\record
 
     if( $is_new )
     {
-      // add the first reqn version
-      $db_reqn_version = lib::create( 'database\reqn_version' );
-      $db_reqn_version->reqn_id = $this->id;
-      $db_reqn_version->version = 1;
-      $db_reqn_version->datetime = util::get_datetime_object();
-      $db_reqn_version->applicant_name = $db_user->first_name.' '.$db_user->last_name;
-      $db_reqn_version->applicant_email = $db_user->email;
-      $db_reqn_version->save();
-
-      // assign new reqns to the first stage
+      $this->create_version();
       $this->proceed_to_next_stage();
     }
 
@@ -100,47 +89,61 @@ class reqn extends \cenozo\database\record
     $db_current_reqn_version = $this->get_current_reqn_version();
 
     $db_reqn_version = lib::create( 'database\reqn_version' );
+    $db_reqn_version->reqn_id = $this->id;
+    $db_reqn_version->datetime = util::get_datetime_object();
+
     if( is_null( $db_current_reqn_version ) )
     {
-      $db_reqn_version->reqn_id = $this->id;
+      $db_user = lib::create( 'business\session' )->get_user();
+      $db_graduate = $db_user->get_graduate();
+
       $db_reqn_version->version = 1;
+      if( !is_null( $db_graduate ) )
+      {
+        $db_user = $db_graduate->get_user();
+        $db_graduate_user = $db_graduate->get_graduate_user();
+        $db_reqn_version->graduate_name = $db_graduate_user->first_name.' '.$db_graduate_user->last_name;
+        $db_reqn_version->graduate_email = $db_graduate_user->email;
+      }
       $db_reqn_version->applicant_name = $db_user->first_name.' '.$db_user->last_name;
       $db_reqn_version->applicant_email = $db_user->email;
     }
     else
     {
       $db_reqn_version->copy( $db_current_reqn_version );
-      $db_reqn_version->datetime = util::get_datetime_object();
       $db_reqn_version->version = $db_current_reqn_version->version + 1;
     }
 
     $db_reqn_version->save();
 
-    // copy coapplicant records
-    foreach( $db_current_reqn_version->get_coapplicant_object_list() as $db_coapplicant )
+    if( !is_null( $db_current_reqn_version ) )
     {
-      $db_new_coapplicant = lib::create( 'database\coapplicant' );
-      $db_new_coapplicant->copy( $db_coapplicant );
-      $db_new_coapplicant->reqn_version_id = $db_reqn_version->id;
-      $db_new_coapplicant->save();
-    }
+      // copy coapplicant records
+      foreach( $db_current_reqn_version->get_coapplicant_object_list() as $db_coapplicant )
+      {
+        $db_new_coapplicant = lib::create( 'database\coapplicant' );
+        $db_new_coapplicant->copy( $db_coapplicant );
+        $db_new_coapplicant->reqn_version_id = $db_reqn_version->id;
+        $db_new_coapplicant->save();
+      }
 
-    // copy reference records
-    foreach( $db_current_reqn_version->get_reference_object_list() as $db_reference )
-    {
-      $db_new_reference = lib::create( 'database\reference' );
-      $db_new_reference->copy( $db_reference );
-      $db_new_reference->reqn_version_id = $db_reqn_version->id;
-      $db_new_reference->save();
-    }
+      // copy reference records
+      foreach( $db_current_reqn_version->get_reference_object_list() as $db_reference )
+      {
+        $db_new_reference = lib::create( 'database\reference' );
+        $db_new_reference->copy( $db_reference );
+        $db_new_reference->reqn_version_id = $db_reqn_version->id;
+        $db_new_reference->save();
+      }
 
-    // copy reqn_version_data_option records
-    foreach( $db_current_reqn_version->get_reqn_version_data_option_object_list() as $db_reqn_version_data_option )
-    {
-      $db_new_reqn_version_data_option = lib::create( 'database\reqn_version_data_option' );
-      $db_new_reqn_version_data_option->copy( $db_reqn_version_data_option );
-      $db_new_reqn_version_data_option->reqn_version_id = $db_reqn_version->id;
-      $db_new_reqn_version_data_option->save();
+      // copy reqn_version_data_option records
+      foreach( $db_current_reqn_version->get_reqn_version_data_option_object_list() as $db_reqn_version_data_option )
+      {
+        $db_new_reqn_version_data_option = lib::create( 'database\reqn_version_data_option' );
+        $db_new_reqn_version_data_option->copy( $db_reqn_version_data_option );
+        $db_new_reqn_version_data_option->reqn_version_id = $db_reqn_version->id;
+        $db_new_reqn_version_data_option->save();
+      }
     }
   }
 

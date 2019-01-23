@@ -31,7 +31,9 @@ class module extends \cenozo\service\module
       $db_reqn = $this->get_resource();
       if( 'applicant' == $db_role->name && !is_null( $db_reqn ) )
       {
-        if( $db_reqn->user_id != $db_user->id || 'abandoned' == $db_reqn->state )
+        $db_graduate = $db_reqn->get_graduate();
+        $is_graduate = !is_null( $db_graduate ) && $db_graduate->graduate_user_id == $db_user->id;
+        if( ( $db_reqn->user_id != $db_user->id && !$is_graduate ) || 'abandoned' == $db_reqn->state )
         {
           $this->get_status()->set_code( 404 );
           return;
@@ -54,11 +56,15 @@ class module extends \cenozo\service\module
     $modifier->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
     $modifier->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
     $modifier->join( 'deadline', 'reqn.deadline_id', 'deadline.id' );
+    $modifier->left_join( 'graduate', 'reqn.graduate_id', 'graduate.id' );
 
     // only show applicants their own reqns which aren't abandoned
     if( 'applicant' == $db_role->name )
     {
+      $modifier->where_bracket( true );
       $modifier->where( 'reqn.user_id', '=', $db_user->id );
+      $modifier->or_where( 'graduate.graduate_user_id', '=', $db_user->id );
+      $modifier->where_bracket( false );
       $modifier->where( 'IFNULL( reqn.state, "" )', '!=', 'abandoned' );
     }
 
@@ -67,6 +73,17 @@ class module extends \cenozo\service\module
       $modifier->join( 'user', 'reqn.user_id', 'user.id' );
       $select->add_table_column(
         'user', 'CONCAT_WS( " ", user.first_name, user.last_name )', 'user_full_name', false );
+    }
+
+    if( $select->has_column( 'graduate_full_name' ) )
+    {
+      $modifier->left_join( 'user', 'graduate.graduate_user_id', 'graduate_user.id', 'graduate_user' );
+      $select->add_table_column(
+        'graduate_user',
+        'IF( graduate_user.id IS NULL, "(none)", CONCAT_WS( " ", graduate_user.first_name, graduate_user.last_name ) )',
+        'graduate_full_name',
+        false
+      );
     }
 
     // don't show applicants the deferral notes unless the reqn is deferred

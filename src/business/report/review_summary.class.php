@@ -64,8 +64,6 @@ class review_summary extends \cenozo\business\report\base_report
       }
     }
     
-    \cenozo\database\database::$debug = true;
     $this->add_table_from_select( NULL, $reqn_class_name::select( $select, $modifier ) );
-    \cenozo\database\database::$debug = false;
   }
 }
