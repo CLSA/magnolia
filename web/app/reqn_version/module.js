@@ -230,6 +230,107 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             $scope.model.reloadState( false, false, 'replace' );
           };
 
+          $scope.isPartDifferent = function( part ) {
+            var viewModel = $scope.model.viewModel;
+            if( !viewModel.show( 'compare' ) || null == viewModel.compareRecord ) return false;
+
+            var different = false;
+
+            if( 'part1' == part ) {
+              different = ['a', 'b', 'c', 'd', 'e', 'f'].some( function( section ) {
+                return $scope.isSectionDifferent( 'part1', section );
+              } );
+            } else if ( 'part2' == part ) {
+              different = ['cohort', 'a', 'b', 'c', 'd', 'e', 'f'].some( function( section ) {
+                return $scope.isSectionDifferent( 'part2', section );
+              } );
+            }
+
+            return different;
+          };
+
+          $scope.isSectionDifferent = function( part, section ) {
+            var viewModel = $scope.model.viewModel;
+            if( !viewModel.show( 'compare' ) || null == viewModel.compareRecord ) return false;
+
+            var different = false;
+
+            if( 'part1' == part ) {
+              if( 'a' == section ) {
+                different = [
+                  'applicant_name',
+                  'applicant_position',
+                  'applicant_affiliation',
+                  'applicant_address',
+                  'applicant_phone',
+                  'applicant_email',
+                  'graduate_name',
+                  'graduate_program',
+                  'graduate_institution',
+                  'graduate_address',
+                  'graduate_phone',
+                  'graduate_email',
+                  'waiver'
+                ].some( function( property ) { return $scope.isDifferent( property ); } );
+              } else if( 'b' == section ) {
+                different = $scope.isDifferent( 'coapplicant' );
+              } else if( 'c' == section ) {
+                different = [
+                  'start_date',
+                  'duration'
+                ].some( function( property ) { return $scope.isDifferent( property ); } );
+              } else if( 'd' == section ) {
+                different = [
+                  'title',
+                  'keywords',
+                  'lay_summary',
+                  'background',
+                  'objectives',
+                  'methodology',
+                  'analysis',
+                  'reference'
+                ].some( function( property ) { return $scope.isDifferent( property ); } );
+              } else if( 'e' == section ) {
+                different = [
+                  'funding',
+                  'funding_filename',
+                  'funding_agency',
+                  'grant_number'
+                ].some( function( property ) { return $scope.isDifferent( property ); } );
+              } else if( 'f' == section ) {
+                different = [
+                  'ethics',
+                  'ethics_date',
+                  'ethics_filename'
+                ].some( function( property ) { return $scope.isDifferent( property ); } );
+              }
+            } else if( 'part2' == part ) {
+              if( 'cohort' == section ) {
+                different = [
+                  'comprehensive',
+                  'tracking'
+                ].some( function( property ) { return $scope.isDifferent( property ); } );
+              } else {
+                var index = null;
+                if( 'a' == section ) index = 0;
+                else if( 'b' == section ) index = 1;
+                else if( 'c' == section ) index = 2;
+                else if( 'd' == section ) index = 3;
+                else if( 'e' == section ) index = 4;
+                else if( 'f' == section ) index = 5;
+
+                if( null != index ) {
+                  different = $scope.model.dataOptionCategoryList[index].optionList.some( function( dataOption ) {
+                    return ( dataOption.bl && $scope.isDifferent( 'data_option_value', 'bl', dataOption.id ) ) ||
+                           ( dataOption.f1 && $scope.isDifferent( 'data_option_value', 'f1', dataOption.id ) );
+                  } );
+                }
+              }
+            }
+
+            return different;
+          };
+
           $scope.isDifferent = function( property, studyPhase, id ) {
             // note that studyPhase and id are only used when comparing data_option_values
             var viewModel = $scope.model.viewModel;
@@ -243,7 +344,10 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               return viewModel.compareRecord.dataOptionValueList[studyPhase][id] != viewModel.dataOptionValueList[studyPhase][id];
             }
 
-            throw new Error( 'Tried to compare for property "' + property + '" which is invalid.' );
+            // we're comparing a general value
+            var recordValue = viewModel.record[property] ? viewModel.record[property] : null;
+            var compareValue = viewModel.compareRecord[property] ? viewModel.compareRecord[property] : null;
+            return recordValue != compareValue;
           };
 
           $scope.addCoapplicant = function() {

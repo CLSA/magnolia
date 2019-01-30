@@ -90,7 +90,8 @@
                model.viewModel.record.deferral_note_1a || model.viewModel.record.deferral_note_1b ||
                model.viewModel.record.deferral_note_1c || model.viewModel.record.deferral_note_1d ||
                model.viewModel.record.deferral_note_1e || model.viewModel.record.deferral_note_1f
-             )
+             ),
+             'bg-warning': isPartDifferent( 'part1' )
            }"
            ng-bind-html="t( 'part1.tab' )"></a>
       </li>
@@ -101,7 +102,8 @@
                model.viewModel.record.deferral_note_2a || model.viewModel.record.deferral_note_2b ||
                model.viewModel.record.deferral_note_2c || model.viewMOdel.record.deferral_note_2d ||
                model.viewModel.record.deferral_note_2e || model.viewModel.record.deferral_note_2f
-             )
+             ),
+             'bg-warning': isPartDifferent( 'part2' )
            }"
            ng-bind-html="t( 'part2.tab' )"></a>
       </li>
@@ -129,7 +131,10 @@
               ng-if="'part1' == section[0]"
               ng-class="{'active':section[1] == model.viewModel.tab[1]}">
             <a ng-click="model.viewModel.setTab(1,section[1])"
-               ng-class="{'text-warning flashing':model.getEditEnabled() && model.viewModel.record['deferral_note_1'+section[1]]}"
+               ng-class="{
+                 'text-warning flashing':model.getEditEnabled() && model.viewModel.record['deferral_note_1'+section[1]],
+                 'bg-warning': isSectionDifferent( 'part1', section[1] )
+               }"
                ng-bind-html="t( 'part1.'+section[1]+'.tab' )"></a>
           </li>
         </ul>
@@ -695,7 +700,10 @@
               ng-if="'part2' == section[0]"
               ng-class="{'active':section[2] == model.viewModel.tab[2]}">
             <a ng-click="model.viewModel.setTab(2,section[2])"
-               ng-class="{'text-warning flashing':model.getEditEnabled() && model.viewModel.record['deferral_note_2'+section[2]]}"
+               ng-class="{
+                 'text-warning flashing':model.getEditEnabled() && model.viewModel.record['deferral_note_2'+section[2]],
+                 'bg-warning': isSectionDifferent( 'part2', section[2] )
+               }"
                ng-bind-html="t( 'part2.'+section[2]+'.tab' )"></a>
           </li>
         </ul>
