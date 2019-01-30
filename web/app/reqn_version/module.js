@@ -111,14 +111,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         },
         controller: [ '$scope', function( $scope ) {
           $scope.directive = 'cnReqnViewInput';
-          $scope.isDifferent = function( property ) {
-            var viewModel = $scope.model.viewModel;
-            if( !viewModel.show( 'compare' ) || null == viewModel.compareRecord ) return false;
-
-            var recordValue = viewModel.record[property] ? viewModel.record[property] : null;
-            var compareValue = viewModel.compareRecord[property] ? viewModel.compareRecord[property] : null;
-            return recordValue != compareValue;
-          };
         } ]
       };
     }
@@ -342,9 +334,15 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               return viewModel.compareRecord.referenceDiff;
             } else if( 'data_option_value' == property ) {
               return viewModel.compareRecord.dataOptionValueList[studyPhase][id] != viewModel.dataOptionValueList[studyPhase][id];
+            } else if( null != property.match( /_filename$/ ) ) {
+              // file size are compared instead of filename
+              var fileDetails = viewModel.fileList.findByProperty( 'key', property );
+              var sizeProperty = property.replace( '_filename', '_size' );
+              var recordSize = fileDetails ? fileDetails.size : null;
+              var compareSize = viewModel.compareRecord[sizeProperty] ? viewModel.compareRecord[sizeProperty] : null;
+              return recordSize != compareSize;
             }
 
-            // we're comparing a general value
             var recordValue = viewModel.record[property] ? viewModel.record[property] : null;
             var compareValue = viewModel.compareRecord[property] ? viewModel.compareRecord[property] : null;
             return recordValue != compareValue;
@@ -654,6 +652,20 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                   self.setReferenceDiff( version );
                 } );
                 self.getDataOptionValueList( version.id, version );
+
+                // add the file sizes
+                CnHttpFactory.instance( {
+                  path: 'reqn_version/' + version.id + '?file=funding_filename'
+                } ).get().then( function( response ) {
+                  version.funding_size = response.data;
+                } );
+
+                CnHttpFactory.instance( {
+                  path: 'reqn_version/' + version.id + '?file=ethics_filename'
+                } ).get().then( function( response ) {
+                  version.ethics_size = response.data;
+                } );
+
                 self.versionList.push( version );
               } );
 
