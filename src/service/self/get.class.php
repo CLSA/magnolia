@@ -20,6 +20,7 @@ class get extends \cenozo\service\self\get
   {
     $setting_manager = lib::create( 'business\setting_manager' );
     $db_user = lib::create( 'business\session' )->get_user();
+    $db_role = lib::create( 'business\session' )->get_role();
 
     $resource = parent::create_resource( $index );
     $resource['application']['start_date_delay'] = $setting_manager->get_setting( 'general', 'start_date_delay' );
@@ -27,6 +28,11 @@ class get extends \cenozo\service\self\get
     $resource['application']['study_data_expiry'] = $setting_manager->get_setting( 'general', 'study_data_expiry' );
     $resource['application']['study_data_url'] = sprintf( '%s/%s', str_replace( '/api', '', ROOT_URL ), STUDY_DATA_URL );
     $resource['user']['newsletter'] = $db_user->get_newsletter();
+
+    // define whether the user has a supervisor (for the applicant role only)
+    $resource['user']['graduate'] = false;
+    if( 'applicant' == $db_role->name ) $resource['user']['graduate'] = $db_user->is_graduate();
+
     return $resource;
   }
 }

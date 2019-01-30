@@ -413,35 +413,12 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               self.minStartDate = moment( self.record.deadline ).add( CnSession.application.startDateDelay, 'months' );
 
               if( 'lite' != self.parentModel.type ) {
-                var parent = self.parentModel.getParentIdentifier();
                 return $q.all( [
                   self.getCoapplicantList(),
                   self.getReferenceList(),
                   self.getDataOptionValueList()
                 ] ).then( function() {
-                  // get all other versions
-                  CnHttpFactory.instance( {
-                    path: parent.subject + '/' + parent.identifier + '/reqn_version'
-                  } ).query().then( function( response ) {
-                    response.data.forEach( function( version ) {
-                      self.getCoapplicantList( version.id, version ).then( function() {
-                        // see if there is a difference between this list and the view's list
-                        self.setCoapplicantDiff( version );
-                      } );
-                      self.getReferenceList( version.id, version ).then( function() {
-                        // see if there is a difference between this list and the view's list
-                        self.setReferenceDiff( version );
-                      } );
-                      self.getDataOptionValueList( version.id, version );
-                      self.versionList.push( version );
-                    } );
-
-                    var version = self.parentModel.getQueryParameter( 'c' );
-                    if( angular.isDefined( version ) ) self.compareRecord = self.versionList.findByProperty( 'version', version );
-
-                    // add a null object to the version list so we can turn off comparisons
-                    self.versionList.unshift( null );
-                  } );
+                  return self.getVersionList();
                 } );
               }
             } );
@@ -555,6 +532,35 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                 this.setTab( 0, tabSection[0] );
               }
             }
+          },
+
+          getVersionList: function() {
+            var parent = self.parentModel.getParentIdentifier();
+            this.versionList = [];
+            return CnHttpFactory.instance( {
+              path: parent.subject + '/' + parent.identifier + '/reqn_version'
+            } ).query().then( function( response ) {
+              response.data.forEach( function( version ) {
+                self.getCoapplicantList( version.id, version ).then( function() {
+                  // see if there is a difference between this list and the view's list
+                  self.setCoapplicantDiff( version );
+                } );
+                self.getReferenceList( version.id, version ).then( function() {
+                  // see if there is a difference between this list and the view's list
+                  self.setReferenceDiff( version );
+                } );
+                self.getDataOptionValueList( version.id, version );
+                self.versionList.push( version );
+              } );
+
+              var version = self.parentModel.getQueryParameter( 'c' );
+              if( angular.isDefined( version ) ) self.compareRecord = self.versionList.findByProperty( 'version', version );
+
+              if( 1 < self.versionList.length ) {
+                // add a null object to the version list so we can turn off comparisons
+                self.versionList.unshift( null );
+              }
+            } );
           },
 
           determineCoapplicantDiffs: function() {
@@ -740,9 +746,12 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                   } else CnModalMessageFactory.httpError( response );
                 }
               } ).patch().then( function() {
+                var code = CnSession.user.graduate ?
+                  ( 'deferred' == record.state ? 'graduateResubmit' : 'graduateSubmit' ) :
+                  ( 'deferred' == record.state ? 'resubmit' : 'submit' );
                 return CnModalMessageFactory.instance( {
-                  title: self.translate( 'deferred' == record.state ? 'misc.resubmitTitle' : 'misc.submitTitle' ),
-                  message: self.translate( 'deferred' == record.state ? 'misc.resubmitMessage' : 'misc.submitMessage' ),
+                  title: self.translate( 'misc.' + code + 'Title' ),
+                  message: self.translate( 'misc.' + code + 'Message' ),
                   closeText: 'applicant' == CnSession.role.name ? self.translate( 'misc.close' ) : 'Close'
                 } ).show().then( function() {
                   return self.parentModel.isApplicant() ?

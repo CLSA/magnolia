@@ -112,6 +112,10 @@ class patch extends \cenozo\service\patch
 
     $notification_type_class_name = lib::get_class_name( 'database\notification_type' );
     $stage_type_class_name = lib::get_class_name( 'database\stage_type' );
+    $session = lib::create( 'business\session' );
+    $db_role = $session->get_role();
+    $db_user = $session->get_user();
+    $graduate = 'applicant' == $db_role->name && $db_user->is_graduate();
 
     $db_reqn = $this->get_leaf_record();
     $db_reqn_version = $db_reqn->get_current_reqn_version();
@@ -170,35 +174,53 @@ class patch extends \cenozo\service\patch
         {
           if( 'submit' == $action )
           {
-            if( 'deferred' == $db_reqn->state )
+            // graduates must be get approval from their supervisor
+            if( $graduate )
             {
-              $db_reqn->state = NULL;
-              $db_reqn->save();
-              
-              // when resubmitting set the version's datetime
-              $db_reqn_version->datetime = util::get_datetime_object();
-              $db_reqn_version->save();
+              // send a notification to the supervisor
+              $db_notification = lib::create( 'database\notification' );
+              $db_notification->reqn_id = $db_reqn->id;
+              $db_notification->notification_type_id =
+                $notification_type_class_name::get_unique_record( 'name', 'Approval Required' )->id;
+              $db_notification->datetime = util::get_datetime_object();
+              $db_notification->save();
+
+              $db_notification->add_email( $db_reqn_version->applicant_email, $db_reqn_version->applicant_name );
+
+              $db_notification->mail();
             }
             else
             {
-              // this will submit the reqn for the first time
-              $db_reqn->proceed_to_next_stage();
+              if( 'deferred' == $db_reqn->state )
+              {
+                $db_reqn->state = NULL;
+                $db_reqn->save();
+                
+                // when resubmitting set the version's datetime
+                $db_reqn_version->datetime = util::get_datetime_object();
+                $db_reqn_version->save();
+              }
+              else
+              {
+                // this will submit the reqn for the first time
+                $db_reqn->proceed_to_next_stage();
+              }
+
+              // send a notification
+              $db_notification = lib::create( 'database\notification' );
+              $db_notification->reqn_id = $db_reqn->id;
+              $db_notification->notification_type_id =
+                $notification_type_class_name::get_unique_record( 'name', 'Requisition Submitted' )->id;
+              $db_notification->datetime = util::get_datetime_object();
+              $db_notification->save();
+
+              $db_notification->add_email(
+                lib::create( 'business\setting_manager' )->get_setting( 'general', 'admin_email' ),
+                'Magnolia Administration'
+              );
+
+              $db_notification->mail();
             }
-
-            // send a notification
-            $db_notification = lib::create( 'database\notification' );
-            $db_notification->reqn_id = $db_reqn->id;
-            $db_notification->notification_type_id =
-              $notification_type_class_name::get_unique_record( 'name', 'Requisition Submitted' )->id;
-            $db_notification->datetime = util::get_datetime_object();
-            $db_notification->save();
-
-            $db_notification->add_email(
-              lib::create( 'business\setting_manager' )->get_setting( 'general', 'admin_email' ),
-              'Magnolia Administration'
-            );
-
-            $db_notification->mail();
           }
           else if( 'next_stage' == $action )
           {

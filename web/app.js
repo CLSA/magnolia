@@ -437,6 +437,14 @@ cenozo.service( 'CnReqnHelper', [
               en: 'You have successfully submitted your CLSA Data and Biospecimen Request Application, and it will now be reviewed. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your application. For timelines of the anticipated notice of decision, please check the Data Access Application Process page of our website.',
               fr: 'Votre demande d’accès aux données et aux échantillons biologiques de l’ÉLCV a bien été soumise. Elle sera maintenant évaluée. Vous recevrez un courriel avec des instructions supplémentaires si nous avons besoin d’autre information et lorsque le processus d’évaluation sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour consulter le statut de votre demande. Pour connaître les dates approximatives d’envoi de l’avis de décision, veuillez consulter la page Processus de demande d’accès aux données de notre site Web.'
             },
+            graduateSubmitTitle: {
+              en: 'Application Submitted for Supervisor Approval',
+              fr: 'TRANSLATION REQUIRED'
+            },
+            graduateSubmitMessage: {
+              en: 'You have successfully submitted your CLSA Data and Biospecimen Request Application, and your supervisor will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your application. For timelines of the anticipated notice of decision, please check the Data Access Application Process page of our website.',
+              fr: 'TRANSLATION REQUIRED'
+            },
             resubmitTitle: {
               en: 'Application Resubmitted',
               fr: 'Demande resoumise',
@@ -444,6 +452,14 @@ cenozo.service( 'CnReqnHelper', [
             resubmitMessage: {
               en: 'You have successfully resubmitted your CLSA Data and Biospecimen Request Application. You will receive an email with further instructions if your further attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your application. For timelines of the anticipated notice of decision, please check the Data Access Application Process page of our website.',
               fr: 'Votre demande d’accès aux données et aux échantillons biologiques de l’ÉLCV a bien été resoumise. Vous recevrez un courriel avec des instructions supplémentaires si nous avons besoin d’autre information et lorsque le processus d’évaluation sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour consulter le statut de votre demande. Pour connaître les dates approximatives d’envoi de l’avis de décision, veuillez consulter la page Processus de demande d’accès aux données de notre site Web.'
+            },
+            graduateResubmitTitle: {
+              en: 'Application Resubmitted for Supervisor Approval',
+              fr: 'TRANSLATION REQUIRED',
+            },
+            graduateResubmitMessage: {
+              en: 'You have successfully resubmitted your CLSA Data and Biospecimen Request Application, and your supervisor will receive an email to request approval. You will receive an email with further instructions if your further attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your application. For timelines of the anticipated notice of decision, please check the Data Access Application Process page of our website.',
+              fr: 'TRANSLATION REQUIRED'
             },
             submitWarning: {
               en: 'Are you sure that all changes are complete and the application is ready to be submitted?',
