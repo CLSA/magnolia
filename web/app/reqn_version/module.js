@@ -303,19 +303,23 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                   'tracking'
                 ].some( function( property ) { return $scope.isDifferent( property ); } );
               } else {
-                var index = null;
-                if( 'a' == section ) index = 0;
-                else if( 'b' == section ) index = 1;
-                else if( 'c' == section ) index = 2;
-                else if( 'd' == section ) index = 3;
-                else if( 'e' == section ) index = 4;
-                else if( 'f' == section ) index = 5;
+                different = $scope.isDifferent( 'part2_' + section + '_comment' );
 
-                if( null != index ) {
-                  different = $scope.model.dataOptionCategoryList[index].optionList.some( function( dataOption ) {
-                    return ( dataOption.bl && $scope.isDifferent( 'data_option_value', 'bl', dataOption.id ) ) ||
-                           ( dataOption.f1 && $scope.isDifferent( 'data_option_value', 'f1', dataOption.id ) );
-                  } );
+                if( !different ) {
+                  var index = null;
+                  if( 'a' == section ) index = 0;
+                  else if( 'b' == section ) index = 1;
+                  else if( 'c' == section ) index = 2;
+                  else if( 'd' == section ) index = 3;
+                  else if( 'e' == section ) index = 4;
+                  else if( 'f' == section ) index = 5;
+
+                  if( null != index ) {
+                    different = $scope.model.dataOptionCategoryList[index].optionList.some( function( dataOption ) {
+                      return ( dataOption.bl && $scope.isDifferent( 'data_option_value', 'bl', dataOption.id ) ) ||
+                             ( dataOption.f1 && $scope.isDifferent( 'data_option_value', 'f1', dataOption.id ) );
+                    } );
+                  }
                 }
               }
             }
