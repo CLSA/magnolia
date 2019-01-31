@@ -103,12 +103,6 @@ define( function() {
       constant: true,
       exclude: true // modified in the model
     },
-    user_full_name: {
-      title: 'Applicant',
-      type: 'string',
-      constant: true,
-      exclude: true // modified in the model
-    },
     lay_summary: {
       column: 'reqn_version.lay_summary',
       title: 'Lay Summary',
