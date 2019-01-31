@@ -150,7 +150,8 @@
                   input="{
                     key: 'applicant_name',
                     title: t( 'part1.a.applicant_name' ),
-                    type: model.inputList.applicant_name.type
+                    type: model.inputList.applicant_name.type,
+                    constant: true
                   }"
                   model="model">
                 </cn-reqn-view-input>
@@ -191,6 +192,7 @@
                     key: 'applicant_email',
                     title: t( 'part1.a.applicant_email' )+'<sup>ⓘ</sup>',
                     type: model.inputList.applicant_email.type,
+                    constant: true,
                     help: t( 'misc.emailText' )
                   }"
                   model="model">
@@ -203,7 +205,8 @@
                   input="{
                     key: 'graduate_name',
                     title: t( 'part1.a.graduate_name' ),
-                    type: model.inputList.graduate_name.type
+                    type: model.inputList.graduate_name.type,
+                    constant: true
                   }"
                   model="model">
                 </cn-reqn-view-input>
@@ -244,6 +247,7 @@
                     key: 'graduate_email',
                     title: t( 'part1.a.graduate_email' )+'<sup>ⓘ</sup>',
                     type: model.inputList.graduate_email.type,
+                    constant: true,
                     help: t( 'misc.emailText' )
                   }"
                   model="model">

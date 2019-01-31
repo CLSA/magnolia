@@ -185,7 +185,7 @@ class patch extends \cenozo\service\patch
               $db_notification->datetime = util::get_datetime_object();
               $db_notification->save();
 
-              $db_notification->add_email( $db_reqn_version->applicant_email, $db_reqn_version->applicant_name );
+              $db_notification->add_email( $db_user->email, sprintf( '%s %s', $db_user->first_name, $db_user->last_name ) );
 
               $db_notification->mail();
             }

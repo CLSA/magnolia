@@ -21,10 +21,6 @@ define( function() {
       graduate_full_name: {
         title: 'Graduate'
       },
-      applicant_name: {
-        column: 'reqn_version.applicant_name',
-        title: 'Applicant',
-      },
       deadline: {
         column: 'deadline.name',
         title: 'Deadline'
@@ -107,8 +103,7 @@ define( function() {
       constant: true,
       exclude: true // modified in the model
     },
-    applicant_name: {
-      column: 'reqn_version.applicant_name',
+    user_full_name: {
       title: 'Applicant',
       type: 'string',
       constant: true,
@@ -587,7 +582,7 @@ define( function() {
           mainInputGroup.inputList.data_available.exclude = false;
         } else {
           mainInputGroup.inputList.title.exclude = false;
-          mainInputGroup.inputList.applicant_name.exclude = false;
+          mainInputGroup.inputList.user_fill_name.exclude = false;
           mainInputGroup.inputList.lay_summary.exclude = false;
         }
 

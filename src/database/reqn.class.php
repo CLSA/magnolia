@@ -94,19 +94,7 @@ class reqn extends \cenozo\database\record
 
     if( is_null( $db_current_reqn_version ) )
     {
-      $db_user = lib::create( 'business\session' )->get_user();
-      $db_graduate = $db_user->get_graduate();
-
       $db_reqn_version->version = 1;
-      if( !is_null( $db_graduate ) )
-      {
-        $db_user = $db_graduate->get_user();
-        $db_graduate_user = $db_graduate->get_graduate_user();
-        $db_reqn_version->graduate_name = $db_graduate_user->first_name.' '.$db_graduate_user->last_name;
-        $db_reqn_version->graduate_email = $db_graduate_user->email;
-      }
-      $db_reqn_version->applicant_name = $db_user->first_name.' '.$db_user->last_name;
-      $db_reqn_version->applicant_email = $db_user->email;
     }
     else
     {
@@ -571,17 +559,22 @@ class reqn extends \cenozo\database\record
    */
   public function generate_reviews_file()
   {
+    $db_user = $this->get_user();
+    $db_graduate_user = $this->get_graduate_user();
     $db_reqn_version = $this->get_current_reqn_version();
 
     $text = sprintf(
       "Requisition: %s\n".
       "Title: %s\n".
       "Applicant: %s\n".
+      "%s". // graduate only added if one exists
       "Lay Summary:\n".
       "%s\n",
       $this->identifier,
       $db_reqn_version->title,
-      $db_reqn_version->applicant_name,
+      sprintf( '%s %s', $db_user->first_name, $db_user->last_name ),
+      is_null( $db_graduate_user ) ?
+        '' : sprintf( "Graduate: %s %s\n", $db_graduate_user->first_name, $db_graduate_user->last_name ),
       $db_reqn_version->lay_summary
     );
 
@@ -720,6 +713,23 @@ class reqn extends \cenozo\database\record
     $datetime_obj->setTimestamp( $timestamp );
     $days = $setting_manager->get_setting( 'general', 'study_data_expiry' ) - $datetime_obj->diff( $now )->days;
     return 0 > $days ? 0 : $days;
+  }
+
+  /**
+   * Returns the number of days left before the reqn's study-data will expire
+   * 
+   * @return integer
+   */
+  public function get_graduate_user()
+  {
+    $select = lib::create( 'database\select' );
+    $select->from( 'reqn' );
+    $select->add_table_column( 'graduate', 'graduate_user_id' );
+    $modifier = lib::create( 'database\modifier' );
+    $modifier->join( 'graduate', 'reqn.graduate_id', 'graduate.id' );
+
+    $user_id = static::db()->get_one( sprintf( '%s %s', $select->get_sql(), $modifier->get_sql() ) );
+    return is_null( $user_id ) ? NULL : lib::create( 'database\user', $user_id );
   }
 
   /**

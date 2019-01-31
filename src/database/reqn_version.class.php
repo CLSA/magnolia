@@ -173,12 +173,14 @@ class reqn_version extends \cenozo\database\record
   {
     $pdf_form_type_class_name = lib::get_class_name( 'database\pdf_form_type' );
     $db_reqn = $this->get_reqn();
+    $db_user = $db_reqn->get_user();
+    $db_graduate_user = $db_reqn->get_graduate_user();
 
     $db_pdf_form = NULL;
     $data = array( 'identifier' => $db_reqn->identifier );
     $filename = NULL;
 
-    if( !is_null( $this->applicant_name ) ) $data['applicant_name'] = $this->applicant_name;
+    $data['applicant_name'] = sprintf( '%s %s', $db_user->first_name, $db_user->last_name );
     if( !is_null( $this->title ) ) $data['title'] = $this->title;
 
     if( 'application' == $type )
@@ -192,13 +194,14 @@ class reqn_version extends \cenozo\database\record
       if( !is_null( $this->applicant_affiliation ) ) $data['applicant_affiliation'] = $this->applicant_affiliation;
       if( !is_null( $this->applicant_address ) ) $data['applicant_address'] = $this->applicant_address;
       if( !is_null( $this->applicant_phone ) ) $data['applicant_phone'] = $this->applicant_phone;
-      if( !is_null( $this->applicant_email ) ) $data['applicant_email'] = $this->applicant_email;
-      if( !is_null( $this->graduate_name ) ) $data['graduate_name'] = $this->graduate_name;
+      $data['applicant_email'] = $db_user->email;
+      if( !is_null( $db_graduate_user ) )
+        $data['graduate_name'] = sprintf( '%s %s', $db_graduate_user->first_name, $db_graduate_user->last_name );
       if( !is_null( $this->graduate_program ) ) $data['graduate_program'] = $this->graduate_program;
       if( !is_null( $this->graduate_institution ) ) $data['graduate_institution'] = $this->graduate_institution;
       if( !is_null( $this->graduate_address ) ) $data['graduate_address'] = $this->graduate_address;
       if( !is_null( $this->graduate_phone ) ) $data['graduate_phone'] = $this->graduate_phone;
-      if( !is_null( $this->graduate_email ) ) $data['graduate_email'] = $this->graduate_email;
+      if( !is_null( $db_graduate_user ) ) $data['graduate_email'] = $db_graduate_user->email;
       if( !is_null( $this->start_date ) ) $data['start_date'] = $this->start_date->format( 'Y-m-d' );
       if( !is_null( $this->duration ) ) $data['duration'] = $this->duration;
       if( !is_null( $this->keywords ) ) $data['keywords'] = $this->keywords;
@@ -224,7 +227,7 @@ class reqn_version extends \cenozo\database\record
         if( 'graduate' == $this->waiver ) $data['waiver_graduate'] = 'Yes';
         else if( 'postdoc' == $this->waiver ) $data['waiver_postdoc'] = 'Yes';
       }
-      if( !is_null( $this->applicant_name ) ) $data['signature_applicant_name'] = $this->applicant_name;
+      $data['signature_applicant_name'] = $data['applicant_name'];
 
       foreach( $this->get_coapplicant_list() as $index => $coapplicant )
       {

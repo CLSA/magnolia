@@ -53,8 +53,16 @@ class module extends \cenozo\service\module
   {
     parent::prepare_read( $select, $modifier );
     $modifier->join( 'reqn', 'reqn_version.reqn_id', 'reqn.id' );
+    $modifier->join( 'user', 'reqn.user_id', 'user.id' );
+    $modifier->left_join( 'graduate', 'reqn.graduate_id', 'graduate.id' );
+    $modifier->left_join( 'user', 'graduate.graduate_user_id', 'graduate_user.id', 'graduate_user' );
     $modifier->join( 'language', 'reqn.language_id', 'language.id' );
     $modifier->join( 'deadline', 'reqn.deadline_id', 'deadline.id' );
+
+    $select->add_column( 'CONCAT_WS( " ", user.first_name, user.last_name )', 'applicant_name', false );
+    $select->add_column( 'user.email', 'applicant_email', false );
+    $select->add_column( 'CONCAT_WS( " ", graduate_user.first_name, graduate_user.last_name )', 'graduate_name', false );
+    $select->add_column( 'graduate_user.email', 'graduate_email', false );
 
     if( $select->has_table_columns( 'stage' ) || $select->has_table_columns( 'stage_type' ) ) 
     {

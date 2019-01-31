@@ -31,17 +31,24 @@ class notification extends \cenozo\database\record
    * Sets up the notification to send to the owner and graduate of a reqn
    * @param database\reqn $db_reqn
    */
-   public function set_reqn( $db_reqn )
-   {
-     $db_reqn_version = $db_reqn->get_current_reqn_version();
-     $this->reqn_id = $db_reqn->id;
-     $this->datetime = util::get_datetime_object();
-     $this->save();
+  public function set_reqn( $db_reqn )
+  {
+    $db_user = $db_reqn->get_user();
+    $db_graduate_user = $db_reqn->get_graduate_user();
+    $db_reqn_version = $db_reqn->get_current_reqn_version();
+    $this->reqn_id = $db_reqn->id;
+    $this->datetime = util::get_datetime_object();
+    $this->save();
 
-     $this->add_email( $db_reqn_version->applicant_email, $db_reqn_version->applicant_name );
-     if( !is_null( $db_reqn_version->graduate_email ) )
-       $this->add_email( $db_reqn_version->graduate_email, $db_reqn_version->graduate_name );
-   }
+    $this->add_email( $db_user->email, sprintf( '%s %s', $db_user->first_name, $db_user->last_name ) );
+    if( !is_null( $db_graduate_user ) )
+    {
+      $this->add_email(
+        $db_graduate_user->email,
+        sprintf( '%s %s', $db_graduate_user->first_name, $db_graduate_user->last_name )
+      );
+    }
+  }
 
   /**
    * Sends all emails associated with this notification
@@ -52,14 +59,26 @@ class notification extends \cenozo\database\record
     $mail_manager = lib::create( 'business\mail_manager' );
 
     $db_reqn = $this->get_reqn();
+    $db_user = $db_reqn->get_user();
+    $db_graduate_user = $db_reqn->get_graduate_user();
     $db_reqn_version = $db_reqn->get_current_reqn_version();
     $language = $db_reqn->get_language()->code;
     $db_notification_type = $this->get_notification_type();
 
     // fill in dynamic details in the message body
     $message = str_replace(
-      array( '{{identifier}}', '{{title}}', '{{applicant_name}}' ),
-      array( $db_reqn->identifier, $db_reqn_version->title, $db_reqn_version->applicant_name ),
+      array(
+        '{{identifier}}',
+        '{{title}}',
+        '{{applicant_name}}',
+        '{{graduate_name}}'
+      ),
+      array(
+        $db_reqn->identifier,
+        $db_reqn_version->title,
+        sprintf( '%s %s', $db_user->first_name, $db_user->last_name ),
+        is_null( $db_graduate_user ) ? '' : sprintf( '%s %s', $db_graduate_user->first_name, $db_graduate_user->last_name )
+      ),
       'en' == $language ? $db_notification_type->message_en : $db_notification_type->message_fr
     );
 

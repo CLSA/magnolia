@@ -24,7 +24,8 @@ class review_summary extends \cenozo\business\report\base_report
     $select = lib::create( 'database\select' );
     $select->from( 'reqn' );
     $select->add_column( 'identifier', 'Identifier' );
-    $select->add_column( 'reqn_version.applicant_name', 'Applicant', false );
+    $select->add_column( 'CONCAT_WS( " ", user.first_name, user.last_name )', 'Applicant', false );
+    $select->add_column( 'CONCAT_WS( " ", graduate_user.first_name, graduate_user.last_name )', 'Graduate', false );
     $select->add_column( 'reqn_version.applicant_affiliation', 'Affiliation', false );
     $select->add_column( 'reqn_version.title', 'Title', false );
     $select->add_column( 'reqn_version.lay_summary', 'Lay Summary', false );
@@ -44,6 +45,9 @@ class review_summary extends \cenozo\business\report\base_report
     );
 
     $modifier = lib::create( 'database\modifier' );
+    $modifier->join( 'user', 'reqn.user_id', 'user.id' );
+    $modifier->left_join( 'graduate', 'reqn.graduate_id', 'graduate.id' );
+    $modifier->left_join( 'user', 'graduate.graduate_user_id', 'graduate_user.id', 'graduate_user' );
     $modifier->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
     $modifier->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
     $modifier->join( 'review', 'reqn.id', 'review.reqn_id' );

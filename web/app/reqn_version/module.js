@@ -45,13 +45,13 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     applicant_affiliation: { type: 'string' },
     applicant_address: { type: 'string' },
     applicant_phone: { type: 'string' },
-    applicant_email: { type: 'string', format: 'email' },
+    applicant_email: { type: 'string' },
     graduate_name: { type: 'string' },
     graduate_program: { type: 'string' },
     graduate_institution: { type: 'string' },
     graduate_address: { type: 'string' },
     graduate_phone: { type: 'string' },
-    graduate_email: { type: 'string', format: 'email' },
+    graduate_email: { type: 'string' },
     start_date: { type: 'date' },
     duration: { type: 'string' },
     title: { type: 'string' },
@@ -250,18 +250,14 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             if( 'part1' == part ) {
               if( 'a' == section ) {
                 different = [
-                  'applicant_name',
                   'applicant_position',
                   'applicant_affiliation',
                   'applicant_address',
                   'applicant_phone',
-                  'applicant_email',
-                  'graduate_name',
                   'graduate_program',
                   'graduate_institution',
                   'graduate_address',
                   'graduate_phone',
-                  'graduate_email',
                   'waiver'
                 ].some( function( property ) { return $scope.isDifferent( property ); } );
               } else if( 'b' == section ) {
@@ -891,8 +887,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               if( response ) {
                 // make sure that certain properties have been defined, one tab at a time
                 var requiredTabList = {
-                  a: [ 'applicant_name', 'applicant_position', 'applicant_affiliation',
-                       'applicant_address', 'applicant_phone', 'applicant_email' ],
+                  a: [ 'applicant_position', 'applicant_affiliation', 'applicant_address', 'applicant_phone' ],
                   c: [ 'start_date', 'duration' ],
                   d: [ 'title', 'keywords', 'lay_summary', 'background', 'objectives', 'methodology', 'analysis' ],
                   e: [ 'funding' ],
