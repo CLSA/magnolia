@@ -169,8 +169,8 @@ cenozo.service( 'CnReqnHelper', [
                 fr: '<strong>Demandeur principal</strong> : Le demandeur principal sera la personne-ressource pour l’Entente d’accès de l’ÉLCV, ainsi que pour la transmission des données et toute mise à jour pertinente.'
               },
               text2: {
-                en: 'For <strong>Graduate student</strong> (MSc, PhD) applications, the primary applicant must be the supervisor and the student must be clearly identified. <strong>Postdoctoral Fellows</strong> are permitted to apply as a primary applicant, but the supervisor must accept responsibility for the data and will be required to sign the CLSA Access agreement. If requesting a Fee Waiver, the Postdoctoral Fellow must be listed as the primary applicant.',
-                fr: 'Pour les <strong>demandes faites par des étudiants des cycles supérieurs</strong> (M. Sc., Ph. D.), le demandeur principal doit être le superviseur et l’étudiant doit être clairement identifié. Les <strong>boursiers postdoctoraux</strong> peuvent soumettre une demande à titre de demandeur principal, mais le superviseur doit accepter la responsabilité des données et signer l’Entente d’accès de l’ÉLCV. En cas de demande d’exonération des frais, le boursier postdoctoral doit être le demandeur principal.'
+                en: 'For Trainee (MSc, PhD and Postdoctoral Fellow) applications, the primary applicant must be the supervisor and the trainee must be clearly identified.',
+                fr: 'TRANSLATION REQUIRED'
               },
               applicant_name: { en: 'Name', fr: 'Nom' },
               applicant_position: { en: 'Position', fr: 'Poste' },
@@ -179,8 +179,8 @@ cenozo.service( 'CnReqnHelper', [
               applicant_phone: { en: 'Phone', fr: 'Téléphone' },
               applicant_email: { en: 'E-mail', fr: 'Courriel' },
               text3: {
-                en: 'Complete this section if this is a Graduate student or Postdoctoral Fellow application (if Fellow is not the primary applicant)',
-                fr: 'Remplir cette section si la demande est faite par un étudiant des cycles supérieurs ou un boursier postdoctoral (si le boursier n’est pas le demandeur principal)'
+                en: 'Complete this section if this is a Trainee application (MSc, PhD and Postdoctoral Fellow).',
+                fr: 'TRANSLATION REQUIRED'
               },
               graduate_name: { en: 'Name', fr: 'Nom' },
               graduate_program: { en: 'Degree and Program of Study', fr: 'Grade et programme d’étude' },
@@ -189,8 +189,8 @@ cenozo.service( 'CnReqnHelper', [
               graduate_phone: { en: 'Phone', fr: 'Téléphone' },
               graduate_email: { en: 'E-mail', fr: 'Courriel' },
               text4: {
-                en: 'In order to be eligible for the Fee Waiver for Graduate students, the application must clearly indicate that the proposed project forms part of a thesis. In order to be eligible for the Fee Waiver for Postdoctoral Fellows, the Fellow must be the primary applicant and the supervisor must sign the CLSA Access Agreement.',
-                fr: 'Pour que les étudiants des cycles supérieurs soient admissibles à l’exonération des frais, la demande doit indiquer clairement que le projet proposé s’inscrit dans une thèse. Pour que les boursiers postdoctoraux soient admissibles à l’exonération des frais, le boursier doit être le demandeur principal et le superviseur doit signer l’Entente d’accès de l’ÉLCV.'
+                en: 'In order to be eligible for the Fee Waiver for Graduate students, the application must clearly indicate that the proposed project forms part of a thesis.',
+                fr: 'Pour que les étudiants des cycles supérieurs soient admissibles à l’exonération des frais, la demande doit indiquer clairement que le projet proposé s’inscrit dans une thèse.'
               },
               waiver: { en: 'Fee Waiver Type', fr: 'Type d’exemption de frais' }
             },
