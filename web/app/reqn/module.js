@@ -19,7 +19,7 @@ define( function() {
         isIncluded: function( $state, model ) { return !model.isApplicant(); }
       },
       graduate_full_name: {
-        title: 'Graduate'
+        title: 'Trainee'
       },
       deadline: {
         column: 'deadline.name',
@@ -69,7 +69,7 @@ define( function() {
       constant: true
     },
     graduate_id: {
-      title: 'Graduate',
+      title: 'Trainee',
       type: 'enum'
     },
     language_id: {

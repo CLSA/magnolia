@@ -5,9 +5,9 @@ define( function() {
   angular.extend( module, {
     identifier: {},
     name: {
-      singular: 'graduate',
-      plural: 'graduates',
-      possessive: 'graduate\'s'
+      singular: 'trainee',
+      plural: 'trainees',
+      possessive: 'trainee\'s'
     },
     columnList: {
       user_full_name: {
@@ -15,7 +15,7 @@ define( function() {
         isIncluded: function( $state, model ) { return 'graduate.list' == $state.current.name; }
       },
       graduate_full_name: {
-        title: 'Graduate'
+        title: 'Trainee'
       },
       graduate_name: {
         column: 'graduate_user.name',
@@ -41,7 +41,7 @@ define( function() {
     },
     graduate_user_id: {
       column: 'graduate.graduate_user_id',
-      title: 'Graduate',
+      title: 'Trainee',
       type: 'lookup-typeahead',
       typeahead: {
         table: 'user',
