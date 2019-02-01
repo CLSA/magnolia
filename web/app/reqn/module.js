@@ -576,7 +576,6 @@ define( function() {
           mainInputGroup.inputList.data_available.exclude = false;
         } else {
           mainInputGroup.inputList.title.exclude = false;
-          mainInputGroup.inputList.user_fill_name.exclude = false;
           mainInputGroup.inputList.lay_summary.exclude = false;
         }
 
