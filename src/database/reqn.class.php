@@ -43,12 +43,26 @@ class reqn extends \cenozo\database\record
       $this->data_directory = static::generate_data_directory();
     }
 
+    // track whether the graduate_id has changed to NULL
+    $remove_graduate_details = $this->has_column_changed( 'graduate_id' ) && !is_null( $this->graduate_id );
+
     parent::save();
 
     if( $is_new )
     {
       $this->create_version();
       $this->proceed_to_next_stage();
+    }
+    else if( $remove_graduate_details )
+    {
+      // do not allow graduate details or a fee waiver if there is no graduate selected
+      $db_current_reqn_version = $this->get_current_reqn_version();
+      $db_current_reqn_version->graduate_program = NULL;
+      $db_current_reqn_version->graduate_institution = NULL;
+      $db_current_reqn_version->graduate_address = NULL;
+      $db_current_reqn_version->graduate_phone = NULL;
+      $db_current_reqn_version->waiver = NULL;
+      $db_current_reqn_version->save();
     }
 
     // delete files if they are being set to null
