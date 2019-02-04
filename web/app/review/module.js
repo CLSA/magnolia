@@ -84,7 +84,8 @@ define( function() {
       title: 'Note',
       type: 'text'
     },
-    review_type_id: { type: 'hidden' }
+    review_type_id: { type: 'hidden' },
+    current_reqn_version_id: { column: 'reqn_version.id', type: 'hidden' }
   } );
 
   module.addExtraOperation( 'view', {
@@ -96,10 +97,10 @@ define( function() {
     title: 'Download',
     operations: [ {
       title: 'Application',
-      operation: function( $state, model ) { model.viewModel.downloadReqn(); }
+      operation: function( $state, model ) { model.viewModel.downloadApplication(); }
     }, {
       title: 'Data Checklist',
-      operation: function( $state, model ) { model.viewModel.downloadDataChecklist(); }
+      operation: function( $state, model ) { model.viewModel.downloadChecklist(); }
     } ]
   } );
 
@@ -144,13 +145,14 @@ define( function() {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnReviewViewFactory', [
-    'CnBaseViewFactory', 'CnHttpFactory', 'CnSession',
-    function( CnBaseViewFactory, CnHttpFactory, CnSession ) {
+    'CnBaseViewFactory', 'CnReqnHelper', 'CnHttpFactory', 'CnSession',
+    function( CnBaseViewFactory, CnReqnHelper, CnHttpFactory, CnSession ) {
       var object = function( parentModel, root ) {
         var self = this;
         CnBaseViewFactory.construct( this, parentModel, root );
 
-        // administrators can edit any review, but other roles only have access to specific reviews (updated after the record is loaded)
+        // administrators can edit any review, but other roles only have access to specific reviews
+        // (updated after the record is loaded)
         angular.extend( this, {
           mayEdit: 'administrator' == CnSession.role.name,
           onView: function( force ) {
@@ -174,21 +176,8 @@ define( function() {
             } );
           },
 
-          downloadReqn: function() {
-            var parent = self.parentModel.getParentIdentifier();
-            return CnHttpFactory.instance( {
-              path: parent.subject + '/' + parent.identifier + '?file=application',
-              format: 'pdf'
-            } ).file();
-          },
-
-          downloadDataChecklist: function() {
-            var parent = self.parentModel.getParentIdentifier();
-            return CnHttpFactory.instance( {
-              path: parent.subject + '/' + parent.identifier + '?file=checklist',
-              format: 'pdf'
-            } ).file();
-          }
+          downloadApplication: function() { return CnReqnHelper.download( 'application', this.record.current_reqn_version_id ); },
+          downloadChecklist: function() { return CnReqnHelper.download( 'checklist', this.record.current_reqn_version_id ); }
         } );
 
         // add an additional check to see if the review is editable

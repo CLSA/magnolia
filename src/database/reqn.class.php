@@ -727,6 +727,7 @@ class reqn extends \cenozo\database\record
     $select->add_table_column( 'graduate', 'graduate_user_id' );
     $modifier = lib::create( 'database\modifier' );
     $modifier->join( 'graduate', 'reqn.graduate_id', 'graduate.id' );
+    $modifier->where( 'reqn.id', '=', $this->id );
 
     $user_id = static::db()->get_one( sprintf( '%s %s', $select->get_sql(), $modifier->get_sql() ) );
     return is_null( $user_id ) ? NULL : lib::create( 'database\user', $user_id );

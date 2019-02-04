@@ -346,6 +346,18 @@ define( function() {
           viewReport: function() { return CnReqnHelper.viewReport( this.record.getIdentifier() ); },
           downloadApplication: function() { return CnReqnHelper.download( 'application', this.record.current_reqn_version_id ); },
           downloadChecklist: function() { return CnReqnHelper.download( 'checklist', this.record.current_reqn_version_id ); },
+          downloadReviews: function() {
+            return CnHttpFactory.instance( {
+              path: this.parentModel.getServiceResourcePath() + '?file=reviews',
+              format: 'txt'
+            } ).file();
+          },
+          downloadFinalReport: function() {
+            return CnHttpFactory.instance( {
+              path: this.parentModel.getServiceResourcePath().replace( 'reqn', 'final_report' ),
+              format: 'pdf'
+            } ).file();
+          },
 
           resetData: function() {
             CnHttpFactory.instance( {
@@ -523,20 +535,6 @@ define( function() {
                 } );
               }
             } );
-          },
-
-          downloadReviews: function() {
-            return CnHttpFactory.instance( {
-              path: this.parentModel.getServiceResourcePath() + '?file=reviews',
-              format: 'txt'
-            } ).file();
-          },
-
-          downloadFinalReport: function() {
-            return CnHttpFactory.instance( {
-              path: this.parentModel.getServiceResourcePath().replace( 'reqn', 'final_report' ),
-              format: 'pdf'
-            } ).file();
           },
 
         } );

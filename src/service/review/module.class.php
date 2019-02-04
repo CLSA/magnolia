@@ -66,6 +66,9 @@ class module extends \cenozo\service\module
     $modifier->join( 'review_type', 'review.review_type_id', 'review_type.id' );
     $modifier->left_join( 'user', 'review.user_id', 'user.id' );
     $modifier->left_join( 'recommendation_type', 'review.recommendation_type_id', 'recommendation_type.id' );
+    $modifier->join( 'reqn', 'review.reqn_id', 'reqn.id' );
+    $modifier->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
+    $modifier->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
 
     if( !is_null( $this->get_resource() ) )
     {
