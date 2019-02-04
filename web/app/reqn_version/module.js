@@ -872,7 +872,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                 } ).show().then( function() {
                   return self.parentModel.isApplicant() ?
                     $state.go( 'root.home' ) :
-                    self.parentModel.transitionToParentViewState( parent.subject, parent.identifier );
+                    self.onView( true ); // refresh 
                 } );
               } );
             }

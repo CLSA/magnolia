@@ -107,8 +107,8 @@ class reqn extends \cenozo\database\record
     if( !is_null( $db_current_reqn_version ) )
     {
       // copy the files as well
-      copy( $db_current_reqn_version->get_filename( 'funding' ), $db_reqn_version->get_vilename( 'funding' ) );
-      copy( $db_current_reqn_version->get_filename( 'ethics' ), $db_reqn_version->get_vilename( 'ethics' ) );
+      copy( $db_current_reqn_version->get_filename( 'funding' ), $db_reqn_version->get_filename( 'funding' ) );
+      copy( $db_current_reqn_version->get_filename( 'ethics' ), $db_reqn_version->get_filename( 'ethics' ) );
     }
 
     if( !is_null( $db_current_reqn_version ) )
