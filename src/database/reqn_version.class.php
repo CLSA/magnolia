@@ -195,13 +195,21 @@ class reqn_version extends \cenozo\database\record
       if( !is_null( $this->applicant_address ) ) $data['applicant_address'] = $this->applicant_address;
       if( !is_null( $this->applicant_phone ) ) $data['applicant_phone'] = $this->applicant_phone;
       $data['applicant_email'] = $db_user->email;
+      // only show graduate details if there is a graduate user
       if( !is_null( $db_graduate_user ) )
+      {
         $data['graduate_name'] = sprintf( '%s %s', $db_graduate_user->first_name, $db_graduate_user->last_name );
-      if( !is_null( $this->graduate_program ) ) $data['graduate_program'] = $this->graduate_program;
-      if( !is_null( $this->graduate_institution ) ) $data['graduate_institution'] = $this->graduate_institution;
-      if( !is_null( $this->graduate_address ) ) $data['graduate_address'] = $this->graduate_address;
-      if( !is_null( $this->graduate_phone ) ) $data['graduate_phone'] = $this->graduate_phone;
-      if( !is_null( $db_graduate_user ) ) $data['graduate_email'] = $db_graduate_user->email;
+        if( !is_null( $this->graduate_program ) ) $data['graduate_program'] = $this->graduate_program;
+        if( !is_null( $this->graduate_institution ) ) $data['graduate_institution'] = $this->graduate_institution;
+        if( !is_null( $this->graduate_address ) ) $data['graduate_address'] = $this->graduate_address;
+        if( !is_null( $this->graduate_phone ) ) $data['graduate_phone'] = $this->graduate_phone;
+        if( !is_null( $db_graduate_user ) ) $data['graduate_email'] = $db_graduate_user->email;
+        if( !is_null( $this->waiver ) )
+        {
+          if( 'graduate' == $this->waiver ) $data['waiver_graduate'] = 'Yes';
+          else if( 'postdoc' == $this->waiver ) $data['waiver_postdoc'] = 'Yes';
+        }
+      }
       if( !is_null( $this->start_date ) ) $data['start_date'] = $this->start_date->format( 'Y-m-d' );
       if( !is_null( $this->duration ) ) $data['duration'] = $this->duration;
       if( !is_null( $this->keywords ) ) $data['keywords'] = $this->keywords;
@@ -223,11 +231,6 @@ class reqn_version extends \cenozo\database\record
       if( !is_null( $this->ethics ) ) $data['ethics'] = $this->ethics ? 'yes' : 'no';
       if( !is_null( $this->ethics_date ) && !$data['ethics'] )
         $data['ethics_date'] = $this->ethics_date->format( 'Y-m-d' );
-      if( !is_null( $this->waiver ) )
-      {
-        if( 'graduate' == $this->waiver ) $data['waiver_graduate'] = 'Yes';
-        else if( 'postdoc' == $this->waiver ) $data['waiver_postdoc'] = 'Yes';
-      }
       $data['signature_applicant_name'] = $data['applicant_name'];
 
       foreach( $this->get_coapplicant_list() as $index => $coapplicant )
