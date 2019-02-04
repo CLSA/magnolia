@@ -198,7 +198,7 @@
                   model="model">
                 </cn-reqn-view-input>
               </div>
-              <hr/>
+              <hr />
               <p class="text-primary" ng-bind-html="t( 'part1.a.text3' )"></p>
               <div class="form-horizontal">
                 <cn-reqn-view-input
@@ -214,7 +214,8 @@
                   input="{
                     key: 'graduate_program',
                     title: t( 'part1.a.graduate_program' ),
-                    type: model.inputList.graduate_program.type
+                    type: model.inputList.graduate_program.type,
+                    constant: !model.viewModel.record.graduate_name
                   }"
                   model="model">
                 </cn-reqn-view-input>
@@ -222,7 +223,8 @@
                   input="{
                     key: 'graduate_institution',
                     title: t( 'part1.a.graduate_institution' ),
-                    type: 'string'
+                    type: 'string',
+                    constant: !model.viewModel.record.graduate_name
                   }"
                   model="model">
                 </cn-reqn-view-input>
@@ -230,7 +232,8 @@
                   input="{
                     key: 'graduate_address',
                     title: t( 'part1.a.graduate_address' ),
-                    type: model.inputList.graduate_address.type
+                    type: model.inputList.graduate_address.type,
+                    constant: !model.viewModel.record.graduate_name
                   }"
                   model="model">
                 </cn-reqn-view-input>
@@ -238,7 +241,8 @@
                   input="{
                     key: 'graduate_phone',
                     title: t( 'part1.a.graduate_phone' ),
-                    type: model.inputList.graduate_phone.type
+                    type: model.inputList.graduate_phone.type,
+                    constant: !model.viewModel.record.graduate_name
                   }"
                   model="model">
                 </cn-reqn-view-input>
@@ -253,7 +257,7 @@
                   model="model">
                 </cn-reqn-view-input>
               </div>
-              <hr/>
+              <hr />
               <p class="text-primary" ng-bind-html="t( 'part1.a.text4' )"></p>
               <div class="form-horizontal">
                 <cn-reqn-view-input
@@ -261,7 +265,8 @@
                     key: 'waiver',
                     title: t( 'part1.a.waiver' ),
                     type: 'enum',
-                    enumList: model.metadata.columnList.waiver.enumList[model.viewModel.record.lang]
+                    enumList: model.metadata.columnList.waiver.enumList[model.viewModel.record.lang],
+                    constant: !model.viewModel.record.graduate_name
                   }"
                   model="model">
                 </cn-reqn-view-input>
