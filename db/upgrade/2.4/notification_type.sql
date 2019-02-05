@@ -18,10 +18,10 @@ Title: ({{title}}";
 INSERT IGNORE INTO notification_type SET
   name = "Approval Required",
   title_en = "CLSA Data Access - Approval Required",
-  title_fr = "Accès aux données de l’ÉLCV — TRANSLATION REQUIRED",
+  title_fr = "Accès aux données de l’ÉLCV - Approbation requise",
   message_en = "Dear Dr. {{applicant_name}},
 
-Your approval is required on your application number {{identifier}}, entitled {{title}}.
+Your approval is required on your application number {{identifier}}, on behalf of {{graduate_name}}, entitled {{title}}.
 
 Please log in to the CLSA online data application software, Magnolia (https://magnolia.clsa-elcv.ca/live/gl/). Review the application and, if you are satisfied, submit the application.
 
@@ -32,11 +32,11 @@ If you have any questions, please contact us at access@clsa-elcv.ca.
 The CLSA Data Access Team",
   message_fr = "Bonjour Dr {{applicant_name}},
 
-Votre demande d’accès {{identifier}}, intitulée {{title}}, TRANSLATION REQUIRED.
+La demande d’accès {{identifier}}, intitulée {{title}}, pour le projet de {{graduate_name}} requiert votre approbation.
 
-TRANSLATION REQUIRED.
+Veuillez vous connecter à Magnolia, le logiciel de demande d’accès aux données en ligne de l’ÉLCV (https://magnolia.clsa-elcv.ca/live/gl/), pour passer la demande en revue. Si celle-ci vous satisfait, soumettez-la.
 
-Votre demande passera alors à la prochaine étape du processus d’évaluation et vous serez contacté(e) avec le résultat à une date ultérieure.
+Votre demande passera alors à la prochaine étape du processus d’évaluation et nous vous communiquerons le résultat ultérieurement.
 
 Si vous avez des questions, veuillez nous contacter à access@clsa-elcv.ca.
 

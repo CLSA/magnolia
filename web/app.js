@@ -156,7 +156,7 @@ cenozo.service( 'CnReqnHelper', [
               },
               text2: {
                 en: 'For Trainee (MSc, PhD and Postdoctoral Fellow) applications, the primary applicant must be the supervisor and the trainee must be clearly identified.',
-                fr: 'TRANSLATION REQUIRED'
+                fr: 'Pour les demandes soumises par des étudiants (M. Sc., Ph. D.) ou des chercheurs postdoctoraux, le demandeur principal doit être le superviseur. L’étudiant ou le chercheur postdoctoral doit être clairement identifié dans la demande.'
               },
               applicant_name: { en: 'Name', fr: 'Nom' },
               applicant_position: { en: 'Position', fr: 'Poste' },
@@ -166,7 +166,7 @@ cenozo.service( 'CnReqnHelper', [
               applicant_email: { en: 'E-mail', fr: 'Courriel' },
               text3: {
                 en: 'Complete this section if this is a Trainee application (MSc, PhD and Postdoctoral Fellow).',
-                fr: 'TRANSLATION REQUIRED'
+                fr: 'Remplissez cette section si la demande est pour un étudiant (M. Sc., Ph. D.) ou un chercheur postdoctoral.'
               },
               graduate_name: { en: 'Name', fr: 'Nom' },
               graduate_program: { en: 'Degree and Program of Study', fr: 'Grade et programme d’étude' },
@@ -425,11 +425,11 @@ cenozo.service( 'CnReqnHelper', [
             },
             graduateSubmitTitle: {
               en: 'Application Submitted for Supervisor Approval',
-              fr: 'TRANSLATION REQUIRED'
+              fr: 'Demande envoyée au superviseur pour approbation'
             },
             graduateSubmitMessage: {
               en: 'You have successfully submitted your CLSA Data and Biospecimen Request Application, and your supervisor will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your application. For timelines of the anticipated notice of decision, please check the Data Access Application Process page of our website.',
-              fr: 'TRANSLATION REQUIRED'
+              fr: 'Votre demande d’accès aux données et aux échantillons de l’ÉLCV a été soumise avec succès. Votre superviseur recevra une demande d’approbation par courriel. Elle sera maintenant évaluée. Vous recevrez un courriel avec des instructions supplémentaires si nous avons besoin d’autre information et lorsque le processus d’évaluation sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour consulter le statut de votre demande. Pour connaître les dates approximatives d’envoi de l’avis de décision, veuillez consulter la page Processus de demande d’accès aux données de notre site Web.'
             },
             resubmitTitle: {
               en: 'Application Resubmitted',
@@ -441,11 +441,11 @@ cenozo.service( 'CnReqnHelper', [
             },
             graduateResubmitTitle: {
               en: 'Application Resubmitted for Supervisor Approval',
-              fr: 'TRANSLATION REQUIRED',
+              fr: 'Demande envoyée à nouveau au superviseur pour approbation',
             },
             graduateResubmitMessage: {
               en: 'You have successfully resubmitted your CLSA Data and Biospecimen Request Application, and your supervisor will receive an email to request approval. You will receive an email with further instructions if your further attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your application. For timelines of the anticipated notice of decision, please check the Data Access Application Process page of our website.',
-              fr: 'TRANSLATION REQUIRED'
+              fr: 'Votre demande d’accès aux données et aux échantillons de l’ÉLCV a été resoumise avec succès. Votre superviseur recevra une demande d’approbation par courriel. Vous recevrez un courriel avec des instructions supplémentaires si nous avons besoin d’autre information et lorsque le processus d’évaluation sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour consulter le statut de votre demande. Pour connaître les dates approximatives d’envoi de l’avis de décision, veuillez consulter la page Processus de demande d’accès aux données de notre site Web.'
             },
             submitWarning: {
               en: 'Are you sure that all changes are complete and the application is ready to be submitted?',
@@ -468,7 +468,7 @@ cenozo.service( 'CnReqnHelper', [
             },
             noChangesMessage: {
               en: 'You have not made any changes to the form since your last submission.  Are you sure you wish to proceed?',
-              fr: 'TRANSLATION REQUIRED'
+              fr: 'Vous n’avez apporté aucune modification au formulaire depuis votre dernière soumission. Êtes-vous sûr(e) de vouloir continuer?'
             },
             deleteWarning: {
               en: 'Are you sure you want to delete the application?\n\nThis will permanently destroy all details you have provided. Once this is done there will be no way to restore the application!',
