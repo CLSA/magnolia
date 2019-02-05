@@ -121,8 +121,11 @@ class reqn extends \cenozo\database\record
     if( !is_null( $db_current_reqn_version ) )
     {
       // copy the files as well
-      copy( $db_current_reqn_version->get_filename( 'funding' ), $db_reqn_version->get_filename( 'funding' ) );
-      copy( $db_current_reqn_version->get_filename( 'ethics' ), $db_reqn_version->get_filename( 'ethics' ) );
+      $existing_file = $db_current_reqn_version->get_filename( 'funding' );
+      if( file_exists( $existing_file ) ) copy( $existing_file, $db_reqn_version->get_filename( 'funding' ) );
+
+      $existing_file = $db_current_reqn_version->get_filename( 'ethics' );
+      if( file_exists( $existing_file ) ) copy( $existing_file, $db_reqn_version->get_filename( 'ethics' ) );
     }
 
     if( !is_null( $db_current_reqn_version ) )
