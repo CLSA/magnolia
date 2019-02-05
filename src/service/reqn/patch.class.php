@@ -179,14 +179,9 @@ class patch extends \cenozo\service\patch
             {
               // send a notification to the supervisor
               $db_notification = lib::create( 'database\notification' );
-              $db_notification->reqn_id = $db_reqn->id;
               $db_notification->notification_type_id =
                 $notification_type_class_name::get_unique_record( 'name', 'Approval Required' )->id;
-              $db_notification->datetime = util::get_datetime_object();
-              $db_notification->save();
-
-              $db_notification->add_email( $db_user->email, sprintf( '%s %s', $db_user->first_name, $db_user->last_name ) );
-
+              $db_notification->set_reqn( $db_reqn );
               $db_notification->mail();
             }
             else
