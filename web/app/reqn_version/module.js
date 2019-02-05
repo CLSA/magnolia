@@ -338,9 +338,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               // file size are compared instead of filename
               var fileDetails = viewModel.fileList.findByProperty( 'key', property );
               var sizeProperty = property.replace( '_filename', '_size' );
-              var recordSize = fileDetails ? fileDetails.size : null;
+              var recordSize = angular.isObject( fileDetails ) && fileDetails.size ? fileDetails.size : null;
               var compareSize = viewModel.compareRecord[sizeProperty] ? viewModel.compareRecord[sizeProperty] : null;
-              return recordSize != compareSize;
+              return ( null != recordSize || null != compareSize ) && recordSize != compareSize
             }
 
             var recordValue = viewModel.record[property] ? viewModel.record[property] : null;
