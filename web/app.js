@@ -175,8 +175,8 @@ cenozo.service( 'CnReqnHelper', [
               graduate_phone: { en: 'Phone', fr: 'Téléphone' },
               graduate_email: { en: 'E-mail', fr: 'Courriel' },
               text4: {
-                en: 'In order to be eligible for the Fee Waiver for Graduate students, the application must clearly indicate that the proposed project forms part of a thesis.',
-                fr: 'Pour que les étudiants des cycles supérieurs soient admissibles à l’exonération des frais, la demande doit indiquer clairement que le projet proposé s’inscrit dans une thèse.'
+                en: 'Graduate students (MSc or PhD) who wish to obtain the CLSA data for the sole purpose of their thesis, and postdoctoral fellows (limit 1 waiver per postdoc) who wish to obtain the CLSA data for the sole purpose of their postdoctoral project who are enrolled at Canadian institutions for their graduate degree or postdoc, can apply for a fee waiver. Canadian trainees working outside Canada but funded through a Canadian source are also eligible for a fee waiver. Trainees eligible for a fee waiver are also waived the supplemental data fee for images and raw data.',
+                fr: 'Les étudiants de deuxième et troisième cycle (M. Sc. ou Ph. D.) et les chercheurs postdoctoraux (limite d’une exonération par post doctorat) qui désirent utiliser les données de l’ÉLCV uniquement pour leur recherche et qui sont inscrits à un établissement canadien peuvent demander une exonération des frais. Les stagiaires canadiens qui travaillent à l’extérieur du Canada, mais qui sont financés par un organisme canadien peuvent également demander une exonération des frais. L’exonération des frais pour les stagiaires admissibles s’applique également aux frais additionnels demandés pour les images et les données brutes.'
               },
               waiver: { en: 'Fee Waiver Type', fr: 'Type d’exemption de frais' }
             },
