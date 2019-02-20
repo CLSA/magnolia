@@ -24,6 +24,7 @@ class module extends \cenozo\service\module
     $modifier->left_join( 'notification_type', 'stage_type.notification_type_id', 'notification_type.id' );
 
     // add the total number of reqns
-    if( $select->has_column( 'reqn_count' ) ) $this->add_count_column( 'reqn', $select, $modifier, 'stage' );
+    if( $select->has_column( 'reqn_count' ) )
+      $this->add_count_column( 'reqn_count', 'reqn', $select, $modifier, 'stage' );
   }
 }

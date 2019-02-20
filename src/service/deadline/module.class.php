@@ -19,6 +19,7 @@ class module extends \cenozo\service\module
   public function prepare_read( $select, $modifier )
   {
     // add the total number of reqns
-    if( $select->has_column( 'reqn_count' ) ) $this->add_count_column( 'reqn', $select, $modifier );
+    if( $select->has_column( 'reqn_count' ) )
+      $this->add_count_column( 'reqn_count', 'reqn', $select, $modifier );
   }
 }

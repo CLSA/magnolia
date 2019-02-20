@@ -22,6 +22,7 @@ class module extends \cenozo\service\module
     parent::prepare_read( $select, $modifier );
 
     // add the total number of notifications
-    if( $select->has_column( 'notification_count' ) ) $this->add_count_column( 'notification', $select, $modifier );
+    if( $select->has_column( 'notification_count' ) )
+      $this->add_count_column( 'notification_count', 'notification', $select, $modifier );
   }
 }

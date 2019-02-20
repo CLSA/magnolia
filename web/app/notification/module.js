@@ -19,8 +19,8 @@ define( function() {
         column: 'reqn.identifier',
         title: 'Requisition'
       },
-      emails: {
-        title: 'Email'
+      email_list: {
+        title: 'Sent To'
       },
       type: {
         column: 'notification_type.name',
