@@ -65,7 +65,23 @@ class notification extends \cenozo\database\record
     $language = $db_reqn->get_language()->code;
     $db_notification_type = $this->get_notification_type();
 
-    // fill in dynamic details in the message body
+    // fill in dynamic details in the message title
+    $title = str_replace(
+      array(
+        '{{identifier}}',
+        '{{title}}',
+        '{{applicant_name}}',
+        '{{graduate_name}}'
+      ),
+      array(
+        $db_reqn->identifier,
+        $db_reqn_version->title,
+        sprintf( '%s %s', $db_user->first_name, $db_user->last_name ),
+        is_null( $db_graduate_user ) ? '' : sprintf( '%s %s', $db_graduate_user->first_name, $db_graduate_user->last_name )
+      ),
+      'en' == $language ? $db_notification_type->title_en : $db_notification_type->title_fr
+    );
+
     $message = str_replace(
       array(
         '{{identifier}}',
@@ -87,7 +103,7 @@ class notification extends \cenozo\database\record
     $select->add_column( 'name' );
     foreach( $this->get_notification_email_list() as $email ) $mail_manager->to( $email['email'], $email['name'] );
 
-    $mail_manager->set_title( 'en' == $language ? $db_notification_type->title_en : $db_notification_type->title_fr );
+    $mail_manager->set_title( $title );
     $mail_manager->set_body( $message );
 
     // add cc and bcc recipients
