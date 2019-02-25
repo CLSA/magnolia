@@ -22,7 +22,8 @@ class deadline extends \cenozo\database\record
   {
     $deadline_class_name = lib::get_class_name( 'database\deadline' );
     $deadline_mod = lib::create( 'database\modifier' );
-    $deadline_mod->where( 'date', '>', 'DATE( UTC_TIMESTAMP() )', false );
+    // use midnight of the local timezone for the deadline crossover time
+    $deadline_mod->where( 'date', '>=', 'DATE( NOW() )', false );
     $deadline_mod->order( 'date' );
     $deadline_mod->limit( 1 );
 
