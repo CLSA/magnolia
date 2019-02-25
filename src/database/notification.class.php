@@ -117,5 +117,6 @@ class notification extends \cenozo\database\record
     }
 
     $this->sent = $setting_manager->get_setting( 'mail', 'enabled' ) && $mail_manager->send();
+    $this->save();
   }
 }
