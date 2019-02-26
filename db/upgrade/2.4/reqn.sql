@@ -613,6 +613,19 @@ CREATE PROCEDURE patch_reqn()
           ON UPDATE NO ACTION;
     END IF;
 
+    SELECT "Adding new note column to reqn table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "note";
+
+    IF @test = 0 THEN
+      ALTER TABLE reqn
+      ADD COLUMN note TEXT NULL DEFAULT NULL;
+    END IF;
+
   END //
 DELIMITER ;
 
