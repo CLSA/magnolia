@@ -53,9 +53,11 @@ class module extends \cenozo\service\module
     $db_user = $session->get_user();
     $db_role = $session->get_role();
 
+    $modifier->join( 'reqn_type', 'reqn.reqn_type_id', 'reqn_type.id' );
     $modifier->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
     $modifier->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
     $modifier->join( 'deadline', 'reqn.deadline_id', 'deadline.id' );
+    $modifier->join( 'user', 'reqn.user_id', 'user.id' );
     $modifier->left_join( 'graduate', 'reqn.graduate_id', 'graduate.id' );
 
     // only show applicants their own reqns which aren't abandoned
@@ -70,7 +72,6 @@ class module extends \cenozo\service\module
 
     if( $select->has_column( 'user_full_name' ) )
     {
-      $modifier->join( 'user', 'reqn.user_id', 'user.id' );
       $select->add_table_column(
         'user', 'CONCAT_WS( " ", user.first_name, user.last_name )', 'user_full_name', false );
     }
@@ -144,6 +145,9 @@ class module extends \cenozo\service\module
     $db_reqn = $this->get_resource();
     if( $db_reqn )
     {
+      // include the user first/last/name as supplemental data
+      $select->add_column( 'CONCAT( user.first_name, " ", user.last_name, " (", user.name, ")" )', 'formatted_user_id', false );
+
       if( $select->has_column( 'data_available' ) )
       {
         $days = $db_reqn->get_study_data_expiry();

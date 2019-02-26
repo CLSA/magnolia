@@ -33,27 +33,21 @@ class stage_type extends \cenozo\database\has_rank
   {
     $select = lib::create( 'database\select' );
     $select->from( 'stage_type_has_stage_type' );
-    $select->add_column( 'next_stage_type_id' );
+    $select->add_table_column( 'next_stage_type', 'id' );
     $modifier = lib::create( 'database\modifier' );
     $modifier->where( 'stage_type_id', '=', $this->id );
+    $modifier->join(
+      'stage_type',
+      'stage_type_has_stage_type.next_stage_type_id',
+      'next_stage_type.id',
+      '',
+      'next_stage_type'
+    );
+    $modifier->order( 'next_stage_type.rank' );
     $modifier->limit( 1 );
 
     $next_stage_type_id = static::db()->get_one( sprintf( '%s %s', $select->get_sql(), $modifier->get_sql() ) );
     return is_null( $next_stage_type_id ) ? NULL : new static( $next_stage_type_id );
-  }
-
-  /**
-   * Determines whether the stage-type comes after the given stage-type
-   */
-  public function comes_after( $db_stage_type )
-  {
-    $select = lib::create( 'database\select' );
-    $select->from( 'stage_type_has_stage_type' );
-    $select->add_column( 'COUNT(*)', 'total', false );
-    $modifier = lib::create( 'database\modifier' );
-    $modifier->where( 'next_stage_type_id', '=', $this->id );
-    $modifier->where( 'stage_type_id', '=', $db_stage_type->id );
-    return 0 < static::db()->get_one( sprintf( '%s %s', $select->get_sql(), $modifier->get_sql() ) );
   }
 
   /**

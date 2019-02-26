@@ -10,6 +10,8 @@ INSERT IGNORE INTO service ( subject, method, resource, restricted ) VALUES
 ( 'graduate', 'GET', 1, 1 ),
 ( 'graduate', 'PATCH', 1, 1 ),
 ( 'graduate', 'POST', 0, 1 ),
+( 'reqn_type', 'GET', 0, 0 ),
+( 'reqn_type', 'GET', 1, 0 ),
 ( 'reqn_version', 'GET', 0, 0 ),
 ( 'reqn_version', 'GET', 1, 0 ),
 ( 'reqn_version', 'PATCH', 1, 1 );

@@ -22,6 +22,13 @@ class post extends \cenozo\service\post
     $graduate_class_name = lib::get_class_name( 'database\graduate' );
     $db_reqn = $this->get_leaf_record();
 
+    // if no type has been selected then assume standard
+    if( is_null( $db_reqn->reqn_type_id ) )
+    {
+      $db_reqn_type = lib::get_unique_record( 'name', 'Standard' );
+      $db_reqn->reqn_type_id = $db_reqn_type->id;
+    }
+
     // generate a random identifier if none exists
     if( is_null( $db_reqn->identifier ) ) $db_reqn->identifier = $reqn_class_name::get_temporary_identifier();
 

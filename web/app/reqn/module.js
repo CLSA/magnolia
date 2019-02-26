@@ -14,6 +14,10 @@ define( function() {
       identifier: {
         title: 'Identifier'
       },
+      reqn_type: {
+        column: 'reqn_type.name',
+        title: 'Type'
+      },
       user_full_name: {
         title: 'Owner',
         isIncluded: function( $state, model ) { return !model.isApplicant(); }
@@ -61,16 +65,34 @@ define( function() {
   module.addInputGroup( '', {
     identifier: {
       title: 'Identifier',
-      type: 'string'
-    },
-    user_full_name: {
-      title: 'Owner',
       type: 'string',
-      constant: true
+      exclude: 'add'
+    },
+    reqn_type_id: {
+      title: 'Requisition Type',
+      type: 'enum',
+      constant: 'view',
+      exclude: true // modified in the model
+    },
+    deadline_id: {
+      title: 'Deadline',
+      type: 'enum',
+      exclude: true // modified in the model
+    },
+    user_id: {
+      title: 'Owner',
+      type: 'lookup-typeahead',
+      typeahead: {
+        table: 'user',
+        select: 'CONCAT( user.first_name, " ", user.last_name, " (", user.name, ")" )',
+        where: [ 'user.first_name', 'user.last_name', 'user.name' ]
+      },
+      constant: 'view'
     },
     graduate_id: {
       title: 'Trainee',
-      type: 'enum'
+      type: 'enum',
+      exclude: 'add'
     },
     language_id: {
       title: 'Language',
@@ -123,7 +145,6 @@ define( function() {
       exclude: true // modified in the model
     },
 
-    user_id: { type: 'string', exclude: true },
     current_reqn_version_id: { column: 'reqn_version.id', type: 'string', exclude: true },
     data_directory: { type: 'string', exclude: true },
     phase: { column: 'stage_type.phase', type: 'string', exclude: true },
@@ -136,55 +157,68 @@ define( function() {
   module.addInputGroup( 'Decision and Deferral Notes', {
     decision_notice: {
       title: 'Notice of Decision',
-      type: 'text'
+      type: 'text',
+      exclude: 'add'
     },
     deferral_note_1a: {
       title: 'Part1: A1',
-      type: 'text'
+      type: 'text',
+      exclude: 'add'
     },
     deferral_note_1b: {
       title: 'Part1: A2',
-      type: 'text'
+      type: 'text',
+      exclude: 'add'
     },
     deferral_note_1c: {
       title: 'Part1: A3',
-      type: 'text'
+      type: 'text',
+      exclude: 'add'
     },
     deferral_note_1d: {
       title: 'Part1: A4',
-      type: 'text'
+      type: 'text',
+      exclude: 'add'
     },
     deferral_note_1e: {
       title: 'Part1: A5',
-      type: 'text'
+      type: 'text',
+      exclude: 'add'
     },
     deferral_note_1f: {
       title: 'Part1: A6',
-      type: 'text'
+      type: 'text',
+      exclude: 'add'
     },
     deferral_note_2a: {
       title: 'Part2: Questionnaires',
-      type: 'text'
+      type: 'text',
+      exclude: 'add'
     },
     deferral_note_2b: {
       title: 'Part2: Physical Assessment',
-      type: 'text'
+      type: 'text',
+      exclude: 'add'
     },
     deferral_note_2c: {
       title: 'Part2: Biomarkers',
-      type: 'text'
+      type: 'text',
+      exclude: 'add'
     },
     deferral_note_2d: {
       title: 'Part2: Genomics',
-      type: 'text'
+      type: 'text',
+      exclude: 'add'
     },
     deferral_note_2e: {
       title: 'Part2: Linked Data',
-      type: 'text'
+      type: 'text',
+      exclude: 'add'
     },
     deferral_note_2f: {
       title: 'Part2: Additional Data',
-      type: 'text'
+      type: 'text',
+      exclude: 'add'
     }
   } );
 
@@ -278,6 +312,21 @@ define( function() {
   );
 
   /* ######################################################################################################## */
+  cenozo.providers.directive( 'cnReqnAdd', [
+    'CnReqnModelFactory',
+    function( CnReqnModelFactory ) {
+      return {
+        templateUrl: module.getFileUrl( 'add.tpl.html' ),
+        restrict: 'E',
+        scope: { model: '=?' },
+        controller: function( $scope ) {
+          if( angular.isUndefined( $scope.model ) ) $scope.model = CnReqnModelFactory.root;
+        }
+      };
+    }
+  ] );
+
+  /* ######################################################################################################## */
   cenozo.providers.directive( 'cnReqnList', [
     'CnReqnModelFactory',
     function( CnReqnModelFactory ) {
@@ -304,6 +353,15 @@ define( function() {
           if( angular.isUndefined( $scope.model ) ) $scope.model = CnReqnModelFactory.root;
         }
       };
+    }
+  ] );
+
+  /* ######################################################################################################## */
+  cenozo.providers.factory( 'CnReqnAddFactory', [
+    'CnBaseAddFactory',
+    function( CnBaseAddFactory ) {
+      var object = function( parentModel ) { CnBaseAddFactory.construct( this, parentModel ); };
+      return { instance: function( parentModel ) { return new object( parentModel ); } };
     }
   ] );
 
@@ -404,6 +462,10 @@ define( function() {
 
             return this.$$onView( force ).then( function() {
               var mainInputGroup = self.parentModel.module.inputGroupList.findByProperty( 'title', '' );
+
+              // only allow the deadline to be changed while in the admin review stage
+              mainInputGroup.inputList.deadline_id.constant =
+                3 > CnSession.role.tier || 'Admin Review' != self.record.stage_type;
 
               // show the agreement and instruction files if we're past the review stage
               mainInputGroup.inputList.agreement_filename.exclude = 0 > ['active','complete'].indexOf( self.record.phase );
@@ -545,14 +607,15 @@ define( function() {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnReqnModelFactory', [
-    'CnReqnHelper', 'CnBaseModelFactory', 'CnReqnListFactory', 'CnReqnViewFactory',
-    'CnHttpFactory', 'CnSession', '$state',
-    function( CnReqnHelper, CnBaseModelFactory, CnReqnListFactory, CnReqnViewFactory,
-              CnHttpFactory, CnSession, $state ) {
+    'CnReqnHelper', 'CnBaseModelFactory', 'CnReqnAddFactory', 'CnReqnListFactory', 'CnReqnViewFactory',
+    'CnHttpFactory', 'CnSession', '$state', '$q',
+    function( CnReqnHelper, CnBaseModelFactory, CnReqnAddFactory, CnReqnListFactory, CnReqnViewFactory,
+              CnHttpFactory, CnSession, $state, $q ) {
       var object = function( root ) {
         var self = this;
 
         CnBaseModelFactory.construct( this, module );
+        this.addModel = CnReqnAddFactory.instance( this );
         this.listModel = CnReqnListFactory.instance( this );
         this.viewModel = CnReqnViewFactory.instance( this, root );
 
@@ -568,10 +631,12 @@ define( function() {
 
         var mainInputGroup = module.inputGroupList.findByProperty( 'title', '' );
         if( 'administrator' == CnSession.role.name ) {
+          mainInputGroup.inputList.reqn_type_id.exclude = false;
+          mainInputGroup.inputList.deadline_id.exclude = 'add';
           mainInputGroup.inputList.language_id.exclude = false;
-          mainInputGroup.inputList.stage_type.exclude = false;
-          mainInputGroup.inputList.state.exclude = false;
-          mainInputGroup.inputList.data_available.exclude = false;
+          mainInputGroup.inputList.stage_type.exclude = 'add';
+          mainInputGroup.inputList.state.exclude = 'add';
+          mainInputGroup.inputList.data_available.exclude = 'add';
         } else {
           mainInputGroup.inputList.title.exclude = false;
           mainInputGroup.inputList.lay_summary.exclude = false;
@@ -602,8 +667,8 @@ define( function() {
 
         // override transitionToAddState
         this.transitionToAddState = function() {
-          // immediately get a new reqn and view it (no add state required)
-          return CnHttpFactory.instance( {
+          // for applicants immediately get a new reqn and view it (no add state required)
+          return 'applicant' != CnSession.role.name ? this.$$transitionToAddState() : CnHttpFactory.instance( {
             path: 'reqn',
             data: { user_id: CnSession.user.id }
           } ).post().then( function ( response ) {
@@ -619,30 +684,64 @@ define( function() {
 
         // override transitionToAddState
         this.transitionToViewState = function( record ) {
-          if( this.isApplicant() ) $state.go( 'reqn_version.view', { identifier: record.reqn_version_id } ); 
+          if( this.isApplicant() ) $state.go( 'reqn_version.view', { identifier: record.reqn_version_id } );
           else this.$$transitionToViewState( record );
         };
 
         this.getMetadata = function() {
           return self.$$getMetadata().then( function() {
-            return CnHttpFactory.instance( {
-              path: 'language',
-              data: {
-                select: { column: [ 'id', 'name' ] },
-                modifier: {
-                  where: { column: 'active', operator: '=', value: true },
-                  order: 'name'
+            return $q.all( [
+              CnHttpFactory.instance( {
+                path: 'reqn_type',
+                data: {
+                  select: { column: [ 'id', 'name' ] },
+                  modifier: { order: 'name' }
                 }
-              }
-            } ).query().then( function success( response ) {
-              self.metadata.columnList.language_id.enumList = [];
-              response.data.forEach( function( item ) {
-                self.metadata.columnList.language_id.enumList.push( {
-                  value: item.id,
-                  name: item.name
+              } ).query().then( function success( response ) {
+                self.metadata.columnList.reqn_type_id.enumList = [];
+                response.data.forEach( function( item ) {
+                  self.metadata.columnList.reqn_type_id.enumList.push( {
+                    value: item.id,
+                    name: item.name
+                  } );
                 } );
-              } );
-            } );
+              } ),
+
+              CnHttpFactory.instance( {
+                path: 'deadline',
+                data: {
+                  select: { column: [ 'id', 'name' ] },
+                  modifier: { order: 'date', desc: true }
+                }
+              } ).query().then( function success( response ) {
+                self.metadata.columnList.deadline_id.enumList = [];
+                response.data.forEach( function( item ) {
+                  self.metadata.columnList.deadline_id.enumList.push( {
+                    value: item.id,
+                    name: item.name
+                  } );
+                } );
+              } ),
+
+              CnHttpFactory.instance( {
+                path: 'language',
+                data: {
+                  select: { column: [ 'id', 'name' ] },
+                  modifier: {
+                    where: { column: 'active', operator: '=', value: true },
+                    order: 'name'
+                  }
+                }
+              } ).query().then( function success( response ) {
+                self.metadata.columnList.language_id.enumList = [];
+                response.data.forEach( function( item ) {
+                  self.metadata.columnList.language_id.enumList.push( {
+                    value: item.id,
+                    name: item.name
+                  } );
+                } );
+              } )
+            ] );
           } );
         };
       };

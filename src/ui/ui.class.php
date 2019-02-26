@@ -39,6 +39,13 @@ class ui extends \cenozo\ui\ui
       $module->add_child( 'notification' );
     }
 
+    $module = $this->get_module( 'reqn_type' );
+    if( !is_null( $module ) )
+    {
+      $module->add_child( 'reqn' );
+      $module->add_child( 'stage_type' );
+    }
+
     $module = $this->get_module( 'reqn_version' );
     if( !is_null( $module ) ) $module->append_action_query( 'view', '?{t0}&{t1}&{t2}&{c}' );
 
@@ -96,7 +103,11 @@ class ui extends \cenozo\ui\ui
 
     if( 'applicant' == $db_role->name ) $this->remove_listitem( 'Requisitions' );
     if( 'administrator' != $db_role->name ) $this->remove_listitem( 'Users' );
-    if( 'administrator' == $db_role->name ) $this->add_listitem( 'Data Option Categories', 'data_option_category' );
+    if( 'administrator' == $db_role->name )
+    {
+      $this->add_listitem( 'Data Option Categories', 'data_option_category' );
+      $this->add_listitem( 'Requisition Types', 'reqn_type' );
+    }
   }
 
   /**

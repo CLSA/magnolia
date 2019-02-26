@@ -613,6 +613,29 @@ CREATE PROCEDURE patch_reqn()
           ON UPDATE NO ACTION;
     END IF;
 
+    SELECT "Adding new reqn_type_id column to reqn table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "reqn_type_id";
+
+    IF @test = 0 THEN
+      ALTER TABLE reqn
+      ADD COLUMN reqn_type_id INT UNSIGNED NOT NULL AFTER create_timestamp;
+
+      UPDATE reqn SET reqn_type_id = ( SELECT id FROM reqn_type WHERE name = "Standard" );
+
+      ALTER TABLE reqn
+      ADD INDEX fk_reqn_type_id (reqn_type_id ASC),
+      ADD CONSTRAINT fk_reqn_type_id
+          FOREIGN KEY (reqn_type_id)
+          REFERENCES reqn_type (id)
+          ON DELETE NO ACTION
+          ON UPDATE NO ACTION;
+    END IF;
+
   END //
 DELIMITER ;
 

@@ -2,6 +2,8 @@
 
 SET AUTOCOMMIT=0;
 
+SOURCE reqn_type.sql
+SOURCE reqn_type_has_stage_type.sql
 SOURCE graduate.sql
 SOURCE reqn_version.sql
 SOURCE reqn.sql
@@ -24,3 +26,4 @@ SOURCE user_has_graduate.sql
 SOURCE update_version_number.sql
 
 COMMIT;
+
