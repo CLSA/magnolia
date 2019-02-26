@@ -13,12 +13,16 @@ define( function() {
       name: {
         title: 'Name'
       },
-      stage_type_list: {
-        title: 'Stage Types'
+      available: {
+        title: 'Available',
+        type: 'boolean'
       },
       reqn_count: {
         title: 'Requisitions',
         type: 'number'
+      },
+      stage_type_list: {
+        title: 'Stage Types'
       }
     },
     defaultOrder: {
@@ -31,6 +35,11 @@ define( function() {
     name: {
       title: 'Name',
       type: 'string'
+    },
+    available: {
+      title: 'Available',
+      type: 'boolean',
+      help: 'Determines whether this type is available to applicants when creating new requisitions.'
     }
   } );
 
