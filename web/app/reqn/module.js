@@ -144,6 +144,11 @@ define( function() {
       type: 'file',
       exclude: true // modified in the model
     },
+    note: {
+      title: 'Administrative Note',
+      type: 'text',
+      exclude: true // modified in the model
+    },
 
     current_reqn_version_id: { column: 'reqn_version.id', type: 'string', exclude: true },
     data_directory: { type: 'string', exclude: true },
@@ -637,6 +642,7 @@ define( function() {
           mainInputGroup.inputList.stage_type.exclude = 'add';
           mainInputGroup.inputList.state.exclude = 'add';
           mainInputGroup.inputList.data_available.exclude = 'add';
+          mainInputGroup.inputList.note.exclude = false;
         } else {
           mainInputGroup.inputList.title.exclude = false;
           mainInputGroup.inputList.lay_summary.exclude = false;
