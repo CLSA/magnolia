@@ -6,12 +6,14 @@ DROP PROCEDURE IF EXISTS patch_report_type;
     -- determine the @cenozo database name
     SET @cenozo = ( SELECT REPLACE( DATABASE(), "magnolia", "cenozo" ) );
 
-    SELECT "Adding review_summary report to report_type table" AS "";
+    SELECT "Adding new reports to report_type table" AS "";
 
     SET @sql = CONCAT(
       "INSERT IGNORE INTO ", @cenozo, ".report_type ( name, title, subject, description ) VALUES ",
       "( 'review_summary', 'Review Summary', 'reqn', ",
-        "'This report provides a list of all requisitions and their reviews.' )" );
+        "'This report provides a list of all requisitions and their reviews.' ), ",
+      "( 'conflict_of_interest', 'Conflict of Interest', 'reqn', ",
+        "'This report provides the primary applicant names, institution and all co-applicants for all requisitions which will be included in the current round of DSAC review.' )" );
     PREPARE statement FROM @sql;
     EXECUTE statement;
     DEALLOCATE PREPARE statement;
