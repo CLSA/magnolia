@@ -395,6 +395,7 @@ class reqn extends \cenozo\database\record
 
     $review_class_name = lib::get_class_name( 'database\review' );
     $stage_type_class_name = lib::get_class_name( 'database\stage_type' );
+    $notification_type_class_name = lib::get_class_name( 'database\notification_type' );
     $db_user = lib::create( 'business\session' )->get_user();
     $db_current_stage = $this->get_current_stage();
     $db_current_stage_type = is_null( $db_current_stage ) ? NULL : $db_current_stage->get_stage_type();
@@ -471,6 +472,42 @@ class reqn extends \cenozo\database\record
       $db_reqn_version = $this->get_current_reqn_version();
       $db_reqn_version->datetime = util::get_datetime_object();
       $db_reqn_version->save();
+    }
+    // if we have just entered the DSAC review stage then alert the reviewers who are assigned to a review
+    else if( 'DSAC Review' == $db_next_stage_type->name )
+    {
+      $db_notification_type = $notification_type_class_name::get_unique_record( 'name', 'Review Assigned' );
+      $review_sel = lib::create( 'database\select' );
+      $review_sel->add_table_column( 'user', 'first_name' );
+      $review_sel->add_table_column( 'user', 'last_name' );
+      $review_sel->add_table_column( 'user', 'email' );
+      $review_mod = lib::create( 'database\modifier' );
+      $review_mod->join( 'user', 'review.user_id', 'user.id' );
+      $review_mod->join( 'review_type', 'review.review_type_id', 'review_type.id' );
+      $review_mod->where( 'review_type.name', 'LIKE', 'Reviewer %' );
+      $review_mod->where( 'recommendation_type_id', '=', NULL );
+
+      $review_list = $this->get_review_list( $review_sel, $review_mod );
+
+      if( 0 < count( $review_list ) )
+      {
+        // send a notification
+        $db_notification = lib::create( 'database\notification' );
+        $db_notification->reqn_id = $this->id;
+        $db_notification->notification_type_id = $db_notification_type->id;
+        $db_notification->datetime = util::get_datetime_object();
+        $db_notification->save();
+
+        foreach( $review_list as $review )
+        {
+          $db_notification->add_email(
+            $review['email'],
+            sprintf( '%s %s', $review['first_name'], $review['last_name'] )
+          );
+        }
+
+        $db_notification->mail();
+      }
     }
     // if we have just entered the active stage then create symbolic links to all data files and update file timestamps
     else if( 'Active' == $db_next_stage_type->name )

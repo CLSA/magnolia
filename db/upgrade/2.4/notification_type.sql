@@ -16,6 +16,21 @@ Applicant: {{applicant_name}}
 Title: ({{title}}";
 
 INSERT IGNORE INTO notification_type SET
+  name = "Review Assigned",
+  title_en = "Magnolia - Requisition {{identifier}} review",
+  title_fr = "Magnolia - Requisition {{identifier}} review",
+  message_en = "You have been assigned to review the following requisition:
+
+Identifier: {{identifier}}
+Applicant: {{applicant_name}}
+Title: ({{title}}",
+  message_fr = "You have been assigned to review the following requisition:
+
+Identifier: {{identifier}}
+Applicant: {{applicant_name}}
+Title: ({{title}}";
+
+INSERT IGNORE INTO notification_type SET
   name = "Approval Required",
   title_en = "CLSA Data Access - Approval Required",
   title_fr = "Accès aux données de l’ÉLCV - Approbation requise",
