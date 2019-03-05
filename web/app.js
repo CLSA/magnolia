@@ -456,11 +456,6 @@ cenozo.service( 'CnReqnHelper', [
               en: 'There are mandatory fields which are missing. You will now be redirected to where the incomplete fields can be found. Please try re-submitting once all mandatory fields have been filled out.',
               fr: 'Des champs obligatoires sont manquants. Vous serez redirigé vers l’endroit où se trouvent les champs incomplets. Veuillez soumettre la demande d’accès à nouveau quand tous les champs obligatoires auront été remplis.'
             },
-            tooManyCharactersTitle: { en: 'Too many characters', fr: 'Trop de caractères' },
-            tooManyCharactersMessage: {
-              en: 'Some of your descriptions are too long. You will now be redirected to the general project information details. Please try re-submitting once all descriptions are within the maximum limits.',
-              fr: 'Certaines descriptions sont trop longues. Vous serez redirigé vers la section contenant les informations générales sur le projet. Veuillez essayer de soumettre la demande à nouveau quand toutes les descriptions respecteront les limites de caractères.'
-            },
             invalidStartDateTitle: { en: 'Invalid start date', fr: 'Date de début non valide' },
             invalidStartDateMessage: {
               en: 'The start date you have provided is not acceptable. You will now be redirected to where the start date field can be found. Please try re-submitting once the start date has been corrected.',

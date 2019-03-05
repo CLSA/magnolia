@@ -872,7 +872,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                 } ).show().then( function() {
                   return self.parentModel.isApplicant() ?
                     $state.go( 'root.home' ) :
-                    self.onView( true ); // refresh 
+                    self.onView( true ); // refresh
                 } );
               } );
             }
@@ -890,80 +890,84 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                   a: [ 'applicant_position', 'applicant_affiliation', 'applicant_address', 'applicant_phone' ],
                   c: [ 'start_date', 'duration' ],
                   d: [ 'title', 'keywords', 'lay_summary', 'background', 'objectives', 'methodology', 'analysis' ],
-                  e: [ 'funding' ],
-                  f: [ 'ethics' ],
+                  e: [ 'funding', 'funding_filename', 'funding_agency', 'grant_number' ],
+                  f: [ 'ethics', 'ethics_filename' ],
                   cohort: [ 'tracking', 'comprehensive' ]
                 };
 
-                var error = null;
-                var errorTab = null;
-                for( var tab in requiredTabList ) {
-                  var firstProperty = null;
-                  requiredTabList[tab].forEach( function( property ) {
-                    if( null === record[property] || '' === record[property] ) {
-                      var element = cenozo.getFormElement( property );
-                      element.$error.required = true;
-                      cenozo.updateFormElement( element, true );
-                      if( null == errorTab ) errorTab = tab;
-                      if( null == error ) error = {
-                        title: self.translate( 'misc.missingFieldTitle' ),
-                        message: self.translate( 'misc.missingFieldMessage' ),
-                        error: true
-                      };
-                    }
-                  } );
-                }
+                $q.all( self.fileList.map( file => file.updateFileSize() ) ).then( function() {
+                  var error = null;
+                  var errorTab = null;
+                  for( var tab in requiredTabList ) {
+                    var firstProperty = null;
+                    requiredTabList[tab].filter( function( property ) {
+                      // only check e properties if funding=yes
+                      return 'e' == tab && 'funding' != property ? 'yes' == record.funding :
+                        // only check the ethics filename if ethics=yes (it's a boolean var)
+                        'ethics_filename' ? record.ethics :
+                        // check everything else
+                        true;
+                    } ).forEach( function( property ) {
+                      var missing = false;
+                      if( property.match( '_filename' ) ) {
+                        // check for the file size
+                        var fileDetails = self.fileList.findByProperty( 'key', property );
+                        missing = !angular.isObject( fileDetails ) || 0 == fileDetails.size;
+                      } else {
+                        // check for the property's value
+                        missing = null === record[property] || '' === record[property];
+                      }
 
-                // now check for limited inputs if there are no empty errors
-                if( null == error ) {
-                  if( null != record.lay_summary && 1000 < record.lay_summary.length ) {
-                    var element = cenozo.getFormElement( 'lay_summary' );
-                    element.$error.custom = self.translate( 'misc.tooManyCharactersTitle' );
-                    cenozo.updateFormElement( element, true );
-                    if( null == errorTab ) errorTab = 'd';
-                    if( null == error ) error = {
-                      title: self.translate( 'misc.tooManyCharactersTitle' ),
-                      message: self.translate( 'misc.tooManyCharactersMessage' ),
-                      error: true
-                    };
+                      if( missing ) {
+                        var element = cenozo.getFormElement( property );
+                        element.$error.required = true;
+                        cenozo.updateFormElement( element, true );
+                        if( null == errorTab ) errorTab = tab;
+                        if( null == error ) error = {
+                          title: self.translate( 'misc.missingFieldTitle' ),
+                          message: self.translate( 'misc.missingFieldMessage' ),
+                          error: true
+                        };
+                      }
+                    } );
                   }
-                }
 
-                if( null != error ) {
-                  var element = cenozo.getFormElement( 'lay_summary' );
+                  if( null != error ) {
+                    var element = cenozo.getFormElement( 'lay_summary' );
 
-                  // if there was an error then display it now
-                  if( 'applicant' == CnSession.role.name ) error.closeText = self.translate( 'misc.close' );
-                  CnModalMessageFactory.instance( error ).show().then( function() {
-                    if( 'cohort' == errorTab ) {
-                      self.setTab( 0, 'part2', false );
-                      self.setTab( 2, errorTab );
-                    } else {
-                      self.setTab( 0, 'part1', false );
-                      self.setTab( 1, errorTab );
-                    }
-                  } );
-                } else {
-                  // now check to make sure this version is different from the last (the first is always different)
-                  return CnHttpFactory.instance( {
-                    path: self.parentModel.getServiceResourcePath(),
-                    data: { select: { column: 'has_changed' } }
-                  } ).get().then( function( response ) {
-                    return response.data.has_changed ?
-                      // changes have been made, so submit now
-                      submitReqn() :
-                      // no changes made so warn the user before proceeding
-                      CnModalConfirmFactory.instance( {
-                        title: self.translate( 'misc.pleaseConfirm' ),
-                        noText: 'applicant' == CnSession.role.name ? self.translate( 'misc.no' ) : 'No',
-                        yesText: 'applicant' == CnSession.role.name ? self.translate( 'misc.yes' ) : 'Yes',
-                        message: self.translate( 'misc.noChangesMessage' )
-                      } ).show().then( function( response ) {
-                        if( response ) return submitReqn();
-                      } );
-                  } );
+                    // if there was an error then display it now
+                    if( 'applicant' == CnSession.role.name ) error.closeText = self.translate( 'misc.close' );
+                    CnModalMessageFactory.instance( error ).show().then( function() {
+                      if( 'cohort' == errorTab ) {
+                        self.setTab( 0, 'part2', false );
+                        self.setTab( 2, errorTab );
+                      } else {
+                        self.setTab( 0, 'part1', false );
+                        self.setTab( 1, errorTab );
+                      }
+                    } );
+                  } else {
+                    // now check to make sure this version is different from the last (the first is always different)
+                    return CnHttpFactory.instance( {
+                      path: self.parentModel.getServiceResourcePath(),
+                      data: { select: { column: 'has_changed' } }
+                    } ).get().then( function( response ) {
+                      return response.data.has_changed ?
+                        // changes have been made, so submit now
+                        submitReqn() :
+                        // no changes made so warn the user before proceeding
+                        CnModalConfirmFactory.instance( {
+                          title: self.translate( 'misc.pleaseConfirm' ),
+                          noText: 'applicant' == CnSession.role.name ? self.translate( 'misc.no' ) : 'No',
+                          yesText: 'applicant' == CnSession.role.name ? self.translate( 'misc.yes' ) : 'Yes',
+                          message: self.translate( 'misc.noChangesMessage' )
+                        } ).show().then( function( response ) {
+                          if( response ) return submitReqn();
+                        } );
+                    } );
 
-                }
+                  }
+                } );
               }
             } );
           },
