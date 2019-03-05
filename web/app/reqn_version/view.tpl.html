@@ -469,6 +469,7 @@
                     title: t( 'part1.d.lay_summary' ) + '<sup>ⓘ</sup><br><span class=text-info>(' +
                            model.viewModel.charCount.lay_summary + ' ' + t( 'misc.chars' ) + ')</span>',
                     type: 'text',
+                    maxLength: 1000,
                     help: t( 'part1.d.lay_summary_text' )
                   }"
                   model="model">
@@ -480,7 +481,8 @@
                     key: 'background',
                     title: t( 'part1.d.background' ) + '<br><span class=text-info>(' +
                            model.viewModel.charCount.background + ' ' + t( 'misc.chars' ) + ')</span>',
-                    type: model.inputList.background.type
+                    type: model.inputList.background.type,
+                    maxLength: 4500
                   }"
                   model="model">
                 </cn-reqn-view-input>
@@ -489,7 +491,8 @@
                     key: 'objectives',
                     title: t( 'part1.d.objectives' ) + '<br><span class=text-info>(' +
                            model.viewModel.charCount.objectives + ' ' + t( 'misc.chars' ) + ')</span>',
-                    type: model.inputList.objectives.type
+                    type: model.inputList.objectives.type,
+                    maxLength: 4500
                   }"
                   model="model">
                 </cn-reqn-view-input>
@@ -499,6 +502,7 @@
                     title: t( 'part1.d.methodology' )+'<sup>ⓘ</sup>' + '<br><span class=text-info>(' +
                            model.viewModel.charCount.methodology + ' ' + t( 'misc.chars' ) + ')</span>',
                     type: 'text',
+                    maxLength: 4500,
                     help: t( 'part1.d.methodology_text' )
                   }"
                   model="model">
@@ -509,6 +513,7 @@
                     title: t( 'part1.d.analysis' )+'<sup>ⓘ</sup>' + '<br><span class=text-info>(' +
                            model.viewModel.charCount.analysis + ' ' + t( 'misc.chars' ) + ')</span>',
                     type: 'text',
+                    maxLength: 4500,
                     help: t( 'part1.d.analysis_text' )
                   }"
                   model="model">
