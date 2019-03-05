@@ -18,6 +18,7 @@ class post extends \cenozo\service\post
     parent::prepare();
 
     $reqn_class_name = lib::get_class_name( 'database\reqn' );
+    $reqn_type_class_name = lib::get_class_name( 'database\reqn_type' );
     $language_class_name = lib::get_class_name( 'database\language' );
     $graduate_class_name = lib::get_class_name( 'database\graduate' );
     $db_reqn = $this->get_leaf_record();
@@ -25,7 +26,7 @@ class post extends \cenozo\service\post
     // if no type has been selected then assume standard
     if( is_null( $db_reqn->reqn_type_id ) )
     {
-      $db_reqn_type = lib::get_unique_record( 'name', 'Standard' );
+      $db_reqn_type = $reqn_type_class_name::get_unique_record( 'name', 'Standard' );
       $db_reqn->reqn_type_id = $db_reqn_type->id;
     }
 
