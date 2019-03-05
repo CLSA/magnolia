@@ -1023,37 +1023,15 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         // override the service collection
         this.getServiceData = function( type, columnRestrictLists ) {
           // only include the funding and ethics filenames in the view type in the lite instance
-          var data = 'lite' == this.type
-                   ? {
-                       select: {
-                         column: [ 'is_current_version', 'funding_filename', 'ethics_filename',
-                           { table: 'reqn', column: 'state' },
-                           { table: 'stage_type', column: 'phase' },
-                           { table: 'stage_type', column: 'name', alias: 'stage_type' }
-                         ]
-                       }
-                     }
-                   : this.$$getServiceData( type, columnRestrictLists );
-
-          // chairs only see DSAC reqns from the home screen
-          if( 'root' == this.getSubjectFromState() ) {
-            if( angular.isUndefined( data.modifier.where ) ) data.modifier.where = [];
-            if( 'chair' == CnSession.role.name ) {
-              data.modifier.where.push( {
-                column: 'stage_type.name',
-                operator: 'LIKE',
-                value: '%DSAC%'
-              } );
-            } else if( 'smt' == CnSession.role.name ) {
-              data.modifier.where.push( {
-                column: 'stage_type.name',
-                operator: 'LIKE',
-                value: '%SMT%'
-              } );
+          return 'lite' == this.type ? {
+            select: {
+              column: [ 'is_current_version', 'funding_filename', 'ethics_filename',
+                { table: 'reqn', column: 'state' },
+                { table: 'stage_type', column: 'phase' },
+                { table: 'stage_type', column: 'name', alias: 'stage_type' }
+              ]
             }
-          }
-
-          return data;
+          } : this.$$getServiceData( type, columnRestrictLists );
         };
 
         // make the input lists from all groups more accessible

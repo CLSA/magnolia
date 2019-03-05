@@ -694,6 +694,32 @@ define( function() {
           else this.$$transitionToViewState( record );
         };
 
+        // override the service collection
+        this.getServiceData = function( type, columnRestrictLists ) {
+          // only include the funding and ethics filenames in the view type in the lite instance
+          var data = this.$$getServiceData( type, columnRestrictLists );
+
+          // chairs only see DSAC reqns from the home screen
+          if( 'root' == this.getSubjectFromState() ) {
+            if( angular.isUndefined( data.modifier.where ) ) data.modifier.where = [];
+            if( 'chair' == CnSession.role.name ) {
+              data.modifier.where.push( {
+                column: 'stage_type.name',
+                operator: 'LIKE',
+                value: '%DSAC%'
+              } );
+            } else if( 'smt' == CnSession.role.name ) {
+              data.modifier.where.push( {
+                column: 'stage_type.name',
+                operator: 'LIKE',
+                value: '%SMT%'
+              } );
+            }
+          }
+
+          return data;
+        };
+
         this.getMetadata = function() {
           return self.$$getMetadata().then( function() {
             return $q.all( [
