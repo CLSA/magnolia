@@ -68,12 +68,14 @@ class notification extends \cenozo\database\record
     // fill in dynamic details in the message title
     $title = str_replace(
       array(
+        '{{reqn_type}}',
         '{{identifier}}',
         '{{title}}',
         '{{applicant_name}}',
         '{{graduate_name}}'
       ),
       array(
+        $db_reqn->get_reqn_type()->name,
         $db_reqn->identifier,
         $db_reqn_version->title,
         sprintf( '%s %s', $db_user->first_name, $db_user->last_name ),
@@ -84,12 +86,14 @@ class notification extends \cenozo\database\record
 
     $message = str_replace(
       array(
+        '{{reqn_type}}',
         '{{identifier}}',
         '{{title}}',
         '{{applicant_name}}',
         '{{graduate_name}}'
       ),
       array(
+        $db_reqn->get_reqn_type()->name,
         $db_reqn->identifier,
         $db_reqn_version->title,
         sprintf( '%s %s', $db_user->first_name, $db_user->last_name ),
