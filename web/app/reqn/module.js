@@ -151,6 +151,8 @@ define( function() {
     },
 
     current_reqn_version_id: { column: 'reqn_version.id', type: 'string', exclude: true },
+    funding_filename: { column: 'reqn_version.funding_filename', type: 'string', exclude: true },
+    ethics_filename: { column: 'reqn_version.ethics_filename', type: 'string', exclude: true },
     data_directory: { type: 'string', exclude: true },
     phase: { column: 'stage_type.phase', type: 'string', exclude: true },
     status: { column: 'stage_type.status', type: 'string', exclude: true },
@@ -289,12 +291,22 @@ define( function() {
       title: 'Data Checklist',
       operation: function( $state, model ) { model.viewModel.downloadChecklist(); }
     }, {
+      title: 'Funding Letter',
+      operation: function( $state, model ) { model.viewModel.downloadFundingLetter(); },
+      isDisabled: function( $state, model ) { return !model.viewModel.record.funding_filename; }
+    }, {
+      title: 'Ethics Letter',
+      operation: function( $state, model ) { model.viewModel.downloadEthicsLetter(); },
+      isDisabled: function( $state, model ) { return !model.viewModel.record.ethics_filename; }
+    }, {
       title: 'Reviews',
       operation: function( $state, model ) { model.viewModel.downloadReviews(); }
     }, {
       title: 'Final Report',
       operation: function( $state, model ) { model.viewModel.downloadFinalReport(); },
-      isIncluded: function( $state, model ) { return 0 <= ['Report Required', 'Complete'].indexOf( model.viewModel.record.stage_type ); }
+      isIncluded: function( $state, model ) {
+        return 0 <= ['Report Required', 'Complete'].indexOf( model.viewModel.record.stage_type );
+      }
     }, {
       title: 'Study Data',
       operation: function( $state, model ) { model.viewModel.viewData(); },
@@ -409,6 +421,8 @@ define( function() {
           viewReport: function() { return CnReqnHelper.viewReport( this.record.getIdentifier() ); },
           downloadApplication: function() { return CnReqnHelper.download( 'application', this.record.current_reqn_version_id ); },
           downloadChecklist: function() { return CnReqnHelper.download( 'checklist', this.record.current_reqn_version_id ); },
+          downloadFundingLetter: function() { return CnReqnHelper.download( 'funding_filename', this.record.current_reqn_version_id ); },
+          downloadEthicsLetter: function() { return CnReqnHelper.download( 'ethics_filename', this.record.current_reqn_version_id ); },
           downloadReviews: function() {
             return CnHttpFactory.instance( {
               path: this.parentModel.getServiceResourcePath() + '?file=reviews',
@@ -696,7 +710,6 @@ define( function() {
 
         // override the service collection
         this.getServiceData = function( type, columnRestrictLists ) {
-          // only include the funding and ethics filenames in the view type in the lite instance
           var data = this.$$getServiceData( type, columnRestrictLists );
 
           // chairs only see DSAC reqns from the home screen

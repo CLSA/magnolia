@@ -85,7 +85,9 @@ define( function() {
       type: 'text'
     },
     review_type_id: { type: 'hidden' },
-    current_reqn_version_id: { column: 'reqn_version.id', type: 'hidden' }
+    current_reqn_version_id: { column: 'reqn_version.id', type: 'hidden' },
+    funding_filename: { column: 'reqn_version.funding_filename', type: 'hidden' },
+    ethics_filename: { column: 'reqn_version.ethics_filename', type: 'hidden' }
   } );
 
   module.addExtraOperation( 'view', {
@@ -101,6 +103,14 @@ define( function() {
     }, {
       title: 'Data Checklist',
       operation: function( $state, model ) { model.viewModel.downloadChecklist(); }
+    }, {
+      title: 'Funding Letter',
+      operation: function( $state, model ) { model.viewModel.downloadFundingLetter(); },
+      isDisabled: function( $state, model ) { return !model.viewModel.record.funding_filename; }
+    }, {
+      title: 'Ethics Letter',
+      operation: function( $state, model ) { model.viewModel.downloadEthicsLetter(); },
+      isDisabled: function( $state, model ) { return !model.viewModel.record.ethics_filename; }
     } ]
   } );
 
@@ -177,7 +187,9 @@ define( function() {
           },
 
           downloadApplication: function() { return CnReqnHelper.download( 'application', this.record.current_reqn_version_id ); },
-          downloadChecklist: function() { return CnReqnHelper.download( 'checklist', this.record.current_reqn_version_id ); }
+          downloadChecklist: function() { return CnReqnHelper.download( 'checklist', this.record.current_reqn_version_id ); },
+          downloadFundingLetter: function() { return CnReqnHelper.download( 'funding_filename', this.record.current_reqn_version_id ); },
+          downloadEthicsLetter: function() { return CnReqnHelper.download( 'ethics_filename', this.record.current_reqn_version_id ); }
         } );
 
         // add an additional check to see if the review is editable
