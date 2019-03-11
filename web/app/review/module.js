@@ -92,7 +92,9 @@ define( function() {
 
   module.addExtraOperation( 'view', {
     title: 'View Form',
-    operation: function( $state, model ) { $state.go( 'reqn.form', model.getParentIdentifier() ); }
+    operation: function( $state, model ) {
+      $state.go( 'reqn_version.view', { identifier: model.viewModel.record.current_reqn_version_id } );
+    }
   } );
 
   module.addExtraOperationGroup( 'view', {
