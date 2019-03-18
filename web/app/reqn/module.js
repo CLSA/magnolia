@@ -482,9 +482,12 @@ define( function() {
             return this.$$onView( force ).then( function() {
               var mainInputGroup = self.parentModel.module.inputGroupList.findByProperty( 'title', '' );
 
-              // only allow the deadline to be changed while in the admin review stage
+              // only allow the deadline to be changed while in the admin review stage (hide if there is no deadline)
               mainInputGroup.inputList.deadline_id.constant =
                 3 > CnSession.role.tier || 'Admin Review' != self.record.stage_type;
+
+              mainInputGroup.inputList.deadline_id.exclude =
+                3 > CnSession.role.tier || null == self.record.deadline_id ? true : 'add';
 
               // show the agreement and instruction files if we're past the review stage
               mainInputGroup.inputList.agreement_filename.exclude = 0 > ['active','complete'].indexOf( self.record.phase );
@@ -651,7 +654,6 @@ define( function() {
         var mainInputGroup = module.inputGroupList.findByProperty( 'title', '' );
         if( 'administrator' == CnSession.role.name ) {
           mainInputGroup.inputList.reqn_type_id.exclude = false;
-          mainInputGroup.inputList.deadline_id.exclude = 'add';
           mainInputGroup.inputList.language_id.exclude = false;
           mainInputGroup.inputList.stage_type.exclude = 'add';
           mainInputGroup.inputList.state.exclude = 'add';

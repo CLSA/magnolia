@@ -56,7 +56,7 @@ class module extends \cenozo\service\module
     $modifier->join( 'reqn_type', 'reqn.reqn_type_id', 'reqn_type.id' );
     $modifier->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
     $modifier->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
-    $modifier->join( 'deadline', 'reqn.deadline_id', 'deadline.id' );
+    $modifier->left_join( 'deadline', 'reqn.deadline_id', 'deadline.id' );
     $modifier->join( 'user', 'reqn.user_id', 'user.id' );
     $modifier->left_join( 'graduate', 'reqn.graduate_id', 'graduate.id' );
 
@@ -130,7 +130,7 @@ class module extends \cenozo\service\module
           '  "deferred" = state, "Action Required", '."\n".
           '  IF( state IS NOT NULL, CONCAT( UPPER( SUBSTRING( state, 1, 1 ) ), SUBSTRING( state, 2 ) ), '."\n".
           '    IF( '."\n".
-          '      "review" = stage_type.phase AND deadline.date > DATE( UTC_TIMESTAMP() ), '."\n".
+          '      "review" = stage_type.phase AND IFNULL( deadline.date, 0 ) > DATE( UTC_TIMESTAMP() ), '."\n".
           '      "Waiting for Review", '."\n".
           '      stage_type.status '."\n".
           '    )'."\n".

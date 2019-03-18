@@ -72,9 +72,12 @@ class patch extends \cenozo\service\patch
             // check to make sure the start date is appropriate
             $delay = lib::create( 'business\setting_manager' )->get_setting( 'general', 'start_date_delay' );
             $db_reqn->save(); // this will make sure the deadline is appropriate
-            $deadline = util::get_datetime_object( $db_reqn->get_deadline()->date );
-            $deadline->add( new \DateInterval( sprintf( 'P%dM', $delay ) ) );
-            if( $db_reqn->get_current_reqn_version()->start_date < $deadline ) $code = 409;
+            if( $db_reqn->deadline_id )
+            {
+              $deadline = util::get_datetime_object( $db_reqn->get_deadline()->date );
+              $deadline->add( new \DateInterval( sprintf( 'P%dM', $delay ) ) );
+              if( $db_reqn->get_current_reqn_version()->start_date < $deadline ) $code = 409;
+            }
           }
         }
         else $code = 403;

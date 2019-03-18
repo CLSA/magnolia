@@ -649,6 +649,19 @@ CREATE PROCEDURE patch_reqn()
           ON UPDATE NO ACTION;
     END IF;
 
+    SELECT "Making deadline_id nullable in reqn table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "deadline_id"
+    AND is_nullable = "NO";
+
+    IF @test = 1 THEN
+      ALTER TABLE reqn MODIFY COLUMN deadline_id int(10) unsigned NULL DEFAULT NULL;
+    END IF;
+
   END //
 DELIMITER ;
 

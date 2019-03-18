@@ -177,6 +177,8 @@ class reqn extends \cenozo\database\record
 
   /**
    * Check the reqn's deadline and change it to the next available deadline if needed
+   * 
+   * This is only done for reqn types which go through the DSAC review process
    * NOTE: This method will change the deadline_id column but not save the record
    * @access public
    */
@@ -184,33 +186,37 @@ class reqn extends \cenozo\database\record
   {
     $deadline_class_name = lib::get_class_name( 'database\deadline' );
 
-    $db_deadline = NULL;
-    $change_deadline = false;
-    if( is_null( $this->deadline_id ) )
-    { // no deadline found
-      $db_deadline = $deadline_class_name::get_next();
-      $change_deadline = true;
-    }
-    else
+    $db_reqn_type = lib::create( 'database\reqn_type', $this->reqn_type_id );
+    if( $db_reqn_type->is_deadline_required() )
     {
-      $db_current_stage_type = $this->get_current_stage_type();
-      if( is_null( $db_current_stage_type ) || 1 == $db_current_stage_type->rank )
+      $db_deadline = NULL;
+      $change_deadline = false;
+      if( is_null( $this->deadline_id ) )
+      { // no deadline found
+        $db_deadline = $deadline_class_name::get_next();
+        $change_deadline = true;
+      }
+      else
       {
-        if( 0 < $this->get_deadline()->date->diff( util::get_datetime_object() )->days )
-        { // deadline has expired, get the next one
-          $db_deadline = $deadline_class_name::get_next();
-          $change_deadline = true;
+        $db_current_stage_type = $this->get_current_stage_type();
+        if( is_null( $db_current_stage_type ) || 1 == $db_current_stage_type->rank )
+        {
+          if( 0 < $this->get_deadline()->date->diff( util::get_datetime_object() )->days )
+          { // deadline has expired, get the next one
+            $db_deadline = $deadline_class_name::get_next();
+            $change_deadline = true;
+          }
         }
       }
-    }
 
-    if( $change_deadline )
-    {
-      if( is_null( $db_deadline ) )
-        throw lib::create( 'exception\runtime',
-          'Cannot proceed since there are no future deadlines defined.',
-          __METHOD__ );
-      $this->deadline_id = $db_deadline->id;
+      if( $change_deadline )
+      {
+        if( is_null( $db_deadline ) )
+          throw lib::create( 'exception\runtime',
+            'Cannot proceed since there are no future deadlines defined.',
+            __METHOD__ );
+        $this->deadline_id = $db_deadline->id;
+      }
     }
   }
 
@@ -465,8 +471,10 @@ class reqn extends \cenozo\database\record
     // if we have just entered the admin review stage then set the identifier and mark the version datetime
     if( 'Admin Review' == $db_next_stage_type->name )
     {
-      $base = $this->get_deadline()->date->format( 'ym' );
-      $this->identifier = $this->get_deadline()->get_next_identifier();
+      $db_reqn_type = $this->get_reqn_type();
+      $this->identifier = $db_reqn_type->is_deadline_required()
+                        ? $this->get_deadline()->get_next_identifier()
+                        : $db_reqn_type->get_next_identifier();
       $this->save();
 
       $db_reqn_version = $this->get_current_reqn_version();
