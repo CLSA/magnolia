@@ -48,6 +48,6 @@ SELECT reqn_type.id, stage_type.id
 FROM reqn_type, stage_type
 WHERE reqn_type.name IN ( "Catalyst Grant" )
 AND stage_type.name IN(
-  "New", "Admin Review", "SAC Review", "DSAC Selection", "DSAC Review",
+  "New", "Admin Review", "SAC Review",
   "Agreement", "Data Release", "Active", "Report Required", "Complete"
 );
