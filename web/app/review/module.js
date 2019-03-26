@@ -84,6 +84,7 @@ define( function() {
       title: 'Note',
       type: 'text'
     },
+    reqn_id: { type: 'hidden' },
     review_type_id: { type: 'hidden' },
     current_reqn_version_id: { column: 'reqn_version.id', type: 'hidden' },
     funding_filename: { column: 'reqn_version.funding_filename', type: 'hidden' },
@@ -113,6 +114,9 @@ define( function() {
       title: 'Ethics Letter',
       operation: function( $state, model ) { model.viewModel.downloadEthicsLetter(); },
       isDisabled: function( $state, model ) { return !model.viewModel.record.ethics_filename; }
+    }, {
+      title: 'Reviews',
+      operation: function( $state, model ) { model.viewModel.downloadReviews(); }
     } ]
   } );
 
@@ -191,7 +195,13 @@ define( function() {
           downloadApplication: function() { return CnReqnHelper.download( 'application', this.record.current_reqn_version_id ); },
           downloadChecklist: function() { return CnReqnHelper.download( 'checklist', this.record.current_reqn_version_id ); },
           downloadFundingLetter: function() { return CnReqnHelper.download( 'funding_filename', this.record.current_reqn_version_id ); },
-          downloadEthicsLetter: function() { return CnReqnHelper.download( 'ethics_filename', this.record.current_reqn_version_id ); }
+          downloadEthicsLetter: function() { return CnReqnHelper.download( 'ethics_filename', this.record.current_reqn_version_id ); },
+          downloadReviews: function() {
+            return CnHttpFactory.instance( {
+              path: 'reqn/' + this.record.reqn_id + '?file=reviews',
+              format: 'txt'
+            } ).file();
+          }
         } );
 
         // add an additional check to see if the review is editable
