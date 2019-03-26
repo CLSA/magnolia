@@ -83,8 +83,13 @@ class module extends \cenozo\service\module
     // restrict reviewers to seeing their own "reviewer" reviews only
     if( 'reviewer' == $db_role->name )
     {
+      $modifier->where_bracket( true );
+      $modifier->where_bracket( true );
       $modifier->where( 'review_type.name', 'LIKE', 'Reviewer %' );
       $modifier->where( 'review.user_id', '=', $db_user->id );
+      $modifier->where_bracket( false );
+      $modifier->or_where( 'review_type.name', 'IN', array( 'Admin', 'SAC' ) );
+      $modifier->where_bracket( false );
     }
   }
 }
