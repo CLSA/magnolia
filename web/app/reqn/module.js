@@ -49,7 +49,7 @@ define( function() {
         column: 'stage_type.name',
         title: 'Stage',
         type: 'string',
-        isIncluded: function( $state, model ) { return !model.isApplicant(); }
+        isIncluded: function( $state, model ) { return !model.isApplicant() && !model.isReviewer(); }
       },
       reqn_version_id: {
         column: 'reqn_version.id',
@@ -650,6 +650,7 @@ define( function() {
         // make the input lists from all groups more accessible
         this.isApplicant = function() { return 'applicant' == CnSession.role.name; }
         this.isAdministrator = function() { return 'administrator' == CnSession.role.name; }
+        this.isReviewer = function() { return 'reviewer' == CnSession.role.name; }
 
         var mainInputGroup = module.inputGroupList.findByProperty( 'title', '' );
         if( 'administrator' == CnSession.role.name ) {

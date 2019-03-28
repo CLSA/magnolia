@@ -70,6 +70,12 @@ class module extends \cenozo\service\module
     $modifier->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
     $modifier->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
 
+    $join_mod = lib::create( 'database\modifier' );
+    $join_mod->where( 'reqn.id', '=', 'stage.reqn_id', false );
+    $join_mod->where( 'stage.datetime', '=', NULL );
+    $modifier->join_modifier( 'stage', $join_mod );
+    $modifier->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
+
     if( !is_null( $this->get_resource() ) )
     {
       // include the requisition identifier and user first/last/name as supplemental data
@@ -88,7 +94,10 @@ class module extends \cenozo\service\module
       $modifier->where( 'review_type.name', 'LIKE', 'Reviewer %' );
       $modifier->where( 'review.user_id', '=', $db_user->id );
       $modifier->where_bracket( false );
-      $modifier->or_where( 'review_type.name', 'IN', array( 'Admin', 'SAC' ) );
+      $modifier->where_bracket( true, true );
+      $modifier->where( 'review_type.name', 'IN', array( 'Admin', 'SAC' ) );
+      $modifier->where( 'stage_type.name', '=', 'DSAC Review' );
+      $modifier->where_bracket( false );
       $modifier->where_bracket( false );
     }
   }

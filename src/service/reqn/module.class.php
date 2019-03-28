@@ -60,15 +60,11 @@ class module extends \cenozo\service\module
     $modifier->join( 'user', 'reqn.user_id', 'user.id' );
     $modifier->left_join( 'graduate', 'reqn.graduate_id', 'graduate.id' );
 
-    // only show applicants their own reqns which aren't abandoned
-    if( 'applicant' == $db_role->name )
-    {
-      $modifier->where_bracket( true );
-      $modifier->where( 'reqn.user_id', '=', $db_user->id );
-      $modifier->or_where( 'graduate.graduate_user_id', '=', $db_user->id );
-      $modifier->where_bracket( false );
-      $modifier->where( 'IFNULL( reqn.state, "" )', '!=', 'abandoned' );
-    }
+    $join_mod = lib::create( 'database\modifier' );
+    $join_mod->where( 'reqn.id', '=', 'stage.reqn_id', false );
+    $join_mod->where( 'stage.datetime', '=', NULL );
+    $modifier->join_modifier( 'stage', $join_mod );
+    $modifier->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
 
     if( $select->has_column( 'user_full_name' ) )
     {
@@ -87,9 +83,16 @@ class module extends \cenozo\service\module
       );
     }
 
-    // don't show applicants the deferral notes unless the reqn is deferred
     if( 'applicant' == $db_role->name )
     {
+      // only show applicants their own reqns which aren't abandoned
+      $modifier->where_bracket( true );
+      $modifier->where( 'reqn.user_id', '=', $db_user->id );
+      $modifier->or_where( 'graduate.graduate_user_id', '=', $db_user->id );
+      $modifier->where_bracket( false );
+      $modifier->where( 'IFNULL( reqn.state, "" )', '!=', 'abandoned' );
+
+      // don't show applicants the deferral notes unless the reqn is deferred
       if( $select->has_column( 'deferral_note_1a' ) )
       {
         $select->add_column(
@@ -112,15 +115,14 @@ class module extends \cenozo\service\module
           'IF( "deferred" = reqn.state, deferral_note_2c, NULL )', 'deferral_note_2c', false );
       }
     }
+    else if( 'reviewer' == $db_role->name )
+    {
+      // restrict reviewers to seeing reqns in the DSAC Review stage only
+      $modifier->where( 'stage_type.name', '=', 'DSAC Review' );
+    }
 
     if( $select->has_table_columns( 'stage_type' ) )
     {
-      $join_mod = lib::create( 'database\modifier' );
-      $join_mod->where( 'reqn.id', '=', 'stage.reqn_id', false );
-      $join_mod->where( 'stage.datetime', '=', NULL );
-      $modifier->join_modifier( 'stage', $join_mod );
-      $modifier->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
-
       if( $select->has_table_column( 'stage_type', 'status' ) )
       {
         // show admin stages before deadline as waiting for review
