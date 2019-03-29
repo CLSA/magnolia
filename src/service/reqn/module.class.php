@@ -182,4 +182,39 @@ class module extends \cenozo\service\module
       }
     }
   }
+
+  /**
+   * Extend parent method
+   */
+  public function pre_write( $record )
+  {
+    parent::pre_write( $record );
+
+    $reqn_class_name = lib::get_class_name( 'database\reqn' );
+    $reqn_type_class_name = lib::get_class_name( 'database\reqn_type' );
+    $language_class_name = lib::get_class_name( 'database\language' );
+    $graduate_class_name = lib::get_class_name( 'database\graduate' );
+
+    // if no type has been selected then assume standard
+    if( is_null( $record->reqn_type_id ) )
+    {
+      $db_reqn_type = $reqn_type_class_name::get_unique_record( 'name', 'Standard' );
+      $record->reqn_type_id = $db_reqn_type->id;
+    }
+
+    // generate a random identifier if none exists
+    if( is_null( $record->identifier ) ) $record->identifier = $reqn_class_name::get_temporary_identifier();
+
+    // if the language_id isn't set then default to English
+    if( is_null( $record->language_id ) )
+      $record->language_id = $language_class_name::get_unique_record( 'code', 'en' )->id;
+
+    // if the current user has a supervisor then make them the owner
+    $db_graduate = $graduate_class_name::get_unique_record( 'graduate_user_id', $record->user_id );
+    if( !is_null( $db_graduate ) )
+    {
+      $record->user_id = $db_graduate->user_id;
+      $record->graduate_id = $db_graduate->id;
+    }
+  }
 }
