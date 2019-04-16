@@ -18,6 +18,18 @@ DROP PROCEDURE IF EXISTS patch_report_restriction;
     PREPARE statement FROM @sql;
     EXECUTE statement;
     DEALLOCATE PREPARE statement;
+
+    SET @sql = CONCAT(
+      "INSERT IGNORE INTO ", @cenozo, ".report_restriction ( ",
+        "report_type_id, rank, name, title, mandatory, null_allowed, restriction_type, custom, subject, description ) ",
+      "SELECT report_type.id, 1, 'stage_type', 'Stage Type', 0, 0, 'table', 1, 'stage_type', ",
+             "'Restrict to requisitions which have reached a particular stage type.' ",
+      "FROM ", @cenozo, ".report_type ",
+      "WHERE report_type.name = 'requisition'" );
+    PREPARE statement FROM @sql;
+    EXECUTE statement;
+    DEALLOCATE PREPARE statement;
+
   END //
 DELIMITER ;
 
