@@ -17,9 +17,6 @@ class patch extends \cenozo\service\patch
   {
     parent::execute();
 
-    $notification_type_class_name = lib::get_class_name( 'database\notification_type' );
-    $stage_type_class_name = lib::get_class_name( 'database\stage_type' );
-
     $db_reqn_version = $this->get_leaf_record();
     $file = $this->get_argument( 'file', NULL );
     $headers = apache_request_headers();

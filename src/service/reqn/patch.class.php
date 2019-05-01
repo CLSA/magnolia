@@ -67,7 +67,7 @@ class patch extends \cenozo\service\patch
         if( 'applicant' == $db_role->name || 'administrator' == $db_role->name )
         {
           if( 'new' != $phase && 'deferred' != $state ) $code = 403;
-          else
+          else if( 'new' == $phase )
           {
             // check to make sure the start date is appropriate
             $delay = lib::create( 'business\setting_manager' )->get_setting( 'general', 'start_date_delay' );

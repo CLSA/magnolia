@@ -613,6 +613,19 @@ CREATE PROCEDURE patch_reqn()
           ON UPDATE NO ACTION;
     END IF;
 
+    SELECT "Adding new revision_recommended column to reqn table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "revision_recommended";
+
+    IF @test = 0 THEN
+      ALTER TABLE reqn
+      ADD COLUMN revision_recommended TINYINT(1) NOT NULL DEFAULT 0 AFTER instruction_filename;
+    END IF;
+
     SELECT "Adding new note column to reqn table" AS "";
 
     SELECT COUNT(*) INTO @test

@@ -322,7 +322,7 @@ class reqn extends \cenozo\database\record
         else if( 'Second DSAC Decision' == $db_current_stage_type->name )
         {
           // if approved then go to decision made, otherwise go to the second SMT decision
-          $db_review = current( $db_stage->get_review_object_list() );
+          $db_review = current( $this->get_current_stage()->get_review_object_list() );
           if( $db_review )
           {
             $db_recommendation_type = $db_review->get_recommendation_type();
@@ -346,6 +346,8 @@ class reqn extends \cenozo\database\record
           $recommendation = NULL;
           // if there is a second SMT review then use that decision
           if( array_key_exists( 'Second SMT', $review_list ) ) $recommendation = $review_list['Second SMT'];
+          // if there is a second chair review then use that decision
+          else if( array_key_exists( 'Second Chair', $review_list ) ) $recommendation = $review_list['Second Chair'];
           // if there is a first SMT review then use that decision
           else if( array_key_exists( 'SMT', $review_list ) ) $recommendation = $review_list['SMT'];
           // if the chair approved their review then approve
@@ -354,7 +356,11 @@ class reqn extends \cenozo\database\record
           else if( !array_key_exists( 'Chair', $review_list ) ) $recommendation = 'Not Approved';
 
           if( !is_null( $recommendation ) )
-            $find_stage_type_name = 'Approved' == $recommendation ? 'Agreement' : 'Not Approved';
+          {
+            $find_stage_type_name = 'Approved' == $recommendation
+                                  ? ( $this->revision_recommended ? 'Revision Recommended' : 'Agreement' )
+                                  : 'Not Approved';
+          }
         }
 
         // now find the approrpiate stage type
@@ -462,6 +468,16 @@ class reqn extends \cenozo\database\record
       $db_current_stage->save();
     }
 
+    // send any notifications associated with the current stage
+    $db_notification_type = $db_current_stage_type->get_notification_type();
+    if( !is_null( $db_notification_type ) )
+    {
+      $db_notification = lib::create( 'database\notification' );
+      $db_notification->notification_type_id = $db_notification_type->id;
+      $db_notification->set_reqn( $this ); // this saves the record
+      $db_notification->mail();
+    }
+
     // create the new stage
     $db_next_stage = lib::create( 'database\stage' );
     $db_next_stage->reqn_id = $this->id;
@@ -516,6 +532,17 @@ class reqn extends \cenozo\database\record
 
         $db_notification->mail();
       }
+    }
+    // if we're recommending a revision then automatically defer the reqn
+    else if( 'Revision Recommended' == $db_next_stage_type->name )
+    {
+      $this->state = 'deferred';
+      $this->save();
+
+      // create a new reqn version
+      $this->create_version();
+
+      // do not send a notification since there is one already sent after leaving the Decision Made stage
     }
     // if we have just entered the active stage then create symbolic links to all data files and update file timestamps
     else if( 'Active' == $db_next_stage_type->name )

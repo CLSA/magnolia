@@ -51,7 +51,8 @@ define( function() {
     notification_type: {
       column: 'notification_type.name',
       title: 'Notification',
-      type: 'string'
+      type: 'string',
+      help: 'The notification to send after the stage is complete.'
     }
   } );
 

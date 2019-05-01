@@ -28,10 +28,11 @@ WHERE reqn_type.name IN ( "Consortium", "Standard" )
 AND stage_type.name IN(
   "New", "Admin Review", "SAC Review", "DSAC Selection", "DSAC Review",
   "SMT Decision", "Revision Required", "Second DSAC Decision", "Second SMT Decision",
-  "Decision Made", "Agreement", "Data Release", "Active", "Report Required", "Not Approved", "Complete"
+  "Decision Made", "Revision Recommended", "Agreement", "Data Release",
+  "Active", "Report Required", "Not Approved", "Complete"
 );
 
--- Methods, special project, partership and internal requisition types
+-- Internal, methods, partnership and special project requisition types
 INSERT IGNORE INTO reqn_type_has_stage_type( reqn_type_id, stage_type_id )
 SELECT reqn_type.id, stage_type.id
 FROM reqn_type, stage_type
@@ -39,14 +40,15 @@ WHERE reqn_type.name IN ( "Internal", "Methods", "Partnership", "Special Project
 AND stage_type.name IN(
   "New", "Admin Review", "SAC Review",
   "SMT Decision", "Revision Required", "Second SMT Decision",
-  "Decision Made", "Agreement", "Data Release", "Active", "Report Required", "Not Approved", "Complete"
+  "Decision Made", "Revision Recommended", "Agreement", "Data Release",
+  "Active", "Report Required", "Not Approved", "Complete"
 );
 
--- Methods, special project, partership and internal requisition types
+-- Catalyst grant requisition type
 INSERT IGNORE INTO reqn_type_has_stage_type( reqn_type_id, stage_type_id )
 SELECT reqn_type.id, stage_type.id
 FROM reqn_type, stage_type
-WHERE reqn_type.name IN ( "Catalyst Grant" )
+WHERE reqn_type.name = "Catalyst Grant"
 AND stage_type.name IN(
   "New", "Admin Review", "SAC Review",
   "Agreement", "Data Release", "Active", "Report Required", "Complete"

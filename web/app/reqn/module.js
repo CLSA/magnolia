@@ -156,7 +156,6 @@ define( function() {
     data_directory: { type: 'string', exclude: true },
     phase: { column: 'stage_type.phase', type: 'string', exclude: true },
     status: { column: 'stage_type.status', type: 'string', exclude: true },
-    decision: { column: 'stage_type.decision', type: 'boolean', exclude: true },
     lang: { type: 'string', column: 'language.code', exclude: true },
     deadline: { type: 'date', column: 'deadline.date', exclude: true }
   } );
@@ -166,6 +165,11 @@ define( function() {
       title: 'Notice of Decision',
       type: 'text',
       exclude: 'add'
+    },
+    revision_recommended: {
+      title: 'Revision Recommended',
+      type: 'boolean',
+      exclude: true // modified in the model
     },
     deferral_note_1a: {
       title: 'Part1: A1',
@@ -481,6 +485,8 @@ define( function() {
 
             return this.$$onView( force ).then( function() {
               var mainInputGroup = self.parentModel.module.inputGroupList.findByProperty( 'title', '' );
+              var decisionInputGroup =
+                self.parentModel.module.inputGroupList.findByProperty( 'title', 'Decision and Deferral Notes' );
 
               // only allow the deadline to be changed while in the admin review stage (hide if there is no deadline)
               mainInputGroup.inputList.deadline_id.constant =
@@ -495,6 +501,12 @@ define( function() {
 
               // show the study data available if we're in the active phase
               mainInputGroup.inputList.data_available.exclude = 'active' != self.record.phase;
+
+              // show the revision recommended checkbox to admins when in the decision made stage
+              decisionInputGroup.inputList.revision_recommended.exclude =
+                3 > CnSession.role.tier ||
+                'Decision Made' != self.record.stage_type ||
+                'Not Approved' == self.record.next_stage_type;
 
               return CnHttpFactory.instance( {
                 path: 'user/' + self.record.user_id + '/graduate',
@@ -519,8 +531,10 @@ define( function() {
 
           onPatch: function( data ) {
             return self.$$onPatch( data ).then( function() {
-              // reload the view if we're changing the decision notice (the proceed button's enable state is affected by it)
-              if( angular.isDefined( data.decision_notice ) ) return self.onView();
+              // Reload the view if we're changing the decision notice (the proceed button's enable state is affected by it)
+              // or the revision recommended (the next stage will change)
+              if( angular.isDefined( data.decision_notice ) || angular.isDefined( data.revision_recommended ) )
+                return self.onView();
             } );
           },
 

@@ -2,6 +2,8 @@
 
 SET AUTOCOMMIT=0;
 
+SOURCE stage_type.sql
+SOURCE stage_type_has_stage_type.sql
 SOURCE reqn_type.sql
 SOURCE reqn_type_has_stage_type.sql
 SOURCE graduate.sql

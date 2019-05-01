@@ -15,30 +15,6 @@ use cenozo\lib, cenozo\log, magnolia\util;
 class stage extends \cenozo\database\record
 {
   /**
-   * Extend parent method
-   */
-  public function save()
-  {
-    // track if this is a new stage
-    $is_new = is_null( $this->id );
-
-    parent::save();
-
-    // if this is a new stage then send its notification if it has one
-    if( $is_new )
-    {
-      $db_notification_type = $this->get_stage_type()->get_notification_type();
-      if( !is_null( $db_notification_type ) )
-      {
-        $db_notification = lib::create( 'database\notification' );
-        $db_notification->notification_type_id = $db_notification_type->id;
-        $db_notification->set_reqn( $this->get_reqn() ); // this saves the record
-        $db_notification->mail();
-      }
-    }
-  }
-
-  /**
    * Determines whether the stage is complete and may proceed to the next stage-type
    */
   public function check_if_complete()
