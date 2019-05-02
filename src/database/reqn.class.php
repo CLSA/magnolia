@@ -408,6 +408,7 @@ class reqn extends \cenozo\database\record
     $review_class_name = lib::get_class_name( 'database\review' );
     $stage_type_class_name = lib::get_class_name( 'database\stage_type' );
     $notification_type_class_name = lib::get_class_name( 'database\notification_type' );
+    $setting_manager = lib::create( 'business\setting_manager' );
     $db_user = lib::create( 'business\session' )->get_user();
     $db_current_stage = $this->get_current_stage();
     $db_current_stage_type = is_null( $db_current_stage ) ? NULL : $db_current_stage->get_stage_type();
@@ -475,6 +476,24 @@ class reqn extends \cenozo\database\record
       $db_notification = lib::create( 'database\notification' );
       $db_notification->notification_type_id = $db_notification_type->id;
       $db_notification->set_reqn( $this ); // this saves the record
+      $db_notification->mail();
+    }
+
+    // send a notification to the admins when leaving the suggested revisions stage
+    if( 'Suggested Revisions' == $db_current_stage_type->name )
+    {
+      $db_notification = lib::create( 'database\notification' );
+      $db_notification->reqn_id = $this->id;
+      $db_notification->notification_type_id =
+        $notification_type_class_name::get_unique_record( 'name', 'Suggested Revisions Complete' )->id;
+      $db_notification->datetime = util::get_datetime_object();
+      $db_notification->save();
+
+      $db_notification->add_email(
+        $setting_manager->get_setting( 'general', 'admin_email' ),
+        'Magnolia Administration'
+      );
+
       $db_notification->mail();
     }
 
