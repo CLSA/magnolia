@@ -358,7 +358,7 @@ class reqn extends \cenozo\database\record
           if( !is_null( $recommendation ) )
           {
             $find_stage_type_name = 'Approved' == $recommendation
-                                  ? ( $this->revision_recommended ? 'Revision Recommended' : 'Agreement' )
+                                  ? ( $this->suggested_revisions ? 'Suggested Revisions' : 'Agreement' )
                                   : 'Not Approved';
           }
         }
@@ -534,7 +534,7 @@ class reqn extends \cenozo\database\record
       }
     }
     // if we're recommending a revision then automatically defer the reqn
-    else if( 'Revision Recommended' == $db_next_stage_type->name )
+    else if( 'Suggested Revisions' == $db_next_stage_type->name )
     {
       $this->state = 'deferred';
       $this->save();

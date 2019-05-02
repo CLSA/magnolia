@@ -166,8 +166,8 @@ define( function() {
       type: 'text',
       exclude: 'add'
     },
-    revision_recommended: {
-      title: 'Revision Recommended',
+    suggested_revisions: {
+      title: 'Suggested Revisions',
       type: 'boolean',
       exclude: true // modified in the model
     },
@@ -502,8 +502,8 @@ define( function() {
               // show the study data available if we're in the active phase
               mainInputGroup.inputList.data_available.exclude = 'active' != self.record.phase;
 
-              // show the revision recommended checkbox to admins when in the decision made stage
-              decisionInputGroup.inputList.revision_recommended.exclude =
+              // show the suggested revisions checkbox to admins when in the decision made stage
+              decisionInputGroup.inputList.suggested_revisions.exclude =
                 3 > CnSession.role.tier ||
                 'Decision Made' != self.record.stage_type ||
                 'Not Approved' == self.record.next_stage_type;
@@ -532,8 +532,8 @@ define( function() {
           onPatch: function( data ) {
             return self.$$onPatch( data ).then( function() {
               // Reload the view if we're changing the decision notice (the proceed button's enable state is affected by it)
-              // or the revision recommended (the next stage will change)
-              if( angular.isDefined( data.decision_notice ) || angular.isDefined( data.revision_recommended ) )
+              // or the suggested revisions (the next stage will change)
+              if( angular.isDefined( data.decision_notice ) || angular.isDefined( data.suggested_revisions ) )
                 return self.onView();
             } );
           },

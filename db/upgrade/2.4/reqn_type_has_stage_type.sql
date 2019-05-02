@@ -28,7 +28,7 @@ WHERE reqn_type.name IN ( "Consortium", "Standard" )
 AND stage_type.name IN(
   "New", "Admin Review", "SAC Review", "DSAC Selection", "DSAC Review",
   "SMT Decision", "Revision Required", "Second DSAC Decision", "Second SMT Decision",
-  "Decision Made", "Revision Recommended", "Agreement", "Data Release",
+  "Decision Made", "Suggested Revisions", "Agreement", "Data Release",
   "Active", "Report Required", "Not Approved", "Complete"
 );
 
@@ -40,7 +40,7 @@ WHERE reqn_type.name IN ( "Internal", "Methods", "Partnership", "Special Project
 AND stage_type.name IN(
   "New", "Admin Review", "SAC Review",
   "SMT Decision", "Revision Required", "Second SMT Decision",
-  "Decision Made", "Revision Recommended", "Agreement", "Data Release",
+  "Decision Made", "Suggested Revisions", "Agreement", "Data Release",
   "Active", "Report Required", "Not Approved", "Complete"
 );
 

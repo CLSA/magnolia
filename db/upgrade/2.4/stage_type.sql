@@ -15,10 +15,10 @@ CREATE PROCEDURE patch_stage_type()
 
     SELECT COUNT(*) INTO @test
     FROM stage_type
-    WHERE name = "Revision Recommended";
+    WHERE name = "Suggested Revisions";
 
     IF @test = 0 THEN
-      SELECT "Creating new Revision Recommended stage type" AS "";
+      SELECT "Creating new Suggested Revisions stage type" AS "";
 
       -- push forward existing stage ranks
       UPDATE stage_type SET rank = 17 WHERE rank = 16;
@@ -31,9 +31,8 @@ CREATE PROCEDURE patch_stage_type()
       INSERT IGNORE INTO stage_type SET
         phase = "review",
         rank = 11,
-        name = "Revision Recommended",
-        status = "Revision Recommended",
-        decision = 0;
+        name = "Suggested Revisions",
+        status = "Suggested Revisions";
 
       SELECT "Changing stage type notifications to after the stage is complete instead of when it starts" AS "";
 
