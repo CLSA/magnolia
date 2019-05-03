@@ -477,24 +477,24 @@ class reqn extends \cenozo\database\record
         $db_notification->set_reqn( $this ); // this saves the record
         $db_notification->mail();
       }
-    }
 
-    // send a notification to the admins when leaving the suggested revisions stage
-    if( 'Suggested Revisions' == $db_current_stage_type->name )
-    {
-      $db_notification = lib::create( 'database\notification' );
-      $db_notification->reqn_id = $this->id;
-      $db_notification->notification_type_id =
-        $notification_type_class_name::get_unique_record( 'name', 'Suggested Revisions Complete' )->id;
-      $db_notification->datetime = util::get_datetime_object();
-      $db_notification->save();
+      // send a notification to the admins when leaving the suggested revisions stage
+      if( 'Suggested Revisions' == $db_current_stage_type->name )
+      {
+        $db_notification = lib::create( 'database\notification' );
+        $db_notification->reqn_id = $this->id;
+        $db_notification->notification_type_id =
+          $notification_type_class_name::get_unique_record( 'name', 'Suggested Revisions Complete' )->id;
+        $db_notification->datetime = util::get_datetime_object();
+        $db_notification->save();
 
-      $db_notification->add_email(
-        $setting_manager->get_setting( 'general', 'admin_email' ),
-        'Magnolia Administration'
-      );
+        $db_notification->add_email(
+          $setting_manager->get_setting( 'general', 'admin_email' ),
+          'Magnolia Administration'
+        );
 
-      $db_notification->mail();
+        $db_notification->mail();
+      }
     }
 
     // create the new stage
