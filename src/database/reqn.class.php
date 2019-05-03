@@ -176,51 +176,6 @@ class reqn extends \cenozo\database\record
   }
 
   /**
-   * Check the reqn's deadline and change it to the next available deadline if needed
-   * 
-   * This is only done for reqn types which go through the DSAC review process
-   * NOTE: This method will change the deadline_id column but not save the record
-   * @access public
-   */
-  public function assert_deadline()
-  {
-    $deadline_class_name = lib::get_class_name( 'database\deadline' );
-
-    $db_reqn_type = lib::create( 'database\reqn_type', $this->reqn_type_id );
-    if( $db_reqn_type->is_deadline_required() )
-    {
-      $db_deadline = NULL;
-      $change_deadline = false;
-      if( is_null( $this->deadline_id ) )
-      { // no deadline found
-        $db_deadline = $deadline_class_name::get_next();
-        $change_deadline = true;
-      }
-      else
-      {
-        $db_current_stage_type = $this->get_current_stage_type();
-        if( is_null( $db_current_stage_type ) || 1 == $db_current_stage_type->rank )
-        {
-          if( 0 < $this->get_deadline()->date->diff( util::get_datetime_object() )->days )
-          { // deadline has expired, get the next one
-            $db_deadline = $deadline_class_name::get_next();
-            $change_deadline = true;
-          }
-        }
-      }
-
-      if( $change_deadline )
-      {
-        if( is_null( $db_deadline ) )
-          throw lib::create( 'exception\runtime',
-            'Cannot proceed since there are no future deadlines defined.',
-            __METHOD__ );
-        $this->deadline_id = $db_deadline->id;
-      }
-    }
-  }
-
-  /**
    * Returns the reqns current stage
    * @return database\stage
    * @access public
@@ -918,5 +873,56 @@ class reqn extends \cenozo\database\record
 
     // if we get here then something is wrong
     throw lib::create( 'exception\runtime', 'Unable to create unique data directory.', __METHOD__ );
+  }
+
+  /**
+   * Check the reqn's deadline and change it to the next available deadline if needed
+   * 
+   * This is only done for reqn types which go through the DSAC review process
+   * NOTE: This method will change the deadline_id column but not save the record
+   * @access private
+   */
+  private function assert_deadline()
+  {
+    $deadline_class_name = lib::get_class_name( 'database\deadline' );
+
+    $db_reqn_type = lib::create( 'database\reqn_type', $this->reqn_type_id );
+    if( $db_reqn_type->is_deadline_required() )
+    {
+      $db_deadline = NULL;
+      $change_deadline = false;
+      if( is_null( $this->deadline_id ) )
+      { // no deadline found
+        $db_deadline = $deadline_class_name::get_next();
+        $change_deadline = true;
+      }
+      else
+      {
+        // if there are zero or one stages then this is a new requisition which needs its deadline set
+        $stage_sel = lib::create( 'database\select' );
+        $stage_sel->add_table_column( 'stage_type', 'rank' );
+        $stage_mod = lib::create( 'database\modifier' );
+        $stage_mod->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
+        $stage_list = $this->get_stage_list( $stage_sel, $stage_mod );
+
+        if( 2 > count( $stage_list ) )
+        {
+          if( 0 < $this->get_deadline()->date->diff( util::get_datetime_object() )->days )
+          { // deadline has expired, get the next one
+            $db_deadline = $deadline_class_name::get_next();
+            $change_deadline = true;
+          }
+        }
+      }
+
+      if( $change_deadline )
+      {
+        if( is_null( $db_deadline ) )
+          throw lib::create( 'exception\runtime',
+            'Cannot proceed since there are no future deadlines defined.',
+            __METHOD__ );
+        $this->deadline_id = $db_deadline->id;
+      }
+    }
   }
 }
