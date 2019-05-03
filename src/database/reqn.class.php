@@ -461,22 +461,22 @@ class reqn extends \cenozo\database\record
       }
     }
 
-    // save the user who completed the current stage
     if( !is_null( $db_current_stage ) )
     {
+      // save the user who completed the current stage
       $db_current_stage->user_id = $db_user->id;
       $db_current_stage->datetime = util::get_datetime_object();
       $db_current_stage->save();
-    }
 
-    // send any notifications associated with the current stage
-    $db_notification_type = $db_current_stage_type->get_notification_type();
-    if( !is_null( $db_notification_type ) )
-    {
-      $db_notification = lib::create( 'database\notification' );
-      $db_notification->notification_type_id = $db_notification_type->id;
-      $db_notification->set_reqn( $this ); // this saves the record
-      $db_notification->mail();
+      // send any notifications associated with the current stage
+      $db_notification_type = $db_current_stage_type->get_notification_type();
+      if( !is_null( $db_notification_type ) )
+      {
+        $db_notification = lib::create( 'database\notification' );
+        $db_notification->notification_type_id = $db_notification_type->id;
+        $db_notification->set_reqn( $this ); // this saves the record
+        $db_notification->mail();
+      }
     }
 
     // send a notification to the admins when leaving the suggested revisions stage
