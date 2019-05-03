@@ -222,7 +222,6 @@ class patch extends \cenozo\service\patch
           }
           else if( 'next_stage' == $action )
           {
-            $db_current_stage_type = $db_reqn->get_current_stage_type();
             $db_reqn->proceed_to_next_stage();
           }
           else if( 'reject' == $action )
