@@ -416,6 +416,7 @@ cenozo.service( 'CnReqnHelper', [
             studyData: { en: 'Study Data', fr: 'Données d’étude' },
             finalReport: { en: 'Final Report', fr: 'Rapport final' },
             notAvailable: { en: 'not yet available', fr: 'pas encore disponible' },
+            notApplicable: { en: 'not applicable', fr: 'sans objet' },
             baseline: { en: 'Baseline', fr: 'Départ' },
             followup1: { en: 'Follow-up 1', fr: '1er suivi' },
             submit: { en: 'Submit', fr: 'Soumettre' },
