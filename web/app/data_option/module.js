@@ -4,7 +4,6 @@ define( function() {
   try { var module = cenozoApp.module( 'data_option', true ); } catch( err ) { console.warn( err ); return; }
   angular.extend( module, {
     identifier: {
-      column: 'name_en',
       parent: {
         subject: 'data_option_category',
         column: 'data_option_category.name_en'
