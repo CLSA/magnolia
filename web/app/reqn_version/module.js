@@ -982,7 +982,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           displayDecisionNotice: function() {
             if( 'applicant' == CnSession.role.name &&
                 this.record.decision_notice &&
-                ( 'Agreement' == this.record.stage_type || 'Not Approved' == this.record.stage_type ) ) {
+                -1 < [ 'Suggested Revisions', 'Agreement', 'Not Approved' ].indexOf( this.record.stage_type ) ) {
               CnModalMessageFactory.instance( {
                 title: 'Notice of decision for ' + self.record.identifier,
                 message: self.record.decision_notice
