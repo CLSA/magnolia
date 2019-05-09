@@ -456,7 +456,7 @@ define( function() {
           canResetData: function() {
             // administrators and applicants can view data when in the active stage
             var stage_type = this.record.stage_type ? this.record.stage_type : '';
-            return 'administrator' == CnSession.role.name && 'Active' == stage_type;
+            return 'administrator' == CnSession.role.name && ( 'Data Release' == stage_type || 'Active' == stage_type );
           },
           viewData: function() {
             $window.open( CnSession.application.studyDataUrl + '/' + self.record.data_directory, 'studyData' + self.record.id );
@@ -464,7 +464,8 @@ define( function() {
           canViewData: function() {
             // administrators and applicants can view data when in the active stage
             var stage_type = this.record.stage_type ? this.record.stage_type : '';
-            return 0 <= ['administrator','applicant'].indexOf( CnSession.role.name ) && 'Active' == stage_type;
+            return ( 'administrator' == CnSession.role.name && 0 <= ['Data Release','Active'].indexOf( stage_type ) ) ||
+                   ( 'applicant' == CnSession.role.name && 'Active' == stage_type );
           },
           onView: function( force ) {
             // if we are a reviewer assigned to this reqn and haven't completed our review then show a reminder

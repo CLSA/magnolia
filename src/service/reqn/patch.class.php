@@ -48,7 +48,8 @@ class patch extends \cenozo\service\patch
       $code = NULL;
       if( 'reset_data' == $action )
       {
-        if( 'administrator' != $db_role->name || 'Active' != $db_current_stage_type->name ) $code = 403;
+        if( 'administrator' != $db_role->name ||
+            ( !in_array( $db_current_stage_type->name, array( 'Data Release', 'Active' ) ) ) ) $code = 403;
       }
       else if( 'abandon' == $action )
       {

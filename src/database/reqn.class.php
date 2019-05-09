@@ -37,11 +37,7 @@ class reqn extends \cenozo\database\record
     $is_new = is_null( $this->id );
 
     // make sure the deadline is appropriate
-    if( $is_new )
-    {
-      $this->assert_deadline();
-      $this->data_directory = static::generate_data_directory();
-    }
+    if( $is_new ) $this->assert_deadline();
 
     // track whether the graduate_id has changed to NULL
     $remove_graduate_details = $this->has_column_changed( 'graduate_id' ) && !is_null( $this->graduate_id );
@@ -518,6 +514,11 @@ class reqn extends \cenozo\database\record
 
       // do not send a notification since there is one already sent after leaving the Decision Made stage
     }
+    // when going to the data release stage generate the data directory
+    else if( 'Data Release' == $db_next_stage_type->name )
+    {
+      $this->generate_data_directory();
+    }
     // if we have just entered the active stage then create symbolic links to all data files and update file timestamps
     else if( 'Active' == $db_next_stage_type->name )
     {
@@ -680,7 +681,7 @@ class reqn extends \cenozo\database\record
   public function get_study_data_path( $type )
   {
     if( !in_array( $type, array( 'data', 'web' ) ) ) throw lib::create( 'exception\argument', 'type', $type, __METHOD__ );
-    return sprintf( '%s/%s/%s', STUDY_DATA_PATH, $type, $this->data_directory );
+    return sprintf( '%s/%s/%s', STUDY_DATA_PATH, $type, 'data' == $type ? $this->identifier : $this->data_directory );
   }
 
   /**
@@ -777,7 +778,7 @@ class reqn extends \cenozo\database\record
           touch( $file );
 
           // create a link if one doesn't already exist
-          $filename = sprintf( '../../data/%s%s', $this->data_directory, str_replace( $data_path, '', $file ) );
+          $filename = sprintf( '../../data/%s%s', $this->identifier, str_replace( $data_path, '', $file ) );
           $link = str_replace( $data_path, $web_path, $file );
 
           // create a relative link to the data file
@@ -836,11 +837,11 @@ class reqn extends \cenozo\database\record
   /**
    * Creates a unique directory for study data and returns the directory name
    * 
-   * @access public
-   * @return string
+   * @access private
    */
-  public static function generate_data_directory()
+  private function generate_data_directory()
   {
+    $created = false;
     $count = 0;
     while( 100 > $count++ )
     {
@@ -852,27 +853,28 @@ class reqn extends \cenozo\database\record
         bin2hex( openssl_random_pseudo_bytes( 2 ) )
       );
 
-      // create the data directory
-      $path = sprintf( '%s/data/%s', STUDY_DATA_PATH, $name );
-      if( !file_exists( $path ) )
-      {
-        if( !mkdir( $path ) )
-          throw lib::create( 'exception\runtime', sprintf( 'Unable to create data directory "%s"', $path ), __METHOD__ );
-        return $name;
-      }
-
-      // create the web directory
+      // create the web directory based on the random name
       $path = sprintf( '%s/web/%s', STUDY_DATA_PATH, $name );
       if( !file_exists( $path ) )
       {
         if( !mkdir( $path ) )
           throw lib::create( 'exception\runtime', sprintf( 'Unable to create data directory "%s"', $path ), __METHOD__ );
-        return $name;
+
+        // now create the data directory based on the identifier
+        $path = sprintf( '%s/data/%s', STUDY_DATA_PATH, $this->identifier );
+        if( !mkdir( $path ) )
+          throw lib::create( 'exception\runtime', sprintf( 'Unable to create data directory "%s"', $path ), __METHOD__ );
+
+        $this->data_directory = $name;
+        $this->save();
+
+        $created = true;
+        break;
       }
     }
 
     // if we get here then something is wrong
-    throw lib::create( 'exception\runtime', 'Unable to create unique data directory.', __METHOD__ );
+    if( !$created ) throw lib::create( 'exception\runtime', 'Unable to create unique data directory.', __METHOD__ );
   }
 
   /**

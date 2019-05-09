@@ -136,6 +136,7 @@ class reqn_version extends \cenozo\database\record
     $directory = '';
     if( 'funding' == $type ) $directory = FUNDING_LETTER_PATH;
     else if( 'ethics' == $type ) $directory = ETHICS_LETTER_PATH;
+    else if( 'instruction' == $type ) $directory = INSTRUCTION_FILE_PATH;
     else throw lib::create( 'exception\argument', 'type', $type, __METHOD__ );
     return sprintf( '%s/%s', $directory, $this->id );
   }

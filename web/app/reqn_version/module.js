@@ -471,9 +471,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnReqnVersionViewFactory', [
     'CnReqnHelper', 'CnCoapplicantModelFactory', 'CnReferenceModelFactory', 'CnBaseViewFactory',
-    'CnSession', 'CnHttpFactory', 'CnModalMessageFactory', 'CnModalConfirmFactory', '$state', '$q',
+    'CnSession', 'CnHttpFactory', 'CnModalMessageFactory', 'CnModalConfirmFactory', '$state', '$q', '$window',
     function( CnReqnHelper, CnCoapplicantModelFactory, CnReferenceModelFactory, CnBaseViewFactory,
-              CnSession, CnHttpFactory, CnModalMessageFactory, CnModalConfirmFactory, $state, $q ) {
+              CnSession, CnHttpFactory, CnModalMessageFactory, CnModalConfirmFactory, $state, $q, $window ) {
       var object = function( parentModel, root ) {
         var self = this;
         CnBaseViewFactory.construct( this, parentModel, root );
