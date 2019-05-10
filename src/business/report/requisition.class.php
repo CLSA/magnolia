@@ -49,6 +49,7 @@ class requisition extends \cenozo\business\report\base_report
     ////////////////////////////////////////////////////////////////////////////////////////////////
     $select->add_column( 'CONCAT_WS( " ", user.first_name, user.last_name )', 'Primary Applicant', false );
     $select->add_column( 'reqn_version.applicant_affiliation', 'Institution', false );
+    $select->add_column( 'user.email', 'Email', false );
 
     $select->add_column( 'reqn_version.title', 'Title', false );
     $select->add_column( 'IF( reqn_version.ethics, "Yes", "No" )', 'Ethics', false ); 
