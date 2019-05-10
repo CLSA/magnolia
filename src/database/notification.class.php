@@ -123,4 +123,21 @@ class notification extends \cenozo\database\record
     $this->sent = $setting_manager->get_setting( 'mail', 'enabled' ) && $mail_manager->send();
     $this->save();
   }
+
+  /**
+   * Sends an email notification to the admin_email (from general settings)
+   */
+  public static function mail_admin( $title, $message )
+  {
+    $setting_manager = lib::create( 'business\setting_manager' );
+    $email = $setting_manager->get_setting( 'general', 'admin_email' );
+    if( !is_null( $email ) )
+    {
+      $mail_manager = lib::create( 'business\mail_manager' );
+      $mail_manager->to( $email, 'Magnolia Administration' );
+      $mail_manager->set_title( $title );
+      $mail_manager->set_body( $message );
+      $mail_manager->send();
+    }
+  }
 }

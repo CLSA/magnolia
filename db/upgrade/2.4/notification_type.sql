@@ -1,23 +1,6 @@
 SELECT "Adding new notification types" AS "";
 
 INSERT IGNORE INTO notification_type SET
-  name = "Requisition Submitted",
-  title_en = "Magnolia - Requisition {{identifier}} submitted",
-  title_fr = "Magnolia - Requisition {{identifier}} submitted",
-  message_en = "The following requisition has been submitted:
-
-Type: {{reqn_type}}
-Identifier: {{identifier}}
-Applicant: {{applicant_name}}
-Title: ({{title}}",
-  message_fr = "The following requisition has been submitted:
-
-Type: {{reqn_type}}
-Identifier: {{identifier}}
-Applicant: {{applicant_name}}
-Title: ({{title}}";
-
-INSERT IGNORE INTO notification_type SET
   name = "Review Assigned",
   title_en = "Magnolia - Requisition {{identifier}} review",
   title_fr = "Magnolia - Requisition {{identifier}} review",
@@ -58,20 +41,3 @@ Votre demande passera alors à la prochaine étape du processus d’évaluation 
 Si vous avez des questions, veuillez nous contacter à access@clsa-elcv.ca.
 
 L’équipe d’accès aux données de l’ÉLCV";
-
-INSERT IGNORE INTO notification_type SET
-  name = "Suggested Revisions Complete",
-  title_en = "Magnolia - Requisition {{identifier}} suggested revisions complete",
-  title_fr = "Magnolia - Requisition {{identifier}} suggested revisions complete",
-  message_en = "The following requisition has moved from suggested revisions to agreement:
-
-Type: {{reqn_type}}
-Identifier: {{identifier}}
-Applicant: {{applicant_name}}
-Title: ({{title}}",
-  message_fr = "The following requisition has moved from suggested revisions to agreement:
-
-Type: {{reqn_type}}
-Identifier: {{identifier}}
-Applicant: {{applicant_name}}
-Title: ({{title}}";

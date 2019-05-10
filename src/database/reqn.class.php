@@ -356,6 +356,7 @@ class reqn extends \cenozo\database\record
       return;
     }
 
+    $notification_class_name = lib::get_class_name( 'database\notification' );
     $review_class_name = lib::get_class_name( 'database\review' );
     $stage_type_class_name = lib::get_class_name( 'database\stage_type' );
     $notification_type_class_name = lib::get_class_name( 'database\notification_type' );
@@ -363,6 +364,8 @@ class reqn extends \cenozo\database\record
     $db_user = lib::create( 'business\session' )->get_user();
     $db_current_stage = $this->get_current_stage();
     $db_current_stage_type = is_null( $db_current_stage ) ? NULL : $db_current_stage->get_stage_type();
+    $db_reqn_type = $this->get_reqn_type();
+    $db_reqn_version = $this->get_current_reqn_version();
 
     $db_next_stage_type = NULL;
     if( is_null( $stage_type ) )
@@ -428,23 +431,26 @@ class reqn extends \cenozo\database\record
         $db_notification->set_reqn( $this ); // this saves the record
         $db_notification->mail();
       }
-
-      // send a notification to the admins when leaving the suggested revisions stage
-      if( 'Suggested Revisions' == $db_current_stage_type->name )
+      else
       {
-        $db_notification = lib::create( 'database\notification' );
-        $db_notification->reqn_id = $this->id;
-        $db_notification->notification_type_id =
-          $notification_type_class_name::get_unique_record( 'name', 'Suggested Revisions Complete' )->id;
-        $db_notification->datetime = util::get_datetime_object();
-        $db_notification->save();
-
-        $db_notification->add_email(
-          $setting_manager->get_setting( 'general', 'admin_email' ),
-          'Magnolia Administration'
+        $db_reqn_user = $this->get_user();
+        $notification_class_name::mail_admin(
+          sprintf( 'Requisition %s: %s complete', $this->identifier, $db_current_stage_type->name ),
+          sprintf(
+            "The following requisition has moved from \"%s\" to \"%s\":\n".
+            "\n".
+            "Type: %s\n".
+            "Identifier: %s\n".
+            "Applicant: %s %s\n".
+            "Title: %s\n",
+            $db_current_stage_type->name,
+            $db_next_stage_type->name,
+            $db_reqn_type->name,
+            $this->identifier,
+            $db_reqn_user->first_name, $db_reqn_user->last_name,
+            $db_reqn_version->title
+          )
         );
-
-        $db_notification->mail();
       }
     }
 
@@ -457,13 +463,11 @@ class reqn extends \cenozo\database\record
     // if we have just entered the admin review stage then set the identifier and mark the version datetime
     if( 'Admin Review' == $db_next_stage_type->name )
     {
-      $db_reqn_type = $this->get_reqn_type();
       $this->identifier = $db_reqn_type->is_deadline_required()
                         ? $this->get_deadline()->get_next_identifier()
                         : $db_reqn_type->get_next_identifier();
       $this->save();
 
-      $db_reqn_version = $this->get_current_reqn_version();
       $db_reqn_version->datetime = util::get_datetime_object();
       $db_reqn_version->save();
     }

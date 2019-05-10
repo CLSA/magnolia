@@ -115,6 +115,7 @@ class patch extends \cenozo\service\patch
     parent::execute();
 
     $notification_type_class_name = lib::get_class_name( 'database\notification_type' );
+    $notification_class_name = lib::get_class_name( 'database\notification' );
     $stage_type_class_name = lib::get_class_name( 'database\stage_type' );
     $session = lib::create( 'business\session' );
     $db_role = $session->get_role();
@@ -194,7 +195,7 @@ class patch extends \cenozo\service\patch
               {
                 $db_reqn->state = NULL;
                 $db_reqn->save();
-                
+
                 // when resubmitting set the version's datetime
                 $db_reqn_version->datetime = util::get_datetime_object();
                 $db_reqn_version->save();
@@ -206,19 +207,22 @@ class patch extends \cenozo\service\patch
               }
 
               // send a notification
-              $db_notification = lib::create( 'database\notification' );
-              $db_notification->reqn_id = $db_reqn->id;
-              $db_notification->notification_type_id =
-                $notification_type_class_name::get_unique_record( 'name', 'Requisition Submitted' )->id;
-              $db_notification->datetime = util::get_datetime_object();
-              $db_notification->save();
-
-              $db_notification->add_email(
-                lib::create( 'business\setting_manager' )->get_setting( 'general', 'admin_email' ),
-                'Magnolia Administration'
+              $db_reqn_user = $db_reqn->get_user();
+              $notification_class_name::mail_admin(
+                sprintf( 'Requisition %s: submitted', $db_reqn->identifier ),
+                sprintf(
+                  "The following requisition has been submitted:\n".
+                  "\n".
+                  "Type: %s\n".
+                  "Identifier: %s\n".
+                  "Applicant: %s %s\n".
+                  "Title: %s\n",
+                  $db_reqn->get_reqn_type()->name,
+                  $db_reqn->identifier,
+                  $db_reqn_user->first_name, $db_reqn_user->last_name,
+                  $db_reqn_version->title
+                )
               );
-
-              $db_notification->mail();
             }
           }
           else if( 'next_stage' == $action )
