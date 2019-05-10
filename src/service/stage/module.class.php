@@ -27,5 +27,8 @@ class module extends \cenozo\service\module
 
     if( $select->has_column( 'user_full_name' ) )
       $select->add_column( 'CONCAT( user.first_name, " ", user.last_name )', 'user_full_name', false );
+
+    // only show open stages when getting a list of stages belonging to a stage-type
+    if( 'stage_type' == $this->get_parent_subject() ) $modifier->where( 'stage.datetime', '=', NULL );
   }
 }
