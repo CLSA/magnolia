@@ -675,6 +675,8 @@ CREATE PROCEDURE patch_reqn()
       ALTER TABLE reqn MODIFY COLUMN deadline_id int(10) unsigned NULL DEFAULT NULL;
     END IF;
 
+    ALTER TABLE reqn MODIFY data_directory VARCHAR(45) NULL DEFAULT NULL;
+
   END //
 DELIMITER ;
 
