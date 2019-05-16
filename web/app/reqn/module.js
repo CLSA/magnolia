@@ -112,9 +112,9 @@ define( function() {
       constant: true,
       exclude: true // modified in the model
     },
-    data_available: {
-      title: 'Study Data Available',
-      type: 'string',
+    data_expiry_date: {
+      title: 'Data Expiry Date',
+      type: 'date',
       constant: true,
       exclude: true // modified in the model
     },
@@ -443,13 +443,16 @@ define( function() {
           resetData: function() {
             CnHttpFactory.instance( {
               path: self.parentModel.getServiceResourcePath() + '?action=reset_data'
-            } ).patch().then( function() {
+            } ).patch().then( function( response ) {
               self.onView();
               CnModalMessageFactory.instance( {
                 title: 'Study Data Reset',
-                message: 'This ' + self.parentModel.module.name.possessive +
+                message: response.data ?
+                  'This ' + self.parentModel.module.name.possessive +
                   ' study data has been made available and will automatically expire in ' +
-                  CnSession.application.studyDataExpiry + ' days.'
+                  CnSession.application.studyDataExpiry + ' days.' :
+                  'Warning: The ' + self.parentModel.module.name.singular + ' has no data to make available.',
+                error: !response.data
               } ).show();
             } );
           },
@@ -501,7 +504,7 @@ define( function() {
               mainInputGroup.inputList.instruction_filename.exclude = 0 > ['active','complete'].indexOf( self.record.phase );
 
               // show the study data available if we're in the active phase
-              mainInputGroup.inputList.data_available.exclude = 'active' != self.record.phase;
+              mainInputGroup.inputList.data_expiry_date.exclude = 'active' != self.record.phase;
 
               // show the suggested revisions checkbox to admins when in the decision made stage
               decisionInputGroup.inputList.suggested_revisions.exclude =
@@ -673,7 +676,7 @@ define( function() {
           mainInputGroup.inputList.language_id.exclude = false;
           mainInputGroup.inputList.stage_type.exclude = 'add';
           mainInputGroup.inputList.state.exclude = 'add';
-          mainInputGroup.inputList.data_available.exclude = 'add';
+          mainInputGroup.inputList.data_expiry_date.exclude = 'add';
           mainInputGroup.inputList.note.exclude = false;
         } else {
           mainInputGroup.inputList.title.exclude = false;

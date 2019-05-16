@@ -36,16 +36,6 @@ function write_log( $message )
 }
 
 /**
- * Remove all exipired links to data
- */
-write_log( 'Removing all expired study data' );
-exec( sprintf(
-  'find -L %s/web/*/ -type f -mtime +%d -exec rm {} +',
-  STUDY_DATA_PATH,
-  $settings['general']['study_data_expiry']
-) );
-
-/**
  * Send a command to run all scheduled reports
  */
 write_log( 'Updating all scheduled reports' );
@@ -75,6 +65,42 @@ else
   else
   {
     write_log( 'Scheduled reports have been successfully updated' );
+  }
+}
+curl_close( $curl );
+
+/**
+ * Remove all exipired links to data
+ */
+write_log( 'Removing all expired study data' );
+
+curl_setopt( $curl, CURLOPT_URL, URL.'reqn?expire_data=1' );
+curl_setopt( $curl, CURLOPT_SSL_VERIFYHOST, false );
+curl_setopt( $curl, CURLOPT_RETURNTRANSFER, true );
+curl_setopt( $curl, CURLOPT_HTTPHEADER, array( AUTH ) );
+
+$count = curl_exec( $curl );
+if( curl_errno( $curl ) )
+{
+  write_log( sprintf(
+    "Returned error code %s when trying to remove expired study data\nMessage: %s",
+    curl_errno( $curl ),
+    curl_error( $curl )
+  ) );
+}
+else
+{
+  $code = curl_getinfo( $curl, CURLINFO_HTTP_CODE );
+  if( 200 != $code && 503 != $code )
+  {
+    write_log( sprintf( 'Failed to remove expired study data (response code: %s)', $code ) );
+  }
+  else
+  {
+    write_log( sprintf(
+      'Expired study data removed, %s affected.',
+      0 == $count ? 'no requisitions' : ( 1 == $count ? '1 requisition' : $count.' requisitions' )
+    ) );
   }
 }
 curl_close( $curl );

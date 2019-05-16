@@ -677,6 +677,18 @@ CREATE PROCEDURE patch_reqn()
 
     ALTER TABLE reqn MODIFY data_directory VARCHAR(45) NULL DEFAULT NULL;
 
+    SELECT "Adding new data_expiry_date column to reqn table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "data_expiry_date";
+
+    IF @test = 0 THEN
+      ALTER TABLE reqn ADD COLUMN data_expiry_date DATE NULL DEFAULT NULL AFTER data_directory;
+    END IF;
+
   END //
 DELIMITER ;
 

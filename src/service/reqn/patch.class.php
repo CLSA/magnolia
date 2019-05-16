@@ -141,7 +141,7 @@ class patch extends \cenozo\service\patch
       {
         if( 'reset_data' == $action )
         {
-          $db_reqn->refresh_study_data_files();
+          $this->set_data( $db_reqn->refresh_study_data_files() );
         }
         else if( 'abandon' == $action )
         {

@@ -693,57 +693,6 @@ class reqn extends \cenozo\database\record
    * 
    * @return integer
    */
-  public function get_study_data_expiry()
-  {
-    $setting_manager = lib::create( 'business\setting_manager' );
-
-    $data_path = $this->get_study_data_path( 'data' );
-
-    // get any file in the reqn's data directory
-    $list = glob( $data_path.'/*' );
-    if( false === $list )
-    {
-      log::warning( sprintf( 'Unable to list contents of the data directory belonging to requisition "%s" (%s)',
-        $this->identifier,
-        $data_path
-      ) );
-      return 0;
-    }
-
-    $filename = NULL;
-    foreach( $list as $file )
-    {
-      if( is_file( $file ) )
-      {
-        $filename = $file;
-        break;
-      }
-    }
-
-    if( is_null( $filename ) ) return 0;
-
-    $timestamp = filemtime( $filename );
-    if( false === $timestamp )
-    {
-      log::warning( sprintf( 'Unable to get modification time of data file belonging to requisition "%s" (%s)',
-        $this->identifier,
-        $filename
-      ) );
-      return 0;
-    }
-
-    $now = util::get_datetime_object();
-    $datetime_obj = util::get_datetime_object();
-    $datetime_obj->setTimestamp( $timestamp );
-    $days = $setting_manager->get_setting( 'general', 'study_data_expiry' ) - $datetime_obj->diff( $now )->days;
-    return 0 > $days ? 0 : $days;
-  }
-
-  /**
-   * Returns the number of days left before the reqn's study-data will expire
-   * 
-   * @return integer
-   */
   public function get_graduate_user()
   {
     $select = lib::create( 'database\select' );
@@ -763,6 +712,7 @@ class reqn extends \cenozo\database\record
   public function refresh_study_data_files()
   {
     $supplemental_file_class_name = lib::get_class_name( 'database\supplemental_file' );
+    $setting_manager = lib::create( 'business\setting_manager' );
     $data_path = $this->get_study_data_path( 'data' );
     $web_path = $this->get_study_data_path( 'web' );
     $db_reqn_version = $this->get_current_reqn_version();
@@ -770,22 +720,22 @@ class reqn extends \cenozo\database\record
     // delete all existing links
     util::exec_timeout( sprintf( 'rm -rf %s/*', $web_path ) );
 
-    // refresh links
+    // by default we'll remove the expiry date (possible set below if a data exists)
+    $this->data_expiry_date = NULL;
+
+    // create a relative link to the data files
     $list = glob( $data_path.'/*' );
     if( false !== $list )
     {
+      $files_exist = false;
       foreach( $list as $file )
       {
         if( is_file( $file ) )
         {
-          // update the file's timestamp to reset the link removal counter
-          touch( $file );
-
-          // create a link if one doesn't already exist
+          $files_exist = true;
           $filename = sprintf( '../../data/%s%s', $this->identifier, str_replace( $data_path, '', $file ) );
           $link = str_replace( $data_path, $web_path, $file );
 
-          // create a relative link to the data file
           $result = symlink( $filename, $link );
           if( !$result )
           {
@@ -797,7 +747,19 @@ class reqn extends \cenozo\database\record
           }
         }
       }
+
+      if( $files_exist )
+      {
+        // update the data expiry date
+        $expiry = util::get_datetime_object();
+        $expiry->add( new \DateInterval( sprintf(
+          'P%dD', $setting_manager->get_setting( 'general', 'study_data_expiry' )
+        ) ) );
+        $this->data_expiry_date = $expiry;
+      }
     }
+
+    $this->save();
 
     // add the instructions
     $filename = $db_reqn_version->get_filename( 'instruction' );
@@ -836,6 +798,30 @@ class reqn extends \cenozo\database\record
         }
       }
     }
+
+    return !is_null( $this->data_expiry_date );
+  }
+
+  /**
+   * Removes links to study data files when they have expired
+   */
+  public static function expire_data()
+  {
+    $modifier = lib::create( 'database\modifier' );
+    $modifier->where( 'data_expiry_date', '<=', util::get_datetime_object() );
+
+    $reqn_list = static::select_objects( $modifier );
+    foreach( $reqn_list as $db_reqn )
+    {
+      // delete all existing links
+      util::exec_timeout( sprintf( 'rm -rf %s/*', $db_reqn->get_study_data_path( 'web' ) ) );
+
+      // remove the expiry date
+      $db_reqn->data_expiry_date = NULL;
+      $db_reqn->save();
+    }
+
+    return count( $reqn_list );
   }
 
   /**

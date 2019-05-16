@@ -150,15 +150,6 @@ class module extends \cenozo\service\module
       // include the user first/last/name as supplemental data
       $select->add_column( 'CONCAT( user.first_name, " ", user.last_name, " (", user.name, ")" )', 'formatted_user_id', false );
 
-      if( $select->has_column( 'data_available' ) )
-      {
-        $days = $db_reqn->get_study_data_expiry();
-        $value = 'No';
-        if( 1 == $days ) $value = '1 day remaining';
-        else if( 1 < $days ) $value = $days.' days remaining';
-        $select->add_constant( $value, 'data_available' );
-      }
-
       if( $select->has_column( 'chair_name' ) )
       {
         $chair_name = NULL;
