@@ -15,7 +15,9 @@ DROP PROCEDURE IF EXISTS patch_report_type;
       "( 'conflict_of_interest', 'Conflict of Interest', 'reqn', ",
         "'This report provides the primary applicant names, institution and all co-applicants for all requisitions which will be included in the current round of DSAC review.' ), ",
       "( 'requisition', 'Requisition', 'reqn', ",
-        "'This report provides basic details about all requisitions which have been submitted.' )" );
+        "'This report provides basic details about all requisitions which have been submitted.' ), ",
+      "( 'reference', 'Reference', 'reqn', ",
+        "'This report provides reference details for all requisitions which have been approved or reached the agreement stage.' )" );
     PREPARE statement FROM @sql;
     EXECUTE statement;
     DEALLOCATE PREPARE statement;
