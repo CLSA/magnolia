@@ -64,7 +64,8 @@ class ui extends \cenozo\ui\ui
     if( !is_null( $module ) ) $module->add_action( 'form', '/{identifier}?{t}' );
 
     $module = $this->get_module( 'stage_type' );
-    if( !is_null( $module ) ) $module->add_child( 'stage' );
+    if( !is_null( $module ) ) $module->add_child( 'reqn' );
+
 
     // make sure the review module exists even if there is no access to it (this is needed by web/app/root/module.extend.js)
     if( is_null( $this->get_module( 'review' ) ) ) $this->assert_module( 'review' );
