@@ -93,41 +93,39 @@ class reqn extends \cenozo\database\record
    * 
    * If no version exists then the first (empty) version will be created.  Otherwise the current version
    * will be copied exactly into a new version
+   * 
+   * @param database\reqn_version $db_clone_reqn_version Which reqn_version to copy (default is this reqn's current)
    */
-  public function create_version()
+  public function create_version( $db_clone_reqn_version = NULL )
   {
+    // first get the current reqn version to determine the next version number
     $db_current_reqn_version = $this->get_current_reqn_version();
+    $version = is_null( $db_current_reqn_version ) ? 1 : $db_current_reqn_version->version + 1;
 
+    // now set the clone version (use the current if none is provided)
+    if( is_null( $db_clone_reqn_version ) ) $db_clone_reqn_version = $db_current_reqn_version;
+
+    // create the new record and copy the clone record (if it exists)
     $db_reqn_version = lib::create( 'database\reqn_version' );
+    if( !is_null( $db_current_reqn_version ) ) $db_reqn_version->copy( $db_clone_reqn_version );
+
+    // set the parent, datetime and version (never use the clone)
     $db_reqn_version->reqn_id = $this->id;
     $db_reqn_version->datetime = util::get_datetime_object();
-
-    if( is_null( $db_current_reqn_version ) )
-    {
-      $db_reqn_version->version = 1;
-    }
-    else
-    {
-      $db_reqn_version->copy( $db_current_reqn_version );
-      $db_reqn_version->version = $db_current_reqn_version->version + 1;
-    }
-
+    $db_reqn_version->version = $version;
     $db_reqn_version->save();
 
-    if( !is_null( $db_current_reqn_version ) )
+    if( !is_null( $db_clone_reqn_version ) )
     {
       // copy the files as well
-      $existing_file = $db_current_reqn_version->get_filename( 'funding' );
+      $existing_file = $db_clone_reqn_version->get_filename( 'funding' );
       if( file_exists( $existing_file ) ) copy( $existing_file, $db_reqn_version->get_filename( 'funding' ) );
 
-      $existing_file = $db_current_reqn_version->get_filename( 'ethics' );
+      $existing_file = $db_clone_reqn_version->get_filename( 'ethics' );
       if( file_exists( $existing_file ) ) copy( $existing_file, $db_reqn_version->get_filename( 'ethics' ) );
-    }
 
-    if( !is_null( $db_current_reqn_version ) )
-    {
       // copy coapplicant records
-      foreach( $db_current_reqn_version->get_coapplicant_object_list() as $db_coapplicant )
+      foreach( $db_clone_reqn_version->get_coapplicant_object_list() as $db_coapplicant )
       {
         $db_new_coapplicant = lib::create( 'database\coapplicant' );
         $db_new_coapplicant->copy( $db_coapplicant );
@@ -136,7 +134,7 @@ class reqn extends \cenozo\database\record
       }
 
       // copy reference records
-      foreach( $db_current_reqn_version->get_reference_object_list() as $db_reference )
+      foreach( $db_clone_reqn_version->get_reference_object_list() as $db_reference )
       {
         $db_new_reference = lib::create( 'database\reference' );
         $db_new_reference->copy( $db_reference );
@@ -145,7 +143,7 @@ class reqn extends \cenozo\database\record
       }
 
       // copy reqn_version_data_option records
-      foreach( $db_current_reqn_version->get_reqn_version_data_option_object_list() as $db_reqn_version_data_option )
+      foreach( $db_clone_reqn_version->get_reqn_version_data_option_object_list() as $db_reqn_version_data_option )
       {
         $db_new_reqn_version_data_option = lib::create( 'database\reqn_version_data_option' );
         $db_new_reqn_version_data_option->copy( $db_reqn_version_data_option );
@@ -847,12 +845,12 @@ class reqn extends \cenozo\database\record
       $path = sprintf( '%s/web/%s', STUDY_DATA_PATH, $name );
       if( !file_exists( $path ) )
       {
-        if( !mkdir( $path, 0777 ) )
+        if( !mkdir( $path, 0775 ) )
           throw lib::create( 'exception\runtime', sprintf( 'Unable to create data directory "%s"', $path ), __METHOD__ );
 
         // now create the data directory based on the identifier
         $path = sprintf( '%s/data/%s', STUDY_DATA_PATH, $this->identifier );
-        if( !mkdir( $path ) )
+        if( !mkdir( $path, 0775 ) )
           throw lib::create( 'exception\runtime', sprintf( 'Unable to create data directory "%s"', $path ), __METHOD__ );
 
         $this->data_directory = $name;

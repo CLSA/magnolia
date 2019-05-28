@@ -34,6 +34,8 @@ cenozo.service( 'CnReqnHelper', [
             0 <= ['review','active'].indexOf( phase );
         } else if( 'reactivate' == subject ) {
           return 'administrator' == role && 'abandoned' == state;
+        } else if( 'recreate' == subject ) {
+          return 'administrator' == role && 'Not Approved' == stage_type;
         } else if( 'report' == subject ) {
           return 0 <= ['Report Required','Complete'].indexOf( stage_type );
         } else if( 'proceed' == subject ) {

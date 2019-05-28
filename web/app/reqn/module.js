@@ -271,6 +271,14 @@ define( function() {
   } );
 
   module.addExtraOperation( 'view', {
+    title: 'Recreate',
+    classes: 'btn-danger',
+    isIncluded: function( $state, model ) { return model.viewModel.show( 'recreate' ); },
+    isDisabled: function( $state, model ) { return !model.viewModel.enabled( 'recreate' ); },
+    operation: function( $state, model ) { model.viewModel.recreate(); }
+  } );
+
+  module.addExtraOperation( 'view', {
     title: 'Proceed',
     classes: 'btn-success',
     isIncluded: function( $state, model ) { return model.viewModel.show( 'proceed' ); },
@@ -398,9 +406,9 @@ define( function() {
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnReqnViewFactory', [
     'CnBaseViewFactory',
-    'CnReqnHelper', 'CnSession', 'CnHttpFactory', 'CnModalMessageFactory', 'CnModalConfirmFactory', '$window',
+    'CnReqnHelper', 'CnSession', 'CnHttpFactory', 'CnModalMessageFactory', 'CnModalConfirmFactory', '$window', '$state',
     function( CnBaseViewFactory,
-              CnReqnHelper, CnSession, CnHttpFactory, CnModalMessageFactory, CnModalConfirmFactory, $window ) {
+              CnReqnHelper, CnSession, CnHttpFactory, CnModalMessageFactory, CnModalConfirmFactory, $window, $state ) {
       var object = function( parentModel, root ) {
         var self = this;
         CnBaseViewFactory.construct( this, parentModel, root );
@@ -554,7 +562,7 @@ define( function() {
           enabled: function( subject ) {
             var state = this.record.state ? this.record.state : '';
 
-            if( 0 <= ['abandon','defer','reactivate'].indexOf( subject ) ) {
+            if( 0 <= ['abandon','defer','reactivate','recreate'].indexOf( subject ) ) {
               return true;
             } else if( 0 <= ['proceed','reject'].indexOf( subject ) ) {
               return !state && null != this.record.next_stage_type;
@@ -634,6 +642,23 @@ define( function() {
                 } ).patch().then( function() {
                   self.record.state = 'deferred';
                   if( angular.isDefined( self.notificationModel ) ) self.notificationModel.listModel.onList( true );
+                } );
+              }
+            } );
+          },
+
+          recreate: function() {
+            return CnModalConfirmFactory.instance( {
+              message: 'Are you sure you wish to recreate the ' + this.parentModel.module.name.singular + '?' +
+                '\n\nA new ' + this.parentModel.module.name.singular + ' will be created using all of the details ' +
+                'provided in this ' + this.parentModel.module.name.singular + '.'
+            } ).show().then( function( response ) {
+              if( response ) {
+                return CnHttpFactory.instance( {
+                  path: self.parentModel.getServiceCollectionPath() + "?clone=" + self.record.identifier
+                } ).post().then( function( response ) {
+                  // redirect to the new requestion
+                  return $state.go( 'reqn.view', { identifier: response.data } );
                 } );
               }
             } );
