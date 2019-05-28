@@ -845,12 +845,12 @@ class reqn extends \cenozo\database\record
       $path = sprintf( '%s/web/%s', STUDY_DATA_PATH, $name );
       if( !file_exists( $path ) )
       {
-        if( !mkdir( $path, 0775 ) )
+        if( !mkdir( $path, 0777 ) )
           throw lib::create( 'exception\runtime', sprintf( 'Unable to create data directory "%s"', $path ), __METHOD__ );
 
         // now create the data directory based on the identifier
         $path = sprintf( '%s/data/%s', STUDY_DATA_PATH, $this->identifier );
-        if( !mkdir( $path, 0775 ) )
+        if( !mkdir( $path, 0777 ) )
           throw lib::create( 'exception\runtime', sprintf( 'Unable to create data directory "%s"', $path ), __METHOD__ );
 
         $this->data_directory = $name;
