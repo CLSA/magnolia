@@ -25,7 +25,11 @@ class ui extends \cenozo\ui\ui
     if( !is_null( $module ) ) $module->add_child( 'data_option' );
 
     $module = $this->get_module( 'data_option' );
-    if( !is_null( $module ) ) $module->add_child( 'data_option_detail' );
+    if( !is_null( $module ) )
+    {
+      $module->add_choose( 'study_phase' );
+      $module->add_child( 'data_option_detail' );
+    }
 
     $module = $this->get_module( 'deadline' );
     if( !is_null( $module ) ) $module->add_child( 'reqn' );
