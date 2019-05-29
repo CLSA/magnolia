@@ -67,7 +67,7 @@ class reference extends \cenozo\business\report\base_report
     $select->add_column( 'reqn_version.title', 'Title', false );
     $select->add_column( 'CONCAT_WS( " ", user.first_name, user.last_name )', 'Primary Applicant', false );
     $select->add_column( 'reqn_version.applicant_affiliation', 'Institution', false );
-    $select->add_column( 'CONCAT_WS( " ", graduate_user.first_name, graduate_user.last_name )', 'Primary Applicant', false );
+    $select->add_column( 'CONCAT_WS( " ", graduate_user.first_name, graduate_user.last_name )', 'Graduate', false );
     $select->add_column( 'reqn_version.lay_summary', 'Lay Summary', false );
     $select->add_column( 'reqn_version.keywords', 'Keywords', false );
 
