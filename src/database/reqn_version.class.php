@@ -104,12 +104,32 @@ class reqn_version extends \cenozo\database\record
           return true;
     }
 
+    // see if there is a different number of data options
+    if( $this->get_reqn_version_data_option_count() != $db_last_reqn_version->get_reqn_version_data_option_count() )
+      return true;
+
     // now check reqn_version_data_option records
     foreach( $this->get_reqn_version_data_option_object_list() as $db_rvdo )
     {
       $db_last_rvdo = $reqn_version_data_option_class_name::get_unique_record(
         array( 'reqn_version_id', 'data_option_id', 'study_phase_id' ),
         array( $db_last_reqn_version->id, $db_rvdo->data_option_id, $db_rvdo->study_phase_id )
+      );
+      if( is_null( $db_last_rvdo ) ) return true;
+
+      // check all column values except for id, reqn_version_id and timestamps
+      $ignore_columns = array( 'id', 'reqn_version_id', 'update_timestamp', 'create_timestamp' );
+      foreach( $db_rvdo->get_column_names() as $column )
+        if( !in_array( $column, $ignore_columns ) && $db_rvdo->$column != $db_last_rvdo->$column )
+          return true;
+    }
+
+    // do the same check but from the last version instead
+    foreach( $db_last_reqn_version->get_reqn_version_data_option_object_list() as $db_rvdo )
+    {
+      $db_last_rvdo = $reqn_version_data_option_class_name::get_unique_record(
+        array( 'reqn_version_id', 'data_option_id', 'study_phase_id' ),
+        array( $this->id, $db_rvdo->data_option_id, $db_rvdo->study_phase_id )
       );
       if( is_null( $db_last_rvdo ) ) return true;
 
