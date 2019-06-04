@@ -433,7 +433,8 @@
                   input="{
                     key: 'duration',
                     title: t( 'part1.c.duration' ),
-                    type: model.inputList.duration.type
+                    type: 'enum',
+                    enumList: model.metadata.columnList.duration.enumList[model.viewModel.record.lang]
                   }"
                   model="model">
                 </cn-reqn-view-input>

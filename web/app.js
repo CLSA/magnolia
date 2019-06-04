@@ -485,6 +485,14 @@ cenozo.service( 'CnReqnHelper', [
               en: 'You must provide an institutional email. Public email accounts such as @gmail.com are not allowed.',
               fr: 'Vous devez fournir un courriel institutionnel. Les comptes de messagerie publics tels que @gmail.com ne sont pas autorisés.'
             },
+            duration2Years: {
+              en: '2 Years',
+              fr: '2 ans'
+            },
+            duration3Years: {
+              en: '3 Years',
+              fr: '3 années'
+            },
             graduateFeeWaiver: {
               en: 'Fee Waiver for Graduate student (MSc or PhD) for thesis only',
               fr: 'Exonération pour un étudiant des cycles supérieurs (M. Sc. ou Ph. D.) pour la thèse seulement'

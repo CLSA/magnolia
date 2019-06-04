@@ -53,7 +53,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     graduate_phone: { type: 'string' },
     graduate_email: { type: 'string' },
     start_date: { type: 'date' },
-    duration: { type: 'string' },
+    duration: { type: 'enum' },
     title: { type: 'string' },
     keywords: { type: 'string' },
     lay_summary: { type: 'text' },
@@ -1121,6 +1121,15 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                   en: [ { value: '', name: misc.choose.en }, { value: true, name: misc.yes.en }, { value: false, name: misc.no.en } ],
                   fr: [ { value: '', name: misc.choose.fr }, { value: true, name: misc.yes.fr }, { value: false, name: misc.no.fr } ]
                 };
+
+                // translate duration
+                self.metadata.columnList.duration.enumList.unshift( { value: '', name: misc.choose.en } );
+                self.metadata.columnList.duration.enumList = {
+                  en: self.metadata.columnList.duration.enumList,
+                  fr: angular.copy( self.metadata.columnList.duration.enumList )
+                };
+                self.metadata.columnList.duration.enumList.fr[0].name = misc.duration2Years.fr;
+                self.metadata.columnList.duration.enumList.fr[1].name = misc.duration3Years.fr;
 
                 // translate funding enum
                 self.metadata.columnList.funding.enumList = {

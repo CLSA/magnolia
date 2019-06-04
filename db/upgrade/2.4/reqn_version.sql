@@ -28,7 +28,7 @@ CREATE PROCEDURE patch_reqn_version()
         graduate_address VARCHAR(511) NULL DEFAULT NULL,
         graduate_phone VARCHAR(45) NULL DEFAULT NULL,
         start_date DATE NULL DEFAULT NULL,
-        duration VARCHAR(45) NULL DEFAULT NULL,
+        duration ENUM('2 years', '3 years') NULL DEFAULT NULL,
         title VARCHAR(511) NULL DEFAULT NULL,
         keywords VARCHAR(255) NULL DEFAULT NULL,
         lay_summary VARCHAR(2047) NULL DEFAULT NULL,
