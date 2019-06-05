@@ -407,6 +407,8 @@
           <div class="panel-body">
             <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_1c"></cn-reqn-deferral-note>
             <p class="text-primary" ng-bind-html="t( 'part1.c.text1' ) + startDateDelay + t( 'part1.c.text2' )"></p>
+            <p class="text-primary" ng-bind-html="t( 'part1.c.text3' )"></p>
+            <p class="text-primary" ng-bind-html="t( 'part1.c.text4' )"></p>
             <hr/>
             <form id="part1cForm" name="part1cForm" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
               <div class="form-horizontal">

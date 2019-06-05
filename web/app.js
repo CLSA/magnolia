@@ -214,6 +214,14 @@ cenozo.service( 'CnReqnHelper', [
                 en: ' months from the application submission deadline</strong> to the time you receive your dataset.',
                 fr: ' mois à compter de la date limite de soumission</strong> de votre candidature pour recevoir votre ensemble de données.'
               },
+              text3: {
+                en: 'Project duration: The length of time you propose to use the CLSA data for analysis. You may choose 2 or 3 years.',
+                fr: 'Durée du projet : la durée pendant laquelle vous proposez d’utiliser les données de l’ÉLCV à des fins d’analyse. Vous pouvez choisir entre 2 ou 3 ans.'
+              },
+              text4: {
+                en: 'Agreement duration: An approved project will have an additional two years beyond the project duration to complete all work, and to disseminate the results in the form of manuscripts or presentations, as noted within the CLSA Access Agreement.',
+                fr: 'Durée de l’entente : un projet approuvé disposera de deux années supplémentaires au-delà de la durée du projet pour achever tous les travaux et diffuser les résultats sous la forme de manuscrits et de présentations, tel qu’indiqué dans l’entente d’accès aux données de l’ÉLCV.'
+              },
               deadline: { en: 'Application submission deadline', fr: 'Date limite de soumission' },
               start_date: { en: 'Anticipated start date', fr: 'Date prévue de début' },
               duration: { en: 'Proposed project duration', fr: 'Durée proposée du projet' }
