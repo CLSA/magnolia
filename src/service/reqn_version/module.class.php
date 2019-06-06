@@ -59,6 +59,7 @@ class module extends \cenozo\service\module
     $modifier->join( 'language', 'reqn.language_id', 'language.id' );
     $modifier->left_join( 'deadline', 'reqn.deadline_id', 'deadline.id' );
 
+    $select->add_column( 'CONCAT( reqn_version.amendment, reqn_version.version )', 'amendment_version', false );
     $select->add_column( 'CONCAT_WS( " ", user.first_name, user.last_name )', 'applicant_name', false );
     $select->add_column( 'user.email', 'applicant_email', false );
     $select->add_column( 'CONCAT_WS( " ", graduate_user.first_name, graduate_user.last_name )', 'graduate_name', false );
@@ -83,7 +84,12 @@ class module extends \cenozo\service\module
         '',
         'current_reqn_version'
       );
-      $select->add_column( 'reqn_version.version = current_reqn_version.version', 'is_current_version', false, 'boolean' );
+      $select->add_column(
+        'reqn_version.amendment = current_reqn_version.amendment AND reqn_version.version = current_reqn_version.version',
+        'is_current_version',
+        false,
+        'boolean'
+      );
     }
 
     $db_reqn_version = $this->get_resource();

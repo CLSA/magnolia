@@ -21,9 +21,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
       possessive: 'version\'s'
     },
     columnList: {
-      version: {
+      amendment_version: {
         title: 'Version',
-        type: 'rank'
+        type: 'string'
       },
       datetime: {
         title: 'Date & Time',
@@ -31,14 +31,14 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
       }
     },
     defaultOrder: {
-      column: 'version',
+      column: 'amendment_version',
       reverse: true
     }
   } );
 
   module.addInputGroup( '', {
     reqn_id: { column: 'reqn.id', type: 'string' },
-    version: { type: 'string' },
+    amendment_version: { type: 'string' },
     is_current_version: { type: 'boolean' },
     applicant_name: { type: 'string' },
     applicant_position: { type: 'string' },
@@ -210,7 +210,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               '-',
               $scope.model.viewModel.record.identifier,
               'version',
-              $scope.model.viewModel.record.version,
+              $scope.model.viewModel.record.amendment_version,
               '(' + status + ')'
             ].join( ' ' );
           };
@@ -218,7 +218,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           $scope.compareTo = function( version ) {
             $scope.model.viewModel.compareRecord = version;
             $scope.liteModel.viewModel.compareRecord = version;
-            $scope.model.setQueryParameter( 'c', null == version ? undefined : version.version );
+            $scope.model.setQueryParameter( 'c', null == version ? undefined : version.amendment_version );
             $scope.model.reloadState( false, false, 'replace' );
           };
 
@@ -671,8 +671,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                 self.versionList.push( version );
               } );
 
-              var version = self.parentModel.getQueryParameter( 'c' );
-              if( angular.isDefined( version ) ) self.compareRecord = self.versionList.findByProperty( 'version', version );
+              var amendmentVersion = self.parentModel.getQueryParameter( 'c' );
+              if( angular.isDefined( amendmentVersion ) )
+                self.compareRecord = self.versionList.findByProperty( 'amendment_version', amendmentVersion );
 
               if( 1 < self.versionList.length ) {
                 // add a null object to the version list so we can turn off comparisons
@@ -974,6 +975,40 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             } );
           },
 
+          amend: function() {
+            return CnModalConfirmFactory.instance( {
+              title: self.translate( 'misc.pleaseConfirm' ),
+              noText: 'applicant' == CnSession.role.name ? self.translate( 'misc.no' ) : 'No',
+              yesText: 'applicant' == CnSession.role.name ? self.translate( 'misc.yes' ) : 'Yes',
+              message: self.translate( 'misc.amendWarning' )
+            } ).show().then( function( response ) {
+              if( response ) {
+                var parent = self.parentModel.getParentIdentifier();
+                return CnHttpFactory.instance( {
+                  path: parent.subject + '/' + parent.identifier + "?action=amend",
+                } ).patch().then( function() {
+                  // get the new version and transition to viewing it
+                  return CnHttpFactory.instance( {
+                    path: parent.subject + '/' + parent.identifier,
+                    data: {
+                      select: {
+                        column: {
+                          table: 'reqn_version',
+                          column: 'id',
+                          alias: 'reqn_version_id'
+                        }
+                      }
+                    }
+                  } ).get().then( function( response ) {
+                    return self.parentModel.transitionToViewState( {
+                      getIdentifier: function() { return response.data.reqn_version_id; }
+                    } );
+                  } );
+                } );
+              }
+            } );
+          },
+
           viewReqn: function() {
             var parent = this.parentModel.getParentIdentifier();
             return this.parentModel.transitionToParentViewState( parent.subject, parent.identifier );
@@ -1076,7 +1111,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               title: this.viewModel.record.identifier,
               go: function() { return $state.go( 'reqn.view', { identifier: 'identifier=' + self.viewModel.record.identifier } ); }
             }, {
-              title: 'version ' + this.viewModel.record.version
+              title: 'version ' + this.viewModel.record.amendment_version
             } ];
           }
 

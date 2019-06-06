@@ -43,14 +43,14 @@
                 data-toggle="dropdown"
                 aria-haspopup="true"
                 aria-expanded="false">
-          Compare {{ null == model.viewModel.compareRecord ? '' : 'Version ' + model.viewModel.compareRecord.version }}
+          Compare {{ null == model.viewModel.compareRecord ? '' : 'Version ' + model.viewModel.compareRecord.amendment_version }}
           <span class="caret"></span>
         </button>
         <ul class="dropdown-menu full-width" aria-labelledby="versionList">
           <li ng-repeat="version in model.viewModel.versionList">
             <a ng-if="version.id != model.viewModel.record.id && model.viewModel.compareRecord != version"
                ng-click="compareTo( version )">
-              {{ null == version ? 'none' : 'Version ' + version.version }}
+              {{ null == version ? 'none' : 'Version ' + version.amendment_version }}
             </a>
           </li>
         </ul>
@@ -63,6 +63,11 @@
               ng-if="model.viewModel.show( 'submit' )"
               ng-click="model.viewModel.submit()"
               ng-bind-html="t( 'misc.submit' )"
+              type="button"></button>
+      <button class="btn btn-warning"
+              ng-if="model.viewModel.show( 'amend' )"
+              ng-click="model.viewModel.amend()"
+              ng-bind-html="t( 'misc.amend' )"
               type="button"></button>
     </div>
     <div class="btn-group pull-left">
@@ -317,7 +322,7 @@
                 </table>
                 <div ng-if="isDifferent( 'coapplicant' )">
                   <hr style="border-top-color: gray;"/>
-                  <h4>Version {{ model.viewModel.compareRecord.version }} List</h4>
+                  <h4>Version {{ model.viewModel.compareRecord.amendment_version }} List</h4>
                   <span ng-show="0 == model.viewModel.compareRecord.coapplicantList.length"
                         ng-bind-html="t( 'part1.b.noCoapplicants' )"></span>
                   <table class="table table-striped" ng-show="0 < model.viewModel.compareRecord.coapplicantList.length">
@@ -572,7 +577,7 @@
                     </table>
                     <div ng-if="isDifferent( 'reference' )">
                       <hr style="border-top-color: gray;"/>
-                      <h4>Version {{ model.viewModel.compareRecord.version }} List</h4>
+                      <h4>Version {{ model.viewModel.compareRecord.amendment_version }} List</h4>
                       <span ng-show="0 == model.viewModel.compareRecord.referenceList.length"
                             ng-bind-html="t( 'part1.d.noReferences' )"></span>
                       <table class="table table-striped" ng-show="0 < model.viewModel.compareRecord.referenceList.length">

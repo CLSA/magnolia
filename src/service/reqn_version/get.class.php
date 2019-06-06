@@ -31,9 +31,23 @@ class get extends \cenozo\service\downloadable
     if( 'funding_filename' == $file ) return $db_reqn_version->funding_filename;
     else if( 'ethics_filename' == $file ) return $db_reqn_version->ethics_filename;
     else if( 'checklist' == $file )
-      return sprintf( 'Data Checklist %s version %d.pdf', $db_reqn->identifier, $db_reqn_version->version );
+    {
+      return sprintf(
+        'Data Checklist %s version %s%d.pdf',
+        $db_reqn->identifier,
+        $db_reqn_version->amendment,
+        $db_reqn_version->version
+      );
+    }
     else if( 'application' == $file )
-      return sprintf( 'Data Application %s version %d.pdf', $db_reqn->identifier, $db_reqn_version->version );
+    {
+      return sprintf(
+        'Data Application %s version %s%d.pdf',
+        $db_reqn->identifier,
+        $db_reqn_version->amendment,
+        $db_reqn_version->version
+      );
+    }
 
     throw lib::create( 'exception\argument', 'file', $file, __METHOD__ );
   }

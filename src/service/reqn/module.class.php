@@ -83,6 +83,9 @@ class module extends \cenozo\service\module
       );
     }
 
+    if( $select->has_column( 'amendment_version' ) )
+      $select->add_column( 'CONCAT( reqn_version.amendment, reqn_version.version )', 'amendment_version', false );
+
     if( 'applicant' == $db_role->name )
     {
       // only show applicants their own reqns which aren't abandoned

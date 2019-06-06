@@ -46,6 +46,7 @@ class post extends \cenozo\service\post
     {
       // create a new version using the clone
       $db_reqn = $this->get_leaf_record()->create_version(
+        false, // don't create a new amendment
         $reqn_class_name::get_unique_record( 'identifier', $clone_identifier )->get_current_reqn_version()
       );
     }

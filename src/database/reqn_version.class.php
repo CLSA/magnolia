@@ -57,17 +57,19 @@ class reqn_version extends \cenozo\database\record
     $reference_class_name = lib::get_class_name( 'database\reference' );
     $reqn_version_data_option_class_name = lib::get_class_name( 'database\reqn_version_data_option' );
 
-    // get the version before this one
-    $db_last_reqn_version = static::get_unique_record(
-      array( 'reqn_id', 'version' ),
-      array( $this->reqn_id, $this->version - 1 )
-    );
+    // get the two newest versions
+    $version_mod = lib::create( 'database\modifier' );
+    $version_mod->order( 'CHAR_LENGTH( amendment )', true );
+    $version_mod->order( 'amendment', true );
+    $version_mod->order( 'version', true );
+    $version_mod->limit( 2 );
+    $reqn_version_list = static::select_objects( $version_mod );
+    if( 2 != count( $reqn_version_list ) ) return true;
 
-    // if there was no last version then this is the first (and so yes, there are changes)
-    if( is_null( $db_last_reqn_version ) ) return true;
+    $db_last_reqn_version = $reqn_version_list[1];
 
     // check all column values except for id, version, datetime and timestamps
-    $ignore_columns = array( 'id', 'version', 'datetime', 'update_timestamp', 'create_timestamp' );
+    $ignore_columns = array( 'id', 'amendment', 'version', 'datetime', 'update_timestamp', 'create_timestamp' );
     foreach( $this->get_column_names() as $column )
       if( !in_array( $column, $ignore_columns ) && $this->$column != $db_last_reqn_version->$column )
         return true;

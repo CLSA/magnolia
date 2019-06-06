@@ -41,3 +41,20 @@ Votre demande passera alors à la prochaine étape du processus d’évaluation 
 Si vous avez des questions, veuillez nous contacter à access@clsa-elcv.ca.
 
 L’équipe d’accès aux données de l’ÉLCV";
+
+INSERT IGNORE INTO notification_type SET
+  name = "Amendment Started",
+  title_en = "CLSA Data Access - New Amendment Started",
+  title_fr = "Accès aux données de l’ÉLCV - ",
+  message_en = "Dear Dr. {{applicant_name}},
+
+A new amendment process has been started for your application number {{identifier}}, entitled {{title}}.
+
+Please log in to the CLSA online data application software, Magnolia (https://magnolia.clsa-elcv.ca/live/gl/). Make the desired changes and re-submit the application.
+
+Your application will proceed through the amendment review process and you will be contacted with the outcome at a later date.
+
+If you have any questions, please contact us at access@clsa-elcv.ca.
+
+The CLSA Data Access Team",
+  message_fr = "";

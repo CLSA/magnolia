@@ -59,6 +59,12 @@ class patch extends \cenozo\service\patch
       {
         if( 'review' != $phase && 'active' != $phase ) $code = 403;
       }
+      else if( 'amend' == $action )
+      {
+        if( !in_array( $db_role->name, array( 'applicant', 'administrator' ) ) ||
+            'active' != $phase ||
+            'Report Required' == $db_current_stage_type->name ) $code = 403;
+      }
       else if( 'reactivate' == $action )
       {
         if( 'administrator' != $db_role->name || 'abandoned' != $state ) $code = 403;
@@ -160,6 +166,24 @@ class patch extends \cenozo\service\patch
           $db_notification = lib::create( 'database\notification' );
           $db_notification->notification_type_id =
             $notification_type_class_name::get_unique_record( 'name', 'Action required' )->id;
+          $db_notification->set_reqn( $db_reqn ); // this saves the record
+          $db_notification->mail();
+        }
+        else if( 'amend' == $action )
+        {
+          $db_reqn->state = 'deferred';
+          $db_reqn->save();
+
+          // create a new version using a new amendment code
+          $db_reqn->create_version( true );
+
+          // this will put the reqn to the start of the amendment process
+          $db_reqn->proceed_to_next_stage( NULL, true ); // start a new amendment
+
+          // send a notification
+          $db_notification = lib::create( 'database\notification' );
+          $db_notification->notification_type_id =
+            $notification_type_class_name::get_unique_record( 'name', 'Amendment Started' )->id;
           $db_notification->set_reqn( $db_reqn ); // this saves the record
           $db_notification->mail();
         }

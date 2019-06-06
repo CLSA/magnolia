@@ -10,8 +10,8 @@ BEGIN
   SELECT reqn.id, reqn_version.id
   FROM reqn
   LEFT JOIN reqn_version ON reqn.id = reqn_version.reqn_id
-  AND reqn_version.version <=> (
-    SELECT MAX( version )
+  AND CONCAT( reqn_version.amendment, reqn_version.version ) <=> (
+    SELECT MAX( CONCAT( amendment, version ) )
     FROM reqn_version
     WHERE reqn.id = reqn_version.reqn_id
     GROUP BY reqn_version.reqn_id

@@ -32,6 +32,10 @@ cenozo.service( 'CnReqnHelper', [
           return 'administrator' == role &&
             0 > ['abandoned','deferred'].indexOf( state ) &&
             0 <= ['review','active'].indexOf( phase );
+        } else if( 'amend' == subject ) {
+          return 0 <= ['administrator','applicant'].indexOf( role ) &&
+            0 > ['abandoned','deferred'].indexOf( state ) &&
+            'active' == phase && 'Report Required' != stage_type;
         } else if( 'reactivate' == subject ) {
           return 'administrator' == role && 'abandoned' == state;
         } else if( 'recreate' == subject ) {
@@ -429,6 +433,11 @@ cenozo.service( 'CnReqnHelper', [
             notApplicable: { en: 'not applicable', fr: 'sans objet' },
             baseline: { en: 'Baseline', fr: 'Départ' },
             followup1: { en: 'Follow-up 1', fr: '1er suivi' },
+            amend: { en: 'Create Amendment', fr: 'TRANSLATION REQUIRED' },
+            amendWarning: {
+              en: 'Are you sure you wish to create an amendment?\n\nThe application form will be re-opened and you will be able to make and submit changes.',
+              fr: 'TRANSLATION REQUIRED'
+            },
             submit: { en: 'Submit', fr: 'Soumettre' },
             submitTitle: {
               en: 'Application Submitted',

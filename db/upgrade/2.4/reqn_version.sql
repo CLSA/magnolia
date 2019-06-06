@@ -17,7 +17,7 @@ CREATE PROCEDURE patch_reqn_version()
         update_timestamp TIMESTAMP NOT NULL,
         create_timestamp TIMESTAMP NOT NULL,
         reqn_id INT UNSIGNED NOT NULL,
-        version INT UNSIGNED NOT NULL DEFAULT 1,
+        version CHAR(3) NOT NULL DEFAULT '1',
         datetime DATETIME NOT NULL,
         applicant_position VARCHAR(255) NULL DEFAULT NULL,
         applicant_affiliation VARCHAR(255) NULL DEFAULT NULL,
@@ -65,7 +65,7 @@ CREATE PROCEDURE patch_reqn_version()
       ALTER TABLE reqn_version AUTO_INCREMENT = 1001;
 
       -- transfer reqn data into first version
-      INSERT INTO reqn_version( 
+      INSERT INTO reqn_version(
         reqn_id, version, datetime,
         applicant_position, applicant_affiliation, applicant_address, applicant_phone,
         graduate_program, graduate_institution, graduate_address, graduate_phone,
@@ -77,7 +77,7 @@ CREATE PROCEDURE patch_reqn_version()
         waiver,
         comprehensive, tracking,
         part2_a_comment, part2_b_comment, part2_c_comment, part2_d_comment, part2_e_comment, part2_f_comment )
-      SELECT 
+      SELECT
         id, 1, UTC_TIMESTAMP(),
         applicant_position, applicant_affiliation, applicant_address, applicant_phone,
         graduate_program, graduate_institution, graduate_address, graduate_phone,
@@ -91,6 +91,22 @@ CREATE PROCEDURE patch_reqn_version()
         part2_a_comment, part2_b_comment, part2_c_comment, part2_d_comment, part2_e_comment, part2_f_comment
       FROM reqn;
 
+    END IF;
+
+    SELECT "Adding revisiion column to reqn_version table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn_version"
+    AND column_name = "amendment";
+
+    IF @test = 0 THEN
+      ALTER TABLE reqn_version ADD COLUMN amendment CHAR(2) NOT NULL DEFAULT '' AFTER reqn_id;
+
+      ALTER TABLE reqn_version
+      DROP KEY uq_reqn_id_version,
+      ADD UNIQUE KEY uq_reqn_id_amendment_version (reqn_id, amendment, version);
     END IF;
 
   END //

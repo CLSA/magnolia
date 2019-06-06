@@ -94,13 +94,14 @@ class reqn extends \cenozo\database\record
    * If no version exists then the first (empty) version will be created.  Otherwise the current version
    * will be copied exactly into a new version
    * 
+   * @param boolean $new_amendment Whether to create a new amendment when creating the version
    * @param database\reqn_version $db_clone_reqn_version Which reqn_version to copy (default is this reqn's current)
    */
-  public function create_version( $db_clone_reqn_version = NULL )
+  public function create_version( $new_amendment = false, $db_clone_reqn_version = NULL )
   {
     // first get the current reqn version to determine the next version number
     $db_current_reqn_version = $this->get_current_reqn_version();
-    $version = is_null( $db_current_reqn_version ) ? 1 : $db_current_reqn_version->version + 1;
+    $version = is_null( $db_current_reqn_version ) || $new_amendment ? 1 : $db_current_reqn_version->version + 1;
 
     // now set the clone version (use the current if none is provided)
     if( is_null( $db_clone_reqn_version ) ) $db_clone_reqn_version = $db_current_reqn_version;
@@ -113,6 +114,12 @@ class reqn extends \cenozo\database\record
     $db_reqn_version->reqn_id = $this->id;
     $db_reqn_version->datetime = util::get_datetime_object();
     $db_reqn_version->version = $version;
+    if( $new_amendment )
+    {
+      // go to the next amendment (starting with A)
+      if( '' == $db_reqn_version->amendment ) $db_reqn_version->amendment = 'A';
+      else $db_reqn_version->amendment++;
+    }
     $db_reqn_version->save();
 
     if( !is_null( $db_clone_reqn_version ) )
@@ -343,9 +350,11 @@ class reqn extends \cenozo\database\record
    * Proceeds to the reqn to the next stage
    * 
    * The next stage is based on the current stage as well as the reqn's reviews
+   * @param mixed $stage_type The next stage (a stage_type record, rank or name or NULL will automatically pick the next stage)
+   * @param boolean $start_amendment Whether the next stage is to start a new amendment
    * @access public
    */
-  public function proceed_to_next_stage( $stage_type = NULL )
+  public function proceed_to_next_stage( $stage_type = NULL, $start_amendment = false )
   {
     // check the primary key value
     if( is_null( $this->id ) )
@@ -368,7 +377,10 @@ class reqn extends \cenozo\database\record
     $db_next_stage_type = NULL;
     if( is_null( $stage_type ) )
     {
-      $db_next_stage_type = $this->get_next_stage_type();
+      $db_next_stage_type = $start_amendment
+                          ? $stage_type_class_name::get_unique_record( 'name', 'Admin Review' )
+                          : $this->get_next_stage_type();
+
       if( is_null( $db_next_stage_type ) )
         throw lib::create( 'exception\runtime',
           'Unable to proceed to next stage since there is currently no valid stage type available.', __METHOD__ );
@@ -389,7 +401,7 @@ class reqn extends \cenozo\database\record
     if( is_null( $db_next_stage_type ) )
       throw lib::create( 'exception\argument', 'stage_type', $stage_type, __METHOD__ );
 
-    // Note: there is a special circumstanse where a reqn is being rejected during the DSAC selection stage (make note here)
+    // Note: there is a special circumstance where a reqn is being rejected during the DSAC selection stage (make note here)
     $reject_selection = !is_null( $db_current_stage_type ) &&
                         'DSAC Selection' == $db_current_stage_type->name &&
                         'Decision Made' == $db_next_stage_type->name;
@@ -406,7 +418,7 @@ class reqn extends \cenozo\database\record
     else
     {
       // determine whether we can safely proceed to the next stage (ignoring if the DSAC selection stage has been rejected)
-      if( !$reject_selection )
+      if( !$reject_selection && !$start_amendment )
       {
         $result = $db_current_stage->check_if_complete();
         if( true !== $result ) throw lib::create( 'exception\notice', $result, __METHOD__ );
@@ -422,7 +434,7 @@ class reqn extends \cenozo\database\record
 
       // send any notifications associated with the current stage
       $db_notification_type = $db_current_stage_type->get_notification_type();
-      if( !is_null( $db_notification_type ) )
+      if( !$start_amendment && !is_null( $db_notification_type ) )
       {
         $db_notification = lib::create( 'database\notification' );
         $db_notification->notification_type_id = $db_notification_type->id;
@@ -433,7 +445,13 @@ class reqn extends \cenozo\database\record
       {
         $db_reqn_user = $this->get_user();
         $notification_class_name::mail_admin(
-          sprintf( 'Requisition %s: %s complete', $this->identifier, $db_current_stage_type->name ),
+          sprintf(
+            'Requisition %s: %s',
+            $this->identifier,
+            $start_amendment ?
+              sprintf( 'Amendment %s started', $db_reqn_version->amendment ) :
+              sprintf( '%s complete', $db_current_stage_type->name )
+          ),
           sprintf(
             "The following requisition has moved from \"%s\" to \"%s\":\n".
             "\n".
@@ -461,13 +479,17 @@ class reqn extends \cenozo\database\record
     // if we have just entered the admin review stage then set the identifier and mark the version datetime
     if( 'Admin Review' == $db_next_stage_type->name )
     {
-      $this->identifier = $db_reqn_type->is_deadline_required()
-                        ? $this->get_deadline()->get_next_identifier()
-                        : $db_reqn_type->get_next_identifier();
-      $this->save();
+      // we don't need to do this step if this is a new amendment
+      if( !$start_amendment )
+      {
+        $this->identifier = $db_reqn_type->is_deadline_required()
+                          ? $this->get_deadline()->get_next_identifier()
+                          : $db_reqn_type->get_next_identifier();
+        $this->save();
 
-      $db_reqn_version->datetime = util::get_datetime_object();
-      $db_reqn_version->save();
+        $db_reqn_version->datetime = util::get_datetime_object();
+        $db_reqn_version->save();
+      }
     }
     // if we have just entered the DSAC review stage then alert the reviewers who are assigned to a review
     else if( 'DSAC Review' == $db_next_stage_type->name )

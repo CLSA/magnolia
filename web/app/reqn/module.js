@@ -29,10 +29,8 @@ define( function() {
         column: 'deadline.name',
         title: 'Deadline'
       },
-      version: {
-        column: 'reqn_version.version',
-        title: 'Version',
-        type: 'rank'
+      amendment_version: {
+        title: 'Version'
       },
       status: {
         column: 'stage_type.status',
@@ -731,7 +729,7 @@ define( function() {
                  'new' == this.listModel.record.phase;
         };
 
-        // override transitionToAddState
+        // override transitionToAddState (used when applicant creates a new reqn)
         this.transitionToAddState = function() {
           // for applicants immediately get a new reqn and view it (no add state required)
           return 'applicant' != CnSession.role.name ? this.$$transitionToAddState() : CnHttpFactory.instance( {
@@ -748,7 +746,7 @@ define( function() {
           } )
         };
 
-        // override transitionToAddState
+        // override transitionToViewState (used when application views a reqn)
         this.transitionToViewState = function( record ) {
           if( this.isApplicant() ) $state.go( 'reqn_version.view', { identifier: record.reqn_version_id } );
           else this.$$transitionToViewState( record );
