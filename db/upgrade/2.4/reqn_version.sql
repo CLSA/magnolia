@@ -17,7 +17,8 @@ CREATE PROCEDURE patch_reqn_version()
         update_timestamp TIMESTAMP NOT NULL,
         create_timestamp TIMESTAMP NOT NULL,
         reqn_id INT UNSIGNED NOT NULL,
-        version CHAR(3) NOT NULL DEFAULT '1',
+        amendment CHAR(1) NOT NULL DEFAULT '',
+        version INT UNSIGNED NOT NULL DEFAULT 1,
         datetime DATETIME NOT NULL,
         applicant_position VARCHAR(255) NULL DEFAULT NULL,
         applicant_affiliation VARCHAR(255) NULL DEFAULT NULL,
@@ -46,6 +47,7 @@ CREATE PROCEDURE patch_reqn_version()
         waiver ENUM('graduate', 'postdoc') NULL DEFAULT NULL,
         comprehensive TINYINT(1) NULL DEFAULT NULL,
         tracking TINYINT(1) NULL DEFAULT NULL,
+        reason_for_amendment TEXT NULL DEFAULT NULL,
         part2_a_comment TEXT NULL DEFAULT NULL,
         part2_b_comment TEXT NULL DEFAULT NULL,
         part2_c_comment TEXT NULL DEFAULT NULL,
@@ -93,7 +95,7 @@ CREATE PROCEDURE patch_reqn_version()
 
     END IF;
 
-    SELECT "Adding revisiion column to reqn_version table" AS "";
+    SELECT "Adding amendment column to reqn_version table" AS "";
 
     SELECT COUNT(*) INTO @test
     FROM information_schema.COLUMNS
@@ -102,11 +104,23 @@ CREATE PROCEDURE patch_reqn_version()
     AND column_name = "amendment";
 
     IF @test = 0 THEN
-      ALTER TABLE reqn_version ADD COLUMN amendment CHAR(2) NOT NULL DEFAULT '' AFTER reqn_id;
+      ALTER TABLE reqn_version ADD COLUMN amendment CHAR(1) NOT NULL DEFAULT '' AFTER reqn_id;
 
       ALTER TABLE reqn_version
       DROP KEY uq_reqn_id_version,
       ADD UNIQUE KEY uq_reqn_id_amendment_version (reqn_id, amendment, version);
+    END IF;
+
+    SELECT "Adding reason_for_amendment column to reqn_version table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn_version"
+    AND column_name = "reason_for_amendment";
+
+    IF @test = 0 THEN
+      ALTER TABLE reqn_version ADD COLUMN reason_for_amendment TEXT NULL DEFAULT NULL AFTER tracking;
     END IF;
 
   END //

@@ -39,6 +39,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
   module.addInputGroup( '', {
     reqn_id: { column: 'reqn.id', type: 'string' },
     amendment_version: { type: 'string' },
+    amendment: { type: 'string' },
     is_current_version: { type: 'boolean' },
     applicant_name: { type: 'string' },
     applicant_position: { type: 'string' },
@@ -69,6 +70,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     waiver: { type: 'enum' },
     comprehensive: { type: 'boolean' },
     tracking: { type: 'boolean' },
+    reason_for_amendment: { type: 'text' },
     part2_a_comment: { type: 'text' },
     part2_b_comment: { type: 'text' },
     part2_c_comment: { type: 'text' },
@@ -85,6 +87,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     phase: { column: 'stage_type.phase', type: 'string' },
     lang: { column: 'language.code', type: 'string' },
     deadline: { column: 'deadline.date', type: 'date' },
+    deferral_note_amendment: { column: 'reqn.deferral_note_amendment', type: 'text' },
     deferral_note_1a: { column: 'reqn.deferral_note_1a', type: 'text' },
     deferral_note_1b: { column: 'reqn.deferral_note_1b', type: 'text' },
     deferral_note_1c: { column: 'reqn.deferral_note_1c', type: 'text' },
@@ -232,10 +235,12 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               different = ['a', 'b', 'c', 'd', 'e', 'f'].some( function( section ) {
                 return $scope.isSectionDifferent( 'part1', section );
               } );
-            } else if ( 'part2' == part ) {
+            } else if( 'part2' == part ) {
               different = ['cohort', 'a', 'b', 'c', 'd', 'e', 'f'].some( function( section ) {
                 return $scope.isSectionDifferent( 'part2', section );
               } );
+            } else if( 'amendment' == part ) {
+              different = $scope.isSectionDifferent( 'amendment' );
             }
 
             return different;
@@ -318,6 +323,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                   }
                 }
               }
+            } else if( 'amendment' == part ) {
+              different = $scope.isDifferent( 'reason_for_amendment' );
             }
 
             return different;
@@ -570,6 +577,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           tab: [],
           tabSectionList: [
             [ 'instructions', null, null ],
+            [ 'amendment', null, null ],
             [ 'part1', 'a', null ],
             [ 'part1', 'b', null ],
             [ 'part1', 'c', null ],
@@ -630,6 +638,11 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
             if( null != currentTabSectionIndex ) {
               var tabSection = this.tabSectionList[currentTabSectionIndex + (reverse?-1:1)];
+              
+              // skip the amendment section if this isn't an amendment
+              if( 'amendment' == tabSection[0] && 0 == this.record.amendment.length )
+                tabSection = this.tabSectionList[currentTabSectionIndex + (reverse?-2:2)];
+
               if( angular.isDefined( tabSection ) ) {
                 if( null != tabSection[2] ) this.setTab( 2, tabSection[2], false );
                 if( null != tabSection[1] ) this.setTab( 1, tabSection[1], false );
@@ -890,6 +903,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               if( response ) {
                 // make sure that certain properties have been defined, one tab at a time
                 var requiredTabList = {
+                  amendment: [ 'reason_for_amendment' ],
                   a: [ 'applicant_position', 'applicant_affiliation', 'applicant_address', 'applicant_phone' ],
                   c: [ 'start_date', 'duration' ],
                   d: [ 'title', 'keywords', 'lay_summary', 'background', 'objectives', 'methodology', 'analysis' ],
@@ -904,12 +918,19 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                   for( var tab in requiredTabList ) {
                     var firstProperty = null;
                     requiredTabList[tab].filter( function( property ) {
-                      // only check e properties if funding=yes
-                      return 'e' == tab && 'funding' != property ? 'yes' == record.funding :
+                      if( 'amendment' == tab ) {
+                        // only check the reason for amendment while doing an amendment
+                        return 0 < record.amendment.length;
+                      } else if( 'e' == tab ) {
+                        // only check e properties if funding=yes
+                        return 'funding' != property ? 'yes' == record.funding : true;
+                      } else if( 'f' == tab ) {
                         // only check the ethics filename if ethics=yes (it's a boolean var)
-                        'ethics_filename' ? record.ethics :
-                        // check everything else
-                        true;
+                        return 'ethics_filename' == property ? record.ethics : true;
+                      }
+
+                      // check everything else
+                      return true;
                     } ).forEach( function( property ) {
                       var missing = false;
                       if( property.match( '_filename' ) ) {
@@ -941,7 +962,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                     // if there was an error then display it now
                     if( 'applicant' == CnSession.role.name ) error.closeText = self.translate( 'misc.close' );
                     CnModalMessageFactory.instance( error ).show().then( function() {
-                      if( 'cohort' == errorTab ) {
+                      if( 'amendment' == errorTab ) {
+                        self.setTab( 0, 'amendment', false );
+                      } else if( 'cohort' == errorTab ) {
                         self.setTab( 0, 'part2', false );
                         self.setTab( 2, errorTab );
                       } else {

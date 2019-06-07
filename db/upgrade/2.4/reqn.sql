@@ -450,6 +450,19 @@ CREATE PROCEDURE patch_reqn()
       ALTER TABLE reqn DROP COLUMN part2_f_comment;
     END IF;
 
+    SELECT "Adding new deferral_note_amendment column to reqn table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "deferral_note_amendment";
+
+    IF @test = 0 THEN
+      ALTER TABLE reqn
+      ADD COLUMN deferral_note_amendment TEXT NULL DEFAULT NULL AFTER decision_notice;
+    END IF;
+
     SELECT "Renaming deferral_note_part1_a1 column to deferral_note_1a in reqn table" AS "";
 
     SELECT COUNT(*) INTO @test

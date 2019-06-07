@@ -152,6 +152,14 @@ cenozo.service( 'CnReqnHelper', [
               fr: 'Assurez-vous de bien remplir <strong>toutes les sections pertinentes du formulaire de demande d’accès</strong>. Les demandes incomplètes pourront causer un retard dans le traitement de votre demande ou entraîner un refus.'
             }
           },
+          amendment: {
+            tab: { en: 'Amendment', fr: 'TRANSLATION REQUIRED' },
+            title: {
+              en: 'Amendment Details',
+              fr: 'TRANSLATION REQUIRED'
+            },
+            reason_for_amendment: { en: 'Reason for Amendment', fr: 'TRANSLATION REQUIRED' },
+          },
           part1: {
             tab: { en: 'Part 1', fr: '1<sup>re</sup> partie' },
             title: {

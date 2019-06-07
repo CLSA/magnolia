@@ -169,6 +169,11 @@ define( function() {
       type: 'boolean',
       exclude: true // modified in the model
     },
+    deferral_note_amendment: {
+      title: 'Amendment',
+      type: 'text',
+      exclude: 'add'
+    },
     deferral_note_1a: {
       title: 'Part1: A1',
       type: 'text',

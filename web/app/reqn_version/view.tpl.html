@@ -88,6 +88,16 @@
       <li ng-class="{'active':'instructions'==model.viewModel.tab[0]}">
         <a ng-click="model.viewModel.setTab(0,'instructions')" ng-bind-html="t( 'instructions.tab' )"></a>
       </li>
+      <li ng-class="{'active':'amendment'==model.viewModel.tab[0]}" ng-if="model.viewModel.record.amendment">
+        <a ng-click="model.viewModel.setTab(0,'amendment')"
+           ng-class="{
+             'text-warning flashing': model.getEditEnabled() && (
+               model.viewModel.record.deferral_note_amendment
+             ),
+             'bg-warning': isPartDifferent( 'amendment' )
+           }"
+           ng-bind-html="t( 'amendment.tab' )"></a>
+      </li>
       <li ng-class="{'active':'part1'==model.viewModel.tab[0]}">
         <a ng-click="model.viewModel.setTab(0,'part1')"
            ng-class="{
@@ -129,6 +139,26 @@
         </ul>
       </div>
     </div>
+    <div ng-show="'amendment'==model.viewModel.tab[0]"
+         class="panel panel-default"
+         style="border-top-left-radius: 0px;"
+         ng-if="model.viewModel.record.amendment">
+      <div class="panel-body" style="padding-bottom: 0px;">
+        <h4 ng-bind-html="t( 'amendment.title' )"></h4>
+        <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_amendment" class="bg-info"></cn-reqn-deferral-note>
+        <form id="amendmentForm" name="amendmentForm" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
+          <div class="form-horizontal">
+            <cn-reqn-view-input
+              input="{
+                key: 'reason_for_amendment',
+                title: t( 'amendment.reason_for_amendment' ),
+                type: model.inputList.reason_for_amendment.type
+              }"
+              model="model">
+          </div>
+        </fieldset></form>
+      </div>
+    </div>
     <div ng-show="'part1'==model.viewModel.tab[0]" class="panel panel-default">
       <div class="panel-body" style="padding-bottom: 0px;">
         <h4 style="margin-top: 0; margin-bottom: 1em;" ng-bind-html="t( 'part1.title' )"></h4>
@@ -150,7 +180,7 @@
             <p class="text-primary" ng-bind-html="t( 'part1.a.text1' )"></p>
             <p class="text-primary" ng-bind-html="t( 'part1.a.text2' )"></p>
             <hr/>
-            <form id="part1aForm" name="part1aForm" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
+            <form id="amendmentForm" name="amendmentForm" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
               <div class="form-horizontal">
                 <cn-reqn-view-input
                   input="{
