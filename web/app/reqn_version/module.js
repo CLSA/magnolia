@@ -906,7 +906,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                       // only check e properties if funding=yes
                       return 'e' == tab && 'funding' != property ? 'yes' == record.funding :
                         // only check the ethics filename if ethics=yes (it's a boolean var)
-                        'ethics_filename' ? record.ethics :
+                        'ethics_filename' == property ? record.ethics :
                         // check everything else
                         true;
                     } ).forEach( function( property ) {
