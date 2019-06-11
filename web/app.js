@@ -87,7 +87,7 @@ cenozo.service( 'CnReqnHelper', [
       download: function( subject, reqn_version_id ) {
         return CnHttpFactory.instance( {
           path: 'reqn_version/' + reqn_version_id + '?file=' + subject,
-          format: 'pdf'
+          format: 'unknown'
         } ).file();
       },
 

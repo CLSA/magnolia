@@ -63,12 +63,9 @@ class get extends \cenozo\service\downloadable
     $mime_type = $this->get_mime_type();
 
     // if requesting the reqn_version's application or checklist PDF file then create it first
-    if( 'application/pdf' == $mime_type )
-    {
-      $db_reqn_version = $this->get_leaf_record();
-      $file = $this->get_argument( 'file', NULL );
-      if( 'application' == $file || 'checklist' == $file ) $db_reqn_version->generate_pdf_form( $file );
-    }
+    $db_reqn_version = $this->get_leaf_record();
+    $file = $this->get_argument( 'file', NULL );
+    if( 'application' == $file || 'checklist' == $file ) $db_reqn_version->generate_pdf_form( $file );
   }
 
   /**
