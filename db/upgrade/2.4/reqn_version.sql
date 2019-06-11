@@ -17,7 +17,7 @@ CREATE PROCEDURE patch_reqn_version()
         update_timestamp TIMESTAMP NOT NULL,
         create_timestamp TIMESTAMP NOT NULL,
         reqn_id INT UNSIGNED NOT NULL,
-        amendment CHAR(1) NOT NULL DEFAULT '',
+        amendment CHAR(1) NOT NULL DEFAULT '.',
         version INT UNSIGNED NOT NULL DEFAULT 1,
         datetime DATETIME NOT NULL,
         reason_for_amendment TEXT NULL DEFAULT NULL,
@@ -105,7 +105,7 @@ CREATE PROCEDURE patch_reqn_version()
     AND column_name = "amendment";
 
     IF @test = 0 THEN
-      ALTER TABLE reqn_version ADD COLUMN amendment CHAR(1) NOT NULL DEFAULT '' AFTER reqn_id;
+      ALTER TABLE reqn_version ADD COLUMN amendment CHAR(1) NOT NULL DEFAULT '.' AFTER reqn_id;
 
       ALTER TABLE reqn_version
       DROP KEY uq_reqn_id_version,
