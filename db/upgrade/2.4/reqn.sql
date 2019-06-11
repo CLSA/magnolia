@@ -702,6 +702,16 @@ CREATE PROCEDURE patch_reqn()
       ALTER TABLE reqn ADD COLUMN data_expiry_date DATE NULL DEFAULT NULL AFTER data_directory;
     END IF;
 
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "agreement_filename";
+
+    IF @test THEN
+      ALTER TABLE reqn DROP COLUMN agreement_filename;
+    END IF;
+
   END //
 DELIMITER ;
 

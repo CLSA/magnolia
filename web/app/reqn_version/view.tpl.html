@@ -88,7 +88,7 @@
       <li ng-class="{'active':'instructions'==model.viewModel.tab[0]}">
         <a ng-click="model.viewModel.setTab(0,'instructions')" ng-bind-html="t( 'instructions.tab' )"></a>
       </li>
-      <li ng-class="{'active':'amendment'==model.viewModel.tab[0]}" ng-if="model.viewModel.record.amendment">
+      <li ng-class="{'active':'amendment'==model.viewModel.tab[0]}" ng-if="'.' != model.viewModel.record.amendment">
         <a ng-click="model.viewModel.setTab(0,'amendment')"
            ng-class="{
              'text-warning flashing': model.getEditEnabled() && (
@@ -125,6 +125,9 @@
       <li ng-class="{'active':'part3'==model.viewModel.tab[0]}">
         <a ng-click="model.viewModel.setTab(0,'part3')" ng-bind-html="t( 'part3.tab' )"></a>
       </li>
+      <li ng-class="{'active':'agreement'==model.viewModel.tab[0]}" ng-if="model.viewModel.showAgreement()">
+        <a ng-click="model.viewModel.setTab(0,'agreement')">Agreement</a>
+      </li>
     </ul>
     <div ng-show="'instructions'==model.viewModel.tab[0]" class="panel panel-default" style="border-top-left-radius: 0px;">
       <div class="panel-body" style="padding-bottom: 0px;">
@@ -141,10 +144,9 @@
     </div>
     <div ng-show="'amendment'==model.viewModel.tab[0]"
          class="panel panel-default"
-         style="border-top-left-radius: 0px;"
-         ng-if="model.viewModel.record.amendment">
+         ng-if="'.' != model.viewModel.record.amendment">
       <div class="panel-body" style="padding-bottom: 0px;">
-        <h4 ng-bind-html="t( 'amendment.title' )"></h4>
+        <h4 style="margin-top: 0; margin-bottom: 1em;" ng-bind-html="t( 'amendment.title' )"></h4>
         <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_amendment" class="bg-info"></cn-reqn-deferral-note>
         <form id="amendmentForm" name="amendmentForm" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
           <div class="form-horizontal">
@@ -921,6 +923,25 @@
       <div class="panel-body" style="padding-bottom: 0px;">
         <h4 style="margin-top: 0; margin-bottom: 1em;" ng-bind-html="t( 'part3.title' )"></h4>
         <p class="text-primary" ng-bind-html="t( 'part3.text' )"></p>
+      </div>
+    </div>
+    <div ng-show="'agreement'==model.viewModel.tab[0]" class="panel panel-default" ng-if="model.viewModel.showAgreement()">
+      <div class="panel-body" style="padding-bottom: 0px;">
+        <h4 style="margin-top: 0; margin-bottom: 1em;">Agreement Details</h4>
+        <form id="agreementForm" name="agreementForm" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
+          <div class="form-horizontal">
+            <fieldset ng-disabled="!liteModel.getEditEnabled()">
+              <cn-reqn-view-input
+                input="{
+                  key: 'agreement_filename',
+                  title: 'Agreement File',
+                  type: 'file'
+                }"
+                model="liteModel">
+              </cn-reqn-view-input>
+            </fieldset>
+          </div>
+        </fieldset></form>
       </div>
     </div>
   </div>

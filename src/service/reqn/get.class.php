@@ -27,8 +27,7 @@ class get extends \cenozo\service\downloadable
   {
     $file = $this->get_argument( 'file', NULL );
     $db_reqn = $this->get_leaf_record();
-    if( 'agreement_filename' == $file ) return $db_reqn->agreement_filename;
-    else if( 'instruction_filename' == $file ) return $db_reqn->instruction_filename;
+    if( 'instruction_filename' == $file ) return $db_reqn->instruction_filename;
     else if( 'reviews' == $file ) return sprintf( 'Reviews %s.txt', $db_reqn->identifier );
 
     throw lib::create( 'exception\argument', 'file', $file, __METHOD__ );
@@ -41,8 +40,7 @@ class get extends \cenozo\service\downloadable
   {
     $file = $this->get_argument( 'file', NULL );
     $db_reqn = $this->get_leaf_record();
-    if( 'agreement_filename' == $file ) return sprintf( '%s/%s', AGREEMENT_LETTER_PATH, $db_reqn->id );
-    else if( 'instruction_filename' == $file ) return sprintf( '%s/%s', INSTRUCTION_FILE_PATH, $db_reqn->id );
+    if( 'instruction_filename' == $file ) return sprintf( '%s/%s', INSTRUCTION_FILE_PATH, $db_reqn->id );
     else if( 'reviews' == $file ) return sprintf( '%s/%s.txt', DATA_REVIEWS_PATH, $db_reqn->id );
 
     throw lib::create( 'exception\argument', 'file', $file, __METHOD__ );

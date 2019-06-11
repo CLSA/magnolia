@@ -84,7 +84,13 @@ class module extends \cenozo\service\module
     }
 
     if( $select->has_column( 'amendment_version' ) )
-      $select->add_column( 'CONCAT( reqn_version.amendment, reqn_version.version )', 'amendment_version', false );
+    {
+      $select->add_column(
+        'CONCAT( REPLACE( reqn_version.amendment, ".", "" ), reqn_version.version )',
+        'amendment_version',
+        false
+      );
+    }
 
     if( 'applicant' == $db_role->name )
     {

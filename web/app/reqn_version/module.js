@@ -28,6 +28,10 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
       datetime: {
         title: 'Date & Time',
         type: 'datetime'
+      },
+      has_agreement_filename: {
+        title: 'Has Agreement',
+        type: 'boolean'
       }
     },
     defaultOrder: {
@@ -489,6 +493,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           if( angular.isDefined( self.stageModel ) ) self.stageModel.listModel.heading = 'Stage History';
         } );
 
+        this.configureFileInput( 'agreement_filename' );
         this.configureFileInput( 'funding_filename' );
         this.configureFileInput( 'ethics_filename' );
 
@@ -496,6 +501,10 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           compareRecord: null,
           versionList: [],
           show: function( subject ) { return CnReqnHelper.showAction( subject, this.record ); },
+          showAgreement: function() {
+            // only show the agreement tab to administrators and when we've passed the review stage
+            return 'administrator' == CnSession.role.name && 0 <= ['active','complete'].indexOf( self.record.phase );
+          },
           abandon: function() {
             return CnReqnHelper.abandon( 'identifier=' + this.record.identifier, this.record.lang ).then( function() {
               if( 'applicant' == CnSession.role.name )
@@ -592,7 +601,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             [ 'part2', null, 'd' ],
             [ 'part2', null, 'e' ],
             [ 'part2', null, 'f' ],
-            [ 'part3', null, null ]
+            [ 'part3', null, null ],
+            [ 'agreement', null, null ]
           ],
 
           setTab: function( index, tab, transition ) {
@@ -640,7 +650,11 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               var tabSection = this.tabSectionList[currentTabSectionIndex + (reverse?-1:1)];
               
               // skip the amendment section if this isn't an amendment
-              if( 'amendment' == tabSection[0] && 0 == this.record.amendment.length )
+              if( 'amendment' == tabSection[0] && '.' == this.record.amendment )
+                tabSection = this.tabSectionList[currentTabSectionIndex + (reverse?-2:2)];
+
+              // always skip the agreement section
+              if( 'agreement' == tabSection[0] )
                 tabSection = this.tabSectionList[currentTabSectionIndex + (reverse?-2:2)];
 
               if( angular.isDefined( tabSection ) ) {
@@ -920,7 +934,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                     requiredTabList[tab].filter( function( property ) {
                       if( 'amendment' == tab ) {
                         // only check the reason for amendment while doing an amendment
-                        return 0 < record.amendment.length;
+                        return '.' != record.amendment;
                       } else if( 'e' == tab ) {
                         // only check e properties if funding=yes
                         return 'funding' != property ? 'yes' == record.funding : true;
@@ -1073,10 +1087,10 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
         // override the service collection
         this.getServiceData = function( type, columnRestrictLists ) {
-          // only include the funding and ethics filenames in the view type in the lite instance
+          // only include the agreement, funding and ethics filenames in the view type in the lite instance
           return 'lite' == this.type ? {
             select: {
-              column: [ 'is_current_version', 'funding_filename', 'ethics_filename',
+              column: [ 'is_current_version', 'agreement_filename', 'funding_filename', 'ethics_filename',
                 { table: 'reqn', column: 'state' },
                 { table: 'stage_type', column: 'phase' },
                 { table: 'stage_type', column: 'name', alias: 'stage_type' }

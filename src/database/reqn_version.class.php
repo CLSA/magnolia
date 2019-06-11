@@ -32,6 +32,11 @@ class reqn_version extends \cenozo\database\record
       $filename = $this->get_filename( 'ethics' );
       if( file_exists( $filename ) ) unlink( $filename );
     }
+    if( is_null( $this->agreement_filename ) )
+    {
+      $filename = $this->get_filename( 'agreement' );
+      if( file_exists( $filename ) ) unlink( $filename );
+    }
   }
 
   /**
@@ -42,6 +47,7 @@ class reqn_version extends \cenozo\database\record
     $file_list = array();
     if( !is_null( $this->funding_filename ) ) $file_list[] = $this->get_filename( 'funding' );
     if( !is_null( $this->ethics_filename ) ) $file_list[] = $this->get_filename( 'ethics' );
+    if( !is_null( $this->agreement_filename ) ) $file_list[] = $this->get_filename( 'agreement' );
 
     parent::delete();
 
@@ -59,7 +65,6 @@ class reqn_version extends \cenozo\database\record
 
     // get the two newest versions
     $version_mod = lib::create( 'database\modifier' );
-    $version_mod->order( 'CHAR_LENGTH( amendment )', true );
     $version_mod->order( 'amendment', true );
     $version_mod->order( 'version', true );
     $version_mod->limit( 2 );
@@ -149,7 +154,7 @@ class reqn_version extends \cenozo\database\record
   /**
    * Returns the path to various files associated with the reqn
    * 
-   * @param string $type Should be 'funding' or 'ethics'
+   * @param string $type Should be 'agreement', 'funding', 'ethics' or 'instruction'
    * @return string
    * @access public
    */
@@ -158,6 +163,7 @@ class reqn_version extends \cenozo\database\record
     $directory = '';
     if( 'funding' == $type ) $directory = FUNDING_LETTER_PATH;
     else if( 'ethics' == $type ) $directory = ETHICS_LETTER_PATH;
+    else if( 'agreement' == $type ) $directory = AGREEMENT_LETTER_PATH;
     else if( 'instruction' == $type ) $directory = INSTRUCTION_FILE_PATH;
     else throw lib::create( 'exception\argument', 'type', $type, __METHOD__ );
     return sprintf( '%s/%s', $directory, $this->id );

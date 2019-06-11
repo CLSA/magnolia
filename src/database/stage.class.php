@@ -44,7 +44,7 @@ class stage extends \cenozo\database\record
       $db_reqn_version = $db_reqn->get_current_reqn_version();
       if( is_null( $db_reqn_version->ethics_filename ) )
         return 'The ethics letter must be attached before proceeding to the next stage.';
-      if( is_null( $db_reqn->agreement_filename ) )
+      if( is_null( $db_reqn_version->agreement_filename ) )
         return 'The agreement letter must be attached before proceeding to the next stage.';
     }
     else if( 'Data Release' == $db_stage_type->name )

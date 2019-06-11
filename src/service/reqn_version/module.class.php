@@ -59,11 +59,18 @@ class module extends \cenozo\service\module
     $modifier->join( 'language', 'reqn.language_id', 'language.id' );
     $modifier->left_join( 'deadline', 'reqn.deadline_id', 'deadline.id' );
 
-    $select->add_column( 'CONCAT( reqn_version.amendment, reqn_version.version )', 'amendment_version', false );
+    $select->add_column(
+      'CONCAT( REPLACE( reqn_version.amendment, ".", "" ), reqn_version.version )',
+      'amendment_version',
+      false
+    );
     $select->add_column( 'CONCAT_WS( " ", user.first_name, user.last_name )', 'applicant_name', false );
     $select->add_column( 'user.email', 'applicant_email', false );
     $select->add_column( 'CONCAT_WS( " ", graduate_user.first_name, graduate_user.last_name )', 'graduate_name', false );
     $select->add_column( 'graduate_user.email', 'graduate_email', false );
+
+    if( $select->has_columns( 'has_agreement_filename' ) )
+      $select->add_column( 'agreement_filename IS NOT NULL', 'has_agreement_filename' );
 
     if( $select->has_table_columns( 'stage' ) || $select->has_table_columns( 'stage_type' ) ) 
     {

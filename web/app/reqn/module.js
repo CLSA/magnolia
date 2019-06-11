@@ -130,12 +130,6 @@ define( function() {
       constant: true,
       exclude: true // modified in the model
     },
-    agreement_filename: {
-      column: 'agreement_filename',
-      title: 'Agreement File',
-      type: 'file',
-      exclude: true // modified in the model
-    },
     instruction_filename: {
       column: 'instruction_filename',
       title: 'Instruction File',
@@ -151,6 +145,7 @@ define( function() {
     current_reqn_version_id: { column: 'reqn_version.id', type: 'string', exclude: true },
     funding_filename: { column: 'reqn_version.funding_filename', type: 'string', exclude: true },
     ethics_filename: { column: 'reqn_version.ethics_filename', type: 'string', exclude: true },
+    agreement_filename: { column: 'reqn_version.agreement_filename', type: 'string', exclude: true },
     data_directory: { type: 'string', exclude: true },
     phase: { column: 'stage_type.phase', type: 'string', exclude: true },
     status: { column: 'stage_type.status', type: 'string', exclude: true },
@@ -314,6 +309,10 @@ define( function() {
       operation: function( $state, model ) { model.viewModel.downloadEthicsLetter(); },
       isDisabled: function( $state, model ) { return !model.viewModel.record.ethics_filename; }
     }, {
+      title: 'Agreement Letter',
+      operation: function( $state, model ) { model.viewModel.downloadAgreementLetter(); },
+      isDisabled: function( $state, model ) { return !model.viewModel.record.agreement_filename; }
+    }, {
       title: 'Reviews',
       operation: function( $state, model ) { model.viewModel.downloadReviews(); }
     }, {
@@ -420,7 +419,6 @@ define( function() {
           if( angular.isDefined( self.stageModel ) ) self.stageModel.listModel.heading = 'Stage History';
         } );
 
-        this.configureFileInput( 'agreement_filename' );
         this.configureFileInput( 'instruction_filename' );
 
         angular.extend( this, {
@@ -438,6 +436,9 @@ define( function() {
           downloadChecklist: function() { return CnReqnHelper.download( 'checklist', this.record.current_reqn_version_id ); },
           downloadFundingLetter: function() { return CnReqnHelper.download( 'funding_filename', this.record.current_reqn_version_id ); },
           downloadEthicsLetter: function() { return CnReqnHelper.download( 'ethics_filename', this.record.current_reqn_version_id ); },
+          downloadAgreementLetter: function() {
+            return CnReqnHelper.download( 'agreement_filename', this.record.current_reqn_version_id );
+          },
           downloadReviews: function() {
             return CnHttpFactory.instance( {
               path: this.parentModel.getServiceResourcePath() + '?file=reviews',
@@ -511,7 +512,6 @@ define( function() {
                 3 > CnSession.role.tier || null == self.record.deadline_id ? true : 'add';
 
               // show the agreement and instruction files if we're past the review stage
-              mainInputGroup.inputList.agreement_filename.exclude = 0 > ['active','complete'].indexOf( self.record.phase );
               mainInputGroup.inputList.instruction_filename.exclude = 0 > ['active','complete'].indexOf( self.record.phase );
 
               // show the study data available if we're in the active phase

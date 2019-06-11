@@ -27,5 +27,7 @@ SOURCE user_has_graduate.sql
 
 SOURCE update_version_number.sql
 
+SELECT "TO COMPLETE THE INSTALLATION: you must now run the 'convert_agreement_filenames.php' script" AS "";
+
 COMMIT;
 

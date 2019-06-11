@@ -62,11 +62,6 @@ class reqn extends \cenozo\database\record
     }
 
     // delete files if they are being set to null
-    if( is_null( $this->agreement_filename ) )
-    {
-      $filename = $this->get_filename( 'agreement' );
-      if( file_exists( $filename ) ) unlink( $filename );
-    }
     if( is_null( $this->instruction_filename ) )
     {
       $filename = $this->get_filename( 'instruction' );
@@ -80,7 +75,6 @@ class reqn extends \cenozo\database\record
   public function delete()
   {
     $file_list = array();
-    if( !is_null( $this->agreement_filename ) ) $file_list[] = $this->get_filename( 'agreement' );
     if( !is_null( $this->instruction_filename ) ) $file_list[] = $this->get_filename( 'instruction' );
 
     parent::delete();
@@ -110,14 +104,17 @@ class reqn extends \cenozo\database\record
     $db_reqn_version = lib::create( 'database\reqn_version' );
     if( !is_null( $db_current_reqn_version ) ) $db_reqn_version->copy( $db_clone_reqn_version );
 
-    // set the parent, datetime and version (never use the clone)
+    // set the parent, datetime, version and agreement_filename (never use the clone)
     $db_reqn_version->reqn_id = $this->id;
     $db_reqn_version->datetime = util::get_datetime_object();
     $db_reqn_version->version = $version;
+    $db_reqn_version->agreement_filename = NULL;
+
+    // determine the amendment
     if( $new_amendment )
     {
       // go to the next amendment (starting with A)
-      if( '' == $db_reqn_version->amendment ) $db_reqn_version->amendment = 'A';
+      if( '.' == $db_reqn_version->amendment ) $db_reqn_version->amendment = 'A';
       else $db_reqn_version->amendment++;
     }
     $db_reqn_version->save();

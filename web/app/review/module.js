@@ -88,7 +88,8 @@ define( function() {
     review_type_id: { type: 'hidden' },
     current_reqn_version_id: { column: 'reqn_version.id', type: 'hidden' },
     funding_filename: { column: 'reqn_version.funding_filename', type: 'hidden' },
-    ethics_filename: { column: 'reqn_version.ethics_filename', type: 'hidden' }
+    ethics_filename: { column: 'reqn_version.ethics_filename', type: 'hidden' },
+    agreement_filename: { column: 'reqn_version.agreement_filename', type: 'hidden' }
   } );
 
   module.addExtraOperation( 'view', {
@@ -114,6 +115,10 @@ define( function() {
       title: 'Ethics Letter',
       operation: function( $state, model ) { model.viewModel.downloadEthicsLetter(); },
       isDisabled: function( $state, model ) { return !model.viewModel.record.ethics_filename; }
+    }, {
+      title: 'Agreement Letter',
+      operation: function( $state, model ) { model.viewModel.downloadAgreementLetter(); },
+      isDisabled: function( $state, model ) { return !model.viewModel.record.agreement_filename; }
     }, {
       title: 'Reviews',
       operation: function( $state, model ) { model.viewModel.downloadReviews(); }
@@ -196,6 +201,9 @@ define( function() {
           downloadChecklist: function() { return CnReqnHelper.download( 'checklist', this.record.current_reqn_version_id ); },
           downloadFundingLetter: function() { return CnReqnHelper.download( 'funding_filename', this.record.current_reqn_version_id ); },
           downloadEthicsLetter: function() { return CnReqnHelper.download( 'ethics_filename', this.record.current_reqn_version_id ); },
+          downloadAgreementLetter: function() {
+            return CnReqnHelper.download( 'agreement_filename', this.record.current_reqn_version_id );
+          },
           downloadReviews: function() {
             return CnHttpFactory.instance( {
               path: 'reqn/' + this.record.reqn_id + '?file=reviews',

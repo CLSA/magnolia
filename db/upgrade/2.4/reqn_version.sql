@@ -20,6 +20,7 @@ CREATE PROCEDURE patch_reqn_version()
         amendment CHAR(1) NOT NULL DEFAULT '',
         version INT UNSIGNED NOT NULL DEFAULT 1,
         datetime DATETIME NOT NULL,
+        reason_for_amendment TEXT NULL DEFAULT NULL,
         applicant_position VARCHAR(255) NULL DEFAULT NULL,
         applicant_affiliation VARCHAR(255) NULL DEFAULT NULL,
         applicant_address VARCHAR(511) NULL DEFAULT NULL,
@@ -47,7 +48,7 @@ CREATE PROCEDURE patch_reqn_version()
         waiver ENUM('graduate', 'postdoc') NULL DEFAULT NULL,
         comprehensive TINYINT(1) NULL DEFAULT NULL,
         tracking TINYINT(1) NULL DEFAULT NULL,
-        reason_for_amendment TEXT NULL DEFAULT NULL,
+        agreement_filename VARCHAR(255) NULL DEFAULT NULL,
         part2_a_comment TEXT NULL DEFAULT NULL,
         part2_b_comment TEXT NULL DEFAULT NULL,
         part2_c_comment TEXT NULL DEFAULT NULL,
@@ -111,8 +112,6 @@ CREATE PROCEDURE patch_reqn_version()
       ADD UNIQUE KEY uq_reqn_id_amendment_version (reqn_id, amendment, version);
     END IF;
 
-    SELECT "Adding reason_for_amendment column to reqn_version table" AS "";
-
     SELECT COUNT(*) INTO @test
     FROM information_schema.COLUMNS
     WHERE table_schema = DATABASE()
@@ -120,7 +119,28 @@ CREATE PROCEDURE patch_reqn_version()
     AND column_name = "reason_for_amendment";
 
     IF @test = 0 THEN
-      ALTER TABLE reqn_version ADD COLUMN reason_for_amendment TEXT NULL DEFAULT NULL AFTER tracking;
+      ALTER TABLE reqn_version ADD COLUMN reason_for_amendment TEXT NULL DEFAULT NULL AFTER datetime;
+    END IF;
+
+    SELECT "Adding agreement_filename column to reqn_version table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn_version"
+    AND column_name = "agreement_filename";
+
+    IF @test = 0 THEN
+      ALTER TABLE reqn_version ADD COLUMN agreement_filename VARCHAR(255) NULL DEFAULT NULL AFTER tracking;
+
+      -- make sure the old update trigger doesn't exist, otherwise the following update won't work
+      DROP TRIGGER IF EXISTS reqn_version_AFTER_UPDATE;
+
+      UPDATE reqn
+      JOIN reqn_current_reqn_version ON reqn.id = reqn_current_reqn_version.reqn_id
+      JOIN reqn_version ON reqn_current_reqn_version.reqn_version_id = reqn_version.id
+      SET reqn_version.agreement_filename = reqn.agreement_filename
+      WHERE reqn.agreement_filename IS NOT NULL;
     END IF;
 
   END //
@@ -134,12 +154,6 @@ DELIMITER $$
 
 DROP TRIGGER IF EXISTS reqn_version_AFTER_INSERT $$
 CREATE DEFINER = CURRENT_USER TRIGGER reqn_version_AFTER_INSERT AFTER INSERT ON reqn_version FOR EACH ROW
-BEGIN
-  CALL update_reqn_current_reqn_version( NEW.reqn_id );
-END$$
-
-DROP TRIGGER IF EXISTS reqn_version_AFTER_UPDATE $$
-CREATE DEFINER = CURRENT_USER TRIGGER reqn_version_AFTER_UPDATE AFTER UPDATE ON reqn_version FOR EACH ROW
 BEGIN
   CALL update_reqn_current_reqn_version( NEW.reqn_id );
 END$$
