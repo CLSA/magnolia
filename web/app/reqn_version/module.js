@@ -152,8 +152,14 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           scope.liteModel.viewModel.onView();
 
           scope.model.viewModel.afterView( function() {
-            // display the decision notice (the function will determine whether this should be done or not)
-            scope.model.viewModel.displayDecisionNotice();
+            var record = scope.model.viewModel.record;
+
+            // display the decision notice to the applicant under specific circumstances
+            if( 'applicant' == CnSession.role.name &&
+                record.decision_notice &&
+                -1 < [ 'Suggested Revisions', 'Agreement', 'Not Approved' ].indexOf( record.stage_type ) ) {
+              scope.model.viewModel.displayDecisionNotice();
+            }
           } );
 
           // fill in the start date delay
@@ -980,15 +986,11 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           },
 
           displayDecisionNotice: function() {
-            if( 'applicant' == CnSession.role.name &&
-                this.record.decision_notice &&
-                -1 < [ 'Suggested Revisions', 'Agreement', 'Not Approved' ].indexOf( this.record.stage_type ) ) {
-              CnModalMessageFactory.instance( {
-                title: 'Notice of decision for ' + self.record.identifier,
-                message: self.record.decision_notice,
-                print: true
-              } ).show();
-            }
+            CnModalMessageFactory.instance( {
+              title: 'Notice of decision for ' + self.record.identifier,
+              message: self.record.decision_notice,
+              print: true
+            } ).show();
           }
 
         } );

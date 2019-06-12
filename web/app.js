@@ -423,6 +423,7 @@ cenozo.service( 'CnReqnHelper', [
             download: { en: 'Download', fr: 'Télécharger' },
             application: { en: 'Application', fr: 'Soumission' },
             dataChecklist: { en: 'Data Checklist', fr: 'Sélection des données' },
+            noticeOfDecision: { en: 'Notice of Decision', fr: 'Envoi de l’avis de décision' },
             studyData: { en: 'Study Data', fr: 'Données d’étude' },
             finalReport: { en: 'Final Report', fr: 'Rapport final' },
             notAvailable: { en: 'not yet available', fr: 'pas encore disponible' },
