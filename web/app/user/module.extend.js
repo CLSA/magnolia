@@ -8,7 +8,7 @@ define( [ cenozoApp.module( 'user' ).getFileUrl( 'module.js' ) ], function() {
   delete module.columnList.sites;
 
   // add the newsletter column to the column list
-  cenozo.insertPropertyAfter( module.columnList, 'roles', 'newsletter', {
+  cenozo.insertPropertyAfter( module.columnList, 'role_list', 'newsletter', {
     column: 'newsletter',
     title: 'Newsletter',
     type: 'boolean'
