@@ -845,7 +845,7 @@
                         </button>
                       </td>
                       <td ng-if="!dataOption.f1">
-                        <span style="line-height: 28px;">({{ t( 'c' == part ? 'misc.notApplicable' : 'misc.notAvailable' ) }})</span>
+                        <span style="line-height: 28px;">({{ t( 'c' == part && !dataOption.name[model.viewModel.record.lang].includes( 'Report' ) ? 'misc.notApplicable' : 'misc.notAvailable' ) }})</span>
                       </td>
                     </tr>
                     <tr ng-repeat-end data-toggle="collapse" data-target="#accordion{{ dataOption.id }}" style="background: white">
