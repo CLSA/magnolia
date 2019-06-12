@@ -74,6 +74,7 @@ curl_close( $curl );
  */
 write_log( 'Removing all expired study data' );
 
+$curl = curl_init();
 curl_setopt( $curl, CURLOPT_URL, URL.'reqn?expire_data=1' );
 curl_setopt( $curl, CURLOPT_SSL_VERIFYHOST, false );
 curl_setopt( $curl, CURLOPT_RETURNTRANSFER, true );
