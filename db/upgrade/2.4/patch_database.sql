@@ -8,7 +8,9 @@ SOURCE reqn_type.sql
 SOURCE reqn_type_has_stage_type.sql
 SOURCE graduate.sql
 SOURCE reqn_version.sql
+SOURCE reqn_version2.sql
 SOURCE reqn.sql
+SOURCE reqn2.sql
 SOURCE reqn_current_reqn_version.sql
 SOURCE update_reqn_current_reqn_version.sql
 SOURCE coapplicant.sql
@@ -24,6 +26,10 @@ SOURCE notification_type.sql
 SOURCE notification_email.sql
 SOURCE notification.sql
 SOURCE user_has_graduate.sql
+SOURCE data_option.sql
+SOURCE data_option_category.sql
+SOURCE data_option_detail.sql
+SOURCE data_option_has_study_phase.sql
 
 SOURCE update_version_number.sql
 

@@ -74,7 +74,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     part2_c_comment: { type: 'text' },
     part2_d_comment: { type: 'text' },
     part2_e_comment: { type: 'text' },
-    part2_f_comment: { type: 'text' },
 
     identifier: { column: 'reqn.identifier', type: 'string' },
     state: { column: 'reqn.state', type: 'string' },
@@ -95,8 +94,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     deferral_note_2b: { column: 'reqn.deferral_note_2b', type: 'text' },
     deferral_note_2c: { column: 'reqn.deferral_note_2c', type: 'text' },
     deferral_note_2d: { column: 'reqn.deferral_note_2d', type: 'text' },
-    deferral_note_2e: { column: 'reqn.deferral_note_2e', type: 'text' },
-    deferral_note_2f: { column: 'reqn.deferral_note_2f', type: 'text' }
+    deferral_note_2e: { column: 'reqn.deferral_note_2e', type: 'text' }
   } );
 
   /* ######################################################################################################## */
@@ -239,7 +237,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                 return $scope.isSectionDifferent( 'part1', section );
               } );
             } else if ( 'part2' == part ) {
-              different = ['cohort', 'a', 'b', 'c', 'd', 'e', 'f'].some( function( section ) {
+              different = ['cohort', 'a', 'b', 'c', 'd', 'e'].some( function( section ) {
                 return $scope.isSectionDifferent( 'part2', section );
               } );
             }
@@ -589,7 +587,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             [ 'part2', null, 'c' ],
             [ 'part2', null, 'd' ],
             [ 'part2', null, 'e' ],
-            [ 'part2', null, 'f' ],
             [ 'part3', null, null ]
           ],
 

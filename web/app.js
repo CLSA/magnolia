@@ -359,8 +359,7 @@ cenozo.service( 'CnReqnHelper', [
             },
             b: { tab: { en: '', fr: '' }, module: { en: '', fr: '' }, tracking: { en: '', fr: '' }, comprehensive: { en: '', fr: '' } },
             c: { tab: { en: '', fr: '' }, module: { en: '', fr: '' }, tracking: { en: '', fr: '' }, comprehensive: { en: '', fr: '' } },
-            d: { tab: { en: '', fr: '' }, module: { en: '', fr: '' }, tracking: { en: '', fr: '' }, comprehensive: { en: '', fr: '' } },
-            e: {
+            d: {
               tab: { en: '', fr: '' },
               module: { en: 'Linked Data', fr: 'Données liées' },
               tracking: {
@@ -372,7 +371,7 @@ cenozo.service( 'CnReqnHelper', [
                 fr: 'Évaluation globale<br/>(Entrevue en personne - à domicile ou au DCS) (COM)'
               }
             },
-            f: {
+            e: {
               tab: { en: '', fr: '' },
               module: { en: '', fr: '' },
               tracking: { en: '', fr: '' },

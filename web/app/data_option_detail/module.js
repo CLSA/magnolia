@@ -8,7 +8,7 @@ define( [ 'data_option' ].reduce( function( list, name ) {
     identifier: {
       parent: {
         subject: 'data_option',
-        column: 'data_option.name_en'
+        column: 'data_option.id'
       }
     },
     name: {
