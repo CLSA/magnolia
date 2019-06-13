@@ -70,8 +70,9 @@ class stage extends \cenozo\database\record
         if( is_null( $db_review->recommendation_type_id ) )
         {
           return sprintf(
-            'The %s Review\'s recommendation must be chosen before proceeding to the next stage.',
-            $db_review->get_review_type()->name
+            'The recommendation for the %s Review%s must be chosen before proceeding to the next stage.',
+            $db_review->get_review_type()->name,
+            '.' == $db_review->amendment ? '' : sprintf( ' (Amendment %s)', $db_review->amendment )
           );
         }
       }

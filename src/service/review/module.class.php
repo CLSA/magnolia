@@ -83,6 +83,9 @@ class module extends \cenozo\service\module
       $select->add_column( 'CONCAT( user.first_name, " ", user.last_name, " (", user.name, ")" )', 'formatted_user_id', false );
     }
 
+    if( $select->has_column( 'amendment' ) )
+      $select->add_column( 'REPLACE( review.amendment, ".", "no" )', 'amendment', false );
+
     if( $select->has_column( 'user_full_name' ) )
       $select->add_column( 'CONCAT( user.first_name, " ", user.last_name )', 'user_full_name', false );
 

@@ -292,6 +292,12 @@ class reqn extends \cenozo\database\record
           $review_mod = lib::create( 'database\modifier' );
           $review_mod->join( 'review_type', 'review.review_type_id', 'review_type.id' );
           $review_mod->join( 'recommendation_type', 'review.recommendation_type_id', 'recommendation_type.id' );
+
+          // make sure to only get reviews for the current amendment
+          $review_mod->join( 'reqn_current_reqn_version', 'review.reqn_id', 'reqn_current_reqn_version.reqn_id' );
+          $review_mod->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
+          $review_mod->where( 'review.amendment', '=', 'reqn_version.amendment', false );
+
           $review_list = array();
           foreach( $this->get_review_list( $review_sel, $review_mod ) as $review )
             $review_list[$review['name']] = $review['recommendation'];
@@ -502,6 +508,11 @@ class reqn extends \cenozo\database\record
       $review_mod->where( 'review_type.name', 'LIKE', 'Reviewer %' );
       $review_mod->where( 'recommendation_type_id', '=', NULL );
 
+      // make sure to only get reviews for the current amendment
+      $review_mod->join( 'reqn_current_reqn_version', 'review.reqn_id', 'reqn_current_reqn_version.reqn_id' );
+      $review_mod->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
+      $review_mod->where( 'review.amendment', '=', 'reqn_version.amendment', false );
+
       $review_list = $this->get_review_list( $review_sel, $review_mod );
 
       if( 0 < count( $review_list ) )
@@ -606,12 +617,14 @@ class reqn extends \cenozo\database\record
 
     $text = sprintf(
       "Requisition: %s\n".
+      "Amendment: %s\n".
       "Title: %s\n".
       "Applicant: %s\n".
       "%s". // graduate only added if one exists
       "Lay Summary:\n".
       "%s\n",
       $this->identifier,
+      str_replace( '.', 'no', $db_reqn_version->amendment ),
       $db_reqn_version->title,
       sprintf( '%s %s', $db_user->first_name, $db_user->last_name ),
       is_null( $db_graduate_user ) ?
@@ -620,6 +633,7 @@ class reqn extends \cenozo\database\record
     );
 
     $review_sel = lib::create( 'database\select' );
+    $review_sel->add_column( 'amendment' );
     $review_sel->add_table_column( 'user', 'first_name' );
     $review_sel->add_table_column( 'user', 'last_name' );
     $review_sel->add_column( 'date' );
@@ -634,6 +648,11 @@ class reqn extends \cenozo\database\record
     $review_mod->order( 'date' );
     $review_mod->order( 'stage_type_id' );
 
+    // make sure to only get reviews for the current amendment
+    $review_mod->join( 'reqn_current_reqn_version', 'review.reqn_id', 'reqn_current_reqn_version.reqn_id' );
+    $review_mod->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
+    $review_mod->where( 'review.amendment', '=', 'reqn_version.amendment', false );
+
     foreach( $this->get_review_list( $review_sel, $review_mod ) as $review )
     {
       $text .= sprintf(
@@ -644,6 +663,7 @@ class reqn extends \cenozo\database\record
         "Notes:\n".
         "%s\n",
         $review['type'],
+        str_replace( '.', 'no', $review['amendment'] ),
         is_null( $review['first_name'] ) ? '(none)' : $review['first_name'].' '.$review['last_name'],
         $review['date'],
         is_null( $review['recommendation'] ) ? '(none)' : $review['recommendation'],

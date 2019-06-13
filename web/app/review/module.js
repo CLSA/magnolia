@@ -16,6 +16,7 @@ define( function() {
     },
     columnList: {
       identifier: { column: 'reqn.identifier', title: 'Requisition' },
+      amendment: { title: 'Amendment' },
       review_type: {
         column: 'review_type.name',
         title: 'Type',
@@ -52,6 +53,11 @@ define( function() {
         select: 'reqn.identifier',
         where: 'reqn.identifier'
       },
+      constant: true
+    },
+    amendment: {
+      title: 'Amendment',
+      type: 'string',
       constant: true
     },
     review_type: {

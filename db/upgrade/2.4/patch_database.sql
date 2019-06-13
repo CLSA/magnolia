@@ -2,6 +2,7 @@
 
 SET AUTOCOMMIT=0;
 
+SOURCE stage.sql
 SOURCE stage_type.sql
 SOURCE stage_type_has_stage_type.sql
 SOURCE reqn_type.sql
@@ -30,6 +31,7 @@ SOURCE data_option.sql
 SOURCE data_option_category.sql
 SOURCE data_option_detail.sql
 SOURCE data_option_has_study_phase.sql
+SOURCE review.sql
 
 SOURCE update_version_number.sql
 
