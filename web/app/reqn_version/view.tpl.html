@@ -22,9 +22,10 @@
                 aria-haspopup="true"
                 aria-expanded="false"
                 ng-bind-html="t( 'misc.download' ) + ' <span class=\'caret\' ng-if=\'op.operations\'></span>'"></button>
-        <ul class="dropdown-menu full-width" style="width: 180px !important" aria-labelledby="downloadForms">
+        <ul class="dropdown-menu dropdown-menu-right full-width" style="width: 200px !important" aria-labelledby="downloadForms">
           <li><a ng-click="model.viewModel.downloadApplication()" ng-bind-html="t( 'misc.application' )"></a></li>
           <li><a ng-click="model.viewModel.downloadChecklist()" ng-bind-html="t( 'misc.dataChecklist' )"></a></li>
+          <li><a ng-if="model.viewModel.record.decision_notice && 'review' != model.viewModel.record.phase" ng-click="model.viewModel.displayDecisionNotice()" ng-bind-html="t( 'misc.noticeOfDecision' )"></a></li>
           <li ng-if="model.viewModel.canViewData()">
             <a ng-click="model.viewModel.viewData()" ng-bind-html="t( 'misc.studyData' )"></a>
           </li>
@@ -116,7 +117,7 @@
              'text-warning flashing': model.getEditEnabled() && (
                model.viewModel.record.deferral_note_2a || model.viewModel.record.deferral_note_2b ||
                model.viewModel.record.deferral_note_2c || model.viewMOdel.record.deferral_note_2d ||
-               model.viewModel.record.deferral_note_2e || model.viewModel.record.deferral_note_2f
+               model.viewModel.record.deferral_note_2e
              ),
              'bg-warning': isPartDifferent( 'part2' )
            }"
@@ -805,7 +806,7 @@
             <p class="text-primary" ng-bind-html="t( 'part2.cohort.text2' )"></p>
           </div>
         </div>
-        <div ng-repeat="part in ['a','b','c','d','e','f']"
+        <div ng-repeat="part in ['a','b','c','d','e']"
              ng-init="partIndex = $index"
              ng-show="part==model.viewModel.tab[2]"
              class="panel panel-default">
@@ -813,21 +814,21 @@
             <form ng-attr-id="part2{{ part }}Form" ng-attr-name="part2{{ part }}Form" novalidate>
               <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_2{{ part }}"></cn-reqn-deferral-note>
               <div class="form-horizontal">
-                <ul class="list-group" ng-if="'f'==part">
+                <ul class="list-group" ng-if="'e'==part">
                   <li class="list-group-item">
-                    <h4 ng-bind-html="t( 'part2.f.title1' )"></h4>
-                    <div ng-bind-html="t( 'part2.f.text1' )"></div>
+                    <h4 ng-bind-html="t( 'part2.e.title1' )"></h4>
+                    <div ng-bind-html="t( 'part2.e.text1' )"></div>
                   </li>
                   <li class="list-group-item">
-                    <h4 ng-bind-html="t( 'part2.f.title2' )"></h4>
-                    <div ng-bind-html="t( 'part2.f.text2' )"></div>
+                    <h4 ng-bind-html="t( 'part2.e.title2' )"></h4>
+                    <div ng-bind-html="t( 'part2.e.text2' )"></div>
                   </li>
                   <li class="list-group-item">
-                    <h4 ng-bind-html="t( 'part2.f.title3' )"></h4>
-                    <div ng-bind-html="t( 'part2.f.text3' )"></div>
+                    <h4 ng-bind-html="t( 'part2.e.title3' )"></h4>
+                    <div ng-bind-html="t( 'part2.e.text3' )"></div>
                   </li>
                   <li class="list-group-item">
-                    <div class="vertical-spacer" ng-bind-html="t( 'part2.f.text4' )"></div>
+                    <div class="vertical-spacer" ng-bind-html="t( 'part2.e.text4' )"></div>
                   </li>
                 </ul>
                 <table class="table table-hover" ng-if="model.dataOptionCategoryList[partIndex].optionList.length">

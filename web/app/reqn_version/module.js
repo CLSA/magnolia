@@ -80,7 +80,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     part2_c_comment: { type: 'text' },
     part2_d_comment: { type: 'text' },
     part2_e_comment: { type: 'text' },
-    part2_f_comment: { type: 'text' },
 
     identifier: { column: 'reqn.identifier', type: 'string' },
     state: { column: 'reqn.state', type: 'string' },
@@ -102,8 +101,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     deferral_note_2b: { column: 'reqn.deferral_note_2b', type: 'text' },
     deferral_note_2c: { column: 'reqn.deferral_note_2c', type: 'text' },
     deferral_note_2d: { column: 'reqn.deferral_note_2d', type: 'text' },
-    deferral_note_2e: { column: 'reqn.deferral_note_2e', type: 'text' },
-    deferral_note_2f: { column: 'reqn.deferral_note_2f', type: 'text' }
+    deferral_note_2e: { column: 'reqn.deferral_note_2e', type: 'text' }
   } );
 
   /* ######################################################################################################## */
@@ -159,8 +157,14 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           scope.liteModel.viewModel.onView();
 
           scope.model.viewModel.afterView( function() {
-            // display the decision notice (the function will determine whether this should be done or not)
-            scope.model.viewModel.displayDecisionNotice();
+            var record = scope.model.viewModel.record;
+
+            // display the decision notice to the applicant under specific circumstances
+            if( 'applicant' == CnSession.role.name &&
+                record.decision_notice &&
+                -1 < [ 'Suggested Revisions', 'Agreement', 'Not Approved' ].indexOf( record.stage_type ) ) {
+              scope.model.viewModel.displayDecisionNotice();
+            }
           } );
 
           // fill in the start date delay
@@ -240,7 +244,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                 return $scope.isSectionDifferent( 'part1', section );
               } );
             } else if( 'part2' == part ) {
-              different = ['cohort', 'a', 'b', 'c', 'd', 'e', 'f'].some( function( section ) {
+              different = ['cohort', 'a', 'b', 'c', 'd', 'e'].some( function( section ) {
                 return $scope.isSectionDifferent( 'part2', section );
               } );
             } else if( 'amendment' == part ) {
@@ -600,7 +604,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             [ 'part2', null, 'c' ],
             [ 'part2', null, 'd' ],
             [ 'part2', null, 'e' ],
-            [ 'part2', null, 'f' ],
             [ 'part3', null, null ],
             [ 'agreement', null, null ]
           ],
@@ -1052,15 +1055,11 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           },
 
           displayDecisionNotice: function() {
-            if( 'applicant' == CnSession.role.name &&
-                this.record.decision_notice &&
-                -1 < [ 'Suggested Revisions', 'Agreement', 'Not Approved' ].indexOf( this.record.stage_type ) ) {
-              CnModalMessageFactory.instance( {
-                title: 'Notice of decision for ' + self.record.identifier,
-                message: self.record.decision_notice,
-                print: true
-              } ).show();
-            }
+            CnModalMessageFactory.instance( {
+              title: 'Notice of decision for ' + self.record.identifier,
+              message: self.record.decision_notice,
+              print: true
+            } ).show();
           }
 
         } );

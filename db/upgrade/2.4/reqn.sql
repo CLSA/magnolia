@@ -3,9 +3,6 @@ DELIMITER //
 CREATE PROCEDURE patch_reqn()
   BEGIN
 
-    -- determine the @cenozo database name
-    SET @cenozo = ( SELECT REPLACE( DATABASE(), "magnolia", "cenozo" ) );
-
     SELECT "Removing reqn.applicant_name column" AS "";
 
     SELECT COUNT(*) INTO @test

@@ -295,7 +295,6 @@ class reqn_version extends \cenozo\database\record
       if( !is_null( $this->part2_c_comment ) ) $data['part2_c_comment'] = $this->part2_c_comment;
       if( !is_null( $this->part2_d_comment ) ) $data['part2_d_comment'] = $this->part2_d_comment;
       if( !is_null( $this->part2_e_comment ) ) $data['part2_e_comment'] = $this->part2_e_comment;
-      if( !is_null( $this->part2_f_comment ) ) $data['part2_f_comment'] = $this->part2_f_comment;
 
       $reqn_version_data_option_list = array();
       $reqn_version_data_option_sel = lib::create( 'database\select' );

@@ -371,8 +371,7 @@ cenozo.service( 'CnReqnHelper', [
             },
             b: { tab: { en: '', fr: '' }, module: { en: '', fr: '' }, tracking: { en: '', fr: '' }, comprehensive: { en: '', fr: '' } },
             c: { tab: { en: '', fr: '' }, module: { en: '', fr: '' }, tracking: { en: '', fr: '' }, comprehensive: { en: '', fr: '' } },
-            d: { tab: { en: '', fr: '' }, module: { en: '', fr: '' }, tracking: { en: '', fr: '' }, comprehensive: { en: '', fr: '' } },
-            e: {
+            d: {
               tab: { en: '', fr: '' },
               module: { en: 'Linked Data', fr: 'Données liées' },
               tracking: {
@@ -384,7 +383,7 @@ cenozo.service( 'CnReqnHelper', [
                 fr: 'Évaluation globale<br/>(Entrevue en personne - à domicile ou au DCS) (COM)'
               }
             },
-            f: {
+            e: {
               tab: { en: '', fr: '' },
               module: { en: '', fr: '' },
               tracking: { en: '', fr: '' },
@@ -435,6 +434,7 @@ cenozo.service( 'CnReqnHelper', [
             download: { en: 'Download', fr: 'Télécharger' },
             application: { en: 'Application', fr: 'Soumission' },
             dataChecklist: { en: 'Data Checklist', fr: 'Sélection des données' },
+            noticeOfDecision: { en: 'Notice of Decision', fr: 'Envoi de l’avis de décision' },
             studyData: { en: 'Study Data', fr: 'Données d’étude' },
             finalReport: { en: 'Final Report', fr: 'Rapport final' },
             notAvailable: { en: 'not yet available', fr: 'pas encore disponible' },

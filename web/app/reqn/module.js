@@ -223,11 +223,6 @@ define( function() {
       title: 'Part2: Linked Data',
       type: 'text',
       exclude: 'add'
-    },
-    deferral_note_2f: {
-      title: 'Part2: Additional Data',
-      type: 'text',
-      exclude: 'add'
     }
   } );
 
@@ -559,7 +554,7 @@ define( function() {
                    this.record.deferral_note_1e || this.record.deferral_note_1f ||
                    this.record.deferral_note_2a || this.record.deferral_note_2b ||
                    this.record.deferral_note_2c || this.record.deferral_note_2d ||
-                   this.record.deferral_note_2e || this.record.deferral_note_2f;
+                   this.record.deferral_note_2e;
           },
 
           enabled: function( subject ) {
