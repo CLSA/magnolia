@@ -279,6 +279,34 @@ define( function() {
     operation: function( $state, model ) { model.viewModel.proceed(); }
   } );
 
+  module.addExtraOperationGroup( 'view', {
+    title: 'Proceed...',
+    isIncluded: function( $state, model ) { return model.viewModel.show( 'amendment proceed' ); },
+    isDisabled: function( $state, model ) { return !model.viewModel.enabled( 'proceed' ); },
+    classes: 'btn-success',
+    operations: [ {
+      title: 'To SAC Review',
+      operation: function( $state, model ) { model.viewModel.proceed( 'SAC Review' ); },
+      isIncluded: function( $state, model ) { return model.viewModel.show( 'amendment sac review' ); }
+    }, {
+      title: 'To DSAC Review',
+      operation: function( $state, model ) { model.viewModel.proceed( 'DSAC Review' ); },
+      isIncluded: function( $state, model ) { return model.viewModel.show( 'amendment dsac review' ); }
+    }, {
+      title: 'To Agreement',
+      operation: function( $state, model ) { model.viewModel.proceed( 'Agreement' ); },
+      isIncluded: function( $state, model ) { return model.viewModel.show( 'amendment agreement' ); }
+    }, {
+      title: 'To Data Release',
+      operation: function( $state, model ) { model.viewModel.proceed( 'Data Release' ); },
+      isIncluded: function( $state, model ) { return model.viewModel.show( 'amendment data release' ); }
+    }, {
+      title: 'To Active',
+      operation: function( $state, model ) { model.viewModel.proceed( 'Active' ); },
+      isIncluded: function( $state, model ) { return model.viewModel.show( 'amendment active' ); }
+    } ]
+  } );
+
   module.addExtraOperation( 'view', {
     title: 'Reject',
     classes: 'btn-danger',
@@ -567,9 +595,9 @@ define( function() {
             } else return false;
           },
 
-          proceed: function() {
+          proceed: function( stageType ) {
             var message = 'Are you sure you wish to move this ' + this.parentModel.module.name.singular + ' to the "' +
-              this.record.next_stage_type + '" stage?';
+              ( angular.isDefined( stageType ) ? stageType : this.record.next_stage_type ) + '" stage?';
             if( 'administrator' == CnSession.role.name && this.deferralNotesExist() ) {
               message += '\n\nWARNING: there are deferral notes present, you may wish to remove them before proceeding.';
             }
@@ -577,8 +605,10 @@ define( function() {
               message: message
             } ).show().then( function( response ) {
               if( response ) {
+                var queryString = '?action=next_stage';
+                if( angular.isDefined( stageType ) ) queryString += '&stage_type=' + stageType;
                 return CnHttpFactory.instance( {
-                  path: self.parentModel.getServiceResourcePath() + "?action=next_stage",
+                  path: self.parentModel.getServiceResourcePath() + queryString,
                 } ).patch().then( function() {
                   self.onView();
                   if( angular.isDefined( self.reviewModel ) ) self.reviewModel.listModel.onList( true );

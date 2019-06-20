@@ -47,11 +47,23 @@ cenozo.service( 'CnReqnHelper', [
             ( 'administrator' == role && 'new' != phase ) ||
             ( 'chair' == role && 0 <= stage_type.indexOf( 'DSAC' ) ) ||
             ( 'smt' == role && 0 <= stage_type.indexOf( 'SMT' ) )
-          );
+          ) && !this.showAction( 'amendment proceed', record );
         } else if( 'reject' == subject ) {
           return 'DSAC Selection' == stage_type && 0 <= ['administrator','chair'].indexOf( role );
         } else if( 'compare' == subject ) {
           return 'applicant' != role;
+        } else if( 'amendment proceed' == subject ) {
+          return '.' != record.amendment && 0 <= ['Admin Review','SAC Review'].indexOf( stage_type ) && 'administrator' == role;
+        } else if( 'amendment sac review' == subject ) {
+          return 'Admin Review' == stage_type;
+        } else if( 'amendment dsac review' == subject ) {
+          return 'SAC Review' == stage_type;
+        } else if( 'amendment agreement' == subject ) {
+          return 'Admin Review' == stage_type;
+        } else if( 'amendment data release' == subject ) {
+          return 'SAC Review' == stage_type;
+        } else if( 'amendment active' == subject ) {
+          return 'Admin Review' == stage_type;
         } else return false;
       },
 
