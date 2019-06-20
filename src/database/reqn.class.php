@@ -104,10 +104,11 @@ class reqn extends \cenozo\database\record
     $db_reqn_version = lib::create( 'database\reqn_version' );
     if( !is_null( $db_current_reqn_version ) ) $db_reqn_version->copy( $db_clone_reqn_version );
 
-    // set the parent, datetime, version and agreement_filename (never use the clone)
+    // set the parent, datetime, version, reason_for_amendment and agreement_filename (never use the clone)
     $db_reqn_version->reqn_id = $this->id;
     $db_reqn_version->datetime = util::get_datetime_object();
     $db_reqn_version->version = $version;
+    $db_reqn_version->reason_for_amendment = NULL;
     $db_reqn_version->agreement_filename = NULL;
 
     // determine the amendment
@@ -316,8 +317,10 @@ class reqn extends \cenozo\database\record
 
           if( !is_null( $recommendation ) )
           {
+            // NOTE: when approved check if this is not an amendment and revisions have been suggested
+            $amendment = $this->get_current_reqn_version()->amendment;
             $find_stage_type_name = 'Approved' == $recommendation
-                                  ? ( $this->suggested_revisions ? 'Suggested Revisions' : 'Agreement' )
+                                  ? ( '.' == $amendment && $this->suggested_revisions ? 'Suggested Revisions' : 'Agreement' )
                                   : 'Not Approved';
           }
         }
@@ -460,12 +463,14 @@ class reqn extends \cenozo\database\record
             "\n".
             "Type: %s\n".
             "Identifier: %s\n".
+            "Amendment: %s\n".
             "Applicant: %s %s\n".
             "Title: %s\n",
             $db_current_stage_type->name,
             $db_next_stage_type->name,
             $db_reqn_type->name,
             $this->identifier,
+            str_replace( '.', 'no', $db_reqn_version->amendment ),
             $db_reqn_user->first_name, $db_reqn_user->last_name,
             $db_reqn_version->title
           )

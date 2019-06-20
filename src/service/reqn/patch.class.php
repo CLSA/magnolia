@@ -91,11 +91,19 @@ class patch extends \cenozo\service\patch
       }
       else if( 'next_stage' == $action )
       {
-        if( !is_null( $db_reqn->state ) || (
-            'administrator' != $db_role->name &&
-            ( 'chair' != $db_role->name || false === strpos( $db_current_stage_type->name, 'DSAC' ) ) &&
-            ( 'smt' != $db_role->name || false === strpos( $db_current_stage_type->name, 'SMT' ) )
-        ) ) $code = 403;
+        if( $this->get_argument( 'stage_type', false ) )
+        {
+          // only administrators can proceed to a specific stage type
+          if( !is_null( $db_reqn->state ) || 'administrator' != $db_role->name ) $code = 403;
+        }
+        else
+        {
+          if( !is_null( $db_reqn->state ) || (
+              'administrator' != $db_role->name &&
+              ( 'chair' != $db_role->name || false === strpos( $db_current_stage_type->name, 'DSAC' ) ) &&
+              ( 'smt' != $db_role->name || false === strpos( $db_current_stage_type->name, 'SMT' ) )
+          ) ) $code = 403;
+        }
       }
       else if( 'reject' == $action )
       {
@@ -239,10 +247,12 @@ class patch extends \cenozo\service\patch
                   "\n".
                   "Type: %s\n".
                   "Identifier: %s\n".
+                  "Amendment: %s\n".
                   "Applicant: %s %s\n".
                   "Title: %s\n",
                   $db_reqn->get_reqn_type()->name,
                   $db_reqn->identifier,
+                  str_replace( '.', 'no', $db_reqn_version->amendment ),
                   $db_reqn_user->first_name, $db_reqn_user->last_name,
                   $db_reqn_version->title
                 )
@@ -251,7 +261,7 @@ class patch extends \cenozo\service\patch
           }
           else if( 'next_stage' == $action )
           {
-            $db_reqn->proceed_to_next_stage();
+            $db_reqn->proceed_to_next_stage( $this->get_argument( 'stage_type', NULL ) );
           }
           else if( 'reject' == $action )
           {
