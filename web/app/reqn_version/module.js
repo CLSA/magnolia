@@ -402,7 +402,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
             // reset compare version and differences
             this.compareRecord = null;
-            this.agreementDifferenceList = [];
+            this.agreementDifferenceList = null;
 
             return this.$$onView( force ).then( function() {
               // define the earliest date that the reqn may start (based on the deadline, or today if there is no deadline)
@@ -596,7 +596,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
                   // while we're at it determine the last agreement version and calculate its differences
                   if( null == self.agreementDifferenceList && null != version.agreement_filename ) {
-                    console.log( self.record.identifier, version.amendment_version );
                     self.agreementDifferenceList = self.getDifferenceList( version );
                   }
                 } );
@@ -774,6 +773,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
           getDifferenceList: function( version ) {
             var differenceList = [];
+            var mainInputGroup = self.parentModel.module.inputGroupList.findByProperty( 'title', '' );
 
             if( version.differences.diff ) {
               for( var part in version.differences ) {
@@ -803,11 +803,19 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                             } );
                           } );
                         } else {
-                          if( version.differences[part][section][property] ) differenceList.push( {
-                            name: property.replace( /_/g, ' ' ).ucWords(),
-                            old: version[property],
-                            new: self.record[property]
-                          } );
+                          if( version.differences[part][section][property] ) {
+                            differenceList.push(
+                              angular.isDefined( mainInputGroup.inputList[property] ) &&
+                              'text' == mainInputGroup.inputList[property].type ? {
+                                name: property.replace( /_/g, ' ' ).ucWords(),
+                                diff: 'changed'
+                              } : {
+                                name: property.replace( /_/g, ' ' ).ucWords(),
+                                old: null == version[property] ? '(empty)' : '"' + version[property] + '"',
+                                new: null == self.record[property] ? '(empty)' : '"' + self.record[property] + '"'
+                              }
+                            );
+                          }
                         }
                       }
                     }

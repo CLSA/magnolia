@@ -975,11 +975,9 @@
                   <div ng-if="0 == model.viewModel.agreementDifferenceList.length">None</div>
                   <ul style="padding-left: 1em;" ng-if=" 0 < model.viewModel.agreementDifferenceList.length">
                     <li ng-repeat="difference in model.viewModel.agreementDifferenceList">{{
-                      difference.type ?
-                        difference.type + ' "' + difference.name + '" has been ' + difference.diff :
-                        '"' + difference.name + '" has been changed from ' +
-                          ( null == difference.old ? '(empty)' : '"' + difference.old + '"' ) + ' to ' +
-                          ( null == difference.new ? '(empty)' : '"' + difference.new + '"' )
+                      ( difference.type ? difference.type + ' ' : '' ) +
+                      '"' + difference.name + '" has been ' +
+                      ( difference.diff ? difference.diff : 'changed from ' + difference.old + ' to ' + difference.new )
                     }}</li>
                   </ul>
                 </div>
