@@ -112,6 +112,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         restrict: 'E',
         scope: {
           model: '=',
+          difference: '=',
           input: '='
         },
         controller: [ '$scope', function( $scope ) {
@@ -231,136 +232,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             $scope.liteModel.viewModel.compareRecord = version;
             $scope.model.setQueryParameter( 'c', null == version ? undefined : version.amendment_version );
             $scope.model.reloadState( false, false, 'replace' );
-          };
-
-          $scope.isPartDifferent = function( part ) {
-            var viewModel = $scope.model.viewModel;
-            if( !viewModel.show( 'compare' ) || null == viewModel.compareRecord ) return false;
-
-            var different = false;
-
-            if( 'part1' == part ) {
-              different = ['a', 'b', 'c', 'd', 'e', 'f'].some( function( section ) {
-                return $scope.isSectionDifferent( 'part1', section );
-              } );
-            } else if( 'part2' == part ) {
-              different = ['cohort', 'a', 'b', 'c', 'd', 'e'].some( function( section ) {
-                return $scope.isSectionDifferent( 'part2', section );
-              } );
-            } else if( 'amendment' == part ) {
-              different = $scope.isSectionDifferent( 'amendment' );
-            }
-
-            return different;
-          };
-
-          $scope.isSectionDifferent = function( part, section ) {
-            var viewModel = $scope.model.viewModel;
-            if( !viewModel.show( 'compare' ) || null == viewModel.compareRecord ) return false;
-
-            var different = false;
-
-            if( 'part1' == part ) {
-              if( 'a' == section ) {
-                different = [
-                  'applicant_position',
-                  'applicant_affiliation',
-                  'applicant_address',
-                  'applicant_phone',
-                  'graduate_program',
-                  'graduate_institution',
-                  'graduate_address',
-                  'graduate_phone',
-                  'waiver'
-                ].some( function( property ) { return $scope.isDifferent( property ); } );
-              } else if( 'b' == section ) {
-                different = $scope.isDifferent( 'coapplicant' );
-              } else if( 'c' == section ) {
-                different = [
-                  'start_date',
-                  'duration'
-                ].some( function( property ) { return $scope.isDifferent( property ); } );
-              } else if( 'd' == section ) {
-                different = [
-                  'title',
-                  'keywords',
-                  'lay_summary',
-                  'background',
-                  'objectives',
-                  'methodology',
-                  'analysis',
-                  'reference'
-                ].some( function( property ) { return $scope.isDifferent( property ); } );
-              } else if( 'e' == section ) {
-                different = [
-                  'funding',
-                  'funding_filename',
-                  'funding_agency',
-                  'grant_number'
-                ].some( function( property ) { return $scope.isDifferent( property ); } );
-              } else if( 'f' == section ) {
-                different = [
-                  'ethics',
-                  'ethics_date',
-                  'ethics_filename'
-                ].some( function( property ) { return $scope.isDifferent( property ); } );
-              }
-            } else if( 'part2' == part ) {
-              if( 'cohort' == section ) {
-                different = [
-                  'comprehensive',
-                  'tracking'
-                ].some( function( property ) { return $scope.isDifferent( property ); } );
-              } else {
-                different = $scope.isDifferent( 'part2_' + section + '_comment' );
-
-                if( !different ) {
-                  var index = null;
-                  if( 'a' == section ) index = 0;
-                  else if( 'b' == section ) index = 1;
-                  else if( 'c' == section ) index = 2;
-                  else if( 'd' == section ) index = 3;
-                  else if( 'e' == section ) index = 4;
-                  else if( 'f' == section ) index = 5;
-
-                  if( null != index ) {
-                    different = $scope.model.dataOptionCategoryList[index].optionList.some( function( dataOption ) {
-                      return ( dataOption.bl && $scope.isDifferent( 'data_option_value', 'bl', dataOption.id ) ) ||
-                             ( dataOption.f1 && $scope.isDifferent( 'data_option_value', 'f1', dataOption.id ) );
-                    } );
-                  }
-                }
-              }
-            } else if( 'amendment' == part ) {
-              different = $scope.isDifferent( 'reason_for_amendment' );
-            }
-
-            return different;
-          };
-
-          $scope.isDifferent = function( property, studyPhase, id ) {
-            // note that studyPhase and id are only used when comparing data_option_values
-            var viewModel = $scope.model.viewModel;
-            if( !viewModel.show( 'compare' ) || null == viewModel.compareRecord ) return false;
-
-            if( 'coapplicant' == property ) {
-              return viewModel.compareRecord.coapplicantDiff;
-            } else if( 'reference' == property ) {
-              return viewModel.compareRecord.referenceDiff;
-            } else if( 'data_option_value' == property ) {
-              return viewModel.compareRecord.dataOptionValueList[studyPhase][id] != viewModel.dataOptionValueList[studyPhase][id];
-            } else if( null != property.match( /_filename$/ ) ) {
-              // file size are compared instead of filename
-              var fileDetails = viewModel.fileList.findByProperty( 'key', property );
-              var sizeProperty = property.replace( '_filename', '_size' );
-              var recordSize = angular.isObject( fileDetails ) && fileDetails.size ? fileDetails.size : null;
-              var compareSize = viewModel.compareRecord[sizeProperty] ? viewModel.compareRecord[sizeProperty] : null;
-              return ( null != recordSize || null != compareSize ) && recordSize != compareSize
-            }
-
-            var recordValue = viewModel.record[property] ? viewModel.record[property] : null;
-            var compareValue = viewModel.compareRecord[property] ? viewModel.compareRecord[property] : null;
-            return recordValue != compareValue;
           };
 
           $scope.addCoapplicant = function() {
@@ -485,9 +356,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnReqnVersionViewFactory', [
-    'CnReqnHelper', 'CnCoapplicantModelFactory', 'CnReferenceModelFactory', 'CnBaseViewFactory',
+    'CnReqnHelper', 'CnReqnVersionHelper', 'CnCoapplicantModelFactory', 'CnReferenceModelFactory', 'CnBaseViewFactory',
     'CnSession', 'CnHttpFactory', 'CnModalMessageFactory', 'CnModalConfirmFactory', '$state', '$q', '$window',
-    function( CnReqnHelper, CnCoapplicantModelFactory, CnReferenceModelFactory, CnBaseViewFactory,
+    function( CnReqnHelper, CnReqnVersionHelper, CnCoapplicantModelFactory, CnReferenceModelFactory, CnBaseViewFactory,
               CnSession, CnHttpFactory, CnModalMessageFactory, CnModalConfirmFactory, $state, $q, $window ) {
       var object = function( parentModel, root ) {
         var self = this;
@@ -504,6 +375,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         angular.extend( this, {
           compareRecord: null,
           versionList: [],
+          lastAgreementVersion: null,
+          agreementDifferenceList: null,
           show: function( subject ) { return CnReqnHelper.showAction( subject, this.record ); },
           showAgreement: function() {
             // only show the agreement tab to administrators and when we've passed the review stage
@@ -541,9 +414,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                   self.getCoapplicantList(),
                   self.getReferenceList(),
                   self.getDataOptionValueList()
-                ] ).then( function() {
-                  return self.getVersionList();
-                } );
+                ] ).then( function() { return self.getVersionList(); } );
               }
             } );
           },
@@ -651,7 +522,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
             if( null != currentTabSectionIndex ) {
               var tabSection = this.tabSectionList[currentTabSectionIndex + (reverse?-1:1)];
-              
+
               // skip the amendment section if this isn't an amendment
               if( 'amendment' == tabSection[0] && '.' == this.record.amendment )
                 tabSection = this.tabSectionList[currentTabSectionIndex + (reverse?-2:2)];
@@ -674,29 +545,35 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             return CnHttpFactory.instance( {
               path: parent.subject + '/' + parent.identifier + '/reqn_version'
             } ).query().then( function( response ) {
+              var promiseList = [];
+
               response.data.forEach( function( version ) {
-                self.getCoapplicantList( version.id, version ).then( function() {
-                  // see if there is a difference between this list and the view's list
-                  self.setCoapplicantDiff( version );
-                } );
-                self.getReferenceList( version.id, version ).then( function() {
-                  // see if there is a difference between this list and the view's list
-                  self.setReferenceDiff( version );
-                } );
-                self.getDataOptionValueList( version.id, version );
+                promiseList = promiseList.concat( [
+                  self.getCoapplicantList( version.id, version ).then( function() {
+                    // see if there is a difference between this list and the view's list
+                    self.setCoapplicantDiff( version );
+                  } ),
 
-                // add the file sizes
-                CnHttpFactory.instance( {
-                  path: 'reqn_version/' + version.id + '?file=funding_filename'
-                } ).get().then( function( response ) {
-                  version.funding_size = response.data;
-                } );
+                  self.getReferenceList( version.id, version ).then( function() {
+                    // see if there is a difference between this list and the view's list
+                    self.setReferenceDiff( version );
+                  } ),
 
-                CnHttpFactory.instance( {
-                  path: 'reqn_version/' + version.id + '?file=ethics_filename'
-                } ).get().then( function( response ) {
-                  version.ethics_size = response.data;
-                } );
+                  self.getDataOptionValueList( version.id, version ),
+
+                  // add the file sizes
+                  CnHttpFactory.instance( {
+                    path: 'reqn_version/' + version.id + '?file=funding_filename'
+                  } ).get().then( function( response ) {
+                    version.funding_size = response.data;
+                  } ),
+
+                  CnHttpFactory.instance( {
+                    path: 'reqn_version/' + version.id + '?file=ethics_filename'
+                  } ).get().then( function( response ) {
+                    version.ethics_size = response.data;
+                  } )
+                ] );
 
                 self.versionList.push( version );
               } );
@@ -709,6 +586,25 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                 // add a null object to the version list so we can turn off comparisons
                 self.versionList.unshift( null );
               }
+
+              return $q.all( promiseList ).then( function() {
+                // Calculate all differences for all versions (in reverse order so we can find the last agreement version)
+                self.versionList.reverse();
+
+                self.lastAgreementVersion = null;
+                self.versionList.forEach( function( version ) {
+                  if( null != version )
+                    version.differences = CnReqnVersionHelper.getDifferences( self.record, version, self.parentModel );
+
+                  // while we're at it determine the last agreement version and calculate its differences
+                  if( null == self.agreementDifferenceList && null != version.agreement_filename ) {
+                    self.agreementDifferenceList = self.getDifferenceList( version );
+                  }
+                } );
+
+                // put the order of the version list back to normal
+                self.versionList.reverse();
+              } );
             } );
           },
 
@@ -735,7 +631,12 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             var basePath = angular.isDefined( reqnVersionId )
                          ? 'reqn_version/' + reqnVersionId
                          : this.parentModel.getServiceResourcePath()
-            if( angular.isUndefined( object ) ) object = self;
+
+            var rawr = false;
+            if( angular.isUndefined( object ) ) {
+              rawr = true;
+              object = self;
+            }
 
             return CnHttpFactory.instance( {
               path: basePath + '/coapplicant',
@@ -745,6 +646,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               }
             } ).query().then( function( response ) {
               object.coapplicantList = response.data;
+              if( rawr ) object.record.coapplicantList = response.data;
             } );
           },
 
@@ -779,7 +681,11 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             var basePath = angular.isDefined( reqnVersionId )
                          ? 'reqn_version/' + reqnVersionId
                          : this.parentModel.getServiceResourcePath()
-            if( angular.isUndefined( object ) ) object = self;
+            var rawr = false;
+            if( angular.isUndefined( object ) ) {
+              rawr = true;
+              object = self;
+            }
 
             return CnHttpFactory.instance( {
               path: basePath + '/reference',
@@ -789,6 +695,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               }
             } ).query().then( function( response ) {
               object.referenceList = response.data;
+              if( rawr ) object.record.referenceList = response.data;
             } );
           },
 
@@ -813,9 +720,15 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             var basePath = angular.isDefined( reqnVersionId )
                          ? 'reqn_version/' + reqnVersionId
                          : this.parentModel.getServiceResourcePath()
-            if( angular.isUndefined( object ) ) object = self;
+
+            var rawr = false;
+            if( angular.isUndefined( object ) ) {
+              rawr = true;
+              object = self;
+            }
 
             object.dataOptionValueList = { bl: [], f1: [] };
+            if( rawr ) object.record.dataOptionValueList = { bl: [], f1: [] };
             return CnHttpFactory.instance( {
               path: 'data_option',
               data: { select: { column: [ { column: 'MAX(data_option.id)', alias: 'maxId', table_prefix: false } ] } }
@@ -823,6 +736,10 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               for( var i = 0; i <= response.data[0].maxId; i++ ) {
                 object.dataOptionValueList.bl[i] = false;
                 object.dataOptionValueList.f1[i] = false;
+                if( rawr ) {
+                  object.record.dataOptionValueList.bl[i] = false;
+                  object.record.dataOptionValueList.f1[i] = false;
+                }
               }
             } ).then( function() {
               return CnHttpFactory.instance( {
@@ -832,6 +749,10 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                 response.data.forEach( function( dataOption ) {
                   if( angular.isDefined( object.dataOptionValueList[dataOption.phase] ) )
                     object.dataOptionValueList[dataOption.phase][dataOption.data_option_id] = true;
+                  if( rawr ) {
+                    if( angular.isDefined( object.record.dataOptionValueList[dataOption.phase] ) )
+                      object.record.dataOptionValueList[dataOption.phase][dataOption.data_option_id] = true;
+                  }
                 } );
               } );
             } );
@@ -870,6 +791,49 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             // administrators and applicants can view data when in the active stage
             var stage_type = this.record.stage_type ? this.record.stage_type : '';
             return 0 <= ['administrator','applicant'].indexOf( CnSession.role.name ) && 'Active' == stage_type;
+          },
+
+          getDifferenceList: function( version ) {
+            var differenceList = [];
+
+            if( version.differences.diff ) {
+              for( var part in version.differences ) {
+                if( !version.differences.hasOwnProperty( part ) ) continue;
+                if( 'diff' == section ) continue; // used to track overall diff
+
+                if( version.differences[part].diff ) {
+                  for( var section in version.differences[part] ) {
+                    if( !version.differences[part].hasOwnProperty( section ) ) continue;
+                    if( 'diff' == section ) continue; // used to track overall diff
+
+                    if( version.differences[part][section].diff ) {
+                      for( var property in version.differences[part][section] ) {
+                        if( !version.differences[part][section].hasOwnProperty( property ) ) continue;
+                        if( 'diff' == property ) continue; // used to track overall diff
+
+                        if( angular.isArray( version.differences[part][section][property] ) ) {
+                          version.differences[part][section][property].forEach( function( change ) {
+                            differenceList.push( {
+                              type: property.replace( 'List', '' ).camelToSnake().replace( /_/g, ' ' ).replace( /[0-9]+/g, ' $&' ).ucWords(),
+                              name: change.name,
+                              diff: change.diff
+                            } );
+                          } );
+                        } else {
+                          if( version.differences[part][section][property] ) differenceList.push( {
+                            name: property.replace( /_/g, ' ' ).ucWords(),
+                            old: version[property],
+                            new: self.record[property]
+                          } );
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+
+            return differenceList;
           },
 
           submit: function() {
@@ -1245,7 +1209,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               CnHttpFactory.instance( {
                 path: 'data_option_category',
                 data: {
-                  select: { column: [ 'id', 'name_en', 'name_fr', 'note_en', 'note_fr' ] },
+                  select: { column: [ 'id', 'rank', 'name_en', 'name_fr', 'note_en', 'note_fr' ] },
                   modifier: { order: 'rank', limit: 1000000 }
                 }
               } ).query().then( function( response ) {

@@ -25,7 +25,11 @@
         <ul class="dropdown-menu dropdown-menu-right full-width" style="width: 200px !important" aria-labelledby="downloadForms">
           <li><a ng-click="model.viewModel.downloadApplication()" ng-bind-html="t( 'misc.application' )"></a></li>
           <li><a ng-click="model.viewModel.downloadChecklist()" ng-bind-html="t( 'misc.dataChecklist' )"></a></li>
-          <li><a ng-if="model.viewModel.record.decision_notice && 'review' != model.viewModel.record.phase" ng-click="model.viewModel.displayDecisionNotice()" ng-bind-html="t( 'misc.noticeOfDecision' )"></a></li>
+          <li>
+            <a ng-if="model.viewModel.record.decision_notice && 'review' != model.viewModel.record.phase"
+               ng-click="model.viewModel.displayDecisionNotice()"
+               ng-bind-html="t( 'misc.noticeOfDecision' )"></a>
+          </li>
           <li ng-if="model.viewModel.canViewData()">
             <a ng-click="model.viewModel.viewData()" ng-bind-html="t( 'misc.studyData' )"></a>
           </li>
@@ -95,7 +99,7 @@
              'text-warning flashing': model.getEditEnabled() && (
                model.viewModel.record.deferral_note_amendment
              ),
-             'bg-warning': isPartDifferent( 'amendment' )
+             'bg-warning': model.viewModel.compareRecord.differences.amendment.diff
            }"
            ng-bind-html="t( 'amendment.tab' )"></a>
       </li>
@@ -107,7 +111,7 @@
                model.viewModel.record.deferral_note_1c || model.viewModel.record.deferral_note_1d ||
                model.viewModel.record.deferral_note_1e || model.viewModel.record.deferral_note_1f
              ),
-             'bg-warning': isPartDifferent( 'part1' )
+             'bg-warning': model.viewModel.compareRecord.differences.part1.diff
            }"
            ng-bind-html="t( 'part1.tab' )"></a>
       </li>
@@ -119,7 +123,7 @@
                model.viewModel.record.deferral_note_2c || model.viewMOdel.record.deferral_note_2d ||
                model.viewModel.record.deferral_note_2e
              ),
-             'bg-warning': isPartDifferent( 'part2' )
+             'bg-warning': model.viewModel.compareRecord.differences.amendment.diff
            }"
            ng-bind-html="t( 'part2.tab' )"></a>
       </li>
@@ -157,6 +161,7 @@
                 title: t( 'amendment.reason_for_amendment' ),
                 type: model.inputList.reason_for_amendment.type
               }"
+              difference="model.viewModel.compareRecord.differences.amendment.a.reason_for_amendment"
               model="model">
           </div>
         </fieldset></form>
@@ -172,7 +177,7 @@
             <a ng-click="model.viewModel.setTab(1,section[1])"
                ng-class="{
                  'text-warning flashing':model.getEditEnabled() && model.viewModel.record['deferral_note_1'+section[1]],
-                 'bg-warning': isSectionDifferent( 'part1', section[1] )
+                 'bg-warning': model.viewModel.compareRecord.differences.part1[section[1]].diff
                }"
                ng-bind-html="t( 'part1.'+section[1]+'.tab' )"></a>
           </li>
@@ -192,6 +197,7 @@
                     type: model.inputList.applicant_name.type,
                     constant: true
                   }"
+                  difference="model.viewModel.compareRecord.differences.part1.a.applicant_name"
                   model="model">
                 </cn-reqn-view-input>
                 <cn-reqn-view-input
@@ -200,6 +206,7 @@
                     title: t( 'part1.a.applicant_position' ),
                     type: model.inputList.applicant_position.type
                   }"
+                  difference="model.viewModel.compareRecord.differences.part1.a.applicant_position"
                   model="model">
                 </cn-reqn-view-input>
                 <cn-reqn-view-input
@@ -208,6 +215,7 @@
                     title: t( 'part1.a.applicant_affiliation' ),
                     type: model.inputList.applicant_affiliation.type
                   }"
+                  difference="model.viewModel.compareRecord.differences.part1.a.applicant_affiliation"
                   model="model">
                 </cn-reqn-view-input>
                 <cn-reqn-view-input
@@ -216,6 +224,7 @@
                     title: t( 'part1.a.applicant_address' ),
                     type: model.inputList.applicant_address.type
                   }"
+                  difference="model.viewModel.compareRecord.differences.part1.a.applicant_address"
                   model="model">
                 </cn-reqn-view-input>
                 <cn-reqn-view-input
@@ -224,6 +233,7 @@
                     title: t( 'part1.a.applicant_phone' ),
                     type: model.inputList.applicant_phone.type
                   }"
+                  difference="model.viewModel.compareRecord.differences.part1.a.applicant_phone"
                   model="model">
                 </cn-reqn-view-input>
                 <cn-reqn-view-input
@@ -234,6 +244,7 @@
                     constant: true,
                     help: t( 'misc.emailText' )
                   }"
+                  difference="model.viewModel.compareRecord.differences.part1.a.applicant_email"
                   model="model">
                 </cn-reqn-view-input>
               </div>
@@ -247,6 +258,7 @@
                     type: model.inputList.graduate_name.type,
                     constant: true
                   }"
+                  difference="model.viewModel.compareRecord.differences.part1.a.graduate_name"
                   model="model">
                 </cn-reqn-view-input>
                 <cn-reqn-view-input
@@ -256,6 +268,7 @@
                     type: model.inputList.graduate_program.type,
                     constant: !model.viewModel.record.graduate_name
                   }"
+                  difference="model.viewModel.compareRecord.differences.part1.a.graduate_program"
                   model="model">
                 </cn-reqn-view-input>
                 <cn-reqn-view-input
@@ -265,6 +278,7 @@
                     type: 'string',
                     constant: !model.viewModel.record.graduate_name
                   }"
+                  difference="model.viewModel.compareRecord.differences.part1.a.graduate_institution"
                   model="model">
                 </cn-reqn-view-input>
                 <cn-reqn-view-input
@@ -274,6 +288,7 @@
                     type: model.inputList.graduate_address.type,
                     constant: !model.viewModel.record.graduate_name
                   }"
+                  difference="model.viewModel.compareRecord.differences.part1.a.graduate_address"
                   model="model">
                 </cn-reqn-view-input>
                 <cn-reqn-view-input
@@ -283,6 +298,7 @@
                     type: model.inputList.graduate_phone.type,
                     constant: !model.viewModel.record.graduate_name
                   }"
+                  difference="model.viewModel.compareRecord.differences.part1.a.graduate_phone"
                   model="model">
                 </cn-reqn-view-input>
                 <cn-reqn-view-input
@@ -293,6 +309,7 @@
                     constant: true,
                     help: t( 'misc.emailText' )
                   }"
+                  difference="model.viewModel.compareRecord.differences.part1.a.graduate_email"
                   model="model">
                 </cn-reqn-view-input>
               </div>
@@ -307,6 +324,7 @@
                     enumList: model.metadata.columnList.waiver.enumList[model.viewModel.record.lang],
                     constant: !model.viewModel.record.graduate_name
                   }"
+                  difference="model.viewModel.compareRecord.differences.part1.a.waiver"
                   model="model">
                 </cn-reqn-view-input>
               </div>
@@ -318,8 +336,9 @@
             <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_1b"></cn-reqn-deferral-note>
             <p class="text-primary" ng-bind-html="t( 'part1.b.text' )"></p>
             <div class="panel panel-default">
-              <div class="panel-body" ng-class="{ 'bg-warning': isDifferent( 'coapplicant' ) }">
-                <h4 ng-if="isDifferent( 'coapplicant' )">Current Version List</h4>
+              <div class="panel-body"
+                   ng-class="{ 'bg-warning': 0 < model.viewModel.compareRecord.differences.part1.b.coapplicantList.length }">
+                <h4 ng-if="0 < model.viewModel.compareRecord.differences.part1.b.coapplicantList.length">Current Version List</h4>
                 <span ng-show="0 == model.viewModel.coapplicantList.length"
                       ng-bind-html="t( 'part1.b.noCoapplicants' )"></span>
                 <table class="table table-striped" ng-show="0 < model.viewModel.coapplicantList.length">
@@ -353,7 +372,7 @@
                     </tr>
                   </tbody>
                 </table>
-                <div ng-if="isDifferent( 'coapplicant' )">
+                <div ng-if="0 < model.viewModel.compareRecord.differences.part1.b.coapplicantList.length">
                   <hr style="border-top-color: gray;"/>
                   <h4>Version {{ model.viewModel.compareRecord.amendment_version }} List</h4>
                   <span ng-show="0 == model.viewModel.compareRecord.coapplicantList.length"
@@ -458,6 +477,7 @@
                     constant: true
                   }"
                   ng-if="model.viewModel.record.deadline"
+                  difference="model.viewModel.compareRecord.differences.part1.c.deadline"
                   model="model">
                 </cn-view-input>
                 <cn-reqn-view-input
@@ -467,6 +487,7 @@
                     type: model.inputList.start_date.type,
                     min: model.viewModel.minStartDate
                   }"
+                  difference="model.viewModel.compareRecord.differences.part1.c.start_date"
                   model="model">
                 </cn-reqn-view-input>
                 <cn-reqn-view-input
@@ -476,6 +497,7 @@
                     type: 'enum',
                     enumList: model.metadata.columnList.duration.enumList[model.viewModel.record.lang]
                   }"
+                  difference="model.viewModel.compareRecord.differences.part1.c.duration"
                   model="model">
                 </cn-reqn-view-input>
               </div>
@@ -495,6 +517,7 @@
                     title: t( 'part1.d.title' ),
                     type: model.inputList.title.type
                   }"
+                  difference="model.viewModel.compareRecord.differences.part1.d.title"
                   model="model">
                 </cn-reqn-view-input>
                 <cn-reqn-view-input
@@ -504,6 +527,7 @@
                     type: 'string',
                     help: t( 'part1.d.keywords_text' )
                   }"
+                  difference="model.viewModel.compareRecord.differences.part1.d.keywords"
                   model="model">
                 </cn-reqn-view-input>
                 <cn-reqn-view-input
@@ -515,6 +539,7 @@
                     maxLength: 1000,
                     help: t( 'part1.d.lay_summary_text' )
                   }"
+                  difference="model.viewModel.compareRecord.differences.part1.d.lay_summary"
                   model="model">
                 </cn-reqn-view-input>
                 <hr/>
@@ -527,6 +552,7 @@
                     type: model.inputList.background.type,
                     maxLength: 4500
                   }"
+                  difference="model.viewModel.compareRecord.differences.part1.d.background"
                   model="model">
                 </cn-reqn-view-input>
                 <cn-reqn-view-input
@@ -537,6 +563,7 @@
                     type: model.inputList.objectives.type,
                     maxLength: 4500
                   }"
+                  difference="model.viewModel.compareRecord.differences.part1.d.objectives"
                   model="model">
                 </cn-reqn-view-input>
                 <cn-reqn-view-input
@@ -548,6 +575,7 @@
                     maxLength: 4500,
                     help: t( 'part1.d.methodology_text' )
                   }"
+                  difference="model.viewModel.compareRecord.differences.part1.d.methodology"
                   model="model">
                 </cn-reqn-view-input>
                 <cn-reqn-view-input
@@ -559,13 +587,15 @@
                     maxLength: 4500,
                     help: t( 'part1.d.analysis_text' )
                   }"
+                  difference="model.viewModel.compareRecord.differences.part1.d.analysis"
                   model="model">
                 </cn-reqn-view-input>
                 <hr/>
                 <p class="text-primary" ng-bind-html="t( 'part1.d.text3' ) + maxReferencesPerReqn + t( 'part1.d.text4' )"></p>
                 <div class="panel panel-default">
-                  <div class="panel-body" ng-class="{ 'bg-warning': isDifferent( 'reference' ) }">
-                    <h4 ng-if="isDifferent( 'reference' )">Current Version List</h4>
+                  <div class="panel-body"
+                       ng-class="{ 'bg-warning': 0 < model.viewModel.compareRecord.differences.part1.d.referenceList.length }">
+                    <h4 ng-if="0 < model.viewModel.compareRecord.differences.part1.d.referenceList.length">Current Version List</h4>
                     <span ng-show="0 == model.viewModel.referenceList.length"
                           ng-bind-html="t( 'part1.d.noReferences' )"></span>
                     <table class="table table-striped" ng-show="0 < model.viewModel.referenceList.length">
@@ -608,7 +638,7 @@
                         </tr>
                       </tbody>
                     </table>
-                    <div ng-if="isDifferent( 'reference' )">
+                    <div ng-if="0 < model.viewModel.compareRecord.differences.part1.d.referenceList.length">
                       <hr style="border-top-color: gray;"/>
                       <h4>Version {{ model.viewModel.compareRecord.amendment_version }} List</h4>
                       <span ng-show="0 == model.viewModel.compareRecord.referenceList.length"
@@ -661,6 +691,7 @@
                     type: 'enum',
                     enumList: model.metadata.columnList.funding.enumList[model.viewModel.record.lang]
                   }"
+                  difference="model.viewModel.compareRecord.differences.part1.e.funding"
                   model="model">
                 </cn-reqn-view-input>
                 <cn-reqn-view-input
@@ -670,6 +701,7 @@
                     type: model.inputList.funding_agency.type
                   }"
                   ng-if="'no' != model.viewModel.record.funding"
+                  difference="model.viewModel.compareRecord.differences.part1.e.funding_agency"
                   model="model">
                 </cn-reqn-view-input>
                 <cn-reqn-view-input
@@ -679,6 +711,7 @@
                     type: model.inputList.grant_number.type
                   }"
                   ng-if="'no' != model.viewModel.record.funding"
+                  difference="model.viewModel.compareRecord.differences.part1.e.grant_number"
                   model="model">
                 </cn-reqn-view-input>
                 <fieldset ng-disabled="!liteModel.getEditEnabled()">
@@ -689,6 +722,7 @@
                       title: t( 'part1.e.letter' ),
                       type: 'file'
                     }"
+                    difference="model.viewModel.compareRecord.differences.part1.e.funding_filename"
                     model="liteModel">
                   </cn-reqn-view-input>
                 </fieldset>
@@ -711,6 +745,7 @@
                       type: model.inputList.ethics.type,
                       enumList: model.metadata.columnList.ethics.enumList[model.viewModel.record.lang]
                     }"
+                    difference="model.viewModel.compareRecord.differences.part1.f.ethics"
                     model="model">
                   </cn-reqn-view-input>
                   <cn-reqn-view-input
@@ -720,6 +755,7 @@
                       title: t( 'part1.f.expiration' ),
                       type: model.inputList.ethics_date.type
                     }"
+                    difference="model.viewModel.compareRecord.differences.part1.f.ethics_date"
                     model="model">
                   </cn-reqn-view-input>
                   <cn-reqn-view-input
@@ -729,6 +765,7 @@
                       title: t( 'part1.f.response' ),
                       type: model.inputList.ethics_date.type
                     }"
+                    difference="model.viewModel.compareRecord.differences.part1.f.response"
                     model="model">
                   </cn-reqn-view-input>
                 </fieldset>
@@ -740,6 +777,7 @@
                       title: t( 'part1.f.letter' ),
                       type: 'file'
                     }"
+                    difference="model.viewModel.compareRecord.differences.part1.f.ethics_filename"
                     model="liteModel">
                   </cn-reqn-view-input>
                 </fieldset>
@@ -759,7 +797,7 @@
             <a ng-click="model.viewModel.setTab(2,section[2])"
                ng-class="{
                  'text-warning flashing':model.getEditEnabled() && model.viewModel.record['deferral_note_2'+section[2]],
-                 'bg-warning': isSectionDifferent( 'part2', section[2] )
+                 'bg-warning': model.viewModel.compareRecord.differences.part2[section[2]].diff
                }"
                ng-bind-html="t( 'part2.'+section[2]+'.tab' )"></a>
           </li>
@@ -788,6 +826,7 @@
                       type: model.inputList.tracking.type,
                       enumList: model.metadata.columnList.tracking.enumList[model.viewModel.record.lang]
                     }"
+                    difference="model.viewModel.compareRecord.differences.part2.cohort.tracking"
                     model="model">
                   </cn-reqn-view-input>
                   <cn-reqn-view-input
@@ -798,6 +837,7 @@
                       type: model.inputList.comprehensive.type,
                       enumList: model.metadata.columnList.comprehensive.enumList[model.viewModel.record.lang]
                     }"
+                    difference="model.viewModel.compareRecord.differences.part2.cohort.comprehensive"
                     model="model">
                   </cn-reqn-view-input>
                 </fieldset>
@@ -850,7 +890,7 @@
                           </span><sup ng-if="dataOption.note[model.viewModel.record.lang]">ⓘ</sup>
                         </a>
                       </td>
-                      <td ng-if="dataOption.bl" ng-class="{ 'bg-warning': isDifferent( 'data_option_value', 'bl', dataOption.id ) }">
+                      <td ng-if="dataOption.bl" ng-class="{ 'bg-warning': model.viewModel.compareRecord.differences.part2[part].baselineDataOptionList.findByProperty( 'id', dataOption.id ) }">
                         <button class="btn full-width"
                                 ng-class="model.viewModel.dataOptionValueList.bl[dataOption.id] ?
                                   'btn-success' : 'btn-default'"
@@ -864,7 +904,7 @@
                         </button>
                       </td>
                       <td ng-if="!dataOption.bl" ng-bind-html="t( 'misc.notAvailable' )"></td>
-                      <td ng-if="dataOption.f1" ng-class="{ 'bg-warning': isDifferent( 'data_option_value', 'f1', dataOption.id ) }">
+                      <td ng-if="dataOption.f1" ng-class="{ 'bg-warning': model.viewModel.compareRecord.differences.part2[part].followUp1DataOptionList.findByProperty( 'id', dataOption.id ) }">
                         <button class="btn full-width"
                                 ng-class="model.viewModel.dataOptionValueList.f1[dataOption.id] ?
                                   'btn-success' : 'btn-default'"
@@ -907,6 +947,7 @@
                       title: t( 'misc.comments' ),
                       type: model.inputList['part2_' + part + '_comment'].type
                     }"
+                    difference="model.viewModel.compareRecord.differences.part2['part2_' + part + '_comment']"
                     model="model">
                   </cn-reqn-view-input>
                 </div>
@@ -928,6 +969,21 @@
         <form id="agreementForm" name="agreementForm" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
           <div class="form-horizontal">
             <fieldset ng-disabled="!liteModel.getEditEnabled()">
+              <div class="row">
+                <label class="control-label col-sm-3">Changes since last agreement</label>
+                <div class="row col-sm-9">
+                  <div ng-if="0 == model.viewModel.agreementDifferenceList.length">None</div>
+                  <ul class="form-text" style="padding-left: 1em;" ng-if=" 0 < model.viewModel.agreementDifferenceList.length">
+                    <li ng-repeat="difference in model.viewModel.agreementDifferenceList">{{
+                      difference.type ?
+                        difference.type + ' "' + difference.name + '" has been ' + difference.diff :
+                        '"' + difference.name + '" has been changed from ' +
+                          ( null == difference.old ? '(empty)' : '"' + difference.old + '"' ) + ' to ' +
+                          ( null == difference.new ? '(empty)' : '"' + difference.new + '"' )
+                    }}</li>
+                  </ul>
+                </div>
+              </div>
               <cn-reqn-view-input
                 input="{
                   key: 'agreement_filename',
