@@ -123,7 +123,7 @@
                model.viewModel.record.deferral_note_2c || model.viewMOdel.record.deferral_note_2d ||
                model.viewModel.record.deferral_note_2e
              ),
-             'bg-warning': model.viewModel.compareRecord.differences.amendment.diff
+             'bg-warning': model.viewModel.compareRecord.differences.part2.diff
            }"
            ng-bind-html="t( 'part2.tab' )"></a>
       </li>
@@ -339,9 +339,9 @@
               <div class="panel-body"
                    ng-class="{ 'bg-warning': 0 < model.viewModel.compareRecord.differences.part1.b.coapplicantList.length }">
                 <h4 ng-if="0 < model.viewModel.compareRecord.differences.part1.b.coapplicantList.length">Current Version List</h4>
-                <span ng-show="0 == model.viewModel.coapplicantList.length"
+                <span ng-show="0 == model.viewModel.record.coapplicantList.length"
                       ng-bind-html="t( 'part1.b.noCoapplicants' )"></span>
-                <table class="table table-striped" ng-show="0 < model.viewModel.coapplicantList.length">
+                <table class="table table-striped" ng-show="0 < model.viewModel.record.coapplicantList.length">
                   <thead class="bg-info">
                     <tr>
                       <td ng-bind-html="t( 'part1.b.name' )"></td>
@@ -354,7 +354,7 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr ng-repeat="coapplicant in model.viewModel.coapplicantList">
+                    <tr ng-repeat="coapplicant in model.viewModel.record.coapplicantList">
                       <td>{{ coapplicant.name }}</td>
                       <td>{{ coapplicant.position }}</td>
                       <td>{{ coapplicant.affiliation }}</td>
@@ -535,7 +535,7 @@
                     key: 'lay_summary',
                     title: t( 'part1.d.lay_summary' ) + '<sup>ⓘ</sup><br><span class=text-info>(' +
                            model.viewModel.charCount.lay_summary + ' ' + t( 'misc.chars' ) + ')</span>',
-                    type: 'text',
+                    type: model.inputList.lay_summary.type,
                     maxLength: 1000,
                     help: t( 'part1.d.lay_summary_text' )
                   }"
@@ -596,9 +596,9 @@
                   <div class="panel-body"
                        ng-class="{ 'bg-warning': 0 < model.viewModel.compareRecord.differences.part1.d.referenceList.length }">
                     <h4 ng-if="0 < model.viewModel.compareRecord.differences.part1.d.referenceList.length">Current Version List</h4>
-                    <span ng-show="0 == model.viewModel.referenceList.length"
+                    <span ng-show="0 == model.viewModel.record.referenceList.length"
                           ng-bind-html="t( 'part1.d.noReferences' )"></span>
-                    <table class="table table-striped" ng-show="0 < model.viewModel.referenceList.length">
+                    <table class="table table-striped" ng-show="0 < model.viewModel.record.referenceList.length">
                       <thead class="bg-info">
                         <tr>
                           <td ng-bind-html="t( 'part1.d.number' )"></td>
@@ -607,7 +607,7 @@
                         </tr>
                       </thead>
                       <tbody>
-                        <tr ng-repeat="reference in model.viewModel.referenceList | orderBy: 'rank'">
+                        <tr ng-repeat="reference in model.viewModel.record.referenceList | orderBy: 'rank'">
                           <td>
                             <div class="btn-group">
                               <button class="btn btn-info dropdown-toggle"
@@ -617,7 +617,7 @@
                                 {{ reference.rank }}
                               </button>
                               <ul class="dropdown-menu" role="menu">
-                                <li ng-repeat="r in model.viewModel.referenceList | orderBy: 'rank'"
+                                <li ng-repeat="r in model.viewModel.record.referenceList | orderBy: 'rank'"
                                     ng-class="{ 'active': r.rank == reference.rank }">
                                   <a href="#" ng-click="setReferenceRank( reference.id, r.rank )">
                                     {{ r.rank }}
@@ -892,28 +892,28 @@
                       </td>
                       <td ng-if="dataOption.bl" ng-class="{ 'bg-warning': model.viewModel.compareRecord.differences.part2[part].baselineDataOptionList.findByProperty( 'id', dataOption.id ) }">
                         <button class="btn full-width"
-                                ng-class="model.viewModel.dataOptionValueList.bl[dataOption.id] ?
+                                ng-class="model.viewModel.record.dataOptionValueList.bl[dataOption.id] ?
                                   'btn-success' : 'btn-default'"
                                 ng-disabled="!model.getEditEnabled()"
                                 ng-click="model.viewModel.toggleDataOptionValue( 'bl', dataOption.id )">
                           <i class="glyphicon glyphicon-ok"
-                             ng-if="model.viewModel.dataOptionValueList.bl[dataOption.id]"></i>
+                             ng-if="model.viewModel.record.dataOptionValueList.bl[dataOption.id]"></i>
                           <span style="font-weight: normal"
-                                ng-if="!model.viewModel.dataOptionValueList.bl[dataOption.id]"
+                                ng-if="!model.viewModel.record.dataOptionValueList.bl[dataOption.id]"
                                 ng-bind-html="t( 'misc.clickToSelect' )"></span>
                         </button>
                       </td>
                       <td ng-if="!dataOption.bl" ng-bind-html="t( 'misc.notAvailable' )"></td>
                       <td ng-if="dataOption.f1" ng-class="{ 'bg-warning': model.viewModel.compareRecord.differences.part2[part].followUp1DataOptionList.findByProperty( 'id', dataOption.id ) }">
                         <button class="btn full-width"
-                                ng-class="model.viewModel.dataOptionValueList.f1[dataOption.id] ?
+                                ng-class="model.viewModel.record.dataOptionValueList.f1[dataOption.id] ?
                                   'btn-success' : 'btn-default'"
                                 ng-disabled="!model.getEditEnabled()"
                                 ng-click="model.viewModel.toggleDataOptionValue( 'f1', dataOption.id )">
                           <i class="glyphicon glyphicon-ok"
-                             ng-if="model.viewModel.dataOptionValueList.f1[dataOption.id]"></i>
+                             ng-if="model.viewModel.record.dataOptionValueList.f1[dataOption.id]"></i>
                           <span style="font-weight: normal"
-                                ng-if="!model.viewModel.dataOptionValueList.f1[dataOption.id]"
+                                ng-if="!model.viewModel.record.dataOptionValueList.f1[dataOption.id]"
                                 ng-bind-html="t( 'misc.clickToSelect' )"></span>
                         </button>
                       </td>
@@ -947,7 +947,7 @@
                       title: t( 'misc.comments' ),
                       type: model.inputList['part2_' + part + '_comment'].type
                     }"
-                    difference="model.viewModel.compareRecord.differences.part2['part2_' + part + '_comment']"
+                    difference="model.viewModel.compareRecord.differences.part2[part]['part2_' + part + '_comment']"
                     model="model">
                   </cn-reqn-view-input>
                 </div>
@@ -971,9 +971,9 @@
             <fieldset ng-disabled="!liteModel.getEditEnabled()">
               <div class="row">
                 <label class="control-label col-sm-3">Changes since last agreement</label>
-                <div class="row col-sm-9">
+                <div class="row col-sm-9 form-text vertical-spacer">
                   <div ng-if="0 == model.viewModel.agreementDifferenceList.length">None</div>
-                  <ul class="form-text" style="padding-left: 1em;" ng-if=" 0 < model.viewModel.agreementDifferenceList.length">
+                  <ul style="padding-left: 1em;" ng-if=" 0 < model.viewModel.agreementDifferenceList.length">
                     <li ng-repeat="difference in model.viewModel.agreementDifferenceList">{{
                       difference.type ?
                         difference.type + ' "' + difference.name + '" has been ' + difference.diff :

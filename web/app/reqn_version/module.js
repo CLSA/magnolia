@@ -400,8 +400,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             this.setTab( 1, this.parentModel.getQueryParameter( 't1' ), false );
             this.setTab( 2, this.parentModel.getQueryParameter( 't2' ), false );
 
-            // reset compare version
+            // reset compare version and differences
             this.compareRecord = null;
+            this.agreementDifferenceList = [];
 
             return this.$$onView( force ).then( function() {
               // define the earliest date that the reqn may start (based on the deadline, or today if there is no deadline)
@@ -440,10 +441,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           },
 
           coapplicantModel: CnCoapplicantModelFactory.instance(),
-          coapplicantList: [],
           referenceModel: CnReferenceModelFactory.instance(),
-          referenceList: [],
-          dataOptionValueList: {},
           charCount: { lay_summary: 0, background: 0, objectives: 0, methodology: 0, analysis: 0 },
           minStartDate: null,
 
@@ -598,6 +596,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
                   // while we're at it determine the last agreement version and calculate its differences
                   if( null == self.agreementDifferenceList && null != version.agreement_filename ) {
+                    console.log( self.record.identifier, version.amendment_version );
                     self.agreementDifferenceList = self.getDifferenceList( version );
                   }
                 } );
@@ -616,9 +615,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             if( null != version ) {
               // see if there is a difference between this list and the view's list
               version.coapplicantDiff =
-                version.coapplicantList.length != self.coapplicantList.length ||
+                version.coapplicantList.length != self.record.coapplicantList.length ||
                 version.coapplicantList.some(
-                  c1 => !self.coapplicantList.some(
+                  c1 => !self.record.coapplicantList.some(
                     c2 => ![ 'name', 'position', 'affiliation', 'email', 'role', 'access' ].some(
                       prop => c1[prop] != c2[prop]
                     )
@@ -632,11 +631,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                          ? 'reqn_version/' + reqnVersionId
                          : this.parentModel.getServiceResourcePath()
 
-            var rawr = false;
-            if( angular.isUndefined( object ) ) {
-              rawr = true;
-              object = self;
-            }
+            if( angular.isUndefined( object ) ) object = self.record;
 
             return CnHttpFactory.instance( {
               path: basePath + '/coapplicant',
@@ -646,7 +641,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               }
             } ).query().then( function( response ) {
               object.coapplicantList = response.data;
-              if( rawr ) object.record.coapplicantList = response.data;
             } );
           },
 
@@ -666,9 +660,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             if( null != version ) {
               // see if there is a difference between this list and the view's list
               version.referenceDiff =
-                version.referenceList.length != self.referenceList.length ||
+                version.referenceList.length != self.record.referenceList.length ||
                 version.referenceList.some(
-                  c1 => !self.referenceList.some(
+                  c1 => !self.record.referenceList.some(
                     c2 => ![ 'rank', 'reference' ].some(
                       prop => c1[prop] != c2[prop]
                     )
@@ -681,11 +675,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             var basePath = angular.isDefined( reqnVersionId )
                          ? 'reqn_version/' + reqnVersionId
                          : this.parentModel.getServiceResourcePath()
-            var rawr = false;
-            if( angular.isUndefined( object ) ) {
-              rawr = true;
-              object = self;
-            }
+            if( angular.isUndefined( object ) ) object = self.record;
 
             return CnHttpFactory.instance( {
               path: basePath + '/reference',
@@ -695,7 +685,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               }
             } ).query().then( function( response ) {
               object.referenceList = response.data;
-              if( rawr ) object.record.referenceList = response.data;
             } );
           },
 
@@ -721,14 +710,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                          ? 'reqn_version/' + reqnVersionId
                          : this.parentModel.getServiceResourcePath()
 
-            var rawr = false;
-            if( angular.isUndefined( object ) ) {
-              rawr = true;
-              object = self;
-            }
+            if( angular.isUndefined( object ) ) object = self.record;
 
             object.dataOptionValueList = { bl: [], f1: [] };
-            if( rawr ) object.record.dataOptionValueList = { bl: [], f1: [] };
             return CnHttpFactory.instance( {
               path: 'data_option',
               data: { select: { column: [ { column: 'MAX(data_option.id)', alias: 'maxId', table_prefix: false } ] } }
@@ -736,10 +720,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               for( var i = 0; i <= response.data[0].maxId; i++ ) {
                 object.dataOptionValueList.bl[i] = false;
                 object.dataOptionValueList.f1[i] = false;
-                if( rawr ) {
-                  object.record.dataOptionValueList.bl[i] = false;
-                  object.record.dataOptionValueList.f1[i] = false;
-                }
               }
             } ).then( function() {
               return CnHttpFactory.instance( {
@@ -749,10 +729,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                 response.data.forEach( function( dataOption ) {
                   if( angular.isDefined( object.dataOptionValueList[dataOption.phase] ) )
                     object.dataOptionValueList[dataOption.phase][dataOption.data_option_id] = true;
-                  if( rawr ) {
-                    if( angular.isDefined( object.record.dataOptionValueList[dataOption.phase] ) )
-                      object.record.dataOptionValueList[dataOption.phase][dataOption.data_option_id] = true;
-                  }
                 } );
               } );
             } );
@@ -760,15 +736,17 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
           toggleDataOptionValue: function( studyPhaseCode, dataOptionId ) {
             // toggle the option
-            this.dataOptionValueList[studyPhaseCode][dataOptionId] = !this.dataOptionValueList[studyPhaseCode][dataOptionId];
+            this.record.dataOptionValueList[studyPhaseCode][dataOptionId] =
+              !this.record.dataOptionValueList[studyPhaseCode][dataOptionId];
 
-            if( this.dataOptionValueList[studyPhaseCode][dataOptionId] ) {
+            if( this.record.dataOptionValueList[studyPhaseCode][dataOptionId] ) {
               // add the data-option
               return CnHttpFactory.instance( {
                 path: this.parentModel.getServiceResourcePath() + '/reqn_version_data_option',
                 data: { data_option_id: dataOptionId, study_phase_code: studyPhaseCode },
                 onError: function( response ) {
-                  self.dataOptionValueList[studyPhaseCode][dataOptionId] = !self.dataOptionValueList[studyPhaseCode][dataOptionId];
+                  self.record.dataOptionValueList[studyPhaseCode][dataOptionId] =
+                    !self.record.dataOptionValueList[studyPhaseCode][dataOptionId];
                 }
               } ).post();
             } else {
@@ -777,7 +755,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                 path: this.parentModel.getServiceResourcePath() +
                   '/reqn_version_data_option/data_option_id=' + dataOptionId + ';study_phase_code=' + studyPhaseCode,
                 onError: function( response ) {
-                  self.dataOptionValueList[studyPhaseCode][dataOptionId] = !self.dataOptionValueList[studyPhaseCode][dataOptionId];
+                  self.record.dataOptionValueList[studyPhaseCode][dataOptionId] =
+                    !self.record.dataOptionValueList[studyPhaseCode][dataOptionId];
                 }
               } ).delete();
             }
@@ -814,7 +793,11 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                         if( angular.isArray( version.differences[part][section][property] ) ) {
                           version.differences[part][section][property].forEach( function( change ) {
                             differenceList.push( {
-                              type: property.replace( 'List', '' ).camelToSnake().replace( /_/g, ' ' ).replace( /[0-9]+/g, ' $&' ).ucWords(),
+                              type: property.replace( 'List', '' )
+                                            .camelToSnake()
+                                            .replace( /_/g, ' ' )
+                                            .replace( /[0-9]+/g, ' $&' )
+                                            .ucWords(),
                               name: change.name,
                               diff: change.diff
                             } );

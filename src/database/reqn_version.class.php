@@ -65,6 +65,7 @@ class reqn_version extends \cenozo\database\record
 
     // get the two newest versions
     $version_mod = lib::create( 'database\modifier' );
+    $version_mod->where( 'reqn_id', '=', $this->reqn_id );
     $version_mod->order( 'amendment', true );
     $version_mod->order( 'version', true );
     $version_mod->limit( 2 );
