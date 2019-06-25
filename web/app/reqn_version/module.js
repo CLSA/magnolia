@@ -599,12 +599,13 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
                 self.lastAgreementVersion = null;
                 self.versionList.forEach( function( version ) {
-                  if( null != version )
+                  if( null != version ) {
                     version.differences = CnReqnVersionHelper.getDifferences( self.record, version, self.parentModel );
 
-                  // while we're at it determine the last agreement version and calculate its differences
-                  if( null == self.agreementDifferenceList && null != version.agreement_filename ) {
-                    self.agreementDifferenceList = self.getDifferenceList( version );
+                    // while we're at it determine the last agreement version and calculate its differences
+                    if( null == self.agreementDifferenceList && null != version.agreement_filename ) {
+                      self.agreementDifferenceList = self.getDifferenceList( version );
+                    }
                   }
                 } );
 
