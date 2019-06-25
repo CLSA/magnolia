@@ -606,6 +606,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                     if( null == self.agreementDifferenceList && null != version.agreement_filename ) {
                       self.agreementDifferenceList = self.getDifferenceList( version );
                     }
+                  } else {
+                    self.agreementDifferenceList = [];
                   }
                 } );
 
