@@ -129,6 +129,9 @@ class reqn extends \cenozo\database\record
       $existing_file = $db_clone_reqn_version->get_filename( 'ethics' );
       if( file_exists( $existing_file ) ) copy( $existing_file, $db_reqn_version->get_filename( 'ethics' ) );
 
+      $existing_file = $db_clone_reqn_version->get_filename( 'data_sharing' );
+      if( file_exists( $existing_file ) ) copy( $existing_file, $db_reqn_version->get_filename( 'data_sharing' ) );
+
       // copy coapplicant records
       foreach( $db_clone_reqn_version->get_coapplicant_object_list() as $db_coapplicant )
       {

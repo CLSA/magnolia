@@ -30,6 +30,7 @@ class get extends \cenozo\service\downloadable
     $db_reqn = $db_reqn_version->get_reqn();
     if( 'funding_filename' == $file ) return $db_reqn_version->funding_filename;
     else if( 'ethics_filename' == $file ) return $db_reqn_version->ethics_filename;
+    else if( 'data_sharing_filename' == $file ) return $db_reqn_version->data_sharing_filename;
     else if( 'agreement_filename' == $file ) return $db_reqn_version->agreement_filename;
     else if( 'checklist' == $file )
     {
@@ -62,6 +63,7 @@ class get extends \cenozo\service\downloadable
     $db_reqn_version = $this->get_leaf_record();
     if( 'funding_filename' == $file ) return sprintf( '%s/%s', FUNDING_LETTER_PATH, $db_reqn_version->id );
     else if( 'ethics_filename' == $file ) return sprintf( '%s/%s', ETHICS_LETTER_PATH, $db_reqn_version->id );
+    else if( 'data_sharing_filename' == $file ) return sprintf( '%s/%s', DATA_SHARING_LETTER_PATH, $db_reqn_version->id );
     else if( 'agreement_filename' == $file ) return sprintf( '%s/%s', AGREEMENT_LETTER_PATH, $db_reqn_version->id );
     else if( 'checklist' == $file ) return sprintf( '%s/%s.pdf', DATA_CHECKLIST_PATH, $db_reqn_version->id );
     else if( 'application' == $file ) return sprintf( '%s/%s.pdf', DATA_APPLICATION_PATH, $db_reqn_version->id );

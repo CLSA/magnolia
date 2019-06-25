@@ -29,7 +29,7 @@ class get extends \cenozo\service\downloadable
   /**
    * Replace parent method
    * 
-   * When the client calls for a file we return the final_report's ethics letter
+   * When the client calls for a file we return the final_report's letter
    */
   protected function get_downloadable_file_path()
   {

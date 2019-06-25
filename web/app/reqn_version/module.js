@@ -369,9 +369,10 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           if( angular.isDefined( self.stageModel ) ) self.stageModel.listModel.heading = 'Stage History';
         } );
 
-        this.configureFileInput( 'agreement_filename' );
         this.configureFileInput( 'funding_filename' );
         this.configureFileInput( 'ethics_filename' );
+        this.configureFileInput( 'data_sharing_filename' );
+        this.configureFileInput( 'agreement_filename' );
 
         angular.extend( this, {
           compareRecord: null,
@@ -571,6 +572,12 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                     path: 'reqn_version/' + version.id + '?file=ethics_filename'
                   } ).get().then( function( response ) {
                     version.ethics_size = response.data;
+                  } ),
+
+                  CnHttpFactory.instance( {
+                    path: 'reqn_version/' + version.id + '?file=data_sharing_filename'
+                  } ).get().then( function( response ) {
+                    version.data_sharing_size = response.data;
                   } )
                 ] );
 
@@ -1042,10 +1049,10 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
         // override the service collection
         this.getServiceData = function( type, columnRestrictLists ) {
-          // only include the agreement, funding and ethics filenames in the view type in the lite instance
+          // only include the funding, ethics, data_sharing and agreement filenames in the view type in the lite instance
           return 'lite' == this.type ? {
             select: {
-              column: [ 'is_current_version', 'agreement_filename', 'funding_filename', 'ethics_filename',
+              column: [ 'is_current_version', 'funding_filename', 'ethics_filename', 'data_sharing_filename', 'agreement_filename',
                 { table: 'reqn', column: 'state' },
                 { table: 'stage_type', column: 'phase' },
                 { table: 'stage_type', column: 'name', alias: 'stage_type' }

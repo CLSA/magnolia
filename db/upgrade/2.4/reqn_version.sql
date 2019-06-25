@@ -143,6 +143,18 @@ CREATE PROCEDURE patch_reqn_version()
       WHERE reqn.agreement_filename IS NOT NULL;
     END IF;
 
+    SELECT "Adding data_sharing_filename column to reqn_version table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn_version"
+    AND column_name = "data_sharing_filename";
+
+    IF @test = 0 THEN
+      ALTER TABLE reqn_version ADD COLUMN data_sharing_filename VARCHAR(255) NULL DEFAULT NULL AFTER tracking;
+    END IF;
+
   END //
 DELIMITER ;
 

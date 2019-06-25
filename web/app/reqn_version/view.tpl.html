@@ -854,6 +854,7 @@
             <form ng-attr-id="part2{{ part }}Form" ng-attr-name="part2{{ part }}Form" novalidate>
               <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_2{{ part }}"></cn-reqn-deferral-note>
               <div class="form-horizontal">
+                <p ng-if="'d'==part" class="text-primary" ng-bind-html="t( 'part2.d.text' )"></p>
                 <ul class="list-group" ng-if="'e'==part">
                   <li class="list-group-item">
                     <h4 ng-bind-html="t( 'part2.e.title1' )"></h4>
@@ -939,6 +940,22 @@
                     </tr>
                   </tbody>
                 </table>
+                <hr/>
+                <div ng-if="'d'==part" class="container-fluid form-horizontal">
+                  <fieldset ng-disabled="!model.getEditEnabled()">
+                    <cn-reqn-view-input
+                      no-cols=true
+                      input="{
+                        key: 'data_sharing_filename',
+                        title: t( 'part2.d.data_sharing' ),
+                        type: 'file'
+                      }"
+                      difference="model.viewModel.compareRecord.differences.part2.d.data_sharing_filename"
+                      model="liteModel">
+                    </cn-reqn-view-input>
+                  </fieldset>
+                  </fieldset>
+                </div>
                 <div class="container-fluid">
                   <cn-reqn-view-input
                     no-cols=true
