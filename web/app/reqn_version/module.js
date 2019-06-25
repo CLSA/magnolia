@@ -74,6 +74,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     waiver: { type: 'enum' },
     comprehensive: { type: 'boolean' },
     tracking: { type: 'boolean' },
+    longitudinal: { type: 'boolean' },
+    last_identifier: { type: 'string' },
     reason_for_amendment: { type: 'text' },
     part2_a_comment: { type: 'text' },
     part2_b_comment: { type: 'text' },
@@ -892,7 +894,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                   d: [ 'title', 'keywords', 'lay_summary', 'background', 'objectives', 'methodology', 'analysis' ],
                   e: [ 'funding', 'funding_filename', 'funding_agency', 'grant_number' ],
                   f: [ 'ethics', 'ethics_filename' ],
-                  cohort: [ 'tracking', 'comprehensive' ]
+                  cohort: [ 'tracking', 'comprehensive', 'longitudinal', 'last_identifier' ]
                 };
 
                 $q.all( self.fileList.map( file => file.updateFileSize() ) ).then( function() {
@@ -907,9 +909,12 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                       } else if( 'e' == tab ) {
                         // only check e properties if funding=yes
                         return 'funding' != property ? 'yes' == record.funding : true;
-                      } else if( 'f' == tab ) {
+                      } else if( 'ethics_filename' == property ) {
                         // only check the ethics filename if ethics=yes (it's a boolean var)
-                        return 'ethics_filename' == property ? record.ethics : true;
+                        return record.ethics;
+                      } else if( 'last_identifier' == property ) {
+                        // only check the last_identifier if longitidunal=yes (it's a boolean var) 
+                        return record.longitudinal;
                       }
 
                       // check everything else
@@ -1153,8 +1158,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                   fr: [ { value: true, name: misc.yes.fr }, { value: false, name: misc.no.fr } ]
                 };
 
-                // create ethics enum
-                self.metadata.columnList.ethics.enumList = {
+                // create generic yes/no enum
+                self.metadata.yesNoEnumList = {
                   en: [ { value: '', name: misc.choose.en }, { value: true, name: misc.yes.en }, { value: false, name: misc.no.en } ],
                   fr: [ { value: '', name: misc.choose.fr }, { value: true, name: misc.yes.fr }, { value: false, name: misc.no.fr } ]
                 };
@@ -1191,18 +1196,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                 self.metadata.columnList.waiver.enumList.fr[0].name = misc.none.fr;
                 self.metadata.columnList.waiver.enumList.fr[1].name = misc.graduateFeeWaiver.fr;
                 self.metadata.columnList.waiver.enumList.fr[2].name = misc.postdocFeeWaiver.fr;
-
-                // create tracking enum
-                self.metadata.columnList.tracking.enumList = {
-                  en: [ { value: '', name: misc.choose.en }, { value: true, name: misc.yes.en }, { value: false, name: misc.no.en } ],
-                  fr: [ { value: '', name: misc.choose.fr }, { value: true, name: misc.yes.fr }, { value: false, name: misc.no.fr } ]
-                };
-
-                // create comprehensive enum
-                self.metadata.columnList.comprehensive.enumList = {
-                  en: [ { value: '', name: misc.choose.en }, { value: true, name: misc.yes.en }, { value: false, name: misc.no.en } ],
-                  fr: [ { value: '', name: misc.choose.fr }, { value: true, name: misc.yes.fr }, { value: false, name: misc.no.fr } ]
-                };
               }
             } ),
 

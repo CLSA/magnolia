@@ -743,7 +743,7 @@
                       key: 'ethics',
                       title: t( 'part1.f.ethics' ),
                       type: model.inputList.ethics.type,
-                      enumList: model.metadata.columnList.ethics.enumList[model.viewModel.record.lang]
+                      enumList: model.metadata.yesNoEnumList[model.viewModel.record.lang]
                     }"
                     difference="model.viewModel.compareRecord.differences.part1.f.ethics"
                     model="model">
@@ -814,8 +814,8 @@
         </div>
         <div ng-show="'cohort'==model.viewModel.tab[2]" class="panel panel-default" style="border-top-left-radius: 0px;">
           <div class="panel-body" style="padding-bottom: 0px;">
-            <p class="text-primary" ng-bind-html="t( 'part2.cohort.text1' )"></p>
             <form ng-attr-id="part2CohortForm" ng-attr-name="part2CohortForm" novalidate>
+              <p class="text-primary" ng-bind-html="t( 'part2.cohort.text1' )"></p>
               <div class="container-fluid form-horizontal">
                 <fieldset ng-disabled="!model.getEditEnabled()">
                   <cn-reqn-view-input
@@ -824,7 +824,7 @@
                       key: 'tracking',
                       title: t( 'part2.cohort.tracking' ),
                       type: model.inputList.tracking.type,
-                      enumList: model.metadata.columnList.tracking.enumList[model.viewModel.record.lang]
+                      enumList: model.metadata.yesNoEnumList[model.viewModel.record.lang]
                     }"
                     difference="model.viewModel.compareRecord.differences.part2.cohort.tracking"
                     model="model">
@@ -835,15 +835,42 @@
                       key: 'comprehensive',
                       title: t( 'part2.cohort.comprehensive' ),
                       type: model.inputList.comprehensive.type,
-                      enumList: model.metadata.columnList.comprehensive.enumList[model.viewModel.record.lang]
+                      enumList: model.metadata.yesNoEnumList[model.viewModel.record.lang]
                     }"
                     difference="model.viewModel.compareRecord.differences.part2.cohort.comprehensive"
                     model="model">
                   </cn-reqn-view-input>
                 </fieldset>
               </div>
+              <p class="text-primary" ng-bind-html="t( 'part2.cohort.text2' )"></p>
+              <hr/>
+              <div class="container-fluid form-horizontal">
+                <fieldset ng-disabled="!model.getEditEnabled()">
+                  <cn-reqn-view-input
+                    no-cols=true
+                    input="{
+                      key: 'longitudinal',
+                      title: t( 'part2.cohort.longitudinal' ),
+                      type: model.inputList.longitudinal.type,
+                      enumList: model.metadata.yesNoEnumList[model.viewModel.record.lang]
+                    }"
+                    difference="model.viewModel.compareRecord.differences.part2.cohort.longitudinal"
+                    model="model">
+                  </cn-reqn-view-input>
+                  <cn-reqn-view-input
+                    ng-if="model.viewModel.record.longitudinal"
+                    no-cols=true
+                    input="{
+                      key: 'last_identifier',
+                      title: t( 'part2.cohort.last_identifier' ),
+                      type: model.inputList.last_identifier.type
+                    }"
+                    difference="model.viewModel.compareRecord.differences.part2.cohort.last_identifier"
+                    model="model">
+                  </cn-reqn-view-input>
+                </fieldset>
+              </div>
             </form>
-            <p class="text-primary" ng-bind-html="t( 'part2.cohort.text2' )"></p>
           </div>
         </div>
         <div ng-repeat="part in ['a','b','c','d','e']"

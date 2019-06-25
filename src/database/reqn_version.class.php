@@ -298,6 +298,8 @@ class reqn_version extends \cenozo\database\record
 
       if( $this->comprehensive ) $data['comprehensive'] = 'Yes';
       if( $this->tracking ) $data['tracking'] = 'Yes';
+      if( $this->longitudinal ) $data['longitudinal'] = 'Yes';
+      if( !is_null( $this->last_identifier ) ) $data['last_identifier'] = $this->last_identifier;
       if( !is_null( $this->part2_a_comment ) ) $data['part2_a_comment'] = $this->part2_a_comment;
       if( !is_null( $this->part2_b_comment ) ) $data['part2_b_comment'] = $this->part2_b_comment;
       if( !is_null( $this->part2_c_comment ) ) $data['part2_c_comment'] = $this->part2_c_comment;

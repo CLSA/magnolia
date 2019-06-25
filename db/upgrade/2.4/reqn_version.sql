@@ -155,6 +155,30 @@ CREATE PROCEDURE patch_reqn_version()
       ALTER TABLE reqn_version ADD COLUMN data_sharing_filename VARCHAR(255) NULL DEFAULT NULL AFTER tracking;
     END IF;
 
+    SELECT "Adding last_identifier column to reqn_version table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn_version"
+    AND column_name = "last_identifier";
+
+    IF @test = 0 THEN
+      ALTER TABLE reqn_version ADD COLUMN last_identifier CHAR(10) NULL DEFAULT NULL AFTER tracking;
+    END IF;
+
+    SELECT "Adding longitudinal column to reqn_version table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn_version"
+    AND column_name = "longitudinal";
+
+    IF @test = 0 THEN
+      ALTER TABLE reqn_version ADD COLUMN longitudinal TINYINT(1) NULL DEFAULT NULL AFTER tracking;
+    END IF;
+
   END //
 DELIMITER ;
 

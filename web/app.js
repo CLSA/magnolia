@@ -357,7 +357,7 @@ cenozo.service( 'CnReqnHelper', [
               }
             },
             cohort: {
-              tab: { en: 'Cohort', fr: 'Cohorte' },
+              tab: { en: 'Cohort & Longitudinal Analyses', fr: 'TRANSLATION REQUIRED' },
               text1: {
                 en: 'Please select the cohort (Tracking and/or Comprehensive) for which you are requesting data:',
                 fr: 'Veuillez sélectionner la cohorte (surveillance et/ou globale) visée par votre demande de données:'
@@ -366,8 +366,22 @@ cenozo.service( 'CnReqnHelper', [
                 en: 'You will be able to make your selection of the wave of data collection (Baseline and/or Follow-up 1) within the Data Checklist.',
                 fr: 'Vous pourrez sélectionner la vague de collecte de données (départ et/ou 1er suivi) dans le tableau de sélection de données.'
               },
-              tracking: { en: 'Tracking Cohort (Telephone Interview) (TRM)', fr: 'Évaluation de surveillance (Entrevue téléphonique) (TRM)' },
-              comprehensive: { en: 'Comprehensive Cohort (In-home Interview & DCS visit) (COM)', fr: 'Évaluation globale (Entrevue à domicile et au site) (COM)' }
+              tracking: {
+                en: 'Tracking Cohort (Telephone Interview) (TRM)',
+                fr: 'Évaluation de surveillance (Entrevue téléphonique) (TRM)'
+              },
+              comprehensive: {
+                en: 'Comprehensive Cohort (In-home Interview & DCS visit) (COM)',
+                fr: 'Évaluation globale (Entrevue à domicile et au site) (COM)'
+              },
+              longitudinal: {
+                en: 'Is this project part of longitudinal analyses involving a previously approved project using CLSA data?',
+                fr: 'TRANSLATION REQUIRED'
+              },
+              last_identifier: {
+                en: 'Please enter the application number of the related CLSA approved project',
+                fr: 'TRANSLATION REQUIRED'
+              }
             },
             a: {
               tab: { en: '', fr: '' },
