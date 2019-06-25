@@ -113,7 +113,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
         scope: {
           model: '=',
           difference: '=',
-          input: '='
+          input: '=',
+          noCols: '='
         },
         controller: [ '$scope', function( $scope ) {
           $scope.directive = 'cnReqnViewInput';

@@ -1,5 +1,5 @@
 <div style="margin: 0;" class="row" ng-class="{ 'bg-warning': difference }">
-  <cn-view-input input="input" condensed="difference" model="model"></cn-view-input>
+  <cn-view-input input="input" condensed="difference" model="model" no-cols="noCols"></cn-view-input>
   <div class="col-slim col-sm-9 col-sm-offset-3 vertical-spacer" ng-if="difference" ng-bind-html="
       model.viewModel.compareRecord[input.key] ? (
         'date' == input.type ? (model.viewModel.compareRecord[input.key]|cnDatetime:'date') :
