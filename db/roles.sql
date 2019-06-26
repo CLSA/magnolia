@@ -9,6 +9,7 @@ INSERT IGNORE INTO cenozo.role( name, tier, all_sites ) VALUES
 ( "applicant", 1, false ),
 ( "reviewer", 1, true ),
 ( "chair", 1, true ),
+( "sac", 1, true ),
 ( "smt", 1, true );
 
 COMMIT;

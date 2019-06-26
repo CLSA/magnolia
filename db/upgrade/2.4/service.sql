@@ -15,7 +15,10 @@ INSERT IGNORE INTO service ( subject, method, resource, restricted ) VALUES
 ( 'reqn_type', 'PATCH', 1, 1 ),
 ( 'reqn_version', 'GET', 0, 0 ),
 ( 'reqn_version', 'GET', 1, 0 ),
-( 'reqn_version', 'PATCH', 1, 1 );
+( 'reqn_version', 'PATCH', 1, 1 ),
+( 'review_type', 'GET', 0, 1 ),
+( 'review_type', 'GET', 1, 1 ),
+( 'review_type', 'PATCH', 1, 1 );
 
 UPDATE service
 SET subject = 'reqn_version_data_option'

@@ -64,6 +64,7 @@ define( function() {
     identifier: {
       title: 'Identifier',
       type: 'string',
+      constant: true, // modified by the model
       exclude: 'add'
     },
     reqn_type_id: {
@@ -75,6 +76,7 @@ define( function() {
     deadline_id: {
       title: 'Deadline',
       type: 'enum',
+      constant: true, // modified by the model
       exclude: true // modified in the model
     },
     user_id: {
@@ -90,11 +92,13 @@ define( function() {
     graduate_id: {
       title: 'Trainee',
       type: 'enum',
+      constant: true, // modified by the model
       exclude: 'add'
     },
     language_id: {
       title: 'Language',
       type: 'enum',
+      constant: true, // modified by the model
       exclude: true // modified in the model
     },
     stage_type: {
@@ -134,6 +138,7 @@ define( function() {
       column: 'instruction_filename',
       title: 'Instruction File',
       type: 'file',
+      constant: true, // modified by the model
       exclude: true // modified in the model
     },
     note: {
@@ -397,14 +402,22 @@ define( function() {
 
   /* ######################################################################################################## */
   cenozo.providers.directive( 'cnReqnView', [
-    'CnReqnModelFactory',
-    function( CnReqnModelFactory ) {
+    'CnReqnModelFactory', 'CnSession',
+    function( CnReqnModelFactory, CnSession ) {
       return {
         templateUrl: module.getFileUrl( 'view.tpl.html' ),
         restrict: 'E',
         scope: { model: '=?' },
         controller: function( $scope ) {
           if( angular.isUndefined( $scope.model ) ) $scope.model = CnReqnModelFactory.root;
+
+          // remove the decision and deferral note input group if we're not an admin
+          if( 3 > CnSession.role.tier ) {
+            $scope.$on( 'cnRecordView linked', function( event, data ) {
+              var index = data.dataArray.findIndexByProperty( 'title', 'Decision and Deferral Notes' );
+              if( null != index ) data.dataArray.splice( index, 1 );
+            } );
+          }
         }
       };
     }
@@ -724,13 +737,21 @@ define( function() {
         this.isReviewer = function() { return 'reviewer' == CnSession.role.name; }
 
         var mainInputGroup = module.inputGroupList.findByProperty( 'title', '' );
-        if( 'administrator' == CnSession.role.name ) {
+        if( ['administrator','sac'].includes( CnSession.role.name ) ) {
           mainInputGroup.inputList.reqn_type_id.exclude = false;
           mainInputGroup.inputList.language_id.exclude = false;
           mainInputGroup.inputList.stage_type.exclude = 'add';
           mainInputGroup.inputList.state.exclude = 'add';
           mainInputGroup.inputList.data_expiry_date.exclude = 'add';
           mainInputGroup.inputList.note.exclude = false;
+
+          if( 'administrator' == CnSession.role.name ) {
+            mainInputGroup.inputList.identifier.constant = false;
+            mainInputGroup.inputList.deadline_id.constant = false;
+            mainInputGroup.inputList.graduate_id.constant = false;
+            mainInputGroup.inputList.language_id.constant = false;
+            mainInputGroup.inputList.instruction_filename.constant = false;
+          }
         } else {
           mainInputGroup.inputList.title.exclude = false;
           mainInputGroup.inputList.lay_summary.exclude = false;
@@ -744,7 +765,7 @@ define( function() {
           var check = false;
           if( 'applicant' == CnSession.role.name ) {
             check = 'new' == phase || ( 'deferred' == state && 'review' == phase );
-          } else if( 'administrator' == CnSession.role.name ) {
+          } else if( ['administrator','sac'].includes( CnSession.role.name ) ) {
             check = 'new' == phase || (
               'abandoned' != state && ( 'review' == phase || 'Agreement' == stage_type || 'Data Release' == stage_type )
             );

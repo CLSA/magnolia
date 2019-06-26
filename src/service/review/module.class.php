@@ -95,5 +95,14 @@ class module extends \cenozo\service\module
       $modifier->where( 'review_type.name', 'IN', array( 'Admin', 'SAC', 'Reviewer 1', 'Reviewer 2' ) );
       $modifier->where( 'stage_type.name', '=', 'DSAC Review' );
     }
+
+    if( $select->has_column( 'editable' ) )
+    {
+      $join_mod = lib::create( 'database\modifier' );
+      $join_mod->where( 'review_type.id', '=', 'role_has_review_type.review_type_id', false );
+      $join_mod->where( 'role_has_review_type.role_id', '=', $db_role->id );
+      $modifier->join_modifier( 'role_has_review_type', $join_mod, 'left' );
+      $select->add_column( 'role_has_review_type.role_id IS NOT NULL', 'editable', false, 'boolean' );
+    }
   }
 }

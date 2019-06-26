@@ -95,7 +95,8 @@ define( function() {
     current_reqn_version_id: { column: 'reqn_version.id', type: 'hidden' },
     funding_filename: { column: 'reqn_version.funding_filename', type: 'hidden' },
     ethics_filename: { column: 'reqn_version.ethics_filename', type: 'hidden' },
-    agreement_filename: { column: 'reqn_version.agreement_filename', type: 'hidden' }
+    agreement_filename: { column: 'reqn_version.agreement_filename', type: 'hidden' },
+    editable: { type: 'boolean', exclude: true }
   } );
 
   module.addExtraOperation( 'view', {
@@ -183,19 +184,9 @@ define( function() {
         angular.extend( this, {
           mayEdit: 'administrator' == CnSession.role.name,
           onView: function( force ) {
-            self.mayEdit = 'administrator' == CnSession.role.name;
+            self.mayEdit = false;
             return self.$$onView( force ).then( function() {
-              if( !self.mayEdit ) {
-                if( 'Admin' == self.record.review_type || 'SAC' == self.record.review_type ) {
-                  self.mayEdit = false;
-                } else if( 'Reviewer 1' == self.record.review_type || 'Reviewer 2' == self.record.review_type ) {
-                  self.mayEdit = 'reviewer' == CnSession.role.name || 'chair' == CnSession.role.name;
-                } else if( 'Chair' == self.record.review_type || 'Second Chair' == self.record.review_type ) {
-                  self.mayEdit = 'chair' == CnSession.role.name;
-                } else if( 'SMT' == self.record.review_type || 'Second SMT' == self.record.review_type ) {
-                  self.mayEdit = 'smt' == CnSession.role.name;
-                }
-              }
+              self.mayEdit = self.record.editable;
 
               // determine which recommendation_type enum list to use based on the review type
               self.parentModel.metadata.columnList.recommendation_type_id.enumList =

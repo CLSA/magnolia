@@ -74,6 +74,9 @@ class ui extends \cenozo\ui\ui
     // make sure the review module exists even if there is no access to it (this is needed by web/app/root/module.extend.js)
     if( is_null( $this->get_module( 'review' ) ) ) $this->assert_module( 'review' );
 
+    $module = $this->get_module( 'review_type' );
+    if( !is_null( $module ) ) $module->add_choose( 'role' );
+
     $module = $this->get_module( 'user' );
     if( !is_null( $module ) )
     {
@@ -96,6 +99,7 @@ class ui extends \cenozo\ui\ui
     $this->add_listitem( 'PDF Form Templates', 'pdf_form_type' );
     $this->add_listitem( 'Requisitions', 'reqn' );
     $this->add_listitem( 'Reviews', 'review' );
+    $this->add_listitem( 'Review Types', 'review_type' );
     $this->add_listitem( 'Stage Types', 'stage_type' );
     $this->add_listitem( 'Supplemental Files', 'supplemental_file' );
 
