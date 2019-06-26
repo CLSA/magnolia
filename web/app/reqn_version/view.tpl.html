@@ -363,7 +363,7 @@
                       <td>{{ coapplicant.access ? 'Yes' : 'No' }}</td>
                       <td ng-show="model.getEditEnabled()">
                         <button class="btn btn-xs btn-danger"
-                                ng-disabled="0 <= isDeletingCoapplicant.indexOf( coapplicant.id )"
+                                ng-disabled="isDeletingCoapplicant.includes( coapplicant.id )"
                                 ng-click="removeCoapplicant( coapplicant.id )"
                                 uib-tooltip-html="t( 'misc.remove' )">
                           <i class="glyphicon glyphicon-remove"></i>
@@ -629,7 +629,7 @@
                           <td class="text-left">{{ reference.reference }}</td>
                           <td ng-show="model.getEditEnabled()">
                             <button class="btn btn-xs btn-danger"
-                                    ng-disabled="0 <= isDeletingReference.indexOf( reference.id )"
+                                    ng-disabled="isDeletingReference.includes( reference.id )"
                                     ng-click="removeReference( reference.id )"
                                     uib-tooltip-html="t( 'misc.remove' )">
                               <i class="glyphicon glyphicon-remove"></i>

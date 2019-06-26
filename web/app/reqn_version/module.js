@@ -166,7 +166,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             // display the decision notice to the applicant under specific circumstances
             if( 'applicant' == CnSession.role.name &&
                 record.decision_notice &&
-                -1 < [ 'Suggested Revisions', 'Agreement', 'Not Approved' ].indexOf( record.stage_type ) ) {
+                [ 'Suggested Revisions', 'Agreement', 'Not Approved' ].includes( record.stage_type ) ) {
               scope.model.viewModel.displayDecisionNotice();
             }
           } );
@@ -273,7 +273,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
           $scope.removeCoapplicant = function( id ) {
             if( $scope.model.viewModel.coapplicantModel.getDeleteEnabled() ) {
-              if( 0 > $scope.isDeletingCoapplicant.indexOf( id ) ) $scope.isDeletingCoapplicant.push( id );
+              if( !$scope.isDeletingCoapplicant.includes( id ) ) $scope.isDeletingCoapplicant.push( id );
               var index = $scope.isDeletingCoapplicant.indexOf( id );
               $scope.model.viewModel.removeCoapplicant( id ).finally( function() {
                 if( 0 <= index ) $scope.isDeletingCoapplicant.splice( index, 1 );
@@ -309,7 +309,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
           $scope.removeReference = function( id ) {
             if( $scope.model.viewModel.referenceModel.getDeleteEnabled() ) {
-              if( 0 > $scope.isDeletingReference.indexOf( id ) ) $scope.isDeletingReference.push( id );
+              if( !$scope.isDeletingReference.includes( id ) ) $scope.isDeletingReference.push( id );
               var index = $scope.isDeletingReference.indexOf( id );
               $scope.model.viewModel.removeReference( id ).finally( function() {
                 if( 0 <= index ) $scope.isDeletingReference.splice( index, 1 );
@@ -384,7 +384,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           show: function( subject ) { return CnReqnHelper.showAction( subject, this.record ); },
           showAgreement: function() {
             // only show the agreement tab to administrators and when we've passed the review stage
-            return 'administrator' == CnSession.role.name && 0 <= ['active','complete'].indexOf( self.record.phase );
+            return 'administrator' == CnSession.role.name && ['active','complete'].includes( self.record.phase );
           },
           abandon: function() {
             return CnReqnHelper.abandon( 'identifier=' + this.record.identifier, this.record.lang ).then( function() {
@@ -781,7 +781,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           canViewData: function() {
             // administrators and applicants can view data when in the active stage
             var stage_type = this.record.stage_type ? this.record.stage_type : '';
-            return 0 <= ['administrator','applicant'].indexOf( CnSession.role.name ) && 'Active' == stage_type;
+            return ['administrator','applicant'].includes( CnSession.role.name ) && 'Active' == stage_type;
           },
 
           getDifferenceList: function( version ) {

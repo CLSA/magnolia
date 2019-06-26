@@ -238,7 +238,7 @@ define( function() {
         this.recommendationList = {};
 
         // only allow editing user and date under particular roles
-        if( 0 <= ['administrator','chair'].indexOf( CnSession.role.name ) ) {
+        if( ['administrator','chair'].includes( CnSession.role.name ) ) {
           this.module.inputGroupList.findByProperty( 'title', '' ).inputList.user_id.constant = false;
           this.module.inputGroupList.findByProperty( 'title', '' ).inputList.date.constant = false;
         }

@@ -342,7 +342,7 @@ define( function() {
       title: 'Final Report',
       operation: function( $state, model ) { model.viewModel.downloadFinalReport(); },
       isIncluded: function( $state, model ) {
-        return 0 <= ['Report Required', 'Complete'].indexOf( model.viewModel.record.stage_type );
+        return ['Report Required', 'Complete'].includes( model.viewModel.record.stage_type );
       }
     }, {
       title: 'Study Data',
@@ -502,7 +502,7 @@ define( function() {
           canViewData: function() {
             // administrators and applicants can view data when in the active stage
             var stage_type = this.record.stage_type ? this.record.stage_type : '';
-            return ( 'administrator' == CnSession.role.name && 0 <= ['Data Release','Active'].indexOf( stage_type ) ) ||
+            return ( 'administrator' == CnSession.role.name && ['Data Release','Active'].includes( stage_type ) ) ||
                    ( 'applicant' == CnSession.role.name && 'Active' == stage_type );
           },
           onView: function( force ) {
@@ -535,7 +535,7 @@ define( function() {
                 3 > CnSession.role.tier || null == self.record.deadline_id ? true : 'add';
 
               // show the agreement and instruction files if we're past the review stage
-              mainInputGroup.inputList.instruction_filename.exclude = 0 > ['active','complete'].indexOf( self.record.phase );
+              mainInputGroup.inputList.instruction_filename.exclude = !['active','complete'].includes( self.record.phase );
 
               // show the study data available if we're in the active phase
               mainInputGroup.inputList.data_expiry_date.exclude = 'active' != self.record.phase;
@@ -588,9 +588,9 @@ define( function() {
           enabled: function( subject ) {
             var state = this.record.state ? this.record.state : '';
 
-            if( 0 <= ['abandon','defer','reactivate','recreate'].indexOf( subject ) ) {
+            if( ['abandon','defer','reactivate','recreate'].includes( subject ) ) {
               return true;
-            } else if( 0 <= ['proceed','reject'].indexOf( subject ) ) {
+            } else if( ['proceed','reject'].includes( subject ) ) {
               return !state && null != this.record.next_stage_type;
             } else return false;
           },

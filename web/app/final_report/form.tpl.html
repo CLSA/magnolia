@@ -112,7 +112,7 @@
                     <td class="text-left">{{ production.detail }}</td>
                     <td ng-show="model.getEditEnabled()">
                       <button class="btn btn-xs btn-danger"
-                              ng-disabled="0 <= isDeletingProduction.indexOf( production.id )"
+                              ng-disabled="isDeletingProduction.includes( production.id )"
                               ng-click="removeProduction( production.id )"
                               uib-tooltip-html="t( 'misc.remove' )">
                         <i class="glyphicon glyphicon-remove"></i>

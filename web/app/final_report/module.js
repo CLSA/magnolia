@@ -124,7 +124,7 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
 
           $scope.removeProduction = function( id ) {
             if( $scope.model.viewModel.productionModel.getDeleteEnabled() ) {
-              if( 0 > $scope.isDeletingProduction.indexOf( id ) ) $scope.isDeletingProduction.push( id );
+              if( !$scope.isDeletingProduction.includes( id ) ) $scope.isDeletingProduction.push( id );
               var index = $scope.isDeletingProduction.indexOf( id );
               $scope.model.viewModel.removeProduction( id ).finally( function() {
                 if( 0 <= index ) $scope.isDeletingProduction.splice( index, 1 ); 
@@ -207,7 +207,7 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
           tabSectionList: ['instructions','part1','part2','part3'],
           setTab: function( tab, transition ) {
             if( angular.isUndefined( transition ) ) transition = true;
-            if( 0 > this.tabSectionList.indexOf( tab ) ) tab = 'instructions';
+            if( !this.tabSectionList.includes( tab ) ) tab = 'instructions';
             this.tab = tab;
             this.parentModel.setQueryParameter( 't', tab );
             if( transition ) this.parentModel.reloadState( false, false, 'replace' );

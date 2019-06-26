@@ -21,39 +21,45 @@ cenozo.service( 'CnReqnHelper', [
         var stage_type = record.stage_type ? record.stage_type : '';
 
         if( 'submit' == subject ) {
-          return ( 'applicant' == role || 'administrator' == role ) && ( 'new' == phase || 'deferred' == state );
+          return ( 'applicant' == role || 'administrator' == role ) &&
+                 ( 'new' == phase || 'deferred' == state );
         } else if( 'view' == subject ) {
           return 'applicant' != role;
         } else if( 'abandon' == subject ) {
-          return 0 <= ['administrator','applicant'].indexOf( role ) && 'deferred' == state && 'review' == phase;
+          return ['administrator','applicant'].includes( role ) &&
+                 'deferred' == state &&
+                 'review' == phase;
         } else if( 'delete' == subject ) {
           return 'new' == phase;
         } else if( 'defer' == subject ) {
           return 'administrator' == role &&
-            0 > ['abandoned','deferred'].indexOf( state ) &&
-            0 <= ['review','active'].indexOf( phase );
+                 !['abandoned','deferred'].includes( state ) &&
+                 ['review','active'].includes( phase );
         } else if( 'amend' == subject ) {
-          return 0 <= ['administrator','applicant'].indexOf( role ) &&
-            0 > ['abandoned','deferred'].indexOf( state ) &&
-            'active' == phase && 'Report Required' != stage_type;
+          return ['administrator','applicant'].includes( role ) &&
+                 !['abandoned','deferred'].includes( state ) &&
+                 'active' == phase && 'Report Required' != stage_type;
         } else if( 'reactivate' == subject ) {
           return 'administrator' == role && 'abandoned' == state;
         } else if( 'recreate' == subject ) {
           return 'administrator' == role && 'Not Approved' == stage_type;
         } else if( 'report' == subject ) {
-          return 0 <= ['Report Required','Complete'].indexOf( stage_type );
+          return ['Report Required','Complete'].includes( stage_type );
         } else if( 'proceed' == subject ) {
-          return 0 > ['Complete','Not Approved'].indexOf( stage_type ) && (
-            ( 'administrator' == role && 'new' != phase ) ||
-            ( 'chair' == role && 0 <= stage_type.indexOf( 'DSAC' ) ) ||
-            ( 'smt' == role && 0 <= stage_type.indexOf( 'SMT' ) )
-          ) && !this.showAction( 'amendment proceed', record );
+          return !['Complete','Not Approved'].includes( stage_type ) && (
+                   ( 'administrator' == role && 'new' != phase ) ||
+                   ( 'chair' == role && stage_type.includes( 'DSAC' ) ) ||
+                   ( 'smt' == role && stage_type.includes( 'SMT' ) )
+                 ) && !this.showAction( 'amendment proceed', record );
         } else if( 'reject' == subject ) {
-          return 'DSAC Selection' == stage_type && 0 <= ['administrator','chair'].indexOf( role );
+          return 'DSAC Selection' == stage_type &&
+                 ['administrator','chair'].includes( role );
         } else if( 'compare' == subject ) {
           return 'applicant' != role;
         } else if( 'amendment proceed' == subject ) {
-          return '.' != record.amendment && 0 <= ['Admin Review','SAC Review'].indexOf( stage_type ) && 'administrator' == role;
+          return '.' != record.amendment &&
+                 ['Admin Review','SAC Review'].includes( stage_type ) &&
+                 'administrator' == role;
         } else if( 'amendment sac review' == subject ) {
           return 'Admin Review' == stage_type;
         } else if( 'amendment dsac review' == subject ) {
