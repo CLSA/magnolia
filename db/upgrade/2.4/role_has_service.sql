@@ -69,7 +69,7 @@ CREATE PROCEDURE patch_role_has_service()
     SET @sql = CONCAT(
       "INSERT IGNORE INTO role_has_service( role_id, service_id ) ",
       "SELECT role.id, service.id ",
-      "FROM patrick_cenozo.role, service ",
+      "FROM ", @cenozo, ".role, service ",
       "WHERE role.name = 'sac' ",
       "AND service.subject = 'review'" );
     PREPARE statement FROM @sql;
@@ -79,7 +79,7 @@ CREATE PROCEDURE patch_role_has_service()
     SET @sql = CONCAT(
       "INSERT IGNORE INTO role_has_service( role_id, service_id ) ",
       "SELECT role.id, service.id ",
-      "FROM patrick_cenozo.role, service ",
+      "FROM ", @cenozo, ".role, service ",
       "WHERE role.name = 'sac' ",
       "AND service.subject IN( 'deadline', 'graduate' ) ",
       "AND service.method = 'GET'" );
@@ -90,7 +90,7 @@ CREATE PROCEDURE patch_role_has_service()
     SET @sql = CONCAT(
       "INSERT IGNORE INTO role_has_service( role_id, service_id ) ",
       "SELECT role.id, service.id ",
-      "FROM patrick_cenozo.role, service ",
+      "FROM ", @cenozo, ".role, service ",
       "WHERE role.name = 'sac' ",
       "AND service.subject = 'reqn' ",
       "AND service.method = 'PATCH'" );
