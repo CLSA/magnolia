@@ -136,7 +136,7 @@ define( function() {
     },
     instruction_filename: {
       column: 'instruction_filename',
-      title: 'Instruction File',
+      title: 'Additional Documentation',
       type: 'file',
       constant: true, // modified by the model
       exclude: true // modified in the model
