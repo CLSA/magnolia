@@ -242,11 +242,16 @@ define( function() {
           return this.$$getServiceCollectionPath( 'root' == this.getSubjectFromState() );
         };
 
-        // override the service data so that reviewers only see incomplete reviews from the home screen
+        // override the service data so that reviewers only see their own incomplete reviews from the home screen
         this.getServiceData = function( type, columnRestrictLists ) {
           var data = this.$$getServiceData( type, columnRestrictLists );
           if( 'root' == this.getSubjectFromState() && 'reviewer' == CnSession.role.name ) {
             if( angular.isUndefined( data.modifier.where ) ) data.modifier.where = [];
+            data.modifier.where.push( {
+              column: 'review.user_id',
+              operator: '=',
+              value: CnSession.user.id
+            } );
             data.modifier.where.push( {
               column: 'review.recommendation_type_id',
               operator: '=',

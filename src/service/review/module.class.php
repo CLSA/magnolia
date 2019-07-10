@@ -102,7 +102,14 @@ class module extends \cenozo\service\module
       $join_mod->where( 'review_type.id', '=', 'role_has_review_type.review_type_id', false );
       $join_mod->where( 'role_has_review_type.role_id', '=', $db_role->id );
       $modifier->join_modifier( 'role_has_review_type', $join_mod, 'left' );
-      $select->add_column( 'role_has_review_type.role_id IS NOT NULL', 'editable', false, 'boolean' );
+
+      $column = 'role_has_review_type.role_id IS NOT NULL';
+      if( 'reviewer' == $db_role->name )
+      {
+        // reviewers can only edit their own reviews
+        $column .= sprintf( ' AND review.user_id = %s', $db_user::db()->format_string( $db_user->id ) );
+      }
+      $select->add_column( $column, 'editable', false, 'boolean' );
     }
   }
 }
