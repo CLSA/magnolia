@@ -70,7 +70,7 @@ cenozo.service( 'CnReqnHelper', [
         } else if( 'amendment dsac review' == subject ) {
           return 'SAC Review' == stage_type;
         } else if( 'amendment agreement' == subject ) {
-          return 'Admin Review' == stage_type;
+          return ['Admin Review','SAC Review'].includes( stage_type );
         } else if( 'amendment data release' == subject ) {
           return 'SAC Review' == stage_type;
         } else if( 'amendment active' == subject ) {
