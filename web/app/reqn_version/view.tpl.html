@@ -91,17 +91,14 @@
   <div class="container-fluid" style="padding-top: 1em;">
     <ul class="nav nav-tabs">
       <li ng-class="{'active':'instructions'==model.viewModel.tab[0]}">
-        <a ng-click="model.viewModel.setTab(0,'instructions')" ng-bind-html="t( 'instructions.tab' )"></a>
-      </li>
-      <li ng-class="{'active':'amendment'==model.viewModel.tab[0]}" ng-if="'.' != model.viewModel.record.amendment">
-        <a ng-click="model.viewModel.setTab(0,'amendment')"
+        <a ng-click="model.viewModel.setTab(0,'instructions')"
            ng-class="{
              'text-warning flashing': model.getEditEnabled() && (
                model.viewModel.record.deferral_note_amendment
              ),
              'bg-warning': model.viewModel.compareRecord.differences.amendment.diff
            }"
-           ng-bind-html="t( 'amendment.tab' )"></a>
+           ng-bind-html="t( 'instructions.tab' )"></a>
       </li>
       <li ng-class="{'active':'part1'==model.viewModel.tab[0]}">
         <a ng-click="model.viewModel.setTab(0,'part1')"
@@ -135,7 +132,7 @@
       </li>
     </ul>
     <div ng-show="'instructions'==model.viewModel.tab[0]" class="panel panel-default" style="border-top-left-radius: 0px;">
-      <div class="panel-body" style="padding-bottom: 0px;">
+      <div class="panel-body" style="padding-bottom: 0px;" ng-if="'.' == model.viewModel.record.amendment">
         <h4 ng-bind-html="t( 'instructions.title' )"></h4>
         <ul class="list-group">
           <li class="list-group-item" ng-bind-html="t( 'instructions.text1' )"></li>
@@ -146,11 +143,7 @@
           <li class="list-group-item" ng-bind-html="t( 'instructions.text6' )"></li>
         </ul>
       </div>
-    </div>
-    <div ng-show="'amendment'==model.viewModel.tab[0]"
-         class="panel panel-default"
-         ng-if="'.' != model.viewModel.record.amendment">
-      <div class="panel-body" style="padding-bottom: 0px;">
+      <div class="panel-body" style="padding-bottom: 0px;" ng-if="'.' != model.viewModel.record.amendment">
         <h4 style="margin-top: 0; margin-bottom: 1em;" ng-bind-html="t( 'amendment.title' )"></h4>
         <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_amendment" class="bg-info"></cn-reqn-deferral-note>
         <form id="amendmentForm" name="amendmentForm" novalidate><fieldset ng-disabled="!model.getEditEnabled()">

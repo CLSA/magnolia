@@ -466,7 +466,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           tab: [],
           tabSectionList: [
             [ 'instructions', null, null ],
-            [ 'amendment', null, null ],
             [ 'part1', 'a', null ],
             [ 'part1', 'b', null ],
             [ 'part1', 'c', null ],
@@ -527,10 +526,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
             if( null != currentTabSectionIndex ) {
               var tabSection = this.tabSectionList[currentTabSectionIndex + (reverse?-1:1)];
-
-              // skip the amendment section if this isn't an amendment
-              if( 'amendment' == tabSection[0] && '.' == this.record.amendment )
-                tabSection = this.tabSectionList[currentTabSectionIndex + (reverse?-2:2)];
 
               // always skip the agreement section
               if( 'agreement' == tabSection[0] )
