@@ -92,5 +92,6 @@ class module extends \cenozo\service\module
       $modifier->where( 'review_type.name', 'IN', array( 'Admin', 'SAC', 'Reviewer 1', 'Reviewer 2' ) );
       $modifier->where( 'stage_type.name', '=', 'DSAC Review' );
     }
+    \cenozo\database\database::$debug = true;
   }
 }

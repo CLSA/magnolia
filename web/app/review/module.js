@@ -178,7 +178,9 @@ define( function() {
                 if( 'Admin' == self.record.review_type || 'SAC' == self.record.review_type ) {
                   self.mayEdit = false;
                 } else if( 'Reviewer 1' == self.record.review_type || 'Reviewer 2' == self.record.review_type ) {
-                  self.mayEdit = 'reviewer' == CnSession.role.name || 'chair' == CnSession.role.name;
+                  self.mayEdit = 'reviewer' == CnSession.role.name
+                               ? self.record.user_id == CnSession.user.id
+                               : 'chair' == CnSession.role.name;
                 } else if( 'Chair' == self.record.review_type || 'Second Chair' == self.record.review_type ) {
                   self.mayEdit = 'chair' == CnSession.role.name;
                 } else if( 'SMT' == self.record.review_type || 'Second SMT' == self.record.review_type ) {
@@ -237,11 +239,16 @@ define( function() {
           return this.$$getServiceCollectionPath( 'root' == this.getSubjectFromState() );
         };
 
-        // override the service data so that reviewers only see incomplete reviews from the home screen
+        // override the service data so that reviewers only see their own incomplete reviews from the home screen
         this.getServiceData = function( type, columnRestrictLists ) {
           var data = this.$$getServiceData( type, columnRestrictLists );
           if( 'root' == this.getSubjectFromState() && 'reviewer' == CnSession.role.name ) {
             if( angular.isUndefined( data.modifier.where ) ) data.modifier.where = [];
+            data.modifier.where.push( {
+              column: 'review.user_id',
+              operator: '=',
+              value: CnSession.user.id
+            } );
             data.modifier.where.push( {
               column: 'review.recommendation_type_id',
               operator: '=',
