@@ -608,13 +608,13 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                     version.differences = CnReqnVersionHelper.getDifferences( self.record, version, self.parentModel );
 
                     // while we're at it determine the last agreement version and calculate its differences
-                    if( null == self.agreementDifferenceList && null != version.agreement_filename ) {
+                    if( null == self.agreementDifferenceList && null != version.agreement_filename )
                       self.agreementDifferenceList = self.getDifferenceList( version );
-                    }
-                  } else {
-                    self.agreementDifferenceList = [];
                   }
                 } );
+
+                // if no different list was defined then make it an empty list
+                if( null == self.agreementDifferenceList ) self.agreementDifferenceList = [];
 
                 // put the order of the version list back to normal
                 self.versionList.reverse();
@@ -794,7 +794,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             if( version.differences.diff ) {
               for( var part in version.differences ) {
                 if( !version.differences.hasOwnProperty( part ) ) continue;
-                if( 'diff' == section ) continue; // used to track overall diff
+                if( 'diff' == part ) continue; // used to track overall diff
+                if( 'amendment' == part ) continue; // do not include changes to the amendment details
 
                 if( version.differences[part].diff ) {
                   for( var section in version.differences[part] ) {
