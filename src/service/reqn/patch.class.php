@@ -42,6 +42,7 @@ class patch extends \cenozo\service\patch
       // define whether the action is allowed
       $db_role = lib::create( 'business\session' )->get_role();
       $db_reqn = $this->get_leaf_record();
+      $db_reqn_version = $db_reqn->get_current_reqn_version();
       $db_current_stage_type = $db_reqn->get_current_stage_type();
       $state = $db_reqn->state;
       $phase = $db_current_stage_type->phase;
@@ -54,6 +55,11 @@ class patch extends \cenozo\service\patch
       else if( 'abandon' == $action )
       {
         if( !in_array( $db_role->name, array( 'applicant', 'administrator' ) ) || 'deferred' != $state ) $code = 403;
+        else if( '.' != $db_reqn_version->amendment )
+        {
+          // do not allow an amendment to be abandoned once it has gone past the admin review
+          if( 'Admin Review' != $db_current_stage_type->name ) $code = 400;
+        }
       }
       else if( 'defer' == $action )
       {
@@ -83,7 +89,7 @@ class patch extends \cenozo\service\patch
             {
               $deadline = util::get_datetime_object( $db_reqn->get_deadline()->date );
               $deadline->add( new \DateInterval( sprintf( 'P%dM', $delay ) ) );
-              if( $db_reqn->get_current_reqn_version()->start_date < $deadline ) $code = 409;
+              if( $db_reqn_version->start_date < $deadline ) $code = 409;
             }
           }
         }
@@ -159,8 +165,39 @@ class patch extends \cenozo\service\patch
         }
         else if( 'abandon' == $action )
         {
-          $db_reqn->state = 'abandoned';
-          $db_reqn->save();
+          if( '.' == $db_reqn_version->amendment )
+          {
+            // abandon the requisition
+            $db_reqn->state = 'abandoned';
+            $db_reqn->save();
+          }
+          else
+          {
+            // remove the amendment's review
+            $report_mod = lib::create( 'database\modifier' );
+            $report_mod->where( 'amendment', '=', $db_reqn_version->amendment );
+            foreach( $db_reqn->get_review_object_list( $report_mod ) as $db_review ) $db_review->delete();
+
+            // remove the current stage and re-activate the previous one
+            $db_current_stage = $db_reqn->get_current_stage();
+            $db_current_stage->delete();
+            $stage_mod = lib::create( 'database\modifier' );
+            $stage_mod->order_desc( 'datetime' );
+            $stage_mod->limit( 1 );
+            $db_last_stage = current( $db_reqn->get_stage_object_list( $stage_mod ) );
+            $db_last_stage->datetime = NULL;
+            $db_last_stage->save();
+
+            // delete the current (amendment) version
+            $db_reqn_version->delete();
+
+            // and finally, make sure the reqn is no longer deferred
+            if( 'deferred' == $db_reqn->state )
+            {
+              $db_reqn->state = NULL;
+              $db_reqn->save();
+            }
+          }
         }
         else if( 'defer' == $action )
         {

@@ -104,12 +104,14 @@ class reqn extends \cenozo\database\record
     $db_reqn_version = lib::create( 'database\reqn_version' );
     if( !is_null( $db_current_reqn_version ) ) $db_reqn_version->copy( $db_clone_reqn_version );
 
-    // set the parent, datetime, version, reason_for_amendment and agreement_filename (never use the clone)
+    // set the parent, datetime, version and agreement_filename (never use the clone)
     $db_reqn_version->reqn_id = $this->id;
     $db_reqn_version->datetime = util::get_datetime_object();
     $db_reqn_version->version = $version;
-    $db_reqn_version->reason_for_amendment = NULL;
     $db_reqn_version->agreement_filename = NULL;
+
+    // do not copy the reason for amendment if this is a new amendment
+    if( $new_amendment ) $db_reqn_version->reason_for_amendment = NULL;
 
     // determine the amendment
     if( $new_amendment )

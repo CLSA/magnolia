@@ -26,9 +26,14 @@ cenozo.service( 'CnReqnHelper', [
         } else if( 'view' == subject ) {
           return 'applicant' != role;
         } else if( 'abandon' == subject ) {
-          return ['administrator','applicant'].includes( role ) &&
+          return '.' == record.amendment ?
+                 // non-amendment process
+                 ['administrator','applicant'].includes( role ) &&
                  'deferred' == state &&
-                 'review' == phase;
+                 'review' == phase :
+                 // amendment process
+                 ['administrator','applicant'].includes( role ) &&
+                 'Admin Review' == record.stage_type;
         } else if( 'delete' == subject ) {
           return 'new' == phase;
         } else if( 'defer' == subject ) {
@@ -73,12 +78,24 @@ cenozo.service( 'CnReqnHelper', [
         } else return false;
       },
 
-      abandon: function( reqnIdentifier, language ) {
-        var message = 'applicant' == CnSession.role.name
-                    ? this.translate( 'reqn', 'misc.abandonWarning', language )
-                    : 'Are you sure you wish to abandon the requisition?'
-                      '\n\nThe applicant will no longer have access to the requisition and the review process will ' +
-                      'be discontinued. It is possible to re-activate the requisition at a later time.';
+      abandon: function( reqnIdentifier, amendment, language ) {
+        var message = '';
+        if( amendment ) {
+          if( 'applicant' == CnSession.role.name ) {
+            message = this.translate( 'reqn', 'misc.abandonAmendmentWarning', language );
+          } else {
+            message = 'Are you sure you want to abandon the amendment?' +
+              '\n\nThe amendment process will be discontinued and the requisition will be returned back to its previous status.';
+          }
+        } else {
+          if( 'applicant' == CnSession.role.name ) {
+            message = this.translate( 'reqn', 'misc.abandonWarning', language );
+          } else {
+            message = 'Are you sure you wish to abandon the requisition?' +
+              '\n\nThe applicant will no longer have access to the requisition and the review process will ' +
+              'be discontinued. It is possible to re-activate the requisition at a later time.';
+          }
+        }
         return CnModalConfirmFactory.instance( {
           title: 'applicant' == CnSession.role.name ? this.translate( 'reqn', 'misc.pleaseConfirm', language ) : 'Please Confirm',
           noText: 'applicant' == CnSession.role.name ? this.translate( 'reqn', 'misc.no', language ) : 'No',
@@ -86,8 +103,10 @@ cenozo.service( 'CnReqnHelper', [
           message: message
         } ).show().then( function( response ) {
           if( response ) {
-            return CnHttpFactory.instance( { path: 'reqn/' + reqnIdentifier + "?action=abandon" } ).patch();
-          }
+            return CnHttpFactory.instance( { path: 'reqn/' + reqnIdentifier + "?action=abandon" } ).patch().then( function() {
+              return true;
+            } );
+          } else return false;
         } );
       },
 
@@ -541,6 +560,10 @@ cenozo.service( 'CnReqnHelper', [
             abandonWarning: {
               en: 'Are you sure you want to abandon the application?\n\nYou will no longer have access to the application and the review process will be discontinued.',
               fr: 'Êtes-vous sûr(e) de vouloir abandonner la demande d’accès?\n\nVous n’y aurez plus accès et le processus d’évaluation sera interrompu.'
+            },
+            abandonAmendmentWarning: {
+              en: 'Are you sure you want to abandon the amendment?\n\nThe amendment process will be discontinued and your application will be returned back to its previous status.',
+              fr: 'TRANSLATION REQUIRED'
             },
             emailText: {
               en: 'You must provide an institutional email. Public email accounts such as @gmail.com are not allowed.',

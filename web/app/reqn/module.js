@@ -148,6 +148,7 @@ define( function() {
     },
 
     current_reqn_version_id: { column: 'reqn_version.id', type: 'string', exclude: true },
+    amendment: { column: 'reqn_version.amendment', type: 'string', exclude: true },
     funding_filename: { column: 'reqn_version.funding_filename', type: 'string', exclude: true },
     ethics_filename: { column: 'reqn_version.ethics_filename', type: 'string', exclude: true },
     agreement_filename: { column: 'reqn_version.agreement_filename', type: 'string', exclude: true },
@@ -460,9 +461,15 @@ define( function() {
         angular.extend( this, {
           show: function( subject ) { return CnReqnHelper.showAction( subject, this.record ); },
           abandon: function() {
-            return CnReqnHelper.abandon( this.record.getIdentifier(), this.record.lang  ).then( function() {
-              self.record.state = 'abandoned';
-              if( angular.isDefined( self.notificationModel ) ) self.notificationModel.listModel.onList( true );
+            return CnReqnHelper.abandon(
+              this.record.getIdentifier(),
+              '.' != this.record.amendment,
+              this.record.lang
+            ).then( function( response ) {
+              if( response ) {
+                self.record.state = 'abandoned';
+                if( angular.isDefined( self.notificationModel ) ) self.notificationModel.listModel.onList( true );
+              }
             } );
           },
           delete: function() { return CnReqnHelper.delete( this.record.getIdentifier(), this.record.lang ); },

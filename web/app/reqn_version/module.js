@@ -387,9 +387,12 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             return 'administrator' == CnSession.role.name && ['active','complete'].includes( self.record.phase );
           },
           abandon: function() {
-            return CnReqnHelper.abandon( 'identifier=' + this.record.identifier, this.record.lang ).then( function() {
-              if( 'applicant' == CnSession.role.name )
-                $state.go( 'applicant' == CnSession.role.name ? 'root.home' : 'reqn.list' );
+            return CnReqnHelper.abandon(
+              'identifier=' + this.record.identifier,
+              '.' != this.record.amendment,
+              this.record.lang
+            ).then( function( response ) {
+              if( response ) $state.go( 'applicant' == CnSession.role.name ? 'root.home' : 'reqn.list' );
             } );
           },
           delete: function() { return CnReqnHelper.delete( 'identifier=' + this.record.identifier, this.record.lang ); },

@@ -35,7 +35,7 @@ BEGIN
   ) AND amendment = (
     SELECT amendment
     FROM reqn_current_reqn_version
-    JOIN reqn_version ON reqn_current_reqn_version.reqn_version = reqn_version.id
+    JOIN reqn_version ON reqn_current_reqn_version.reqn_version_id = reqn_version.id
     WHERE reqn_current_reqn_version.reqn_id = OLD.reqn_id
   );
 END$$
