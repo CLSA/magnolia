@@ -94,6 +94,7 @@ class ui extends \cenozo\ui\ui
 
     $db_role = lib::create( 'business\session' )->get_role();
 
+    $this->add_listitem( 'Amendment Types', 'amendment_type' );
     $this->add_listitem( 'Deadlines', 'deadline' );
     $this->add_listitem( 'Notification Types', 'notification_type' );
     $this->add_listitem( 'PDF Form Templates', 'pdf_form_type' );

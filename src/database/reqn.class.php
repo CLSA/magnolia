@@ -110,8 +110,8 @@ class reqn extends \cenozo\database\record
     $db_reqn_version->version = $version;
     $db_reqn_version->agreement_filename = NULL;
 
-    // do not copy the reason for amendment if this is a new amendment
-    if( $new_amendment ) $db_reqn_version->reason_for_amendment = NULL;
+    // do not copy the amendment type if this is a new amendment
+    if( $new_amendment ) $db_reqn_version->amendment_type_id = NULL;
 
     // determine the amendment
     if( $new_amendment )

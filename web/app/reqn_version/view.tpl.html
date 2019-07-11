@@ -150,11 +150,12 @@
           <div class="form-horizontal">
             <cn-reqn-view-input
               input="{
-                key: 'reason_for_amendment',
-                title: t( 'amendment.reason_for_amendment' ),
-                type: model.inputList.reason_for_amendment.type
+                key: 'amendment_type_id',
+                title: t( 'amendment.amendment_type_id' ),
+                type: model.inputList.amendment_type_id.type,
+                enumList: model.metadata.columnList.amendment_type_id.enumList[model.viewModel.record.lang]
               }"
-              difference="model.viewModel.compareRecord.differences.amendment.a.reason_for_amendment"
+              difference="model.viewModel.compareRecord.differences.amendment.a.amendment_type_id"
               model="model">
           </div>
         </fieldset></form>

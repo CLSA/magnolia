@@ -76,7 +76,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     tracking: { type: 'boolean' },
     longitudinal: { type: 'boolean' },
     last_identifier: { type: 'string' },
-    reason_for_amendment: { type: 'text' },
+    amendment_type_id: { type: 'enum' },
     part2_a_comment: { type: 'text' },
     part2_b_comment: { type: 'text' },
     part2_c_comment: { type: 'text' },
@@ -887,7 +887,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               if( response ) {
                 // make sure that certain properties have been defined, one tab at a time
                 var requiredTabList = {
-                  amendment: [ 'reason_for_amendment' ],
+                  amendment: [ 'amendment_type_id' ],
                   a: [ 'applicant_position', 'applicant_affiliation', 'applicant_address', 'applicant_phone' ],
                   c: [ 'start_date', 'duration' ],
                   d: [ 'title', 'keywords', 'lay_summary', 'background', 'objectives', 'methodology', 'analysis' ],
@@ -1147,6 +1147,24 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                     self.metadata.columnList[column] = {};
                   angular.extend( self.metadata.columnList[column], columnList[column] );
                 }
+              } ),
+              CnHttpFactory.instance( {
+                path: 'amendment_type',
+                data: {
+                  select: { column: [ 'id', 'reason_en', 'reason_fr' ] }
+                }
+              } ).query().then( function success( response ) {
+                self.metadata.columnList.amendment_type_id.enumList = { en: [], fr: [] };
+                response.data.forEach( function( item ) {
+                  self.metadata.columnList.amendment_type_id.enumList.en.push( {
+                    value: item.id,
+                    name: item.reason_en
+                  } );
+                  self.metadata.columnList.amendment_type_id.enumList.fr.push( {
+                    value: item.id,
+                    name: item.reason_fr
+                  } );
+                } );
               } )
             ] ).then( function() {
               // only do the following for the root instance

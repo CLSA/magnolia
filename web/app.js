@@ -195,7 +195,7 @@ cenozo.service( 'CnReqnHelper', [
               en: 'Amendment Details',
               fr: 'TRANSLATION REQUIRED'
             },
-            reason_for_amendment: { en: 'Reason for Amendment', fr: 'TRANSLATION REQUIRED' },
+            amendment_type_id: { en: 'Amendment Type', fr: 'TRANSLATION REQUIRED' },
           },
           part1: {
             tab: { en: 'Part 1', fr: '1<sup>re</sup> partie' },
@@ -733,7 +733,7 @@ cenozo.service( 'CnReqnVersionHelper', [
             diff: false,
             a: { // the only unnamed amendment category
               diff: false,
-              reason_for_amendment: false
+              amendment_type_id: false
             }
           },
           part1: {

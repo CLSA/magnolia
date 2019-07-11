@@ -5,6 +5,7 @@ SET AUTOCOMMIT=0;
 SOURCE role.sql
 SOURCE application_type_has_role.sql
 SOURCE role_has_review_type.sql
+SOURCE amendment_type.sql
 SOURCE stage.sql
 SOURCE stage_type.sql
 SOURCE stage_type_has_stage_type.sql
