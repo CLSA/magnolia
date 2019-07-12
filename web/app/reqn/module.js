@@ -141,6 +141,11 @@ define( function() {
       constant: true, // modified by the model
       exclude: true // modified in the model
     },
+    suggested_revisions: {
+      title: 'Suggested Revisions',
+      type: 'boolean',
+      exclude: true // modified in the model
+    },
     note: {
       title: 'Administrative Note',
       type: 'text',
@@ -159,12 +164,7 @@ define( function() {
     deadline: { type: 'date', column: 'deadline.date', exclude: true }
   } );
 
-  module.addInputGroup( 'Decision and Deferral Notes', {
-    suggested_revisions: {
-      title: 'Suggested Revisions',
-      type: 'boolean',
-      exclude: true // modified in the model
-    },
+  module.addInputGroup( 'Deferral Notes', {
     deferral_note_amendment: {
       title: 'Amendment',
       type: 'text',
@@ -560,7 +560,7 @@ define( function() {
               mainInputGroup.inputList.data_expiry_date.exclude = 'active' != self.record.phase;
 
               // show the suggested revisions checkbox to admins when in the decision made stage
-              decisionInputGroup.inputList.suggested_revisions.exclude =
+              mainInputGroup.inputList.suggested_revisions.exclude =
                 3 > CnSession.role.tier ||
                 'Decision Made' != self.record.stage_type ||
                 'Not Approved' == self.record.next_stage_type;
