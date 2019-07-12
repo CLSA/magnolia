@@ -40,6 +40,7 @@ class ui extends \cenozo\ui\ui
       $module->add_child( 'reqn_version' );
       $module->add_child( 'review' );
       $module->add_child( 'stage' );
+      $module->add_child( 'notice' );
       $module->add_child( 'notification' );
     }
 

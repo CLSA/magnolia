@@ -85,7 +85,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
     identifier: { column: 'reqn.identifier', type: 'string' },
     state: { column: 'reqn.state', type: 'string' },
-    decision_notice: { column: 'reqn.decision_notice', type: 'string' },
     data_directory: { column: 'reqn.data_directory', type: 'string' },
     status: { column: 'stage_type.status', type: 'string' },
     stage_type: { column: 'stage_type.name', type: 'string' },
@@ -165,7 +164,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
             // display the decision notice to the applicant under specific circumstances
             if( 'applicant' == CnSession.role.name &&
-                record.decision_notice &&
                 [ 'Suggested Revisions', 'Agreement', 'Not Approved' ].includes( record.stage_type ) ) {
               scope.model.viewModel.displayDecisionNotice();
             }
@@ -359,9 +357,11 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnReqnVersionViewFactory', [
-    'CnReqnHelper', 'CnReqnVersionHelper', 'CnCoapplicantModelFactory', 'CnReferenceModelFactory', 'CnBaseViewFactory',
+    'CnReqnHelper', 'CnReqnVersionHelper', 'CnModalNoticeListFactory',
+    'CnCoapplicantModelFactory', 'CnReferenceModelFactory', 'CnBaseViewFactory',
     'CnSession', 'CnHttpFactory', 'CnModalMessageFactory', 'CnModalConfirmFactory', '$state', '$q', '$window',
-    function( CnReqnHelper, CnReqnVersionHelper, CnCoapplicantModelFactory, CnReferenceModelFactory, CnBaseViewFactory,
+    function( CnReqnHelper, CnReqnVersionHelper, CnModalNoticeListFactory,
+              CnCoapplicantModelFactory, CnReferenceModelFactory, CnBaseViewFactory,
               CnSession, CnHttpFactory, CnModalMessageFactory, CnModalConfirmFactory, $state, $q, $window ) {
       var object = function( parentModel, root ) {
         var self = this;
@@ -1025,13 +1025,18 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           },
 
           displayDecisionNotice: function() {
-            CnModalMessageFactory.instance( {
-              title: 'Notice of decision for ' + self.record.identifier,
-              message: self.record.decision_notice,
-              print: true
-            } ).show();
+            var noticeList = [];
+            return CnHttpFactory.instance( {
+              path: '/reqn/identifier=' + this.record.identifier + '/notice',
+              data: { modifier: { order: { datetime: true } } }
+            } ).query().then( function( response ) {
+              return CnModalNoticeListFactory.instance( {
+                title: 'Notice List',
+                closeText: self.translate( 'misc.close' ),
+                noticeList: response.data
+              } ).show();
+            } );
           }
-
         } );
         this.coapplicantModel.metadata.getPromise(); // needed to get the coapplicant's metadata
         this.referenceModel.metadata.getPromise(); // needed to get the reference's metadata
@@ -1147,25 +1152,26 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                     self.metadata.columnList[column] = {};
                   angular.extend( self.metadata.columnList[column], columnList[column] );
                 }
+
+                return CnHttpFactory.instance( {
+                  path: 'amendment_type',
+                  data: {
+                    select: { column: [ 'id', 'reason_en', 'reason_fr' ] }
+                  }
+                } ).query().then( function success( response ) {
+                  self.metadata.columnList.amendment_type_id.enumList = { en: [], fr: [] };
+                  response.data.forEach( function( item ) {
+                    self.metadata.columnList.amendment_type_id.enumList.en.push( {
+                      value: item.id,
+                      name: item.reason_en
+                    } );
+                    self.metadata.columnList.amendment_type_id.enumList.fr.push( {
+                      value: item.id,
+                      name: item.reason_fr
+                    } );
+                  } );
+                } )
               } ),
-              CnHttpFactory.instance( {
-                path: 'amendment_type',
-                data: {
-                  select: { column: [ 'id', 'reason_en', 'reason_fr' ] }
-                }
-              } ).query().then( function success( response ) {
-                self.metadata.columnList.amendment_type_id.enumList = { en: [], fr: [] };
-                response.data.forEach( function( item ) {
-                  self.metadata.columnList.amendment_type_id.enumList.en.push( {
-                    value: item.id,
-                    name: item.reason_en
-                  } );
-                  self.metadata.columnList.amendment_type_id.enumList.fr.push( {
-                    value: item.id,
-                    name: item.reason_fr
-                  } );
-                } );
-              } )
             ] ).then( function() {
               // only do the following for the root instance
               if( 'root' == self.type ) {

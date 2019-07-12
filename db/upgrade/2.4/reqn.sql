@@ -447,6 +447,19 @@ CREATE PROCEDURE patch_reqn()
       ALTER TABLE reqn DROP COLUMN part2_f_comment;
     END IF;
 
+    SELECT "Adding new suggested_revisions column to reqn table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "suggested_revisions";
+
+    IF @test = 0 THEN
+      ALTER TABLE reqn
+      ADD COLUMN suggested_revisions TINYINT(1) NOT NULL DEFAULT 0 AFTER instruction_filename;
+    END IF;
+
     SELECT "Adding new deferral_note_amendment column to reqn table" AS "";
 
     SELECT COUNT(*) INTO @test
@@ -457,7 +470,7 @@ CREATE PROCEDURE patch_reqn()
 
     IF @test = 0 THEN
       ALTER TABLE reqn
-      ADD COLUMN deferral_note_amendment TEXT NULL DEFAULT NULL AFTER decision_notice;
+      ADD COLUMN deferral_note_amendment TEXT NULL DEFAULT NULL AFTER suggested_revisions;
     END IF;
 
     SELECT "Renaming deferral_note_part1_a1 column to deferral_note_1a in reqn table" AS "";
@@ -623,19 +636,6 @@ CREATE PROCEDURE patch_reqn()
           ON UPDATE NO ACTION;
     END IF;
 
-    SELECT "Adding new suggested_revisions column to reqn table" AS "";
-
-    SELECT COUNT(*) INTO @test
-    FROM information_schema.COLUMNS
-    WHERE table_schema = DATABASE()
-    AND table_name = "reqn"
-    AND column_name = "suggested_revisions";
-
-    IF @test = 0 THEN
-      ALTER TABLE reqn
-      ADD COLUMN suggested_revisions TINYINT(1) NOT NULL DEFAULT 0 AFTER instruction_filename;
-    END IF;
-
     SELECT "Adding new note column to reqn table" AS "";
 
     SELECT COUNT(*) INTO @test
@@ -699,6 +699,8 @@ CREATE PROCEDURE patch_reqn()
       ALTER TABLE reqn ADD COLUMN data_expiry_date DATE NULL DEFAULT NULL AFTER data_directory;
     END IF;
 
+    SELECT "Removing agreement_filename column" AS "";
+
     SELECT COUNT(*) INTO @test
     FROM information_schema.COLUMNS
     WHERE table_schema = DATABASE()
@@ -707,6 +709,27 @@ CREATE PROCEDURE patch_reqn()
 
     IF @test THEN
       ALTER TABLE reqn DROP COLUMN agreement_filename;
+    END IF;
+
+    SELECT "Removing decision_notice column" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "decision_notice";
+
+    IF @test THEN
+      SELECT "Moving decision notices from reqn to notice table" AS "";
+      INSERT INTO notice( reqn_id, datetime, title, description )
+      SELECT reqn.id, CONVERT_TZ( stage.update_timestamp, "Canada/Eastern", "UTC" ), "Notice of decision", decision_notice
+      FROM reqn
+      JOIN stage ON reqn.id = stage.reqn_id
+      JOIN stage_type ON stage.stage_type_id = stage_type.id
+      WHERE stage_type.name = "Decision Made"
+      AND decision_notice IS NOT NULL;
+
+      ALTER TABLE reqn DROP COLUMN decision_notice;
     END IF;
 
   END //

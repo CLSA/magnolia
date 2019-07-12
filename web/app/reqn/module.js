@@ -160,11 +160,6 @@ define( function() {
   } );
 
   module.addInputGroup( 'Decision and Deferral Notes', {
-    decision_notice: {
-      title: 'Notice of Decision',
-      type: 'text',
-      exclude: 'add'
-    },
     suggested_revisions: {
       title: 'Suggested Revisions',
       type: 'boolean',
@@ -173,7 +168,7 @@ define( function() {
     deferral_note_amendment: {
       title: 'Amendment',
       type: 'text',
-      exclude: 'add'
+      exclude: true // modified in the model
     },
     deferral_note_1a: {
       title: 'Part1: A1',
@@ -566,6 +561,11 @@ define( function() {
                 'Decision Made' != self.record.stage_type ||
                 'Not Approved' == self.record.next_stage_type;
 
+              // show the amendment deferral note to admins when an amendment is active
+              decisionInputGroup.inputList.deferral_note_amendment.exclude =
+                3 > CnSession.role.tier ||
+                '.' == self.record.amendment;
+
               return CnHttpFactory.instance( {
                 path: 'user/' + self.record.user_id + '/graduate',
                 data: {
@@ -589,10 +589,8 @@ define( function() {
 
           onPatch: function( data ) {
             return self.$$onPatch( data ).then( function() {
-              // Reload the view if we're changing the decision notice (the proceed button's enable state is affected by it)
-              // or the suggested revisions (the next stage will change)
-              if( angular.isDefined( data.decision_notice ) || angular.isDefined( data.suggested_revisions ) )
-                return self.onView();
+              // Reload the view if we're changing the suggested revisions (the next stage will change)
+              if( angular.isDefined( data.suggested_revisions ) ) return self.onView();
             } );
           },
 

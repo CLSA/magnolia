@@ -26,7 +26,7 @@
           <li><a ng-click="model.viewModel.downloadApplication()" ng-bind-html="t( 'misc.application' )"></a></li>
           <li><a ng-click="model.viewModel.downloadChecklist()" ng-bind-html="t( 'misc.dataChecklist' )"></a></li>
           <li>
-            <a ng-if="model.viewModel.record.decision_notice && 'review' != model.viewModel.record.phase"
+            <a ng-if="'review' != model.viewModel.record.phase"
                ng-click="model.viewModel.displayDecisionNotice()"
                ng-bind-html="t( 'misc.noticeOfDecision' )"></a>
           </li>

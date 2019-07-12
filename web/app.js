@@ -10,6 +10,58 @@ cenozo.controller( 'HeaderCtrl', [
   }
 ] );
 
+cenozo.service( 'CnModalNoticeListFactory', [
+  '$uibModal', '$state', '$window', '$filter',
+  function( $uibModal, $state, $window, $filter ) {
+    var object = function( params ) {
+      var self = this;
+      angular.extend( this, {
+        title: 'Title',
+        closeText: 'Close',
+
+      } );
+      angular.extend( this, params );
+
+      this.show = function() {
+        console.log( cenozoApp.getFileUrl( 'magnolia', 'modal-notice-list.tpl.html' ) );
+        self.modal = $uibModal.open( {
+          backdrop: 'static',
+          keyboard: !self.block,
+          modalFade: true,
+          templateUrl: cenozoApp.getFileUrl( 'magnolia', 'modal-notice-list.tpl.html' ),
+          controller: [ '$scope', '$uibModalInstance', function( $scope, $uibModalInstance ) {
+            $scope.model = self;
+            $scope.close = function() { $uibModalInstance.close( false ); };
+            $scope.printMessage = function() {
+              var printWindow = $window.open(
+                '',
+                '_blank',
+                'width=600,height=700,scrollbars=no,menubar=no,toolbar=no,location=no,status=no,titlebar=no'
+              );
+              printWindow.document.open();
+              var body = '<html><body onload="window.print()">';
+              $scope.model.noticeList.forEach( function( notice ) {
+                body += '<h3>' + $filter( 'cnDatetime' )( notice.datetime, 'date' ) + ': ' + notice.title + '</h3>' +
+                        '<div>' + $filter( 'cnNewlines' )( notice.description ) + '</div>';
+              } );
+              body += '</body></html>';
+
+              printWindow.document.write( body );
+              printWindow.document.close();
+            }
+          } ]
+        } );
+
+        return self.modal.result;
+      };
+
+      this.close = function() { if( angular.isDefined( this.modal ) ) this.modal.close( false ); };
+    };
+
+    return { instance: function( params ) { return new object( angular.isUndefined( params ) ? {} : params ); } };
+  }
+] );
+
 cenozo.service( 'CnReqnHelper', [
   'CnSession', 'CnHttpFactory', 'CnModalConfirmFactory', '$state',
   function( CnSession, CnHttpFactory, CnModalConfirmFactory, $state ) {

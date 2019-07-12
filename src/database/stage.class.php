@@ -33,9 +33,20 @@ class stage extends \cenozo\database\record
     }
     else if( 'Decision Made' == $db_stage_type->name )
     {
-      // the reqn's decision_notice must be set in order for the decision made stage to be complete
-      if( is_null( $this->get_reqn()->decision_notice ) )
-        return 'The decision notice must be set before proceeding to the next stage.';
+      // make sure that there is a recent notice (test against the datetime of the last stage)
+      $stage_mod = lib::create( 'database\modifier' );
+      $stage_mod->order_desc( 'datetime' );
+      $stage_mod->limit( 1 );
+      $stage_sel = lib::create( 'database\select' );
+      $stage_sel->add_column( 'datetime' );
+
+      $db_reqn = $this->get_reqn();
+      $last_stage = current( $db_reqn->get_stage_list( $stage_sel, $stage_mod ) );
+      
+      $notice_mod = lib::create( 'database\modifier' );
+      $notice_mod->where( 'datetime', '>', $last_stage['datetime'] );
+      if( 0 == $db_reqn->get_notice_count( $notice_mod ) )
+        return 'A new notice must be created before proceeding to the next stage.';
     }
     else if( 'Agreement' == $db_stage_type->name )
     {

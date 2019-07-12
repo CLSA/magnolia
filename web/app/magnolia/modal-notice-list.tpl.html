@@ -1,0 +1,37 @@
+<form ng-submit="close()" class="noselect">
+  <div class="modal-header bg-primary">
+    <h4 class="modal-title">{{ model.title }}</h4>
+  </div>
+  <div class="modal-body allow-select">
+    <div class="panel-group" id="noticeAccordion" role="tablist" aria-multiselectable="true">
+      <div class="panel panel-default" ng-repeat="notice in model.noticeList">
+        <div class="panel-heading" role="tab" id="heading{{ $index }}">
+          <h4 class="panel-title">
+            <button class="btn btn-link"
+                    type="button"
+                    data-toggle="collapse"
+                    data-target="#collapse{{ $index }}"
+                    aria-expanded="{{ $first ? 'true' : 'false' }}"
+                    aria-controls="collapse{{ $index }}">
+              {{ notice.datetime | cnDatetime: 'date' }}: {{ notice.title }}
+            </button>
+          </h4>
+        </div>
+        <div id="collapse{{ $index }}"
+             class="panel-collapse collapse"
+             role="tabpanel"
+             ng-class="{ in: $first }"
+             aria-labelledby="heading{{ $index }}"
+             data-parent="#noticeAccordion">
+          <div class="panel-body">
+            <span style="white-space: pre-wrap;">{{ notice.description }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer bg-info">
+    <button type="button" class="btn btn-default pull-left" ng-click="printMessage()">Print</button>
+    <button type="submit" cn-autofocus class="btn btn-primary">{{ model.closeText }}</button>
+  </div>
+</form>
