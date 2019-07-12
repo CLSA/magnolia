@@ -294,6 +294,10 @@ define( function() {
       operation: function( $state, model ) { model.viewModel.proceed( 'DSAC Review' ); },
       isIncluded: function( $state, model ) { return model.viewModel.show( 'amendment dsac review' ); }
     }, {
+      title: 'To Decision Made',
+      operation: function( $state, model ) { model.viewModel.proceed( 'Decision Made' ); },
+      isIncluded: function( $state, model ) { return model.viewModel.show( 'amendment decision made' ); }
+    }, {
       title: 'To Agreement',
       operation: function( $state, model ) { model.viewModel.proceed( 'Agreement' ); },
       isIncluded: function( $state, model ) { return model.viewModel.show( 'amendment agreement' ); }

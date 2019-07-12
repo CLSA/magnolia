@@ -191,6 +191,13 @@ CREATE PROCEDURE patch_reqn_version()
 
     IF @test = 0 THEN
       ALTER TABLE reqn_version ADD COLUMN longitudinal TINYINT(1) NULL DEFAULT NULL AFTER tracking;
+
+      UPDATE reqn_version
+      JOIN reqn ON reqn_version.reqn_id = reqn.id
+      JOIN stage ON reqn.id = stage.reqn_id AND stage.datetime IS NULL
+      JOIN stage_type ON stage.stage_type_id = stage_type.id
+      SET reqn_version.longitudinal = false
+      WHERE stage_type.name != "New";
     END IF;
 
   END //

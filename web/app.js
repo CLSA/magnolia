@@ -115,18 +115,20 @@ cenozo.service( 'CnReqnHelper', [
           return 'applicant' != role;
         } else if( 'amendment proceed' == subject ) {
           return '.' != record.amendment &&
-                 ['Admin Review','SAC Review'].includes( stage_type ) &&
+                 ['Admin Review','SAC Review','Decision Made'].includes( stage_type ) &&
                  'administrator' == role;
         } else if( 'amendment sac review' == subject ) {
           return 'Admin Review' == stage_type;
         } else if( 'amendment dsac review' == subject ) {
           return 'SAC Review' == stage_type;
-        } else if( 'amendment agreement' == subject ) {
+        } else if( 'amendment decision made' == subject ) {
           return ['Admin Review','SAC Review'].includes( stage_type );
+        } else if( 'amendment agreement' == subject ) {
+          return 'Decision Made' == stage_type;
         } else if( 'amendment data release' == subject ) {
-          return 'SAC Review' == stage_type;
+          return 'Decision Made' == stage_type;
         } else if( 'amendment active' == subject ) {
-          return 'Admin Review' == stage_type;
+          return 'Decision Made' == stage_type;
         } else return false;
       },
 
