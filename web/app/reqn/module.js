@@ -543,8 +543,8 @@ define( function() {
 
             return this.$$onView( force ).then( function() {
               var mainInputGroup = self.parentModel.module.inputGroupList.findByProperty( 'title', '' );
-              var decisionInputGroup =
-                self.parentModel.module.inputGroupList.findByProperty( 'title', 'Decision and Deferral Notes' );
+              var deferralInputGroup =
+                self.parentModel.module.inputGroupList.findByProperty( 'title', 'Deferral Notes' );
 
               // only allow the deadline to be changed while in the admin review stage (hide if there is no deadline)
               mainInputGroup.inputList.deadline_id.constant =
@@ -566,7 +566,7 @@ define( function() {
                 'Not Approved' == self.record.next_stage_type;
 
               // show the amendment deferral note to admins when an amendment is active
-              decisionInputGroup.inputList.deferral_note_amendment.exclude =
+              deferralInputGroup.inputList.deferral_note_amendment.exclude =
                 3 > CnSession.role.tier ||
                 '.' == self.record.amendment;
 
