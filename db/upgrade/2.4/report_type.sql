@@ -17,7 +17,9 @@ DROP PROCEDURE IF EXISTS patch_report_type;
       "( 'requisition', 'Requisition', 'reqn', ",
         "'This report provides basic details about all requisitions which have been submitted.' ), ",
       "( 'reference', 'Reference', 'reqn', ",
-        "'This report provides reference details for all requisitions which have been approved or reached the agreement stage.' )" );
+        "'This report provides reference details for all requisitions which have been approved or reached the agreement stage.' ), ",
+      "( 'newsletter', 'Newsletter', 'user', ",
+        "'This report provides a list of all users who have consented to receiving a monthly email newsletter.' )" );
     PREPARE statement FROM @sql;
     EXECUTE statement;
     DEALLOCATE PREPARE statement;
