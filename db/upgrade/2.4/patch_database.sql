@@ -39,6 +39,8 @@ SOURCE data_option_has_study_phase.sql
 SOURCE review.sql
 SOURCE recommendation_type.sql
 SOURCE review_type_has_recommendation_type.sql
+SOURCE data_version.sql
+SOURCE data_release.sql
 
 SOURCE update_version_number.sql
 

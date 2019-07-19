@@ -31,6 +31,9 @@ class ui extends \cenozo\ui\ui
       $module->add_child( 'data_option_detail' );
     }
 
+    $module = $this->get_module( 'data_version' );
+    if( !is_null( $module ) ) $module->add_child( 'data_release' );
+
     $module = $this->get_module( 'deadline' );
     if( !is_null( $module ) ) $module->add_child( 'reqn' );
 
@@ -40,6 +43,7 @@ class ui extends \cenozo\ui\ui
       $module->add_child( 'reqn_version' );
       $module->add_child( 'review' );
       $module->add_child( 'stage' );
+      $module->add_child( 'data_release' );
       $module->add_child( 'notice' );
       $module->add_child( 'notification' );
     }
@@ -96,6 +100,7 @@ class ui extends \cenozo\ui\ui
     $db_role = lib::create( 'business\session' )->get_role();
 
     $this->add_listitem( 'Amendment Types', 'amendment_type' );
+    $this->add_listitem( 'Data Versions', 'data_version' );
     $this->add_listitem( 'Deadlines', 'deadline' );
     $this->add_listitem( 'Notification Types', 'notification_type' );
     $this->add_listitem( 'PDF Form Templates', 'pdf_form_type' );
