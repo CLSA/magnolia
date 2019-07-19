@@ -248,6 +248,18 @@ cenozo.service( 'CnReqnHelper', [
               en: 'Amendment Details',
               fr: 'TRANSLATION REQUIRED'
             },
+            text1: {
+              en: "Amendment requests will be reviewed as they are received. Amendments must NOT be operationalized until the amendment has been approved.",
+              fr: "Les demandes de modification seront évalués au fur et à mesure qu’ils seront reçus. Vous DEVEZ attendre l’autorisation avant d’effectuer les modifications demandées."
+            },
+            text2: {
+              en: 'All requests will be reviewed by the CLSA. If the change is deemed to be significant, the request will be forwarded to the Chair of the CLSA Data and Biospecimen Access Committee (DSAC) who may request a new application be submitted for review and approval. Certain changes may require an amendment to your CLSA Access Agreement.',
+              fr: 'Toutes les demandes seront révisées par l’ÉLCV. Si les changements apportés sont jugés majeurs, la demande sera envoyée au président du Comité chargé de l’accès aux données et aux échantillons biologiques qui pourrait exiger qu’une nouvelle demande d’accès soit soumise et approuvée. Certains changements peuvent nécessiter une modification de votre Entente d’accès de l’ÉLCV.'
+            },
+            text3: {
+              en: "Please indicate the purpose of your amendment request. (Check ALL that apply):",
+              fr: "TRANSLATION REQUIRED"
+            },
             amendment_type_id: { en: 'Amendment Type', fr: 'TRANSLATION REQUIRED' },
           },
           part1: {

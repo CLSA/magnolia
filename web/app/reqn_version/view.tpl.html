@@ -146,7 +146,12 @@
       <div class="panel-body" style="padding-bottom: 0px;" ng-if="'.' != model.viewModel.record.amendment">
         <h4 style="margin-top: 0; margin-bottom: 1em;" ng-bind-html="t( 'amendment.title' )"></h4>
         <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_amendment" class="bg-info"></cn-reqn-deferral-note>
+        <ul class="list-group">
+          <li class="list-group-item" ng-bind-html="t( 'amendment.text1' )"></li>
+          <li class="list-group-item" ng-bind-html="t( 'amendment.text2' )"></li>
+        </ul>
         <form id="amendmentForm" name="amendmentForm" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
+          <p class="text-primary" ng-bind-html="t( 'amendment.text3' )"></p>
           <div class="form-horizontal">
             <cn-reqn-view-input
               input="{
