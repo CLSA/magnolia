@@ -23,7 +23,6 @@ cenozo.service( 'CnModalNoticeListFactory', [
       angular.extend( this, params );
 
       this.show = function() {
-        console.log( cenozoApp.getFileUrl( 'magnolia', 'modal-notice-list.tpl.html' ) );
         self.modal = $uibModal.open( {
           backdrop: 'static',
           keyboard: !self.block,
