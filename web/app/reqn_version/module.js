@@ -76,7 +76,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     tracking: { type: 'boolean' },
     longitudinal: { type: 'boolean' },
     last_identifier: { type: 'string' },
-    amendment_type_id: { type: 'enum' },
     part2_a_comment: { type: 'text' },
     part2_b_comment: { type: 'text' },
     part2_c_comment: { type: 'text' },
@@ -419,6 +418,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
               if( 'lite' != self.parentModel.type ) {
                 return $q.all( [
+                  self.getAmendmentTypeList(),
                   self.getCoapplicantList(),
                   self.getReferenceList(),
                   self.getDataOptionValueList()
@@ -451,6 +451,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           referenceModel: CnReferenceModelFactory.instance(),
           charCount: { lay_summary: 0, background: 0, objectives: 0, methodology: 0, analysis: 0 },
           minStartDate: null,
+          noAmendmentTypes: false,
 
           // setup language and tab state parameters
           toggleLanguage: function() {
@@ -633,6 +634,53 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                     )
                   )
                 );
+            }
+          },
+
+          getAmendmentTypeList: function( reqnVersionId, object ) {
+            var basePath = angular.isDefined( reqnVersionId )
+                         ? 'reqn_version/' + reqnVersionId
+                         : this.parentModel.getServiceResourcePath()
+
+            if( angular.isUndefined( object ) ) object = this.record;
+
+            // start by setting all amendment types to false
+            this.parentModel.amendmentTypeList.en.forEach( function( amendmentType ) {
+              var property = 'amendmentType' + amendmentType.id;
+              object[property] = false;
+            } );
+
+            // now change any which the reqn has to true
+            return CnHttpFactory.instance( {
+              path: basePath + '/amendment_type',
+              data: {
+                select: { column: [ 'id' ] },
+                modifier: { order: 'id', limit: 1000000 }
+              }
+            } ).query().then( function( response ) {
+              response.data.forEach( function( row ) {
+                var property = 'amendmentType' + row.id;
+                object[property] = true;
+              } );
+            } );
+          },
+
+          toggleAmendmentTypeValue: function( amendmentTypeId ) {
+            var property = 'amendmentType' + amendmentTypeId;
+            if( this.record[property] ) {
+              // add the amendment type
+              return CnHttpFactory.instance( {
+                path: this.parentModel.getServiceResourcePath() + '/amendment_type',
+                data: amendmentTypeId,
+                onError: function( response ) { self.record[property] = !self.record[property]; }
+              } ).post();
+            } else {
+              // delete the amendment type
+              return CnHttpFactory.instance( {
+                path: this.parentModel.getServiceResourcePath() +
+                  '/amendment_type/' + amendmentTypeId,
+                onError: function( response ) { self.record[property] = !self.record[property]; }
+              } ).delete();
             }
           },
 
@@ -887,7 +935,6 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               if( response ) {
                 // make sure that certain properties have been defined, one tab at a time
                 var requiredTabList = {
-                  amendment: [ 'amendment_type_id' ],
                   a: [ 'applicant_position', 'applicant_affiliation', 'applicant_address', 'applicant_phone' ],
                   c: [ 'start_date', 'duration' ],
                   d: [ 'title', 'keywords', 'lay_summary', 'background', 'objectives', 'methodology', 'analysis' ],
@@ -902,17 +949,14 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                   for( var tab in requiredTabList ) {
                     var firstProperty = null;
                     requiredTabList[tab].filter( function( property ) {
-                      if( 'amendment' == tab ) {
-                        // only check the reason for amendment while doing an amendment
-                        return '.' != record.amendment;
-                      } else if( 'e' == tab ) {
+                      if( 'e' == tab ) {
                         // only check e properties if funding=yes
                         return 'funding' != property ? 'yes' == record.funding : true;
                       } else if( 'ethics_filename' == property ) {
                         // only check the ethics filename if ethics=yes (it's a boolean var)
                         return record.ethics;
                       } else if( 'last_identifier' == property ) {
-                        // only check the last_identifier if longitidunal=yes (it's a boolean var) 
+                        // only check the last_identifier if longitidunal=yes (it's a boolean var)
                         return record.longitudinal;
                       }
 
@@ -941,6 +985,25 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                         };
                       }
                     } );
+                  }
+
+                  if( '.' != self.record.amendment ) {
+                    // reset the no-amendment-types indicator
+                    self.noAmendmentTypes = false;
+
+                    // for amendments make sure that at least one amendment type has been selected
+                    if( !self.parentModel.amendmentTypeList.en.some( function( amendmentType ) {
+                      var property = 'amendmentType' + amendmentType.id;
+                      return self.record[property];
+                    } ) ) {
+                      self.noAmendmentTypes = true;
+                      if( null == errorTab ) errorTab = 'amendment';
+                      if( null == error ) error = {
+                        title: self.translate( 'misc.missingFieldTitle' ),
+                        message: self.translate( 'misc.missingFieldMessage' ),
+                        error: true
+                      };
+                    }
                   }
 
                   if( null != error ) {
@@ -1159,14 +1222,14 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                     select: { column: [ 'id', 'reason_en', 'reason_fr' ] }
                   }
                 } ).query().then( function success( response ) {
-                  self.metadata.columnList.amendment_type_id.enumList = { en: [], fr: [] };
+                  self.amendmentTypeList = { en: [], fr: [] };
                   response.data.forEach( function( item ) {
-                    self.metadata.columnList.amendment_type_id.enumList.en.push( {
-                      value: item.id,
+                    self.amendmentTypeList.en.push( {
+                      id: item.id,
                       name: item.reason_en
                     } );
-                    self.metadata.columnList.amendment_type_id.enumList.fr.push( {
-                      value: item.id,
+                    self.amendmentTypeList.fr.push( {
+                      id: item.id,
                       name: item.reason_fr
                     } );
                   } );

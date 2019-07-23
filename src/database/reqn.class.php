@@ -110,9 +110,6 @@ class reqn extends \cenozo\database\record
     $db_reqn_version->version = $version;
     $db_reqn_version->agreement_filename = NULL;
 
-    // do not copy the amendment type if this is a new amendment
-    if( $new_amendment ) $db_reqn_version->amendment_type_id = NULL;
-
     // determine the amendment
     if( $new_amendment )
     {
@@ -133,6 +130,18 @@ class reqn extends \cenozo\database\record
 
       $existing_file = $db_clone_reqn_version->get_filename( 'data_sharing' );
       if( file_exists( $existing_file ) ) copy( $existing_file, $db_reqn_version->get_filename( 'data_sharing' ) );
+
+      // only copy amendment types if this is not a new amendment
+      if( !$new_amendment )
+      {
+        $amendment_type_list = array();
+        $select = lib::create( 'database\select' );
+        $select->add_column( 'id' );
+        foreach( $db_clone_reqn_version->get_amendment_type_list( $select ) as $amendment_type )
+          $amendment_type_list[] = $amendment_type['id'];
+
+        if( 0 < count( $amendment_type_list ) ) $db_reqn_version->add_amendment_type( $amendment_type_list );
+      }
 
       // copy coapplicant records
       foreach( $db_clone_reqn_version->get_coapplicant_object_list() as $db_coapplicant )

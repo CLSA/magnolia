@@ -260,7 +260,10 @@ cenozo.service( 'CnReqnHelper', [
               en: "Please indicate the purpose of your amendment request. (Check ALL that apply):",
               fr: "TRANSLATION REQUIRED"
             },
-            amendment_type_id: { en: 'Amendment Type', fr: 'TRANSLATION REQUIRED' },
+            atLeastOne: {
+              en: "You must select at least one reason for your amendment request.",
+              fr: "TRANSLATION REQUIRED"
+            }
           },
           part1: {
             tab: { en: 'Part 1', fr: '1<sup>re</sup> partie' },

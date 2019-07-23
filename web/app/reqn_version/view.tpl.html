@@ -152,16 +152,17 @@
         </ul>
         <form id="amendmentForm" name="amendmentForm" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
           <p class="text-primary" ng-bind-html="t( 'amendment.text3' )"></p>
-          <div class="form-horizontal">
-            <cn-reqn-view-input
-              input="{
-                key: 'amendment_type_id',
-                title: t( 'amendment.amendment_type_id' ),
-                type: model.inputList.amendment_type_id.type,
-                enumList: model.metadata.columnList.amendment_type_id.enumList[model.viewModel.record.lang]
-              }"
-              difference="model.viewModel.compareRecord.differences.amendment.a.amendment_type_id"
-              model="model">
+          <div class="input-group spacer"
+               ng-class="{'has-feedback has-error':model.viewModel.noAmendmentTypes}"
+               style="padding: 0 0.5em">
+            <div ng-repeat="amendmentType in model.amendmentTypeList[model.viewModel.record.lang]">
+              <input type="checkbox"
+                     id="amendmentType{{ amendmentType.id }}"
+                     ng-model="model.viewModel.record['amendmentType'+amendmentType.id]"
+                     ng-change="model.viewModel.toggleAmendmentTypeValue( amendmentType.id )"></input>
+              <label for="amendmentType{{ amendmentType.id }}" class="control-label" ng-bind-html="amendmentType.name"></label>
+            </div>
+            <span ng-if="model.viewModel.noAmendmentTypes" class="help-block" ng-bind-html="t( 'amendment.atLeastOne' )"></span>
           </div>
         </fieldset></form>
       </div>

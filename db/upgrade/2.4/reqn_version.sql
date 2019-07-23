@@ -20,7 +20,6 @@ CREATE PROCEDURE patch_reqn_version()
         amendment CHAR(1) NOT NULL DEFAULT '.',
         version INT UNSIGNED NOT NULL DEFAULT 1,
         datetime DATETIME NOT NULL,
-        amendment_type_id INT UNSIGNED NULL DEFAULT NULL,
         applicant_position VARCHAR(255) NULL DEFAULT NULL,
         applicant_affiliation VARCHAR(255) NULL DEFAULT NULL,
         applicant_address VARCHAR(511) NULL DEFAULT NULL,
@@ -58,17 +57,11 @@ CREATE PROCEDURE patch_reqn_version()
         PRIMARY KEY (id),
         INDEX fk_reqn_id (reqn_id ASC),
         UNIQUE INDEX uq_reqn_id_version (reqn_id ASC, version ASC),
-        INDEX fk_amendment_type_id (amendment_type_id ASC),
         CONSTRAINT fk_reqn_version_reqn_id
           FOREIGN KEY (reqn_id)
           REFERENCES reqn (id)
           ON DELETE CASCADE
-          ON UPDATE CASCADE,
-        CONSTRAINT fk_reqn_version_amendment_type_id
-          FOREIGN KEY (amendment_type_id)
-          REFERENCES amendment_type (id)
-          ON DELETE NO ACTION
-          ON UPDATE NO ACTION)
+          ON UPDATE CASCADE)
       ENGINE = InnoDB;
 
       ALTER TABLE reqn_version AUTO_INCREMENT = 1001;
@@ -116,24 +109,6 @@ CREATE PROCEDURE patch_reqn_version()
       ALTER TABLE reqn_version
       DROP KEY uq_reqn_id_version,
       ADD UNIQUE KEY uq_reqn_id_amendment_version (reqn_id, amendment, version);
-    END IF;
-
-    SELECT COUNT(*) INTO @test
-    FROM information_schema.COLUMNS
-    WHERE table_schema = DATABASE()
-    AND table_name = "reqn_version"
-    AND column_name = "amendment_type_id";
-
-    IF @test = 0 THEN
-      ALTER TABLE reqn_version ADD COLUMN amendment_type_id INT UNSIGNED NULL DEFAULT NULL AFTER datetime;
-
-      ALTER TABLE reqn_version
-      ADD INDEX fk_amendment_type_id (amendment_type_id ASC),
-      ADD CONSTRAINT fk_reqn_version_amendment_type_id
-        FOREIGN KEY (amendment_type_id)
-        REFERENCES amendment_type (id)
-        ON DELETE NO ACTION
-        ON UPDATE NO ACTION;
     END IF;
 
     SELECT "Adding agreement_filename column to reqn_version table" AS "";

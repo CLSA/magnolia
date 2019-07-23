@@ -6,6 +6,7 @@ SOURCE role.sql
 SOURCE application_type_has_role.sql
 SOURCE role_has_review_type.sql
 SOURCE amendment_type.sql
+SOURCE reqn_version_has_amendment_type.sql
 SOURCE notice.sql
 SOURCE stage.sql
 SOURCE stage_type.sql
