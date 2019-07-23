@@ -4,9 +4,11 @@ CREATE TABLE IF NOT EXISTS amendment_type (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   update_timestamp TIMESTAMP NOT NULL,
   create_timestamp TIMESTAMP NOT NULL,
-  reason_en VARCHAR(255) NOT NULL,
-  reason_fr VARCHAR(255) NOT NULL,
-  PRIMARY KEY (id))
+  reason_en VARCHAR(127) NOT NULL,
+  reason_fr VARCHAR(127) NOT NULL,
+  PRIMARY KEY (id),
+  UNIQUE INDEX uq_reason_en (reason_en ASC),
+  UNIQUE INDEX uq_reason_fr (reason_fr ASC))
 ENGINE = InnoDB;
 
 INSERT IGNORE INTO amendment_type( reason_en, reason_fr ) VALUES
