@@ -645,6 +645,30 @@ cenozo.service( 'CnReqnHelper', [
               en: '3 Years',
               fr: '3 années'
             },
+            duration2p1Years: {
+              en: '2 Years + 1 Additional Year',
+              fr: 'TRANSLATION REQUIRED'
+            },
+            duration2p2Years: {
+              en: '2 Years + 2 Additional Years',
+              fr: 'TRANSLATION REQUIRED'
+            },
+            duration2p3Years: {
+              en: '2 Years + 3 Additional Years',
+              fr: 'TRANSLATION REQUIRED'
+            },
+            duration3p1Years: {
+              en: '3 Years + 1 Additional Year',
+              fr: 'TRANSLATION REQUIRED'
+            },
+            duration3p2Years: {
+              en: '3 Years + 2 Additional Years',
+              fr: 'TRANSLATION REQUIRED'
+            },
+            duration3p3Years: {
+              en: '3 Years + 3 Additional Years',
+              fr: 'TRANSLATION REQUIRED'
+            },
             graduateFeeWaiver: {
               en: 'Fee Waiver for Graduate student (MSc or PhD) for thesis only',
               fr: 'Exonération pour un étudiant des cycles supérieurs (M. Sc. ou Ph. D.) pour la thèse seulement'

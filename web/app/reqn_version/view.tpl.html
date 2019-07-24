@@ -495,7 +495,11 @@
                     key: 'duration',
                     title: t( 'part1.c.duration' ),
                     type: 'enum',
-                    enumList: model.metadata.columnList.duration.enumList[model.viewModel.record.lang]
+                    enumList: '.' == model.viewModel.record.amendment
+                      ? model.metadata.columnList.duration.standardEnumList[model.viewModel.record.lang]
+                      : '2' == model.viewModel.record.duration.substr(0,1)
+                      ? model.metadata.columnList.duration.amendment2EnumList[model.viewModel.record.lang]
+                      : model.metadata.columnList.duration.amendment3EnumList[model.viewModel.record.lang]
                   }"
                   difference="model.viewModel.compareRecord.differences.part1.c.duration"
                   model="model">

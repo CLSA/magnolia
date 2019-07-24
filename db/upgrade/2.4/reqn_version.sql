@@ -29,7 +29,7 @@ CREATE PROCEDURE patch_reqn_version()
         graduate_address VARCHAR(511) NULL DEFAULT NULL,
         graduate_phone VARCHAR(45) NULL DEFAULT NULL,
         start_date DATE NULL DEFAULT NULL,
-        duration ENUM('2 years', '3 years') NULL DEFAULT NULL,
+        duration ENUM('2 years', '3 years', '2 years + 1 additional year', '2 years + 2 additional years', '2 years + 3 additional years', '3 years + 1 additional year', '3 years + 2 additional years', '3 years + 3 additional years') NULL DEFAULT NULL,
         title VARCHAR(511) NULL DEFAULT NULL,
         keywords VARCHAR(255) NULL DEFAULT NULL,
         lay_summary VARCHAR(2047) NULL DEFAULT NULL,
@@ -174,6 +174,8 @@ CREATE PROCEDURE patch_reqn_version()
       SET reqn_version.longitudinal = false
       WHERE stage_type.name != "New";
     END IF;
+
+    ALTER TABLE reqn_version MODIFY duration ENUM('2 years', '3 years', '2 years + 1 additional year', '2 years + 2 additional years', '2 years + 3 additional years', '3 years + 1 additional year', '3 years + 2 additional years', '3 years + 3 additional years') NULL DEFAULT NULL;
 
   END //
 DELIMITER ;
