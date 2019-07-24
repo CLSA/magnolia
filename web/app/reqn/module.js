@@ -250,7 +250,7 @@ define( function() {
 
   module.addExtraOperation( 'view', {
     title: 'Abandon',
-    classes: 'btn-warning',
+    classes: 'btn-danger',
     isIncluded: function( $state, model ) { return model.viewModel.show( 'abandon' ); },
     isDisabled: function( $state, model ) { return !model.viewModel.enabled( 'abandon' ); },
     operation: function( $state, model ) { model.viewModel.abandon(); }
