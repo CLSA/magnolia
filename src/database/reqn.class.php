@@ -763,7 +763,7 @@ class reqn extends \cenozo\database\record
     $filename = $db_reqn_version->get_filename( 'instruction' );
     if( is_file( $filename ) )
     {
-      $link = sprintf( '%s/%s', $web_path, $db_reqn_version->instruction_filename );
+      $link = sprintf( '%s/%s', $web_path, $this->instruction_filename );
       $result = symlink( $filename, $link );
       if( !$result )
       {
