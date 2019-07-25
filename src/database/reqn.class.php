@@ -760,7 +760,7 @@ class reqn extends \cenozo\database\record
     $this->save();
 
     // add the instructions
-    $filename = $db_reqn_version->get_filename( 'instruction' );
+    $filename = $this->get_filename( 'instruction' );
     if( is_file( $filename ) )
     {
       $link = sprintf( '%s/%s', $web_path, $this->instruction_filename );
