@@ -548,7 +548,7 @@ define( function() {
 
               // only allow the deadline to be changed while in the admin review stage (hide if there is no deadline)
               mainInputGroup.inputList.deadline_id.constant =
-                3 > CnSession.role.tier || 'Admin Review' != self.record.stage_type;
+                3 > CnSession.role.tier || 'review' != self.record.phase;
 
               mainInputGroup.inputList.deadline_id.exclude =
                 3 > CnSession.role.tier || null == self.record.deadline_id ? true : 'add';
