@@ -452,8 +452,8 @@ cenozo.service( 'CnReqnHelper', [
             cohort: {
               tab: { en: 'Cohort & Longitudinal Analyses', fr: 'TRANSLATION REQUIRED' },
               text1: {
-                en: 'Please select the cohort (Tracking and/or Comprehensive) for which you are requesting data:',
-                fr: 'Veuillez sélectionner la cohorte (surveillance et/ou globale) visée par votre demande de données:'
+                en: 'Please select the cohort (Tracking and/or Comprehensive - YOU MUST SELECT "YES" FOR AT LEAST ONE COHORT) for which you are requesting data:',
+                fr: 'TRANSLATION REQUIRED'
               },
               text2: {
                 en: 'You will be able to make your selection of the wave of data collection (Baseline and/or Follow-up 1) within the Data Checklist.',
