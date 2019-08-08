@@ -7,7 +7,7 @@ SELECT "Adding new services" AS "";
 INSERT IGNORE INTO service ( subject, method, resource, restricted ) VALUES
 ( 'amendment_type', 'DELETE', 1, 1 ),
 ( 'amendment_type', 'GET', 0, 0 ),
-( 'amendment_type', 'GET', 1, 1 ),
+( 'amendment_type', 'GET', 1, 0 ),
 ( 'amendment_type', 'PATCH', 1, 1 ),
 ( 'amendment_type', 'POST', 0, 1 ),
 ( 'data_version', 'DELETE', 1, 1 ),
