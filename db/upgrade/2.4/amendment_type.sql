@@ -12,8 +12,8 @@ CREATE TABLE IF NOT EXISTS amendment_type (
 ENGINE = InnoDB;
 
 INSERT IGNORE INTO amendment_type( reason_en, reason_fr ) VALUES
-( "Amendment to Primary Applicant Information", "TRANSLATION REQUIRED" ),
-( "Changes to Co-Applicants and Support Personnel", "TRANSLATION REQUIRED" ),
-( "Changes to the Approved Project Title, Lay Summary and/or Objectives", "TRANSLATION REQUIRED" ),
-( "Changes to the Project Timeline", "TRANSLATION REQUIRED" ),
-( "Changes to the Data Checklist.", "TRANSLATION REQUIRED" );
+( "Amendment to Primary Applicant Information", "Modification des informations sur le demandeur principal" ),
+( "Changes to Co-Applicants and Support Personnel", "Modifications des codemandeurs et du personnel de soutien" ),
+( "Changes to the Approved Project Title, Lay Summary and/or Objectives", "Modifications du titre, du résumé non scientifique et/ou des objectifs du projet approuvé" ),
+( "Changes to the Project Timeline", "Modification de la chronologie du projet" ),
+( "Changes to the Data Checklist.", "Modifications de la liste des données demandées" );

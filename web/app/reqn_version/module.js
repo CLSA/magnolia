@@ -1254,43 +1254,43 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                 self.metadata.columnList.duration.standardEnumList = {
                   en: [
                     { value: '', name: misc.choose.en },
-                    { value: '2 years', name: '2 years' },
-                    { value: '3 years', name: '3 years' }
+                    { value: '2 years', name: misc.duration2Years.en },
+                    { value: '3 years', name: misc.duration3Years.en }
                   ],
                   fr: [
                     { value: '', name: misc.choose.fr },
-                    { value: '2 years', name: '2 ans' },
-                    { value: '3 years', name: '3 années' }
+                    { value: '2 years', name: misc.duration2Years.fr },
+                    { value: '3 years', name: misc.duration3Years.fr }
                   ]
                 };
 
                 self.metadata.columnList.duration.amendment2EnumList = {
                   en: [
-                    { value: '2 years', name: '2 years' },
-                    { value: '2 years + 1 additional year', name: '2 years + 1 additional year' },
-                    { value: '2 years + 2 additional years', name: '2 years + 2 additional years' },
-                    { value: '2 years + 3 additional years', name: '2 years + 3 additional years' }
+                    { value: '2 years', name: misc.duration2Years.en },
+                    { value: '2 years + 1 additional year', name: misc.duration2p1Years.en },
+                    { value: '2 years + 2 additional years', name: misc.duration2p2Years.en },
+                    { value: '2 years + 3 additional years', name: misc.duration2p3Years.en }
                   ],
                   fr: [
-                    { value: '2 years', name: '2 ans' },
-                    { value: '2 years + 1 additional year', name: 'TRANSLATION REQUIRED' },
-                    { value: '2 years + 2 additional years', name: 'TRANSLATION REQUIRED' },
-                    { value: '2 years + 3 additional years', name: 'TRANSLATION REQUIRED' }
+                    { value: '2 years', name: misc.duration2Years.fr },
+                    { value: '2 years + 1 additional year', name: misc.duration2p1Years.fr },
+                    { value: '2 years + 2 additional years', name: misc.duration2p2Years.fr },
+                    { value: '2 years + 3 additional years', name: misc.duration2p3Years.fr }
                   ]
                 };
 
                 self.metadata.columnList.duration.amendment3EnumList = {
                   en: [
-                    { value: '3 years', name: '3 years' },
-                    { value: '3 years + 1 additional year', name: '3 years + 1 additional year' },
-                    { value: '3 years + 2 additional years', name: '3 years + 2 additional years' },
-                    { value: '3 years + 3 additional years', name: '3 years + 3 additional years' }
+                    { value: '3 years', name: misc.duration3Years.en },
+                    { value: '3 years + 1 additional year', name: misc.duration3p1Years.en },
+                    { value: '3 years + 2 additional years', name: misc.duration3p2Years.en },
+                    { value: '3 years + 3 additional years', name: misc.duration3p3Years.en }
                   ],
                   fr: [
-                    { value: '3 years', name: '3 années' },
-                    { value: '3 years + 1 additional year', name: 'TRANSLATION REQUIRED' },
-                    { value: '3 years + 2 additional years', name: 'TRANSLATION REQUIRED' },
-                    { value: '3 years + 3 additional years', name: 'TRANSLATION REQUIRED' }
+                    { value: '3 years', name: misc.duration3Years.fr },
+                    { value: '3 years + 1 additional year', name: misc.duration3p1Years.fr },
+                    { value: '3 years + 2 additional years', name: misc.duration3p2Years.fr },
+                    { value: '3 years + 3 additional years', name: misc.duration3p3Years.fr }
                   ]
                 };
 

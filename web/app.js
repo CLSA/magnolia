@@ -243,10 +243,10 @@ cenozo.service( 'CnReqnHelper', [
             }
           },
           amendment: {
-            tab: { en: 'Amendment', fr: 'TRANSLATION REQUIRED' },
+            tab: { en: 'Amendment', fr: 'Modification' },
             title: {
               en: 'Amendment Details',
-              fr: 'TRANSLATION REQUIRED'
+              fr: 'Détails de la modification'
             },
             text1: {
               en: "Amendment requests will be reviewed as they are received. Amendments must NOT be operationalized until the amendment has been approved.",
@@ -258,11 +258,11 @@ cenozo.service( 'CnReqnHelper', [
             },
             text3: {
               en: "Please indicate the purpose of your amendment request. (Check ALL that apply):",
-              fr: "TRANSLATION REQUIRED"
+              fr: "Veuillez indiquer le motif de votre demande de modification (cochez toutes les cases qui s’appliquent) :"
             },
             atLeastOne: {
               en: "You must select at least one reason for your amendment request.",
-              fr: "TRANSLATION REQUIRED"
+              fr: "Vous devez sélectionner au moins un motif pour votre demande de modification."
             }
           },
           part1: {
@@ -450,10 +450,10 @@ cenozo.service( 'CnReqnHelper', [
               }
             },
             cohort: {
-              tab: { en: 'Cohort & Longitudinal Analyses', fr: 'TRANSLATION REQUIRED' },
+              tab: { en: 'Cohort & Longitudinal Analyses', fr: 'Analyses de cohorte et longitudinales' },
               text1: {
                 en: 'Please select the cohort (Tracking and/or Comprehensive - YOU MUST SELECT "YES" FOR AT LEAST ONE COHORT) for which you are requesting data:',
-                fr: 'TRANSLATION REQUIRED'
+                fr: 'Veuillez sélectionner la cohorte (surveillance et/ou globale) pour laquelle vous demandez des données (VOUS DEVEZ SÉLECTIONNER AU MOINS UNE COHORTE) :'
               },
               text2: {
                 en: 'You will be able to make your selection of the wave of data collection (Baseline and/or Follow-up 1) within the Data Checklist.',
@@ -469,11 +469,11 @@ cenozo.service( 'CnReqnHelper', [
               },
               longitudinal: {
                 en: 'Is this project part of longitudinal analyses involving a previously approved project using CLSA data?',
-                fr: 'TRANSLATION REQUIRED'
+                fr: 'Ce projet fait-il partie d’analyses longitudinales en lien avec un projet utilisant les données de l’ÉLCV déjà approuvé?'
               },
               last_identifier: {
                 en: 'Please enter the application number of the related CLSA approved project',
-                fr: 'TRANSLATION REQUIRED'
+                fr: 'Veuillez entrer le numéro de demande du projet connexe approuvé par l’ÉLCV.'
               }
             },
             a: {
@@ -557,17 +557,17 @@ cenozo.service( 'CnReqnHelper', [
             download: { en: 'Download', fr: 'Télécharger' },
             application: { en: 'Application', fr: 'Soumission' },
             dataChecklist: { en: 'Data Checklist', fr: 'Sélection des données' },
-            notices: { en: 'Notices', fr: 'TRANSLATION REQUIRED' },
+            notices: { en: 'Notices', fr: 'Notifications' },
             studyData: { en: 'Study Data', fr: 'Données d’étude' },
             finalReport: { en: 'Final Report', fr: 'Rapport final' },
             notAvailable: { en: 'not yet available', fr: 'pas encore disponible' },
             notApplicable: { en: 'not applicable', fr: 'sans objet' },
             baseline: { en: 'Baseline', fr: 'Départ' },
             followup1: { en: 'Follow-up 1', fr: '1er suivi' },
-            amend: { en: 'Create Amendment', fr: 'TRANSLATION REQUIRED' },
+            amend: { en: 'Create Amendment', fr: 'Effectuer une modification' },
             amendWarning: {
               en: 'Are you sure you wish to create an amendment?\n\nThe application form will be re-opened and you will be able to make and submit changes.',
-              fr: 'TRANSLATION REQUIRED'
+              fr: 'Êtes-vous sûr de vouloir effectuer une modification? Le formulaire de demande sera rouvert. Vous pourrez alors apporter des modifications et les soumettre.'
             },
             submit: { en: 'Submit', fr: 'Soumettre' },
             submitTitle: {
@@ -631,7 +631,7 @@ cenozo.service( 'CnReqnHelper', [
             },
             abandonAmendmentWarning: {
               en: 'Are you sure you want to abandon the amendment?\n\nThe amendment process will be discontinued and your application will be returned back to its previous status.',
-              fr: 'TRANSLATION REQUIRED'
+              fr: 'Êtes-vous sûr de vouloir abandonner la modification? Le processus de modification sera interrompu et votre demande sera renvoyée à son statut précédent.'
             },
             emailText: {
               en: 'You must provide an institutional email. Public email accounts such as @gmail.com are not allowed.',
@@ -647,27 +647,27 @@ cenozo.service( 'CnReqnHelper', [
             },
             duration2p1Years: {
               en: '2 Years + 1 Additional Year',
-              fr: 'TRANSLATION REQUIRED'
+              fr: '2 ans + 1 année supplémentaire'
             },
             duration2p2Years: {
               en: '2 Years + 2 Additional Years',
-              fr: 'TRANSLATION REQUIRED'
+              fr: '2 ans + 2 années supplémentaires'
             },
             duration2p3Years: {
               en: '2 Years + 3 Additional Years',
-              fr: 'TRANSLATION REQUIRED'
+              fr: '2 ans + 3 années supplémentaires'
             },
             duration3p1Years: {
               en: '3 Years + 1 Additional Year',
-              fr: 'TRANSLATION REQUIRED'
+              fr: '3 ans + 1 année supplémentaire'
             },
             duration3p2Years: {
               en: '3 Years + 2 Additional Years',
-              fr: 'TRANSLATION REQUIRED'
+              fr: '3 ans + 2 années supplémentaires'
             },
             duration3p3Years: {
               en: '3 Years + 3 Additional Years',
-              fr: 'TRANSLATION REQUIRED'
+              fr: '3 ans + 3 années supplémentaires'
             },
             graduateFeeWaiver: {
               en: 'Fee Waiver for Graduate student (MSc or PhD) for thesis only',
