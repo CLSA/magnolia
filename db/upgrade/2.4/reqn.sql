@@ -11,7 +11,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "applicant_name";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn DROP COLUMN applicant_name;
     END IF;
 
@@ -23,7 +23,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "applicant_position";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn DROP COLUMN applicant_position;
     END IF;
 
@@ -35,7 +35,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "applicant_affiliation";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn DROP COLUMN applicant_affiliation;
     END IF;
 
@@ -47,7 +47,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "applicant_address";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn DROP COLUMN applicant_address;
     END IF;
 
@@ -59,7 +59,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "applicant_phone";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn DROP COLUMN applicant_phone;
     END IF;
 
@@ -71,7 +71,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "applicant_email";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn DROP COLUMN applicant_email;
     END IF;
 
@@ -83,7 +83,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "graduate_name";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn DROP COLUMN graduate_name;
     END IF;
 
@@ -95,7 +95,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "graduate_program";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn DROP COLUMN graduate_program;
     END IF;
 
@@ -107,7 +107,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "graduate_institution";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn DROP COLUMN graduate_institution;
     END IF;
 
@@ -119,7 +119,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "graduate_address";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn DROP COLUMN graduate_address;
     END IF;
 
@@ -131,7 +131,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "graduate_phone";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn DROP COLUMN graduate_phone;
     END IF;
 
@@ -143,7 +143,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "graduate_email";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn DROP COLUMN graduate_email;
     END IF;
 
@@ -155,7 +155,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "start_date";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn DROP COLUMN start_date;
     END IF;
 
@@ -167,7 +167,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "duration";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn DROP COLUMN duration;
     END IF;
 
@@ -179,7 +179,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "title";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn DROP COLUMN title;
     END IF;
 
@@ -191,7 +191,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "keywords";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn DROP COLUMN keywords;
     END IF;
 
@@ -203,7 +203,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "lay_summary";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn DROP COLUMN lay_summary;
     END IF;
 
@@ -215,7 +215,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "background";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn DROP COLUMN background;
     END IF;
 
@@ -227,7 +227,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "objectives";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn DROP COLUMN objectives;
     END IF;
 
@@ -239,7 +239,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "methodology";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn DROP COLUMN methodology;
     END IF;
 
@@ -251,7 +251,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "analysis";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn DROP COLUMN analysis;
     END IF;
 
@@ -263,7 +263,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "funding";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn DROP COLUMN funding;
     END IF;
 
@@ -275,7 +275,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "funding_filename";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn DROP COLUMN funding_filename;
     END IF;
 
@@ -287,7 +287,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "funding_agency";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn DROP COLUMN funding_agency;
     END IF;
 
@@ -299,7 +299,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "grant_number";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn DROP COLUMN grant_number;
     END IF;
 
@@ -311,7 +311,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "ethics";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn DROP COLUMN ethics;
     END IF;
 
@@ -323,7 +323,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "ethics_date";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn DROP COLUMN ethics_date;
     END IF;
 
@@ -335,7 +335,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "ethics_filename";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn DROP COLUMN ethics_filename;
     END IF;
 
@@ -347,7 +347,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "waiver";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn DROP COLUMN waiver;
     END IF;
 
@@ -359,7 +359,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "comprehensive";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn DROP COLUMN comprehensive;
     END IF;
 
@@ -371,7 +371,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "tracking";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn DROP COLUMN tracking;
     END IF;
 
@@ -383,7 +383,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "part2_a_comment";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn DROP COLUMN part2_a_comment;
     END IF;
 
@@ -395,7 +395,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "part2_b_comment";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn DROP COLUMN part2_b_comment;
     END IF;
 
@@ -407,7 +407,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "part2_c_comment";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn DROP COLUMN part2_c_comment;
     END IF;
 
@@ -419,7 +419,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "part2_d_comment";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn DROP COLUMN part2_d_comment;
     END IF;
 
@@ -431,7 +431,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "part2_e_comment";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn DROP COLUMN part2_e_comment;
     END IF;
 
@@ -443,7 +443,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "part2_f_comment";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn DROP COLUMN part2_f_comment;
     END IF;
 
@@ -481,7 +481,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "deferral_note_part1_a1";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn CHANGE deferral_note_part1_a1 deferral_note_1a text;
     END IF;
 
@@ -493,7 +493,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "deferral_note_part1_a2";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn CHANGE deferral_note_part1_a2 deferral_note_1b text;
     END IF;
 
@@ -505,7 +505,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "deferral_note_part1_a3";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn CHANGE deferral_note_part1_a3 deferral_note_1c text;
     END IF;
 
@@ -517,7 +517,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "deferral_note_part1_a4";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn CHANGE deferral_note_part1_a4 deferral_note_1d text;
     END IF;
 
@@ -529,7 +529,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "deferral_note_part1_a5";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn CHANGE deferral_note_part1_a5 deferral_note_1e text;
     END IF;
 
@@ -541,7 +541,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "deferral_note_part1_a6";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn CHANGE deferral_note_part1_a6 deferral_note_1f text;
     END IF;
 
@@ -553,7 +553,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "deferral_note_part2_a";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn CHANGE deferral_note_part2_a deferral_note_2a text;
     END IF;
 
@@ -565,7 +565,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "deferral_note_part2_b";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn CHANGE deferral_note_part2_b deferral_note_2b text;
     END IF;
 
@@ -577,7 +577,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "deferral_note_part2_c";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn CHANGE deferral_note_part2_c deferral_note_2c text;
     END IF;
 
@@ -589,7 +589,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "deferral_note_part2_d";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn CHANGE deferral_note_part2_d deferral_note_2d text;
     END IF;
 
@@ -601,7 +601,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "deferral_note_part2_e";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn CHANGE deferral_note_part2_e deferral_note_2e text;
     END IF;
 
@@ -613,7 +613,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "deferral_note_part2_f";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn CHANGE deferral_note_part2_f deferral_note_2f text;
     END IF;
 
@@ -707,7 +707,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "agreement_filename";
 
-    IF @test THEN
+    IF @test = 1 THEN
       ALTER TABLE reqn DROP COLUMN agreement_filename;
     END IF;
 
@@ -719,7 +719,7 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "decision_notice";
 
-    IF @test THEN
+    IF @test = 1 THEN
       SELECT "Moving decision notices from reqn to notice table" AS "";
       INSERT INTO notice( reqn_id, datetime, title, description )
       SELECT reqn.id, CONVERT_TZ( stage.update_timestamp, "Canada/Eastern", "UTC" ), "Notice of decision", decision_notice
@@ -732,8 +732,40 @@ CREATE PROCEDURE patch_reqn()
       ALTER TABLE reqn DROP COLUMN decision_notice;
     END IF;
 
+    SELECT "Adding new state_date column to reqn table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "state_date";
+
+    IF @test = 0 THEN
+      ALTER TABLE reqn
+      ADD COLUMN state_date DATE NULL DEFAULT NULL AFTER state,
+      ADD INDEX dk_state_date (state_date ASC);
+
+      -- immediately set the state date for those reqns already in a state
+      UPDATE reqn
+      SET state_date = DATE( CONVERT_TZ( update_timestamp, 'Canada/Eastern', 'UTC' ) )
+      WHERE state IS NOT NULL;
+    END IF;
+
   END //
 DELIMITER ;
 
 CALL patch_reqn();
 DROP PROCEDURE IF EXISTS patch_reqn;
+
+
+DELIMITER $$
+
+DROP TRIGGER IF EXISTS reqn_AFTER_UPDATE $$
+CREATE DEFINER = CURRENT_USER TRIGGER reqn_AFTER_UPDATE AFTER UPDATE ON reqn FOR EACH ROW
+BEGIN
+  IF !( NEW.state <=> OLD.state ) THEN
+    UPDATE reqn SET state_date = IF( NEW.state IS NULL, NULL, UTC_TIMESTAMP() );
+  END IF;
+END$$
+
+DELIMITER ;

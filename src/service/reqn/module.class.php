@@ -66,6 +66,9 @@ class module extends \cenozo\service\module
     $modifier->join_modifier( 'stage', $join_mod );
     $modifier->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
 
+    if( $select->has_column( 'state_days' ) )
+      $select->add_column( 'DATEDIFF( NOW(), state_date )', 'state_days', false, 'integer' );
+
     if( $select->has_column( 'user_full_name' ) )
     {
       $select->add_table_column(

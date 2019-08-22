@@ -43,6 +43,12 @@ define( function() {
         isIncluded: function( $state, model ) { return !model.isApplicant(); },
         help: 'The reason the requisition is on hold (empty if the requisition hasn\'t been held up)'
       },
+      state_days: {
+        title: 'Days On Hold',
+        type: 'number',
+        isIncluded: function( $state, model ) { return !model.isApplicant(); },
+        help: 'The number of days since the requisition was put on hold (empty if the requisition hasn\'t been held up)'
+      },
       stage_type: {
         column: 'stage_type.name',
         title: 'Stage',
