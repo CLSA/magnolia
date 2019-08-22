@@ -120,6 +120,12 @@ define( function() {
       constant: true,
       exclude: true // modified in the model
     },
+    state_date: {
+      title: 'State Set On',
+      type: 'date',
+      constant: true,
+      exclude: true // modified in the model
+    },
     data_expiry_date: {
       title: 'Data Expiry Date',
       type: 'date',
@@ -473,6 +479,8 @@ define( function() {
             ).then( function( response ) {
               if( response ) {
                 self.record.state = 'abandoned';
+                self.record.state_date = moment().format( 'YYYY-MM-DD' );
+                self.updateFormattedRecord( 'state_date', 'date' );
                 if( angular.isDefined( self.notificationModel ) ) self.notificationModel.listModel.onList( true );
               }
             } );
@@ -680,6 +688,8 @@ define( function() {
                   path: self.parentModel.getServiceResourcePath() + "?action=defer"
                 } ).patch().then( function() {
                   self.record.state = 'deferred';
+                  self.record.state_date = moment().format( 'YYYY-MM-DD' );
+                  self.updateFormattedRecord( 'state_date', 'date' );
                   if( angular.isDefined( self.reqnVersionModel ) ) self.reqnVersionModel.listModel.onList( true );
                   if( angular.isDefined( self.notificationModel ) ) self.notificationModel.listModel.onList( true );
                 } );
@@ -697,6 +707,8 @@ define( function() {
                   path: self.parentModel.getServiceResourcePath() + "?action=reactivate"
                 } ).patch().then( function() {
                   self.record.state = 'deferred';
+                  self.record.state_date = moment().format( 'YYYY-MM-DD' );
+                  self.updateFormattedRecord( 'state_date', 'date' );
                   if( angular.isDefined( self.notificationModel ) ) self.notificationModel.listModel.onList( true );
                 } );
               }
@@ -757,6 +769,7 @@ define( function() {
           mainInputGroup.inputList.language_id.exclude = false;
           mainInputGroup.inputList.stage_type.exclude = 'add';
           mainInputGroup.inputList.state.exclude = 'add';
+          mainInputGroup.inputList.state_date.exclude = 'add';
           mainInputGroup.inputList.data_expiry_date.exclude = 'add';
           mainInputGroup.inputList.note.exclude = false;
 
