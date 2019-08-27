@@ -825,7 +825,7 @@ cenozo.service( 'CnReqnVersionHelper', [
             diff: false,
             a: { // the only unnamed amendment category
               diff: false,
-              amendment_type_id: false
+              amendment_justification: false
             }
           },
           part1: {
@@ -914,6 +914,11 @@ cenozo.service( 'CnReqnVersionHelper', [
             }
           }
         };
+
+        // add all amendment types
+        model.amendmentTypeList.en.forEach( function( amendmentType ) {
+          differences.amendment.a['amendmentType'+amendmentType.id] = false;
+        } );
 
         if( null != v2 ) {
           for( var part in differences ) {

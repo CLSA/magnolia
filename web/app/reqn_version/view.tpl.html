@@ -156,13 +156,32 @@
                ng-class="{'has-feedback has-error':model.viewModel.noAmendmentTypes}"
                style="padding: 0 0.5em">
             <div ng-repeat="amendmentType in model.amendmentTypeList[model.viewModel.record.lang]">
-              <input type="checkbox"
-                     id="amendmentType{{ amendmentType.id }}"
-                     ng-model="model.viewModel.record['amendmentType'+amendmentType.id]"
-                     ng-change="model.viewModel.toggleAmendmentTypeValue( amendmentType.id )"></input>
-              <label for="amendmentType{{ amendmentType.id }}" class="control-label" ng-bind-html="amendmentType.name"></label>
+              <div style="margin: 0;"
+                   class="row"
+                   ng-class="{ 'bg-warning': model.viewModel.compareRecord.differences.amendment.a['amendmentType'+amendmentType.id] }">
+                <input type="checkbox"
+                       id="amendmentType{{ amendmentType.id }}"
+                       ng-model="model.viewModel.record['amendmentType'+amendmentType.id]"
+                       ng-change="model.viewModel.toggleAmendmentTypeValue( amendmentType.id )"></input>
+                <label for="amendmentType{{ amendmentType.id }}" class="control-label" ng-bind-html="amendmentType.name"></label>
+              </div>
+              <div style="padding: 0 2em;"
+                   ng-if="amendmentType.justificationPrompt && model.viewModel.record['amendmentType'+amendmentType.id]">
+                <span class="text-info" ng-bind-html="amendmentType.justificationPrompt"></span>
+              </div>
             </div>
             <span ng-if="model.viewModel.noAmendmentTypes" class="help-block" ng-bind-html="t( 'amendment.atLeastOne' )"></span>
+            <cn-reqn-view-input
+              ng-if="model.viewModel.amendmentTypeWithJustificationSelected()"
+              no-cols=true
+              input="{
+                key: 'amendment_justification',
+                title: 'Justification',
+                type: 'text'
+              }"
+              difference="model.viewModel.compareRecord.differences.amendment.a.amendment_justification"
+              model="model">
+            </cn-reqn-view-input>
           </div>
         </fieldset></form>
       </div>

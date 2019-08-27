@@ -1,11 +1,14 @@
 <div style="margin: 0;" class="row" ng-class="{ 'bg-warning': difference }">
   <cn-view-input input="input" condensed="difference" model="model" no-cols="noCols"></cn-view-input>
-  <div class="col-slim col-sm-9 col-sm-offset-3 vertical-spacer" ng-if="difference" ng-bind-html="
-      model.viewModel.compareRecord[input.key] ? (
-        'date' == input.type ? (model.viewModel.compareRecord[input.key]|cnDatetime:'date') :
-        'boolean' == input.type ? (model.viewModel.compareRecord[input.key]|cnYesNo|cnUCWords) :
-        'text' == input.type ? (model.viewModel.compareRecord[input.key]|cnNewlines) :
-        model.viewModel.compareRecord[input.key]
-      ) : '(empty)'
-  "></div>
+  <div ng-if="difference"
+       class="col-slim vertical-spacer"
+       ng-class="noCols ? 'col-sm-12' : 'col-sm-9 col-sm-offset-3'"
+       ng-bind-html="
+         model.viewModel.compareRecord[input.key] ? (
+           'date' == input.type ? (model.viewModel.compareRecord[input.key]|cnDatetime:'date') :
+           'boolean' == input.type ? (model.viewModel.compareRecord[input.key]|cnYesNo|cnUCWords) :
+           'text' == input.type ? (model.viewModel.compareRecord[input.key]|cnNewlines) :
+           model.viewModel.compareRecord[input.key]
+         ) : '(empty)'
+       "></div>
 </div>

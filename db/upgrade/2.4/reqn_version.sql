@@ -177,6 +177,18 @@ CREATE PROCEDURE patch_reqn_version()
 
     ALTER TABLE reqn_version MODIFY duration ENUM('2 years', '3 years', '2 years + 1 additional year', '2 years + 2 additional years', '2 years + 3 additional years', '3 years + 1 additional year', '3 years + 2 additional years', '3 years + 3 additional years') NULL DEFAULT NULL;
 
+    SELECT "Adding amendment_justification column to reqn_version table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn_version"
+    AND column_name = "amendment_justification";
+
+    IF @test = 0 THEN
+      ALTER TABLE reqn_version ADD COLUMN amendment_justification TEXT NULL DEFAULT NULL;
+    END IF;
+
   END //
 DELIMITER ;
 

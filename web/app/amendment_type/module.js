@@ -27,6 +27,14 @@ define( function() {
     reason_fr: {
       title: 'Reason (French)',
       type: 'string'
+    },
+    justification_prompt_en: {
+      title: 'Justification Prompt (English)',
+      type: 'text'
+    },
+    justification_prompt_fr: {
+      title: 'Justification Prompt (French)',
+      type: 'text'
     }
   } );
 

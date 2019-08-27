@@ -81,6 +81,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     part2_c_comment: { type: 'text' },
     part2_d_comment: { type: 'text' },
     part2_e_comment: { type: 'text' },
+    amendment_justification: { type: 'text' },
 
     identifier: { column: 'reqn.identifier', type: 'string' },
     state: { column: 'reqn.state', type: 'string' },
@@ -453,6 +454,14 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           minStartDate: null,
           noAmendmentTypes: false,
 
+          amendmentTypeWithJustificationSelected: function() {
+            return angular.isDefined( this.parentModel.amendmentTypeList ) ?
+              this.parentModel.amendmentTypeList.en.some( function( amendmentType ) {
+                return null != amendmentType.justificationPrompt && self.record['amendmentType' + amendmentType.id];
+              } ) :
+              false;
+          },
+
           // setup language and tab state parameters
           toggleLanguage: function() {
             var parent = this.parentModel.getParentIdentifier();
@@ -550,6 +559,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
               response.data.forEach( function( version ) {
                 promiseList = promiseList.concat( [
+                  self.getAmendmentTypeList( version.id, version ),
+
                   self.getCoapplicantList( version.id, version ).then( function() {
                     // see if there is a difference between this list and the view's list
                     self.setCoapplicantDiff( version );
@@ -1004,6 +1015,18 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                         error: true
                       };
                     }
+
+                    if( self.amendmentTypeWithJustificationSelected() && null == record.amendment_justification ) {
+                      var element = cenozo.getFormElement( 'amendment_justification' );
+                      element.$error.required = true;
+                      cenozo.updateFormElement( element, true );
+                      if( null == errorTab ) errorTab = 'amendment';
+                      if( null == error ) error = {
+                        title: self.translate( 'misc.missingFieldTitle' ),
+                        message: self.translate( 'misc.missingFieldMessage' ),
+                        error: true
+                      };
+                    }
                   }
 
                   if( null != error ) {
@@ -1219,18 +1242,20 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                 return CnHttpFactory.instance( {
                   path: 'amendment_type',
                   data: {
-                    select: { column: [ 'id', 'reason_en', 'reason_fr' ] }
+                    select: { column: [ 'id', 'reason_en', 'reason_fr', 'justification_prompt_en', 'justification_prompt_fr' ] }
                   }
                 } ).query().then( function success( response ) {
                   self.amendmentTypeList = { en: [], fr: [] };
                   response.data.forEach( function( item ) {
                     self.amendmentTypeList.en.push( {
                       id: item.id,
-                      name: item.reason_en
+                      name: item.reason_en,
+                      justificationPrompt: item.justification_prompt_en
                     } );
                     self.amendmentTypeList.fr.push( {
                       id: item.id,
-                      name: item.reason_fr
+                      name: item.reason_fr,
+                      justificationPrompt: item.justification_prompt_fr
                     } );
                   } );
                 } )

@@ -6,6 +6,8 @@ CREATE TABLE IF NOT EXISTS amendment_type (
   create_timestamp TIMESTAMP NOT NULL,
   reason_en VARCHAR(127) NOT NULL,
   reason_fr VARCHAR(127) NOT NULL,
+  justification_prompt_en TEXT NULL DEFAULT NULL,
+  justification_prompt_fr TEXT NULL DEFAULT NULL,
   PRIMARY KEY (id),
   UNIQUE INDEX uq_reason_en (reason_en ASC),
   UNIQUE INDEX uq_reason_fr (reason_fr ASC))
