@@ -168,7 +168,7 @@ define( function() {
     amendment: { column: 'reqn_version.amendment', type: 'string', exclude: true },
     funding_filename: { column: 'reqn_version.funding_filename', type: 'string', exclude: true },
     ethics_filename: { column: 'reqn_version.ethics_filename', type: 'string', exclude: true },
-    agreement_filename: { column: 'reqn_version.agreement_filename', type: 'string', exclude: true },
+    has_agreements: { type: 'boolean', exclude: true },
     data_directory: { type: 'string', exclude: true },
     phase: { column: 'stage_type.phase', type: 'string', exclude: true },
     status: { column: 'stage_type.status', type: 'string', exclude: true },
@@ -349,9 +349,9 @@ define( function() {
       operation: function( $state, model ) { model.viewModel.downloadEthicsLetter(); },
       isDisabled: function( $state, model ) { return !model.viewModel.record.ethics_filename; }
     }, {
-      title: 'Agreement Letter',
-      operation: function( $state, model ) { model.viewModel.downloadAgreementLetter(); },
-      isDisabled: function( $state, model ) { return !model.viewModel.record.agreement_filename; }
+      title: 'Agreement Letters',
+      operation: function( $state, model ) { model.viewModel.downloadAgreementLetters(); },
+      isDisabled: function( $state, model ) { return !model.viewModel.record.has_agreements; }
     }, {
       title: 'Reviews',
       operation: function( $state, model ) { model.viewModel.downloadReviews(); }
@@ -492,8 +492,11 @@ define( function() {
           downloadChecklist: function() { return CnReqnHelper.download( 'checklist', this.record.current_reqn_version_id ); },
           downloadFundingLetter: function() { return CnReqnHelper.download( 'funding_filename', this.record.current_reqn_version_id ); },
           downloadEthicsLetter: function() { return CnReqnHelper.download( 'ethics_filename', this.record.current_reqn_version_id ); },
-          downloadAgreementLetter: function() {
-            return CnReqnHelper.download( 'agreement_filename', this.record.current_reqn_version_id );
+          downloadAgreementLetters: function() {
+            return CnHttpFactory.instance( {
+              path: this.parentModel.getServiceResourcePath() + '?file=agreements',
+              format: 'zip'
+            } ).file();
           },
           downloadReviews: function() {
             return CnHttpFactory.instance( {

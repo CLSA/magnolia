@@ -161,6 +161,13 @@ class module extends \cenozo\service\module
     {
       // include the user first/last/name as supplemental data
       $select->add_column( 'CONCAT( user.first_name, " ", user.last_name, " (", user.name, ")" )', 'formatted_user_id', false );
+
+      if( $select->has_column( 'has_agreements' ) )
+      {
+        $reqn_version_mod = lib::create( 'database\modifier' );
+        $reqn_version_mod->where( 'agreement_filename', '!=', NULL );
+        $select->add_constant( 0 < $db_reqn->get_reqn_version_count( $reqn_version_mod ), 'has_agreements' );
+      }
     }
   }
 

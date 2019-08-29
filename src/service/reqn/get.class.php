@@ -17,7 +17,7 @@ class get extends \cenozo\service\downloadable
    */
   protected function get_downloadable_mime_type_list()
   {
-    return array( 'application/octet-stream', 'application/pdf', 'text/plain' );
+    return array( 'application/octet-stream', 'application/pdf', 'application/zip', 'text/plain' );
   }
 
   /**
@@ -27,7 +27,8 @@ class get extends \cenozo\service\downloadable
   {
     $file = $this->get_argument( 'file', NULL );
     $db_reqn = $this->get_leaf_record();
-    if( 'instruction_filename' == $file ) return $db_reqn->instruction_filename;
+    if( 'agreements' == $file ) return sprintf( 'Agreements %s.zip', $db_reqn->identifier );
+    else if( 'instruction_filename' == $file ) return $db_reqn->instruction_filename;
     else if( 'reviews' == $file ) return sprintf( 'Reviews %s.txt', $db_reqn->identifier );
 
     throw lib::create( 'exception\argument', 'file', $file, __METHOD__ );
@@ -40,8 +41,9 @@ class get extends \cenozo\service\downloadable
   {
     $file = $this->get_argument( 'file', NULL );
     $db_reqn = $this->get_leaf_record();
-    if( 'instruction_filename' == $file ) return sprintf( '%s/%s', INSTRUCTION_FILE_PATH, $db_reqn->id );
-    else if( 'reviews' == $file ) return sprintf( '%s/%s.txt', DATA_REVIEWS_PATH, $db_reqn->id );
+    if( 'agreements' == $file ) return $db_reqn->get_filename( $file );
+    else if( 'instruction_filename' == $file ) return $db_reqn->get_filename( 'instruction' );
+    else if( 'reviews' == $file ) return $db_reqn->get_filename( $file );
 
     throw lib::create( 'exception\argument', 'file', $file, __METHOD__ );
   }
@@ -56,7 +58,13 @@ class get extends \cenozo\service\downloadable
     $mime_type = $this->get_mime_type();
 
     // if requesting the reqn's review list TXT file then create it first
-    if( 'text/plain' == $mime_type )
+    if( 'application/zip' == $mime_type )
+    {
+      $db_reqn = $this->get_leaf_record();
+      $file = $this->get_argument( 'file', NULL );
+      if( 'agreements' == $file ) $db_reqn->generate_agreements_file();
+    }
+    else if( 'text/plain' == $mime_type )
     {
       $db_reqn = $this->get_leaf_record();
       $file = $this->get_argument( 'file', NULL );

@@ -182,7 +182,8 @@ class reqn extends \cenozo\database\record
   public function get_filename( $type )
   {
     $directory = '';
-    if( 'agreement' == $type ) $directory = AGREEMENT_LETTER_PATH;
+    if( 'agreements' == $type ) return sprintf( '%s/%s.zip', AGREEMENT_LETTER_PATH, $this->id );
+    else if( 'reviews' == $type ) return sprintf( '%s/%s.txt', DATA_REVIEWS_PATH, $this->id );
     else if( 'instruction' == $type ) $directory = INSTRUCTION_FILE_PATH;
     else throw lib::create( 'exception\argument', 'type', $type, __METHOD__ );
     return sprintf( '%s/%s', $directory, $this->id );
@@ -621,6 +622,36 @@ class reqn extends \cenozo\database\record
 
     $reqn_version_id = static::db()->get_one( sprintf( '%s %s', $select->get_sql(), $modifier->get_sql() ) );
     return $reqn_version_id ? lib::create( 'database\reqn_version', $reqn_version_id ) : NULL;
+  }
+
+  /**
+   * Generates a zip file containing all agreement letters
+   * 
+   * @access public
+   */
+  public function generate_agreements_file()
+  {
+    $zip_filename = $this->get_filename( 'agreements' );
+    $zip = new \ZipArchive();
+    if( true !== $zip->open( $zip_filename, \ZipArchive::OVERWRITE ) )
+    {
+      throw lib::create( 'exception\runtime',
+        sprintf(
+          'Unable to create zip file "%s" for reqn "%s" agreement letters',
+          $zip_filename,
+          $this->identifier
+        )
+      );
+    }
+
+    foreach( $this->get_reqn_version_object_list() as $db_reqn_version )
+    {
+      $agreement_filename = $db_reqn_version->get_filename( 'agreement' );
+      if( file_exists( $agreement_filename ) )
+        $zip->addFile( $agreement_filename, sprintf( '%s version %s.pdf', $this->identifier, $db_reqn_version->version ) );
+    }
+
+    $zip->close();
   }
 
   /**
