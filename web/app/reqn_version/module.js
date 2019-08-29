@@ -164,7 +164,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
             // display the decision notice to the applicant under specific circumstances
             if( 'applicant' == CnSession.role.name &&
-                [ 'Suggested Revisions', 'Agreement', 'Not Approved' ].includes( record.stage_type ) ) {
+                [ 'Suggested Revisions', 'Data Release', 'Agreement', 'Not Approved' ].includes( record.stage_type ) ) {
               scope.model.viewModel.displayDecisionNotice();
             }
           } );
