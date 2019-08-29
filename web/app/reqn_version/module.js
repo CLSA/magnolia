@@ -383,8 +383,14 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           agreementDifferenceList: null,
           show: function( subject ) { return CnReqnHelper.showAction( subject, this.record ); },
           showAgreement: function() {
-            // only show the agreement tab to administrators and when we've passed the review stage
-            return 'administrator' == CnSession.role.name && ['active','complete'].includes( self.record.phase );
+            // only show the agreement tab to administrators
+            return 'administrator' == CnSession.role.name && (
+              // and when there is an agreement
+              this.record.has_agreement_filename || (
+                // or when we're looking at the current version and we're in the active or complete phases
+                this.record.is_current_version && ['active','complete'].includes( self.record.phase )
+              )
+            );
           },
           abandon: function() {
             return CnReqnHelper.abandon(

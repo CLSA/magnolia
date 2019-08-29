@@ -70,7 +70,7 @@ class module extends \cenozo\service\module
     $select->add_column( 'graduate_user.email', 'graduate_email', false );
 
     if( $select->has_columns( 'has_agreement_filename' ) )
-      $select->add_column( 'agreement_filename IS NOT NULL', 'has_agreement_filename' );
+      $select->add_column( 'agreement_filename IS NOT NULL', 'has_agreement_filename', true, 'boolean' );
 
     if( $select->has_table_columns( 'stage' ) || $select->has_table_columns( 'stage_type' ) ) 
     {
