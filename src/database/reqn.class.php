@@ -632,26 +632,34 @@ class reqn extends \cenozo\database\record
   public function generate_agreements_file()
   {
     $zip_filename = $this->get_filename( 'agreements' );
-    $zip = new \ZipArchive();
-    if( true !== $zip->open( $zip_filename, \ZipArchive::OVERWRITE ) )
-    {
-      throw lib::create( 'exception\runtime',
-        sprintf(
-          'Unable to create zip file "%s" for reqn "%s" agreement letters',
-          $zip_filename,
-          $this->identifier
-        )
-      );
-    }
 
+    $file_list = array();
     foreach( $this->get_reqn_version_object_list() as $db_reqn_version )
     {
       $agreement_filename = $db_reqn_version->get_filename( 'agreement' );
-      if( file_exists( $agreement_filename ) )
-        $zip->addFile( $agreement_filename, sprintf( '%s version %s.pdf', $this->identifier, $db_reqn_version->version ) );
+      if( file_exists( $agreement_filename ) ) $file_list[] = array(
+        'path' => $agreement_filename,
+        'name' => sprintf( '%s version %s.pdf', $this->identifier, $db_reqn_version->version )
+      );
     }
 
-    $zip->close();
+    if( 0 < count( $file_list ) ) {
+      $zip = new \ZipArchive();
+      if( true !== $zip->open( $zip_filename, \ZipArchive::CREATE | \ZipArchive::OVERWRITE ) )
+      {
+        throw lib::create( 'exception\runtime',
+          sprintf(
+            'Unable to create zip file "%s" for reqn "%s" agreement letters',
+            $zip_filename,
+            $this->identifier
+          ),
+          __METHOD__
+        );
+      }
+
+      foreach( $file_list as $file ) $zip->addFile( $file['path'], $file['name'] );
+      $zip->close();
+    }
   }
 
   /**
