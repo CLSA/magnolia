@@ -3,7 +3,8 @@
     <h4 class="modal-title">{{ model.title }}</h4>
   </div>
   <div class="modal-body allow-select">
-    <div class="panel-group" id="noticeAccordion" role="tablist" aria-multiselectable="true">
+    <div ng-if="0 == model.noticeList.length">The requisition does not have any notices.</div>
+    <div ng-if="0 < model.noticeList.length" class="panel-group" id="noticeAccordion" role="tablist" aria-multiselectable="true">
       <div class="panel panel-default" ng-repeat="notice in model.noticeList">
         <div class="panel-heading" role="tab" id="heading{{ $index }}">
           <h4 class="panel-title">
@@ -31,7 +32,10 @@
     </div>
   </div>
   <div class="modal-footer bg-info">
-    <button type="button" class="btn btn-default pull-left" ng-click="printMessage()">Print</button>
+    <button ng-if="0 < model.noticeList.length"
+            type="button"
+            class="btn btn-default pull-left"
+            ng-click="model.printMessage()">Print</button>
     <button type="submit" cn-autofocus class="btn btn-primary">{{ model.closeText }}</button>
   </div>
 </form>

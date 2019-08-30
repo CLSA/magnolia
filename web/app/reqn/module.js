@@ -353,6 +353,9 @@ define( function() {
       operation: function( $state, model ) { model.viewModel.downloadAgreementLetters(); },
       isDisabled: function( $state, model ) { return !model.viewModel.record.has_agreements; }
     }, {
+      title: 'Notices',
+      operation: function( $state, model ) { model.viewModel.displayDecisionNotice(); }
+    }, {
       title: 'Reviews',
       operation: function( $state, model ) { model.viewModel.downloadReviews(); }
     }, {
@@ -455,10 +458,10 @@ define( function() {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnReqnViewFactory', [
-    'CnBaseViewFactory',
-    'CnReqnHelper', 'CnSession', 'CnHttpFactory', 'CnModalMessageFactory', 'CnModalConfirmFactory', '$window', '$state',
-    function( CnBaseViewFactory,
-              CnReqnHelper, CnSession, CnHttpFactory, CnModalMessageFactory, CnModalConfirmFactory, $window, $state ) {
+    'CnBaseViewFactory', 'CnReqnHelper', 'CnSession', 'CnHttpFactory',
+    'CnModalMessageFactory', 'CnModalConfirmFactory', 'CnModalNoticeListFactory', '$window', '$state',
+    function( CnBaseViewFactory, CnReqnHelper, CnSession, CnHttpFactory,
+              CnModalMessageFactory, CnModalConfirmFactory, CnModalNoticeListFactory, $window, $state ) {
       var object = function( parentModel, root ) {
         var self = this;
         CnBaseViewFactory.construct( this, parentModel, root );
@@ -734,6 +737,20 @@ define( function() {
               }
             } );
           },
+
+          displayDecisionNotice: function() {
+            var noticeList = [];
+            return CnHttpFactory.instance( {
+              path: this.parentModel.getServiceResourcePath() + '/notice',
+              data: { modifier: { order: { datetime: true } } }
+            } ).query().then( function( response ) {
+              CnModalNoticeListFactory.instance( {
+                title: 'Notice List',
+                closeText: self.translate( 'misc.close' ),
+                noticeList: response.data
+              } ).printMessage();
+            } );
+          }
 
         } );
       };
