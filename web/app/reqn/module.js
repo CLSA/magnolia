@@ -76,7 +76,7 @@ define( function() {
     reqn_type_id: {
       title: 'Requisition Type',
       type: 'enum',
-      constant: 'view',
+      constant: 'view', // modified in the model
       exclude: true // modified in the model
     },
     deadline_id: {
@@ -572,6 +572,11 @@ define( function() {
 
               mainInputGroup.inputList.deadline_id.exclude =
                 3 > CnSession.role.tier || null == self.record.deadline_id ? true : 'add';
+
+              // only allow the reqn type to be changed by an admin while in the new stage
+              mainInputGroup.inputList.reqn_type_id.constant = 3 <= CnSession.role.tier && 'New' == self.record.stage_type
+                                                             ? false
+                                                             : 'view';
 
               // show the agreement and instruction files if we're past the review stage
               mainInputGroup.inputList.instruction_filename.exclude = !['active','complete'].includes( self.record.phase );
