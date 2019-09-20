@@ -61,6 +61,10 @@ class patch extends \cenozo\service\patch
           if( 'Admin Review' != $db_current_stage_type->name ) $code = 400;
         }
       }
+      else if( 'deactivate' == $action )
+      {
+        if( 'administrator' != $db_role->name ) $code = 403;
+      }
       else if( 'defer' == $action )
       {
         if( 'review' != $phase && 'active' != $phase ) $code = 403;
@@ -73,7 +77,7 @@ class patch extends \cenozo\service\patch
       }
       else if( 'reactivate' == $action )
       {
-        if( 'administrator' != $db_role->name || 'abandoned' != $state ) $code = 403;
+        if( 'administrator' != $db_role->name || !in_array( $state, [ 'abandoned', 'inactive' ] ) ) $code = 403;
       }
       else if( 'submit' == $action )
       {
@@ -199,6 +203,12 @@ class patch extends \cenozo\service\patch
             }
           }
         }
+        else if( 'deactivate' == $action )
+        {
+          // deactivate the requisition
+          $db_reqn->state = 'inactive';
+          $db_reqn->save();
+        }
         else if( 'defer' == $action )
         {
           $db_reqn->state = 'deferred';
@@ -234,7 +244,7 @@ class patch extends \cenozo\service\patch
         }
         else if( 'reactivate' == $action )
         {
-          $db_reqn->state = 'deferred';
+          $db_reqn->state = 'abandoned' == $db_reqn->state ? 'deferred' : NULL;
           $db_reqn->save();
 
           // send a notification

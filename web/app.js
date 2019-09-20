@@ -92,14 +92,18 @@ cenozo.service( 'CnReqnHelper', [
           return 'new' == phase;
         } else if( 'defer' == subject ) {
           return 'administrator' == role &&
-                 !['abandoned','deferred'].includes( state ) &&
+                 !['abandoned','inactive','deferred'].includes( state ) &&
                  ['review','active'].includes( phase );
         } else if( 'amend' == subject ) {
           return ['administrator','applicant'].includes( role ) &&
                  !['abandoned','deferred'].includes( state ) &&
                  'active' == phase && 'Report Required' != stage_type;
+        } else if( 'deactivate' == subject ) {
+          return 'administrator' == role &&
+                 !['abandoned','inactive'].includes( state ) &&
+                 'new' != phase;
         } else if( 'reactivate' == subject ) {
-          return 'administrator' == role && 'abandoned' == state;
+          return 'administrator' == role && ['abandoned','inactive'].includes( state );
         } else if( 'recreate' == subject ) {
           return 'administrator' == role && 'Not Approved' == stage_type;
         } else if( 'report' == subject ) {

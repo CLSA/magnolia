@@ -269,6 +269,14 @@ define( function() {
   } );
 
   module.addExtraOperation( 'view', {
+    title: 'De-activate',
+    classes: 'btn-danger',
+    isIncluded: function( $state, model ) { return model.viewModel.show( 'deactivate' ); },
+    isDisabled: function( $state, model ) { return !model.viewModel.enabled( 'deactivate' ); },
+    operation: function( $state, model ) { model.viewModel.deactivate(); }
+  } );
+
+  module.addExtraOperation( 'view', {
     title: 'Re-activate',
     classes: 'btn-warning',
     isIncluded: function( $state, model ) { return model.viewModel.show( 'reactivate' ); },
@@ -635,7 +643,7 @@ define( function() {
           enabled: function( subject ) {
             var state = this.record.state ? this.record.state : '';
 
-            if( ['abandon','defer','reactivate','recreate'].includes( subject ) ) {
+            if( ['abandon', 'deactivate', 'defer', 'reactivate', 'recreate'].includes( subject ) ) {
               return true;
             } else if( ['proceed','reject'].includes( subject ) ) {
               return !state && null != this.record.next_stage_type;
@@ -708,6 +716,39 @@ define( function() {
             } );
           },
 
+          deactivate: function() {
+            return CnReqnHelper.deactivate(
+              this.record.getIdentifier(),
+              '.' != this.record.amendment,
+              this.record.lang
+            ).then( function( response ) {
+              if( response ) {
+                self.record.state = 'inactive';
+                self.record.state_date = moment().format( 'YYYY-MM-DD' );
+                self.updateFormattedRecord( 'state_date', 'date' );
+                if( angular.isDefined( self.notificationModel ) ) self.notificationModel.listModel.onList( true );
+              }
+            } );
+          },
+
+          deactivate: function() {
+            return CnModalConfirmFactory.instance( {
+              message: 'Are you sure you wish to de-activate the ' + this.parentModel.module.name.singular + '?' +
+                '\n\nThe applicant will no longer be able to edit or submit the ' + this.parentModel.module.name.singular + '.'
+            } ).show().then( function( response ) {
+              if( response ) {
+                return CnHttpFactory.instance( {
+                  path: self.parentModel.getServiceResourcePath() + "?action=deactivate"
+                } ).patch().then( function() {
+                  self.record.state = 'inactive';
+                  self.record.state_date = moment().format( 'YYYY-MM-DD' );
+                  self.updateFormattedRecord( 'state_date', 'date' );
+                  if( angular.isDefined( self.notificationModel ) ) self.notificationModel.listModel.onList( true );
+                } );
+              }
+            } );
+          },
+
           reactivate: function() {
             return CnModalConfirmFactory.instance( {
               message: 'Are you sure you wish to re-activate the ' + this.parentModel.module.name.singular + '?' +
@@ -717,8 +758,8 @@ define( function() {
                 return CnHttpFactory.instance( {
                   path: self.parentModel.getServiceResourcePath() + "?action=reactivate"
                 } ).patch().then( function() {
-                  self.record.state = 'deferred';
-                  self.record.state_date = moment().format( 'YYYY-MM-DD' );
+                  self.record.state = 'abandoned' == self.record.state ? 'deferred' : '';
+                  self.record.state_date = 'abandoned' == self.record.state ? moment().format( 'YYYY-MM-DD' ) : null;
                   self.updateFormattedRecord( 'state_date', 'date' );
                   if( angular.isDefined( self.notificationModel ) ) self.notificationModel.listModel.onList( true );
                 } );
