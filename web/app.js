@@ -564,6 +564,7 @@ cenozo.service( 'CnReqnHelper', [
             download: { en: 'Download', fr: 'Télécharger' },
             application: { en: 'Application', fr: 'Soumission' },
             dataChecklist: { en: 'Data Checklist', fr: 'Sélection des données' },
+            applicationAndDataChecklist: { en: 'Application + Data Checklist', fr: 'Soumission + Sélection des données' },
             notices: { en: 'Notices', fr: 'Notifications' },
             studyData: { en: 'Study Data', fr: 'Données d’étude' },
             finalReport: { en: 'Final Report', fr: 'Rapport final' },

@@ -201,135 +201,168 @@ class reqn_version extends \cenozo\database\record
   }
 
   /**
-   * Generates a PDF form version of the reqn (overwritting the previous version)
+   * Generates all PDF forms of the reqn version (overwritting the previous versions)
    * 
-   * @param string $type One of "application" or "checklist" which determines which form to generate
+   * This includes the application, checklist and application+checklist PDF files
    * @access public
    */
-  public function generate_pdf_form( $type )
+  public function generate_pdf_forms()
   {
     $pdf_form_type_class_name = lib::get_class_name( 'database\pdf_form_type' );
     $db_reqn = $this->get_reqn();
     $db_user = $db_reqn->get_user();
     $db_graduate_user = $db_reqn->get_graduate_user();
 
-    $db_pdf_form = NULL;
+    // generate the application form
     $data = array( 'identifier' => $db_reqn->identifier );
-    $filename = NULL;
-
     $data['applicant_name'] = sprintf( '%s %s', $db_user->first_name, $db_user->last_name );
     if( !is_null( $this->title ) ) $data['title'] = $this->title;
 
-    if( 'application' == $type )
+    $db_pdf_form_type = $pdf_form_type_class_name::get_unique_record( 'name', 'Data Application' );
+    $db_pdf_form = $db_pdf_form_type->get_active_pdf_form();
+    $application_filename = sprintf( '%s/%s.pdf', DATA_APPLICATION_PATH, $this->id );
+
+    if( !is_null( $this->applicant_position ) ) $data['applicant_position'] = $this->applicant_position;
+    if( !is_null( $this->applicant_affiliation ) ) $data['applicant_affiliation'] = $this->applicant_affiliation;
+    if( !is_null( $this->applicant_address ) ) $data['applicant_address'] = $this->applicant_address;
+    if( !is_null( $this->applicant_phone ) ) $data['applicant_phone'] = $this->applicant_phone;
+    $data['applicant_email'] = $db_user->email;
+    // only show graduate details if there is a graduate user
+    if( !is_null( $db_graduate_user ) )
     {
-      // get the data application and filename
-      $db_pdf_form_type = $pdf_form_type_class_name::get_unique_record( 'name', 'Data Application' );
-      $db_pdf_form = $db_pdf_form_type->get_active_pdf_form();
-      $filename = sprintf( '%s/%s.pdf', DATA_APPLICATION_PATH, $this->id );
-
-      if( !is_null( $this->applicant_position ) ) $data['applicant_position'] = $this->applicant_position;
-      if( !is_null( $this->applicant_affiliation ) ) $data['applicant_affiliation'] = $this->applicant_affiliation;
-      if( !is_null( $this->applicant_address ) ) $data['applicant_address'] = $this->applicant_address;
-      if( !is_null( $this->applicant_phone ) ) $data['applicant_phone'] = $this->applicant_phone;
-      $data['applicant_email'] = $db_user->email;
-      // only show graduate details if there is a graduate user
-      if( !is_null( $db_graduate_user ) )
+      $data['graduate_name'] = sprintf( '%s %s', $db_graduate_user->first_name, $db_graduate_user->last_name );
+      if( !is_null( $this->graduate_program ) ) $data['graduate_program'] = $this->graduate_program;
+      if( !is_null( $this->graduate_institution ) ) $data['graduate_institution'] = $this->graduate_institution;
+      if( !is_null( $this->graduate_address ) ) $data['graduate_address'] = $this->graduate_address;
+      if( !is_null( $this->graduate_phone ) ) $data['graduate_phone'] = $this->graduate_phone;
+      if( !is_null( $db_graduate_user ) ) $data['graduate_email'] = $db_graduate_user->email;
+      if( !is_null( $this->waiver ) )
       {
-        $data['graduate_name'] = sprintf( '%s %s', $db_graduate_user->first_name, $db_graduate_user->last_name );
-        if( !is_null( $this->graduate_program ) ) $data['graduate_program'] = $this->graduate_program;
-        if( !is_null( $this->graduate_institution ) ) $data['graduate_institution'] = $this->graduate_institution;
-        if( !is_null( $this->graduate_address ) ) $data['graduate_address'] = $this->graduate_address;
-        if( !is_null( $this->graduate_phone ) ) $data['graduate_phone'] = $this->graduate_phone;
-        if( !is_null( $db_graduate_user ) ) $data['graduate_email'] = $db_graduate_user->email;
-        if( !is_null( $this->waiver ) )
-        {
-          if( 'graduate' == $this->waiver ) $data['waiver_graduate'] = 'Yes';
-          else if( 'postdoc' == $this->waiver ) $data['waiver_postdoc'] = 'Yes';
-        }
+        if( 'graduate' == $this->waiver ) $data['waiver_graduate'] = 'Yes';
+        else if( 'postdoc' == $this->waiver ) $data['waiver_postdoc'] = 'Yes';
       }
-      if( !is_null( $this->start_date ) ) $data['start_date'] = $this->start_date->format( 'Y-m-d' );
-      if( !is_null( $this->duration ) ) $data['duration'] = $this->duration;
-      if( !is_null( $this->keywords ) ) $data['keywords'] = $this->keywords;
-      if( !is_null( $this->lay_summary ) ) $data['lay_summary'] = $this->lay_summary;
-      $data['word_count'] = is_null( $this->lay_summary ) ? 0 : count( explode( ' ', $this->lay_summary ) );
-      if( !is_null( $this->background ) ) $data['background'] = $this->background;
-      if( !is_null( $this->objectives ) ) $data['objectives'] = $this->objectives;
-      if( !is_null( $this->methodology ) ) $data['methodology'] = $this->methodology;
-      if( !is_null( $this->analysis ) ) $data['analysis'] = $this->analysis;
-
-      if( !is_null( $this->funding ) )
-      {
-        if( 'yes' == $this->funding ) $data['funding_yes'] = 'Yes';
-        else if( 'no' == $this->funding ) $data['funding_no'] = 'Yes';
-        else if( 'requested' == $this->funding ) $data['funding_requested'] = 'Yes';
-      }
-      if( !is_null( $this->funding_agency ) ) $data['funding_agency'] = $this->funding_agency;
-      if( !is_null( $this->grant_number ) ) $data['grant_number'] = $this->grant_number;
-      if( !is_null( $this->ethics ) ) $data['ethics'] = $this->ethics ? 'yes' : 'no';
-      if( !is_null( $this->ethics_date ) && !$data['ethics'] )
-        $data['ethics_date'] = $this->ethics_date->format( 'Y-m-d' );
-      $data['signature_applicant_name'] = $data['applicant_name'];
-
-      foreach( $this->get_coapplicant_list() as $index => $coapplicant )
-      {
-        $data[sprintf( 'coapplicant%d_name', $index+1 )] = $coapplicant['name'];
-        $data[sprintf( 'coapplicant%d_position', $index+1 )] =
-          sprintf( "%s\n%s\n%s", $coapplicant['position'], $coapplicant['affiliation'], $coapplicant['email'] );
-        $data[sprintf( 'coapplicant%d_role', $index+1 )] = $coapplicant['role'];
-        $data[sprintf( 'coapplicant%d_%s', $index+1, $coapplicant['access'] ? 'yes' : 'no' )] = 'Yes';
-      }
-
-      $reference_list = array();
-      $reference_sel = lib::create( 'database\select' );
-      $reference_sel->add_column( 'rank' );
-      $reference_sel->add_column( 'reference' );
-      $reference_mod = lib::create( 'database\modifier' );
-      $reference_mod->order( 'rank' );
-      foreach( $this->get_reference_list( $reference_sel, $reference_mod ) as $reference )
-        $reference_list[] = sprintf( '%s.  %s', $reference['rank'], $reference['reference'] );
-      $data['references'] = implode( "\n", $reference_list );
     }
-    else if( 'checklist' == $type )
+    if( !is_null( $this->start_date ) ) $data['start_date'] = $this->start_date->format( 'Y-m-d' );
+    if( !is_null( $this->duration ) ) $data['duration'] = $this->duration;
+    if( !is_null( $this->keywords ) ) $data['keywords'] = $this->keywords;
+    if( !is_null( $this->lay_summary ) ) $data['lay_summary'] = $this->lay_summary;
+    $data['word_count'] = is_null( $this->lay_summary ) ? 0 : count( explode( ' ', $this->lay_summary ) );
+    if( !is_null( $this->background ) ) $data['background'] = $this->background;
+    if( !is_null( $this->objectives ) ) $data['objectives'] = $this->objectives;
+    if( !is_null( $this->methodology ) ) $data['methodology'] = $this->methodology;
+    if( !is_null( $this->analysis ) ) $data['analysis'] = $this->analysis;
+
+    if( !is_null( $this->funding ) )
     {
-      // get the data application and filename
-      $db_pdf_form_type = $pdf_form_type_class_name::get_unique_record( 'name', 'Data Checklist' );
-      $db_pdf_form = $db_pdf_form_type->get_active_pdf_form();
-      $filename = sprintf( '%s/%s.pdf', DATA_CHECKLIST_PATH, $this->id );
-
-      if( $this->comprehensive ) $data['comprehensive'] = 'Yes';
-      if( $this->tracking ) $data['tracking'] = 'Yes';
-      if( $this->longitudinal ) $data['longitudinal'] = 'Yes';
-      if( !is_null( $this->last_identifier ) ) $data['last_identifier'] = $this->last_identifier;
-      if( !is_null( $this->part2_a_comment ) ) $data['part2_a_comment'] = $this->part2_a_comment;
-      if( !is_null( $this->part2_b_comment ) ) $data['part2_b_comment'] = $this->part2_b_comment;
-      if( !is_null( $this->part2_c_comment ) ) $data['part2_c_comment'] = $this->part2_c_comment;
-      if( !is_null( $this->part2_d_comment ) ) $data['part2_d_comment'] = $this->part2_d_comment;
-      if( !is_null( $this->part2_e_comment ) ) $data['part2_e_comment'] = $this->part2_e_comment;
-
-      $reqn_version_data_option_list = array();
-      $reqn_version_data_option_sel = lib::create( 'database\select' );
-      $reqn_version_data_option_sel->add_column( 'data_option_id' );
-      $reqn_version_data_option_sel->add_table_column( 'study_phase', 'code' );
-      $reqn_version_data_option_mod = lib::create( 'database\modifier' );
-      $reqn_version_data_option_mod->join( 'study_phase', 'reqn_version_data_option.study_phase_id', 'study_phase.id' );
-      $list = $this->get_reqn_version_data_option_list( $reqn_version_data_option_sel, $reqn_version_data_option_mod );
-      foreach( $list as $reqn_version_data_option )
-        $data[sprintf( 'data_option_%s_%s', $reqn_version_data_option['data_option_id'], $reqn_version_data_option['code'] )] = 'Yes';
+      if( 'yes' == $this->funding ) $data['funding_yes'] = 'Yes';
+      else if( 'no' == $this->funding ) $data['funding_no'] = 'Yes';
+      else if( 'requested' == $this->funding ) $data['funding_requested'] = 'Yes';
     }
+    if( !is_null( $this->funding_agency ) ) $data['funding_agency'] = $this->funding_agency;
+    if( !is_null( $this->grant_number ) ) $data['grant_number'] = $this->grant_number;
+    if( !is_null( $this->ethics ) ) $data['ethics'] = $this->ethics ? 'yes' : 'no';
+    if( !is_null( $this->ethics_date ) && !$data['ethics'] )
+      $data['ethics_date'] = $this->ethics_date->format( 'Y-m-d' );
+    $data['signature_applicant_name'] = $data['applicant_name'];
+
+    foreach( $this->get_coapplicant_list() as $index => $coapplicant )
+    {
+      $data[sprintf( 'coapplicant%d_name', $index+1 )] = $coapplicant['name'];
+      $data[sprintf( 'coapplicant%d_position', $index+1 )] =
+        sprintf( "%s\n%s\n%s", $coapplicant['position'], $coapplicant['affiliation'], $coapplicant['email'] );
+      $data[sprintf( 'coapplicant%d_role', $index+1 )] = $coapplicant['role'];
+      $data[sprintf( 'coapplicant%d_%s', $index+1, $coapplicant['access'] ? 'yes' : 'no' )] = 'Yes';
+    }
+
+    $reference_list = array();
+    $reference_sel = lib::create( 'database\select' );
+    $reference_sel->add_column( 'rank' );
+    $reference_sel->add_column( 'reference' );
+    $reference_mod = lib::create( 'database\modifier' );
+    $reference_mod->order( 'rank' );
+    foreach( $this->get_reference_list( $reference_sel, $reference_mod ) as $reference )
+      $reference_list[] = sprintf( '%s.  %s', $reference['rank'], $reference['reference'] );
+    $data['references'] = implode( "\n", $reference_list );
 
     if( is_null( $db_pdf_form ) )
       throw lib::create( 'exception\runtime',
-        'Cannot generate PDF form since there is no active Data Application PDF form.', __METHOD__ );
+        'Cannot generate PDF application form since there is no active PDF template.', __METHOD__ );
 
     $pdf_writer = lib::create( 'business\pdf_writer' );
     $pdf_writer->set_template( sprintf( '%s/%d.pdf', PDF_FORM_PATH, $db_pdf_form->id ) );
     $pdf_writer->fill_form( $data );
-    if( !$pdf_writer->save( $filename ) )
+    if( !$pdf_writer->save( $application_filename ) )
     {
       throw lib::create( 'exception\runtime',
         sprintf(
           'Failed to generate PDF form "%s" for requisition %s%s',
-          $filename,
+          $application_filename,
+          $db_reqn->identifier,
+          "\n".$pdf_writer->get_error()
+        ),
+        __METHOD__
+      );
+    }
+
+    // now generate the checklist form
+    $data = array( 'identifier' => $db_reqn->identifier );
+    $data['applicant_name'] = sprintf( '%s %s', $db_user->first_name, $db_user->last_name );
+    if( !is_null( $this->title ) ) $data['title'] = $this->title;
+
+    $db_pdf_form_type = $pdf_form_type_class_name::get_unique_record( 'name', 'Data Checklist' );
+    $db_pdf_form = $db_pdf_form_type->get_active_pdf_form();
+    $checklist_filename = sprintf( '%s/%s.pdf', DATA_CHECKLIST_PATH, $this->id );
+
+    if( $this->comprehensive ) $data['comprehensive'] = 'Yes';
+    if( $this->tracking ) $data['tracking'] = 'Yes';
+    if( $this->longitudinal ) $data['longitudinal'] = 'Yes';
+    if( !is_null( $this->last_identifier ) ) $data['last_identifier'] = $this->last_identifier;
+    if( !is_null( $this->part2_a_comment ) ) $data['part2_a_comment'] = $this->part2_a_comment;
+    if( !is_null( $this->part2_b_comment ) ) $data['part2_b_comment'] = $this->part2_b_comment;
+    if( !is_null( $this->part2_c_comment ) ) $data['part2_c_comment'] = $this->part2_c_comment;
+    if( !is_null( $this->part2_d_comment ) ) $data['part2_d_comment'] = $this->part2_d_comment;
+    if( !is_null( $this->part2_e_comment ) ) $data['part2_e_comment'] = $this->part2_e_comment;
+
+    $reqn_version_data_option_list = array();
+    $reqn_version_data_option_sel = lib::create( 'database\select' );
+    $reqn_version_data_option_sel->add_column( 'data_option_id' );
+    $reqn_version_data_option_sel->add_table_column( 'study_phase', 'code' );
+    $reqn_version_data_option_mod = lib::create( 'database\modifier' );
+    $reqn_version_data_option_mod->join( 'study_phase', 'reqn_version_data_option.study_phase_id', 'study_phase.id' );
+    $list = $this->get_reqn_version_data_option_list( $reqn_version_data_option_sel, $reqn_version_data_option_mod );
+    foreach( $list as $reqn_version_data_option )
+      $data[sprintf( 'data_option_%s_%s', $reqn_version_data_option['data_option_id'], $reqn_version_data_option['code'] )] = 'Yes';
+
+    if( is_null( $db_pdf_form ) )
+      throw lib::create( 'exception\runtime',
+        'Cannot generate PDF checklist form since there is no active PDF template.', __METHOD__ );
+
+    $pdf_writer = lib::create( 'business\pdf_writer' );
+    $pdf_writer->set_template( sprintf( '%s/%d.pdf', PDF_FORM_PATH, $db_pdf_form->id ) );
+    $pdf_writer->fill_form( $data );
+    if( !$pdf_writer->save( $checklist_filename ) )
+    {
+      throw lib::create( 'exception\runtime',
+        sprintf(
+          'Failed to generate PDF form "%s" for requisition %s%s',
+          $checklist_filename,
+          $db_reqn->identifier,
+          "\n".$pdf_writer->get_error()
+        ),
+        __METHOD__
+      );
+    }
+
+    // now generate the combined PDF form containing both application and checklist
+    $application_and_checklist_filename = sprintf( '%s/%s.pdf', DATA_APPLICATION_AND_CHECKLIST_PATH, $this->id );
+    $pdf_writer = lib::create( 'business\pdf_writer' );
+    $pdf_writer->merge( array( $application_filename, $checklist_filename ) );
+    if( !$pdf_writer->save( $application_and_checklist_filename ) )
+    {
+      throw lib::create( 'exception\runtime',
+        sprintf(
+          'Failed to generate PDF form "%s" for requisition %s%s',
+          $application_and_checklist_filename,
           $db_reqn->identifier,
           "\n".$pdf_writer->get_error()
         ),

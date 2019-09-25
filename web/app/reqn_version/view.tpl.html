@@ -25,6 +25,7 @@
         <ul class="dropdown-menu dropdown-menu-right full-width" style="width: 200px !important" aria-labelledby="downloadForms">
           <li><a ng-click="model.viewModel.downloadApplication()" ng-bind-html="t( 'misc.application' )"></a></li>
           <li><a ng-click="model.viewModel.downloadChecklist()" ng-bind-html="t( 'misc.dataChecklist' )"></a></li>
+          <li><a ng-click="model.viewModel.downloadApplicationAndChecklist()" ng-bind-html="t( 'misc.applicationAndDataChecklist' )"></a></li>
           <li><a ng-click="model.viewModel.displayDecisionNotice()" ng-bind-html="t( 'misc.notices' )"></a></li>
           <li ng-if="model.viewModel.canViewData()">
             <a ng-click="model.viewModel.viewData()" ng-bind-html="t( 'misc.studyData' )"></a>

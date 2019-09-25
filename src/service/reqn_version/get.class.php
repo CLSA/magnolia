@@ -50,6 +50,15 @@ class get extends \cenozo\service\downloadable
         $db_reqn_version->version
       );
     }
+    else if( 'application_and_checklist' == $file )
+    {
+      return sprintf(
+        'Data Application and Checklist %s version %s%d.pdf',
+        $db_reqn->identifier,
+        '.' == $db_reqn_version->amendment ? '' : $db_reqn_version->amendment,
+        $db_reqn_version->version
+      );
+    }
 
     throw lib::create( 'exception\argument', 'file', $file, __METHOD__ );
   }
@@ -67,6 +76,8 @@ class get extends \cenozo\service\downloadable
     else if( 'agreement_filename' == $file ) return sprintf( '%s/%s', AGREEMENT_LETTER_PATH, $db_reqn_version->id );
     else if( 'checklist' == $file ) return sprintf( '%s/%s.pdf', DATA_CHECKLIST_PATH, $db_reqn_version->id );
     else if( 'application' == $file ) return sprintf( '%s/%s.pdf', DATA_APPLICATION_PATH, $db_reqn_version->id );
+    else if( 'application_and_checklist' == $file )
+      return sprintf( '%s/%s.pdf', DATA_APPLICATION_AND_CHECKLIST_PATH, $db_reqn_version->id );
 
     throw lib::create( 'exception\argument', 'file', $file, __METHOD__ );
   }
@@ -83,7 +94,7 @@ class get extends \cenozo\service\downloadable
     // if requesting the reqn_version's application or checklist PDF file then create it first
     $db_reqn_version = $this->get_leaf_record();
     $file = $this->get_argument( 'file', NULL );
-    if( 'application' == $file || 'checklist' == $file ) $db_reqn_version->generate_pdf_form( $file );
+    if( in_array( $file, ['application', 'checklist', 'application_and_checklist'] ) ) $db_reqn_version->generate_pdf_forms();
   }
 
   /**
