@@ -349,6 +349,9 @@ define( function() {
       title: 'Data Checklist',
       operation: function( $state, model ) { model.viewModel.downloadChecklist(); }
     }, {
+      title: 'Application + Data Checklist',
+      operation: function( $state, model ) { model.viewModel.downloadApplicationAndChecklist(); }
+    }, {
       title: 'Funding Letter',
       operation: function( $state, model ) { model.viewModel.downloadFundingLetter(); },
       isDisabled: function( $state, model ) { return !model.viewModel.record.funding_filename; }
@@ -501,6 +504,9 @@ define( function() {
           viewReport: function() { return CnReqnHelper.viewReport( this.record.getIdentifier() ); },
           downloadApplication: function() { return CnReqnHelper.download( 'application', this.record.current_reqn_version_id ); },
           downloadChecklist: function() { return CnReqnHelper.download( 'checklist', this.record.current_reqn_version_id ); },
+          downloadApplicationAndChecklist: function() {
+            return CnReqnHelper.download( 'application_and_checklist', this.record.current_reqn_version_id );
+          },
           downloadFundingLetter: function() { return CnReqnHelper.download( 'funding_filename', this.record.current_reqn_version_id ); },
           downloadEthicsLetter: function() { return CnReqnHelper.download( 'ethics_filename', this.record.current_reqn_version_id ); },
           downloadAgreementLetters: function() {
