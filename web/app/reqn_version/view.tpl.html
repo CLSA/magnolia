@@ -22,10 +22,19 @@
                 aria-haspopup="true"
                 aria-expanded="false"
                 ng-bind-html="t( 'misc.download' ) + ' <span class=\'caret\' ng-if=\'op.operations\'></span>'"></button>
-        <ul class="dropdown-menu dropdown-menu-right full-width" style="width: 200px !important" aria-labelledby="downloadForms">
+        <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="downloadForms">
           <li><a ng-click="model.viewModel.downloadApplication()" ng-bind-html="t( 'misc.application' )"></a></li>
           <li><a ng-click="model.viewModel.downloadChecklist()" ng-bind-html="t( 'misc.dataChecklist' )"></a></li>
-          <li><a ng-click="model.viewModel.downloadApplicationAndChecklist()" ng-bind-html="t( 'misc.applicationAndDataChecklist' )"></a></li>
+          <li>
+            <a ng-click="model.viewModel.downloadApplicationAndChecklist()"
+               ng-bind-html="t( 'misc.applicationAndDataChecklist' )"></a>
+          </li>
+          <li ng-class="!liteModel.viewModel.record.data_sharing_filename ? 'disabled' : ''">
+            <a ng-click="!liteModel.viewModel.record.data_sharing_filename ?
+                         $event.stopPropagation() :
+                         model.viewModel.downloadDataSharing()"
+               ng-bind-html="t( 'misc.dataSharing' )"></a>
+          </li>
           <li><a ng-click="model.viewModel.displayDecisionNotice()" ng-bind-html="t( 'misc.notices' )"></a></li>
           <li ng-if="model.viewModel.canViewData()">
             <a ng-click="model.viewModel.viewData()" ng-bind-html="t( 'misc.studyData' )"></a>

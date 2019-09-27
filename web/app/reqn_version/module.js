@@ -406,7 +406,10 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           viewReport: function() { return CnReqnHelper.viewReport( this.record.identifier ); },
           downloadApplication: function() { return CnReqnHelper.download( 'application', this.record.getIdentifier() ); },
           downloadChecklist: function() { return CnReqnHelper.download( 'checklist', this.record.getIdentifier() ); },
-          downloadApplicationAndChecklist: function() { return CnReqnHelper.download( 'application_and_checklist', this.record.getIdentifier() ); },
+          downloadApplicationAndChecklist: function() {
+            return CnReqnHelper.download( 'application_and_checklist', this.record.getIdentifier() );
+          },
+          downloadDataSharing: function() { return CnReqnHelper.download( 'data_sharing_filename', this.record.getIdentifier() ); },
 
           onView: function( force ) {
             // reset tab values
