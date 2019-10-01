@@ -633,7 +633,8 @@ define( function() {
           onPatch: function( data ) {
             return self.$$onPatch( data ).then( function() {
               // Reload the view if we're changing the suggested revisions (the next stage will change)
-              if( angular.isDefined( data.suggested_revisions ) ) return self.onView();
+              // or reqn type (the deadline might change)
+              if( angular.isDefined( data.suggested_revisions ) || angular.isDefined( data.reqn_type_id ) ) return self.onView();
             } );
           },
 

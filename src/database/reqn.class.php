@@ -70,6 +70,20 @@ class reqn extends \cenozo\database\record
   }
 
   /**
+   * Change deadline when changing the reqn-type
+   */
+  public function __set( $column_name, $value )
+  {
+    parent::__set( $column_name, $value );
+
+    if( 'reqn_type_id' == $column_name )
+    {
+      if( !$this->get_reqn_type()->is_deadline_required() ) $this->deadline_id = NULL;
+      $this->assert_deadline();
+    }
+  }
+
+  /**
    * Override the parent method
    */
   public function delete()
