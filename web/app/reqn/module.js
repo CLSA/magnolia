@@ -867,9 +867,7 @@ define( function() {
           if( 'applicant' == CnSession.role.name ) {
             check = 'new' == phase || ( 'deferred' == state && 'review' == phase );
           } else if( ['administrator','sac'].includes( CnSession.role.name ) ) {
-            check = 'new' == phase || (
-              'abandoned' != state && ( 'review' == phase || 'Agreement' == stage_type || 'Data Release' == stage_type )
-            );
+            check = true;
           }
 
           return this.$$getEditEnabled() && check;
