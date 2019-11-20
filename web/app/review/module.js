@@ -53,18 +53,18 @@ define( function() {
         select: 'reqn.identifier',
         where: 'reqn.identifier'
       },
-      constant: true
+      isConstant: true
     },
     amendment: {
       title: 'Amendment',
       type: 'string',
-      constant: true
+      isConstant: true
     },
     review_type: {
       column: 'review_type.name',
       title: 'Review Type',
       type: 'string',
-      constant: true
+      isConstant: true
     },
     user_id: {
       column: 'review.user_id',
@@ -75,12 +75,12 @@ define( function() {
         select: 'CONCAT( user.first_name, " ", user.last_name, " (", user.name, ")" )',
         where: [ 'user.first_name', 'user.last_name', 'user.name' ]
       },
-      constant: true
+      isConstant: function( $state, model ) { return !model.isAdministratorOrChair(); }
     },
     date: {
       title: 'Created On',
       type: 'date',
-      constant: true
+      isConstant: function( $state, model ) { return !model.isAdministratorOrChair(); }
     },
     recommendation_type_id: {
       title: 'Recommendation',
@@ -96,7 +96,7 @@ define( function() {
     funding_filename: { column: 'reqn_version.funding_filename', type: 'hidden' },
     ethics_filename: { column: 'reqn_version.ethics_filename', type: 'hidden' },
     agreement_filename: { column: 'reqn_version.agreement_filename', type: 'hidden' },
-    editable: { type: 'boolean', exclude: true }
+    editable: { type: 'boolean', isExcluded: true }
   } );
 
   module.addExtraOperation( 'view', {
@@ -228,12 +228,7 @@ define( function() {
 
         this.recommendationList = {};
 
-        // only allow editing user and date under particular roles
-        if( ['administrator','chair'].includes( CnSession.role.name ) ) {
-          this.module.inputGroupList.findByProperty( 'title', '' ).inputList.user_id.constant = false;
-          this.module.inputGroupList.findByProperty( 'title', '' ).inputList.date.constant = false;
-        }
-
+        this.isAdministratorOrChair = function() { return ['administrator','chair'].includes( CnSession.role.name ); };
         this.isReviewer = function() { return 'reviewer' == CnSession.role.name; };
 
         // override the service collection path so that reviewers can view their reviews from the home screen

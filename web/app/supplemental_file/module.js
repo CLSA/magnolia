@@ -27,12 +27,12 @@ define( function() {
     filename_en: {
       title: 'File (English)',
       type: 'file',
-      exclude: 'add'
+      isExcluded: 'add'
     },
     filename_fr: {
       title: 'File (French)',
       type: 'file',
-      exclude: 'add'
+      isExcluded: 'add'
     }
   } );
 

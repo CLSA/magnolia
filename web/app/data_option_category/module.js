@@ -21,7 +21,7 @@ define( function() {
     rank: {
       title: 'Rank',
       type: 'rank',
-      constant: true
+      isConstant: true
     },
     name_en: {
       title: 'Name (English)',

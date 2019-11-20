@@ -29,16 +29,16 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
     },
 
     // the following are for the form and will not appear in the view
-    language: { column: 'language.code', type: 'string', exclude: true },
-    activities: { type: 'text', exclude: true },
-    findings: { type: 'text', exclude: true },
-    outcomes: { type: 'text', exclude: true },
-    thesis_title: { type: 'text', exclude: true },
-    thesis_status: { type: 'text', exclude: true },
-    impact: { type: 'text', exclude: true },
-    opportunities: { type: 'text', exclude: true },
-    dissemination: { type: 'text', exclude: true },
-    waiver: { column: 'reqn.waiver', type: 'string', exclude: true }
+    language: { column: 'language.code', type: 'string', isExcluded: true },
+    activities: { type: 'text', isExcluded: true },
+    findings: { type: 'text', isExcluded: true },
+    outcomes: { type: 'text', isExcluded: true },
+    thesis_title: { type: 'text', isExcluded: true },
+    thesis_status: { type: 'text', isExcluded: true },
+    impact: { type: 'text', isExcluded: true },
+    opportunities: { type: 'text', isExcluded: true },
+    dissemination: { type: 'text', isExcluded: true },
+    waiver: { column: 'reqn.waiver', type: 'string', isExcluded: true }
   } );
 
   /* ######################################################################################################## */

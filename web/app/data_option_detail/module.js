@@ -32,18 +32,18 @@ define( [ 'data_option' ].reduce( function( list, name ) {
       column: 'data_option_category.name_en',
       title: 'Category',
       type: 'string',
-      exclude: 'add',
-      constant: true
+      isExcluded: 'add',
+      isConstant: true
     },
     data_option_id: {
       title: 'Data Option',
       type: 'enum',
-      constant: 'view'
+      isConstant: 'view'
     },
     study_phase_id: {
       title: 'Study Phase',
       type: 'enum',
-      constant: 'view'
+      isConstant: 'view'
     },
     rank: { title: 'Rank', type: 'rank' },
     name_en: { title: 'Name (English)', type: 'string' },

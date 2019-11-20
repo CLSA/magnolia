@@ -29,7 +29,7 @@ define( function() {
     datetime: {
       title: 'Date & Time',
       type: 'datetime',
-      exclude: 'add'
+      isExcluded: 'add'
     },
     title: {
       title: 'Title',

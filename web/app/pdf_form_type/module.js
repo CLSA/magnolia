@@ -29,7 +29,7 @@ define( function() {
     name: {
       title: 'Name',
       type: 'string',
-      constant: true
+      isConstant: true
     }
   } );
 

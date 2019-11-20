@@ -29,12 +29,12 @@ define( function() {
       column: 'data_option_category.name_en',
       title: 'Category',
       type: 'string',
-      constant: true
+      isConstant: true
     },
     rank: {
       title: 'Rank',
       type: 'rank',
-      constant: true
+      isConstant: true
     },
     name_en: {
       title: 'Name (English)',

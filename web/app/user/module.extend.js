@@ -18,7 +18,7 @@ define( [ cenozoApp.module( 'user' ).getFileUrl( 'module.js' ) ], function() {
   module.addInput( '', 'supervisor', {
     title: 'Supervisor',
     type: 'string',
-    constant: true
+    isConstant: true
   } );
 
   cenozo.providers.decorator( 'CnUserViewFactory', [
