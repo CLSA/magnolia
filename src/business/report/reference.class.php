@@ -24,11 +24,15 @@ class reference extends \cenozo\business\report\base_report
     $recommendation_type_class_name = lib::get_class_name( 'database\recommendation_type' );
     $stage_type_class_name = lib::get_class_name( 'database\stage_type' );
 
-    // get review type, recommendation type and stage type records
-    $db_review_type = $review_type_class_name::get_unique_record( 'name', 'SMT' );
+    // get various review types, recommendation type and stage type records
+    $db_second_smt_review_type = $review_type_class_name::get_unique_record( 'name', 'Second SMT' );
+    $db_second_chair_review_type = $review_type_class_name::get_unique_record( 'name', 'Second Chair' );
+    $db_smt_review_type = $review_type_class_name::get_unique_record( 'name', 'SMT' );
+    $db_chair_review_type = $review_type_class_name::get_unique_record( 'name', 'Chair' );
     $db_approved_recommendation_type = $recommendation_type_class_name::get_unique_record( 'name', 'Approved' );
-    $db_revise_recommendation_type = $recommendation_type_class_name::get_unique_record( 'name', 'Revise' );
-    $db_stage_type = $stage_type_class_name::get_unique_record( 'name', 'Agreement' );
+    $db_decision_made_stage_type = $stage_type_class_name::get_unique_record( 'name', 'Decision Made' );
+    $db_data_release_stage_type = $stage_type_class_name::get_unique_record( 'name', 'Data Release' );
+    $db_active_stage_type = $stage_type_class_name::get_unique_record( 'name', 'Active' );
 
     $modifier = lib::create( 'database\modifier' );
     $modifier->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
@@ -38,27 +42,75 @@ class reference extends \cenozo\business\report\base_report
     $modifier->left_join( 'user', 'graduate.graduate_user_id', 'graduate_user.id', 'graduate_user' );
     $modifier->order( 'reqn.identifier' );
 
+    // join to the second SMT review
+    $join_mod = lib::create( 'database\modifier' );
+    $join_mod->where( 'reqn.id', '=', 'second_smt_review.reqn_id', false );
+    $join_mod->where( 'second_smt_review.review_type_id', '=', $db_second_smt_review_type->id );
+    $modifier->join_modifier( 'review', $join_mod, 'left', 'second_smt_review' );
+
+    // join to the second chair review
+    $join_mod = lib::create( 'database\modifier' );
+    $join_mod->where( 'reqn.id', '=', 'second_chair_review.reqn_id', false );
+    $join_mod->where( 'second_chair_review.review_type_id', '=', $db_second_chair_review_type->id );
+    $modifier->join_modifier( 'review', $join_mod, 'left', 'second_chair_review' );
+
     // join to the SMT review
     $join_mod = lib::create( 'database\modifier' );
-    $join_mod->where( 'reqn.id', '=', 'review.reqn_id', false );
-    $join_mod->where( 'review.review_type_id', '=', $db_review_type->id );
-    $join_mod->where(
-      'review.recommendation_type_id',
-      'IN',
-      array( $db_approved_recommendation_type->id, $db_revise_recommendation_type->id )
-    );
-    $modifier->join_modifier( 'review', $join_mod, 'left' );
+    $join_mod->where( 'reqn.id', '=', 'smt_review.reqn_id', false );
+    $join_mod->where( 'smt_review.review_type_id', '=', $db_smt_review_type->id );
+    $modifier->join_modifier( 'review', $join_mod, 'left', 'smt_review' );
 
-    // join to the agreement stage
+    // join to the chair review
     $join_mod = lib::create( 'database\modifier' );
-    $join_mod->where( 'reqn.id', '=', 'stage.reqn_id', false );
-    $join_mod->where( 'stage.stage_type_id', '=', $db_stage_type->id );
-    $modifier->join_modifier( 'stage', $join_mod, 'left' );
+    $join_mod->where( 'reqn.id', '=', 'chair_review.reqn_id', false );
+    $join_mod->where( 'chair_review.review_type_id', '=', $db_chair_review_type->id );
+    $modifier->join_modifier( 'review', $join_mod, 'left', 'chair_review' );
 
-    // must have an Approved or Revise SMT review or be in the agreement stage
+    // join to the decision made stage
+    $join_mod = lib::create( 'database\modifier' );
+    $join_mod->where( 'reqn.id', '=', 'decision_made_stage.reqn_id', false );
+    $join_mod->where( 'decision_made_stage.stage_type_id', '=', $db_decision_made_stage_type->id );
+    $modifier->join_modifier( 'stage', $join_mod, 'left', 'decision_made_stage' );
+
+    // join to the data release stage
+    $join_mod = lib::create( 'database\modifier' );
+    $join_mod->where( 'reqn.id', '=', 'data_release_stage.reqn_id', false );
+    $join_mod->where( 'data_release_stage.stage_type_id', '=', $db_data_release_stage_type->id );
+    $modifier->join_modifier( 'stage', $join_mod, 'left', 'data_release_stage' );
+
+    // join to the active stage
+    $join_mod = lib::create( 'database\modifier' );
+    $join_mod->where( 'reqn.id', '=', 'active_stage.reqn_id', false );
+    $join_mod->where( 'active_stage.stage_type_id', '=', $db_active_stage_type->id );
+    $modifier->join_modifier( 'stage', $join_mod, 'left', 'active_stage' );
+
     $modifier->where_bracket( true );
-    $modifier->where( 'review.id', '!=', NULL );
-    $modifier->or_where( 'stage.id', '!=', NULL );
+    // must have reached the release or active stage
+    $modifier->where( 'data_release_stage.id', '!=', NULL );
+    $modifier->or_where( 'active_stage.id', '!=', NULL );
+    $modifier->where_bracket( true, true );
+    // or reached the decision made stage and...
+    $modifier->where( 'decision_made_stage.id', '!=', NULL );
+    // the reqn was approved
+    $modifier->where(
+      'IF( '.
+        // use the second smt review if it was done
+        'second_smt_review.id IS NOT NULL, second_smt_review.recommendation_type_id, '.
+        'IF( '.
+          // if not then use the second chair review if it was done
+          'second_chair_review.id IS NOT NULL, second_chair_review.recommendation_type_id, '.
+          'IF( '.
+            // if not then use the first smt review if it was done, otherwise use the first char review
+            'smt_review.id IS NOT NULL, '.
+            'smt_review.recommendation_type_id, '.
+            'chair_review.recommendation_type_id '.
+          ') '.
+        ') '.
+      ')',
+      '=',
+      $db_approved_recommendation_type->id
+    );
+    $modifier->where_bracket( false );
     $modifier->where_bracket( false );
 
     $select = lib::create( 'database\select' );
