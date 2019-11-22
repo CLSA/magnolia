@@ -30,11 +30,13 @@ class reference extends \cenozo\business\report\base_report
     $db_smt_review_type = $review_type_class_name::get_unique_record( 'name', 'SMT' );
     $db_chair_review_type = $review_type_class_name::get_unique_record( 'name', 'Chair' );
     $db_approved_recommendation_type = $recommendation_type_class_name::get_unique_record( 'name', 'Approved' );
+    $db_admin_review_stage_type = $stage_type_class_name::get_unique_record( 'name', 'Admin Review' );
     $db_decision_made_stage_type = $stage_type_class_name::get_unique_record( 'name', 'Decision Made' );
     $db_data_release_stage_type = $stage_type_class_name::get_unique_record( 'name', 'Data Release' );
     $db_active_stage_type = $stage_type_class_name::get_unique_record( 'name', 'Active' );
 
     $modifier = lib::create( 'database\modifier' );
+    $modifier->join( 'reqn_type', 'reqn.reqn_type_id', 'reqn_type.id' );
     $modifier->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
     $modifier->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
     $modifier->join( 'user', 'reqn.user_id', 'user.id' );
@@ -66,6 +68,12 @@ class reference extends \cenozo\business\report\base_report
     $join_mod->where( 'chair_review.review_type_id', '=', $db_chair_review_type->id );
     $modifier->join_modifier( 'review', $join_mod, 'left', 'chair_review' );
 
+    // join to the admin review stage
+    $join_mod = lib::create( 'database\modifier' );
+    $join_mod->where( 'reqn.id', '=', 'admin_review_stage.reqn_id', false );
+    $join_mod->where( 'admin_review_stage.stage_type_id', '=', $db_admin_review_stage_type->id );
+    $modifier->join_modifier( 'stage', $join_mod, 'left', 'admin_review_stage' );
+
     // join to the decision made stage
     $join_mod = lib::create( 'database\modifier' );
     $join_mod->where( 'reqn.id', '=', 'decision_made_stage.reqn_id', false );
@@ -85,11 +93,17 @@ class reference extends \cenozo\business\report\base_report
     $modifier->join_modifier( 'stage', $join_mod, 'left', 'active_stage' );
 
     $modifier->where_bracket( true );
+    // is a catalyst grant and has reached the admin review stage
+    $modifier->where( 'reqn_type.name', '=', 'Catalyst Grant' );
+    $modifier->where( 'admin_review_stage.id', '!=', NULL );
+    // OR
+    $modifier->where_bracket( true, true );
     // must have reached the release or active stage
     $modifier->where( 'data_release_stage.id', '!=', NULL );
     $modifier->or_where( 'active_stage.id', '!=', NULL );
+    // OR
     $modifier->where_bracket( true, true );
-    // or reached the decision made stage and...
+    // reached the decision made stage and...
     $modifier->where( 'decision_made_stage.id', '!=', NULL );
     // the reqn was approved
     $modifier->where(
@@ -112,6 +126,9 @@ class reference extends \cenozo\business\report\base_report
     );
     $modifier->where_bracket( false );
     $modifier->where_bracket( false );
+    $modifier->where_bracket( false );
+
+    $modifier->group( 'reqn.id' );
 
     $select = lib::create( 'database\select' );
     $select->from( 'reqn' );
