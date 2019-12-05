@@ -594,7 +594,8 @@ define( function() {
           },
 
           deferralNotesExist: function() {
-            return this.record.deferral_note_1a || this.record.deferral_note_1b ||
+            return this.record.deferral_note_amendment ||
+                   this.record.deferral_note_1a || this.record.deferral_note_1b ||
                    this.record.deferral_note_1c || this.record.deferral_note_1d ||
                    this.record.deferral_note_1e || this.record.deferral_note_1f ||
                    this.record.deferral_note_2a || this.record.deferral_note_2b ||
