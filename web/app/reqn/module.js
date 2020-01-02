@@ -563,7 +563,6 @@ define( function() {
             }
 
             return this.$$onView( force ).then( function() {
-              console.log( self.record );
               return CnHttpFactory.instance( {
                 path: 'user/' + self.record.user_id + '/graduate',
                 data: {
