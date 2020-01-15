@@ -34,7 +34,7 @@ CREATE PROCEDURE patch_reqn_version()
 
       UPDATE reqn_version SET cimt = 1, cimt_justification = part2_e_comment;
 
-      ALTER TABLE reqn_version DROP COLUMN part2_e_comment;`
+      ALTER TABLE reqn_version DROP COLUMN part2_e_comment;
     END IF;
 
   END //
