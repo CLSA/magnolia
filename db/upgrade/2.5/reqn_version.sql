@@ -32,7 +32,7 @@ CREATE PROCEDURE patch_reqn_version()
 
       SELECT "Moving all part2e comments to the cimt justification" AS "";
 
-      UPDATE reqn_version SET cimt = 1, cimt_justification = part2_e_comment;
+      UPDATE reqn_version SET cimt = 1, cimt_justification = part2_e_comment WHERE part2_e_comment IS NOT NULL;
 
       ALTER TABLE reqn_version DROP COLUMN part2_e_comment;
     END IF;
