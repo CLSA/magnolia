@@ -80,7 +80,22 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     part2_b_comment: { type: 'text' },
     part2_c_comment: { type: 'text' },
     part2_d_comment: { type: 'text' },
-    part2_e_comment: { type: 'text' },
+    cimt: { type: 'boolean' },
+    cimt_justification: { type: 'text' },
+    dxa: { type: 'boolean' },
+    dxa_justification: { type: 'text' },
+    ecg: { type: 'boolean' },
+    ecg_justification: { type: 'text' },
+    retinal: { type: 'boolean' },
+    retinal_justification: { type: 'text' },
+    spirometry: { type: 'boolean' },
+    spirometry_justification: { type: 'text' },
+    tonometry: { type: 'boolean' },
+    tonometry_justification: { type: 'text' },
+    fsa: { type: 'boolean' },
+    fsa_justification: { type: 'text' },
+    csd: { type: 'boolean' },
+    csd_justification: { type: 'text' },
     amendment_justification: { type: 'text' },
 
     identifier: { column: 'reqn.identifier', type: 'string' },
@@ -442,7 +457,18 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             // make sure to send patches to deferral notes to the parent reqn
             var property = Object.keys( data )[0];
             if( null == property.match( /^deferral_note/ ) ) {
-              return this.$$onPatch( data );
+              return this.$$onPatch( data ).then( function() {
+                if( angular.isDefined( data.comprehensive ) || angular.isDefined( data.tracking ) ) {
+                  if( self.record.comprehensive && self.record.tracking ) {
+                    // show the cohort warning to the applicant
+                    CnModalMessageFactory.instance( {
+                      title: self.translate( 'part2.cohort.bothCohortNoticeTitle' ),
+                      message: self.translate( 'part2.cohort.bothCohortNotice' ),
+                      closeText: 'applicant' == CnSession.role.name ? self.translate( 'misc.close' ) : 'Close'
+                    } ).show();
+                  }
+                }
+              } );
             } else {
               if( !this.parentModel.getEditEnabled() ) throw new Error( 'Calling onPatch() but edit is not enabled.' );
 
@@ -956,12 +982,16 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               if( response ) {
                 // make sure that certain properties have been defined, one tab at a time
                 var requiredTabList = {
-                  a: [ 'applicant_position', 'applicant_affiliation', 'applicant_address', 'applicant_phone' ],
-                  c: [ 'start_date', 'duration' ],
-                  d: [ 'title', 'keywords', 'lay_summary', 'background', 'objectives', 'methodology', 'analysis' ],
-                  e: [ 'funding', 'funding_filename', 'funding_agency', 'grant_number' ],
-                  f: [ 'ethics', 'ethics_filename' ],
-                  cohort: [ 'tracking', 'comprehensive', 'longitudinal', 'last_identifier' ]
+                  '1a': [ 'applicant_position', 'applicant_affiliation', 'applicant_address', 'applicant_phone' ],
+                  '1c': [ 'start_date', 'duration' ],
+                  '1d': [ 'title', 'keywords', 'lay_summary', 'background', 'objectives', 'methodology', 'analysis' ],
+                  '1e': [ 'funding', 'funding_filename', 'funding_agency', 'grant_number' ],
+                  '1f': [ 'ethics', 'ethics_filename' ],
+                  '2cohort': [ 'tracking', 'comprehensive', 'longitudinal', 'last_identifier' ],
+                  '2e': [
+                    'cimt_justification', 'dxa_justification', 'ecg_justification', 'retinal_justification',
+                    'spirometry_justification', 'tonometry_justification', 'fsa_justification', 'csd_justification'
+                  ]
                 };
 
                 $q.all( self.fileList.map( file => file.updateFileSize() ) ).then( function() {
@@ -970,7 +1000,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                   for( var tab in requiredTabList ) {
                     var firstProperty = null;
                     requiredTabList[tab].filter( function( property ) {
-                      if( 'e' == tab ) {
+                      if( '1e' == tab ) {
                         // only check e properties if funding=yes
                         return 'funding' != property ? 'yes' == record.funding : true;
                       } else if( 'ethics_filename' == property ) {
@@ -979,6 +1009,10 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                       } else if( 'last_identifier' == property ) {
                         // only check the last_identifier if longitidunal=yes (it's a boolean var)
                         return record.longitudinal;
+                      } else if( '2e' == tab ) {
+                        // only check data justifications if the data type =yes (they are boolean vars)
+                        var dataType = property.replace( '_justification', '' );
+                        return record[dataType];
                       }
 
                       // check everything else
@@ -1040,19 +1074,19 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                   }
 
                   if( null != error ) {
-                    var element = cenozo.getFormElement( 'lay_summary' );
-
                     // if there was an error then display it now
                     if( 'applicant' == CnSession.role.name ) error.closeText = self.translate( 'misc.close' );
                     CnModalMessageFactory.instance( error ).show().then( function() {
                       if( 'amendment' == errorTab ) {
                         self.setTab( 0, 'amendment', false );
-                      } else if( 'cohort' == errorTab ) {
-                        self.setTab( 0, 'part2', false );
-                        self.setTab( 2, errorTab );
                       } else {
-                        self.setTab( 0, 'part1', false );
-                        self.setTab( 1, errorTab );
+                        if( 1 == errorTab.substr( 0, 1 ) ) {
+                          self.setTab( 0, 'part1', false );
+                          self.setTab( 1, errorTab.substr( 1 ) );
+                        } else {
+                          self.setTab( 0, 'part2', false );
+                          self.setTab( 2, errorTab.substr( 1 ) );
+                        }
                       }
                     } );
                   } else {

@@ -467,12 +467,25 @@ cenozo.service( 'CnReqnHelper', [
                 fr: 'Vous pourrez sélectionner la vague de collecte de données (départ et/ou 1er suivi) dans le tableau de sélection de données.'
               },
               tracking: {
-                en: 'Tracking Cohort (Telephone Interview) (TRM)',
-                fr: 'Évaluation de surveillance (Entrevue téléphonique) (TRM)'
+                en: 'Tracking Cohort (Telephone Interview)',
+                fr: 'Évaluation de surveillance (Entrevue téléphonique)'
+              },
+              trackingHelp: {
+                en: 'Participants providing data through telephone interviews only. No physical assessment data, medications data or biomarker data are available for this cohort. For further information on what data are available for the Tracking Cohort, consult the CLSA Data Availability Table on our website.',
+                fr: 'Cohorte de surveillance (entrevue téléphonique) : Les participants de cette cohorte fournissent des données uniquement via une entrevue téléphonique. Aucune donnée sur les tests physiques, les médicaments ou les biomarqueurs n’est disponible pour cette cohorte. Pour plus d’informations sur les données disponibles pour la cohorte de surveillance, consultez le tableau de disponibilité des données de l’ÉLCV sur notre site Web.'
               },
               comprehensive: {
-                en: 'Comprehensive Cohort (In-home Interview & DCS visit) (COM)',
-                fr: 'Évaluation globale (Entrevue à domicile et au site) (COM)'
+                en: 'Comprehensive Cohort (In-home Interview & DCS visit)',
+                fr: 'Évaluation globale (Entrevue à domicile et au site)'
+              },
+              comprehensiveHelp: {
+                en: 'Participants providing data through an In-home interview and during a visit to a Data Collection Site. Physical assessment, medications and biomarker data are available for this cohort only. For further information on what data are available for the Tracking Cohort, consult the CLSA Data Availability Table on our website.',
+                fr: 'Cohorte globale (entrevue à domicile et visite à un Site de collecte de données) : Les participants de cette cohorte fournissent des données via une entrevue à domicile et une visite à un Site de collecte de données. Les tests physiques, les médicaments et les données sur les biomarqueurs sont disponibles pour cette cohorte uniquement. Pour plus d’informations sur les données disponibles pour la cohorte globale, consultez le tableau de disponibilité des données de l’ÉLCV sur notre site Web.'
+              },
+              bothCohortNoticeTitle: { en: 'Please Note', fr: 'Notez bien' },
+              bothCohortNotice: {
+                en: 'Please be sure to fully explain in "Part 1 - Description" section of your application, how you will use the data from both the Tracking and Comprehensive cohorts in your analyses, accounting for the differences in the data available for each cohort. For further information on what data are available for the Tracking and Comprehensive Cohort, consult the CLSA Data Availability Table on our website.',
+                fr: 'À la « Partie 1 - Description » de votre demande d’accès, assurez-vous de bien expliquer comment les données des cohortes globale et de surveillance seront utilisées dans vos analyses, en tenant compte des différences entre les données disponibles pour chaque cohorte. Pour plus d’informations sur les données disponibles pour la cohorte de surveillance et la cohorte globale, consultez le tableau de disponibilité des données de l’ÉLCV sur notre site Web.'
               },
               longitudinal: {
                 en: 'Is this project part of longitudinal analyses involving a previously approved project using CLSA data?',
@@ -485,29 +498,13 @@ cenozo.service( 'CnReqnHelper', [
             },
             a: {
               tab: { en: '', fr: '' },
-              module: { en: 'Data Module', fr: 'Module de données' },
-              tracking: {
-                en: 'Tracking<br/>(Telephone Interview) (TRM)',
-                fr: 'Évaluation de surveillance<br/>(Entrevue téléphonique) (TRM)'
-              },
-              comprehensive: {
-                en: 'Comprehensive<br/>(Face-to-face Interview - In-home or DCS visit) (COM)',
-                fr: 'Évaluation globale<br/>(Entrevue en personne - à domicile ou au DCS) (COM)'
-              }
+              module: { en: 'Data Module', fr: 'Module de données' }
             },
-            b: { tab: { en: '', fr: '' }, module: { en: '', fr: '' }, tracking: { en: '', fr: '' }, comprehensive: { en: '', fr: '' } },
-            c: { tab: { en: '', fr: '' }, module: { en: '', fr: '' }, tracking: { en: '', fr: '' }, comprehensive: { en: '', fr: '' } },
+            b: { tab: { en: '', fr: '' }, module: { en: '', fr: '' } },
+            c: { tab: { en: '', fr: '' }, module: { en: '', fr: '' } },
             d: {
               tab: { en: '', fr: '' },
               module: { en: 'Linked Data', fr: 'Données liées' },
-              tracking: {
-                en: 'Tracking<br/>(Telephone Interview) (TRM)',
-                fr: 'Évaluation de surveillance<br/>(Entrevue téléphonique) (TRM)'
-              },
-              comprehensive: {
-                en: 'Comprehensive<br/>(Face-to-face Interview - In-home or DCS visit) (COM)',
-                fr: 'Évaluation globale<br/>(Entrevue en personne - à domicile ou au DCS) (COM)'
-              },
               text: {
                 en: 'When requesting these data, please note that if your CLSA Data and Biospecimen Request Application is approved, you will also be required to sign a <a href="https://canue.ca/wp-content/uploads/2018/11/CANUE-Data-Use-and-Sharing-via-Third-Party-Agreement.pdf" target="canue_agreement">Data Use and Sharing via Third Party Agreement</a> (available for consultation and <a href="http://canue.ca/data/" target="canue">download here</a>), and submit it to the CLSA.  For a detailed list of the linked variables please consult the <a href="https://www.clsa-elcv.ca/doc/2743" target="linked_data">Linked Data Summary Table</a> available in the Data and Biospecimens section of the CLSA website, <a href="https://www.clsa-elcv.ca/" target="clsa">www.clsa-elcv.ca</a>.',
                 fr: 'Lorsque vous demandez l’accès à ces données, veuillez noter que si votre demande d’accès aux données et aux échantillons biologiques de l’ÉLCV est approuvée, vous devrez également signer une Entente de partage et d’utilisation des données via une tierce partie autorisée (en anglais seulement - <a href="https://canue.ca/wp-content/uploads/2018/11/CANUE-Data-Use-and-Sharing-via-Third-Party-Agreement.pdf" target="canue_agreement">Data Use and Sharing via Third Party Agreement</a>) (disponible pour consultation et <a href="http://canue.ca/data/" target="canue">téléchargement ici</a>) et la soumettre à l’ÉLCV.  Pour obtenir une liste détaillée des variables liées, veuillez consulter le <a href="https://www.clsa-elcv.ca/sites/default/files/documents/clsa_linked_data_v1.0_2018jul11_fr_ims.pdf" target="donnees liees">Tableau récapitulatif des données liées</a> disponible à la section Données et échantillons biologiques du site Web de l’ÉLCV, <a href="https://www.clsa-elcv.ca/" target="clsa">www.clsa-elcv.ca</a>.'
@@ -520,23 +517,47 @@ cenozo.service( 'CnReqnHelper', [
             e: {
               tab: { en: '', fr: '' },
               module: { en: '', fr: '' },
-              tracking: { en: '', fr: '' },
-              comprehensive: { en: '', fr: '' },
 
               title1: { en: 'Additional Data Requests', fr: 'Demandes de données additionnelles' },
               text1: {
-                en: 'Additional data including images (e.g. DXA, Retinal scan) and raw data (e.g. Spirometry, ECG, Cognition) are available for some modules of the CLSA, as described in the CLSA Data Availability Table on our website. To request these data, please use the Comments box below and also explain in Part 1 of the Application how these additional data will be used to achieve your proposed objectives.<ul><li>Please note that the request for Additional data incurs additional costs beyond the current data access fee, and these are outlined in the Fees section of our website.</li><li>Requests for additional data may prolong the processing time of your application, and it may take longer to receive these data than the 6 months to receive alphanumeric data. For more information, please contact <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.</li></ul>',
-                fr: 'Des données additionnelles, y compris les images (p. ex. DEXA, imagerie rétinienne) et les données brutes (p. ex. spirométrie, ECG, cognition) sont disponibles pour certains modules de l’ÉLCV, comme indiqué dans le Tableau de disponibilité des données de l’ÉLCV publié sur notre site Web. Pour demander à obtenir ces données, veuillez utiliser la case « Commentaires », ci-dessous. De plus, veuillez expliquer dans la Partie 1 du formulaire de demande d’accès comment ces données additionnelles seront utilisées pour atteindre les objectifs proposés.<ul><li>Veuillez noter que les demandes de données additionnelles entraînent des frais supplémentaires en plus des frais d’accès actuels, ces derniers étant décrits dans la section « Frais » de notre site Web.</li><li>Les demandes de données additionnelles peuvent prolonger le traitement de votre demande d’accès et la réception de ces données peut prendre plus de temps que les six mois prévus pour la réception des données alphanumériques. Pour plus d’information, veuillez nous contacter à l’adresse <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.</li></ul>'
+                en: 'Additional data including images (e.g. DXA, Retinal scan) and raw data (e.g. Spirometry, ECG, Cognition) are available for some modules of the CLSA, as described in the CLSA Data Availability Table on our website. To request these data, please check the corresponding field below, and in the Justification box:<ol><li>specify which subtype/format of the data you are requesting where multiple types are available</li><li>provide detailed justification explaining how these data will help to achieve proposed objectives</li><li>describe how they will be analysed</li><li>provide evidence, if available, that you have the experience and resources to work with these types of data (i.e. references of publications)</li></ol>Please note that the request for Additional data incurs additional costs beyond the current data access fee, and these are outlined in the Fees section of our website. Requests for additional data may prolong the processing time of your application, and it may take longer to receive these data than the 6 months to receive alphanumeric data. For more information, please contact <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.',
+                fr: 'Des données additionnelles, y compris les images (p. ex. DEXA, imagerie rétinienne) et les données brutes (p. ex. spirométrie, ECG, cognition) sont disponibles pour certains modules de l’ÉLCV, comme indiqué dans le Tableau de disponibilité des données de l’ÉLCV publié sur notre site Web. Pour demander ces données, veuillez cocher le champ correspondant ci-dessous. Ensuite, dans la case ‘Justification’ :<ol><li>indiquez le sous-type ou le format des données que vous demandez lorsque plusieurs types sont disponibles</li><li>fournissez une justification détaillée expliquant comment ces données aideront à atteindre les objectifs proposés</li><li>décrivez comment ces données seront analysées</li><li>fournissez la preuve, le cas échéant, que vous disposez de l’expérience et des ressources nécessaires pour utiliser ce type de données (références de publications)</li></ol>Veuillez noter que les demandes de données additionnelles entraînent des frais supplémentaires en plus des frais d’accès actuels, ces derniers étant décrits dans la section « Frais » de notre site Web. Les demandes de données additionnelles peuvent prolonger le traitement de votre demande d’accès et la réception de ces données peut prendre plus de temps que les six mois prévus pour la réception des données alphanumériques. Pour plus d’information, veuillez nous contacter à l’adresse <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.'
+              },
+              cimt: {
+                en: 'cIMT (Still image / Cineloops<sup>ⓘ</sup>)',
+                fr: 'cIMT (image fixe / Cineloops<sup>ⓘ</sup>)',
+              },
+              dxa: {
+                en: 'DXA (Forearm / Hip / IVA Lateral Spine / AP Lumbar Spine (FUP1)<sup>ⓘ</sup> / Whole Body<sup>ⓘ</sup>)',
+                fr: 'DEXA (avant-bras / hanche / colonne latérale IVA / colonne vertébrale lombaire AP (1er suivi)<sup>ⓘ</sup> / corps entier<sup>ⓘ</sup>)'
+              },
+              ecg: {
+                en: 'ECG (RAW+ / Images)',
+                fr: 'ECG (RAW+ / Images)'
+              },
+              retinal: {
+                en: 'Retinal Scan (Image)',
+                fr: 'Scan rétinien (image)'
+              },
+              spirometry: {
+                en: 'Spirometry (RAW+ / Images (FUP1) / Images (Baseline)<sup>ⓘ</sup>)',
+                fr: 'Spirométrie (RAW+ / Images (1er suivi) / Images (Départ)<sup>ⓘ</sup>)'
+              },
+              tonometry: {
+                en: 'Tonometry (Pressure and applination data)',
+                fr: 'Tonométrie (données sur la pression et l’aplanissement)'
+              },
+              specialDataNote: {
+                en: 'Please consult the CLSA Data Availability Table on our website for additional information/conditions if requesting these data',
+                fr: 'Vous trouverez des informations supplémentaires et les conditions associées à la demande de ces données dans le tableau de disponibilité des données de l’ÉLCV sur notre site Web.'
               },
               title2: { en: 'Geographic Indicators', fr: 'Indicateurs géographiques' },
               text2: {
                 en: '<ol><li>Forward Sortation Areas (A forward sortation area (FSA) is a geographic region in which all postal codes start with the same three characters.)</li><li>Census Subdivision Codes and Names - determined using the Postal Code Conversion File (PCCF) from Statistics Canada. (A census subdivision (CSD) is a geographic unit defined by Statistics Canada, roughly corresponding to municipalities, whose unique codes can be linked to other sociodemographic or census data)</li></ol>Due to the sensitive nature of these geographic indicators, a special request must be made to receive CSDs and FSAs as part of your dataset.  Adequate justification must be provided within the project description (Application Part 1) as well as in the Comments box below. By requesting these data, you also agree that you will not present in any form (presentation, publication, poster), an illustration of these geographic areas with fewer than 50 CLSA participants per FSA or CSD. For more information, please contact <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.',
                 fr: '<ol><li>Région de tri d’acheminement (Une région de tri d’acheminement (RTA) est une region géographique où tous les codes postaux ont les mêmes trois premiers caractères.)</li><li>Codes et noms des subdivisions de recensement déterminé à l’aide du Fichier de conversion des codes postaux (FCCP) de Statistique Canada. Une subdivision de recensement (SDR) est une unité géographique définie par Statistique Canada correspondant approximativement aux municipalités, dont les codes uniques peuvent être liés à d’autres données sociodémographiques ou de recensement.</li></ol>En raison de la nature de ces indicateurs géographiques, une demande spéciale doit être faite pour que les SDR et les RTA soient incluses dans votre ensemble de données. Une justification adéquate doit être fournie dans la description du projet (partie 1 de la demande). En demandant ces données, vous acceptez également de ne pas présenter sous quelque forme que ce soit (présentation, publication, affiche) une illustration des zones géographiques habitées par moins de 50 participants à l’ÉLCV. Pour toute information supplémentaire, veuillez écrire à <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.'
               },
-              text3: {
-                en: 'In the Comments, include other relevant information concerning your request, including rationale for the request of Additional Data (e.g. Images).',
-                fr: 'Ajoutez toute autre information pertinente à votre demande à la section Commentaires, y compris une justification de la demande de données supplémentaires (par exemple, les images).'
-              }
+              fsa: { en: 'FSA', fr: 'RTA' },
+              csd: { en: 'CSD', fr: 'SDR' }
             },
           },
           part3: {
@@ -919,7 +940,22 @@ cenozo.service( 'CnReqnVersionHelper', [
             },
             e: { // additional data
               diff: false,
-              part2_e_comment: false
+              cimt: false,
+              cimt_justification: false,
+              dxa: false,
+              dxa_justification: false,
+              ecg: false,
+              ecg_justification: false,
+              retinal: false,
+              retinal_justification: false,
+              spirometry: false,
+              spirometry_justification: false,
+              tonometry: false,
+              tonometry_justification: false,
+              fsa: false,
+              fsa_justification: false,
+              csd: false,
+              csd_justification: false,
             }
           }
         };
