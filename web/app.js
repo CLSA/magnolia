@@ -353,8 +353,8 @@ cenozo.service( 'CnReqnHelper', [
             d: {
               tab: { en: 'Description', fr: 'Description' },
               text1: {
-                en: 'Please adhere to character count limits.',
-                fr: 'Veuillez respecter les limites de caractères.'
+                en: '<strong>Provide the level of detail you would normally provide in a grant application. Failure to provide adequate detail to assess feasibility will result in rejection of the application.</strong> Please adhere to character count limits.',
+                fr: '<strong>Fournissez autant de détails que vous fourniriez normalement dans une demande de subvention. Si l’information pour évaluer la faisabilité du projet n’est pas assez détaillée, la demande sera rejetée.</strong> Veuillez respecter les limites de caractères.'
               },
               title: { en: 'Project Title', fr: 'Titre du projet' },
               keywords: { en: 'Keywords', fr: 'Mots clés' },
