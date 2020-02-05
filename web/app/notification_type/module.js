@@ -31,12 +31,12 @@ define( function() {
       isConstant: true
     },
     title_en: {
-      title: 'Message (English)',
+      title: 'Title (English)',
       type: 'string',
       help: 'The title of the email to English applicants when this notification is triggered.'
     },
     title_fr: {
-      title: 'Message (French)',
+      title: 'Title (French)',
       type: 'string',
       help: 'The title of the email to French applicants when this notification is triggered.'
     },
