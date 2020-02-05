@@ -92,6 +92,8 @@ class reference extends \cenozo\business\report\base_report
     $join_mod->where( 'active_stage.stage_type_id', '=', $db_active_stage_type->id );
     $modifier->join_modifier( 'stage', $join_mod, 'left', 'active_stage' );
 
+    $modifier->where( 'reqn.state', 'NOT IN', array( 'inactive', 'abandoned' ) );
+
     $modifier->where_bracket( true );
     // is a catalyst grant and has reached the admin review stage
     $modifier->where( 'reqn_type.name', '=', 'Catalyst Grant' );
