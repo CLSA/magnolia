@@ -65,8 +65,8 @@ class notification extends \cenozo\database\record
     $language = $db_reqn->get_language()->code;
     $db_notification_type = $this->get_notification_type();
 
-    // fill in dynamic details in the message title
-    $title = str_replace(
+    // fill in dynamic details in the message subject
+    $subject = str_replace(
       array(
         '{{reqn_type}}',
         '{{identifier}}',
@@ -107,7 +107,7 @@ class notification extends \cenozo\database\record
     $select->add_column( 'name' );
     foreach( $this->get_notification_email_list() as $email ) $mail_manager->to( $email['email'], $email['name'] );
 
-    $mail_manager->set_title( $title );
+    $mail_manager->set_subject( $subject );
     $mail_manager->set_body( $message );
 
     // add cc and bcc recipients
@@ -127,7 +127,7 @@ class notification extends \cenozo\database\record
   /**
    * Sends an email notification to the admin_email (from general settings)
    */
-  public static function mail_admin( $title, $message )
+  public static function mail_admin( $subject, $message )
   {
     $setting_manager = lib::create( 'business\setting_manager' );
     $email = $setting_manager->get_setting( 'general', 'admin_email' );
@@ -135,7 +135,7 @@ class notification extends \cenozo\database\record
     {
       $mail_manager = lib::create( 'business\mail_manager' );
       $mail_manager->to( $email, 'Magnolia Administration' );
-      $mail_manager->set_title( $title );
+      $mail_manager->set_subject( $subject );
       $mail_manager->set_body( $message );
       $mail_manager->send();
     }
