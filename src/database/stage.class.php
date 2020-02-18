@@ -42,7 +42,7 @@ class stage extends \cenozo\database\record
 
       $db_reqn = $this->get_reqn();
       $last_stage = current( $db_reqn->get_stage_list( $stage_sel, $stage_mod ) );
-      
+
       $notice_mod = lib::create( 'database\modifier' );
       $notice_mod->where( 'datetime', '>', $last_stage['datetime'] );
       if( 0 == $db_reqn->get_notice_count( $notice_mod ) )
@@ -53,10 +53,19 @@ class stage extends \cenozo\database\record
       // make sure both the agreement and ethics files have been attached
       $db_reqn = $this->get_reqn();
       $db_reqn_version = $db_reqn->get_current_reqn_version();
+
       if( is_null( $db_reqn_version->ethics_filename ) )
-        return 'The ethics letter must be attached before proceeding to the next stage.';
+      {
+        return sprintf(
+          'The ethics %s must be attached before proceeding to the next stage.',
+          'yes' == $db_reqn_version->ethics ? 'letter' : 'exemption'
+        );
+      }
+
       if( is_null( $db_reqn_version->agreement_filename ) )
+      {
         return 'The agreement letter must be attached before proceeding to the next stage.';
+      }
     }
     else
     {

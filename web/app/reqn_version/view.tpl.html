@@ -771,14 +771,14 @@
                     input="{
                       key: 'ethics',
                       title: t( 'part1.f.ethics' ),
-                      type: model.inputList.ethics.type,
-                      enumList: model.metadata.yesNoEnumList[model.viewModel.record.lang]
+                      type: 'enum',
+                      enumList: model.metadata.columnList.ethics.enumList[model.viewModel.record.lang]
                     }"
                     difference="model.viewModel.compareRecord.differences.part1.f.ethics"
                     model="model">
                   </cn-reqn-view-input>
                   <cn-reqn-view-input
-                    ng-if="true === model.viewModel.record.ethics"
+                    ng-if="'yes' === model.viewModel.record.ethics"
                     input="{
                       key: 'ethics_date',
                       title: t( 'part1.f.expiration' ),
@@ -788,7 +788,7 @@
                     model="model">
                   </cn-reqn-view-input>
                   <cn-reqn-view-input
-                    ng-if="false === model.viewModel.record.ethics"
+                    ng-if="'no' === model.viewModel.record.ethics"
                     input="{
                       key: 'ethics_date',
                       title: t( 'part1.f.response' ),
@@ -800,7 +800,7 @@
                 </fieldset>
                 <fieldset ng-disabled="!liteModel.getEditEnabled()">
                   <cn-reqn-view-input
-                    ng-if="true === model.viewModel.record.ethics"
+                    ng-if="'yes' === model.viewModel.record.ethics || 'exempt' === model.viewModel.record.ethics"
                     input="{
                       key: 'ethics_filename',
                       title: t( 'part1.f.letter' ),

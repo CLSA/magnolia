@@ -69,7 +69,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     funding: { type: 'enum' },
     funding_agency: { type: 'string' },
     grant_number: { type: 'string' },
-    ethics: { type: 'boolean' },
+    ethics: { type: 'enum' },
     ethics_date: { type: 'date' },
     waiver: { type: 'enum' },
     comprehensive: { type: 'boolean' },
@@ -1004,8 +1004,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                         // only check e properties if funding=yes
                         return 'funding' != property ? 'yes' == record.funding : true;
                       } else if( 'ethics_filename' == property ) {
-                        // only check the ethics filename if ethics=yes (it's a boolean var)
-                        return record.ethics;
+                        // only check the ethics filename if ethics=yes or exempt
+                        return ['yes', 'exempt'].includes( record.ethics );
                       } else if( 'last_identifier' == property ) {
                         // only check the last_identifier if longitidunal=yes (it's a boolean var)
                         return record.longitudinal;
@@ -1374,6 +1374,18 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
                 self.metadata.columnList.funding.enumList.en.unshift( { value: '', name: misc.choose.en } );
                 self.metadata.columnList.funding.enumList.fr.unshift( { value: '', name: misc.choose.fr } );
+
+                // translate ethics enum
+                self.metadata.columnList.ethics.enumList = {
+                  en: self.metadata.columnList.ethics.enumList,
+                  fr: angular.copy( self.metadata.columnList.ethics.enumList )
+                };
+                self.metadata.columnList.ethics.enumList.fr[0].name = misc.yes.fr.toLowerCase();
+                self.metadata.columnList.ethics.enumList.fr[1].name = misc.no.fr.toLowerCase();
+                self.metadata.columnList.ethics.enumList.fr[2].name = misc.exempt.fr.toLowerCase();
+
+                self.metadata.columnList.ethics.enumList.en.unshift( { value: '', name: misc.choose.en } );
+                self.metadata.columnList.ethics.enumList.fr.unshift( { value: '', name: misc.choose.fr } );
 
                 // translate waiver enum
                 self.metadata.columnList.waiver.enumList.unshift( { value: '', name: misc.none.en } );

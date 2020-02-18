@@ -52,7 +52,7 @@ class requisition extends \cenozo\business\report\base_report
     $select->add_column( 'user.email', 'Email', false );
 
     $select->add_column( 'reqn_version.title', 'Title', false );
-    $select->add_column( 'IF( reqn_version.ethics, "Yes", "No" )', 'Ethics', false ); 
+    $select->add_column( 'reqn_version.ethics', 'Ethics', false ); 
 
     $modifier->join( 'user', 'reqn.user_id', 'user.id' );
       

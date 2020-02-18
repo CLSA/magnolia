@@ -37,6 +37,29 @@ CREATE PROCEDURE patch_reqn_version()
       ALTER TABLE reqn_version DROP COLUMN part2_e_comment;
     END IF;
 
+    SELECT "Adding new 'exempt' option to ethics column in reqn_version table" AS "";
+
+    SELECT data_type INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn_version"
+    AND column_name = "ethics";
+
+    IF @test != "enum" THEN
+      CREATE TEMPORARY TABLE reqn_version_cache
+      SELECT id, ethics
+      FROM reqn_version;
+      
+      UPDATE reqn_version SET ethics = NULL;
+
+      ALTER TABLE reqn_version
+      MODIFY COLUMN ethics ENUM('yes', 'no', 'exempt') NULL DEFAULT NULL;
+
+      UPDATE reqn_version
+      JOIN reqn_version_cache USING( id )
+      SET reqn_version.ethics = IF( reqn_version_cache.ethics IS NULL, NULL, IF( reqn_version_cache.ethics, "yes", "no" ) );
+    END IF;
+
   END //
 DELIMITER ;
 

@@ -119,7 +119,7 @@ define( function() {
       operation: function( $state, model ) { model.viewModel.downloadFundingLetter(); },
       isDisabled: function( $state, model ) { return !model.viewModel.record.funding_filename; }
     }, {
-      title: 'Ethics Letter',
+      title: 'Ethics Letter/Exemption',
       operation: function( $state, model ) { model.viewModel.downloadEthicsLetter(); },
       isDisabled: function( $state, model ) { return !model.viewModel.record.ethics_filename; }
     }, {
