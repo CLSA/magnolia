@@ -101,15 +101,20 @@ cenozo.service( 'CnReqnHelper', [
         } else if( 'deactivate' == subject ) {
           return 'administrator' == role &&
                  !['abandoned','inactive'].includes( state ) &&
-                 'new' != phase;
+                 !['new','complete'].includes( phase );
+        } else if( 'incomplete' == subject ) {
+          return 'administrator' == role &&
+                 '.' == record.amendment &&
+                 'review' == phase &&
+                 !['Decision Made','Suggested Revisions'].includes( record.stage_type );
         } else if( 'reactivate' == subject ) {
           return 'administrator' == role && ['abandoned','inactive'].includes( state );
         } else if( 'recreate' == subject ) {
-          return 'administrator' == role && 'Not Approved' == stage_type;
+          return 'administrator' == role && 'complete' == phase;
         } else if( 'report' == subject ) {
           return ['Report Required','Complete'].includes( stage_type );
         } else if( 'proceed' == subject ) {
-          return !['Complete','Not Approved'].includes( stage_type ) && (
+          return 'complete' != phase && (
                    ( 'administrator' == role && 'new' != phase ) ||
                    ( 'chair' == role && stage_type.includes( 'DSAC' ) ) ||
                    ( 'smt' == role && stage_type.includes( 'SMT' ) )

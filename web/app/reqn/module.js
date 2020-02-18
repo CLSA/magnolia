@@ -272,8 +272,16 @@ define( function() {
   } );
 
   module.addExtraOperation( 'view', {
-    title: 'Recreate',
+    title: 'Incomplete',
     classes: 'btn-danger',
+    isIncluded: function( $state, model ) { return model.viewModel.show( 'incomplete' ); },
+    isDisabled: function( $state, model ) { return !model.viewModel.enabled( 'incomplete' ); },
+    operation: function( $state, model ) { model.viewModel.incomplete(); }
+  } );
+
+  module.addExtraOperation( 'view', {
+    title: 'Recreate',
+    classes: 'btn-success',
     isIncluded: function( $state, model ) { return model.viewModel.show( 'recreate' ); },
     isDisabled: function( $state, model ) { return !model.viewModel.enabled( 'recreate' ); },
     operation: function( $state, model ) { model.viewModel.recreate(); }
@@ -605,7 +613,7 @@ define( function() {
           enabled: function( subject ) {
             var state = this.record.state ? this.record.state : '';
 
-            if( ['abandon', 'deactivate', 'defer', 'reactivate', 'recreate'].includes( subject ) ) {
+            if( ['abandon', 'deactivate', 'defer', 'incomplete', 'reactivate', 'recreate'].includes( subject ) ) {
               return true;
             } else if( ['proceed','reject'].includes( subject ) ) {
               return !state && null != this.record.next_stage_type;
@@ -679,21 +687,6 @@ define( function() {
           },
 
           deactivate: function() {
-            return CnReqnHelper.deactivate(
-              this.record.getIdentifier(),
-              '.' != this.record.amendment,
-              this.record.lang
-            ).then( function( response ) {
-              if( response ) {
-                self.record.state = 'inactive';
-                self.record.state_date = moment().format( 'YYYY-MM-DD' );
-                self.updateFormattedRecord( 'state_date', 'date' );
-                if( angular.isDefined( self.notificationModel ) ) self.notificationModel.listModel.onList( true );
-              }
-            } );
-          },
-
-          deactivate: function() {
             return CnModalConfirmFactory.instance( {
               message: 'Are you sure you wish to de-activate the ' + this.parentModel.module.name.singular + '?' +
                 '\n\nThe applicant will no longer be able to edit or submit the ' + this.parentModel.module.name.singular + '.'
@@ -706,6 +699,23 @@ define( function() {
                   self.record.state_date = moment().format( 'YYYY-MM-DD' );
                   self.updateFormattedRecord( 'state_date', 'date' );
                   if( angular.isDefined( self.notificationModel ) ) self.notificationModel.listModel.onList( true );
+                } );
+              }
+            } );
+          },
+
+          incomplete: function() {
+            return CnModalConfirmFactory.instance( {
+              message: 'Are you sure you wish to permanantly make this ' + this.parentModel.module.name.singular + ' incomplete?' +
+                '\n\nThere is no undoing this action. However, once moved to the Permanantly Incomplete stage the ' +
+                this.parentModel.module.name.singular + ' can be recreated as a new application.'
+            } ).show().then( function( response ) {
+              if( response ) {
+                return CnHttpFactory.instance( {
+                  path: self.parentModel.getServiceResourcePath() + "?action=incomplete"
+                } ).patch().then( function() {
+                  self.onView();
+                  if( angular.isDefined( self.stageModel ) ) self.stageModel.listModel.onList( true );
                 } );
               }
             } );

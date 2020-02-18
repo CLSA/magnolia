@@ -445,6 +445,8 @@ class reqn extends \cenozo\database\record
                         'DSAC Selection' == $db_current_stage_type->name &&
                         'Decision Made' == $db_next_stage_type->name;
 
+    $incomplete = 'Permanently Incomplete' == $db_next_stage_type->name;
+
     // make sure the stage type is appropriate
     if( is_null( $db_current_stage_type ) )
     {
@@ -456,8 +458,16 @@ class reqn extends \cenozo\database\record
     }
     else
     {
-      // determine whether we can safely proceed to the next stage (ignoring if the DSAC selection stage has been rejected)
-      if( !$reject_selection && !$start_amendment )
+      if( $incomplete && '.' != $db_reqn_version->amendment )
+      {
+        throw lib::create( 'exception\runtime',
+          sprintf( 'Tried to move amendment into "%s" stage.', $db_next_stage_type->name ),
+          __METHOD__ );
+      }
+
+      // Determine whether we can safely proceed to the next stage (ignoring if the DSAC selection stage has been rejected or
+      // if we're moving the reqn to the permanently incomplete stage
+      if( !( $reject_selection || $start_amendment || $incomplete ) )
       {
         $result = $db_current_stage->check_if_complete();
         if( true !== $result ) throw lib::create( 'exception\notice', $result, __METHOD__ );
@@ -473,7 +483,7 @@ class reqn extends \cenozo\database\record
 
       // send any notifications associated with the current stage
       $db_notification_type = $db_current_stage_type->get_notification_type();
-      if( !$start_amendment && !is_null( $db_notification_type ) )
+      if( !( $start_amendment || $incomplete || is_null( $db_notification_type ) ) )
       {
         $db_notification = lib::create( 'database\notification' );
         $db_notification->notification_type_id = $db_notification_type->id;
@@ -483,6 +493,9 @@ class reqn extends \cenozo\database\record
       else
       {
         $db_reqn_user = $this->get_user();
+        if( $start_amendment ) $subject = sprintf( 'Amendment %s started', $db_reqn_version->amendment );
+        else if( $incomplete ) $subject = $db_next_stage_type->name;
+        else $subject = sprintf( '%s complete', $db_current_stage_type->name );
         $notification_class_name::mail_admin(
           sprintf(
             'Requisition %s: %s',
@@ -594,6 +607,11 @@ class reqn extends \cenozo\database\record
     {
       $this->refresh_study_data_files();
     }
+    else if( $incomplete )
+    {
+      $this->state = NULL;
+      $this->save();
+    }
 
     // manage any reviews associated with the current stage
     if( !is_null( $db_current_stage_type ) )
@@ -605,7 +623,7 @@ class reqn extends \cenozo\database\record
           // remove all reviews
           $db_review->delete();
         }
-        else
+        else if( !$incomplete )
         {
           // update the current stage's review's reviewer with the current user if it isn't already set
           if( is_null( $db_review->user_id ) )
@@ -1007,14 +1025,16 @@ class reqn extends \cenozo\database\record
       }
       else
       {
-        // if there are zero or one stages then this is a new requisition which needs its deadline set
-        $stage_sel = lib::create( 'database\select' );
-        $stage_sel->add_table_column( 'stage_type', 'rank' );
-        $stage_mod = lib::create( 'database\modifier' );
-        $stage_mod->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
-        $stage_list = $this->get_stage_list( $stage_sel, $stage_mod );
+        $number_of_stages = 0;
+        if( !is_null( $this->id ) )
+        {
+          $stage_mod = lib::create( 'database\modifier' );
+          $stage_mod->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
+          $number_of_stages = $this->get_stage_count( $stage_mod );
+        }
 
-        if( 2 > count( $stage_list ) )
+        // if there are zero or one stages then this is a new requisition which needs its deadline set
+        if( 2 > count( $number_of_stages ) )
         {
           if( 0 < $this->get_deadline()->date->diff( util::get_datetime_object() )->days )
           { // deadline has expired, get the next one

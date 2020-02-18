@@ -75,6 +75,14 @@ class patch extends \cenozo\service\patch
             'active' != $phase ||
             'Report Required' == $db_current_stage_type->name ) $code = 403;
       }
+      else if( 'incomplete' == $action )
+      {
+        if( 'administrator' != $db_role->name ||
+            '.' != $db_reqn_version->amendment ||
+            'review' != $phase ||
+            'Decision Made' == $db_current_stage_type->name ||
+            'Suggested Revisions' == $db_current_stage_type->name ) $code = 403;
+      }
       else if( 'reactivate' == $action )
       {
         if( 'administrator' != $db_role->name || !in_array( $state, [ 'abandoned', 'inactive' ] ) ) $code = 403;
@@ -241,6 +249,12 @@ class patch extends \cenozo\service\patch
             $notification_type_class_name::get_unique_record( 'name', 'Amendment Started' )->id;
           $db_notification->set_reqn( $db_reqn ); // this saves the record
           $db_notification->mail();
+        }
+        else if( 'incomplete' == $action )
+        {
+          // move the requisition to permanantly incomplete
+          $db_incomplete_stage = $stage_type_class_name::get_unique_record( 'name', 'Permanently Incomplete' );
+          $db_reqn->proceed_to_next_stage( $db_incomplete_stage );
         }
         else if( 'reactivate' == $action )
         {

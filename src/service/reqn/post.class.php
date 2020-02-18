@@ -44,11 +44,21 @@ class post extends \cenozo\service\post
     $clone_identifier = $this->get_argument( 'clone', false );
     if( $clone_identifier )
     {
+      // delete the empty reqn version which was just created as the cloned one will be version #1
+      $db_reqn = $this->get_leaf_record();
+      $db_temp_reqn_version = $db_reqn->get_current_reqn_version();
+
       // create a new version using the clone
-      $db_reqn = $this->get_leaf_record()->create_version(
+      $db_reqn->create_version(
         false, // don't create a new amendment
         $reqn_class_name::get_unique_record( 'identifier', $clone_identifier )->get_current_reqn_version()
       );
+
+      // now remove the first version (an empty form) and re-version the second form to the first (the cloned form)
+      $db_temp_reqn_version->delete();
+      $db_reqn_version = $db_reqn->get_current_reqn_version();
+      $db_reqn_version->version = 1;
+      $db_reqn_version->save();
     }
   }
 }
