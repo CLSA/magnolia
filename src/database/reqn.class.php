@@ -339,10 +339,14 @@ class reqn extends \cenozo\database\record
           else if( array_key_exists( 'Second Chair', $review_list ) ) $recommendation = $review_list['Second Chair'];
           // if there is a first SMT review then use that decision
           else if( array_key_exists( 'SMT', $review_list ) ) $recommendation = $review_list['SMT'];
-          // if the chair approved their review then approve
-          else if( array_key_exists( 'Chair', $review_list ) && 'Approved' == $review_list['Chair'] ) $recommendation = 'Approved';
-          // if there is no chair review then do not approve (rejected before DSAC review)
-          else if( !array_key_exists( 'Chair', $review_list ) ) $recommendation = 'Not Approved';
+          // if there is a first chair review then use that decision
+          else if( array_key_exists( 'Chair', $review_list ) ) $recommendation = $review_list['Chair'];
+          // if there is a SAC review then use that decision
+          else if( array_key_exists( 'SAC', $review_list ) )
+            $recommendation = 'Not Feasible' == $review_list['SAC'] ? 'Not Approved' : 'Approved';
+          // if there is an admin review then use that decision
+          else if( array_key_exists( 'Admin', $review_list ) )
+            $recommendation = 'Not Satisfactory' == $review_list['Admin'] ? 'Not Approved' : 'Approved';
 
           if( !is_null( $recommendation ) )
           {
