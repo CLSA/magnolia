@@ -706,8 +706,8 @@ define( function() {
 
           incomplete: function() {
             return CnModalConfirmFactory.instance( {
-              message: 'Are you sure you wish to permanantly make this ' + this.parentModel.module.name.singular + ' incomplete?' +
-                '\n\nThere is no undoing this action. However, once moved to the Permanantly Incomplete stage the ' +
+              message: 'Are you sure you wish to permanently make this ' + this.parentModel.module.name.singular + ' incomplete?' +
+                '\n\nThere is no undoing this action. However, once moved to the Permanently Incomplete stage the ' +
                 this.parentModel.module.name.singular + ' can be recreated as a new application.'
             } ).show().then( function( response ) {
               if( response ) {
@@ -716,6 +716,7 @@ define( function() {
                 } ).patch().then( function() {
                   self.onView();
                   if( angular.isDefined( self.stageModel ) ) self.stageModel.listModel.onList( true );
+                  if( angular.isDefined( self.notificationModel ) ) self.notificationModel.listModel.onList( true );
                 } );
               }
             } );

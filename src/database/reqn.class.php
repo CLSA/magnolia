@@ -481,9 +481,12 @@ class reqn extends \cenozo\database\record
       $db_current_stage->datetime = util::get_datetime_object();
       $db_current_stage->save();
 
-      // send any notifications associated with the current stage
-      $db_notification_type = $db_current_stage_type->get_notification_type();
-      if( !( $start_amendment || $incomplete || is_null( $db_notification_type ) ) )
+      // send any notifications associated with the current stage (permanently incomplete has it's own special notification)
+      $db_notification_type = $incomplete
+                            ? $notification_type_class_name::get_unique_record( 'name', 'Permanently Incomplete' )
+                            : $db_current_stage_type->get_notification_type();
+
+      if( !( $start_amendment || is_null( $db_notification_type ) ) )
       {
         $db_notification = lib::create( 'database\notification' );
         $db_notification->notification_type_id = $db_notification_type->id;

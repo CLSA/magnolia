@@ -103,7 +103,6 @@ class module extends \cenozo\service\module
       $modifier->or_where( 'graduate.graduate_user_id', '=', $db_user->id );
       $modifier->where_bracket( false );
       $modifier->where( 'IFNULL( reqn.state, "" )', '!=', 'abandoned' );
-      $modifier->where( 'stage_type.name', '!=', 'Permanently Incomplete' );
 
       // don't show applicants the deferral notes unless the reqn is deferred
       if( $select->has_column( 'deferral_note_1a' ) )

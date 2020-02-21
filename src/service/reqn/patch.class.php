@@ -252,7 +252,7 @@ class patch extends \cenozo\service\patch
         }
         else if( 'incomplete' == $action )
         {
-          // move the requisition to permanantly incomplete
+          // move the requisition to permanently incomplete
           $db_incomplete_stage = $stage_type_class_name::get_unique_record( 'name', 'Permanently Incomplete' );
           $db_reqn->proceed_to_next_stage( $db_incomplete_stage );
         }
