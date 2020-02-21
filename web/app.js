@@ -433,7 +433,7 @@ cenozo.service( 'CnReqnHelper', [
               },
               letter: {
                 en: 'Digital copy of ethics approval letter or proof of exemption',
-                fr: 'TODO'
+                fr: 'Copie numérique de la lettre d’approbation ou une lettre d’exemption de la part du Comité d’éthique'
               },
               expiration: { en: 'Expiration date of approval', fr: 'Date limite d’autorisation' },
               response: { en: 'Expected date of response', fr: 'Date approximative de la réponse' }
@@ -579,7 +579,7 @@ cenozo.service( 'CnReqnHelper', [
             close: { en: 'Close', fr: 'Ferme' },
             none: { en: 'none', fr: 'aucun' },
             choose: { en: '(choose)', fr: '(choisir)' },
-            exempt: { en: 'exempt', fr: 'TODO' },
+            exempt: { en: 'exempt', fr: 'exempt(e)' },
             requested: { en: 'requested', fr: 'demandé' },
             prevButton: { en: 'Return to the previous section', fr: 'Retourner à la section précédente' },
             nextButton: { en: 'Proceed to the next section', fr: 'Passez à la section suivante' },
