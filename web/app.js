@@ -1078,16 +1078,22 @@ cenozo.service( 'CnReqnVersionHelper', [
                     } );
                   }
                 } else if( null != property.match( /_filename$/ ) ) {
-                  // file size are compared instead of filename
-                  var fileDetails = model.viewModel.fileList.findByProperty( 'key', property );
-                  var sizeProperty = property.replace( '_filename', '_size' );
-                  var recordSize = angular.isObject( fileDetails ) && fileDetails.size ? fileDetails.size : null;
-                  var compareSize = v2[sizeProperty] ? v2[sizeProperty] : null;
-                  if( ( null != recordSize || null != compareSize ) && recordSize != compareSize ) {
-                    differences.diff = true;
-                    differences[part].diff = true;
-                    differences[part][section].diff = true;
-                    differences[part][section][property] = true;
+                  // if both file names are empty or null then assume there is no difference
+                  var recordName = angular.isUndefined( v1[property] ) ? null : v1[property];
+                  var compareName = angular.isUndefined( v2[property] ) ? null : v2[property];
+
+                  if( !( recordName == null && compareName == null ) ) {
+                    // file size are compared instead of filename
+                    var fileDetails = model.viewModel.fileList.findByProperty( 'key', property );
+                    var sizeProperty = property.replace( '_filename', '_size' );
+                    var recordSize = angular.isObject( fileDetails ) && fileDetails.size ? fileDetails.size : null;
+                    var compareSize = v2[sizeProperty] ? v2[sizeProperty] : null;
+                    if( ( null != recordSize || null != compareSize ) && recordSize != compareSize ) {
+                      differences.diff = true;
+                      differences[part].diff = true;
+                      differences[part][section].diff = true;
+                      differences[part][section][property] = true;
+                    }
                   }
                 } else {
                   // not an array means we have a property to directly check
