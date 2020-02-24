@@ -25,3 +25,8 @@ DELIMITER ;
 
 CALL patch_stage_type();
 DROP PROCEDURE IF EXISTS patch_stage_type;
+
+SELECT "Changing 'SAC Review' review type to 'Feasibility Review'" AS "";
+UPDATE stage_type
+SET name = "Feasibility Review"
+WHERE name = "SAC Review";

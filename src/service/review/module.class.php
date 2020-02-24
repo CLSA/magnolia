@@ -33,7 +33,7 @@ class module extends \cenozo\service\module
           $review_type = $this->get_resource()->get_review_type()->name;
           if( 'administrator' != $db_role->name )
           {
-            if( 'Admin' == $review_type || 'SAC' == $review_type ) $this->get_status()->set_code( 403 );
+            if( 'Admin' == $review_type || 'Feasibility' == $review_type ) $this->get_status()->set_code( 403 );
             else if( 'Reviewer 1' == $review_type || 'Reviewer 2' == $review_type )
             {
               if( 'reviewer' != $db_role->name && 'chair' != $db_role->name ) $this->get_status()->set_code( 403 );
@@ -92,7 +92,7 @@ class module extends \cenozo\service\module
     // restrict reviewers to seeing their own "reviewer" reviews only
     if( 'reviewer' == $db_role->name )
     {
-      $modifier->where( 'review_type.name', 'IN', array( 'Admin', 'SAC', 'Reviewer 1', 'Reviewer 2' ) );
+      $modifier->where( 'review_type.name', 'IN', array( 'Admin', 'Feasibility', 'Reviewer 1', 'Reviewer 2' ) );
       $modifier->where( 'stage_type.name', '=', 'DSAC Review' );
     }
 

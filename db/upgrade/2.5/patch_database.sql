@@ -2,6 +2,9 @@
 
 SET AUTOCOMMIT=0;
 
+SOURCE role.sql
+SOURCE role_has_service.sql
+SOURCE review_type.sql
 SOURCE reqn.sql
 SOURCE reqn_version.sql
 SOURCE pdf_form.sql

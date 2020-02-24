@@ -119,11 +119,8 @@ class ui extends \cenozo\ui\ui
 
     if( 'applicant' == $db_role->name ) $this->remove_listitem( 'Requisitions' );
     if( 'administrator' != $db_role->name ) $this->remove_listitem( 'Users' );
-    if( 'administrator' == $db_role->name )
-    {
-      $this->add_listitem( 'Data Option Categories', 'data_option_category' );
-      $this->add_listitem( 'Requisition Types', 'reqn_type' );
-    }
+    if( 'administrator' == $db_role->name ) $this->add_listitem( 'Data Option Categories', 'data_option_category' );
+    if( in_array( $db_role->name, [ 'administrator', 'readonly' ] ) ) $this->add_listitem( 'Requisition Types', 'reqn_type' );
   }
 
   /**

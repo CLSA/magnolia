@@ -81,7 +81,7 @@ define( function() {
           angular.isUndefined( model.viewModel.record.stage_type ) || 'New' == model.viewModel.record.stage_type
         ) ? false : 'view';
       },
-      isExcluded: function( $state, model ) { return !model.isAdministratorOrSac(); }
+      isExcluded: function( $state, model ) { return !model.isAdministratorOrReadonly(); }
     },
     deadline_id: {
       title: 'Deadline',
@@ -95,7 +95,7 @@ define( function() {
       isExcluded: function( $state, model ) {
         return !model.isAdministrator() ||
                angular.isUndefined( model.viewModel.record.deadline_id ) ||
-               null == model.viewModel.record.deadline_id ? true : 'add';        
+               null == model.viewModel.record.deadline_id ? true : 'add';
       }
     },
     user_id: {
@@ -118,26 +118,26 @@ define( function() {
       title: 'Language',
       type: 'enum',
       isConstant: function( $state, model ) { return !model.isAdministrator(); },
-      isExcluded: function( $state, model ) { return !model.isAdministratorOrSac(); }
+      isExcluded: function( $state, model ) { return !model.isAdministratorOrReadonly(); }
     },
     stage_type: {
       title: 'Current Stage',
       column: 'stage_type.name',
       type: 'string',
       isConstant: true,
-      isExcluded: function( $state, model ) { return model.isAdministratorOrSac() ? 'add' : true; }
+      isExcluded: function( $state, model ) { return model.isAdministratorOrReadonly() ? 'add' : true; }
     },
     state: {
       title: 'State',
       type: 'enum',
       isConstant: true,
-      isExcluded: function( $state, model ) { return model.isAdministratorOrSac() ? 'add' : true; }
+      isExcluded: function( $state, model ) { return model.isAdministratorOrReadonly() ? 'add' : true; }
     },
     state_date: {
       title: 'State Set On',
       type: 'date',
       isConstant: true,
-      isExcluded: function( $state, model ) { return model.isAdministratorOrSac() ? 'add' : true; }
+      isExcluded: function( $state, model ) { return model.isAdministratorOrReadonly() ? 'add' : true; }
     },
     data_expiry_date: {
       title: 'Data Expiry Date',
@@ -146,21 +146,21 @@ define( function() {
         // show the study data available if we're in the active phase
         return angular.isUndefined( model.viewModel.record.phase ) || 'active' != model.viewModel.record.phase;
       },
-      isExcluded: function( $state, model ) { return model.isAdministratorOrSac() ? 'add' : true; }
+      isExcluded: function( $state, model ) { return model.isAdministratorOrReadonly() ? 'add' : true; }
     },
     title: {
       column: 'reqn_version.title',
       title: 'Title',
       type: 'string',
       isConstant: true,
-      isExcluded: function( $state, model ) { return model.isAdministratorOrSac(); }
+      isExcluded: function( $state, model ) { return model.isAdministratorOrReadonly(); }
     },
     lay_summary: {
       column: 'reqn_version.lay_summary',
       title: 'Lay Summary',
       type: 'text',
       isConstant: true,
-      isExcluded: function( $state, model ) { return model.isAdministratorOrSac(); }
+      isExcluded: function( $state, model ) { return model.isAdministratorOrReadonly(); }
     },
     instruction_filename: {
       column: 'instruction_filename',
@@ -188,7 +188,7 @@ define( function() {
     note: {
       title: 'Administrative Note',
       type: 'text',
-      isExcluded: function( $state, model ) { return !model.isAdministratorOrSac(); }
+      isExcluded: function( $state, model ) { return !model.isAdministratorOrReadonly(); }
     },
 
     current_reqn_version_id: { column: 'reqn_version.id', type: 'string', isExcluded: true },
@@ -301,9 +301,9 @@ define( function() {
     isDisabled: function( $state, model ) { return !model.viewModel.enabled( 'proceed' ); },
     classes: 'btn-success',
     operations: [ {
-      title: 'To SAC Review',
-      operation: function( $state, model ) { model.viewModel.proceed( 'SAC Review' ); },
-      isIncluded: function( $state, model ) { return model.viewModel.show( 'amendment sac review' ); }
+      title: 'To Feasibility Review',
+      operation: function( $state, model ) { model.viewModel.proceed( 'Feasibility Review' ); },
+      isIncluded: function( $state, model ) { return model.viewModel.show( 'amendment feasibility review' ); }
     }, {
       title: 'To DSAC Review',
       operation: function( $state, model ) { model.viewModel.proceed( 'DSAC Review' ); },
@@ -800,22 +800,17 @@ define( function() {
         // make the input lists from all groups more accessible
         this.isApplicant = function() { return 'applicant' == CnSession.role.name; };
         this.isAdministrator = function() { return 'administrator' == CnSession.role.name; };
-        this.isAdministratorOrSac = function() { return ['administrator','sac'].includes( CnSession.role.name ); };
+        this.isAdministratorOrReadonly = function() { return ['administrator','readonly'].includes( CnSession.role.name ); };
         this.isReviewer = function() { return 'reviewer' == CnSession.role.name; };
 
         this.getEditEnabled = function() {
           var phase = this.viewModel.record.phase ? this.viewModel.record.phase : '';
           var state = this.viewModel.record.state ? this.viewModel.record.state : '';
-          var stage_type = this.viewModel.record.stage_type ? this.viewModel.record.stage_type : '';
-
-          var check = false;
-          if( 'applicant' == CnSession.role.name ) {
-            check = 'new' == phase || ( 'deferred' == state && 'review' == phase );
-          } else if( ['administrator','sac'].includes( CnSession.role.name ) ) {
-            check = true;
-          }
-
-          return this.$$getEditEnabled() && check;
+          return this.$$getEditEnabled() && (
+            'applicant' == CnSession.role.name ?
+            'new' == phase || ( 'deferred' == state && 'review' == phase ) :
+            'administrator' == CnSession.role.name
+          );
         };
 
         this.getDeleteEnabled = function() {

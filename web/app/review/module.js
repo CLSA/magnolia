@@ -38,7 +38,7 @@ define( function() {
       }
     },
     defaultOrder: {
-      column: 'identifier',
+      column: 'date',
       reverse: false
     }
   } );

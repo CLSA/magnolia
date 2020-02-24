@@ -341,9 +341,9 @@ class reqn extends \cenozo\database\record
           else if( array_key_exists( 'SMT', $review_list ) ) $recommendation = $review_list['SMT'];
           // if there is a first chair review then use that decision
           else if( array_key_exists( 'Chair', $review_list ) ) $recommendation = $review_list['Chair'];
-          // if there is a SAC review then use that decision
-          else if( array_key_exists( 'SAC', $review_list ) )
-            $recommendation = 'Not Feasible' == $review_list['SAC'] ? 'Not Approved' : 'Approved';
+          // if there is a Feasibility review then use that decision
+          else if( array_key_exists( 'Feasibility', $review_list ) )
+            $recommendation = 'Not Feasible' == $review_list['Feasibility'] ? 'Not Approved' : 'Approved';
           // if there is an admin review then use that decision
           else if( array_key_exists( 'Admin', $review_list ) )
             $recommendation = 'Not Satisfactory' == $review_list['Admin'] ? 'Not Approved' : 'Approved';
