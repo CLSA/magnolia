@@ -16,26 +16,26 @@ ENGINE = InnoDB;
 INSERT IGNORE INTO notification_type( name, title_en, title_fr, message_en, message_fr ) VALUES
 (
   "Action required",
-  "TODO: title",
-  "TRANSLATION REQUIRED",
-  "TODO: This will be the message sent to the applicant to indicate that an action is required.",
-  "TRANSLATION REQUIRED"
+  "",
+  "",
+  "",
+  ""
 ), (
   "Requisition Reactivated",
-  "TODO: title",
-  "TRANSLATION REQUIRED",
-  "TODO: This will be the message sent to the applicant to indicate that an abandoned requisition has been reactivated and must be re-submitted.",
-  "TRANSLATION REQUIRED"
+  "",
+  "",
+  "",
+  ""
 ), (
   "Notice of decision",
-  "TODO: title",
-  "TRANSLATION REQUIRED",
-  "TODO: This will be the message sent to the applicant to indicate that a decision has been made regarding their requisition.",
-  "TRANSLATION REQUIRED"
+  "",
+  "",
+  "",
+  ""
 ), (
   "Final report required",
-  "TODO: title",
-  "TRANSLATION REQUIRED",
-  "TODO: This will be the message sent to the applicant to indicate that a final report is required.",
-  "TRANSLATION REQUIRED"
+  "",
+  "",
+  "",
+  ""
 );
