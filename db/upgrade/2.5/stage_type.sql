@@ -5,10 +5,10 @@ CREATE PROCEDURE patch_stage_type()
 
     SELECT COUNT(*) INTO @test
     FROM stage_type
-    WHERE name = "Permanently Incomplete";
+    WHERE name = "Incomplete";
 
     IF @test = 0 THEN
-      SELECT "Creating new Permanently Incomplete stage type" AS "";
+      SELECT "Creating new Incomplete stage type" AS "";
 
       -- push forward existing stage ranks
       UPDATE stage_type SET rank = 18 WHERE rank = 17;
@@ -16,7 +16,7 @@ CREATE PROCEDURE patch_stage_type()
       INSERT IGNORE INTO stage_type SET
         phase = "complete",
         rank = 17,
-        name = "Permanently Incomplete",
+        name = "Incomplete",
         status = "Not Approved";
     END IF;
 

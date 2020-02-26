@@ -706,8 +706,8 @@ define( function() {
 
           incomplete: function() {
             return CnModalConfirmFactory.instance( {
-              message: 'Are you sure you wish to permanently make this ' + this.parentModel.module.name.singular + ' incomplete?' +
-                '\n\nThere is no undoing this action. However, once moved to the Permanently Incomplete stage the ' +
+              message: 'Are you sure you wish to mark this ' + this.parentModel.module.name.singular + ' as permanently incomplete?' +
+                '\n\nThere is no undoing this action. However, once moved to the incomplete stage the ' +
                 this.parentModel.module.name.singular + ' can be recreated as a new application.'
             } ).show().then( function( response ) {
               if( response ) {

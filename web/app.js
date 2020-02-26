@@ -105,8 +105,7 @@ cenozo.service( 'CnReqnHelper', [
         } else if( 'incomplete' == subject ) {
           return 'administrator' == role &&
                  '.' == record.amendment &&
-                 'review' == phase &&
-                 !['Decision Made','Suggested Revisions'].includes( record.stage_type );
+                 ( 'review' == phase || ['Agreement', 'Data Release'].includes( record.stage_type ) );
         } else if( 'reactivate' == subject ) {
           return 'administrator' == role && ['abandoned','inactive'].includes( state );
         } else if( 'recreate' == subject ) {

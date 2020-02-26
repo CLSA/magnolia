@@ -445,7 +445,7 @@ class reqn extends \cenozo\database\record
                         'DSAC Selection' == $db_current_stage_type->name &&
                         'Decision Made' == $db_next_stage_type->name;
 
-    $incomplete = 'Permanently Incomplete' == $db_next_stage_type->name;
+    $incomplete = 'Incomplete' == $db_next_stage_type->name;
 
     // make sure the stage type is appropriate
     if( is_null( $db_current_stage_type ) )
@@ -483,7 +483,7 @@ class reqn extends \cenozo\database\record
 
       // send any notifications associated with the current stage (permanently incomplete has it's own special notification)
       $db_notification_type = $incomplete
-                            ? $notification_type_class_name::get_unique_record( 'name', 'Permanently Incomplete' )
+                            ? $notification_type_class_name::get_unique_record( 'name', 'Incomplete' )
                             : $db_current_stage_type->get_notification_type();
 
       if( !( $start_amendment || is_null( $db_notification_type ) ) )
