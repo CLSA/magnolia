@@ -333,7 +333,19 @@ cenozo.service( 'CnReqnHelper', [
               email: { en: 'E-mail', fr: 'Courriel' },
               role: { en: 'Role', fr: 'Rôle' },
               access: { en: 'Requires Access to Data', fr: 'Doit avoir accès aux données' },
-              addCoapplicant: { en: 'Add Co-Applicant', fr: 'Ajouter codemandeurs' }
+              addCoapplicant: { en: 'Add Co-Applicant', fr: 'Ajouter codemandeurs' },
+              coapplicantAgreementText: {
+                en: 'All Co-Applicants and Support Personnel being added to the project, who will require direct access to the CLSA data, must sign the co-applicant agreement form (download button below) and agree to comply with the conditions outlined in Articles 2.1 and 2.3 of the CLSA Access Agreement. Note: Anyone requiring access to data must use the email address of their affiliated institution. Data will only be released to institutional email addresses.',
+                fr: 'TODO: TRANSLATION REQUIRED'
+              },
+              coapplicantAgreementButton: {
+                en: 'Download Co-Applicant Agreement Form',
+                fr: 'TODO: TRANSLATION REQUIRED'
+              },
+              coapplicantAgreement: {
+                en: 'Changes to co-applicants agreement',
+                fr: 'TODO: TRANSLATION REQUIRED'
+              }
             },
             c: {
               tab: { en: 'Timeline', fr: 'Échéancier' },
@@ -421,7 +433,7 @@ cenozo.service( 'CnReqnHelper', [
               letter: {
                 en: 'Digital copy of funding letter',
                 fr: 'Copie numérique de la lettre de financement'
-              },
+              }
             },
             f: {
               tab: { en: 'Ethics', fr: 'Éthique' },
@@ -882,7 +894,8 @@ cenozo.service( 'CnReqnVersionHelper', [
             },
             b: { // project team
               diff: false,
-              coapplicantList: []
+              coapplicantList: [],
+              coapplicant_agreement_filename: false
             },
             c: { // timeline
               diff: false,

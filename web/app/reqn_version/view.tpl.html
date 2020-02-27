@@ -483,6 +483,24 @@
                 </div>
               </fieldset>
             </form>
+            <div ng-if="model.viewModel.addingCoapplicantWithData">
+              <hr/>
+              <p class="text-primary" ng-bind-html="t( 'part1.b.coapplicantAgreementText' )"></p>
+              <button class="btn btn-default full-width"
+                      ng-click="model.viewModel.downloadCoapplicantAgreementTemplate()"
+                      ng-bind-html="t( 'part1.b.coapplicantAgreementButton' )"></button>
+              <fieldset ng-disabled="!liteModel.getEditEnabled()">
+                <cn-reqn-view-input
+                  input="{
+                    key: 'coapplicant_agreement_filename',
+                    title: t( 'part1.b.coapplicantAgreement' ),
+                    type: 'file'
+                  }"
+                  difference="model.viewModel.compareRecord.differences.part1.e.coapplicant_agreement_filename"
+                  model="liteModel">
+                </cn-reqn-view-input>
+              </fieldset>
+            </div>
           </div>
         </div>
         <div ng-show="'c'==model.viewModel.tab[1]" class="panel panel-default">

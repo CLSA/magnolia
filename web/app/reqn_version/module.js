@@ -386,6 +386,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           if( angular.isDefined( self.stageModel ) ) self.stageModel.listModel.heading = 'Stage History';
         } );
 
+        this.configureFileInput( 'coapplicant_agreement_filename' );
         this.configureFileInput( 'funding_filename' );
         this.configureFileInput( 'ethics_filename' );
         this.configureFileInput( 'data_sharing_filename' );
@@ -396,6 +397,8 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           versionList: [],
           lastAgreementVersion: null,
           agreementDifferenceList: null,
+          lastAmendmentVersion: null, // used to determine the addingCoapplicantWithData variable
+          addingCoapplicantWithData: false, // used when an amendment is adding a new coap
           show: function( subject ) { return CnReqnHelper.showAction( subject, this.record ); },
           showAgreement: function() {
             // only show the agreement tab to administrators
@@ -425,6 +428,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             return CnReqnHelper.download( 'application_and_checklist', this.record.getIdentifier() );
           },
           downloadDataSharing: function() { return CnReqnHelper.download( 'data_sharing_filename', this.record.getIdentifier() ); },
+          downloadCoapplicantAgreementTemplate: function() {
+            return CnReqnHelper.download( 'coapplicant_agreement_template', this.record.getIdentifier() );
+          },
 
           onView: function( force ) {
             // reset tab values
@@ -611,6 +617,12 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
                   // add the file sizes
                   CnHttpFactory.instance( {
+                    path: 'reqn_version/' + version.id + '?file=coapplicant_agreement_filename'
+                  } ).get().then( function( response ) {
+                    version.coapplicant_agreement_size = response.data;
+                  } ),
+
+                  CnHttpFactory.instance( {
                     path: 'reqn_version/' + version.id + '?file=funding_filename'
                   } ).get().then( function( response ) {
                     version.funding_size = response.data;
@@ -639,6 +651,18 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
               if( 1 < self.versionList.length ) {
                 // add a null object to the version list so we can turn off comparisons
                 self.versionList.unshift( null );
+              }
+
+              self.lastAmendmentVersion = null;
+              if( '.' != self.record.amendment ) {
+                self.versionList.slice().reverse().some( function( version ) {
+                  // Note that the amendments we're comparing are letters, and since . is considered less than A it works
+                  // whether we're comparing lettered versions or the initial "." version:
+                  if( self.record.amendment > version.amendment ) {
+                    self.lastAmendmentVersion = version.amendment_version;
+                    return true;
+                  }
+                } );
               }
 
               return $q.all( promiseList ).then( function() {
@@ -681,6 +705,31 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                     )
                   )
                 );
+
+              // When an amendment is made which adds coapplicants with access to data we need to get a signed agreement
+              // form from the user.  In order to do this we need a variable that tracks when this is the case:
+              var versions = self.versionList.length;
+              if( '.' != this.record.amendment && self.lastAmendmentVersion == version.amendment_version ) {
+                self.addingCoapplicantWithData = false;
+                if( version.coapplicantDiff ) {
+                  // There is a difference between this and the previous amendment version, so now determine if there is now
+                  // a coapplicant with access to the data which didn't exist in the previous version
+                  self.record.coapplicantList.some( function( coapplicant ) {
+                    var found = version.coapplicantList.some( function( oldCoapplicant ) {
+                      if( oldCoapplicant.name == coapplicant.name ) {
+                        // check if an existing coap has been given access to the data
+                        if( !oldCoapplicant.access && coapplicant.access ) self.addingCoapplicantWithData = true;
+                        return true;
+                      }
+                    } );
+
+                    // check if a new coap has been given access to the data
+                    if( !found && coapplicant.access ) self.addingCoapplicantWithData = true;
+
+                    return self.addingCoapplicantWithData;
+                  } );
+                }
+              }
             }
           },
 
@@ -983,6 +1032,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                 // make sure that certain properties have been defined, one tab at a time
                 var requiredTabList = {
                   '1a': [ 'applicant_position', 'applicant_affiliation', 'applicant_address', 'applicant_phone' ],
+                  '1b': [ 'coapplicant_agreement_filename' ],
                   '1c': [ 'start_date', 'duration' ],
                   '1d': [ 'title', 'keywords', 'lay_summary', 'background', 'objectives', 'methodology', 'analysis' ],
                   '1e': [ 'funding', 'funding_filename', 'funding_agency', 'grant_number' ],
@@ -1000,8 +1050,11 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                   for( var tab in requiredTabList ) {
                     var firstProperty = null;
                     requiredTabList[tab].filter( function( property ) {
-                      if( '1e' == tab ) {
-                        // only check e properties if funding=yes
+                      if( '1b' == tab ) {
+                        // only check 1b properties if there is a new coapplication with access to data
+                        return self.addingCoapplicantWithData;
+                      } else if( '1e' == tab ) {
+                        // only check 1e properties if funding=yes
                         return 'funding' != property ? 'yes' == record.funding : true;
                       } else if( 'ethics_filename' == property ) {
                         // only check the ethics filename if ethics=yes or exempt
@@ -1191,10 +1244,17 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
         // override the service collection
         this.getServiceData = function( type, columnRestrictLists ) {
-          // only include the funding, ethics, data_sharing and agreement filenames in the view type in the lite instance
+          // Only include the coapplicant_agreement, funding, ethics, data_sharing and agreement filenames in the
+          // view type in the lite instance
           return 'lite' == this.type ? {
             select: {
-              column: [ 'is_current_version', 'funding_filename', 'ethics_filename', 'data_sharing_filename', 'agreement_filename',
+              column: [
+                'is_current_version',
+                'coapplicant_agreement_filename',
+                'funding_filename',
+                'ethics_filename',
+                'data_sharing_filename',
+                'agreement_filename',
                 { table: 'reqn', column: 'state' },
                 { table: 'stage_type', column: 'phase' },
                 { table: 'stage_type', column: 'name', alias: 'stage_type' }

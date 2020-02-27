@@ -22,6 +22,11 @@ class reqn_version extends \cenozo\database\record
     parent::save();
 
     // delete files if they are being set to null
+    if( is_null( $this->coapplicant_agreement_filename ) )
+    {
+      $filename = $this->get_filename( 'coapplicant_agreement' );
+      if( file_exists( $filename ) ) unlink( $filename );
+    }
     if( is_null( $this->funding_filename ) )
     {
       $filename = $this->get_filename( 'funding' );
@@ -50,6 +55,7 @@ class reqn_version extends \cenozo\database\record
   public function delete()
   {
     $file_list = array();
+    if( !is_null( $this->coapplicant_agreement_filename ) ) $file_list[] = $this->get_filename( 'coapplicant_agreement' );
     if( !is_null( $this->funding_filename ) ) $file_list[] = $this->get_filename( 'funding' );
     if( !is_null( $this->ethics_filename ) ) $file_list[] = $this->get_filename( 'ethics' );
     if( !is_null( $this->data_sharing_filename ) ) $file_list[] = $this->get_filename( 'data_sharing' );
@@ -161,14 +167,15 @@ class reqn_version extends \cenozo\database\record
   /**
    * Returns the path to various files associated with the reqn
    * 
-   * @param string $type Should be 'agreement', 'funding', 'ethics', 'data_sharing' or 'instruction'
+   * @param string $type Should be 'agreement', 'coapplicant_agreement', 'funding', 'ethics', 'data_sharing' or 'instruction'
    * @return string
    * @access public
    */
   public function get_filename( $type )
   {
     $directory = '';
-    if( 'funding' == $type ) $directory = FUNDING_LETTER_PATH;
+    if( 'coapplicant_agreement' == $type ) $directory = COAPPLICANT_AGREEMENT_PATH;
+    else if( 'funding' == $type ) $directory = FUNDING_LETTER_PATH;
     else if( 'ethics' == $type ) $directory = ETHICS_LETTER_PATH;
     else if( 'data_sharing' == $type ) $directory = DATA_SHARING_LETTER_PATH;
     else if( 'agreement' == $type ) $directory = AGREEMENT_LETTER_PATH;
@@ -198,6 +205,88 @@ class reqn_version extends \cenozo\database\record
     }
 
     return parent::get_record_from_identifier( $identifier );
+  }
+
+  /**
+   * Generates the coapplicant agreement PDF form template
+   * 
+   * @access public
+   */
+  public function generate_coapplicant_agreement_template_form()
+  {
+    $pdf_form_type_class_name = lib::get_class_name( 'database\pdf_form_type' );
+    $db_reqn = $this->get_reqn();
+    $db_pdf_form_type = $pdf_form_type_class_name::get_unique_record( 'name', 'Co-Applicant Agreement' );
+    $db_pdf_form = $db_pdf_form_type->get_active_pdf_form();
+    $agreement_filename = sprintf( '%s/%s.pdf', COAPPLICANT_AGREEMENT_TEMPLATE_PATH, $this->id );
+
+    // generate the agreement file
+    $data = array( 'identifier' => $db_reqn->identifier );
+    
+    // get a list of all new coapplicants who have access to the data by first finding the last amendment-version
+    $reqn_version_mod = lib::create( 'database\modifier' );
+    $reqn_version_mod->where( 'amendment', '<', $this->amendment );
+    $reqn_version_mod->order_desc( 'amendment' );
+    $reqn_version_mod->order_desc( 'version' );
+    $reqn_version_mod->limit( 1 );
+    $reqn_version_list = $db_reqn->get_reqn_version_object_list( $reqn_version_mod );
+    $db_last_reqn_version = current( $reqn_version_list );
+
+    $coapplicant_sel = lib::create( 'database\select' );
+    $coapplicant_sel->add_column( 'name' );
+    $coapplicant_sel->add_column( 'access' );
+    $last_coapplicant_list = array();
+    foreach( $db_last_reqn_version->get_coapplicant_list( $coapplicant_sel ) as $coapplicant )
+      $last_coapplicant_list[$coapplicant['name']] = $coapplicant['access'];
+
+    $coapplicant_number = 1;
+    $coapplicant_sel = lib::create( 'database\select' );
+    $coapplicant_sel->add_column( 'name' );
+    $coapplicant_sel->add_column( 'affiliation' );
+    $coapplicant_sel->add_column( 'email' );
+    $coapplicant_sel->add_column( 'access' );
+    $coapplicant_mod = lib::create( 'database\modifier' );
+    $coapplicant_mod->where( 'access', '=', true ); // we only care about coapplicants with access
+    foreach( $this->get_coapplicant_list( $coapplicant_sel, $coapplicant_mod ) as $coapplicant )
+    {
+      $add = false;
+
+      // see if the coapplicant existing in the last version
+      if( array_key_exists( $coapplicant['name'], $last_coapplicant_list ) )
+      {
+        // only add the coapplicant if they are newly being granted access to data
+        if( !$last_coapplicant_list[$coapplicant['name']] ) $add = true;
+      }
+      else $add = true;
+
+      if( $add )
+      {
+        $data[sprintf( 'name_%d', $coapplicant_number )] = $coapplicant['name'];
+        $data[sprintf( 'affiliation_%d', $coapplicant_number )] = $coapplicant['affiliation'];
+        $data[sprintf( 'email_%d', $coapplicant_number )] = $coapplicant['email'];
+        $coapplicant_number++;
+      }
+    }
+
+    if( is_null( $db_pdf_form ) )
+      throw lib::create( 'exception\runtime',
+        'Cannot generate PDF coapplicant agreement template since there is no active PDF template.', __METHOD__ );
+
+    $pdf_writer = lib::create( 'business\pdf_writer' );
+    $pdf_writer->set_template( sprintf( '%s/%d.pdf', PDF_FORM_PATH, $db_pdf_form->id ) );
+    $pdf_writer->fill_form( $data );
+    if( !$pdf_writer->save( $agreement_filename ) )
+    {
+      throw lib::create( 'exception\runtime',
+        sprintf(
+          'Failed to generate PDF form "%s" for requisition %s%s',
+          $agreement_filename,
+          $db_reqn->identifier,
+          "\n".$pdf_writer->get_error()
+        ),
+        __METHOD__
+      );
+    }
   }
 
   /**

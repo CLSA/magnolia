@@ -28,3 +28,8 @@ DELIMITER ;
 
 CALL patch_pdf_form();
 DROP PROCEDURE IF EXISTS patch_pdf_form;
+
+INSERT IGNORE INTO pdf_form( pdf_form_type_id, version, active )
+SELECT id, 1, 1
+FROM pdf_form_type
+WHERE name = "Co-Applicant Agreement";

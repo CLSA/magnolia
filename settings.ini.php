@@ -13,7 +13,7 @@ global $SETTINGS;
 $SETTINGS['general']['application_name'] = 'magnolia';
 $SETTINGS['general']['instance_name'] = $SETTINGS['general']['application_name'];
 $SETTINGS['general']['version'] = '2.5';
-$SETTINGS['general']['build'] = '77ac61c';
+$SETTINGS['general']['build'] = '6f87e43';
 
 // the location of magnolia internal path
 $SETTINGS['path']['APPLICATION'] = str_replace( '/settings.ini.php', '', __FILE__ );
@@ -29,6 +29,12 @@ $SETTINGS['path']['DATA_APPLICATION_AND_CHECKLIST'] = str_replace( 'settings.ini
 
 // the location of data reviews forms (defaults to magnolia/doc/data_reviews)
 $SETTINGS['path']['DATA_REVIEWS'] = str_replace( 'settings.ini.php', 'doc/data_reviews', __FILE__ );
+
+// the location of coapplicant agreements (defaults to magnolia/doc/coapplicant_agreement)
+$SETTINGS['path']['COAPPLICANT_AGREEMENT'] = str_replace( 'settings.ini.php', 'doc/coapplicant_agreement', __FILE__ );
+
+// the location of coapplicant agreement templates (defaults to magnolia/doc/coapplicant_agreement_template)
+$SETTINGS['path']['COAPPLICANT_AGREEMENT_TEMPLATE'] = str_replace( 'settings.ini.php', 'doc/coapplicant_agreement_template', __FILE__ );
 
 // the location of funding letters (defaults to magnolia/doc/funding_letter)
 $SETTINGS['path']['FUNDING_LETTER'] = str_replace( 'settings.ini.php', 'doc/funding_letter', __FILE__ );

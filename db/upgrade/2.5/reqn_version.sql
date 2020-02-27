@@ -3,6 +3,20 @@ DELIMITER //
 CREATE PROCEDURE patch_reqn_version()
   BEGIN
 
+    SELECT "Adding new coapplicant_agreement_filename column to reqn_version table" AS "";
+    
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn_version"
+    AND column_name = "coapplicant_agreement_filename";
+
+    IF @test = 0 THEN
+      ALTER TABLE reqn_version
+      ADD COLUMN coapplicant_agreement_filename VARCHAR(255) NULL DEFAULT NULL
+      AFTER graduate_phone;
+    END IF;
+
     SELECT "Replacing part2_e_comment with individual columns in reqn_version table" AS "";
     
     SELECT COUNT(*) INTO @test
