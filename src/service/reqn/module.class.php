@@ -97,7 +97,7 @@ class module extends \cenozo\service\module
 
     if( 'applicant' == $db_role->name )
     {
-      // only show applicants their own reqns which aren't abandoned or permanently incomplete
+      // only show applicants their own reqns which aren't abandoned
       $modifier->where_bracket( true );
       $modifier->where( 'reqn.user_id', '=', $db_user->id );
       $modifier->or_where( 'graduate.graduate_user_id', '=', $db_user->id );

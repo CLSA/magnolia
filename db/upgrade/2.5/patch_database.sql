@@ -9,6 +9,7 @@ SOURCE reqn.sql
 SOURCE reqn_version.sql
 SOURCE pdf_form.sql
 SOURCE stage_type.sql
+SOURCE notification_type.sql
 
 SOURCE update_version_number.sql
 

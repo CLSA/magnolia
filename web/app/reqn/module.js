@@ -280,6 +280,14 @@ define( function() {
   } );
 
   module.addExtraOperation( 'view', {
+    title: 'Withdraw',
+    classes: 'btn-danger',
+    isIncluded: function( $state, model ) { return model.viewModel.show( 'withdraw' ); },
+    isDisabled: function( $state, model ) { return !model.viewModel.enabled( 'withdraw' ); },
+    operation: function( $state, model ) { model.viewModel.withdraw(); }
+  } );
+
+  module.addExtraOperation( 'view', {
     title: 'Recreate',
     classes: 'btn-success',
     isIncluded: function( $state, model ) { return model.viewModel.show( 'recreate' ); },
@@ -613,7 +621,7 @@ define( function() {
           enabled: function( subject ) {
             var state = this.record.state ? this.record.state : '';
 
-            if( ['abandon', 'deactivate', 'defer', 'incomplete', 'reactivate', 'recreate'].includes( subject ) ) {
+            if( ['abandon', 'deactivate', 'defer', 'incomplete', 'withdraw', 'reactivate', 'recreate'].includes( subject ) ) {
               return true;
             } else if( ['proceed','reject'].includes( subject ) ) {
               return !state && null != this.record.next_stage_type;
@@ -713,6 +721,24 @@ define( function() {
               if( response ) {
                 return CnHttpFactory.instance( {
                   path: self.parentModel.getServiceResourcePath() + "?action=incomplete"
+                } ).patch().then( function() {
+                  self.onView();
+                  if( angular.isDefined( self.stageModel ) ) self.stageModel.listModel.onList( true );
+                  if( angular.isDefined( self.notificationModel ) ) self.notificationModel.listModel.onList( true );
+                } );
+              }
+            } );
+          },
+
+          withdraw: function() {
+            return CnModalConfirmFactory.instance( {
+              message: 'Are you sure you wish to mark this ' + this.parentModel.module.name.singular + ' as permanently withdrawn?' +
+                '\n\nThere is no undoing this action. However, once moved to the withdrawn stage the ' +
+                this.parentModel.module.name.singular + ' can be recreated as a new application.'
+            } ).show().then( function( response ) {
+              if( response ) {
+                return CnHttpFactory.instance( {
+                  path: self.parentModel.getServiceResourcePath() + "?action=withdraw"
                 } ).patch().then( function() {
                   self.onView();
                   if( angular.isDefined( self.stageModel ) ) self.stageModel.listModel.onList( true );

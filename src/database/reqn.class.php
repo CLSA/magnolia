@@ -446,6 +446,7 @@ class reqn extends \cenozo\database\record
                         'Decision Made' == $db_next_stage_type->name;
 
     $incomplete = 'Incomplete' == $db_next_stage_type->name;
+    $withdrawn = 'Withdrawn' == $db_next_stage_type->name;
 
     // make sure the stage type is appropriate
     if( is_null( $db_current_stage_type ) )
@@ -467,7 +468,7 @@ class reqn extends \cenozo\database\record
 
       // Determine whether we can safely proceed to the next stage (ignoring if the DSAC selection stage has been rejected or
       // if we're moving the reqn to the permanently incomplete stage
-      if( !( $reject_selection || $start_amendment || $incomplete ) )
+      if( !( $reject_selection || $start_amendment || $incomplete || $withdrawn ) )
       {
         $result = $db_current_stage->check_if_complete();
         if( true !== $result ) throw lib::create( 'exception\notice', $result, __METHOD__ );
@@ -481,10 +482,11 @@ class reqn extends \cenozo\database\record
       $db_current_stage->datetime = util::get_datetime_object();
       $db_current_stage->save();
 
-      // send any notifications associated with the current stage (permanently incomplete has it's own special notification)
-      $db_notification_type = $incomplete
-                            ? $notification_type_class_name::get_unique_record( 'name', 'Incomplete' )
-                            : $db_current_stage_type->get_notification_type();
+      // send any notifications associated with the current stage (incomplete and withdrawn have their own special notifications)
+      $db_notification_type = NULL;
+      if( $incomplete ) $db_notification_type = $notification_type_class_name::get_unique_record( 'name', 'Incomplete' );
+      else if( $withdrawn ) $db_notification_type = $notification_type_class_name::get_unique_record( 'name', 'Withdrawn' );
+      else $db_notification_type = $db_current_stage_type->get_notification_type();
 
       if( !( $start_amendment || is_null( $db_notification_type ) ) )
       {
@@ -503,9 +505,7 @@ class reqn extends \cenozo\database\record
           sprintf(
             'Requisition %s: %s',
             $this->identifier,
-            $start_amendment ?
-              sprintf( 'Amendment %s started', $db_reqn_version->amendment ) :
-              sprintf( '%s complete', $db_current_stage_type->name )
+            $subject
           ),
           sprintf(
             "The following requisition has moved from \"%s\" to \"%s\":\n".
@@ -610,7 +610,7 @@ class reqn extends \cenozo\database\record
     {
       $this->refresh_study_data_files();
     }
-    else if( $incomplete )
+    else if( $incomplete || $withdrawn )
     {
       $this->state = NULL;
       $this->save();
@@ -626,7 +626,7 @@ class reqn extends \cenozo\database\record
           // remove all reviews
           $db_review->delete();
         }
-        else if( !$incomplete )
+        else if( !( $incomplete || $withdrawn ) )
         {
           // update the current stage's review's reviewer with the current user if it isn't already set
           if( is_null( $db_review->user_id ) )

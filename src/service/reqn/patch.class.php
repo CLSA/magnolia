@@ -79,9 +79,11 @@ class patch extends \cenozo\service\patch
       {
         if( 'administrator' != $db_role->name ||
             '.' != $db_reqn_version->amendment ||
-            'review' != $phase ||
-            'Decision Made' == $db_current_stage_type->name ||
-            'Suggested Revisions' == $db_current_stage_type->name ) $code = 403;
+            ( 'review' != $phase && !in_array( $db_current_stage_type->name, array( 'Agreement', 'Data Release' ) ) ) ) $code = 403;
+      }
+      else if( 'withdraw' == $action )
+      {
+        if( 'administrator' != $db_role->name || 'active' != $phase ) $code = 403;
       }
       else if( 'reactivate' == $action )
       {
@@ -252,9 +254,15 @@ class patch extends \cenozo\service\patch
         }
         else if( 'incomplete' == $action )
         {
-          // move the requisition to permanently incomplete
+          // move the requisition to incomplete
           $db_incomplete_stage = $stage_type_class_name::get_unique_record( 'name', 'Incomplete' );
           $db_reqn->proceed_to_next_stage( $db_incomplete_stage );
+        }
+        else if( 'withdraw' == $action )
+        {
+          // move the requisition to withdrawn
+          $db_withdrawn_stage = $stage_type_class_name::get_unique_record( 'name', 'Withdrawn' );
+          $db_reqn->proceed_to_next_stage( $db_withdrawn_stage );
         }
         else if( 'reactivate' == $action )
         {

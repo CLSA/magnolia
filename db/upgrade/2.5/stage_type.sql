@@ -11,13 +11,31 @@ CREATE PROCEDURE patch_stage_type()
       SELECT "Creating new Incomplete stage type" AS "";
 
       -- push forward existing stage ranks
+      UPDATE stage_type SET rank = 18 WHERE rank = 16;
+      UPDATE stage_type SET rank = 19 WHERE rank = 17;
+
+      INSERT IGNORE INTO stage_type SET
+        phase = "complete",
+        rank = 16,
+        name = "Incomplete",
+        status = "Permanently Incomplete";
+    END IF;
+
+    SELECT COUNT(*) INTO @test
+    FROM stage_type
+    WHERE name = "Withdrawn";
+
+    IF @test = 0 THEN
+      SELECT "Creating new Withdrawn stage type" AS "";
+
+      -- push forward existing stage ranks
       UPDATE stage_type SET rank = 18 WHERE rank = 17;
 
       INSERT IGNORE INTO stage_type SET
         phase = "complete",
         rank = 17,
-        name = "Incomplete",
-        status = "Not Approved";
+        name = "Withdrawn",
+        status = "Permanently Withdrawn";
     END IF;
 
   END //
