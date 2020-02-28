@@ -339,7 +339,7 @@ cenozo.service( 'CnReqnHelper', [
                 fr: 'TODO: TRANSLATION REQUIRED'
               },
               coapplicantAgreementButton: {
-                en: 'Download Co-Applicant Agreement Form',
+                en: 'Download Co-Applicant Agreement Form Template',
                 fr: 'TODO: TRANSLATION REQUIRED'
               },
               coapplicantAgreement: {
