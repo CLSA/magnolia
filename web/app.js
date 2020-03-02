@@ -11,8 +11,8 @@ cenozo.controller( 'HeaderCtrl', [
 ] );
 
 cenozo.service( 'CnModalNoticeListFactory', [
-  '$uibModal', '$state', '$window', '$filter',
-  function( $uibModal, $state, $window, $filter ) {
+  'CnModalMessageFactory', '$uibModal', '$state', '$window', '$filter',
+  function( CnModalMessageFactory, $uibModal, $state, $window, $filter ) {
     var object = function( params ) {
       var self = this;
       angular.extend( this, {
@@ -29,16 +29,25 @@ cenozo.service( 'CnModalNoticeListFactory', [
             '_blank',
             'width=600,height=700,scrollbars=no,menubar=no,toolbar=no,location=no,status=no,titlebar=no'
           );
-          printWindow.document.open();
-          var body = '<html><body onload="window.print()">';
-          this.noticeList.forEach( function( notice ) {
-            body += '<h3>' + $filter( 'cnDatetime' )( notice.datetime, 'date' ) + ': ' + notice.title + '</h3>' +
-                    '<div>' + $filter( 'cnNewlines' )( notice.description ) + '</div>';
-          } );
-          body += '</body></html>';
+          if( null == printWindow ) {
+            CnModalMessageFactory.instance( {
+              title: 'Permission Required',
+              message: 'Your web browser is not allowing this site to open pop-up windows. ' +
+                       'In order to download your notices you must allow pop-up windows in your browser\'s settings.',
+              error: true
+            } ).show();
+          } else {
+            printWindow.document.open();
+            var body = '<html><body onload="window.print()">';
+            this.noticeList.forEach( function( notice ) {
+              body += '<h3>' + $filter( 'cnDatetime' )( notice.datetime, 'date' ) + ': ' + notice.title + '</h3>' +
+                      '<div>' + $filter( 'cnNewlines' )( notice.description ) + '</div>';
+            } );
+            body += '</body></html>';
 
-          printWindow.document.write( body );
-          printWindow.document.close();
+            printWindow.document.write( body );
+            printWindow.document.close();
+          }
         },
 
         show: function() {
@@ -335,16 +344,16 @@ cenozo.service( 'CnReqnHelper', [
               access: { en: 'Requires Access to Data', fr: 'Doit avoir accès aux données' },
               addCoapplicant: { en: 'Add Co-Applicant', fr: 'Ajouter codemandeurs' },
               coapplicantAgreementText: {
-                en: 'All Co-Applicants and Support Personnel being added to the project, who will require direct access to the CLSA data, must sign the co-applicant agreement form (download button below) and agree to comply with the conditions outlined in Articles 2.1 and 2.3 of the CLSA Access Agreement. Note: Anyone requiring access to data must use the email address of their affiliated institution. Data will only be released to institutional email addresses.',
-                fr: 'TODO: TRANSLATION REQUIRED'
+                en: 'All Co-Applicants and Support Personnel being added to the project, who will require direct access to the CLSA data, must sign the co-applicant agreement form (download button below) and agree to comply with the conditions outlined in Articles 2.1 and 2.3 of the CLSA Access Agreement.',
+                fr: 'Tous les codemandeurs et le personnel de soutien ajoutés au projet qui auront besoin d’un accès direct aux données de l’ÉLCV doivent signer le formulaire d’entente de codemandeur (lien de téléchargement ci-dessous) et accepter de se conformer aux conditions énoncées aux articles 2.1 et 2.3 de l’Entente d’accès de l’ÉLCV.'
               },
               coapplicantAgreementButton: {
                 en: 'Download Co-Applicant Agreement Form Template',
-                fr: 'TODO: TRANSLATION REQUIRED'
+                fr: 'Télécharger le modèle de formulaire d’entente de codemandeur'
               },
               coapplicantAgreement: {
                 en: 'Changes to co-applicants agreement',
-                fr: 'TODO: TRANSLATION REQUIRED'
+                fr: 'Modifications à apporter à l’entente de codemandeur'
               }
             },
             c: {

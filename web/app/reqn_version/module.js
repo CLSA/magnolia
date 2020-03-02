@@ -117,7 +117,11 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     deferral_note_2b: { column: 'reqn.deferral_note_2b', type: 'text' },
     deferral_note_2c: { column: 'reqn.deferral_note_2c', type: 'text' },
     deferral_note_2d: { column: 'reqn.deferral_note_2d', type: 'text' },
-    deferral_note_2e: { column: 'reqn.deferral_note_2e', type: 'text' }
+    deferral_note_2e: { column: 'reqn.deferral_note_2e', type: 'text' },
+
+    coapplicant_agreement_filename: { type: 'string' },
+    funding_filename: { type: 'string' },
+    ethics_filename: { type: 'string' }
   } );
 
   /* ######################################################################################################## */
@@ -396,6 +400,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           compareRecord: null,
           versionList: [],
           lastAgreementVersion: null,
+          coapplicantAgreementList: [],
           agreementDifferenceList: null,
           lastAmendmentVersion: null, // used to determine the addingCoapplicantWithData variable
           addingCoapplicantWithData: false, // used when an amendment is adding a new coap
@@ -428,6 +433,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             return CnReqnHelper.download( 'application_and_checklist', this.record.getIdentifier() );
           },
           downloadDataSharing: function() { return CnReqnHelper.download( 'data_sharing_filename', this.record.getIdentifier() ); },
+          downloadCoapplicantAgreement: function( reqnVersionId) {
+            return CnReqnHelper.download( 'coapplicant_agreement_filename', reqnVersionId );
+          },
           downloadCoapplicantAgreementTemplate: function() {
             return CnReqnHelper.download( 'coapplicant_agreement_template', this.record.getIdentifier() );
           },
@@ -440,6 +448,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
             // reset compare version and differences
             this.compareRecord = null;
+            this.coapplicantAgreementList = [];
             this.agreementDifferenceList = null;
 
             return this.$$onView( force ).then( function() {
@@ -674,7 +683,11 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                   if( null != version ) {
                     version.differences = CnReqnVersionHelper.getDifferences( self.record, version, self.parentModel );
 
-                    // while we're at it determine the last agreement version and calculate its differences
+                    // while we're at it determine the list of coapplicant agreements
+                    if( null != version.coapplicant_agreement_filename )
+                      self.coapplicantAgreementList.push( { version: version.amendment_version, id: version.id } );
+
+                    // ... and also determine the last agreement version and calculate its differences
                     if( null == self.agreementDifferenceList && null != version.agreement_filename )
                       self.agreementDifferenceList = self.getDifferenceList( version );
                   }
