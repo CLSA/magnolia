@@ -144,6 +144,22 @@ class patch extends \cenozo\service\patch
   /**
    * Extend parent method
    */
+  public function prepare()
+  {
+    parent::prepare();
+
+    // if we're changing the user_id then store the old one so that it can be referenced in the finish() method
+    $patch_array = $this->get_file_as_array();
+    if( array_key_exists( 'user_id', $patch_array ) )
+    {
+      $db_reqn = $this->get_leaf_record();
+      $this->db_old_user = $db_reqn->get_user();
+    }
+  }
+
+  /**
+   * Extend parent method
+   */
   public function execute()
   {
     parent::execute();
@@ -350,4 +366,49 @@ class patch extends \cenozo\service\patch
       }
     }
   }
+
+  /**
+   * Extend parent method
+   */
+  public function finish()
+  {
+    $notification_type_class_name = lib::get_class_name( 'database\notification_type' );
+    $notification_class_name = lib::get_class_name( 'database\notification' );
+
+    parent::finish();
+
+    // if we changed the user_id then we need to send a notification
+    $db_reqn = $this->get_leaf_record();
+    $patch_array = $this->get_file_as_array();
+    if( array_key_exists( 'user_id', $patch_array ) )
+    {
+      $db_graduate = $db_reqn->get_graduate();
+      if( !is_null( $db_graduate ) )
+      {
+        $db_graduate->user_id = $patch_array['user_id'];
+        $db_graduate->save();
+      }
+
+      // send a notification
+      $db_notification = lib::create( 'database\notification' );
+      $db_notification->notification_type_id =
+        $notification_type_class_name::get_unique_record( 'name', 'Change Owner' )->id;
+      $db_notification->set_reqn( $db_reqn ); // this saves the record
+
+      // we also want to add the old owner
+      $db_notification->add_email(
+        $this->db_old_user->email,
+        sprintf( '%s %s', $this->db_old_user->first_name, $this->db_old_user->last_name )
+      );
+
+      $db_notification->mail();
+    }
+  }
+
+  /**
+   * Cache of the reqn's old user in case it gets changed
+   * @var database\user
+   * @access private
+   */
+  private $db_old_user = NULL;
 }

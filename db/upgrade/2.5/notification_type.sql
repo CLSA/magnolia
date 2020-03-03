@@ -37,3 +37,10 @@ Votre demande numéro {{identifier}}, intitulée {{title}}, a reçu la mention �
 Si vous avez des questions, veuillez nous contacter à access@clsa-elcv.ca.
 
 L'équipe d'accès aux données de l’ÉLCV";
+
+INSERT IGNORE INTO notification_type SET
+  name = "Change Owner",
+  title_en = "CLSA Data Access - Change of Primary Applicant ({{identifier}})",
+  title_fr = "TODO: TRANSLATION REQUIRED",
+  message_en = "TODO: message body required",
+  message_fr = "TODO: TRANSLATION REQUIRED";

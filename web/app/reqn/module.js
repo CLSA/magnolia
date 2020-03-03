@@ -106,7 +106,13 @@ define( function() {
         select: 'CONCAT( user.first_name, " ", user.last_name, " (", user.name, ")" )',
         where: [ 'user.first_name', 'user.last_name', 'user.name' ]
       },
-      isConstant: 'view'
+      isConstant: function( $state, model ) {
+        // never constant when adding a new reqn
+        if( 'reqn.add' == $state.current.name ) return false;
+
+        // if the reqn has an agreement then we can't directly change the primary applicant
+        return 0 < model.viewModel.record.has_agreements;
+      }
     },
     graduate_id: {
       title: 'Trainee',
@@ -473,9 +479,9 @@ define( function() {
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnReqnViewFactory', [
     'CnBaseViewFactory', 'CnReqnHelper', 'CnSession', 'CnHttpFactory',
-    'CnModalMessageFactory', 'CnModalConfirmFactory', 'CnModalNoticeListFactory', '$window', '$state',
+    'CnModalMessageFactory', 'CnModalConfirmFactory', 'CnModalNoticeListFactory', '$window', '$state', '$q',
     function( CnBaseViewFactory, CnReqnHelper, CnSession, CnHttpFactory,
-              CnModalMessageFactory, CnModalConfirmFactory, CnModalNoticeListFactory, $window, $state ) {
+              CnModalMessageFactory, CnModalConfirmFactory, CnModalNoticeListFactory, $window, $state, $q ) {
       var object = function( parentModel, root ) {
         var self = this;
         CnBaseViewFactory.construct( this, parentModel, root );
@@ -601,10 +607,45 @@ define( function() {
           },
 
           onPatch: function( data ) {
-            return self.$$onPatch( data ).then( function() {
-              // Reload the view if we're changing the suggested revisions (the next stage will change)
-              // or reqn type (the deadline might change)
-              if( angular.isDefined( data.suggested_revisions ) || angular.isDefined( data.reqn_type_id ) ) return self.onView();
+            var changingUser = angular.isDefined( data.user_id );
+            var promiseList = [];
+
+            // show a warning when changing the primary applicant
+            if( changingUser ) {
+              var message = 'Changing the ' + this.parentModel.module.name.possessive + ' primary applicant will immediately remove ' +
+                            'it from the old owner\'s ' + this.parentModel.module.name.singular + ' list and add it to the new ' +
+                            'owner\'s list.  Also, a notification will be sent to both the old and new applicants explaining the ' +
+                            'transfer of ownership.';
+              if( this.record.graduate_id )
+                message += '\n\nAdditionally, this ' + this.parentModel.module.name.possessive + ' trainee\'s supervisor will also ' +
+                           'be changed to the new primary applicant.  If there are any other requisitions with the same trainee ' +
+                           'then they will also be reassigned to the new owner.';
+
+              message += '\n\nAre you sure you wish to proceed?';
+
+              promiseList.push(
+                CnModalConfirmFactory.instance( {
+                  title: 'Change Owner' + ( this.record.graduate_id ? ' (And Supervisor)' : '' ),
+                  message: message
+                } ).show().then( function( response ) {
+                  return response;
+                } )
+              );
+            }
+
+            return $q.all( promiseList ).then( function( response ) {
+              if( 0 == response.length || response[0] ) {
+                return self.$$onPatch( data ).then( function() {
+                  // Reload the view if we're changing the suggested revisions (the next stage will change)
+                  // or reqn type (the deadline might change)
+                  if( angular.isDefined( data.suggested_revisions ) || angular.isDefined( data.reqn_type_id ) ) return self.onView();
+                } );
+              } else if( changingUser ) {
+                // we're not making the change so put back the old user
+                self.record.user_id = self.backupRecord.user_id;
+                self.formattedRecord.user_id = self.backupRecord.formatted_user_id;
+                if( angular.isDefined( self.notificationModel ) ) self.notificationModel.listModel.onList( true );
+              }
             } );
           },
 
