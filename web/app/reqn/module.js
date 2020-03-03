@@ -639,12 +639,14 @@ define( function() {
                   // Reload the view if we're changing the suggested revisions (the next stage will change)
                   // or reqn type (the deadline might change)
                   if( angular.isDefined( data.suggested_revisions ) || angular.isDefined( data.reqn_type_id ) ) return self.onView();
+
+                  // Reload the notification list if we're changing the user
+                  if( changingUser && angular.isDefined( self.notificationModel ) ) self.notificationModel.listModel.onList( true );
                 } );
               } else if( changingUser ) {
                 // we're not making the change so put back the old user
                 self.record.user_id = self.backupRecord.user_id;
                 self.formattedRecord.user_id = self.backupRecord.formatted_user_id;
-                if( angular.isDefined( self.notificationModel ) ) self.notificationModel.listModel.onList( true );
               }
             } );
           },
