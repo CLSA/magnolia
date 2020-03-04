@@ -80,7 +80,7 @@ class module extends \cenozo\service\module
       $modifier->left_join( 'user', 'graduate.graduate_user_id', 'graduate_user.id', 'graduate_user' );
       $select->add_table_column(
         'graduate_user',
-        'IF( graduate_user.id IS NULL, "(none)", CONCAT_WS( " ", graduate_user.first_name, graduate_user.last_name ) )',
+        'IF( graduate_user.id IS NULL, NULL, CONCAT_WS( " ", graduate_user.first_name, graduate_user.last_name ) )',
         'graduate_full_name',
         false
       );
