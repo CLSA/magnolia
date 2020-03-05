@@ -164,12 +164,25 @@
             <div ng-repeat="amendmentType in model.amendmentTypeList[model.viewModel.record.lang]">
               <div style="margin: 0;"
                    class="row"
-                   ng-class="{ 'bg-warning': model.viewModel.compareRecord.differences.amendment.a['amendmentType'+amendmentType.id] }">
+                   ng-class="{
+                     'bg-warning': model.viewModel.compareRecord.differences.amendment.a['amendmentType'+amendmentType.id]
+                   }">
                 <input type="checkbox"
                        id="amendmentType{{ amendmentType.id }}"
                        ng-model="model.viewModel.record['amendmentType'+amendmentType.id]"
                        ng-change="model.viewModel.toggleAmendmentTypeValue( amendmentType.id )"></input>
                 <label for="amendmentType{{ amendmentType.id }}" class="control-label" ng-bind-html="amendmentType.name"></label>
+                <cn-reqn-view-input
+                  ng-if="amendmentType.newUser && model.viewModel.record['amendmentType'+amendmentType.id]"
+                  no-cols=true
+                  input="{
+                    key: 'new_user_id',
+                    title: t( 'amendment.newUser' ),
+                    type: model.inputList.new_user_id.type,
+                    typeahead: model.inputList.new_user_id.typeahead
+                  }"
+                  model="model">
+                </cn-reqn-view-input>
               </div>
               <div style="padding: 0 2em;"
                    ng-if="amendmentType.justificationPrompt && model.viewModel.record['amendmentType'+amendmentType.id]">

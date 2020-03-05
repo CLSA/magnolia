@@ -102,6 +102,10 @@ class module extends \cenozo\service\module
     $db_reqn_version = $this->get_resource();
     if( !is_null( $db_reqn_version ) )
     {
+      // include the user first/last/name as supplemental data
+      $modifier->left_join( 'user', 'reqn_version.new_user_id', 'new_user.id', 'new_user' );
+      $select->add_column( 'CONCAT( new_user.first_name, " ", new_user.last_name )', 'formatted_new_user_id', false );
+
       if( $select->has_column( 'has_changed' ) )
       {
         $select->add_constant( $db_reqn_version->has_changed(), 'has_changed', 'boolean' );

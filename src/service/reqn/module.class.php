@@ -47,6 +47,8 @@ class module extends \cenozo\service\module
    */
   public function prepare_read( $select, $modifier )
   {
+    $reqn_class_name = lib::get_class_name( 'database\reqn' );
+
     parent::prepare_read( $select, $modifier );
 
     $session = lib::create( 'business\session' );
@@ -167,6 +169,56 @@ class module extends \cenozo\service\module
         $reqn_version_mod = lib::create( 'database\modifier' );
         $reqn_version_mod->where( 'agreement_filename', '!=', NULL );
         $select->add_constant( 0 < $db_reqn->get_reqn_version_count( $reqn_version_mod ), 'has_agreements' );
+      }
+
+      if( $select->has_column( 'related_required_amendment_list' ) )
+      {
+        // Collect a list of all other reqns which have the same graduate, have an agreement but do not have an amendment to
+        // change the primary applicant.  However, we only do this if this reqn is changing the primary applicant
+        $identifier_list = array();
+
+        $db_reqn_version = $db_reqn->get_current_reqn_version();
+        $amendment_type_mod = lib::create( 'database\modifier' );
+        $amendment_type_mod->where( 'amendment_type.new_user', '=', true );
+        if( !is_null( $db_reqn->graduate_id ) && 0 < $db_reqn_version->get_amendment_type_count( $amendment_type_mod ) )
+        {
+          // we're changing the primary user, so see if there are other reqns with the same graduate which have an agreement
+          $reqn_sel = lib::create( 'database\select' );
+          $reqn_sel->set_distinct( true );
+          $reqn_sel->add_column( 'identifier' );
+
+          $reqn_mod = lib::create( 'database\modifier' );
+
+          // make sure the reqn has had an agreement at some point
+          $join_mod = lib::create( 'database\modifier' );
+          $join_mod->where( 'reqn.id', '=', 'reqn_version.reqn_id', false );
+          $join_mod->where( 'reqn_version.agreement_filename', '!=', NULL );
+          $reqn_mod->join_modifier( 'reqn_version', $join_mod );
+
+          // make sure the latest version does not have a new-user amendment
+          $reqn_mod->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
+          $reqn_mod->left_join(
+            'reqn_version_has_amendment_type',
+            'reqn_current_reqn_version.reqn_version_id',
+            'reqn_version_has_amendment_type.reqn_version_id'
+          );
+
+          $join_mod = lib::create( 'database\modifier' );
+          $join_mod->where( 'reqn_version_has_amendment_type.amendment_type_id', '=', 'amendment_type.id', false );
+          $join_mod->where( 'amendment_type.new_user', '=', true );
+          $reqn_mod->join_modifier( 'amendment_type', $join_mod, 'left' );
+
+          $reqn_mod->where( 'reqn.id', '!=', $db_reqn->id );
+          $reqn_mod->where( 'reqn.graduate_id', '=', $db_reqn->graduate_id );
+          $reqn_mod->where( 'amendment_type.id', '=', NULL );
+
+          foreach( $reqn_class_name::select( $reqn_sel, $reqn_mod ) as $row ) $identifier_list[] = $row['identifier'];
+        }
+
+        $select->add_constant(
+          0 < count( $identifier_list ) ? implode( ', ', $identifier_list ) : NULL,
+          'related_required_amendment_list'
+        );
       }
     }
   }

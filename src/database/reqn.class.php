@@ -204,6 +204,47 @@ class reqn extends \cenozo\database\record
   }
 
   /**
+   * TODO: document
+   */
+  public function get_recommendation()
+  {
+    // the decision for this reqn depends on one of several possible reviews
+    $review_sel = lib::create( 'database\select' );
+    $review_sel->add_table_column( 'review_type', 'name' );
+    $review_sel->add_table_column( 'recommendation_type', 'name', 'recommendation' );
+    $review_mod = lib::create( 'database\modifier' );
+    $review_mod->join( 'review_type', 'review.review_type_id', 'review_type.id' );
+    $review_mod->join( 'recommendation_type', 'review.recommendation_type_id', 'recommendation_type.id' );
+
+    // make sure to only get reviews for the current amendment
+    $review_mod->join( 'reqn_current_reqn_version', 'review.reqn_id', 'reqn_current_reqn_version.reqn_id' );
+    $review_mod->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
+    $review_mod->where( 'review.amendment', '=', 'reqn_version.amendment', false );
+
+    $review_list = array();
+    foreach( $this->get_review_list( $review_sel, $review_mod ) as $review )
+      $review_list[$review['name']] = $review['recommendation'];
+
+    $recommendation = NULL;
+    // if there is a second SMT review then use that decision
+    if( array_key_exists( 'Second SMT', $review_list ) ) $recommendation = $review_list['Second SMT'];
+    // if there is a second chair review then use that decision
+    else if( array_key_exists( 'Second Chair', $review_list ) ) $recommendation = $review_list['Second Chair'];
+    // if there is a first SMT review then use that decision
+    else if( array_key_exists( 'SMT', $review_list ) ) $recommendation = $review_list['SMT'];
+    // if there is a first chair review then use that decision
+    else if( array_key_exists( 'Chair', $review_list ) ) $recommendation = $review_list['Chair'];
+    // if there is a Feasibility review then use that decision
+    else if( array_key_exists( 'Feasibility', $review_list ) )
+      $recommendation = 'Not Feasible' == $review_list['Feasibility'] ? 'Not Approved' : 'Approved';
+    // if there is an admin review then use that decision
+    else if( array_key_exists( 'Admin', $review_list ) )
+      $recommendation = 'Not Satisfactory' == $review_list['Admin'] ? 'Not Approved' : 'Approved';
+
+    return $recommendation;
+  }
+
+  /**
    * Returns the reqns current stage
    * @return database\stage
    * @access public
@@ -315,39 +356,7 @@ class reqn extends \cenozo\database\record
         }
         else if( 'Decision Made' == $db_current_stage_type->name )
         {
-          // the decision for this reqn depends on one of several possible reviews
-          $review_sel = lib::create( 'database\select' );
-          $review_sel->add_table_column( 'review_type', 'name' );
-          $review_sel->add_table_column( 'recommendation_type', 'name', 'recommendation' );
-          $review_mod = lib::create( 'database\modifier' );
-          $review_mod->join( 'review_type', 'review.review_type_id', 'review_type.id' );
-          $review_mod->join( 'recommendation_type', 'review.recommendation_type_id', 'recommendation_type.id' );
-
-          // make sure to only get reviews for the current amendment
-          $review_mod->join( 'reqn_current_reqn_version', 'review.reqn_id', 'reqn_current_reqn_version.reqn_id' );
-          $review_mod->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
-          $review_mod->where( 'review.amendment', '=', 'reqn_version.amendment', false );
-
-          $review_list = array();
-          foreach( $this->get_review_list( $review_sel, $review_mod ) as $review )
-            $review_list[$review['name']] = $review['recommendation'];
-
-          $recommendation = NULL;
-          // if there is a second SMT review then use that decision
-          if( array_key_exists( 'Second SMT', $review_list ) ) $recommendation = $review_list['Second SMT'];
-          // if there is a second chair review then use that decision
-          else if( array_key_exists( 'Second Chair', $review_list ) ) $recommendation = $review_list['Second Chair'];
-          // if there is a first SMT review then use that decision
-          else if( array_key_exists( 'SMT', $review_list ) ) $recommendation = $review_list['SMT'];
-          // if there is a first chair review then use that decision
-          else if( array_key_exists( 'Chair', $review_list ) ) $recommendation = $review_list['Chair'];
-          // if there is a Feasibility review then use that decision
-          else if( array_key_exists( 'Feasibility', $review_list ) )
-            $recommendation = 'Not Feasible' == $review_list['Feasibility'] ? 'Not Approved' : 'Approved';
-          // if there is an admin review then use that decision
-          else if( array_key_exists( 'Admin', $review_list ) )
-            $recommendation = 'Not Satisfactory' == $review_list['Admin'] ? 'Not Approved' : 'Approved';
-
+          $recommendation = $this->get_recommendation();
           if( !is_null( $recommendation ) )
           {
             // NOTE: when approved check if this is not an amendment and revisions have been suggested
@@ -605,9 +614,41 @@ class reqn extends \cenozo\database\record
     {
       $this->generate_data_directory();
     }
-    // if we have just entered the active stage then create symbolic links to all data files and update file timestamps
+    else if( 'Agreement' == $db_next_stage_type->name )
+    {
+      // check if there is an amendment to change the primary applicant, and if so change it now
+      if( '.' != $db_reqn_version->amendment &&
+          !is_null( $db_reqn_version->new_user_id ) &&
+          'Approved' == $this->get_recommendation() )
+      {
+        // make sure a new-user amendment type was selected
+        $amendment_type_mod = lib::create( 'database\modifier' );
+        $amendment_type_mod->where( 'new_user', '=', true );
+        if( 0 < $db_reqn_version->get_amendment_type_count( $amendment_type_mod ) )
+        {
+          // change the graduate's supervisor if there is one
+          $db_graduate = $this->get_graduate();
+          if( !is_null( $db_graduate ) )
+          {
+            $db_graduate->user_id = $db_reqn_version->new_user_id;
+            $db_graduate->save();
+          }
+
+          // change ownership to the new user
+          $this->user_id = $db_reqn_version->new_user_id;
+          $this->save();
+        }
+        else
+        {
+          // the new user isn't being used, so clear it out
+          $db_reqn_version->new_user_id = NULL;
+          $db_reqn_version->save();
+        }
+      }
+    }
     else if( 'Active' == $db_next_stage_type->name )
     {
+      // if we have just entered the active stage then create symbolic links to all data files and update file timestamps
       $this->refresh_study_data_files();
     }
     else if( $incomplete || $withdrawn )

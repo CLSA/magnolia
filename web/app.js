@@ -286,6 +286,23 @@ cenozo.service( 'CnReqnHelper', [
             atLeastOne: {
               en: "You must select at least one reason for your amendment request.",
               fr: "Vous devez sélectionner au moins un motif pour votre demande de modification."
+            },
+            newUser: {
+              en: "Please provide the name of the new primary applicant",
+              fr: "TODO: TRANSLATION REQUIRED"
+            },
+            newUserNoticeTitle: { en: 'Please Note', fr: 'Notez bien' },
+            newUserNotice: {
+              en: 'Changing the primary applicant, once approved, will remove your access to this application and transfer ownership to the new applicant.\n\nAre you sure you wish to proceed?',
+              fr: 'TODO: TRANSLATION REQUIRED'
+            },
+            newUserWithTraineeNotice1: {
+              en: 'Changing the primary applicant, once approved, will remove your access to this application and transfer ownership to the new applicant.\n\nAdditionally, the new applicant will be responsible for all applications which list ',
+              fr: ''
+            },
+            newUserWithTraineeNotice2: {
+              en: ' as the trainee which already exist or are created in the future. You may be asked to start new amendments for any existing applications which also list the trainee if an agreement has already been signed.\n\nAre you sure you wish to proceed?',
+              fr: ''
             }
           },
           part1: {

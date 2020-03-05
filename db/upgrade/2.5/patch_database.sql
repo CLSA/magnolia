@@ -11,6 +11,7 @@ SOURCE pdf_form_type.sql
 SOURCE pdf_form.sql
 SOURCE stage_type.sql
 SOURCE notification_type.sql
+SOURCE amendment_type.sql
 
 SOURCE update_version_number.sql
 

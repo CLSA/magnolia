@@ -568,8 +568,8 @@ define( function() {
                    ( 'applicant' == CnSession.role.name && 'Active' == stage_type );
           },
           onView: function( force ) {
-            // if we are a reviewer assigned to this reqn and haven't completed our review then show a reminder
             if( 'reviewer' == CnSession.role.name ) {
+              // If we are a reviewer assigned to this reqn and haven't completed our review then show a reminder
               CnHttpFactory.instance( {
                 path: this.parentModel.getServiceResourcePath() + '/review',
                 data: { modifier: { where: { column: 'recommendation_type_id', operator: '=', value: null } } }
@@ -582,7 +582,7 @@ define( function() {
                   } ).show();
                 }
               } );
-            }
+            } 
 
             return this.$$onView( force ).then( function() {
               return CnHttpFactory.instance( {
@@ -602,16 +602,62 @@ define( function() {
                     name: item.graduate_full_name
                   } );
                 } );
-              } )
+              } ).then( function() {
+                if( 'administrator' == CnSession.role.name ) {
+                  // If we are an administrator and this reqn is in an amendment to change the primary applicant then
+                  // we want to warn if there are any other reqn's with the same trainee that will need a new agreement
+                  // but which haven't had an amendment started
+                  if( '.' != self.record.amendment && 'review' == self.record.phase ) {
+                    CnHttpFactory.instance( {
+                      path: self.parentModel.getServiceResourcePath(),
+                      data: { select: { column: 'related_required_amendment_list' } }
+                    } ).get().then( function( response ) {
+                      if( null != response.data.related_required_amendment_list ) {
+                        // get the graduate's name
+                        var graduate = self.parentModel.metadata.columnList.graduate_id.enumList.findByProperty(
+                          'value', self.record.graduate_id
+                        );
+                        CnModalMessageFactory.instance( {
+                          title: 'Warning',
+                          message:
+                            'The applicant has requested to change ownership of this ' + self.parentModel.module.name.singular +
+                            ' to another applicant.  However, the trainee, ' + graduate.name + ', is also part of the following ' +
+                            self.parentModel.module.name.singular + '(s) which do not have a similar amendment:\n\n' +
+                            response.data.related_required_amendment_list + '\n\n' +
+                            'Before continuing with the review process an amendment to change the primary applicant for all of ' +
+                            'the above ' + self.parentModel.module.name.plural + ' should be started.'
+                        } ).show();
+                      }
+                    } );
+                  }
+                }
+              } );
             } );
           },
 
           onPatch: function( data ) {
             var changingUser = angular.isDefined( data.user_id );
-            var promiseList = [];
+            var outerPromiseList = [];
 
             // show a warning when changing the primary applicant
             if( changingUser ) {
+              var innerPromiseList = [];
+
+              // first things first, make sure there are no other reqns affected by this change which require a new agreement
+              if( this.record.graduate_id ) {
+                innerPromiseList.push(
+                  CnHttpFactory.instance( {
+                    path: ['graduate', this.record.graduate_id, 'reqn'].join( '/' ),
+                    data: {
+                      select: { column: 'identifier' },
+                      modifier: { where: { column: 'reqn_version.agreement_filename', operator: '!=', value: null } }
+                    }
+                  } ).query().then( function( response ) {
+                    return 0 < response.data.length ? response.data[0].identifier : null;
+                  } )
+                );
+              }
+
               var message = 'Changing the ' + this.parentModel.module.name.possessive + ' primary applicant will immediately remove ' +
                             'it from the old owner\'s ' + this.parentModel.module.name.singular + ' list and add it to the new ' +
                             'owner\'s list.  Also, a notification will be sent to both the old and new applicants explaining the ' +
@@ -623,17 +669,28 @@ define( function() {
 
               message += '\n\nAre you sure you wish to proceed?';
 
-              promiseList.push(
-                CnModalConfirmFactory.instance( {
-                  title: 'Change Owner' + ( this.record.graduate_id ? ' (And Supervisor)' : '' ),
-                  message: message
-                } ).show().then( function( response ) {
-                  return response;
+              outerPromiseList.push(
+                $q.all( innerPromiseList ).then( function( response ) {
+                  if( 0 == response.length || null == response[0] ) {
+                    return CnModalConfirmFactory.instance( {
+                      title: 'Change Owner' + ( self.record.graduate_id ? ' (And Supervisor)' : '' ),
+                      message: message
+                    } ).show().then( response => response )
+                  } else {
+                    return CnModalMessageFactory.instance( {
+                      title: 'Cannot Change Owner',
+                      message: 'The owner for this ' + self.parentModel.module.name.singular + ' can\'t be changed because the ' +
+                               'associated trainee is already associated with ' + self.parentModel.module.name.singular + ' ' +
+                               response[0] + ' which has an agreement.  In order to proceed an amendment must be started for that ' +
+                               self.parentModel.module.name.singular + ' instead.',
+                      error: true
+                    } ).show().then( function() { return false; } ); // don't continue below
+                  }
                 } )
               );
             }
 
-            return $q.all( promiseList ).then( function( response ) {
+            return $q.all( outerPromiseList ).then( function( response ) {
               if( 0 == response.length || response[0] ) {
                 return self.$$onPatch( data ).then( function() {
                   // Reload the view if we're changing the suggested revisions (the next stage will change)

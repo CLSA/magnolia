@@ -121,7 +121,15 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
     coapplicant_agreement_filename: { type: 'string' },
     funding_filename: { type: 'string' },
-    ethics_filename: { type: 'string' }
+    ethics_filename: { type: 'string' },
+    new_user_id: {
+      type: 'lookup-typeahead',
+      typeahead: {
+        table: 'user',
+        select: 'CONCAT( user.first_name, " ", user.last_name )',
+        where: [ 'user.first_name', 'user.last_name', 'user.name' ]
+      }
+    }
   } );
 
   /* ######################################################################################################## */
@@ -492,11 +500,20 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                 path: parent.subject + '/' + parent.identifier,
                 data: data
               };
-              httpObj.onError = function( response ) { self.onPatchError( response ); }
+              httpObj.onError = function( response ) { self.onPatchError( response ); };
               return CnHttpFactory.instance( httpObj ).patch().then( function() {
                 self.afterPatchFunctions.forEach( function( fn ) { fn(); } );
               } );
             }
+          },
+
+          onPatchError: function( response ) {
+            if( 306 == response.status && null != response.data.match( /^"You cannot change the primary applicant/ ) ) {
+              // failed to set the new user so put it back
+              self.formattedRecord.new_user_id = self.backupRecord.formatted_new_user_id;
+            }
+
+            return this.$$onPatchError( response );
           },
 
           coapplicantModel: CnCoapplicantModelFactory.instance(),
@@ -775,14 +792,40 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           },
 
           toggleAmendmentTypeValue: function( amendmentTypeId ) {
+            var promiseList = [];
+
             var property = 'amendmentType' + amendmentTypeId;
             if( this.record[property] ) {
+              if( amendmentTypeId == this.parentModel.newUserAmendmentTypeId ) {
+                // show a warning if changing primary applicants
+                var message = self.translate( 'amendment.newUserNotice' );
+                if( 0 < this.record.graduate_name.length ) {
+                  message = self.translate( 'amendment.newUserWithTraineeNotice1' )
+                          + this.record.graduate_name
+                          + self.translate( 'amendment.newUserWithTraineeNotice2' );
+                }
+
+                promiseList.push(
+                  CnModalConfirmFactory.instance( {
+                    title: self.translate( 'amendment.newUserNoticeTitle'),
+                    message: message
+                  } ).show().then( response => response )
+                );
+              }
+
               // add the amendment type
-              return CnHttpFactory.instance( {
-                path: this.parentModel.getServiceResourcePath() + '/amendment_type',
-                data: amendmentTypeId,
-                onError: function( response ) { self.record[property] = !self.record[property]; }
-              } ).post();
+              return $q.all( promiseList ).then( function( response ) {
+                if( 0 == response.length || response[0] ) {
+                  return CnHttpFactory.instance( {
+                    path: self.parentModel.getServiceResourcePath() + '/amendment_type',
+                    data: amendmentTypeId,
+                    onError: function( response ) { self.record[property] = !self.record[property]; }
+                  } ).post();
+                } else {
+                  // we're not making the change so un-select the option
+                  self.record[property] = !self.record[property];
+                }
+              } );
             } else {
               // delete the amendment type
               return CnHttpFactory.instance( {
@@ -1126,6 +1169,20 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                       };
                     }
 
+                    // make sure the new user field is filled out when changing the primary applicant
+                    if( self.record['amendmentType' + self.parentModel.newUserAmendmentTypeId] && null == record.new_user_id ) {
+                      var element = cenozo.getFormElement( 'new_user_id' );
+                      element.$error.required = true;
+                      cenozo.updateFormElement( element, true );
+                      if( null == errorTab ) errorTab = 'amendment';
+                      if( null == error ) error = {
+                        title: self.translate( 'misc.missingFieldTitle' ),
+                        message: self.translate( 'misc.missingFieldMessage' ),
+                        error: true
+                      };
+                    }
+
+                    // make sure the justification is filled out if necessary
                     if( self.amendmentTypeWithJustificationSelected() && null == record.amendment_justification ) {
                       var element = cenozo.getFormElement( 'amendment_justification' );
                       element.$error.required = true;
@@ -1276,6 +1333,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           } : this.$$getServiceData( type, columnRestrictLists );
         };
 
+        // we'll need to track which amendment type changes the reqn's owner
+        this.newUserAmendmentTypeId = null;
+
         // make the input lists from all groups more accessible
         this.inputList = {};
         module.inputGroupList.forEach( group => Object.assign( self.inputList, group.inputList ) );
@@ -1358,19 +1418,21 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
                 return CnHttpFactory.instance( {
                   path: 'amendment_type',
-                  data: {
-                    select: { column: [ 'id', 'reason_en', 'reason_fr', 'justification_prompt_en', 'justification_prompt_fr' ] }
-                  }
+                  data: { modifier: { order: 'rank' } }
                 } ).query().then( function success( response ) {
                   self.amendmentTypeList = { en: [], fr: [] };
                   response.data.forEach( function( item ) {
+                    if( item.new_user ) self.newUserAmendmentTypeId = item.id;
+
                     self.amendmentTypeList.en.push( {
                       id: item.id,
+                      newUser: item.new_user,
                       name: item.reason_en,
                       justificationPrompt: item.justification_prompt_en
                     } );
                     self.amendmentTypeList.fr.push( {
                       id: item.id,
+                      newUser: item.new_user,
                       name: item.reason_fr,
                       justificationPrompt: item.justification_prompt_fr
                     } );
