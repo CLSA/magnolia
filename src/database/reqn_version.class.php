@@ -299,8 +299,9 @@ class reqn_version extends \cenozo\database\record
   {
     $pdf_form_type_class_name = lib::get_class_name( 'database\pdf_form_type' );
     $db_reqn = $this->get_reqn();
+    $db_language = $db_reqn->get_language();
     $db_user = $db_reqn->get_user();
-    $db_graduate_user = $db_reqn->get_graduate_user();
+    $db_trainee_user = $db_reqn->get_trainee_user();
 
     // generate the application form
     $data = array( 'identifier' => $db_reqn->identifier );
@@ -316,15 +317,15 @@ class reqn_version extends \cenozo\database\record
     if( !is_null( $this->applicant_address ) ) $data['applicant_address'] = $this->applicant_address;
     if( !is_null( $this->applicant_phone ) ) $data['applicant_phone'] = $this->applicant_phone;
     $data['applicant_email'] = $db_user->email;
-    // only show graduate details if there is a graduate user
-    if( !is_null( $db_graduate_user ) )
+    // only show trainee details if there is a trainee user
+    if( !is_null( $db_trainee_user ) )
     {
-      $data['graduate_name'] = sprintf( '%s %s', $db_graduate_user->first_name, $db_graduate_user->last_name );
-      if( !is_null( $this->graduate_program ) ) $data['graduate_program'] = $this->graduate_program;
-      if( !is_null( $this->graduate_institution ) ) $data['graduate_institution'] = $this->graduate_institution;
-      if( !is_null( $this->graduate_address ) ) $data['graduate_address'] = $this->graduate_address;
-      if( !is_null( $this->graduate_phone ) ) $data['graduate_phone'] = $this->graduate_phone;
-      if( !is_null( $db_graduate_user ) ) $data['graduate_email'] = $db_graduate_user->email;
+      $data['graduate_name'] = sprintf( '%s %s', $db_trainee_user->first_name, $db_trainee_user->last_name );
+      if( !is_null( $this->trainee_program ) ) $data['graduate_program'] = $this->trainee_program;
+      if( !is_null( $this->trainee_institution ) ) $data['graduate_institution'] = $this->trainee_institution;
+      if( !is_null( $this->trainee_address ) ) $data['graduate_address'] = $this->trainee_address;
+      if( !is_null( $this->trainee_phone ) ) $data['graduate_phone'] = $this->trainee_phone;
+      if( !is_null( $db_trainee_user ) ) $data['trainee_email'] = $db_trainee_user->email;
       if( !is_null( $this->waiver ) )
       {
         if( 'graduate' == $this->waiver ) $data['waiver_graduate'] = 'Yes';
@@ -405,7 +406,9 @@ class reqn_version extends \cenozo\database\record
     if( $this->comprehensive ) $data['comprehensive'] = 'Yes';
     if( $this->tracking ) $data['tracking'] = 'Yes';
     if( $this->longitudinal ) $data['longitudinal'] = 'Yes';
-    if( !is_null( $this->last_identifier ) ) $data['last_identifier'] = $this->last_identifier;
+    $data['last_identifier'] = is_null( $this->last_identifier )
+                             ? ( 'fr' == $db_language->code ? 'TODO' : 'N/A' )
+                             : $this->last_identifier;
     if( !is_null( $this->part2_a_comment ) ) $data['part2_a_comment'] = $this->part2_a_comment;
     if( !is_null( $this->part2_b_comment ) ) $data['part2_b_comment'] = $this->part2_b_comment;
     if( !is_null( $this->part2_c_comment ) ) $data['part2_c_comment'] = $this->part2_c_comment;

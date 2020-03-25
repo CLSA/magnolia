@@ -31,9 +31,8 @@ class module extends \cenozo\service\module
       $db_reqn = $this->get_resource();
       if( 'applicant' == $db_role->name && !is_null( $db_reqn ) )
       {
-        $db_graduate = $db_reqn->get_graduate();
-        $is_graduate = !is_null( $db_graduate ) && $db_graduate->graduate_user_id == $db_user->id;
-        if( ( $db_reqn->user_id != $db_user->id && !$is_graduate ) || 'abandoned' == $db_reqn->state )
+        $trainee = 'applicant' == $db_role->name && $db_reqn->trainee_user_id == $db_user->id;
+        if( ( $db_reqn->user_id != $db_user->id && !$trainee ) || 'abandoned' == $db_reqn->state )
         {
           $this->get_status()->set_code( 404 );
           return;
@@ -60,7 +59,7 @@ class module extends \cenozo\service\module
     $modifier->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
     $modifier->left_join( 'deadline', 'reqn.deadline_id', 'deadline.id' );
     $modifier->join( 'user', 'reqn.user_id', 'user.id' );
-    $modifier->left_join( 'graduate', 'reqn.graduate_id', 'graduate.id' );
+    $modifier->left_join( 'user', 'reqn.trainee_user_id', 'trainee_user.id', 'trainee_user' );
 
     $join_mod = lib::create( 'database\modifier' );
     $join_mod->where( 'reqn.id', '=', 'stage.reqn_id', false );
@@ -77,13 +76,12 @@ class module extends \cenozo\service\module
         'user', 'CONCAT_WS( " ", user.first_name, user.last_name )', 'user_full_name', false );
     }
 
-    if( $select->has_column( 'graduate_full_name' ) )
+    if( $select->has_column( 'trainee_full_name' ) )
     {
-      $modifier->left_join( 'user', 'graduate.graduate_user_id', 'graduate_user.id', 'graduate_user' );
       $select->add_table_column(
-        'graduate_user',
-        'IF( graduate_user.id IS NULL, NULL, CONCAT_WS( " ", graduate_user.first_name, graduate_user.last_name ) )',
-        'graduate_full_name',
+        'trainee_user',
+        'IF( trainee_user.id IS NULL, NULL, CONCAT_WS( " ", trainee_user.first_name, trainee_user.last_name ) )',
+        'trainee_full_name',
         false
       );
     }
@@ -102,7 +100,7 @@ class module extends \cenozo\service\module
       // only show applicants their own reqns which aren't abandoned
       $modifier->where_bracket( true );
       $modifier->where( 'reqn.user_id', '=', $db_user->id );
-      $modifier->or_where( 'graduate.graduate_user_id', '=', $db_user->id );
+      $modifier->or_where( 'reqn.trainee_user_id', '=', $db_user->id );
       $modifier->where_bracket( false );
       $modifier->where( 'IFNULL( reqn.state, "" )', '!=', 'abandoned' );
 
@@ -162,63 +160,23 @@ class module extends \cenozo\service\module
     if( $db_reqn )
     {
       // include the user first/last/name as supplemental data
-      $select->add_column( 'CONCAT( user.first_name, " ", user.last_name, " (", user.name, ")" )', 'formatted_user_id', false );
+      $select->add_column(
+        'CONCAT( user.first_name, " ", user.last_name, " (", user.name, ")" )',
+        'formatted_user_id',
+        false
+      );
+
+      $select->add_column(
+        'CONCAT( trainee_user.first_name, " ", trainee_user.last_name, " (", trainee_user.name, ")" )',
+        'formatted_trainee_user_id',
+        false
+      );
 
       if( $select->has_column( 'has_agreements' ) )
       {
         $reqn_version_mod = lib::create( 'database\modifier' );
         $reqn_version_mod->where( 'agreement_filename', '!=', NULL );
         $select->add_constant( 0 < $db_reqn->get_reqn_version_count( $reqn_version_mod ), 'has_agreements' );
-      }
-
-      if( $select->has_column( 'related_required_amendment_list' ) )
-      {
-        // Collect a list of all other reqns which have the same graduate, have an agreement but do not have an amendment to
-        // change the primary applicant.  However, we only do this if this reqn is changing the primary applicant
-        $identifier_list = array();
-
-        $db_reqn_version = $db_reqn->get_current_reqn_version();
-        $amendment_type_mod = lib::create( 'database\modifier' );
-        $amendment_type_mod->where( 'amendment_type.new_user', '=', true );
-        if( !is_null( $db_reqn->graduate_id ) && 0 < $db_reqn_version->get_amendment_type_count( $amendment_type_mod ) )
-        {
-          // we're changing the primary user, so see if there are other reqns with the same graduate which have an agreement
-          $reqn_sel = lib::create( 'database\select' );
-          $reqn_sel->set_distinct( true );
-          $reqn_sel->add_column( 'identifier' );
-
-          $reqn_mod = lib::create( 'database\modifier' );
-
-          // make sure the reqn has had an agreement at some point
-          $join_mod = lib::create( 'database\modifier' );
-          $join_mod->where( 'reqn.id', '=', 'reqn_version.reqn_id', false );
-          $join_mod->where( 'reqn_version.agreement_filename', '!=', NULL );
-          $reqn_mod->join_modifier( 'reqn_version', $join_mod );
-
-          // make sure the latest version does not have a new-user amendment
-          $reqn_mod->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
-          $reqn_mod->left_join(
-            'reqn_version_has_amendment_type',
-            'reqn_current_reqn_version.reqn_version_id',
-            'reqn_version_has_amendment_type.reqn_version_id'
-          );
-
-          $join_mod = lib::create( 'database\modifier' );
-          $join_mod->where( 'reqn_version_has_amendment_type.amendment_type_id', '=', 'amendment_type.id', false );
-          $join_mod->where( 'amendment_type.new_user', '=', true );
-          $reqn_mod->join_modifier( 'amendment_type', $join_mod, 'left' );
-
-          $reqn_mod->where( 'reqn.id', '!=', $db_reqn->id );
-          $reqn_mod->where( 'reqn.graduate_id', '=', $db_reqn->graduate_id );
-          $reqn_mod->where( 'amendment_type.id', '=', NULL );
-
-          foreach( $reqn_class_name::select( $reqn_sel, $reqn_mod ) as $row ) $identifier_list[] = $row['identifier'];
-        }
-
-        $select->add_constant(
-          0 < count( $identifier_list ) ? implode( ', ', $identifier_list ) : NULL,
-          'related_required_amendment_list'
-        );
       }
     }
   }
@@ -233,7 +191,6 @@ class module extends \cenozo\service\module
     $reqn_class_name = lib::get_class_name( 'database\reqn' );
     $reqn_type_class_name = lib::get_class_name( 'database\reqn_type' );
     $language_class_name = lib::get_class_name( 'database\language' );
-    $graduate_class_name = lib::get_class_name( 'database\graduate' );
 
     // if no type has been selected then assume standard
     if( is_null( $record->reqn_type_id ) )
@@ -250,11 +207,11 @@ class module extends \cenozo\service\module
       $record->language_id = $language_class_name::get_unique_record( 'code', 'en' )->id;
 
     // if the current user has a supervisor then make them the owner
-    $db_graduate = $graduate_class_name::get_unique_record( 'graduate_user_id', $record->user_id );
-    if( !is_null( $db_graduate ) )
+    $db_applicant = $record->get_user()->get_applicant();
+    if( !is_null( $db_applicant->supervisor_user_id ) )
     {
-      $record->user_id = $db_graduate->user_id;
-      $record->graduate_id = $db_graduate->id;
+      $record->user_id = $db_applicant->supervisor_user_id;
+      $record->trainee_user_id = $db_applicant->user_id;
     }
   }
 }

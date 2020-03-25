@@ -51,12 +51,12 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     applicant_address: { type: 'string' },
     applicant_phone: { type: 'string' },
     applicant_email: { type: 'string' },
-    graduate_name: { type: 'string' },
-    graduate_program: { type: 'string' },
-    graduate_institution: { type: 'string' },
-    graduate_address: { type: 'string' },
-    graduate_phone: { type: 'string' },
-    graduate_email: { type: 'string' },
+    trainee_name: { type: 'string' },
+    trainee_program: { type: 'string' },
+    trainee_institution: { type: 'string' },
+    trainee_address: { type: 'string' },
+    trainee_phone: { type: 'string' },
+    trainee_email: { type: 'string' },
     start_date: { type: 'date' },
     duration: { type: 'enum' },
     title: { type: 'string' },
@@ -98,6 +98,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     csd_justification: { type: 'text' },
     amendment_justification: { type: 'text' },
 
+    trainee_user_id: { column: 'reqn.trainee_user_id', type: 'string' },
     identifier: { column: 'reqn.identifier', type: 'string' },
     state: { column: 'reqn.state', type: 'string' },
     data_directory: { column: 'reqn.data_directory', type: 'string' },
@@ -480,17 +481,44 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             // make sure to send patches to deferral notes to the parent reqn
             var property = Object.keys( data )[0];
             if( null == property.match( /^deferral_note/ ) ) {
-              return this.$$onPatch( data ).then( function() {
-                if( angular.isDefined( data.comprehensive ) || angular.isDefined( data.tracking ) ) {
-                  if( self.record.comprehensive && self.record.tracking ) {
-                    // show the cohort warning to the applicant
-                    CnModalMessageFactory.instance( {
-                      title: self.translate( 'part2.cohort.bothCohortNoticeTitle' ),
-                      message: self.translate( 'part2.cohort.bothCohortNotice' ),
-                      closeText: 'applicant' == CnSession.role.name ? self.translate( 'misc.close' ) : 'Close'
-                    } ).show();
+              var promiseList = [];
+              if( 'new_user_id' == property ) {
+                // make sure the new user isn't a trainee
+                promiseList.push(
+                  CnHttpFactory.instance( {
+                    path: 'applicant/user_id=' + data[property],
+                    data: { select: { column: 'supervisor_user_id' } }
+                  } ).get().then( function( response ) {
+                    if( angular.isObject( response.data ) && null != response.data.supervisor_user_id ) {
+                      return CnModalMessageFactory.instance( {
+                        title: self.translate( 'amendment.newUserIsTraineeNoticeTitle' ),
+                        message: self.translate( 'amendment.newUserIsTraineeNotice' ),
+                        closeText: 'applicant' == CnSession.role.name ? self.translate( 'misc.close' ) : 'Close',
+                        error: true
+                      } ).show().then( function() {
+                        // failed to set the new user so put it back
+                        self.formattedRecord.new_user_id = self.backupRecord.formatted_new_user_id;
+                        return true;
+                      } );
+                    }
+                  } )
+                );
+              }
+
+              return $q.all( promiseList ).then( function( response ) {
+                // only proceed if the above check isn't true (prevent trainees to be the new primary applicant)
+                if( true !== response[0] ) return self.$$onPatch( data ).then( function() {
+                  if( angular.isDefined( data.comprehensive ) || angular.isDefined( data.tracking ) ) {
+                    if( self.record.comprehensive && self.record.tracking ) {
+                      // show the cohort warning to the applicant
+                      CnModalMessageFactory.instance( {
+                        title: self.translate( 'part2.cohort.bothCohortNoticeTitle' ),
+                        message: self.translate( 'part2.cohort.bothCohortNotice' ),
+                        closeText: 'applicant' == CnSession.role.name ? self.translate( 'misc.close' ) : 'Close'
+                      } ).show();
+                    }
                   }
-                }
+                } );
               } );
             } else {
               if( !this.parentModel.getEditEnabled() ) throw new Error( 'Calling onPatch() but edit is not enabled.' );
@@ -798,17 +826,11 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             if( this.record[property] ) {
               if( amendmentTypeId == this.parentModel.newUserAmendmentTypeId ) {
                 // show a warning if changing primary applicants
-                var message = self.translate( 'amendment.newUserNotice' );
-                if( 0 < this.record.graduate_name.length ) {
-                  message = self.translate( 'amendment.newUserWithTraineeNotice1' )
-                          + this.record.graduate_name
-                          + self.translate( 'amendment.newUserWithTraineeNotice2' );
-                }
 
                 promiseList.push(
                   CnModalConfirmFactory.instance( {
                     title: self.translate( 'amendment.newUserNoticeTitle'),
-                    message: message
+                    message: self.translate( 'amendment.newUserNotice' )
                   } ).show().then( response => response )
                 );
               }
@@ -1062,9 +1084,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                   } else CnModalMessageFactory.httpError( response );
                 }
               } ).patch().then( function() {
-                var code = CnSession.user.graduate ?
-                  ( 'deferred' == record.state ? 'graduateResubmit' : 'graduateSubmit' ) :
-                  ( 'deferred' == record.state ? 'resubmit' : 'submit' );
+                var code = CnSession.user.id == self.record.trainee_user_id ?
+                  ( 'deferred' == self.record.state ? 'traineeResubmit' : 'traineeSubmit' ) :
+                  ( 'deferred' == self.record.state ? 'resubmit' : 'submit' );
                 return CnModalMessageFactory.instance( {
                   title: self.translate( 'misc.' + code + 'Title' ),
                   message: self.translate( 'misc.' + code + 'Message' ),
@@ -1528,10 +1550,10 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                   en: self.metadata.columnList.waiver.enumList,
                   fr: angular.copy( self.metadata.columnList.waiver.enumList )
                 };
-                self.metadata.columnList.waiver.enumList.en[1].name = misc.graduateFeeWaiver.en;
+                self.metadata.columnList.waiver.enumList.en[1].name = misc.traineeFeeWaiver.en;
                 self.metadata.columnList.waiver.enumList.en[2].name = misc.postdocFeeWaiver.en;
                 self.metadata.columnList.waiver.enumList.fr[0].name = misc.none.fr;
-                self.metadata.columnList.waiver.enumList.fr[1].name = misc.graduateFeeWaiver.fr;
+                self.metadata.columnList.waiver.enumList.fr[1].name = misc.traineeFeeWaiver.fr;
                 self.metadata.columnList.waiver.enumList.fr[2].name = misc.postdocFeeWaiver.fr;
               }
             } ),

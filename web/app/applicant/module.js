@@ -1,7 +1,7 @@
 define( function() {
   'use strict';
 
-  try { var module = cenozoApp.module( 'graduate', true ); } catch( err ) { console.warn( err ); return; }
+  try { var module = cenozoApp.module( 'applicant', true ); } catch( err ) { console.warn( err ); return; }
   angular.extend( module, {
     identifier: {},
     name: {
@@ -10,27 +10,27 @@ define( function() {
       possessive: 'trainee\'s'
     },
     columnList: {
-      user_full_name: {
+      supervisor_full_name: {
         title: 'Supervisor',
-        isIncluded: function( $state, model ) { return 'graduate.list' == $state.current.name; }
+        isIncluded: function( $state, model ) { return 'applicant.list' == $state.current.name; }
       },
-      graduate_full_name: {
+      user_full_name: {
         title: 'Trainee'
       },
-      graduate_name: {
-        column: 'graduate_user.name',
+      user_name: {
+        column: 'user.name',
         isIncluded: function( $state, model ) { return false; }
       }
     },
     defaultOrder: {
-      column: 'graduate_full_name',
+      column: 'user_full_name',
       reverse: false
     }
   } );
 
   module.addInputGroup( '', {
-    user_id: {
-      column: 'graduate.user_id',
+    supervisor_user_id: {
+      column: 'applicant.supervisor_user_id',
       title: 'Supervisor',
       type: 'lookup-typeahead',
       typeahead: {
@@ -39,8 +39,8 @@ define( function() {
         where: [ 'user.first_name', 'user.last_name', 'user.name' ]
       }
     },
-    graduate_user_id: {
-      column: 'graduate.graduate_user_id',
+    user_id: {
+      column: 'applicant.user_id',
       title: 'Trainee',
       type: 'lookup-typeahead',
       typeahead: {
@@ -53,37 +53,37 @@ define( function() {
   } );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnGraduateAdd', [
-    'CnGraduateModelFactory',
-    function( CnGraduateModelFactory ) {
+  cenozo.providers.directive( 'cnApplicantAdd', [
+    'CnApplicantModelFactory',
+    function( CnApplicantModelFactory ) {
       return {
         templateUrl: module.getFileUrl( 'add.tpl.html' ),
         restrict: 'E',
         scope: { model: '=?' },
         controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnGraduateModelFactory.root;
+          if( angular.isUndefined( $scope.model ) ) $scope.model = CnApplicantModelFactory.root;
         }
       };
     }
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnGraduateList', [
-    'CnGraduateModelFactory',
-    function( CnGraduateModelFactory ) {
+  cenozo.providers.directive( 'cnApplicantList', [
+    'CnApplicantModelFactory',
+    function( CnApplicantModelFactory ) {
       return {
         templateUrl: module.getFileUrl( 'list.tpl.html' ),
         restrict: 'E',
         scope: { model: '=?' },
         controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnGraduateModelFactory.root;
+          if( angular.isUndefined( $scope.model ) ) $scope.model = CnApplicantModelFactory.root;
         }
       };
     }
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnGraduateAddFactory', [
+  cenozo.providers.factory( 'CnApplicantAddFactory', [
     'CnBaseAddFactory',
     function( CnBaseAddFactory ) {
       var object = function( parentModel ) { CnBaseAddFactory.construct( this, parentModel ); };
@@ -92,14 +92,14 @@ define( function() {
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnGraduateListFactory', [
+  cenozo.providers.factory( 'CnApplicantListFactory', [
     'CnBaseListFactory', '$state',
     function( CnBaseListFactory, $state ) {
       var object = function( parentModel ) {
         var self = this;
         CnBaseListFactory.construct( this, parentModel );
         this.onSelect = function( record ) {
-          $state.go( 'user.view', { identifier: 'name=' + record.graduate_name } );
+          $state.go( 'user.view', { identifier: 'name=' + record.user_name } );
         };
       };
       return { instance: function( parentModel ) { return new object( parentModel ); } };
@@ -107,14 +107,14 @@ define( function() {
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnGraduateModelFactory', [
-    'CnBaseModelFactory', 'CnGraduateAddFactory', 'CnGraduateListFactory',
-    function( CnBaseModelFactory, CnGraduateAddFactory, CnGraduateListFactory ) {
+  cenozo.providers.factory( 'CnApplicantModelFactory', [
+    'CnBaseModelFactory', 'CnApplicantAddFactory', 'CnApplicantListFactory',
+    function( CnBaseModelFactory, CnApplicantAddFactory, CnApplicantListFactory ) {
       var object = function( root ) {
         var self = this;
         CnBaseModelFactory.construct( this, module );
-        this.addModel = CnGraduateAddFactory.instance( this );
-        this.listModel = CnGraduateListFactory.instance( this );
+        this.addModel = CnApplicantAddFactory.instance( this );
+        this.listModel = CnApplicantListFactory.instance( this );
         this.getViewEnabled = function() { return true; };
       };
 

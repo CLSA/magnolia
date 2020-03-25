@@ -86,7 +86,7 @@ class ui extends \cenozo\ui\ui
     if( !is_null( $module ) )
     {
       $module->add_child( 'reqn', 'access' );
-      $module->add_child( 'graduate', 'access' );
+      $module->add_child( 'applicant', 'access' );
     }
   }
 

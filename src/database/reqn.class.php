@@ -39,8 +39,8 @@ class reqn extends \cenozo\database\record
     // make sure the deadline is appropriate
     if( $is_new ) $this->assert_deadline();
 
-    // track whether the graduate_id has changed to NULL
-    $remove_graduate_details = $this->has_column_changed( 'graduate_id' ) && !is_null( $this->graduate_id );
+    // track whether the trainee_id has changed to NULL
+    $remove_trainee_details = $this->has_column_changed( 'trainee_user_id' ) && !is_null( $this->trainee_user_id );
 
     parent::save();
 
@@ -49,14 +49,14 @@ class reqn extends \cenozo\database\record
       $this->create_version();
       $this->proceed_to_next_stage();
     }
-    else if( $remove_graduate_details )
+    else if( $remove_trainee_details )
     {
-      // do not allow graduate details or a fee waiver if there is no graduate selected
+      // do not allow trainee details or a fee waiver if there is no trainee selected
       $db_current_reqn_version = $this->get_current_reqn_version();
-      $db_current_reqn_version->graduate_program = NULL;
-      $db_current_reqn_version->graduate_institution = NULL;
-      $db_current_reqn_version->graduate_address = NULL;
-      $db_current_reqn_version->graduate_phone = NULL;
+      $db_current_reqn_version->trainee_program = NULL;
+      $db_current_reqn_version->trainee_institution = NULL;
+      $db_current_reqn_version->trainee_address = NULL;
+      $db_current_reqn_version->trainee_phone = NULL;
       $db_current_reqn_version->waiver = NULL;
       $db_current_reqn_version->save();
     }
@@ -204,7 +204,10 @@ class reqn extends \cenozo\database\record
   }
 
   /**
-   * TODO: document
+   * Returns the reqn's calculated recommendation based on all reviews
+   * 
+   * @return string ("Approved" or "Not Approved")
+   * @access public
    */
   public function get_recommendation()
   {
@@ -626,12 +629,13 @@ class reqn extends \cenozo\database\record
         $amendment_type_mod->where( 'new_user', '=', true );
         if( 0 < $db_reqn_version->get_amendment_type_count( $amendment_type_mod ) )
         {
-          // change the graduate's supervisor if there is one
-          $db_graduate = $this->get_graduate();
-          if( !is_null( $db_graduate ) )
+          // change the trainee's supervisor if there is one
+          $db_trainee_user = $this->get_trainee_user();
+          if( !is_null( $db_trainee_user ) )
           {
-            $db_graduate->user_id = $db_reqn_version->new_user_id;
-            $db_graduate->save();
+            $db_applicant = $db_trainee_user->get_applicant();
+            $db_applicant->supervisor_user_id = $db_reqn_version->new_user_id;
+            $db_applicant->save();
           }
 
           // change ownership to the new user
@@ -750,7 +754,7 @@ class reqn extends \cenozo\database\record
   public function generate_reviews_file()
   {
     $db_user = $this->get_user();
-    $db_graduate_user = $this->get_graduate_user();
+    $db_trainee_user = $this->get_trainee_user();
     $db_reqn_version = $this->get_current_reqn_version();
 
     $text = sprintf(
@@ -758,15 +762,14 @@ class reqn extends \cenozo\database\record
       "Amendment: %s\n".
       "Title: %s\n".
       "Applicant: %s\n".
-      "%s". // graduate only added if one exists
+      "%s". // trainee only added if one exists
       "Lay Summary:\n".
       "%s\n",
       $this->identifier,
       str_replace( '.', 'no', $db_reqn_version->amendment ),
       $db_reqn_version->title,
       sprintf( '%s %s', $db_user->first_name, $db_user->last_name ),
-      is_null( $db_graduate_user ) ?
-        '' : sprintf( "Graduate: %s %s\n", $db_graduate_user->first_name, $db_graduate_user->last_name ),
+      is_null( $db_trainee_user ) ?  '' : sprintf( "Trainee: %s %s\n", $db_trainee_user->first_name, $db_trainee_user->last_name ),
       $db_reqn_version->lay_summary
     );
 
@@ -868,17 +871,9 @@ class reqn extends \cenozo\database\record
    * 
    * @return integer
    */
-  public function get_graduate_user()
+  public function get_trainee_user()
   {
-    $select = lib::create( 'database\select' );
-    $select->from( 'reqn' );
-    $select->add_table_column( 'graduate', 'graduate_user_id' );
-    $modifier = lib::create( 'database\modifier' );
-    $modifier->join( 'graduate', 'reqn.graduate_id', 'graduate.id' );
-    $modifier->where( 'reqn.id', '=', $this->id );
-
-    $user_id = static::db()->get_one( sprintf( '%s %s', $select->get_sql(), $modifier->get_sql() ) );
-    return is_null( $user_id ) ? NULL : lib::create( 'database\user', $user_id );
+    return is_null( $this->trainee_user_id ) ? NULL : lib::create( 'database\user', $this->trainee_user_id );
   }
 
   /**
@@ -1078,7 +1073,7 @@ class reqn extends \cenozo\database\record
         }
 
         // if there are zero or one stages then this is a new requisition which needs its deadline set
-        if( 2 > count( $number_of_stages ) )
+        if( 2 > $number_of_stages )
         {
           if( 0 < $this->get_deadline()->date->diff( util::get_datetime_object() )->days )
           { // deadline has expired, get the next one

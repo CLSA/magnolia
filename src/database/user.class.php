@@ -41,24 +41,32 @@ class user extends \cenozo\database\user
   }
 
   /**
-   * Determines whether the user is a graduate (has a supervisor)
+   * Determines whether the user is a trainee (has a supervisor)
    */
-  public function is_graduate()
+  public function is_trainee()
   {
-    $graduate_class_name = lib::get_class_name( 'database\graduate' );
-
-    $modifier = lib::create( 'database\modifier' );
-    $modifier->where( 'graduate_user_id', '=', $this->id );
-    return 0 < $graduate_class_name::count( $modifier );
+    $db_applicant = $this->get_applicant();
+    return is_null( $db_applicant ) ? false : !is_null( $db_applicant->supervisor_user_id );
   }
 
   /**
-   * Returns this user's graduate record (if it exists)
-   * @return database\graduate
+   * Returns this user's applicant record (if it exists)
+   * @return database\applicant
    */
-  public function get_graduate()
+  public function get_applicant()
   {
-    $graduate_class_name = lib::get_class_name( 'database\graduate' );
-    return $graduate_class_name::get_unique_record( 'graduate_user_id', $this->id );
+    $applicant_class_name = lib::get_class_name( 'database\applicant' );
+    return $applicant_class_name::get_unique_record( 'user_id', $this->id );
+  }
+
+  /**
+   * Makes sure that the applicant record exists
+   */
+  public function assert_applicant()
+  {
+    static::db()->execute( sprintf(
+      'INSERT IGNORE INTO applicant SET user_id = %s',
+      static::db()->format_string( $this->id )
+    ) );
   }
 }

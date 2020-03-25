@@ -137,7 +137,7 @@ cenozo.service( 'CnReqnHelper', [
           return 'applicant' != role;
         } else if( 'amendment proceed' == subject ) {
           return '.' != record.amendment &&
-                 ['Admin Review','Feasibility Review','Decision Made'].includes( stage_type ) &&
+                 ['Admin Review','Feasibility Review','Decision Made','Agreement'].includes( stage_type ) &&
                  'administrator' == role;
         } else if( 'amendment feasibility review' == subject ) {
           return 'Admin Review' == stage_type;
@@ -148,9 +148,9 @@ cenozo.service( 'CnReqnHelper', [
         } else if( 'amendment agreement' == subject ) {
           return 'Decision Made' == stage_type;
         } else if( 'amendment data release' == subject ) {
-          return 'Decision Made' == stage_type;
+          return ['Decision Made','Agreement'].includes( stage_type );
         } else if( 'amendment active' == subject ) {
-          return 'Decision Made' == stage_type;
+          return ['Decision Made','Agreement'].includes( stage_type );
         } else return false;
       },
 
@@ -289,20 +289,17 @@ cenozo.service( 'CnReqnHelper', [
             },
             newUser: {
               en: "Please provide the name of the new primary applicant",
-              fr: "TODO: TRANSLATION REQUIRED"
+              fr: "Veuillez fournir le nom du nouveau demandeur principal"
             },
             newUserNoticeTitle: { en: 'Please Note', fr: 'Notez bien' },
             newUserNotice: {
               en: 'Changing the primary applicant, once approved, will remove your access to this application and transfer ownership to the new applicant.\n\nAre you sure you wish to proceed?',
-              fr: 'TODO: TRANSLATION REQUIRED'
+              fr: 'Une fois approuvé, le changement de demandeur principal supprimera votre accès à cette demande et la propriété du compte sera transférée au nouveau demandeur.\n\nÊtes-vous sûr(e) de vouloir continuer?'
             },
-            newUserWithTraineeNotice1: {
-              en: 'Changing the primary applicant, once approved, will remove your access to this application and transfer ownership to the new applicant.\n\nAdditionally, the new applicant will be responsible for all applications which list ',
-              fr: ''
-            },
-            newUserWithTraineeNotice2: {
-              en: ' as the trainee which already exist or are created in the future. You may be asked to start new amendments for any existing applications which also list the trainee if an agreement has already been signed.\n\nAre you sure you wish to proceed?',
-              fr: ''
+            newUserIsTraineeNoticeTitle: { en: 'Please Note', fr: 'Notez bien' },
+            newUserIsTraineeNotice: {
+              en: 'The applicant you have selected is a trainee.  Please select a new applicant which does not have a supervisor.',
+              fr: 'TODO'
             }
           },
           part1: {
@@ -331,12 +328,12 @@ cenozo.service( 'CnReqnHelper', [
                 en: 'Complete this section if this is a Trainee application (MSc, PhD and Postdoctoral Fellow).',
                 fr: 'Remplissez cette section si la demande est pour un étudiant (M. Sc., Ph. D.) ou un chercheur postdoctoral.'
               },
-              graduate_name: { en: 'Name', fr: 'Nom' },
-              graduate_program: { en: 'Degree and Program of Study', fr: 'Grade et programme d’étude' },
-              graduate_institution: { en: 'Institution of Enrollment', fr: 'Établissement d’étude' },
-              graduate_address: { en: 'Current Mailing Address', fr: 'Adresse de correspondance actuelle' },
-              graduate_phone: { en: 'Phone', fr: 'Téléphone' },
-              graduate_email: { en: 'E-mail', fr: 'Courriel' },
+              trainee_name: { en: 'Name', fr: 'Nom' },
+              trainee_program: { en: 'Degree and Program of Study', fr: 'Grade et programme d’étude' },
+              trainee_institution: { en: 'Institution of Enrollment', fr: 'Établissement d’étude' },
+              trainee_address: { en: 'Current Mailing Address', fr: 'Adresse de correspondance actuelle' },
+              trainee_phone: { en: 'Phone', fr: 'Téléphone' },
+              trainee_email: { en: 'E-mail', fr: 'Courriel' },
               text4: {
                 en: 'Graduate students (MSc or PhD) who wish to obtain the CLSA data for the sole purpose of their thesis, and postdoctoral fellows (limit 1 waiver per postdoc) who wish to obtain the CLSA data for the sole purpose of their postdoctoral project who are enrolled at Canadian institutions for their graduate degree or postdoc, can apply for a fee waiver. Canadian trainees working outside Canada but funded through a Canadian source are also eligible for a fee waiver. Trainees eligible for a fee waiver are also waived the supplemental data fee for images and raw data. The CIHR Catalyst Grants for the use of CLSA Data are not eligible for Trainee Fee Waivers.',
                 fr: 'Les étudiants de deuxième et troisième cycle (M. Sc. ou Ph. D.) et les chercheurs postdoctoraux (limite d’une exonération par post doctorat) qui désirent utiliser les données de l’ÉLCV uniquement pour leur recherche et qui sont inscrits à un établissement canadien peuvent demander une exonération des frais. Les stagiaires canadiens qui travaillent à l’extérieur du Canada, mais qui sont financés par un organisme canadien peuvent également demander une exonération des frais. L’exonération des frais pour les stagiaires admissibles s’applique également aux frais additionnels demandés pour les images et les données brutes. Les subventions catalyseur pour l’analyse des données de l’ÉLCV ne sont pas admissibles à l’exonération des frais pour les stagiaires.'
@@ -654,11 +651,11 @@ cenozo.service( 'CnReqnHelper', [
               en: 'You have successfully submitted your CLSA Data and Biospecimen Request Application, and it will now be reviewed. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your application. For timelines of the anticipated notice of decision, please check the Data Access Application Process page of our website.',
               fr: 'Votre demande d’accès aux données et aux échantillons biologiques de l’ÉLCV a bien été soumise. Elle sera maintenant évaluée. Vous recevrez un courriel avec des instructions supplémentaires si nous avons besoin d’autre information et lorsque le processus d’évaluation sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour consulter le statut de votre demande. Pour connaître les dates approximatives d’envoi de l’avis de décision, veuillez consulter la page Processus de demande d’accès aux données de notre site Web.'
             },
-            graduateSubmitTitle: {
+            traineeSubmitTitle: {
               en: 'Application Submitted for Supervisor Approval',
               fr: 'Demande envoyée au superviseur pour approbation'
             },
-            graduateSubmitMessage: {
+            traineeSubmitMessage: {
               en: 'You have successfully submitted your CLSA Data and Biospecimen Request Application, and your supervisor will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your application. For timelines of the anticipated notice of decision, please check the Data Access Application Process page of our website.',
               fr: 'Votre demande d’accès aux données et aux échantillons de l’ÉLCV a été soumise avec succès. Votre superviseur recevra une demande d’approbation par courriel. Elle sera maintenant évaluée. Vous recevrez un courriel avec des instructions supplémentaires si nous avons besoin d’autre information et lorsque le processus d’évaluation sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour consulter le statut de votre demande. Pour connaître les dates approximatives d’envoi de l’avis de décision, veuillez consulter la page Processus de demande d’accès aux données de notre site Web.'
             },
@@ -670,11 +667,11 @@ cenozo.service( 'CnReqnHelper', [
               en: 'You have successfully resubmitted your CLSA Data and Biospecimen Request Application. You will receive an email with further instructions if your further attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your application. For timelines of the anticipated notice of decision, please check the Data Access Application Process page of our website.',
               fr: 'Votre demande d’accès aux données et aux échantillons biologiques de l’ÉLCV a bien été resoumise. Vous recevrez un courriel avec des instructions supplémentaires si nous avons besoin d’autre information et lorsque le processus d’évaluation sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour consulter le statut de votre demande. Pour connaître les dates approximatives d’envoi de l’avis de décision, veuillez consulter la page Processus de demande d’accès aux données de notre site Web.'
             },
-            graduateResubmitTitle: {
+            traineeResubmitTitle: {
               en: 'Application Resubmitted for Supervisor Approval',
               fr: 'Demande envoyée à nouveau au superviseur pour approbation',
             },
-            graduateResubmitMessage: {
+            traineeResubmitMessage: {
               en: 'You have successfully resubmitted your CLSA Data and Biospecimen Request Application, and your supervisor will receive an email to request approval. You will receive an email with further instructions if your further attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your application. For timelines of the anticipated notice of decision, please check the Data Access Application Process page of our website.',
               fr: 'Votre demande d’accès aux données et aux échantillons de l’ÉLCV a été resoumise avec succès. Votre superviseur recevra une demande d’approbation par courriel. Vous recevrez un courriel avec des instructions supplémentaires si nous avons besoin d’autre information et lorsque le processus d’évaluation sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour consulter le statut de votre demande. Pour connaître les dates approximatives d’envoi de l’avis de décision, veuillez consulter la page Processus de demande d’accès aux données de notre site Web.'
             },
@@ -745,7 +742,7 @@ cenozo.service( 'CnReqnHelper', [
               en: '3 Years + 3 Additional Years',
               fr: '3 ans + 3 années supplémentaires'
             },
-            graduateFeeWaiver: {
+            traineeFeeWaiver: {
               en: 'Fee Waiver for Graduate student (MSc or PhD) for thesis only',
               fr: 'Exonération pour un étudiant des cycles supérieurs (M. Sc. ou Ph. D.) pour la thèse seulement'
             },
@@ -912,10 +909,10 @@ cenozo.service( 'CnReqnVersionHelper', [
               applicant_affiliation: false,
               applicant_address: false,
               applicant_phone: false,
-              graduate_program: false,
-              graduate_institution: false,
-              graduate_address: false,
-              graduate_phone: false,
+              trainee_program: false,
+              trainee_institution: false,
+              trainee_address: false,
+              trainee_phone: false,
               waiver: false
             },
             b: { // project team

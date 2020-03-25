@@ -170,9 +170,9 @@ class patch extends \cenozo\service\patch
     $session = lib::create( 'business\session' );
     $db_role = $session->get_role();
     $db_user = $session->get_user();
-    $graduate = 'applicant' == $db_role->name && $db_user->is_graduate();
 
     $db_reqn = $this->get_leaf_record();
+    $trainee = 'applicant' == $db_role->name && $db_reqn->trainee_user_id == $db_user->id;
     $db_reqn_version = $db_reqn->get_current_reqn_version();
     $file = $this->get_argument( 'file', NULL );
     $headers = apache_request_headers();
@@ -296,8 +296,8 @@ class patch extends \cenozo\service\patch
         {
           if( 'submit' == $action )
           {
-            // graduates must be get approval from their supervisor
-            if( $graduate )
+            // trainees must be get approval from their supervisor
+            if( $trainee )
             {
               // send a notification to the supervisor
               $db_notification = lib::create( 'database\notification' );
@@ -382,11 +382,13 @@ class patch extends \cenozo\service\patch
     $patch_array = $this->get_file_as_array();
     if( array_key_exists( 'user_id', $patch_array ) )
     {
-      $db_graduate = $db_reqn->get_graduate();
-      if( !is_null( $db_graduate ) )
+      // if the reqn has a trainee then change their supervisor to the new user
+      $db_trainee_user = $db_reqn->get_trainee_user();
+      if( !is_null( $db_trainee_user ) )
       {
-        $db_graduate->user_id = $patch_array['user_id'];
-        $db_graduate->save();
+        $db_applicant = $db_trainee_user->get_applicant();
+        $db_applicant->supervisor_user_id = $db_reqn->user_id;
+        $db_applicant->save();
       }
 
       // send a notification

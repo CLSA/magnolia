@@ -60,12 +60,11 @@ class conflict_of_interest extends \cenozo\business\report\base_report
     // add the trainee (if there is one)
     ////////////////////////////////////////////////////////////////////////////////////////////////
     $select = clone( $base_sel );
-    $select->add_column( 'CONCAT_WS( " ", user.first_name, user.last_name )', 'Name', false );
-    $select->add_column( 'reqn_version.graduate_institution', 'Institution', false );
+    $select->add_column( 'CONCAT_WS( " ", trainee_user.first_name, trainee_user.last_name )', 'Name', false );
+    $select->add_column( 'reqn_version.trainee_institution', 'Institution', false );
 
     $modifier = clone( $base_mod );
-    $modifier->join( 'graduate', 'reqn.graduate_id', 'graduate.id' );
-    $modifier->join( 'user', 'graduate.graduate_user_id', 'user.id' );
+    $modifier->join( 'user', 'reqn.trainee_user_id', 'trainee_user.id', '', 'trainee_user' );
       
     $data = array_merge( $data, $reqn_class_name::select( $select, $modifier ) );
 

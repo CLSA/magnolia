@@ -291,63 +291,63 @@
               <div class="form-horizontal">
                 <cn-reqn-view-input
                   input="{
-                    key: 'graduate_name',
-                    title: t( 'part1.a.graduate_name' ),
-                    type: model.inputList.graduate_name.type,
+                    key: 'trainee_name',
+                    title: t( 'part1.a.trainee_name' ),
+                    type: model.inputList.trainee_name.type,
                     constant: true
                   }"
-                  difference="model.viewModel.compareRecord.differences.part1.a.graduate_name"
+                  difference="model.viewModel.compareRecord.differences.part1.a.trainee_name"
                   model="model">
                 </cn-reqn-view-input>
                 <cn-reqn-view-input
                   input="{
-                    key: 'graduate_program',
-                    title: t( 'part1.a.graduate_program' ),
-                    type: model.inputList.graduate_program.type,
-                    constant: !model.viewModel.record.graduate_name
+                    key: 'trainee_program',
+                    title: t( 'part1.a.trainee_program' ),
+                    type: model.inputList.trainee_program.type,
+                    constant: !model.viewModel.record.trainee_name
                   }"
-                  difference="model.viewModel.compareRecord.differences.part1.a.graduate_program"
+                  difference="model.viewModel.compareRecord.differences.part1.a.trainee_program"
                   model="model">
                 </cn-reqn-view-input>
                 <cn-reqn-view-input
                   input="{
-                    key: 'graduate_institution',
-                    title: t( 'part1.a.graduate_institution' ),
+                    key: 'trainee_institution',
+                    title: t( 'part1.a.trainee_institution' ),
                     type: 'string',
-                    constant: !model.viewModel.record.graduate_name
+                    constant: !model.viewModel.record.trainee_name
                   }"
-                  difference="model.viewModel.compareRecord.differences.part1.a.graduate_institution"
+                  difference="model.viewModel.compareRecord.differences.part1.a.trainee_institution"
                   model="model">
                 </cn-reqn-view-input>
                 <cn-reqn-view-input
                   input="{
-                    key: 'graduate_address',
-                    title: t( 'part1.a.graduate_address' ),
-                    type: model.inputList.graduate_address.type,
-                    constant: !model.viewModel.record.graduate_name
+                    key: 'trainee_address',
+                    title: t( 'part1.a.trainee_address' ),
+                    type: model.inputList.trainee_address.type,
+                    constant: !model.viewModel.record.trainee_name
                   }"
-                  difference="model.viewModel.compareRecord.differences.part1.a.graduate_address"
+                  difference="model.viewModel.compareRecord.differences.part1.a.trainee_address"
                   model="model">
                 </cn-reqn-view-input>
                 <cn-reqn-view-input
                   input="{
-                    key: 'graduate_phone',
-                    title: t( 'part1.a.graduate_phone' ),
-                    type: model.inputList.graduate_phone.type,
-                    constant: !model.viewModel.record.graduate_name
+                    key: 'trainee_phone',
+                    title: t( 'part1.a.trainee_phone' ),
+                    type: model.inputList.trainee_phone.type,
+                    constant: !model.viewModel.record.trainee_name
                   }"
-                  difference="model.viewModel.compareRecord.differences.part1.a.graduate_phone"
+                  difference="model.viewModel.compareRecord.differences.part1.a.trainee_phone"
                   model="model">
                 </cn-reqn-view-input>
                 <cn-reqn-view-input
                   input="{
-                    key: 'graduate_email',
-                    title: t( 'part1.a.graduate_email' )+'<sup>ⓘ</sup>',
-                    type: model.inputList.graduate_email.type,
+                    key: 'trainee_email',
+                    title: t( 'part1.a.trainee_email' )+'<sup>ⓘ</sup>',
+                    type: model.inputList.trainee_email.type,
                     constant: true,
                     help: t( 'misc.emailText' )
                   }"
-                  difference="model.viewModel.compareRecord.differences.part1.a.graduate_email"
+                  difference="model.viewModel.compareRecord.differences.part1.a.trainee_email"
                   model="model">
                 </cn-reqn-view-input>
               </div>
@@ -360,7 +360,7 @@
                     title: t( 'part1.a.waiver' ),
                     type: 'enum',
                     enumList: model.metadata.columnList.waiver.enumList[model.viewModel.record.lang],
-                    constant: !model.viewModel.record.graduate_name
+                    constant: !model.viewModel.record.trainee_name
                   }"
                   difference="model.viewModel.compareRecord.differences.part1.a.waiver"
                   model="model">
@@ -1220,6 +1220,7 @@
                 <div class="container-fluid">
                   <cn-reqn-view-input
                     no-cols=true
+                    ng-if="'e'!=part"
                     input="{
                       key: 'part2_' + part + '_comment',
                       title: t( 'misc.comments' ),

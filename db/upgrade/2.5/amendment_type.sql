@@ -38,4 +38,4 @@ DROP PROCEDURE IF EXISTS patch_amendment_type;
 SELECT "Adding new amendment type" AS "";
 
 INSERT IGNORE INTO amendment_type( rank, new_user, reason_en, reason_fr ) VALUES
-( 1, 1, "Changing Primary Applicant", "TODO: TRANSLATION REQUIRED" );
+( 1, 1, "Changing Primary Applicant", "Changement de demandeur principal" );

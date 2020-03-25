@@ -28,7 +28,7 @@ class post extends \cenozo\service\post
 
       $db_reqn->reqn_type_id = $db_cloned_reqn->reqn_type_id;
       $db_reqn->user_id = $db_cloned_reqn->user_id;
-      $db_reqn->graduate_id = $db_cloned_reqn->graduate_id;
+      $db_reqn->trainee_user_id = $db_cloned_reqn->trainee_user_id;
       $db_reqn->language_id = $db_cloned_reqn->language_id;
       $db_reqn->note = sprintf( 'Cloned from requisition %s', $db_cloned_reqn->identifier );
     }

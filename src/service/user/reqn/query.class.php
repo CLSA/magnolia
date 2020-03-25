@@ -16,6 +16,25 @@ class query extends \cenozo\service\query
   /**
    * Replaces parent method
    */
+  protected function get_record_count()
+  {
+    if( $this->get_argument( 'choosing', false ) ) return parent::get_record_count();
+
+    $reqn_class_name = lib::get_class_name( 'database\reqn' );
+    $db_user = $this->get_parent_record();
+
+    // show both owned and trainee reqns
+    $modifier = clone $this->modifier;
+    $modifier->where_bracket( true );
+    $modifier->where( 'reqn.user_id', '=', $db_user->id );
+    $modifier->or_where( 'reqn.trainee_user_id', '=', $db_user->id );
+    $modifier->where_bracket( false );
+    return $reqn_class_name::count( $modifier );
+  }
+
+  /**
+   * Replaces parent method
+   */
   protected function get_record_list()
   {
     if( $this->get_argument( 'choosing', false ) ) return parent::get_record_list();
@@ -23,13 +42,11 @@ class query extends \cenozo\service\query
     $reqn_class_name = lib::get_class_name( 'database\reqn' );
     $db_user = $this->get_parent_record();
 
-    // show both owned and graduate reqns
+    // show both owned and trainee reqns
     $modifier = clone $this->modifier;
-    if( !$modifier->has_join( 'graduate' ) )
-      $modifier->left_join( 'graduate', 'reqn.graduate_id', 'graduate.id' );
     $modifier->where_bracket( true );
     $modifier->where( 'reqn.user_id', '=', $db_user->id );
-    $modifier->or_where( 'graduate.graduate_user_id', '=', $db_user->id );
+    $modifier->or_where( 'reqn.trainee_user_id', '=', $db_user->id );
     $modifier->where_bracket( false );
     return $reqn_class_name::select( $this->select, $modifier );
   }

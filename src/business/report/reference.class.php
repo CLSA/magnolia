@@ -40,8 +40,7 @@ class reference extends \cenozo\business\report\base_report
     $modifier->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
     $modifier->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
     $modifier->join( 'user', 'reqn.user_id', 'user.id' );
-    $modifier->left_join( 'graduate', 'reqn.graduate_id', 'graduate.id' );
-    $modifier->left_join( 'user', 'graduate.graduate_user_id', 'graduate_user.id', 'graduate_user' );
+    $modifier->left_join( 'user', 'reqn.trainee_user_id', 'trainee_user.id', 'trainee_user' );
     $modifier->order( 'reqn.identifier' );
 
     // join to the second SMT review
@@ -142,7 +141,7 @@ class reference extends \cenozo\business\report\base_report
     $select->add_column( 'CONCAT_WS( " ", user.first_name, user.last_name )', 'Primary Applicant', false );
     $select->add_column( 'user.email', 'Email', false );
     $select->add_column( 'reqn_version.applicant_affiliation', 'Institution', false );
-    $select->add_column( 'CONCAT_WS( " ", graduate_user.first_name, graduate_user.last_name )', 'Graduate', false );
+    $select->add_column( 'CONCAT_WS( " ", trainee_user.first_name, trainee_user.last_name )', 'Trainee', false );
     $select->add_column( 'reqn_version.lay_summary', 'Lay Summary', false );
     $select->add_column( 'reqn_version.keywords', 'Keywords', false );
 

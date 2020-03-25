@@ -22,7 +22,7 @@ define( function() {
         title: 'Owner',
         isIncluded: function( $state, model ) { return !model.isApplicant(); }
       },
-      graduate_full_name: {
+      trainee_full_name: {
         title: 'Trainee'
       },
       deadline: {
@@ -111,13 +111,21 @@ define( function() {
         if( 'reqn.add' == $state.current.name ) return false;
 
         // if the reqn has an agreement then we can't directly change the primary applicant
-        return 0 < model.viewModel.record.has_agreements;
+        return !model.isAdministrator() || 0 < model.viewModel.record.has_agreements;
       }
     },
-    graduate_id: {
+    trainee_user_id: {
       title: 'Trainee',
-      type: 'enum',
-      isConstant: function( $state, model ) { return !model.isAdministrator(); },
+      type: 'lookup-typeahead',
+      typeahead: {
+        table: 'user',
+        select: 'CONCAT( user.first_name, " ", user.last_name, " (", user.name, ")" )',
+        where: [ 'user.first_name', 'user.last_name', 'user.name' ]
+      },
+      isConstant: function( $state, model ) {
+        // if the reqn has an agreement then we can't directly change the primary applicant
+        return !model.isAdministrator() || 0 < model.viewModel.record.has_agreements;
+      },
       isExcluded: 'add'
     },
     language_id: {
@@ -584,113 +592,28 @@ define( function() {
               } );
             } 
 
-            return this.$$onView( force ).then( function() {
-              return CnHttpFactory.instance( {
-                path: 'user/' + self.record.user_id + '/graduate',
-                data: {
-                  select: { column: [ 'id', 'graduate_full_name' ] },
-                  modifier: {
-                    where: { column: 'user.active', operator: '=', value: true },
-                    order: 'user.first_name'
-                  }
-                }
-              } ).query().then( function success( response ) {
-                self.parentModel.metadata.columnList.graduate_id.enumList = [];
-                response.data.forEach( function( item ) {
-                  self.parentModel.metadata.columnList.graduate_id.enumList.push( {
-                    value: item.id,
-                    name: item.graduate_full_name
-                  } );
-                } );
-              } ).then( function() {
-                if( 'administrator' == CnSession.role.name ) {
-                  // If we are an administrator and this reqn is in an amendment to change the primary applicant then
-                  // we want to warn if there are any other reqn's with the same trainee that will need a new agreement
-                  // but which haven't had an amendment started
-                  if( '.' != self.record.amendment && 'review' == self.record.phase ) {
-                    CnHttpFactory.instance( {
-                      path: self.parentModel.getServiceResourcePath(),
-                      data: { select: { column: 'related_required_amendment_list' } }
-                    } ).get().then( function( response ) {
-                      if( null != response.data.related_required_amendment_list ) {
-                        // get the graduate's name
-                        var graduate = self.parentModel.metadata.columnList.graduate_id.enumList.findByProperty(
-                          'value', self.record.graduate_id
-                        );
-                        CnModalMessageFactory.instance( {
-                          title: 'Warning',
-                          message:
-                            'The applicant has requested to change ownership of this ' + self.parentModel.module.name.singular +
-                            ' to another applicant.  However, the trainee, ' + graduate.name + ', is also part of the following ' +
-                            self.parentModel.module.name.singular + '(s) which do not have a similar amendment:\n\n' +
-                            response.data.related_required_amendment_list + '\n\n' +
-                            'Before continuing with the review process an amendment to change the primary applicant for all of ' +
-                            'the above ' + self.parentModel.module.name.plural + ' should be started.'
-                        } ).show();
-                      }
-                    } );
-                  }
-                }
-              } );
-            } );
+            return this.$$onView( force );
           },
 
           onPatch: function( data ) {
             var changingUser = angular.isDefined( data.user_id );
-            var outerPromiseList = [];
+            var promiseList = [];
 
             // show a warning when changing the primary applicant
             if( changingUser ) {
-              var innerPromiseList = [];
-
-              // first things first, make sure there are no other reqns affected by this change which require a new agreement
-              if( this.record.graduate_id ) {
-                innerPromiseList.push(
-                  CnHttpFactory.instance( {
-                    path: ['graduate', this.record.graduate_id, 'reqn'].join( '/' ),
-                    data: {
-                      select: { column: 'identifier' },
-                      modifier: { where: { column: 'reqn_version.agreement_filename', operator: '!=', value: null } }
-                    }
-                  } ).query().then( function( response ) {
-                    return 0 < response.data.length ? response.data[0].identifier : null;
-                  } )
-                );
-              }
-
-              var message = 'Changing the ' + this.parentModel.module.name.possessive + ' primary applicant will immediately remove ' +
-                            'it from the old owner\'s ' + this.parentModel.module.name.singular + ' list and add it to the new ' +
-                            'owner\'s list.  Also, a notification will be sent to both the old and new applicants explaining the ' +
-                            'transfer of ownership.';
-              if( this.record.graduate_id )
-                message += '\n\nAdditionally, this ' + this.parentModel.module.name.possessive + ' trainee\'s supervisor will also ' +
-                           'be changed to the new primary applicant.  If there are any other requisitions with the same trainee ' +
-                           'then they will also be reassigned to the new owner.';
-
-              message += '\n\nAre you sure you wish to proceed?';
-
-              outerPromiseList.push(
-                $q.all( innerPromiseList ).then( function( response ) {
-                  if( 0 == response.length || null == response[0] ) {
-                    return CnModalConfirmFactory.instance( {
-                      title: 'Change Owner' + ( self.record.graduate_id ? ' (And Supervisor)' : '' ),
-                      message: message
-                    } ).show().then( response => response )
-                  } else {
-                    return CnModalMessageFactory.instance( {
-                      title: 'Cannot Change Owner',
-                      message: 'The owner for this ' + self.parentModel.module.name.singular + ' can\'t be changed because the ' +
-                               'associated trainee is already associated with ' + self.parentModel.module.name.singular + ' ' +
-                               response[0] + ' which has an agreement.  In order to proceed an amendment must be started for that ' +
-                               self.parentModel.module.name.singular + ' instead.',
-                      error: true
-                    } ).show().then( function() { return false; } ); // don't continue below
-                  }
-                } )
+              promiseList.push(
+                CnModalConfirmFactory.instance( {
+                  title: 'Change Owner',
+                  message:
+                    'Changing the ' + this.parentModel.module.name.possessive + ' primary applicant will immediately remove ' +
+                    'it from the old owner\'s ' + this.parentModel.module.name.singular + ' list and add it to the new ' +
+                    'owner\'s list.  Also, a notification will be sent to both the old and new applicants explaining the ' +
+                    'transfer of ownership.\n\nAre you sure you wish to proceed?'
+                } ).show().then( response => response )
               );
             }
 
-            return $q.all( outerPromiseList ).then( function( response ) {
+            return $q.all( promiseList ).then( function( response ) {
               if( 0 == response.length || response[0] ) {
                 return self.$$onPatch( data ).then( function() {
                   // Reload the view if we're changing the suggested revisions (the next stage will change)
