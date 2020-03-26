@@ -299,7 +299,7 @@ cenozo.service( 'CnReqnHelper', [
             newUserIsTraineeNoticeTitle: { en: 'Please Note', fr: 'Notez bien' },
             newUserIsTraineeNotice: {
               en: 'The applicant you have selected is a trainee.  Please select a new applicant which does not have a supervisor.',
-              fr: 'TODO'
+              fr: 'Le demandeur que vous avez sélectionné est un stagiaire. Veuillez sélectionner un nouveau demandeur qui n’a pas de superviseur.'
             }
           },
           part1: {

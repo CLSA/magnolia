@@ -407,7 +407,7 @@ class reqn_version extends \cenozo\database\record
     if( $this->tracking ) $data['tracking'] = 'Yes';
     if( $this->longitudinal ) $data['longitudinal'] = 'Yes';
     $data['last_identifier'] = is_null( $this->last_identifier )
-                             ? ( 'fr' == $db_language->code ? 'TODO' : 'N/A' )
+                             ? ( 'fr' == $db_language->code ? 'S. o.' : 'N/A' )
                              : $this->last_identifier;
     if( !is_null( $this->part2_a_comment ) ) $data['part2_a_comment'] = $this->part2_a_comment;
     if( !is_null( $this->part2_b_comment ) ) $data['part2_b_comment'] = $this->part2_b_comment;
