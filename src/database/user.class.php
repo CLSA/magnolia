@@ -6,7 +6,7 @@
  */
 
 namespace magnolia\database;
-use cenozo\lib, cenozo\log, util;
+use cenozo\lib, cenozo\log, magnolia\util;
 
 /**
  * user: record

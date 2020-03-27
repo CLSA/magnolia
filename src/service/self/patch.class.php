@@ -6,7 +6,7 @@
  */
 
 namespace magnolia\service\self;
-use cenozo\lib, cenozo\log, util;
+use cenozo\lib, cenozo\log, magnolia\util;
 
 /**
  * Special service for handling the patch meta-resource

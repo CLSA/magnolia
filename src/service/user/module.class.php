@@ -6,7 +6,7 @@
  */
 
 namespace magnolia\service\user;
-use cenozo\lib, cenozo\log, util;
+use cenozo\lib, cenozo\log, magnolia\util;
 
 /**
  * Performs operations which effect how this module is used in a service
