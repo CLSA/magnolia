@@ -22,7 +22,7 @@ define( function() {
         title: 'Owner',
         isIncluded: function( $state, model ) { return !model.isApplicant(); }
       },
-      graduate_full_name: {
+      trainee_full_name: {
         title: 'Trainee'
       },
       deadline: {
@@ -81,7 +81,7 @@ define( function() {
           angular.isUndefined( model.viewModel.record.stage_type ) || 'New' == model.viewModel.record.stage_type
         ) ? false : 'view';
       },
-      isExcluded: function( $state, model ) { return !model.isAdministratorOrSac(); }
+      isExcluded: function( $state, model ) { return !model.isAdministratorOrReadonly(); }
     },
     deadline_id: {
       title: 'Deadline',
@@ -95,7 +95,7 @@ define( function() {
       isExcluded: function( $state, model ) {
         return !model.isAdministrator() ||
                angular.isUndefined( model.viewModel.record.deadline_id ) ||
-               null == model.viewModel.record.deadline_id ? true : 'add';        
+               null == model.viewModel.record.deadline_id ? true : 'add';
       }
     },
     user_id: {
@@ -106,38 +106,52 @@ define( function() {
         select: 'CONCAT( user.first_name, " ", user.last_name, " (", user.name, ")" )',
         where: [ 'user.first_name', 'user.last_name', 'user.name' ]
       },
-      isConstant: 'view'
+      isConstant: function( $state, model ) {
+        // never constant when adding a new reqn
+        if( 'reqn.add' == $state.current.name ) return false;
+
+        // if the reqn has an agreement then we can't directly change the primary applicant
+        return !model.isAdministrator() || 0 < model.viewModel.record.has_agreements;
+      }
     },
-    graduate_id: {
+    trainee_user_id: {
       title: 'Trainee',
-      type: 'enum',
-      isConstant: function( $state, model ) { return !model.isAdministrator(); },
+      type: 'lookup-typeahead',
+      typeahead: {
+        table: 'user',
+        select: 'CONCAT( user.first_name, " ", user.last_name, " (", user.name, ")" )',
+        where: [ 'user.first_name', 'user.last_name', 'user.name' ]
+      },
+      isConstant: function( $state, model ) {
+        // if the reqn has an agreement then we can't directly change the primary applicant
+        return !model.isAdministrator() || 0 < model.viewModel.record.has_agreements;
+      },
       isExcluded: 'add'
     },
     language_id: {
       title: 'Language',
       type: 'enum',
       isConstant: function( $state, model ) { return !model.isAdministrator(); },
-      isExcluded: function( $state, model ) { return !model.isAdministratorOrSac(); }
+      isExcluded: function( $state, model ) { return !model.isAdministratorOrReadonly(); }
     },
     stage_type: {
       title: 'Current Stage',
       column: 'stage_type.name',
       type: 'string',
       isConstant: true,
-      isExcluded: function( $state, model ) { return model.isAdministratorOrSac() ? 'add' : true; }
+      isExcluded: function( $state, model ) { return model.isAdministratorOrReadonly() ? 'add' : true; }
     },
     state: {
       title: 'State',
       type: 'enum',
       isConstant: true,
-      isExcluded: function( $state, model ) { return model.isAdministratorOrSac() ? 'add' : true; }
+      isExcluded: function( $state, model ) { return model.isAdministratorOrReadonly() ? 'add' : true; }
     },
     state_date: {
       title: 'State Set On',
       type: 'date',
       isConstant: true,
-      isExcluded: function( $state, model ) { return model.isAdministratorOrSac() ? 'add' : true; }
+      isExcluded: function( $state, model ) { return model.isAdministratorOrReadonly() ? 'add' : true; }
     },
     data_expiry_date: {
       title: 'Data Expiry Date',
@@ -146,21 +160,21 @@ define( function() {
         // show the study data available if we're in the active phase
         return angular.isUndefined( model.viewModel.record.phase ) || 'active' != model.viewModel.record.phase;
       },
-      isExcluded: function( $state, model ) { return model.isAdministratorOrSac() ? 'add' : true; }
+      isExcluded: function( $state, model ) { return model.isAdministratorOrReadonly() ? 'add' : true; }
     },
     title: {
       column: 'reqn_version.title',
       title: 'Title',
       type: 'string',
       isConstant: true,
-      isExcluded: function( $state, model ) { return model.isAdministratorOrSac(); }
+      isExcluded: function( $state, model ) { return model.isAdministratorOrReadonly(); }
     },
     lay_summary: {
       column: 'reqn_version.lay_summary',
       title: 'Lay Summary',
       type: 'text',
       isConstant: true,
-      isExcluded: function( $state, model ) { return model.isAdministratorOrSac(); }
+      isExcluded: function( $state, model ) { return model.isAdministratorOrReadonly(); }
     },
     instruction_filename: {
       column: 'instruction_filename',
@@ -188,7 +202,7 @@ define( function() {
     note: {
       title: 'Administrative Note',
       type: 'text',
-      isExcluded: function( $state, model ) { return !model.isAdministratorOrSac(); }
+      isExcluded: function( $state, model ) { return !model.isAdministratorOrReadonly(); }
     },
 
     current_reqn_version_id: { column: 'reqn_version.id', type: 'string', isExcluded: true },
@@ -272,8 +286,24 @@ define( function() {
   } );
 
   module.addExtraOperation( 'view', {
-    title: 'Recreate',
+    title: 'Incomplete',
     classes: 'btn-danger',
+    isIncluded: function( $state, model ) { return model.viewModel.show( 'incomplete' ); },
+    isDisabled: function( $state, model ) { return !model.viewModel.enabled( 'incomplete' ); },
+    operation: function( $state, model ) { model.viewModel.incomplete(); }
+  } );
+
+  module.addExtraOperation( 'view', {
+    title: 'Withdraw',
+    classes: 'btn-danger',
+    isIncluded: function( $state, model ) { return model.viewModel.show( 'withdraw' ); },
+    isDisabled: function( $state, model ) { return !model.viewModel.enabled( 'withdraw' ); },
+    operation: function( $state, model ) { model.viewModel.withdraw(); }
+  } );
+
+  module.addExtraOperation( 'view', {
+    title: 'Recreate',
+    classes: 'btn-success',
     isIncluded: function( $state, model ) { return model.viewModel.show( 'recreate' ); },
     isDisabled: function( $state, model ) { return !model.viewModel.enabled( 'recreate' ); },
     operation: function( $state, model ) { model.viewModel.recreate(); }
@@ -293,9 +323,9 @@ define( function() {
     isDisabled: function( $state, model ) { return !model.viewModel.enabled( 'proceed' ); },
     classes: 'btn-success',
     operations: [ {
-      title: 'To SAC Review',
-      operation: function( $state, model ) { model.viewModel.proceed( 'SAC Review' ); },
-      isIncluded: function( $state, model ) { return model.viewModel.show( 'amendment sac review' ); }
+      title: 'To Feasibility Review',
+      operation: function( $state, model ) { model.viewModel.proceed( 'Feasibility Review' ); },
+      isIncluded: function( $state, model ) { return model.viewModel.show( 'amendment feasibility review' ); }
     }, {
       title: 'To DSAC Review',
       operation: function( $state, model ) { model.viewModel.proceed( 'DSAC Review' ); },
@@ -343,7 +373,7 @@ define( function() {
       operation: function( $state, model ) { model.viewModel.downloadFundingLetter(); },
       isDisabled: function( $state, model ) { return !model.viewModel.record.funding_filename; }
     }, {
-      title: 'Ethics Letter',
+      title: 'Ethics Letter/Exemption',
       operation: function( $state, model ) { model.viewModel.downloadEthicsLetter(); },
       isDisabled: function( $state, model ) { return !model.viewModel.record.ethics_filename; }
     }, {
@@ -457,9 +487,9 @@ define( function() {
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnReqnViewFactory', [
     'CnBaseViewFactory', 'CnReqnHelper', 'CnSession', 'CnHttpFactory',
-    'CnModalMessageFactory', 'CnModalConfirmFactory', 'CnModalNoticeListFactory', '$window', '$state',
+    'CnModalMessageFactory', 'CnModalConfirmFactory', 'CnModalNoticeListFactory', '$window', '$state', '$q',
     function( CnBaseViewFactory, CnReqnHelper, CnSession, CnHttpFactory,
-              CnModalMessageFactory, CnModalConfirmFactory, CnModalNoticeListFactory, $window, $state ) {
+              CnModalMessageFactory, CnModalConfirmFactory, CnModalNoticeListFactory, $window, $state, $q ) {
       var object = function( parentModel, root ) {
         var self = this;
         CnBaseViewFactory.construct( this, parentModel, root );
@@ -546,8 +576,8 @@ define( function() {
                    ( 'applicant' == CnSession.role.name && 'Active' == stage_type );
           },
           onView: function( force ) {
-            // if we are a reviewer assigned to this reqn and haven't completed our review then show a reminder
             if( 'reviewer' == CnSession.role.name ) {
+              // If we are a reviewer assigned to this reqn and haven't completed our review then show a reminder
               CnHttpFactory.instance( {
                 path: this.parentModel.getServiceResourcePath() + '/review',
                 data: { modifier: { where: { column: 'recommendation_type_id', operator: '=', value: null } } }
@@ -560,35 +590,44 @@ define( function() {
                   } ).show();
                 }
               } );
-            }
+            } 
 
-            return this.$$onView( force ).then( function() {
-              return CnHttpFactory.instance( {
-                path: 'user/' + self.record.user_id + '/graduate',
-                data: {
-                  select: { column: [ 'id', 'graduate_full_name' ] },
-                  modifier: {
-                    where: { column: 'user.active', operator: '=', value: true },
-                    order: 'user.first_name'
-                  }
-                }
-              } ).query().then( function success( response ) {
-                self.parentModel.metadata.columnList.graduate_id.enumList = [];
-                response.data.forEach( function( item ) {
-                  self.parentModel.metadata.columnList.graduate_id.enumList.push( {
-                    value: item.id,
-                    name: item.graduate_full_name
-                  } );
-                } );
-              } )
-            } );
+            return this.$$onView( force );
           },
 
           onPatch: function( data ) {
-            return self.$$onPatch( data ).then( function() {
-              // Reload the view if we're changing the suggested revisions (the next stage will change)
-              // or reqn type (the deadline might change)
-              if( angular.isDefined( data.suggested_revisions ) || angular.isDefined( data.reqn_type_id ) ) return self.onView();
+            var changingUser = angular.isDefined( data.user_id );
+            var promiseList = [];
+
+            // show a warning when changing the primary applicant
+            if( changingUser ) {
+              promiseList.push(
+                CnModalConfirmFactory.instance( {
+                  title: 'Change Owner',
+                  message:
+                    'Changing the ' + this.parentModel.module.name.possessive + ' primary applicant will immediately remove ' +
+                    'it from the old owner\'s ' + this.parentModel.module.name.singular + ' list and add it to the new ' +
+                    'owner\'s list.  Also, a notification will be sent to both the old and new applicants explaining the ' +
+                    'transfer of ownership.\n\nAre you sure you wish to proceed?'
+                } ).show().then( response => response )
+              );
+            }
+
+            return $q.all( promiseList ).then( function( response ) {
+              if( 0 == response.length || response[0] ) {
+                return self.$$onPatch( data ).then( function() {
+                  // Reload the view if we're changing the suggested revisions (the next stage will change)
+                  // or reqn type (the deadline might change)
+                  if( angular.isDefined( data.suggested_revisions ) || angular.isDefined( data.reqn_type_id ) ) return self.onView();
+
+                  // Reload the notification list if we're changing the user
+                  if( changingUser && angular.isDefined( self.notificationModel ) ) self.notificationModel.listModel.onList( true );
+                } );
+              } else if( changingUser ) {
+                // we're not making the change so put back the old user
+                self.record.user_id = self.backupRecord.user_id;
+                self.formattedRecord.user_id = self.backupRecord.formatted_user_id;
+              }
             } );
           },
 
@@ -605,7 +644,7 @@ define( function() {
           enabled: function( subject ) {
             var state = this.record.state ? this.record.state : '';
 
-            if( ['abandon', 'deactivate', 'defer', 'reactivate', 'recreate'].includes( subject ) ) {
+            if( ['abandon', 'deactivate', 'defer', 'incomplete', 'withdraw', 'reactivate', 'recreate'].includes( subject ) ) {
               return true;
             } else if( ['proceed','reject'].includes( subject ) ) {
               return !state && null != this.record.next_stage_type;
@@ -679,21 +718,6 @@ define( function() {
           },
 
           deactivate: function() {
-            return CnReqnHelper.deactivate(
-              this.record.getIdentifier(),
-              '.' != this.record.amendment,
-              this.record.lang
-            ).then( function( response ) {
-              if( response ) {
-                self.record.state = 'inactive';
-                self.record.state_date = moment().format( 'YYYY-MM-DD' );
-                self.updateFormattedRecord( 'state_date', 'date' );
-                if( angular.isDefined( self.notificationModel ) ) self.notificationModel.listModel.onList( true );
-              }
-            } );
-          },
-
-          deactivate: function() {
             return CnModalConfirmFactory.instance( {
               message: 'Are you sure you wish to de-activate the ' + this.parentModel.module.name.singular + '?' +
                 '\n\nThe applicant will no longer be able to edit or submit the ' + this.parentModel.module.name.singular + '.'
@@ -705,6 +729,42 @@ define( function() {
                   self.record.state = 'inactive';
                   self.record.state_date = moment().format( 'YYYY-MM-DD' );
                   self.updateFormattedRecord( 'state_date', 'date' );
+                  if( angular.isDefined( self.notificationModel ) ) self.notificationModel.listModel.onList( true );
+                } );
+              }
+            } );
+          },
+
+          incomplete: function() {
+            return CnModalConfirmFactory.instance( {
+              message: 'Are you sure you wish to mark this ' + this.parentModel.module.name.singular + ' as permanently incomplete?' +
+                '\n\nThere is no undoing this action. However, once moved to the incomplete stage the ' +
+                this.parentModel.module.name.singular + ' can be recreated as a new application.'
+            } ).show().then( function( response ) {
+              if( response ) {
+                return CnHttpFactory.instance( {
+                  path: self.parentModel.getServiceResourcePath() + "?action=incomplete"
+                } ).patch().then( function() {
+                  self.onView();
+                  if( angular.isDefined( self.stageModel ) ) self.stageModel.listModel.onList( true );
+                  if( angular.isDefined( self.notificationModel ) ) self.notificationModel.listModel.onList( true );
+                } );
+              }
+            } );
+          },
+
+          withdraw: function() {
+            return CnModalConfirmFactory.instance( {
+              message: 'Are you sure you wish to mark this ' + this.parentModel.module.name.singular + ' as permanently withdrawn?' +
+                '\n\nThere is no undoing this action. However, once moved to the withdrawn stage the ' +
+                this.parentModel.module.name.singular + ' can be recreated as a new application.'
+            } ).show().then( function( response ) {
+              if( response ) {
+                return CnHttpFactory.instance( {
+                  path: self.parentModel.getServiceResourcePath() + "?action=withdraw"
+                } ).patch().then( function() {
+                  self.onView();
+                  if( angular.isDefined( self.stageModel ) ) self.stageModel.listModel.onList( true );
                   if( angular.isDefined( self.notificationModel ) ) self.notificationModel.listModel.onList( true );
                 } );
               }
@@ -789,22 +849,17 @@ define( function() {
         // make the input lists from all groups more accessible
         this.isApplicant = function() { return 'applicant' == CnSession.role.name; };
         this.isAdministrator = function() { return 'administrator' == CnSession.role.name; };
-        this.isAdministratorOrSac = function() { return ['administrator','sac'].includes( CnSession.role.name ); };
+        this.isAdministratorOrReadonly = function() { return ['administrator','readonly'].includes( CnSession.role.name ); };
         this.isReviewer = function() { return 'reviewer' == CnSession.role.name; };
 
         this.getEditEnabled = function() {
           var phase = this.viewModel.record.phase ? this.viewModel.record.phase : '';
           var state = this.viewModel.record.state ? this.viewModel.record.state : '';
-          var stage_type = this.viewModel.record.stage_type ? this.viewModel.record.stage_type : '';
-
-          var check = false;
-          if( 'applicant' == CnSession.role.name ) {
-            check = 'new' == phase || ( 'deferred' == state && 'review' == phase );
-          } else if( ['administrator','sac'].includes( CnSession.role.name ) ) {
-            check = true;
-          }
-
-          return this.$$getEditEnabled() && check;
+          return this.$$getEditEnabled() && (
+            'applicant' == CnSession.role.name ?
+            'new' == phase || ( 'deferred' == state && 'review' == phase ) :
+            'administrator' == CnSession.role.name
+          );
         };
 
         this.getDeleteEnabled = function() {

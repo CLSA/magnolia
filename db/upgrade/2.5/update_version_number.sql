@@ -3,12 +3,13 @@ DELIMITER //
 CREATE PROCEDURE upgrade_application_number()
   BEGIN
 
-    -- determine the @cenozo database name
+    -- determine the cenozo database name
     SET @cenozo = (
       SELECT unique_constraint_schema
       FROM information_schema.referential_constraints
       WHERE constraint_schema = DATABASE()
-      AND constraint_name = "fk_access_site_id" );
+      AND constraint_name = "fk_access_site_id"
+    );
 
     SELECT "Upgrading application version number" AS "";
 

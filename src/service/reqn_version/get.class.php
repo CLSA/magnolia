@@ -28,10 +28,20 @@ class get extends \cenozo\service\downloadable
     $file = $this->get_argument( 'file', NULL );
     $db_reqn_version = $this->get_leaf_record();
     $db_reqn = $db_reqn_version->get_reqn();
-    if( 'funding_filename' == $file ) return $db_reqn_version->funding_filename;
+    if( 'coapplicant_agreement_filename' == $file ) return $db_reqn_version->coapplicant_agreement_filename;
+    else if( 'funding_filename' == $file ) return $db_reqn_version->funding_filename;
     else if( 'ethics_filename' == $file ) return $db_reqn_version->ethics_filename;
     else if( 'data_sharing_filename' == $file ) return $db_reqn_version->data_sharing_filename;
     else if( 'agreement_filename' == $file ) return $db_reqn_version->agreement_filename;
+    else if( 'coapplicant_agreement_template' == $file )
+    {
+      return sprintf(
+        'Co-Applicant Agreement %s version %s%d.pdf',
+        $db_reqn->identifier,
+        '.' == $db_reqn_version->amendment ? '' : $db_reqn_version->amendment,
+        $db_reqn_version->version
+      );
+    }
     else if( 'checklist' == $file )
     {
       return sprintf(
@@ -70,10 +80,13 @@ class get extends \cenozo\service\downloadable
   {
     $file = $this->get_argument( 'file', NULL );
     $db_reqn_version = $this->get_leaf_record();
-    if( 'funding_filename' == $file ) return sprintf( '%s/%s', FUNDING_LETTER_PATH, $db_reqn_version->id );
+    if( 'coapplicant_agreement_filename' == $file ) return sprintf( '%s/%s', COAPPLICANT_AGREEMENT_PATH, $db_reqn_version->id );
+    else if( 'funding_filename' == $file ) return sprintf( '%s/%s', FUNDING_LETTER_PATH, $db_reqn_version->id );
     else if( 'ethics_filename' == $file ) return sprintf( '%s/%s', ETHICS_LETTER_PATH, $db_reqn_version->id );
     else if( 'data_sharing_filename' == $file ) return sprintf( '%s/%s', DATA_SHARING_LETTER_PATH, $db_reqn_version->id );
     else if( 'agreement_filename' == $file ) return sprintf( '%s/%s', AGREEMENT_LETTER_PATH, $db_reqn_version->id );
+    else if( 'coapplicant_agreement_template' == $file )
+      return sprintf( '%s/%s.pdf', COAPPLICANT_AGREEMENT_TEMPLATE_PATH, $db_reqn_version->id );
     else if( 'checklist' == $file ) return sprintf( '%s/%s.pdf', DATA_CHECKLIST_PATH, $db_reqn_version->id );
     else if( 'application' == $file ) return sprintf( '%s/%s.pdf', DATA_APPLICATION_PATH, $db_reqn_version->id );
     else if( 'application_and_checklist' == $file )
@@ -91,10 +104,11 @@ class get extends \cenozo\service\downloadable
 
     $mime_type = $this->get_mime_type();
 
-    // if requesting the reqn_version's application or checklist PDF file then create it first
+    // if requesting the reqn_version's application, checklist, or coapplicant agreement PDF file then create it first
     $db_reqn_version = $this->get_leaf_record();
     $file = $this->get_argument( 'file', NULL );
     if( in_array( $file, ['application', 'checklist', 'application_and_checklist'] ) ) $db_reqn_version->generate_pdf_forms();
+    else if( 'coapplicant_agreement_template' == $file ) $db_reqn_version->generate_coapplicant_agreement_template_form();
   }
 
   /**

@@ -6,7 +6,7 @@
  */
 
 namespace magnolia\service\user;
-use cenozo\lib, cenozo\log, util;
+use cenozo\lib, cenozo\log, magnolia\util;
 
 /**
  * Performs operations which effect how this module is used in a service
@@ -26,13 +26,14 @@ class module extends \cenozo\service\user\module
       $select->add_column( 'IFNULL( applicant.newsletter, false )', 'newsletter', false );
     }
 
-    if( $select->has_column( 'supervisor' ) )
+    if( $select->has_column( 'supervisor_user_id' ) )
     {
-      $modifier->left_join( 'graduate', 'user.id', 'graduate.graduate_user_id' );
-      $modifier->left_join( 'user', 'graduate.user_id', 'supervisor.id', 'supervisor' );
+      $modifier->left_join( 'applicant', 'user.id', 'applicant.user_id' );
+      $modifier->left_join( 'user', 'applicant.supervisor_user_id', 'supervisor_user.id', 'supervisor_user' );
+      $select->add_column( 'applicant.supervisor_user_id', 'supervisor_user_id', false );
       $select->add_column(
-        'IF( supervisor.id IS NULL, "(none)", CONCAT( supervisor.first_name, " ", supervisor.last_name ) )',
-        'supervisor',
+        'IF( supervisor_user.id IS NULL, "(none)", CONCAT( supervisor_user.first_name, " ", supervisor_user.last_name ) )',
+        'formatted_supervisor_user_id',
         false
       );
     }

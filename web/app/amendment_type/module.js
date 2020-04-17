@@ -10,16 +10,26 @@ define( function() {
       possessive: 'amendment type\'s'
     },
     columnList: {
+      rank: { title: 'Rank', type: 'rank' },
+      new_user: { title: 'Request New User', type: 'boolean' },
       reason_en: { title: 'Reason (English)' },
       reason_fr: { title: 'Reason (French)' }
     },
     defaultOrder: {
-      column: 'amendment_type.id',
+      column: 'amendment_type.rank',
       reverse: false
     }
   } );
 
   module.addInputGroup( '', {
+    rank: {
+      title: 'Rank',
+      type: 'rank'
+    },
+    new_user: {
+      title: 'Request New User',
+      type: 'boolean'
+    },
     reason_en: {
       title: 'Reason (English)',
       type: 'string'

@@ -34,9 +34,8 @@ class module extends \cenozo\service\module
         $db_reqn = $db_reqn_version->get_reqn();
         if( 'applicant' == $db_role->name && !is_null( $db_reqn ) )
         {
-          $db_graduate = $db_reqn->get_graduate();
-          $is_graduate = !is_null( $db_graduate ) && $db_graduate->graduate_user_id == $db_user->id;
-          if( ( $db_reqn->user_id != $db_user->id && !$is_graduate ) || 'abandoned' == $db_reqn->state )
+          $trainee = 'applicant' == $db_role->name && $db_reqn->trainee_user_id == $db_user->id;
+          if( ( $db_reqn->user_id != $db_user->id && !$trainee ) || 'abandoned' == $db_reqn->state )
           {
             $this->get_status()->set_code( 404 );
             return;
@@ -54,8 +53,7 @@ class module extends \cenozo\service\module
     parent::prepare_read( $select, $modifier );
     $modifier->join( 'reqn', 'reqn_version.reqn_id', 'reqn.id' );
     $modifier->join( 'user', 'reqn.user_id', 'user.id' );
-    $modifier->left_join( 'graduate', 'reqn.graduate_id', 'graduate.id' );
-    $modifier->left_join( 'user', 'graduate.graduate_user_id', 'graduate_user.id', 'graduate_user' );
+    $modifier->left_join( 'user', 'reqn.trainee_user_id', 'trainee_user.id', 'trainee_user' );
     $modifier->join( 'language', 'reqn.language_id', 'language.id' );
     $modifier->left_join( 'deadline', 'reqn.deadline_id', 'deadline.id' );
 
@@ -66,8 +64,8 @@ class module extends \cenozo\service\module
     );
     $select->add_column( 'CONCAT_WS( " ", user.first_name, user.last_name )', 'applicant_name', false );
     $select->add_column( 'user.email', 'applicant_email', false );
-    $select->add_column( 'CONCAT_WS( " ", graduate_user.first_name, graduate_user.last_name )', 'graduate_name', false );
-    $select->add_column( 'graduate_user.email', 'graduate_email', false );
+    $select->add_column( 'CONCAT_WS( " ", trainee_user.first_name, trainee_user.last_name )', 'trainee_name', false );
+    $select->add_column( 'trainee_user.email', 'trainee_email', false );
 
     if( $select->has_columns( 'has_agreement_filename' ) )
       $select->add_column( 'agreement_filename IS NOT NULL', 'has_agreement_filename', true, 'boolean' );
@@ -102,6 +100,10 @@ class module extends \cenozo\service\module
     $db_reqn_version = $this->get_resource();
     if( !is_null( $db_reqn_version ) )
     {
+      // include the user first/last/name as supplemental data
+      $modifier->left_join( 'user', 'reqn_version.new_user_id', 'new_user.id', 'new_user' );
+      $select->add_column( 'CONCAT( new_user.first_name, " ", new_user.last_name )', 'formatted_new_user_id', false );
+
       if( $select->has_column( 'has_changed' ) )
       {
         $select->add_constant( $db_reqn_version->has_changed(), 'has_changed', 'boolean' );

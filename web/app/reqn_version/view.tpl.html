@@ -164,12 +164,25 @@
             <div ng-repeat="amendmentType in model.amendmentTypeList[model.viewModel.record.lang]">
               <div style="margin: 0;"
                    class="row"
-                   ng-class="{ 'bg-warning': model.viewModel.compareRecord.differences.amendment.a['amendmentType'+amendmentType.id] }">
+                   ng-class="{
+                     'bg-warning': model.viewModel.compareRecord.differences.amendment.a['amendmentType'+amendmentType.id]
+                   }">
                 <input type="checkbox"
                        id="amendmentType{{ amendmentType.id }}"
                        ng-model="model.viewModel.record['amendmentType'+amendmentType.id]"
                        ng-change="model.viewModel.toggleAmendmentTypeValue( amendmentType.id )"></input>
                 <label for="amendmentType{{ amendmentType.id }}" class="control-label" ng-bind-html="amendmentType.name"></label>
+                <cn-reqn-view-input
+                  ng-if="amendmentType.newUser && model.viewModel.record['amendmentType'+amendmentType.id]"
+                  no-cols=true
+                  input="{
+                    key: 'new_user_id',
+                    title: t( 'amendment.newUser' ),
+                    type: model.inputList.new_user_id.type,
+                    typeahead: model.inputList.new_user_id.typeahead
+                  }"
+                  model="model">
+                </cn-reqn-view-input>
               </div>
               <div style="padding: 0 2em;"
                    ng-if="amendmentType.justificationPrompt && model.viewModel.record['amendmentType'+amendmentType.id]">
@@ -213,7 +226,7 @@
             <p class="text-primary" ng-bind-html="t( 'part1.a.text1' )"></p>
             <p class="text-primary" ng-bind-html="t( 'part1.a.text2' )"></p>
             <hr/>
-            <form id="amendmentForm" name="amendmentForm" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
+            <form id="part1aForm" name="part1aForm" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
               <div class="form-horizontal">
                 <cn-reqn-view-input
                   input="{
@@ -278,63 +291,63 @@
               <div class="form-horizontal">
                 <cn-reqn-view-input
                   input="{
-                    key: 'graduate_name',
-                    title: t( 'part1.a.graduate_name' ),
-                    type: model.inputList.graduate_name.type,
+                    key: 'trainee_name',
+                    title: t( 'part1.a.trainee_name' ),
+                    type: model.inputList.trainee_name.type,
                     constant: true
                   }"
-                  difference="model.viewModel.compareRecord.differences.part1.a.graduate_name"
+                  difference="model.viewModel.compareRecord.differences.part1.a.trainee_name"
                   model="model">
                 </cn-reqn-view-input>
                 <cn-reqn-view-input
                   input="{
-                    key: 'graduate_program',
-                    title: t( 'part1.a.graduate_program' ),
-                    type: model.inputList.graduate_program.type,
-                    constant: !model.viewModel.record.graduate_name
+                    key: 'trainee_program',
+                    title: t( 'part1.a.trainee_program' ),
+                    type: model.inputList.trainee_program.type,
+                    constant: !model.viewModel.record.trainee_name
                   }"
-                  difference="model.viewModel.compareRecord.differences.part1.a.graduate_program"
+                  difference="model.viewModel.compareRecord.differences.part1.a.trainee_program"
                   model="model">
                 </cn-reqn-view-input>
                 <cn-reqn-view-input
                   input="{
-                    key: 'graduate_institution',
-                    title: t( 'part1.a.graduate_institution' ),
+                    key: 'trainee_institution',
+                    title: t( 'part1.a.trainee_institution' ),
                     type: 'string',
-                    constant: !model.viewModel.record.graduate_name
+                    constant: !model.viewModel.record.trainee_name
                   }"
-                  difference="model.viewModel.compareRecord.differences.part1.a.graduate_institution"
+                  difference="model.viewModel.compareRecord.differences.part1.a.trainee_institution"
                   model="model">
                 </cn-reqn-view-input>
                 <cn-reqn-view-input
                   input="{
-                    key: 'graduate_address',
-                    title: t( 'part1.a.graduate_address' ),
-                    type: model.inputList.graduate_address.type,
-                    constant: !model.viewModel.record.graduate_name
+                    key: 'trainee_address',
+                    title: t( 'part1.a.trainee_address' ),
+                    type: model.inputList.trainee_address.type,
+                    constant: !model.viewModel.record.trainee_name
                   }"
-                  difference="model.viewModel.compareRecord.differences.part1.a.graduate_address"
+                  difference="model.viewModel.compareRecord.differences.part1.a.trainee_address"
                   model="model">
                 </cn-reqn-view-input>
                 <cn-reqn-view-input
                   input="{
-                    key: 'graduate_phone',
-                    title: t( 'part1.a.graduate_phone' ),
-                    type: model.inputList.graduate_phone.type,
-                    constant: !model.viewModel.record.graduate_name
+                    key: 'trainee_phone',
+                    title: t( 'part1.a.trainee_phone' ),
+                    type: model.inputList.trainee_phone.type,
+                    constant: !model.viewModel.record.trainee_name
                   }"
-                  difference="model.viewModel.compareRecord.differences.part1.a.graduate_phone"
+                  difference="model.viewModel.compareRecord.differences.part1.a.trainee_phone"
                   model="model">
                 </cn-reqn-view-input>
                 <cn-reqn-view-input
                   input="{
-                    key: 'graduate_email',
-                    title: t( 'part1.a.graduate_email' )+'<sup>ⓘ</sup>',
-                    type: model.inputList.graduate_email.type,
+                    key: 'trainee_email',
+                    title: t( 'part1.a.trainee_email' )+'<sup>ⓘ</sup>',
+                    type: model.inputList.trainee_email.type,
                     constant: true,
                     help: t( 'misc.emailText' )
                   }"
-                  difference="model.viewModel.compareRecord.differences.part1.a.graduate_email"
+                  difference="model.viewModel.compareRecord.differences.part1.a.trainee_email"
                   model="model">
                 </cn-reqn-view-input>
               </div>
@@ -347,7 +360,7 @@
                     title: t( 'part1.a.waiver' ),
                     type: 'enum',
                     enumList: model.metadata.columnList.waiver.enumList[model.viewModel.record.lang],
-                    constant: !model.viewModel.record.graduate_name
+                    constant: !model.viewModel.record.trainee_name
                   }"
                   difference="model.viewModel.compareRecord.differences.part1.a.waiver"
                   model="model">
@@ -483,6 +496,24 @@
                 </div>
               </fieldset>
             </form>
+            <div ng-if="model.viewModel.addingCoapplicantWithData">
+              <hr/>
+              <p class="text-primary" ng-bind-html="t( 'part1.b.coapplicantAgreementText' )"></p>
+              <button class="btn btn-default full-width"
+                      ng-click="model.viewModel.downloadCoapplicantAgreementTemplate()"
+                      ng-bind-html="t( 'part1.b.coapplicantAgreementButton' )"></button>
+              <fieldset ng-disabled="!liteModel.getEditEnabled()">
+                <cn-reqn-view-input
+                  input="{
+                    key: 'coapplicant_agreement_filename',
+                    title: t( 'part1.b.coapplicantAgreement' ),
+                    type: 'file'
+                  }"
+                  difference="model.viewModel.compareRecord.differences.part1.b.coapplicant_agreement_filename"
+                  model="liteModel">
+                </cn-reqn-view-input>
+              </fieldset>
+            </div>
           </div>
         </div>
         <div ng-show="'c'==model.viewModel.tab[1]" class="panel panel-default">
@@ -771,14 +802,14 @@
                     input="{
                       key: 'ethics',
                       title: t( 'part1.f.ethics' ),
-                      type: model.inputList.ethics.type,
-                      enumList: model.metadata.yesNoEnumList[model.viewModel.record.lang]
+                      type: 'enum',
+                      enumList: model.metadata.columnList.ethics.enumList[model.viewModel.record.lang]
                     }"
                     difference="model.viewModel.compareRecord.differences.part1.f.ethics"
                     model="model">
                   </cn-reqn-view-input>
                   <cn-reqn-view-input
-                    ng-if="true === model.viewModel.record.ethics"
+                    ng-if="'yes' === model.viewModel.record.ethics"
                     input="{
                       key: 'ethics_date',
                       title: t( 'part1.f.expiration' ),
@@ -788,7 +819,7 @@
                     model="model">
                   </cn-reqn-view-input>
                   <cn-reqn-view-input
-                    ng-if="false === model.viewModel.record.ethics"
+                    ng-if="'no' === model.viewModel.record.ethics"
                     input="{
                       key: 'ethics_date',
                       title: t( 'part1.f.response' ),
@@ -800,7 +831,7 @@
                 </fieldset>
                 <fieldset ng-disabled="!liteModel.getEditEnabled()">
                   <cn-reqn-view-input
-                    ng-if="true === model.viewModel.record.ethics"
+                    ng-if="'yes' === model.viewModel.record.ethics || 'exempt' === model.viewModel.record.ethics"
                     input="{
                       key: 'ethics_filename',
                       title: t( 'part1.f.letter' ),
@@ -1189,6 +1220,7 @@
                 <div class="container-fluid">
                   <cn-reqn-view-input
                     no-cols=true
+                    ng-if="'e'!=part"
                     input="{
                       key: 'part2_' + part + '_comment',
                       title: t( 'misc.comments' ),
@@ -1226,6 +1258,17 @@
                       '"' + difference.name + '" has been ' +
                       ( difference.diff ? difference.diff : 'changed from ' + difference.old + ' to ' + difference.new )
                     }}</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="row">
+                <label class="control-label col-sm-3">Co-Applicant Agreement Forms</label>
+                <div class="row col-sm-9 form-text vertical-spacer">
+                  <div ng-if="0 == model.viewModel.coapplicantAgreementList.length">None</div>
+                  <ul style="padding-left: 1em;" ng-if=" 0 < model.viewModel.coapplicantAgreementList.length">
+                    <li ng-repeat="form in model.viewModel.coapplicantAgreementList">
+                      <a ng-click="model.viewModel.downloadCoapplicantAgreement( form.id )" style="cursor: pointer;">Version {{ form.version }}</a>
+                    </li>
                   </ul>
                 </div>
               </div>

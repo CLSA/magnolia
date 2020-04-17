@@ -75,6 +75,16 @@ class patch extends \cenozo\service\patch
             'active' != $phase ||
             'Report Required' == $db_current_stage_type->name ) $code = 403;
       }
+      else if( 'incomplete' == $action )
+      {
+        if( 'administrator' != $db_role->name ||
+            '.' != $db_reqn_version->amendment ||
+            ( 'review' != $phase && !in_array( $db_current_stage_type->name, array( 'Agreement', 'Data Release' ) ) ) ) $code = 403;
+      }
+      else if( 'withdraw' == $action )
+      {
+        if( 'administrator' != $db_role->name || 'active' != $phase ) $code = 403;
+      }
       else if( 'reactivate' == $action )
       {
         if( 'administrator' != $db_role->name || !in_array( $state, [ 'abandoned', 'inactive' ] ) ) $code = 403;
@@ -134,6 +144,22 @@ class patch extends \cenozo\service\patch
   /**
    * Extend parent method
    */
+  public function prepare()
+  {
+    parent::prepare();
+
+    // if we're changing the user_id then store the old one so that it can be referenced in the finish() method
+    $patch_array = $this->get_file_as_array();
+    if( array_key_exists( 'user_id', $patch_array ) )
+    {
+      $db_reqn = $this->get_leaf_record();
+      $this->db_old_user = $db_reqn->get_user();
+    }
+  }
+
+  /**
+   * Extend parent method
+   */
   public function execute()
   {
     parent::execute();
@@ -144,9 +170,9 @@ class patch extends \cenozo\service\patch
     $session = lib::create( 'business\session' );
     $db_role = $session->get_role();
     $db_user = $session->get_user();
-    $graduate = 'applicant' == $db_role->name && $db_user->is_graduate();
 
     $db_reqn = $this->get_leaf_record();
+    $trainee = 'applicant' == $db_role->name && $db_reqn->trainee_user_id == $db_user->id;
     $db_reqn_version = $db_reqn->get_current_reqn_version();
     $file = $this->get_argument( 'file', NULL );
     $headers = apache_request_headers();
@@ -242,6 +268,18 @@ class patch extends \cenozo\service\patch
           $db_notification->set_reqn( $db_reqn ); // this saves the record
           $db_notification->mail();
         }
+        else if( 'incomplete' == $action )
+        {
+          // move the requisition to incomplete
+          $db_incomplete_stage = $stage_type_class_name::get_unique_record( 'name', 'Incomplete' );
+          $db_reqn->proceed_to_next_stage( $db_incomplete_stage );
+        }
+        else if( 'withdraw' == $action )
+        {
+          // move the requisition to withdrawn
+          $db_withdrawn_stage = $stage_type_class_name::get_unique_record( 'name', 'Withdrawn' );
+          $db_reqn->proceed_to_next_stage( $db_withdrawn_stage );
+        }
         else if( 'reactivate' == $action )
         {
           $db_reqn->state = 'abandoned' == $db_reqn->state ? 'deferred' : NULL;
@@ -258,8 +296,8 @@ class patch extends \cenozo\service\patch
         {
           if( 'submit' == $action )
           {
-            // graduates must be get approval from their supervisor
-            if( $graduate )
+            // trainees must be get approval from their supervisor
+            if( $trainee )
             {
               // send a notification to the supervisor
               $db_notification = lib::create( 'database\notification' );
@@ -328,4 +366,51 @@ class patch extends \cenozo\service\patch
       }
     }
   }
+
+  /**
+   * Extend parent method
+   */
+  public function finish()
+  {
+    $notification_type_class_name = lib::get_class_name( 'database\notification_type' );
+    $notification_class_name = lib::get_class_name( 'database\notification' );
+
+    parent::finish();
+
+    // if we changed the user_id then we need to send a notification
+    $db_reqn = $this->get_leaf_record();
+    $patch_array = $this->get_file_as_array();
+    if( array_key_exists( 'user_id', $patch_array ) )
+    {
+      // if the reqn has a trainee then change their supervisor to the new user
+      $db_trainee_user = $db_reqn->get_trainee_user();
+      if( !is_null( $db_trainee_user ) )
+      {
+        $db_applicant = $db_trainee_user->get_applicant();
+        $db_applicant->supervisor_user_id = $db_reqn->user_id;
+        $db_applicant->save();
+      }
+
+      // send a notification
+      $db_notification = lib::create( 'database\notification' );
+      $db_notification->notification_type_id =
+        $notification_type_class_name::get_unique_record( 'name', 'Change Owner' )->id;
+      $db_notification->set_reqn( $db_reqn ); // this saves the record
+
+      // we also want to add the old owner
+      $db_notification->add_email(
+        $this->db_old_user->email,
+        sprintf( '%s %s', $this->db_old_user->first_name, $this->db_old_user->last_name )
+      );
+
+      $db_notification->mail();
+    }
+  }
+
+  /**
+   * Cache of the reqn's old user in case it gets changed
+   * @var database\user
+   * @access private
+   */
+  private $db_old_user = NULL;
 }

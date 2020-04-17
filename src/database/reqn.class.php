@@ -39,8 +39,8 @@ class reqn extends \cenozo\database\record
     // make sure the deadline is appropriate
     if( $is_new ) $this->assert_deadline();
 
-    // track whether the graduate_id has changed to NULL
-    $remove_graduate_details = $this->has_column_changed( 'graduate_id' ) && !is_null( $this->graduate_id );
+    // track whether the trainee_id has changed to NULL
+    $remove_trainee_details = $this->has_column_changed( 'trainee_user_id' ) && !is_null( $this->trainee_user_id );
 
     parent::save();
 
@@ -49,14 +49,14 @@ class reqn extends \cenozo\database\record
       $this->create_version();
       $this->proceed_to_next_stage();
     }
-    else if( $remove_graduate_details )
+    else if( $remove_trainee_details )
     {
-      // do not allow graduate details or a fee waiver if there is no graduate selected
+      // do not allow trainee details or a fee waiver if there is no trainee selected
       $db_current_reqn_version = $this->get_current_reqn_version();
-      $db_current_reqn_version->graduate_program = NULL;
-      $db_current_reqn_version->graduate_institution = NULL;
-      $db_current_reqn_version->graduate_address = NULL;
-      $db_current_reqn_version->graduate_phone = NULL;
+      $db_current_reqn_version->trainee_program = NULL;
+      $db_current_reqn_version->trainee_institution = NULL;
+      $db_current_reqn_version->trainee_address = NULL;
+      $db_current_reqn_version->trainee_phone = NULL;
       $db_current_reqn_version->waiver = NULL;
       $db_current_reqn_version->save();
     }
@@ -204,6 +204,50 @@ class reqn extends \cenozo\database\record
   }
 
   /**
+   * Returns the reqn's calculated recommendation based on all reviews
+   * 
+   * @return string ("Approved" or "Not Approved")
+   * @access public
+   */
+  public function get_recommendation()
+  {
+    // the decision for this reqn depends on one of several possible reviews
+    $review_sel = lib::create( 'database\select' );
+    $review_sel->add_table_column( 'review_type', 'name' );
+    $review_sel->add_table_column( 'recommendation_type', 'name', 'recommendation' );
+    $review_mod = lib::create( 'database\modifier' );
+    $review_mod->join( 'review_type', 'review.review_type_id', 'review_type.id' );
+    $review_mod->join( 'recommendation_type', 'review.recommendation_type_id', 'recommendation_type.id' );
+
+    // make sure to only get reviews for the current amendment
+    $review_mod->join( 'reqn_current_reqn_version', 'review.reqn_id', 'reqn_current_reqn_version.reqn_id' );
+    $review_mod->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
+    $review_mod->where( 'review.amendment', '=', 'reqn_version.amendment', false );
+
+    $review_list = array();
+    foreach( $this->get_review_list( $review_sel, $review_mod ) as $review )
+      $review_list[$review['name']] = $review['recommendation'];
+
+    $recommendation = NULL;
+    // if there is a second SMT review then use that decision
+    if( array_key_exists( 'Second SMT', $review_list ) ) $recommendation = $review_list['Second SMT'];
+    // if there is a second chair review then use that decision
+    else if( array_key_exists( 'Second Chair', $review_list ) ) $recommendation = $review_list['Second Chair'];
+    // if there is a first SMT review then use that decision
+    else if( array_key_exists( 'SMT', $review_list ) ) $recommendation = $review_list['SMT'];
+    // if there is a first chair review then use that decision
+    else if( array_key_exists( 'Chair', $review_list ) ) $recommendation = $review_list['Chair'];
+    // if there is a Feasibility review then use that decision
+    else if( array_key_exists( 'Feasibility', $review_list ) )
+      $recommendation = 'Not Feasible' == $review_list['Feasibility'] ? 'Not Approved' : 'Approved';
+    // if there is an admin review then use that decision
+    else if( array_key_exists( 'Admin', $review_list ) )
+      $recommendation = 'Not Satisfactory' == $review_list['Admin'] ? 'Not Approved' : 'Approved';
+
+    return $recommendation;
+  }
+
+  /**
    * Returns the reqns current stage
    * @return database\stage
    * @access public
@@ -315,39 +359,7 @@ class reqn extends \cenozo\database\record
         }
         else if( 'Decision Made' == $db_current_stage_type->name )
         {
-          // the decision for this reqn depends on one of several possible reviews
-          $review_sel = lib::create( 'database\select' );
-          $review_sel->add_table_column( 'review_type', 'name' );
-          $review_sel->add_table_column( 'recommendation_type', 'name', 'recommendation' );
-          $review_mod = lib::create( 'database\modifier' );
-          $review_mod->join( 'review_type', 'review.review_type_id', 'review_type.id' );
-          $review_mod->join( 'recommendation_type', 'review.recommendation_type_id', 'recommendation_type.id' );
-
-          // make sure to only get reviews for the current amendment
-          $review_mod->join( 'reqn_current_reqn_version', 'review.reqn_id', 'reqn_current_reqn_version.reqn_id' );
-          $review_mod->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
-          $review_mod->where( 'review.amendment', '=', 'reqn_version.amendment', false );
-
-          $review_list = array();
-          foreach( $this->get_review_list( $review_sel, $review_mod ) as $review )
-            $review_list[$review['name']] = $review['recommendation'];
-
-          $recommendation = NULL;
-          // if there is a second SMT review then use that decision
-          if( array_key_exists( 'Second SMT', $review_list ) ) $recommendation = $review_list['Second SMT'];
-          // if there is a second chair review then use that decision
-          else if( array_key_exists( 'Second Chair', $review_list ) ) $recommendation = $review_list['Second Chair'];
-          // if there is a first SMT review then use that decision
-          else if( array_key_exists( 'SMT', $review_list ) ) $recommendation = $review_list['SMT'];
-          // if there is a first chair review then use that decision
-          else if( array_key_exists( 'Chair', $review_list ) ) $recommendation = $review_list['Chair'];
-          // if there is a SAC review then use that decision
-          else if( array_key_exists( 'SAC', $review_list ) )
-            $recommendation = 'Not Feasible' == $review_list['SAC'] ? 'Not Approved' : 'Approved';
-          // if there is an admin review then use that decision
-          else if( array_key_exists( 'Admin', $review_list ) )
-            $recommendation = 'Not Satisfactory' == $review_list['Admin'] ? 'Not Approved' : 'Approved';
-
+          $recommendation = $this->get_recommendation();
           if( !is_null( $recommendation ) )
           {
             // NOTE: when approved check if this is not an amendment and revisions have been suggested
@@ -445,6 +457,9 @@ class reqn extends \cenozo\database\record
                         'DSAC Selection' == $db_current_stage_type->name &&
                         'Decision Made' == $db_next_stage_type->name;
 
+    $incomplete = 'Incomplete' == $db_next_stage_type->name;
+    $withdrawn = 'Withdrawn' == $db_next_stage_type->name;
+
     // make sure the stage type is appropriate
     if( is_null( $db_current_stage_type ) )
     {
@@ -456,8 +471,16 @@ class reqn extends \cenozo\database\record
     }
     else
     {
-      // determine whether we can safely proceed to the next stage (ignoring if the DSAC selection stage has been rejected)
-      if( !$reject_selection && !$start_amendment )
+      if( $incomplete && '.' != $db_reqn_version->amendment )
+      {
+        throw lib::create( 'exception\runtime',
+          sprintf( 'Tried to move amendment into "%s" stage.', $db_next_stage_type->name ),
+          __METHOD__ );
+      }
+
+      // Determine whether we can safely proceed to the next stage (ignoring if the DSAC selection stage has been rejected or
+      // if we're moving the reqn to the permanently incomplete stage
+      if( !( $reject_selection || $start_amendment || $incomplete || $withdrawn ) )
       {
         $result = $db_current_stage->check_if_complete();
         if( true !== $result ) throw lib::create( 'exception\notice', $result, __METHOD__ );
@@ -471,9 +494,13 @@ class reqn extends \cenozo\database\record
       $db_current_stage->datetime = util::get_datetime_object();
       $db_current_stage->save();
 
-      // send any notifications associated with the current stage
-      $db_notification_type = $db_current_stage_type->get_notification_type();
-      if( !$start_amendment && !is_null( $db_notification_type ) )
+      // send any notifications associated with the current stage (incomplete and withdrawn have their own special notifications)
+      $db_notification_type = NULL;
+      if( $incomplete ) $db_notification_type = $notification_type_class_name::get_unique_record( 'name', 'Incomplete' );
+      else if( $withdrawn ) $db_notification_type = $notification_type_class_name::get_unique_record( 'name', 'Withdrawn' );
+      else $db_notification_type = $db_current_stage_type->get_notification_type();
+
+      if( !( $start_amendment || is_null( $db_notification_type ) ) )
       {
         $db_notification = lib::create( 'database\notification' );
         $db_notification->notification_type_id = $db_notification_type->id;
@@ -483,13 +510,14 @@ class reqn extends \cenozo\database\record
       else
       {
         $db_reqn_user = $this->get_user();
+        if( $start_amendment ) $subject = sprintf( 'Amendment %s started', $db_reqn_version->amendment );
+        else if( $incomplete ) $subject = $db_next_stage_type->name;
+        else $subject = sprintf( '%s complete', $db_current_stage_type->name );
         $notification_class_name::mail_admin(
           sprintf(
             'Requisition %s: %s',
             $this->identifier,
-            $start_amendment ?
-              sprintf( 'Amendment %s started', $db_reqn_version->amendment ) :
-              sprintf( '%s complete', $db_current_stage_type->name )
+            $subject
           ),
           sprintf(
             "The following requisition has moved from \"%s\" to \"%s\":\n".
@@ -589,10 +617,48 @@ class reqn extends \cenozo\database\record
     {
       $this->generate_data_directory();
     }
-    // if we have just entered the active stage then create symbolic links to all data files and update file timestamps
+    else if( 'Agreement' == $db_next_stage_type->name )
+    {
+      // check if there is an amendment to change the primary applicant, and if so change it now
+      if( '.' != $db_reqn_version->amendment &&
+          !is_null( $db_reqn_version->new_user_id ) &&
+          'Approved' == $this->get_recommendation() )
+      {
+        // make sure a new-user amendment type was selected
+        $amendment_type_mod = lib::create( 'database\modifier' );
+        $amendment_type_mod->where( 'new_user', '=', true );
+        if( 0 < $db_reqn_version->get_amendment_type_count( $amendment_type_mod ) )
+        {
+          // change the trainee's supervisor if there is one
+          $db_trainee_user = $this->get_trainee_user();
+          if( !is_null( $db_trainee_user ) )
+          {
+            $db_applicant = $db_trainee_user->get_applicant();
+            $db_applicant->supervisor_user_id = $db_reqn_version->new_user_id;
+            $db_applicant->save();
+          }
+
+          // change ownership to the new user
+          $this->user_id = $db_reqn_version->new_user_id;
+          $this->save();
+        }
+        else
+        {
+          // the new user isn't being used, so clear it out
+          $db_reqn_version->new_user_id = NULL;
+          $db_reqn_version->save();
+        }
+      }
+    }
     else if( 'Active' == $db_next_stage_type->name )
     {
+      // if we have just entered the active stage then create symbolic links to all data files and update file timestamps
       $this->refresh_study_data_files();
+    }
+    else if( $incomplete || $withdrawn )
+    {
+      $this->state = NULL;
+      $this->save();
     }
 
     // manage any reviews associated with the current stage
@@ -605,7 +671,7 @@ class reqn extends \cenozo\database\record
           // remove all reviews
           $db_review->delete();
         }
-        else
+        else if( !( $incomplete || $withdrawn ) )
         {
           // update the current stage's review's reviewer with the current user if it isn't already set
           if( is_null( $db_review->user_id ) )
@@ -688,7 +754,7 @@ class reqn extends \cenozo\database\record
   public function generate_reviews_file()
   {
     $db_user = $this->get_user();
-    $db_graduate_user = $this->get_graduate_user();
+    $db_trainee_user = $this->get_trainee_user();
     $db_reqn_version = $this->get_current_reqn_version();
 
     $text = sprintf(
@@ -696,15 +762,14 @@ class reqn extends \cenozo\database\record
       "Amendment: %s\n".
       "Title: %s\n".
       "Applicant: %s\n".
-      "%s". // graduate only added if one exists
+      "%s". // trainee only added if one exists
       "Lay Summary:\n".
       "%s\n",
       $this->identifier,
       str_replace( '.', 'no', $db_reqn_version->amendment ),
       $db_reqn_version->title,
       sprintf( '%s %s', $db_user->first_name, $db_user->last_name ),
-      is_null( $db_graduate_user ) ?
-        '' : sprintf( "Graduate: %s %s\n", $db_graduate_user->first_name, $db_graduate_user->last_name ),
+      is_null( $db_trainee_user ) ?  '' : sprintf( "Trainee: %s %s\n", $db_trainee_user->first_name, $db_trainee_user->last_name ),
       $db_reqn_version->lay_summary
     );
 
@@ -806,17 +871,9 @@ class reqn extends \cenozo\database\record
    * 
    * @return integer
    */
-  public function get_graduate_user()
+  public function get_trainee_user()
   {
-    $select = lib::create( 'database\select' );
-    $select->from( 'reqn' );
-    $select->add_table_column( 'graduate', 'graduate_user_id' );
-    $modifier = lib::create( 'database\modifier' );
-    $modifier->join( 'graduate', 'reqn.graduate_id', 'graduate.id' );
-    $modifier->where( 'reqn.id', '=', $this->id );
-
-    $user_id = static::db()->get_one( sprintf( '%s %s', $select->get_sql(), $modifier->get_sql() ) );
-    return is_null( $user_id ) ? NULL : lib::create( 'database\user', $user_id );
+    return is_null( $this->trainee_user_id ) ? NULL : lib::create( 'database\user', $this->trainee_user_id );
   }
 
   /**
@@ -1007,14 +1064,16 @@ class reqn extends \cenozo\database\record
       }
       else
       {
-        // if there are zero or one stages then this is a new requisition which needs its deadline set
-        $stage_sel = lib::create( 'database\select' );
-        $stage_sel->add_table_column( 'stage_type', 'rank' );
-        $stage_mod = lib::create( 'database\modifier' );
-        $stage_mod->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
-        $stage_list = $this->get_stage_list( $stage_sel, $stage_mod );
+        $number_of_stages = 0;
+        if( !is_null( $this->id ) )
+        {
+          $stage_mod = lib::create( 'database\modifier' );
+          $stage_mod->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
+          $number_of_stages = $this->get_stage_count( $stage_mod );
+        }
 
-        if( 2 > count( $stage_list ) )
+        // if there are zero or one stages then this is a new requisition which needs its deadline set
+        if( 2 > $number_of_stages )
         {
           if( 0 < $this->get_deadline()->date->diff( util::get_datetime_object() )->days )
           { // deadline has expired, get the next one

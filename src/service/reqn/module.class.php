@@ -31,9 +31,8 @@ class module extends \cenozo\service\module
       $db_reqn = $this->get_resource();
       if( 'applicant' == $db_role->name && !is_null( $db_reqn ) )
       {
-        $db_graduate = $db_reqn->get_graduate();
-        $is_graduate = !is_null( $db_graduate ) && $db_graduate->graduate_user_id == $db_user->id;
-        if( ( $db_reqn->user_id != $db_user->id && !$is_graduate ) || 'abandoned' == $db_reqn->state )
+        $trainee = 'applicant' == $db_role->name && $db_reqn->trainee_user_id == $db_user->id;
+        if( ( $db_reqn->user_id != $db_user->id && !$trainee ) || 'abandoned' == $db_reqn->state )
         {
           $this->get_status()->set_code( 404 );
           return;
@@ -47,6 +46,8 @@ class module extends \cenozo\service\module
    */
   public function prepare_read( $select, $modifier )
   {
+    $reqn_class_name = lib::get_class_name( 'database\reqn' );
+
     parent::prepare_read( $select, $modifier );
 
     $session = lib::create( 'business\session' );
@@ -58,7 +59,7 @@ class module extends \cenozo\service\module
     $modifier->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
     $modifier->left_join( 'deadline', 'reqn.deadline_id', 'deadline.id' );
     $modifier->join( 'user', 'reqn.user_id', 'user.id' );
-    $modifier->left_join( 'graduate', 'reqn.graduate_id', 'graduate.id' );
+    $modifier->left_join( 'user', 'reqn.trainee_user_id', 'trainee_user.id', 'trainee_user' );
 
     $join_mod = lib::create( 'database\modifier' );
     $join_mod->where( 'reqn.id', '=', 'stage.reqn_id', false );
@@ -75,13 +76,12 @@ class module extends \cenozo\service\module
         'user', 'CONCAT_WS( " ", user.first_name, user.last_name )', 'user_full_name', false );
     }
 
-    if( $select->has_column( 'graduate_full_name' ) )
+    if( $select->has_column( 'trainee_full_name' ) )
     {
-      $modifier->left_join( 'user', 'graduate.graduate_user_id', 'graduate_user.id', 'graduate_user' );
       $select->add_table_column(
-        'graduate_user',
-        'IF( graduate_user.id IS NULL, "(none)", CONCAT_WS( " ", graduate_user.first_name, graduate_user.last_name ) )',
-        'graduate_full_name',
+        'trainee_user',
+        'IF( trainee_user.id IS NULL, NULL, CONCAT_WS( " ", trainee_user.first_name, trainee_user.last_name ) )',
+        'trainee_full_name',
         false
       );
     }
@@ -100,7 +100,7 @@ class module extends \cenozo\service\module
       // only show applicants their own reqns which aren't abandoned
       $modifier->where_bracket( true );
       $modifier->where( 'reqn.user_id', '=', $db_user->id );
-      $modifier->or_where( 'graduate.graduate_user_id', '=', $db_user->id );
+      $modifier->or_where( 'reqn.trainee_user_id', '=', $db_user->id );
       $modifier->where_bracket( false );
       $modifier->where( 'IFNULL( reqn.state, "" )', '!=', 'abandoned' );
 
@@ -160,7 +160,17 @@ class module extends \cenozo\service\module
     if( $db_reqn )
     {
       // include the user first/last/name as supplemental data
-      $select->add_column( 'CONCAT( user.first_name, " ", user.last_name, " (", user.name, ")" )', 'formatted_user_id', false );
+      $select->add_column(
+        'CONCAT( user.first_name, " ", user.last_name, " (", user.name, ")" )',
+        'formatted_user_id',
+        false
+      );
+
+      $select->add_column(
+        'CONCAT( trainee_user.first_name, " ", trainee_user.last_name, " (", trainee_user.name, ")" )',
+        'formatted_trainee_user_id',
+        false
+      );
 
       if( $select->has_column( 'has_agreements' ) )
       {
@@ -181,7 +191,6 @@ class module extends \cenozo\service\module
     $reqn_class_name = lib::get_class_name( 'database\reqn' );
     $reqn_type_class_name = lib::get_class_name( 'database\reqn_type' );
     $language_class_name = lib::get_class_name( 'database\language' );
-    $graduate_class_name = lib::get_class_name( 'database\graduate' );
 
     // if no type has been selected then assume standard
     if( is_null( $record->reqn_type_id ) )
@@ -198,11 +207,11 @@ class module extends \cenozo\service\module
       $record->language_id = $language_class_name::get_unique_record( 'code', 'en' )->id;
 
     // if the current user has a supervisor then make them the owner
-    $db_graduate = $graduate_class_name::get_unique_record( 'graduate_user_id', $record->user_id );
-    if( !is_null( $db_graduate ) )
+    $db_applicant = $record->get_user()->get_applicant();
+    if( !is_null( $db_applicant->supervisor_user_id ) )
     {
-      $record->user_id = $db_graduate->user_id;
-      $record->graduate_id = $db_graduate->id;
+      $record->user_id = $db_applicant->supervisor_user_id;
+      $record->trainee_user_id = $db_applicant->user_id;
     }
   }
 }

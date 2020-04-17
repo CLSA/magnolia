@@ -29,10 +29,6 @@ class get extends \cenozo\service\self\get
     $resource['application']['study_data_url'] = sprintf( '%s/%s', str_replace( '/api', '', ROOT_URL ), STUDY_DATA_URL );
     $resource['user']['newsletter'] = $db_user->get_newsletter();
 
-    // define whether the user has a supervisor (for the applicant role only)
-    $resource['user']['graduate'] = false;
-    if( 'applicant' == $db_role->name ) $resource['user']['graduate'] = $db_user->is_graduate();
-
     return $resource;
   }
 }

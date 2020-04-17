@@ -15,25 +15,49 @@ define( [ cenozoApp.module( 'user' ).getFileUrl( 'module.js' ) ], function() {
   } );
 
   // add the supervisor input
-  module.addInput( '', 'supervisor', {
+  module.addInput( '', 'supervisor_user_id', {
     title: 'Supervisor',
     type: 'string',
-    isConstant: true
+    type: 'lookup-typeahead',
+    typeahead: {
+      table: 'user',
+      select: 'CONCAT( user.first_name, " ", user.last_name, " (", user.name, ")" )',
+      where: [ 'user.first_name', 'user.last_name', 'user.name' ]
+    },
+    help: 'If set then all new requisitions created by this user will define the supervisor as the primary applicant ' +
+          'and this user as the trainee.'
   } );
 
-  cenozo.providers.decorator( 'CnUserViewFactory', [
-    '$delegate', '$state',
-    function( $delegate, $state ) {
+  // extend the model factory
+  cenozo.providers.decorator( 'CnUserModelFactory', [
+    '$delegate', '$state', 'CnHttpFactory',
+    function( $delegate, $state, CnHttpFactory ) {
       var instance = $delegate.instance;
-      $delegate.instance = function( parentModel, root ) {
-        var object = instance( parentModel, root );
-        object.deferred.promise.then( function() {
-          object.graduateModel.getAddEnabled = function() {
-            return object.graduateModel.$$getAddEnabled() && '(none)' == object.record.supervisor;
-          };
+      function extendObject( object ) {
+        angular.extend( object, {
+          // extend getMetadata
+          getMetadata: function() {
+            return object.$$getMetadata().then( function() {
+              return CnHttpFactory.instance( {
+                path: 'applicant'
+              } ).head().then( function success( response ) {
+                var columnMetadata = angular.fromJson( response.headers( 'Columns' ) ).supervisor_user_id;
+                columnMetadata.required = '1' == columnMetadata.required;
+                object.metadata.columnList.supervisor_user_id = columnMetadata;
+              } );
+            } );
+          }
         } );
+      }
+
+      extendObject( $delegate.root );
+
+      $delegate.instance = function() {
+        var object = instance();
+        extendObject( object );
         return object;
       };
+
       return $delegate;
     }
   ] );

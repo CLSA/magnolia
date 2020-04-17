@@ -51,12 +51,12 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     applicant_address: { type: 'string' },
     applicant_phone: { type: 'string' },
     applicant_email: { type: 'string' },
-    graduate_name: { type: 'string' },
-    graduate_program: { type: 'string' },
-    graduate_institution: { type: 'string' },
-    graduate_address: { type: 'string' },
-    graduate_phone: { type: 'string' },
-    graduate_email: { type: 'string' },
+    trainee_name: { type: 'string' },
+    trainee_program: { type: 'string' },
+    trainee_institution: { type: 'string' },
+    trainee_address: { type: 'string' },
+    trainee_phone: { type: 'string' },
+    trainee_email: { type: 'string' },
     start_date: { type: 'date' },
     duration: { type: 'enum' },
     title: { type: 'string' },
@@ -69,7 +69,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     funding: { type: 'enum' },
     funding_agency: { type: 'string' },
     grant_number: { type: 'string' },
-    ethics: { type: 'boolean' },
+    ethics: { type: 'enum' },
     ethics_date: { type: 'date' },
     waiver: { type: 'enum' },
     comprehensive: { type: 'boolean' },
@@ -98,6 +98,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     csd_justification: { type: 'text' },
     amendment_justification: { type: 'text' },
 
+    trainee_user_id: { column: 'reqn.trainee_user_id', type: 'string' },
     identifier: { column: 'reqn.identifier', type: 'string' },
     state: { column: 'reqn.state', type: 'string' },
     data_directory: { column: 'reqn.data_directory', type: 'string' },
@@ -117,7 +118,19 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     deferral_note_2b: { column: 'reqn.deferral_note_2b', type: 'text' },
     deferral_note_2c: { column: 'reqn.deferral_note_2c', type: 'text' },
     deferral_note_2d: { column: 'reqn.deferral_note_2d', type: 'text' },
-    deferral_note_2e: { column: 'reqn.deferral_note_2e', type: 'text' }
+    deferral_note_2e: { column: 'reqn.deferral_note_2e', type: 'text' },
+
+    coapplicant_agreement_filename: { type: 'string' },
+    funding_filename: { type: 'string' },
+    ethics_filename: { type: 'string' },
+    new_user_id: {
+      type: 'lookup-typeahead',
+      typeahead: {
+        table: 'user',
+        select: 'CONCAT( user.first_name, " ", user.last_name )',
+        where: [ 'user.first_name', 'user.last_name', 'user.name' ]
+      }
+    }
   } );
 
   /* ######################################################################################################## */
@@ -386,6 +399,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           if( angular.isDefined( self.stageModel ) ) self.stageModel.listModel.heading = 'Stage History';
         } );
 
+        this.configureFileInput( 'coapplicant_agreement_filename' );
         this.configureFileInput( 'funding_filename' );
         this.configureFileInput( 'ethics_filename' );
         this.configureFileInput( 'data_sharing_filename' );
@@ -395,7 +409,10 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           compareRecord: null,
           versionList: [],
           lastAgreementVersion: null,
+          coapplicantAgreementList: [],
           agreementDifferenceList: null,
+          lastAmendmentVersion: null, // used to determine the addingCoapplicantWithData variable
+          addingCoapplicantWithData: false, // used when an amendment is adding a new coap
           show: function( subject ) { return CnReqnHelper.showAction( subject, this.record ); },
           showAgreement: function() {
             // only show the agreement tab to administrators
@@ -425,6 +442,12 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             return CnReqnHelper.download( 'application_and_checklist', this.record.getIdentifier() );
           },
           downloadDataSharing: function() { return CnReqnHelper.download( 'data_sharing_filename', this.record.getIdentifier() ); },
+          downloadCoapplicantAgreement: function( reqnVersionId) {
+            return CnReqnHelper.download( 'coapplicant_agreement_filename', reqnVersionId );
+          },
+          downloadCoapplicantAgreementTemplate: function() {
+            return CnReqnHelper.download( 'coapplicant_agreement_template', this.record.getIdentifier() );
+          },
 
           onView: function( force ) {
             // reset tab values
@@ -434,6 +457,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
             // reset compare version and differences
             this.compareRecord = null;
+            this.coapplicantAgreementList = [];
             this.agreementDifferenceList = null;
 
             return this.$$onView( force ).then( function() {
@@ -457,17 +481,44 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             // make sure to send patches to deferral notes to the parent reqn
             var property = Object.keys( data )[0];
             if( null == property.match( /^deferral_note/ ) ) {
-              return this.$$onPatch( data ).then( function() {
-                if( angular.isDefined( data.comprehensive ) || angular.isDefined( data.tracking ) ) {
-                  if( self.record.comprehensive && self.record.tracking ) {
-                    // show the cohort warning to the applicant
-                    CnModalMessageFactory.instance( {
-                      title: self.translate( 'part2.cohort.bothCohortNoticeTitle' ),
-                      message: self.translate( 'part2.cohort.bothCohortNotice' ),
-                      closeText: 'applicant' == CnSession.role.name ? self.translate( 'misc.close' ) : 'Close'
-                    } ).show();
+              var promiseList = [];
+              if( 'new_user_id' == property ) {
+                // make sure the new user isn't a trainee
+                promiseList.push(
+                  CnHttpFactory.instance( {
+                    path: 'applicant/user_id=' + data[property],
+                    data: { select: { column: 'supervisor_user_id' } }
+                  } ).get().then( function( response ) {
+                    if( angular.isObject( response.data ) && null != response.data.supervisor_user_id ) {
+                      return CnModalMessageFactory.instance( {
+                        title: self.translate( 'amendment.newUserIsTraineeNoticeTitle' ),
+                        message: self.translate( 'amendment.newUserIsTraineeNotice' ),
+                        closeText: 'applicant' == CnSession.role.name ? self.translate( 'misc.close' ) : 'Close',
+                        error: true
+                      } ).show().then( function() {
+                        // failed to set the new user so put it back
+                        self.formattedRecord.new_user_id = self.backupRecord.formatted_new_user_id;
+                        return true;
+                      } );
+                    }
+                  } )
+                );
+              }
+
+              return $q.all( promiseList ).then( function( response ) {
+                // only proceed if the above check isn't true (prevent trainees to be the new primary applicant)
+                if( true !== response[0] ) return self.$$onPatch( data ).then( function() {
+                  if( angular.isDefined( data.comprehensive ) || angular.isDefined( data.tracking ) ) {
+                    if( self.record.comprehensive && self.record.tracking ) {
+                      // show the cohort warning to the applicant
+                      CnModalMessageFactory.instance( {
+                        title: self.translate( 'part2.cohort.bothCohortNoticeTitle' ),
+                        message: self.translate( 'part2.cohort.bothCohortNotice' ),
+                        closeText: 'applicant' == CnSession.role.name ? self.translate( 'misc.close' ) : 'Close'
+                      } ).show();
+                    }
                   }
-                }
+                } );
               } );
             } else {
               if( !this.parentModel.getEditEnabled() ) throw new Error( 'Calling onPatch() but edit is not enabled.' );
@@ -477,11 +528,20 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                 path: parent.subject + '/' + parent.identifier,
                 data: data
               };
-              httpObj.onError = function( response ) { self.onPatchError( response ); }
+              httpObj.onError = function( response ) { self.onPatchError( response ); };
               return CnHttpFactory.instance( httpObj ).patch().then( function() {
                 self.afterPatchFunctions.forEach( function( fn ) { fn(); } );
               } );
             }
+          },
+
+          onPatchError: function( response ) {
+            if( 306 == response.status && null != response.data.match( /^"You cannot change the primary applicant/ ) ) {
+              // failed to set the new user so put it back
+              self.formattedRecord.new_user_id = self.backupRecord.formatted_new_user_id;
+            }
+
+            return this.$$onPatchError( response );
           },
 
           coapplicantModel: CnCoapplicantModelFactory.instance(),
@@ -611,6 +671,12 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
                   // add the file sizes
                   CnHttpFactory.instance( {
+                    path: 'reqn_version/' + version.id + '?file=coapplicant_agreement_filename'
+                  } ).get().then( function( response ) {
+                    version.coapplicant_agreement_size = response.data;
+                  } ),
+
+                  CnHttpFactory.instance( {
                     path: 'reqn_version/' + version.id + '?file=funding_filename'
                   } ).get().then( function( response ) {
                     version.funding_size = response.data;
@@ -641,6 +707,18 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                 self.versionList.unshift( null );
               }
 
+              self.lastAmendmentVersion = null;
+              if( '.' != self.record.amendment ) {
+                self.versionList.slice().reverse().some( function( version ) {
+                  // Note that the amendments we're comparing are letters, and since . is considered less than A it works
+                  // whether we're comparing lettered versions or the initial "." version:
+                  if( self.record.amendment > version.amendment ) {
+                    self.lastAmendmentVersion = version.amendment_version;
+                    return true;
+                  }
+                } );
+              }
+
               return $q.all( promiseList ).then( function() {
                 // Calculate all differences for all versions (in reverse order so we can find the last agreement version)
                 self.versionList.reverse();
@@ -650,7 +728,11 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                   if( null != version ) {
                     version.differences = CnReqnVersionHelper.getDifferences( self.record, version, self.parentModel );
 
-                    // while we're at it determine the last agreement version and calculate its differences
+                    // while we're at it determine the list of coapplicant agreements
+                    if( null != version.coapplicant_agreement_filename )
+                      self.coapplicantAgreementList.push( { version: version.amendment_version, id: version.id } );
+
+                    // ... and also determine the last agreement version and calculate its differences
                     if( null == self.agreementDifferenceList && null != version.agreement_filename )
                       self.agreementDifferenceList = self.getDifferenceList( version );
                   }
@@ -681,6 +763,31 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                     )
                   )
                 );
+
+              // When an amendment is made which adds coapplicants with access to data we need to get a signed agreement
+              // form from the user.  In order to do this we need a variable that tracks when this is the case:
+              var versions = self.versionList.length;
+              if( '.' != this.record.amendment && self.lastAmendmentVersion == version.amendment_version ) {
+                self.addingCoapplicantWithData = false;
+                if( version.coapplicantDiff ) {
+                  // There is a difference between this and the previous amendment version, so now determine if there is now
+                  // a coapplicant with access to the data which didn't exist in the previous version
+                  self.record.coapplicantList.some( function( coapplicant ) {
+                    var found = version.coapplicantList.some( function( oldCoapplicant ) {
+                      if( oldCoapplicant.name == coapplicant.name ) {
+                        // check if an existing coap has been given access to the data
+                        if( !oldCoapplicant.access && coapplicant.access ) self.addingCoapplicantWithData = true;
+                        return true;
+                      }
+                    } );
+
+                    // check if a new coap has been given access to the data
+                    if( !found && coapplicant.access ) self.addingCoapplicantWithData = true;
+
+                    return self.addingCoapplicantWithData;
+                  } );
+                }
+              }
             }
           },
 
@@ -713,14 +820,34 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           },
 
           toggleAmendmentTypeValue: function( amendmentTypeId ) {
+            var promiseList = [];
+
             var property = 'amendmentType' + amendmentTypeId;
             if( this.record[property] ) {
+              if( amendmentTypeId == this.parentModel.newUserAmendmentTypeId ) {
+                // show a warning if changing primary applicants
+
+                promiseList.push(
+                  CnModalConfirmFactory.instance( {
+                    title: self.translate( 'amendment.newUserNoticeTitle'),
+                    message: self.translate( 'amendment.newUserNotice' )
+                  } ).show().then( response => response )
+                );
+              }
+
               // add the amendment type
-              return CnHttpFactory.instance( {
-                path: this.parentModel.getServiceResourcePath() + '/amendment_type',
-                data: amendmentTypeId,
-                onError: function( response ) { self.record[property] = !self.record[property]; }
-              } ).post();
+              return $q.all( promiseList ).then( function( response ) {
+                if( 0 == response.length || response[0] ) {
+                  return CnHttpFactory.instance( {
+                    path: self.parentModel.getServiceResourcePath() + '/amendment_type',
+                    data: amendmentTypeId,
+                    onError: function( response ) { self.record[property] = !self.record[property]; }
+                  } ).post();
+                } else {
+                  // we're not making the change so un-select the option
+                  self.record[property] = !self.record[property];
+                }
+              } );
             } else {
               // delete the amendment type
               return CnHttpFactory.instance( {
@@ -957,9 +1084,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                   } else CnModalMessageFactory.httpError( response );
                 }
               } ).patch().then( function() {
-                var code = CnSession.user.graduate ?
-                  ( 'deferred' == record.state ? 'graduateResubmit' : 'graduateSubmit' ) :
-                  ( 'deferred' == record.state ? 'resubmit' : 'submit' );
+                var code = CnSession.user.id == self.record.trainee_user_id ?
+                  ( 'deferred' == self.record.state ? 'traineeResubmit' : 'traineeSubmit' ) :
+                  ( 'deferred' == self.record.state ? 'resubmit' : 'submit' );
                 return CnModalMessageFactory.instance( {
                   title: self.translate( 'misc.' + code + 'Title' ),
                   message: self.translate( 'misc.' + code + 'Message' ),
@@ -983,6 +1110,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                 // make sure that certain properties have been defined, one tab at a time
                 var requiredTabList = {
                   '1a': [ 'applicant_position', 'applicant_affiliation', 'applicant_address', 'applicant_phone' ],
+                  '1b': [ 'coapplicant_agreement_filename' ],
                   '1c': [ 'start_date', 'duration' ],
                   '1d': [ 'title', 'keywords', 'lay_summary', 'background', 'objectives', 'methodology', 'analysis' ],
                   '1e': [ 'funding', 'funding_filename', 'funding_agency', 'grant_number' ],
@@ -1000,12 +1128,15 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                   for( var tab in requiredTabList ) {
                     var firstProperty = null;
                     requiredTabList[tab].filter( function( property ) {
-                      if( '1e' == tab ) {
-                        // only check e properties if funding=yes
+                      if( '1b' == tab ) {
+                        // only check 1b properties if there is a new coapplication with access to data
+                        return self.addingCoapplicantWithData;
+                      } else if( '1e' == tab ) {
+                        // only check 1e properties if funding=yes
                         return 'funding' != property ? 'yes' == record.funding : true;
                       } else if( 'ethics_filename' == property ) {
-                        // only check the ethics filename if ethics=yes (it's a boolean var)
-                        return record.ethics;
+                        // only check the ethics filename if ethics=yes or exempt
+                        return ['yes', 'exempt'].includes( record.ethics );
                       } else if( 'last_identifier' == property ) {
                         // only check the last_identifier if longitidunal=yes (it's a boolean var)
                         return record.longitudinal;
@@ -1060,6 +1191,20 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                       };
                     }
 
+                    // make sure the new user field is filled out when changing the primary applicant
+                    if( self.record['amendmentType' + self.parentModel.newUserAmendmentTypeId] && null == record.new_user_id ) {
+                      var element = cenozo.getFormElement( 'new_user_id' );
+                      element.$error.required = true;
+                      cenozo.updateFormElement( element, true );
+                      if( null == errorTab ) errorTab = 'amendment';
+                      if( null == error ) error = {
+                        title: self.translate( 'misc.missingFieldTitle' ),
+                        message: self.translate( 'misc.missingFieldMessage' ),
+                        error: true
+                      };
+                    }
+
+                    // make sure the justification is filled out if necessary
                     if( self.amendmentTypeWithJustificationSelected() && null == record.amendment_justification ) {
                       var element = cenozo.getFormElement( 'amendment_justification' );
                       element.$error.required = true;
@@ -1191,10 +1336,17 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
         // override the service collection
         this.getServiceData = function( type, columnRestrictLists ) {
-          // only include the funding, ethics, data_sharing and agreement filenames in the view type in the lite instance
+          // Only include the coapplicant_agreement, funding, ethics, data_sharing and agreement filenames in the
+          // view type in the lite instance
           return 'lite' == this.type ? {
             select: {
-              column: [ 'is_current_version', 'funding_filename', 'ethics_filename', 'data_sharing_filename', 'agreement_filename',
+              column: [
+                'is_current_version',
+                'coapplicant_agreement_filename',
+                'funding_filename',
+                'ethics_filename',
+                'data_sharing_filename',
+                'agreement_filename',
                 { table: 'reqn', column: 'state' },
                 { table: 'stage_type', column: 'phase' },
                 { table: 'stage_type', column: 'name', alias: 'stage_type' }
@@ -1202,6 +1354,9 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             }
           } : this.$$getServiceData( type, columnRestrictLists );
         };
+
+        // we'll need to track which amendment type changes the reqn's owner
+        this.newUserAmendmentTypeId = null;
 
         // make the input lists from all groups more accessible
         this.inputList = {};
@@ -1285,19 +1440,21 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
                 return CnHttpFactory.instance( {
                   path: 'amendment_type',
-                  data: {
-                    select: { column: [ 'id', 'reason_en', 'reason_fr', 'justification_prompt_en', 'justification_prompt_fr' ] }
-                  }
+                  data: { modifier: { order: 'rank' } }
                 } ).query().then( function success( response ) {
                   self.amendmentTypeList = { en: [], fr: [] };
                   response.data.forEach( function( item ) {
+                    if( item.new_user ) self.newUserAmendmentTypeId = item.id;
+
                     self.amendmentTypeList.en.push( {
                       id: item.id,
+                      newUser: item.new_user,
                       name: item.reason_en,
                       justificationPrompt: item.justification_prompt_en
                     } );
                     self.amendmentTypeList.fr.push( {
                       id: item.id,
+                      newUser: item.new_user,
                       name: item.reason_fr,
                       justificationPrompt: item.justification_prompt_fr
                     } );
@@ -1375,16 +1532,28 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                 self.metadata.columnList.funding.enumList.en.unshift( { value: '', name: misc.choose.en } );
                 self.metadata.columnList.funding.enumList.fr.unshift( { value: '', name: misc.choose.fr } );
 
+                // translate ethics enum
+                self.metadata.columnList.ethics.enumList = {
+                  en: self.metadata.columnList.ethics.enumList,
+                  fr: angular.copy( self.metadata.columnList.ethics.enumList )
+                };
+                self.metadata.columnList.ethics.enumList.fr[0].name = misc.yes.fr.toLowerCase();
+                self.metadata.columnList.ethics.enumList.fr[1].name = misc.no.fr.toLowerCase();
+                self.metadata.columnList.ethics.enumList.fr[2].name = misc.exempt.fr.toLowerCase();
+
+                self.metadata.columnList.ethics.enumList.en.unshift( { value: '', name: misc.choose.en } );
+                self.metadata.columnList.ethics.enumList.fr.unshift( { value: '', name: misc.choose.fr } );
+
                 // translate waiver enum
                 self.metadata.columnList.waiver.enumList.unshift( { value: '', name: misc.none.en } );
                 self.metadata.columnList.waiver.enumList = {
                   en: self.metadata.columnList.waiver.enumList,
                   fr: angular.copy( self.metadata.columnList.waiver.enumList )
                 };
-                self.metadata.columnList.waiver.enumList.en[1].name = misc.graduateFeeWaiver.en;
+                self.metadata.columnList.waiver.enumList.en[1].name = misc.traineeFeeWaiver.en;
                 self.metadata.columnList.waiver.enumList.en[2].name = misc.postdocFeeWaiver.en;
                 self.metadata.columnList.waiver.enumList.fr[0].name = misc.none.fr;
-                self.metadata.columnList.waiver.enumList.fr[1].name = misc.graduateFeeWaiver.fr;
+                self.metadata.columnList.waiver.enumList.fr[1].name = misc.traineeFeeWaiver.fr;
                 self.metadata.columnList.waiver.enumList.fr[2].name = misc.postdocFeeWaiver.fr;
               }
             } ),

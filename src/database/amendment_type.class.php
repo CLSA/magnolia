@@ -12,4 +12,4 @@ use cenozo\lib, cenozo\log, magnolia\util;
 /**
  * amendment_type: record
  */
-class amendment_type extends \cenozo\database\record {}
+class amendment_type extends \cenozo\database\has_rank {}

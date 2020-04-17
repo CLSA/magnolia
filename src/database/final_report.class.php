@@ -58,7 +58,7 @@ class final_report extends \cenozo\database\record
 
     $db_reqn = $this->get_reqn();
     $db_user = $db_reqn->get_user();
-    $db_graduate_user = $db_reqn->get_graduate_user();
+    $db_trainee_user = $db_reqn->get_trainee_user();
     $db_reqn_version = $db_reqn->get_current_reqn_version();
     $data = array( 'identifier' => $db_reqn->identifier );
 
@@ -80,8 +80,8 @@ class final_report extends \cenozo\database\record
         $this->outcomes
       );
     }
-    if( !is_null( $db_graduate_user ) ) $data['graduate_name'] =
-      sprintf( '%s %s', $db_graduate_user->first_name, $db_graduate_user->last_name );
+    if( !is_null( $db_trainee_user ) ) $data['trainee_name'] =
+      sprintf( '%s %s', $db_trainee_user->first_name, $db_trainee_user->last_name );
     if( !is_null( $this->thesis_title ) ) $data['thesis_title'] = $this->thesis_title;
     if( !is_null( $this->thesis_status ) ) $data['thesis_status'] = $this->thesis_status;
     if( !is_null( $this->impact ) ) $data['impact'] = $this->impact;

@@ -11,8 +11,8 @@ cenozo.controller( 'HeaderCtrl', [
 ] );
 
 cenozo.service( 'CnModalNoticeListFactory', [
-  '$uibModal', '$state', '$window', '$filter',
-  function( $uibModal, $state, $window, $filter ) {
+  'CnModalMessageFactory', '$uibModal', '$state', '$window', '$filter',
+  function( CnModalMessageFactory, $uibModal, $state, $window, $filter ) {
     var object = function( params ) {
       var self = this;
       angular.extend( this, {
@@ -29,16 +29,25 @@ cenozo.service( 'CnModalNoticeListFactory', [
             '_blank',
             'width=600,height=700,scrollbars=no,menubar=no,toolbar=no,location=no,status=no,titlebar=no'
           );
-          printWindow.document.open();
-          var body = '<html><body onload="window.print()">';
-          this.noticeList.forEach( function( notice ) {
-            body += '<h3>' + $filter( 'cnDatetime' )( notice.datetime, 'date' ) + ': ' + notice.title + '</h3>' +
-                    '<div>' + $filter( 'cnNewlines' )( notice.description ) + '</div>';
-          } );
-          body += '</body></html>';
+          if( null == printWindow ) {
+            CnModalMessageFactory.instance( {
+              title: 'Permission Required',
+              message: 'Your web browser is not allowing this site to open pop-up windows. ' +
+                       'In order to download your notices you must allow pop-up windows in your browser\'s settings.',
+              error: true
+            } ).show();
+          } else {
+            printWindow.document.open();
+            var body = '<html><body onload="window.print()">';
+            this.noticeList.forEach( function( notice ) {
+              body += '<h3>' + $filter( 'cnDatetime' )( notice.datetime, 'date' ) + ': ' + notice.title + '</h3>' +
+                      '<div>' + $filter( 'cnNewlines' )( notice.description ) + '</div>';
+            } );
+            body += '</body></html>';
 
-          printWindow.document.write( body );
-          printWindow.document.close();
+            printWindow.document.write( body );
+            printWindow.document.close();
+          }
         },
 
         show: function() {
@@ -101,15 +110,22 @@ cenozo.service( 'CnReqnHelper', [
         } else if( 'deactivate' == subject ) {
           return 'administrator' == role &&
                  !['abandoned','inactive'].includes( state ) &&
-                 'new' != phase;
+                 !['new','complete'].includes( phase );
+        } else if( 'incomplete' == subject ) {
+          return 'administrator' == role &&
+                 '.' == record.amendment &&
+                 ( 'review' == phase || ['Agreement', 'Data Release'].includes( record.stage_type ) );
+        } else if( 'withdraw' == subject ) {
+          return 'administrator' == role &&
+                 'active' == phase;
         } else if( 'reactivate' == subject ) {
           return 'administrator' == role && ['abandoned','inactive'].includes( state );
         } else if( 'recreate' == subject ) {
-          return 'administrator' == role && 'Not Approved' == stage_type;
+          return 'administrator' == role && 'complete' == phase;
         } else if( 'report' == subject ) {
           return ['Report Required','Complete'].includes( stage_type );
         } else if( 'proceed' == subject ) {
-          return !['Complete','Not Approved'].includes( stage_type ) && (
+          return 'complete' != phase && (
                    ( 'administrator' == role && 'new' != phase ) ||
                    ( 'chair' == role && stage_type.includes( 'DSAC' ) ) ||
                    ( 'smt' == role && stage_type.includes( 'SMT' ) )
@@ -121,20 +137,20 @@ cenozo.service( 'CnReqnHelper', [
           return 'applicant' != role;
         } else if( 'amendment proceed' == subject ) {
           return '.' != record.amendment &&
-                 ['Admin Review','SAC Review','Decision Made'].includes( stage_type ) &&
+                 ['Admin Review','Feasibility Review','Decision Made','Agreement'].includes( stage_type ) &&
                  'administrator' == role;
-        } else if( 'amendment sac review' == subject ) {
+        } else if( 'amendment feasibility review' == subject ) {
           return 'Admin Review' == stage_type;
         } else if( 'amendment dsac review' == subject ) {
-          return 'SAC Review' == stage_type;
+          return 'Feasibility Review' == stage_type;
         } else if( 'amendment decision made' == subject ) {
-          return ['Admin Review','SAC Review'].includes( stage_type );
+          return ['Admin Review','Feasibility Review'].includes( stage_type );
         } else if( 'amendment agreement' == subject ) {
           return 'Decision Made' == stage_type;
         } else if( 'amendment data release' == subject ) {
-          return 'Decision Made' == stage_type;
+          return ['Decision Made','Agreement'].includes( stage_type );
         } else if( 'amendment active' == subject ) {
-          return 'Decision Made' == stage_type;
+          return ['Decision Made','Agreement'].includes( stage_type );
         } else return false;
       },
 
@@ -270,6 +286,20 @@ cenozo.service( 'CnReqnHelper', [
             atLeastOne: {
               en: "You must select at least one reason for your amendment request.",
               fr: "Vous devez sélectionner au moins un motif pour votre demande de modification."
+            },
+            newUser: {
+              en: "Please provide the name of the new primary applicant",
+              fr: "Veuillez fournir le nom du nouveau demandeur principal"
+            },
+            newUserNoticeTitle: { en: 'Please Note', fr: 'Notez bien' },
+            newUserNotice: {
+              en: 'Changing the primary applicant, once approved, will remove your access to this application and transfer ownership to the new applicant.\n\nAre you sure you wish to proceed?',
+              fr: 'Une fois approuvé, le changement de demandeur principal supprimera votre accès à cette demande et la propriété du compte sera transférée au nouveau demandeur.\n\nÊtes-vous sûr(e) de vouloir continuer?'
+            },
+            newUserIsTraineeNoticeTitle: { en: 'Please Note', fr: 'Notez bien' },
+            newUserIsTraineeNotice: {
+              en: 'The applicant you have selected is a trainee.  Please select a new applicant which does not have a supervisor.',
+              fr: 'Le demandeur que vous avez sélectionné est un stagiaire. Veuillez sélectionner un nouveau demandeur qui n’a pas de superviseur.'
             }
           },
           part1: {
@@ -298,12 +328,12 @@ cenozo.service( 'CnReqnHelper', [
                 en: 'Complete this section if this is a Trainee application (MSc, PhD and Postdoctoral Fellow).',
                 fr: 'Remplissez cette section si la demande est pour un étudiant (M. Sc., Ph. D.) ou un chercheur postdoctoral.'
               },
-              graduate_name: { en: 'Name', fr: 'Nom' },
-              graduate_program: { en: 'Degree and Program of Study', fr: 'Grade et programme d’étude' },
-              graduate_institution: { en: 'Institution of Enrollment', fr: 'Établissement d’étude' },
-              graduate_address: { en: 'Current Mailing Address', fr: 'Adresse de correspondance actuelle' },
-              graduate_phone: { en: 'Phone', fr: 'Téléphone' },
-              graduate_email: { en: 'E-mail', fr: 'Courriel' },
+              trainee_name: { en: 'Name', fr: 'Nom' },
+              trainee_program: { en: 'Degree and Program of Study', fr: 'Grade et programme d’étude' },
+              trainee_institution: { en: 'Institution of Enrollment', fr: 'Établissement d’étude' },
+              trainee_address: { en: 'Current Mailing Address', fr: 'Adresse de correspondance actuelle' },
+              trainee_phone: { en: 'Phone', fr: 'Téléphone' },
+              trainee_email: { en: 'E-mail', fr: 'Courriel' },
               text4: {
                 en: 'Graduate students (MSc or PhD) who wish to obtain the CLSA data for the sole purpose of their thesis, and postdoctoral fellows (limit 1 waiver per postdoc) who wish to obtain the CLSA data for the sole purpose of their postdoctoral project who are enrolled at Canadian institutions for their graduate degree or postdoc, can apply for a fee waiver. Canadian trainees working outside Canada but funded through a Canadian source are also eligible for a fee waiver. Trainees eligible for a fee waiver are also waived the supplemental data fee for images and raw data. The CIHR Catalyst Grants for the use of CLSA Data are not eligible for Trainee Fee Waivers.',
                 fr: 'Les étudiants de deuxième et troisième cycle (M. Sc. ou Ph. D.) et les chercheurs postdoctoraux (limite d’une exonération par post doctorat) qui désirent utiliser les données de l’ÉLCV uniquement pour leur recherche et qui sont inscrits à un établissement canadien peuvent demander une exonération des frais. Les stagiaires canadiens qui travaillent à l’extérieur du Canada, mais qui sont financés par un organisme canadien peuvent également demander une exonération des frais. L’exonération des frais pour les stagiaires admissibles s’applique également aux frais additionnels demandés pour les images et les données brutes. Les subventions catalyseur pour l’analyse des données de l’ÉLCV ne sont pas admissibles à l’exonération des frais pour les stagiaires.'
@@ -326,7 +356,19 @@ cenozo.service( 'CnReqnHelper', [
               email: { en: 'E-mail', fr: 'Courriel' },
               role: { en: 'Role', fr: 'Rôle' },
               access: { en: 'Requires Access to Data', fr: 'Doit avoir accès aux données' },
-              addCoapplicant: { en: 'Add Co-Applicant', fr: 'Ajouter codemandeurs' }
+              addCoapplicant: { en: 'Add Co-Applicant', fr: 'Ajouter codemandeurs' },
+              coapplicantAgreementText: {
+                en: 'All Co-Applicants and Support Personnel being added to the project, who will require direct access to the CLSA data, must sign the co-applicant agreement form (download button below) and agree to comply with the conditions outlined in Articles 2.1 and 2.3 of the CLSA Access Agreement.',
+                fr: 'Tous les codemandeurs et le personnel de soutien ajoutés au projet qui auront besoin d’un accès direct aux données de l’ÉLCV doivent signer le formulaire d’entente de codemandeur (lien de téléchargement ci-dessous) et accepter de se conformer aux conditions énoncées aux articles 2.1 et 2.3 de l’Entente d’accès de l’ÉLCV.'
+              },
+              coapplicantAgreementButton: {
+                en: 'Download Co-Applicant Agreement Form Template',
+                fr: 'Télécharger le modèle de formulaire d’entente de codemandeur'
+              },
+              coapplicantAgreement: {
+                en: 'Changes to co-applicants agreement',
+                fr: 'Modifications à apporter à l’entente de codemandeur'
+              }
             },
             c: {
               tab: { en: 'Timeline', fr: 'Échéancier' },
@@ -414,7 +456,7 @@ cenozo.service( 'CnReqnHelper', [
               letter: {
                 en: 'Digital copy of funding letter',
                 fr: 'Copie numérique de la lettre de financement'
-              },
+              }
             },
             f: {
               tab: { en: 'Ethics', fr: 'Éthique' },
@@ -427,8 +469,8 @@ cenozo.service( 'CnReqnHelper', [
                 fr: 'Ce projet a-t-il reçu une approbation éthique?'
               },
               letter: {
-                en: 'Digital copy of ethics approval letter',
-                fr: 'Copie numérique de la lettre d’approbation éthique'
+                en: 'Digital copy of ethics approval letter or proof of exemption',
+                fr: 'Copie numérique de la lettre d’approbation ou une lettre d’exemption de la part du Comité d’éthique'
               },
               expiration: { en: 'Expiration date of approval', fr: 'Date limite d’autorisation' },
               response: { en: 'Expected date of response', fr: 'Date approximative de la réponse' }
@@ -574,6 +616,7 @@ cenozo.service( 'CnReqnHelper', [
             close: { en: 'Close', fr: 'Ferme' },
             none: { en: 'none', fr: 'aucun' },
             choose: { en: '(choose)', fr: '(choisir)' },
+            exempt: { en: 'exempt', fr: 'exempt(e)' },
             requested: { en: 'requested', fr: 'demandé' },
             prevButton: { en: 'Return to the previous section', fr: 'Retourner à la section précédente' },
             nextButton: { en: 'Proceed to the next section', fr: 'Passez à la section suivante' },
@@ -608,11 +651,11 @@ cenozo.service( 'CnReqnHelper', [
               en: 'You have successfully submitted your CLSA Data and Biospecimen Request Application, and it will now be reviewed. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your application. For timelines of the anticipated notice of decision, please check the Data Access Application Process page of our website.',
               fr: 'Votre demande d’accès aux données et aux échantillons biologiques de l’ÉLCV a bien été soumise. Elle sera maintenant évaluée. Vous recevrez un courriel avec des instructions supplémentaires si nous avons besoin d’autre information et lorsque le processus d’évaluation sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour consulter le statut de votre demande. Pour connaître les dates approximatives d’envoi de l’avis de décision, veuillez consulter la page Processus de demande d’accès aux données de notre site Web.'
             },
-            graduateSubmitTitle: {
+            traineeSubmitTitle: {
               en: 'Application Submitted for Supervisor Approval',
               fr: 'Demande envoyée au superviseur pour approbation'
             },
-            graduateSubmitMessage: {
+            traineeSubmitMessage: {
               en: 'You have successfully submitted your CLSA Data and Biospecimen Request Application, and your supervisor will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your application. For timelines of the anticipated notice of decision, please check the Data Access Application Process page of our website.',
               fr: 'Votre demande d’accès aux données et aux échantillons de l’ÉLCV a été soumise avec succès. Votre superviseur recevra une demande d’approbation par courriel. Elle sera maintenant évaluée. Vous recevrez un courriel avec des instructions supplémentaires si nous avons besoin d’autre information et lorsque le processus d’évaluation sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour consulter le statut de votre demande. Pour connaître les dates approximatives d’envoi de l’avis de décision, veuillez consulter la page Processus de demande d’accès aux données de notre site Web.'
             },
@@ -624,11 +667,11 @@ cenozo.service( 'CnReqnHelper', [
               en: 'You have successfully resubmitted your CLSA Data and Biospecimen Request Application. You will receive an email with further instructions if your further attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your application. For timelines of the anticipated notice of decision, please check the Data Access Application Process page of our website.',
               fr: 'Votre demande d’accès aux données et aux échantillons biologiques de l’ÉLCV a bien été resoumise. Vous recevrez un courriel avec des instructions supplémentaires si nous avons besoin d’autre information et lorsque le processus d’évaluation sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour consulter le statut de votre demande. Pour connaître les dates approximatives d’envoi de l’avis de décision, veuillez consulter la page Processus de demande d’accès aux données de notre site Web.'
             },
-            graduateResubmitTitle: {
+            traineeResubmitTitle: {
               en: 'Application Resubmitted for Supervisor Approval',
               fr: 'Demande envoyée à nouveau au superviseur pour approbation',
             },
-            graduateResubmitMessage: {
+            traineeResubmitMessage: {
               en: 'You have successfully resubmitted your CLSA Data and Biospecimen Request Application, and your supervisor will receive an email to request approval. You will receive an email with further instructions if your further attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your application. For timelines of the anticipated notice of decision, please check the Data Access Application Process page of our website.',
               fr: 'Votre demande d’accès aux données et aux échantillons de l’ÉLCV a été resoumise avec succès. Votre superviseur recevra une demande d’approbation par courriel. Vous recevrez un courriel avec des instructions supplémentaires si nous avons besoin d’autre information et lorsque le processus d’évaluation sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour consulter le statut de votre demande. Pour connaître les dates approximatives d’envoi de l’avis de décision, veuillez consulter la page Processus de demande d’accès aux données de notre site Web.'
             },
@@ -699,7 +742,7 @@ cenozo.service( 'CnReqnHelper', [
               en: '3 Years + 3 Additional Years',
               fr: '3 ans + 3 années supplémentaires'
             },
-            graduateFeeWaiver: {
+            traineeFeeWaiver: {
               en: 'Fee Waiver for Graduate student (MSc or PhD) for thesis only',
               fr: 'Exonération pour un étudiant des cycles supérieurs (M. Sc. ou Ph. D.) pour la thèse seulement'
             },
@@ -866,15 +909,16 @@ cenozo.service( 'CnReqnVersionHelper', [
               applicant_affiliation: false,
               applicant_address: false,
               applicant_phone: false,
-              graduate_program: false,
-              graduate_institution: false,
-              graduate_address: false,
-              graduate_phone: false,
+              trainee_program: false,
+              trainee_institution: false,
+              trainee_address: false,
+              trainee_phone: false,
               waiver: false
             },
             b: { // project team
               diff: false,
-              coapplicantList: []
+              coapplicantList: [],
+              coapplicant_agreement_filename: false
             },
             c: { // timeline
               diff: false,
