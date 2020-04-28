@@ -34,10 +34,11 @@ define( [ cenozoApp.module( 'user' ).getFileUrl( 'module.js' ) ], function() {
     function( $delegate, $state, CnHttpFactory ) {
       var instance = $delegate.instance;
       function extendObject( object ) {
+        var getMetadata = object.getMetadata;
         angular.extend( object, {
           // extend getMetadata
           getMetadata: function() {
-            return object.$$getMetadata().then( function() {
+            return getMetadata().then( function() {
               return CnHttpFactory.instance( {
                 path: 'applicant'
               } ).head().then( function success( response ) {
