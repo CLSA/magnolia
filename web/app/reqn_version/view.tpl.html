@@ -1255,8 +1255,10 @@
                   <ul style="padding-left: 1em;" ng-if=" 0 < model.viewModel.agreementDifferenceList.length">
                     <li ng-repeat="difference in model.viewModel.agreementDifferenceList">{{
                       ( difference.type ? difference.type + ' ' : '' ) +
-                      '"' + difference.name + '" has been ' +
-                      ( difference.diff ? difference.diff : 'changed from ' + difference.old + ' to ' + difference.new )
+                      '"' + difference.name + '" has been ' + ( difference.diff ?
+                        difference.diff :
+                        'changed' + ( null != difference.old ? ' from ' + difference.old : '' ) + ' to ' + difference.new
+                      )
                     }}</li>
                   </ul>
                 </div>

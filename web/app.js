@@ -684,6 +684,11 @@ cenozo.service( 'CnReqnHelper', [
               en: 'There are mandatory fields which are missing. You will now be redirected to where the incomplete fields can be found. Please try re-submitting once all mandatory fields have been filled out.',
               fr: 'Des champs obligatoires sont manquants. Vous serez redirigé vers l’endroit où se trouvent les champs incomplets. Veuillez soumettre la demande d’accès à nouveau quand tous les champs obligatoires auront été remplis.'
             },
+            invalidNewApplicantTitle: { en: 'Invalid applicant', fr: 'Demandeur incorrect' },
+            invalidNewApplicantMessage: {
+              en: 'It is not possible to change the primary applicant to the user you have selected because their role in the system is not that of an applicant.  Please try selecting a different user.',
+              fr: 'Il n’est pas possible de remplacer le demandeur principal par l’utilisateur que vous avez sélectionné, car cet utilisateur n’a pas le rôle de demandeur. Veuillez essayer de sélectionner un autre utilisateur.'
+            },
             invalidStartDateTitle: { en: 'Invalid start date', fr: 'Date de début non valide' },
             invalidStartDateMessage: {
               en: 'The start date you have provided is not acceptable. You will now be redirected to where the start date field can be found. Please try re-submitting once the start date has been corrected.',
@@ -898,6 +903,7 @@ cenozo.service( 'CnReqnVersionHelper', [
             diff: false,
             a: { // the only unnamed amendment category
               diff: false,
+              new_user_id: false,
               amendment_justification: false
             }
           },

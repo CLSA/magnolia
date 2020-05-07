@@ -487,7 +487,21 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                 promiseList.push(
                   CnHttpFactory.instance( {
                     path: 'applicant/user_id=' + data[property],
-                    data: { select: { column: 'supervisor_user_id' } }
+                    data: { select: { column: 'supervisor_user_id' } },
+                    onError: function( response ) {
+                      if( 404 == response.status ) {
+                        CnModalMessageFactory.instance( {
+                          title: self.translate( 'misc.invalidNewApplicantTitle' ),
+                          message: self.translate( 'misc.invalidNewApplicantMessage' ),
+                          closeText: 'applicant' == CnSession.role.name ? self.translate( 'misc.close' ) : 'Close',
+                          error: true
+                        } ).show().then( function() {
+                          // failed to set the new user so put it back
+                          self.formattedRecord.new_user_id = self.backupRecord.formatted_new_user_id;
+                          return true;
+                        } );
+                      } else CnModalMessageFactory.httpError( response );
+                    }
                   } ).get().then( function( response ) {
                     if( angular.isObject( response.data ) && null != response.data.supervisor_user_id ) {
                       return CnModalMessageFactory.instance( {
@@ -1010,11 +1024,17 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
             if( version.differences.diff ) {
               for( var part in version.differences ) {
-                if( !version.differences.hasOwnProperty( part ) ) continue;
-                if( 'diff' == part ) continue; // used to track overall diff
-                if( 'amendment' == part ) continue; // do not include changes to the amendment details
-
-                if( version.differences[part].diff ) {
+                if( !version.differences.hasOwnProperty( part ) || 'diff' == part ) { // used to track overall diff
+                  // do nothing
+                } else if( 'amendment' == part ) {
+                  if( version.differences[part].diff && version.differences[part].a.new_user_id ) {
+                    differenceList.push( {
+                      name: 'New Primary Applicant',
+                      old: null,
+                      new: self.formattedRecord.new_user_id
+                    } );
+                  }
+                } else if( version.differences[part].diff ) {
                   for( var section in version.differences[part] ) {
                     if( !version.differences[part].hasOwnProperty( section ) ) continue;
                     if( 'diff' == section ) continue; // used to track overall diff
