@@ -8,7 +8,7 @@
 namespace magnolia\service\user;
 use cenozo\lib, cenozo\log, magnolia\util;
 
-class patch extends \cenozo\service\patch
+class patch extends \cenozo\service\user\patch
 {
   /**
    * Extend parent method
