@@ -50,9 +50,16 @@ class patch extends \cenozo\service\patch
   }
 
   /**
+   * Whether the supervisor needs to be updated
+   * @var boolean
+   * @access protected
+   */
+  protected $update_supervisor = false;
+
+  /**
    * What to chante the user's supervisor to
    * @var int
    * @access protected
    */
-  protected $supervisor_user_id;
+  protected $supervisor_user_id = NULL;
 }
