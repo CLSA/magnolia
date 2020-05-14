@@ -351,7 +351,7 @@ class reqn_version extends \cenozo\database\record
     if( !is_null( $this->funding_agency ) ) $data['funding_agency'] = $this->funding_agency;
     if( !is_null( $this->grant_number ) ) $data['grant_number'] = $this->grant_number;
     if( !is_null( $this->ethics ) ) $data['ethics'] = $this->ethics;
-    if( !is_null( $this->ethics_date ) && !$data['ethics'] )
+    if( !is_null( $this->ethics_date ) && 'exempt' != $data['ethics'] )
       $data['ethics_date'] = $this->ethics_date->format( 'Y-m-d' );
     $data['signature_applicant_name'] = $data['applicant_name'];
 
