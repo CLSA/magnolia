@@ -45,8 +45,7 @@ class user extends \cenozo\database\user
    */
   public function is_trainee()
   {
-    $db_applicant = $this->get_applicant();
-    return is_null( $db_applicant ) ? false : !is_null( $db_applicant->supervisor_user_id );
+    return !is_null( $this->get_applicant()->supervisor_user_id );
   }
 
   /**
@@ -56,7 +55,14 @@ class user extends \cenozo\database\user
   public function get_applicant()
   {
     $applicant_class_name = lib::get_class_name( 'database\applicant' );
-    return $applicant_class_name::get_unique_record( 'user_id', $this->id );
+    $db_applicant = $applicant_class_name::get_unique_record( 'user_id', $this->id );
+    if( is_null( $db_applicant ) )
+    {
+      $this->assert_applicant();
+      $db_applicant = $applicant_class_name::get_unique_record( 'user_id', $this->id );
+    }
+
+    return $db_applicant;
   }
 
   /**
