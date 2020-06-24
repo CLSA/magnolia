@@ -3,7 +3,12 @@ define( function() {
 
   try { var module = cenozoApp.module( 'notification_type_email', true ); } catch( err ) { console.warn( err ); return; }
   angular.extend( module, {
-    identifier: { column: 'email' },
+    identifier: {
+      parent: {
+        subject: 'notification_type',
+        column: 'notification_type.name'
+      }
+    },
     name: {
       singular: 'carbon copy',
       plural: 'carbon copies',
