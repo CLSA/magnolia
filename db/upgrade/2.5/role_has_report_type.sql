@@ -17,7 +17,7 @@ DROP PROCEDURE IF EXISTS patch_role_has_report_type;
       "INSERT IGNORE INTO ", @cenozo, ".role_has_report_type( role_id, report_type_id ) ",
       "SELECT role.id, report_type.id ",
       "FROM ", @cenozo, ".role, ", @cenozo, ".report_type ",
-      "WHERE role.name IN( 'communication' ) ",
+      "WHERE role.name = 'communication' ",
       "AND report_type.name = 'reference'" );
     PREPARE statement FROM @sql;
     EXECUTE statement;
@@ -27,8 +27,18 @@ DROP PROCEDURE IF EXISTS patch_role_has_report_type;
       "INSERT IGNORE INTO ", @cenozo, ".role_has_report_type( role_id, report_type_id ) ",
       "SELECT role.id, report_type.id ",
       "FROM ", @cenozo, ".role, ", @cenozo, ".report_type ",
-      "WHERE role.name IN( 'communication' ) ",
+      "WHERE role.name = 'communication' ",
       "AND report_type.name = 'newsletter'" );
+    PREPARE statement FROM @sql;
+    EXECUTE statement;
+    DEALLOCATE PREPARE statement;
+
+    SET @sql = CONCAT(
+      "INSERT IGNORE INTO ", @cenozo, ".role_has_report_type( role_id, report_type_id ) ",
+      "SELECT role.id, report_type.id ",
+      "FROM ", @cenozo, ".role, ", @cenozo, ".report_type ",
+      "WHERE role.name = 'chair' ",
+      "AND report_type.name = 'review_summary'" );
     PREPARE statement FROM @sql;
     EXECUTE statement;
     DEALLOCATE PREPARE statement;
