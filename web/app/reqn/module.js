@@ -81,7 +81,7 @@ define( function() {
           angular.isUndefined( model.viewModel.record.stage_type ) || 'New' == model.viewModel.record.stage_type
         ) ? false : 'view';
       },
-      isExcluded: function( $state, model ) { return !model.isAdministratorOrReadonly(); }
+      isExcluded: function( $state, model ) { return !model.isAdministratorOrCommunicationOrReadonly(); }
     },
     deadline_id: {
       title: 'Deadline',
@@ -139,7 +139,7 @@ define( function() {
       column: 'stage_type.name',
       type: 'string',
       isConstant: true,
-      isExcluded: function( $state, model ) { return model.isAdministratorOrReadonly() ? 'add' : true; }
+      isExcluded: function( $state, model ) { return model.isAdministratorOrCommunicationOrReadonly() ? 'add' : true; }
     },
     state: {
       title: 'State',
@@ -152,6 +152,12 @@ define( function() {
       type: 'date',
       isConstant: true,
       isExcluded: function( $state, model ) { return model.isAdministratorOrReadonly() ? 'add' : true; }
+    },
+    website: {
+      title: 'Published on Website',
+      type: 'boolean',
+      isConstant: function( $state, model ) { return !model.isAdministratorOrCommunication(); },
+      isExcluded: function( $state, model ) { return model.isAdministratorOrCommunication() ? 'add' : true; }
     },
     data_expiry_date: {
       title: 'Data Expiry Date',
@@ -849,7 +855,11 @@ define( function() {
         // make the input lists from all groups more accessible
         this.isApplicant = function() { return 'applicant' == CnSession.role.name; };
         this.isAdministrator = function() { return 'administrator' == CnSession.role.name; };
+        this.isAdministratorOrCommunication = function() { return ['administrator','communication'].includes( CnSession.role.name ); };
         this.isAdministratorOrReadonly = function() { return ['administrator','readonly'].includes( CnSession.role.name ); };
+        this.isAdministratorOrCommunicationOrReadonly = function() {
+          return ['administrator','communication','readonly'].includes( CnSession.role.name );
+        };
         this.isReviewer = function() { return 'reviewer' == CnSession.role.name; };
 
         this.getEditEnabled = function() {
@@ -858,7 +868,7 @@ define( function() {
           return this.$$getEditEnabled() && (
             'applicant' == CnSession.role.name ?
             'new' == phase || ( 'deferred' == state && 'review' == phase ) :
-            'administrator' == CnSession.role.name
+            ['administrator','communication'].includes( CnSession.role.name )
           );
         };
 

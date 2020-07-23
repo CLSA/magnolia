@@ -16,6 +16,18 @@ CREATE PROCEDURE patch_reqn()
       ALTER TABLE reqn MODIFY COLUMN state ENUM('deferred', 'inactive', 'abandoned') NULL DEFAULT NULL;
     END IF;
 
+    SELECT "Adding new website column to the reqn table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "website";
+
+    IF @test = 0 THEN
+      ALTER TABLE reqn ADD COLUMN website TINYINT(1) NOT NULL DEFAULT 0 AFTER state_date;
+    END IF;
+
     SELECT "Replacing graduate_id with trainee_user_id column in reqn table" AS "";
 
     SELECT COUNT(*) INTO @test

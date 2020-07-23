@@ -136,7 +136,9 @@ class reference extends \cenozo\business\report\base_report
 
     $select = lib::create( 'database\select' );
     $select->from( 'reqn' );
-    $select->add_column( 'Identifier', 'Identifier' );
+    $select->add_column( 'identifier', 'Identifier' );
+    $select->add_column( 'IF( reqn.website, "Y", "N" )', 'Website', false );
+    $select->add_column( 'reqn_type.name', 'Type', false );
     $select->add_column( 'reqn_version.title', 'Title', false );
     $select->add_column( 'CONCAT_WS( " ", user.first_name, user.last_name )', 'Primary Applicant', false );
     $select->add_column( 'user.email', 'Email', false );

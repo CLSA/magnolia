@@ -4,7 +4,9 @@ SET AUTOCOMMIT=0;
 
 SOURCE service.sql
 SOURCE role.sql
+SOURCE application_type_has_role.sql
 SOURCE role_has_service.sql
+SOURCE role_has_report_type.sql
 SOURCE review_type.sql
 SOURCE applicant.sql
 SOURCE reqn.sql

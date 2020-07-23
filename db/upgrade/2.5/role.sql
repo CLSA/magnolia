@@ -22,6 +22,18 @@ CREATE PROCEDURE patch_role()
     EXECUTE statement;
     DEALLOCATE PREPARE statement;
 
+    SELECT "Adding new 'communication' role" AS "";
+
+    SET @sql = CONCAT(
+      "INSERT IGNORE INTO ", @cenozo, ".role SET ",
+      "name = 'communication', ",
+      "tier = 1, ",
+      "all_sites = 1"
+    );
+    PREPARE statement FROM @sql;
+    EXECUTE statement;
+    DEALLOCATE PREPARE statement;
+
   END //
 DELIMITER ;
 
