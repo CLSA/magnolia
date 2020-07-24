@@ -18,7 +18,7 @@ class patch extends \cenozo\service\patch
     $patch_array = parent::get_file_as_array();
 
     // convert column "language" to language_id
-    if( array_key_exists( 'language', $patch_array ) )
+    if( is_array( $patch_array ) && array_key_exists( 'language', $patch_array ) )
     {
       $language_class_name = lib::get_class_name( 'database\language' );
       $patch_array['language_id'] =
@@ -150,7 +150,7 @@ class patch extends \cenozo\service\patch
 
     // if we're changing the user_id then store the old one so that it can be referenced in the finish() method
     $patch_array = $this->get_file_as_array();
-    if( array_key_exists( 'user_id', $patch_array ) )
+    if( is_array( $patch_array ) && array_key_exists( 'user_id', $patch_array ) )
     {
       $db_reqn = $this->get_leaf_record();
       $this->db_old_user = $db_reqn->get_user();
@@ -380,7 +380,7 @@ class patch extends \cenozo\service\patch
     // if we changed the user_id then we need to send a notification
     $db_reqn = $this->get_leaf_record();
     $patch_array = $this->get_file_as_array();
-    if( array_key_exists( 'user_id', $patch_array ) )
+    if( is_array( $patch_array ) && array_key_exists( 'user_id', $patch_array ) )
     {
       // if the reqn has a trainee then change their supervisor to the new user
       $db_trainee_user = $db_reqn->get_trainee_user();

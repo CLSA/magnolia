@@ -19,6 +19,7 @@ SOURCE notification_type.sql
 SOURCE amendment_type.sql
 SOURCE reqn_version_data_option.sql
 SOURCE reqn_version_has_amendment_type.sql
+SOURCE publication.sql
 
 SOURCE update_version_number.sql
 

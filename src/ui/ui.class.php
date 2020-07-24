@@ -45,6 +45,7 @@ class ui extends \cenozo\ui\ui
       $module->add_child( 'stage' );
       $module->add_child( 'data_release' );
       $module->add_child( 'notice' );
+      $module->add_child( 'publication' );
       $module->add_child( 'notification' );
     }
 

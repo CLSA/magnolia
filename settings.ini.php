@@ -13,7 +13,7 @@ global $SETTINGS;
 $SETTINGS['general']['application_name'] = 'magnolia';
 $SETTINGS['general']['instance_name'] = $SETTINGS['general']['application_name'];
 $SETTINGS['general']['version'] = '2.5';
-$SETTINGS['general']['build'] = 'bd2adbf';
+$SETTINGS['general']['build'] = '5c04644';
 
 // the location of magnolia internal path
 $SETTINGS['path']['APPLICATION'] = str_replace( '/settings.ini.php', '', __FILE__ );
@@ -50,6 +50,9 @@ $SETTINGS['path']['AGREEMENT_LETTER'] = str_replace( 'settings.ini.php', 'doc/ag
 
 // the location of requisition instructions (defaults to magnolia/doc/data_instruction)
 $SETTINGS['path']['INSTRUCTION_FILE'] = str_replace( 'settings.ini.php', 'doc/data_instruction', __FILE__ );
+
+// the location of requisition publications (defaults to magnolia/doc/publication)
+$SETTINGS['path']['PUBLICATION'] = str_replace( 'settings.ini.php', 'doc/publication', __FILE__ );
 
 // the location of final report forms (defaults to magnolia/doc/final_report)
 $SETTINGS['path']['FINAL_REPORT'] = str_replace( 'settings.ini.php', 'doc/final_report', __FILE__ );
