@@ -221,7 +221,12 @@ class reqn_version extends \cenozo\database\record
     $agreement_filename = sprintf( '%s/%s.pdf', COAPPLICANT_AGREEMENT_TEMPLATE_PATH, $this->id );
 
     // generate the agreement file
-    $data = array( 'identifier' => $db_reqn->identifier );
+    $data = array( 'identifier' => sprintf(
+      '%s / %s%s',
+      $db_reqn->identifier,
+      '.' == $this->amendment ? '' : $this->amendment,
+      $this->version
+    ) );
     
     // get a list of all new coapplicants who have access to the data by first finding the last amendment-version
     $reqn_version_mod = lib::create( 'database\modifier' );
