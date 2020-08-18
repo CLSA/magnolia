@@ -17,7 +17,8 @@ CREATE PROCEDURE patch_ethics_approval_2()
       JOIN reqn_version ON reqn_current_reqn_version.reqn_version_id = reqn_version.id
       WHERE stage_type.name = "Active"
       AND ethics = "yes"
-      AND ethics_filename IS NOT NULL;
+      AND ethics_filename IS NOT NULL
+      AND ethics_date IS NOT NULL;
     END IF;
 
   END //
