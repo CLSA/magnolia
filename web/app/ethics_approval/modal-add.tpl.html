@@ -1,0 +1,47 @@
+<form ng-submit="ok()" novalidate name="form" class="noselect">
+  <div class="modal-header bg-primary">
+    <h4 class="modal-title" ng-bind-html="t( 'misc.addEthicsApproval' )"></h4>
+  </div>
+  <div class="modal-body">
+    <div class="row container-fluid vertical-spacer">
+      <label for="filename" class="control-label col-sm-3" ng-bind-html="t( 'misc.file' )"></label>
+      <div class="col-sm-9">
+        <input
+          type="file"
+          id="filename"
+          name="filename"
+          class="form-control"
+          ng-model="file.file"
+          cn-upload="file.getFilename()">
+        </input>
+      </div>
+    </div>
+    <div class="row container-fluid vertical-spacer">
+      <label for="date" class="control-label col-sm-3" ng-bind-html="t( 'misc.expirationDate' )"></label>
+      <div class="col-sm-9">
+        <input
+          ng-model="date"
+          class="form-control"
+          type="text"
+          ng-click="selectDate()"
+          onkeydown="return false">
+        </input>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer bg-info">
+    <button
+      type="button"
+      class="btn btn-default"
+      ng-click="cancel()"
+      ng-bind-html="t( 'misc.cancel' )">
+    </button>
+    <button
+      type="submit"
+      class="btn btn-primary"
+      ng-disabled="!file.file || !date"
+      ng-bind-html="t( 'misc.ok' )"
+      cn-autofocus>
+    </button>
+  </div>
+</form>

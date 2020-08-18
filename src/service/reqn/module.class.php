@@ -95,6 +95,12 @@ class module extends \cenozo\service\module
       );
     }
 
+    if( $select->has_table_columns( 'ethics_approval' ) )
+    {
+      $modifier->join( 'reqn_last_ethics_approval', 'reqn.id', 'reqn_last_ethics_approval.reqn_id' );
+      $modifier->left_join( 'ethics_approval', 'reqn_last_ethics_approval.ethics_approval_id', 'ethics_approval.id' );
+    }
+
     if( 'applicant' == $db_role->name )
     {
       // only show applicants their own reqns which aren't abandoned
@@ -159,6 +165,15 @@ class module extends \cenozo\service\module
     $db_reqn = $this->get_resource();
     if( $db_reqn )
     {
+      if( $select->has_column( 'has_ethics_approval_list' ) )
+      {
+        $select->add_constant(
+          $db_reqn->has_ethics_approval_list(),
+          'has_ethics_approval_list',
+          'boolean'
+        );
+      }
+
       // include the user first/last/name as supplemental data
       $select->add_column(
         'CONCAT( user.first_name, " ", user.last_name, " (", user.name, ")" )',

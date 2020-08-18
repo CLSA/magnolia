@@ -97,6 +97,20 @@ class reqn extends \cenozo\database\record
   }
 
   /**
+   * Returns whether the reqn is using a full ethics approval list or a single-file ethics system
+   * 
+   * All reqns start with a simple one-file ethics system.  Once they've reached the active stage and if
+   * they are not exempt from ethics a list of ethics approvals is used instead.
+   */
+  public function has_ethics_approval_list()
+  {
+    $modifier = lib::create( 'database\modifier' );
+    $modifier->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
+    $modifier->where( 'stage_type.name', '=', 'Active' );
+    return 'yes' == $this->get_current_reqn_version()->ethics && 0 < $this->get_stage_count( $modifier );
+  }
+
+  /**
    * Creates a new version of the requisition
    * 
    * If no version exists then the first (empty) version will be created.  Otherwise the current version
@@ -654,6 +668,22 @@ class reqn extends \cenozo\database\record
     {
       // if we have just entered the active stage then create symbolic links to all data files and update file timestamps
       $this->refresh_study_data_files();
+
+      // if ethics is "yes" then copy ethics file to the ethics_approval list
+      if( 'yes' == $db_reqn_version->ethics && !is_null( $db_reqn_version->ethics_filename ) )
+      {
+        // create the database record
+        $db_ethics_approval = lib::create( 'database\ethics_approval' );
+        $db_ethics_approval->reqn_id = $this->id;
+        $db_ethics_approval->filename = $db_reqn_version->ethics_filename;
+        $db_ethics_approval->date = is_null( $db_reqn_version->ethics_date )
+                                  ? util::get_datetime_object()
+                                  : $db_reqn_version->ethics_date;
+        $db_ethics_approval->save();
+
+        // and also copy the ethics file
+        copy( $db_reqn_version->get_filename( 'ethics' ), $db_ethics_approval->get_filename() );
+      }
     }
     else if( $incomplete || $withdrawn )
     {
@@ -989,6 +1019,38 @@ class reqn extends \cenozo\database\record
       // remove the expiry date
       $db_reqn->data_expiry_date = NULL;
       $db_reqn->save();
+    }
+
+    return count( $reqn_list );
+  }
+
+  /**
+   * Sends expired ethics approval notifications
+   */
+  public static function send_expired_ethics_notifications()
+  {
+    $notification_type_class_name = lib::get_class_name( 'database\notification_type' );
+    $db_notification_type = $notification_type_class_name::get_unique_record( 'name', 'Ethics Expiry Notice' );
+
+    $modifier = lib::create( 'database\modifier' );
+    $modifier->join( 'reqn_last_ethics_approval', 'reqn.id', 'reqn_last_ethics_approval.reqn_id' );
+    $modifier->join( 'ethics_approval', 'reqn_last_ethics_approval.ethics_approval_id', 'ethics_approval.id' );
+    $join_mod = lib::create( 'database\modifier' );
+    $join_mod->where( 'reqn.id', '=', 'notification.reqn_id', false );
+    $join_mod->where( 'notification.notification_type_id', '=', $db_notification_type->id );
+    $join_mod->where( 'TIMESTAMPDIFF( DAY, notification.datetime, UTC_TIMESTAMP() )', '=', 0 );
+    $modifier->join_modifier( 'notification', $join_mod, 'left' );
+    $modifier->where( 'TIMESTAMPDIFF( MONTH, date, UTC_TIMESTAMP() )', '=', 1 );
+    $modifier->where( 'DAY( date )', '=', 'DAY( UTC_TIMESTAMP() )', false );
+    $modifier->where( 'notification.id', '=', NULL );
+
+    $reqn_list = static::select_objects( $modifier );
+    foreach( $reqn_list as $db_reqn )
+    {
+      $db_notification = lib::create( 'database\notification' );
+      $db_notification->notification_type_id = $db_notification_type->id;
+      $db_notification->set_reqn( $db_reqn ); // this saves the record
+      $db_notification->mail();
     }
 
     return count( $reqn_list );

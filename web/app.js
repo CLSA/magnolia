@@ -473,7 +473,7 @@ cenozo.service( 'CnReqnHelper', [
                 fr: 'Copie numérique de la lettre d’approbation ou une lettre d’exemption de la part du Comité d’éthique'
               },
               expiration: { en: 'Expiration date of approval', fr: 'Date limite d’autorisation' },
-              response: { en: 'Expected date of response', fr: 'Date approximative de la réponse' }
+              response: { en: 'Expected date of response', fr: 'Date approximative de la réponse' },
             }
           },
           part2: {
@@ -615,6 +615,9 @@ cenozo.service( 'CnReqnHelper', [
             yes: { en: 'Yes', fr: 'Oui' },
             close: { en: 'Close', fr: 'Ferme' },
             none: { en: 'none', fr: 'aucun' },
+            add: { en: 'Add', fr: 'Ajouter' },
+            ok: { en: 'OK', fr: 'OK' },
+            cancel: { en: 'Cancel', fr: 'Annuler' },
             choose: { en: '(choose)', fr: '(choisir)' },
             exempt: { en: 'exempt', fr: 'exempt(e)' },
             requested: { en: 'requested', fr: 'demandé' },
@@ -637,6 +640,9 @@ cenozo.service( 'CnReqnHelper', [
             notApplicable: { en: 'not applicable', fr: 'sans objet' },
             baseline: { en: 'Baseline', fr: 'Départ' },
             followup1: { en: 'Follow-up 1', fr: '1er suivi' },
+            file: { en: 'File', fr: 'Fichier' },
+            expirationDate: { en: 'Expiration Date', fr: 'Date limite' },
+            addEthicsApproval: { en: 'Add Ethics Approval', fr: 'Ajouter une lettre d’approbation éthique' },
             amend: { en: 'Create Amendment', fr: 'Effectuer une modification' },
             amendWarning: {
               en: 'Are you sure you wish to create an amendment?\n\nThe application form will be re-opened and you will be able to make and submit changes.',

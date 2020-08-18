@@ -13,7 +13,7 @@ global $SETTINGS;
 $SETTINGS['general']['application_name'] = 'magnolia';
 $SETTINGS['general']['instance_name'] = $SETTINGS['general']['application_name'];
 $SETTINGS['general']['version'] = '2.6';
-$SETTINGS['general']['build'] = '5c04644';
+$SETTINGS['general']['build'] = '6ed963e';
 
 // the location of magnolia internal path
 $SETTINGS['path']['APPLICATION'] = str_replace( '/settings.ini.php', '', __FILE__ );
@@ -39,8 +39,11 @@ $SETTINGS['path']['COAPPLICANT_AGREEMENT_TEMPLATE'] = str_replace( 'settings.ini
 // the location of funding letters (defaults to magnolia/doc/funding_letter)
 $SETTINGS['path']['FUNDING_LETTER'] = str_replace( 'settings.ini.php', 'doc/funding_letter', __FILE__ );
 
-// the location of ethics letters (defaults to magnolia/doc/ethics_letter)
+// the location of ethics letters from the review process (defaults to magnolia/doc/ethics_letter)
 $SETTINGS['path']['ETHICS_LETTER'] = str_replace( 'settings.ini.php', 'doc/ethics_letter', __FILE__ );
+
+// the location of ethics approvals from the active stage (defaults to magnolia/doc/ethics_letter)
+$SETTINGS['path']['ETHICS_APPROVAL'] = str_replace( 'settings.ini.php', 'doc/ethics_approval', __FILE__ );
 
 // the location of data_sharing letters (defaults to magnolia/doc/data_sharing_letter)
 $SETTINGS['path']['DATA_SHARING_LETTER'] = str_replace( 'settings.ini.php', 'doc/data_sharing_letter', __FILE__ );

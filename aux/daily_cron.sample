@@ -105,3 +105,40 @@ else
   }
 }
 curl_close( $curl );
+
+/**
+ * Send expired ethics notifications
+ */
+write_log( 'Sending expired ethics approval notifications' );
+
+$curl = curl_init();
+curl_setopt( $curl, CURLOPT_URL, URL.'reqn?send_expired_ethics_notifications=1' );
+curl_setopt( $curl, CURLOPT_SSL_VERIFYHOST, false );
+curl_setopt( $curl, CURLOPT_RETURNTRANSFER, true );
+curl_setopt( $curl, CURLOPT_HTTPHEADER, array( AUTH ) );
+
+$count = curl_exec( $curl );
+if( curl_errno( $curl ) )
+{
+  write_log( sprintf(
+    "Returned error code %s when trying to send expired ethics notifications\nMessage: %s",
+    curl_errno( $curl ),
+    curl_error( $curl )
+  ) );
+}
+else
+{
+  $code = curl_getinfo( $curl, CURLINFO_HTTP_CODE );
+  if( 200 != $code && 503 != $code )
+  {
+    write_log( sprintf( 'Failed to send expired ethics notifications (response code: %s)', $code ) );
+  }
+  else
+  {
+    write_log( sprintf(
+      'Sent expired ethics notification for %s.',
+      0 == $count ? 'no requisitions' : ( 1 == $count ? '1 requisition' : $count.' requisitions' )
+    ) );
+  }
+}
+curl_close( $curl );

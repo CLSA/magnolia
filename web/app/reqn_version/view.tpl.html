@@ -808,28 +808,30 @@
                     difference="model.viewModel.compareRecord.differences.part1.f.ethics"
                     model="model">
                   </cn-reqn-view-input>
-                  <cn-reqn-view-input
-                    ng-if="'yes' === model.viewModel.record.ethics"
-                    input="{
-                      key: 'ethics_date',
-                      title: t( 'part1.f.expiration' ),
-                      type: model.inputList.ethics_date.type
-                    }"
-                    difference="model.viewModel.compareRecord.differences.part1.f.ethics_date"
-                    model="model">
-                  </cn-reqn-view-input>
-                  <cn-reqn-view-input
-                    ng-if="'no' === model.viewModel.record.ethics"
-                    input="{
-                      key: 'ethics_date',
-                      title: t( 'part1.f.response' ),
-                      type: model.inputList.ethics_date.type
-                    }"
-                    difference="model.viewModel.compareRecord.differences.part1.f.response"
-                    model="model">
-                  </cn-reqn-view-input>
+                  <div ng-if="!model.viewModel.record.has_ethics_approval_list">
+                    <cn-reqn-view-input
+                      ng-if="'yes' === model.viewModel.record.ethics"
+                      input="{
+                        key: 'ethics_date',
+                        title: t( 'part1.f.expiration' ),
+                        type: model.inputList.ethics_date.type
+                      }"
+                      difference="model.viewModel.compareRecord.differences.part1.f.ethics_date"
+                      model="model">
+                    </cn-reqn-view-input>
+                    <cn-reqn-view-input
+                      ng-if="'no' === model.viewModel.record.ethics"
+                      input="{
+                        key: 'ethics_date',
+                        title: t( 'part1.f.response' ),
+                        type: model.inputList.ethics_date.type
+                      }"
+                      difference="model.viewModel.compareRecord.differences.part1.f.response"
+                      model="model">
+                    </cn-reqn-view-input>
+                  </div>
                 </fieldset>
-                <fieldset ng-disabled="!liteModel.getEditEnabled()">
+                <fieldset ng-if="!model.viewModel.record.has_ethics_approval_list" ng-disabled="!liteModel.getEditEnabled()">
                   <cn-reqn-view-input
                     ng-if="'yes' === model.viewModel.record.ethics || 'exempt' === model.viewModel.record.ethics"
                     input="{
@@ -841,6 +843,44 @@
                     model="liteModel">
                   </cn-reqn-view-input>
                 </fieldset>
+                <div ng-if="model.viewModel.record.has_ethics_approval_list">
+                  <div class="panel panel-default">
+                    <div class="panel-body">
+                      <table class="table table-striped">
+                        <thead class="bg-info">
+                          <tr>
+                            <td ng-bind-html="t( 'misc.file' )"></td>
+                            <td ng-bind-html="t( 'misc.expirationDate' )"></td>
+                            <td></td>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr ng-repeat="ethicsApproval in model.viewModel.record.ethicsApprovalList">
+                            <td><a ng-click="model.viewModel.downloadEthicsApproval( ethicsApproval.id )" style="cursor: pointer;">
+                              {{ ethicsApproval.filename }}
+                            </a></td>
+                            <td>{{ ethicsApproval.date }}</td>
+                            <td>
+                              <button class="btn btn-xs btn-danger"
+                                      ng-if="isRemoveEthicsApprovalAllowed( ethicsApproval.id )"
+                                      ng-disabled="isDeletingEthicsApproval.includes( ethicsApproval.id )"
+                                      ng-click="removeEthicsApproval( ethicsApproval.id )"
+                                      uib-tooltip-html="t( 'misc.remove' )">
+                                <i class="glyphicon glyphicon-remove"></i>
+                              </button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                  <div ng-show="model.viewModel.ethicsApprovalModel.getEditEnabled()">
+                    <button class="btn btn-primary col-sm-2 pull-right"
+                            ng-disabled="isAddingEthicsApproval"
+                            ng-click="addEthicsApproval()"
+                            ng-bind-html="t( 'misc.add' )"></button>
+                  </div>
+                </div>
               </div>
             </form>
           </div>

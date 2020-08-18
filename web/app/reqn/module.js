@@ -32,6 +32,11 @@ define( function() {
       amendment_version: {
         title: 'Version'
       },
+      ethics_expiry: {
+        column: 'ethics_approval.date',
+        title: 'Ethics Expiry',
+        type: 'date'
+      },
       status: {
         column: 'stage_type.status',
         title: 'Status',
@@ -216,6 +221,7 @@ define( function() {
     funding_filename: { column: 'reqn_version.funding_filename', type: 'string', isExcluded: true },
     ethics_filename: { column: 'reqn_version.ethics_filename', type: 'string', isExcluded: true },
     has_agreements: { type: 'boolean', isExcluded: true },
+    has_ethics_approval_list: { type: 'boolean', isExcluded: true },
     data_directory: { type: 'string', isExcluded: true },
     phase: { column: 'stage_type.phase', type: 'string', isExcluded: true },
     status: { column: 'stage_type.status', type: 'string', isExcluded: true },

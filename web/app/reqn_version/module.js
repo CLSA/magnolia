@@ -1,4 +1,4 @@
-define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
+define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list, name ) {
   return list.concat( cenozoApp.module( name ).getRequiredFiles() );
 }, [] ), function() {
   'use strict';
@@ -103,6 +103,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
     state: { column: 'reqn.state', type: 'string' },
     data_directory: { column: 'reqn.data_directory', type: 'string' },
     status: { column: 'stage_type.status', type: 'string' },
+    has_ethics_approval_list: { type: 'boolean' },
     stage_type: { column: 'stage_type.name', type: 'string' },
     phase: { column: 'stage_type.phase', type: 'string' },
     lang: { column: 'language.code', type: 'string' },
@@ -169,8 +170,10 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
   /* ######################################################################################################## */
   cenozo.providers.directive( 'cnReqnVersionView', [
-    'CnReqnVersionModelFactory', 'cnRecordViewDirective', 'CnSession', '$q',
-    function( CnReqnVersionModelFactory, cnRecordViewDirective, CnSession, $q ) {
+    'CnReqnVersionModelFactory', 'cnRecordViewDirective', 'CnEthicsApprovalModalAddFactory',
+    'CnHttpFactory', 'CnSession', '$q',
+    function( CnReqnVersionModelFactory, cnRecordViewDirective, CnEthicsApprovalModalAddFactory,
+              CnHttpFactory, CnSession, $q ) {
       // used to piggy-back on the basic view controller's functionality
       var cnRecordView = cnRecordViewDirective[0];
 
@@ -184,6 +187,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
           scope.isDeletingCoapplicant = [];
           scope.isAddingReference = false;
           scope.isDeletingReference = [];
+          scope.isDeletingEthicsApproval = [];
 
           scope.liteModel.viewModel.onView();
 
@@ -347,6 +351,55 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             $scope.model.viewModel.setReferenceRank( id, rank );
           };
 
+          $scope.addEthicsApproval = function() {
+            return CnEthicsApprovalModalAddFactory.instance( {
+              language: $scope.model.viewModel.record.lang
+            } ).show().then( function( response ) {
+              if( response ) {
+                var file = response.file;
+                var date = response.date;
+                return CnHttpFactory.instance( {
+                  path: 'ethics_approval',
+                  data: {
+                    reqn_id: $scope.model.viewModel.record.reqn_id,
+                    filename: file.getFilename(),
+                    date: date
+                  }
+                } ).post().then( function( response ) {
+                  file.upload( [
+                    'reqn',
+                    $scope.model.viewModel.record.reqn_id,
+                    'ethics_approval',
+                    response.data
+                  ].join( '/' ) ).then( function() {
+                    $scope.model.viewModel.getEthicsApprovalList();
+                  } );
+                } );
+              }
+            } );
+          };
+
+          $scope.isRemoveEthicsApprovalAllowed = function( id ) {
+            if( $scope.model.viewModel.ethicsApprovalModel.getDeleteEnabled() ) {
+              if( 'administrator' == CnSession.role.name ) return true;
+              else if( 'applicant' == CnSession.role.name ) {
+                var ethicsApproval = $scope.model.viewModel.record.ethicsApprovalList.findByProperty( 'id', id );
+                return null != ethicsApproval && ethicsApproval.one_day_old;
+              }
+            }
+            return false;
+          };
+
+          $scope.removeEthicsApproval = function( id ) {
+            if( $scope.model.viewModel.ethicsApprovalModel.getDeleteEnabled() ) {
+              if( !$scope.isDeletingEthicsApproval.includes( id ) ) $scope.isDeletingEthicsApproval.push( id );
+              var index = $scope.isDeletingEthicsApproval.indexOf( id );
+              $scope.model.viewModel.removeEthicsApproval( id ).finally( function() {
+                if( 0 <= index ) $scope.isDeletingEthicsApproval.splice( index, 1 );
+              } );
+            }
+          };
+
           $scope.check = function( property ) {
             // The cn-reqn-form directive makes use of cn-add-input directives.  These directives need their
             // parent to have a check() function which checks to see whether the input is valid or not.  Since
@@ -386,10 +439,10 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnReqnVersionViewFactory', [
     'CnReqnHelper', 'CnReqnVersionHelper', 'CnModalNoticeListFactory',
-    'CnCoapplicantModelFactory', 'CnReferenceModelFactory', 'CnBaseViewFactory',
+    'CnCoapplicantModelFactory', 'CnReferenceModelFactory', 'CnEthicsApprovalModelFactory', 'CnBaseViewFactory',
     'CnSession', 'CnHttpFactory', 'CnModalMessageFactory', 'CnModalConfirmFactory', '$state', '$q', '$window',
     function( CnReqnHelper, CnReqnVersionHelper, CnModalNoticeListFactory,
-              CnCoapplicantModelFactory, CnReferenceModelFactory, CnBaseViewFactory,
+              CnCoapplicantModelFactory, CnReferenceModelFactory, CnEthicsApprovalModelFactory, CnBaseViewFactory,
               CnSession, CnHttpFactory, CnModalMessageFactory, CnModalConfirmFactory, $state, $q, $window ) {
       var object = function( parentModel, root ) {
         var self = this;
@@ -467,12 +520,14 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
                                 : moment();
 
               if( 'lite' != self.parentModel.type ) {
-                return $q.all( [
+                var promiseList = [
                   self.getAmendmentTypeList(),
                   self.getCoapplicantList(),
                   self.getReferenceList(),
                   self.getDataOptionValueList()
-                ] ).then( function() { return self.getVersionList(); } );
+                ];
+                if( self.record.has_ethics_approval_list ) promiseList.push( self.getEthicsApprovalList() );
+                return $q.all( promiseList ).then( function() { return self.getVersionList(); } );
               }
             } );
           },
@@ -560,6 +615,7 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
 
           coapplicantModel: CnCoapplicantModelFactory.instance(),
           referenceModel: CnReferenceModelFactory.instance(),
+          ethicsApprovalModel: CnEthicsApprovalModelFactory.instance(),
           charCount: { lay_summary: 0, background: 0, objectives: 0, methodology: 0, analysis: 0 },
           minStartDate: null,
           noAmendmentTypes: false,
@@ -949,6 +1005,33 @@ define( [ 'coapplicant', 'reference' ].reduce( function( list, name ) {
             } ).delete().then( function() {
               return self.getReferenceList().then( function() { self.determineReferenceDiffs(); } );
             } );
+          },
+
+          getEthicsApprovalList: function() {
+            return CnHttpFactory.instance( {
+              path: [ 'reqn', self.record.reqn_id, 'ethics_approval' ].join( '/' ),
+              data: {
+                select: { column: [ 'id', 'filename', 'date', 'one_day_old' ] },
+                modifier: { order: { date: true }, limit: 1000000 }
+              }
+            } ).query().then( function( response ) {
+              self.record.ethicsApprovalList = response.data;
+            } );
+          },
+
+          removeEthicsApproval: function( id ) {
+            return CnHttpFactory.instance( {
+              path: 'ethics_approval/' + id
+            } ).delete().then( function() {
+              return self.getEthicsApprovalList();
+            } );
+          },
+
+          downloadEthicsApproval: function( id ) {
+            return CnHttpFactory.instance( {
+              path: 'ethics_approval/' + id + '?file=filename',
+              format: 'unknown'
+            } ).file();
           },
 
           getDataOptionValueList: function( reqnVersionId, object ) {
