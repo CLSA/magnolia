@@ -15,7 +15,7 @@ CREATE PROCEDURE patch_pdf_form()
       ALTER TABLE pdf_form ADD COLUMN filename VARCHAR(255) NOT NULL;
       UPDATE pdf_form
       JOIN pdf_form_type ON pdf_form.pdf_form_type_id = pdf_form_type.id
-      SET filename = CONCAT( pdf_form_type.name, " #", pdf_form.id );
+      SET filename = CONCAT( pdf_form_type.name, " ", pdf_form.id, ".pdf" );
     END IF;
 
   END //
