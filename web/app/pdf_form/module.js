@@ -41,13 +41,11 @@ define( function() {
       title: 'Active',
       type: 'boolean',
       help: 'Determines whether this is the actively used version of the form (only one version may be active)'
+    },
+    filename: {
+      title: 'File',
+      type: 'file'
     }
-  } );
-
-  module.addExtraOperation( 'view', {
-    title: 'Download',
-    isDisabled: function( $state, model ) { return angular.isUndefined( model.viewModel.downloadFile ); },
-    operation: function( $state, model ) { model.viewModel.downloadFile(); }
   } );
 
   /* ######################################################################################################## */
@@ -99,7 +97,10 @@ define( function() {
   cenozo.providers.factory( 'CnPdfFormAddFactory', [
     'CnBaseAddFactory',
     function( CnBaseAddFactory ) {
-      var object = function( parentModel ) { CnBaseAddFactory.construct( this, parentModel ); };
+      var object = function( parentModel ) {
+        CnBaseAddFactory.construct( this, parentModel );
+        this.configureFileInput( 'filename', 'pdf' );
+      };
       return { instance: function( parentModel ) { return new object( parentModel ); } };
     }
   ] );
@@ -120,6 +121,7 @@ define( function() {
       var object = function( parentModel, root ) {
         var self = this;
         CnBaseViewFactory.construct( this, parentModel, root );
+        this.configureFileInput( 'filename', 'pdf' );
 
         this.afterView( function() {
           if( angular.isUndefined( self.downloadFile ) ) {

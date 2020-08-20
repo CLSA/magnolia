@@ -10,6 +10,7 @@ SOURCE update_reqn_last_ethics_approval.sql
 SOURCE ethics_approval_2.sql
 SOURCE reqn.sql
 SOURCE notification_type.sql
+SOURCE pdf_form.sql
 
 SOURCE update_version_number.sql
 

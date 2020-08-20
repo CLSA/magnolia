@@ -27,8 +27,10 @@ class get extends \cenozo\service\downloadable
    */
   protected function get_downloadable_public_name()
   {
-    $db_pdf_form = $this->get_leaf_record();
-    return sprintf( '%s %s.pdf', $db_pdf_form->get_pdf_form_type()->name, $db_pdf_form->version->format( 'Y-m-d' ) );
+    $file = $this->get_argument( 'file', NULL );
+    if( 'filename' == $file ) return $this->get_leaf_record()->filename;
+
+    throw lib::create( 'exception\argument', 'file', $file, __METHOD__ );
   }
 
   /**
@@ -38,6 +40,26 @@ class get extends \cenozo\service\downloadable
    */
   protected function get_downloadable_file_path()
   {
-    return sprintf( '%s/%d.pdf', PDF_FORM_PATH, $this->get_leaf_record()->id );
+    $file = $this->get_argument( 'file', NULL );
+    if( 'filename' == $file ) return $this->get_leaf_record()->get_filename();
+
+    throw lib::create( 'exception\argument', 'file', $file, __METHOD__ );
+  }
+
+  /**
+   * Extend parent method
+   */
+  public function execute()
+  {
+    if( 'application/json' == $this->get_mime_type() && $this->get_argument( 'file', false ) )
+    {
+      $db_pdf_form = $this->get_leaf_record();
+      $path = $this->get_downloadable_file_path();
+      if( !is_null( $db_pdf_form ) && file_exists( $path ) ) $this->set_data( stat( $path )['size'] );
+    }
+    else
+    {
+      parent::execute();
+    }
   }
 }
