@@ -14,6 +14,10 @@ define( function() {
       identifier: {
         title: 'Identifier'
       },
+      language: {
+        title: 'Language',
+        column: 'language.code'
+      },
       reqn_type: {
         column: 'reqn_type.name',
         title: 'Type'
