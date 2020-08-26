@@ -94,7 +94,7 @@ class patch extends \cenozo\service\patch
         if( 'applicant' == $db_role->name || 'administrator' == $db_role->name )
         {
           if( 'new' != $phase && 'deferred' != $state ) $code = 403;
-          else if( 'new' == $phase )
+          else if( !$db_reqn->external && 'new' == $phase )
           {
             // check to make sure the start date is appropriate
             $delay = lib::create( 'business\setting_manager' )->get_setting( 'general', 'start_date_delay' );
@@ -296,52 +296,58 @@ class patch extends \cenozo\service\patch
         {
           if( 'submit' == $action )
           {
-            // trainees must be get approval from their supervisor
-            if( $trainee )
+            if( $db_reqn->external )
             {
-              // send a notification to the supervisor
-              $db_notification = lib::create( 'database\notification' );
-              $db_notification->notification_type_id =
-                $notification_type_class_name::get_unique_record( 'name', 'Approval Required' )->id;
-              $db_notification->set_reqn( $db_reqn );
-              $db_notification->mail();
             }
             else
             {
-              if( 'deferred' == $db_reqn->state )
+              // trainees must be get approval from their supervisor
+              if( $trainee )
               {
-                $db_reqn->state = NULL;
-                $db_reqn->save();
-
-                // when resubmitting set the version's datetime
-                $db_reqn_version->datetime = util::get_datetime_object();
-                $db_reqn_version->save();
+                // send a notification to the supervisor
+                $db_notification = lib::create( 'database\notification' );
+                $db_notification->notification_type_id =
+                  $notification_type_class_name::get_unique_record( 'name', 'Approval Required' )->id;
+                $db_notification->set_reqn( $db_reqn );
+                $db_notification->mail();
               }
               else
               {
-                // this will submit the reqn for the first time
-                $db_reqn->proceed_to_next_stage();
-              }
+                if( 'deferred' == $db_reqn->state )
+                {
+                  $db_reqn->state = NULL;
+                  $db_reqn->save();
 
-              // send a notification
-              $db_reqn_user = $db_reqn->get_user();
-              $notification_class_name::mail_admin(
-                sprintf( 'Requisition %s: submitted', $db_reqn->identifier ),
-                sprintf(
-                  "The following requisition has been submitted:\n".
-                  "\n".
-                  "Type: %s\n".
-                  "Identifier: %s\n".
-                  "Amendment: %s\n".
-                  "Applicant: %s %s\n".
-                  "Title: %s\n",
-                  $db_reqn->get_reqn_type()->name,
-                  $db_reqn->identifier,
-                  str_replace( '.', 'no', $db_reqn_version->amendment ),
-                  $db_reqn_user->first_name, $db_reqn_user->last_name,
-                  $db_reqn_version->title
-                )
-              );
+                  // when resubmitting set the version's datetime
+                  $db_reqn_version->datetime = util::get_datetime_object();
+                  $db_reqn_version->save();
+                }
+                else
+                {
+                  // this will submit the reqn for the first time
+                  $db_reqn->proceed_to_next_stage();
+                }
+
+                // send a notification
+                $db_reqn_user = $db_reqn->get_user();
+                $notification_class_name::mail_admin(
+                  sprintf( 'Requisition %s: submitted', $db_reqn->identifier ),
+                  sprintf(
+                    "The following requisition has been submitted:\n".
+                    "\n".
+                    "Type: %s\n".
+                    "Identifier: %s\n".
+                    "Amendment: %s\n".
+                    "Applicant: %s %s\n".
+                    "Title: %s\n",
+                    $db_reqn->get_reqn_type()->name,
+                    $db_reqn->identifier,
+                    str_replace( '.', 'no', $db_reqn_version->amendment ),
+                    $db_reqn_user->first_name, $db_reqn_user->last_name,
+                    $db_reqn_version->title
+                  )
+                );
+              }
             }
           }
           else if( 'next_stage' == $action )

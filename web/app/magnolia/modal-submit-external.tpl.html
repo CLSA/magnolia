@@ -1,0 +1,32 @@
+<form ng-submit="ok()" class="noselect">
+  <div class="modal-header bg-primary">
+    <h4 class="modal-title">Submit external requisition</h4>
+  </div>
+  <div class="modal-body allow-select">
+    <span style="text-info">
+      <p>
+        In order to submit this non-Magnolia (external) requisition you must select
+        which of the following stages it should be moved to.
+      </p>
+      <p>
+        Note that the requisition will not go through the review process, rather it
+        will immediately be moved to the selected stage.
+      </p>
+    </span>
+    <hr/>
+    <div class="form-group">
+      <label for="stage_type" class="col-sm-4 control-label">Move to Stage</label>
+      <div class="col-sm-8">
+        <select class="form-control" id="stage_type" name="stage_type" ng-model="stage_type">
+          <option name="Active">Active</option>
+          <option name="Not Approved">Not Approved</option>
+          <option name="Complete">Complete</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer bg-info">
+    <button type="button" class="btn btn-default" ng-click="cancel()">Cancel</button>
+    <button type="submit" class="btn btn-primary" cn-autofocus>OK</button>
+  </div>
+</form>

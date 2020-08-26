@@ -110,6 +110,12 @@ class module extends \cenozo\service\module
       $modifier->where_bracket( false );
       $modifier->where( 'IFNULL( reqn.state, "" )', '!=', 'abandoned' );
 
+      // do not show external reqns which are still in the new phase
+      $modifier->where_bracket( true );
+      $modifier->where( 'reqn.external', '=', false );
+      $modifier->or_where( 'stage_type.phase', '!=', 'new' );
+      $modifier->where_bracket( false );
+
       // don't show applicants the deferral notes unless the reqn is deferred
       if( $select->has_column( 'deferral_note_1a' ) )
       {

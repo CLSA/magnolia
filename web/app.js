@@ -73,6 +73,35 @@ cenozo.service( 'CnModalNoticeListFactory', [
   }
 ] );
 
+cenozo.service( 'CnModalSubmitExternalFactory', [
+  '$uibModal',
+  function( $uibModal ) {
+    var object = function( params ) {
+      var self = this;
+      angular.extend( this, params );
+
+      angular.extend( this, {
+        show: function() {
+          return $uibModal.open( {
+            backdrop: 'static',
+            keyboard: true,
+            modalFade: true,
+            templateUrl: cenozoApp.getFileUrl( 'magnolia', 'modal-submit-external.tpl.html' ),
+            controller: [ '$scope', '$uibModalInstance', function( $scope, $uibModalInstance ) {
+              $scope.model = self;
+              $scope.stage_type = 'Active';
+              $scope.ok = function() { $uibModalInstance.close( $scope.stage_type ); };
+              $scope.cancel = function() { $uibModalInstance.close( null ); };
+            } ]
+          } ).result;
+        }
+      } );
+    }
+
+    return { instance: function( params ) { return new object( angular.isUndefined( params ) ? {} : params ); } };
+  }
+] );
+
 cenozo.service( 'CnReqnHelper', [
   'CnSession', 'CnHttpFactory', 'CnModalConfirmFactory', '$state',
   function( CnSession, CnHttpFactory, CnModalConfirmFactory, $state ) {
@@ -135,6 +164,10 @@ cenozo.service( 'CnReqnHelper', [
                  ['administrator','chair'].includes( role );
         } else if( 'compare' == subject ) {
           return 'applicant' != role;
+        } else if( 'external proceed' == subject ) {
+          return record.external &&
+                 'new' == phase &&
+                 'administrator' == role;
         } else if( 'amendment proceed' == subject ) {
           return '.' != record.amendment &&
                  ['Admin Review','Feasibility Review','Decision Made','Agreement'].includes( stage_type ) &&

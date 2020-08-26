@@ -16,7 +16,13 @@ define( function() {
       },
       language: {
         title: 'Language',
-        column: 'language.code'
+        column: 'language.code',
+        isIncluded: function( $state, model ) { return !model.isApplicant(); }
+      },
+      external: {
+        title: 'External',
+        type: 'boolean',
+        isIncluded: function( $state, model ) { return !model.isApplicant(); }
       },
       reqn_type: {
         column: 'reqn_type.name',
@@ -79,8 +85,14 @@ define( function() {
     identifier: {
       title: 'Identifier',
       type: 'string',
-      isConstant: function( $state, model ) { return !model.isAdministrator(); },
-      isExcluded: 'add'
+      isConstant: function( $state, model ) { return !model.isAdministrator(); }
+    },
+    external: {
+      title: 'External',
+      type: 'boolean',
+      isConstant: function( $state, model ) { return 'view' == model.getActionFromState(); },
+      help: 'External requisitions are those which were submitted and reviewed outside of Magnolia.  Use this option ' +
+            'when uploading pre-existing requisitions into Magnolia.'
     },
     reqn_type_id: {
       title: 'Requisition Type',
@@ -198,7 +210,8 @@ define( function() {
       isConstant: function( $state, model ) { return !model.isAdministrator(); },
       isExcluded: function( $state, model ) {
         // show the agreement and instruction files if we're past the review stage
-        return angular.isUndefined( model.viewModel.record.phase ) ||
+        return 'add' == model.getActionFromState() ||
+               angular.isUndefined( model.viewModel.record.phase ) ||
                !['active','complete'].includes( model.viewModel.record.phase );
       }
     },
@@ -365,6 +378,23 @@ define( function() {
     } ]
   } );
 
+  module.addExtraOperationGroup( 'view', {
+    title: 'Proceed...',
+    isIncluded: function( $state, model ) { return model.viewModel.show( 'external proceed' ); },
+    isDisabled: function( $state, model ) { return !model.viewModel.enabled( 'proceed' ); },
+    classes: 'btn-success',
+    operations: [ {
+      title: 'To Active',
+      operation: function( $state, model ) { model.viewModel.proceed( 'Active' ); }
+    }, {
+      title: 'To Not Approved',
+      operation: function( $state, model ) { model.viewModel.proceed( 'Not Approved' ); }
+    }, {
+      title: 'To Complete',
+      operation: function( $state, model ) { model.viewModel.proceed( 'Complete' ); }
+    } ]
+  } );
+
   module.addExtraOperation( 'view', {
     title: 'Reject',
     classes: 'btn-danger',
@@ -484,9 +514,18 @@ define( function() {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnReqnAddFactory', [
-    'CnBaseAddFactory',
-    function( CnBaseAddFactory ) {
-      var object = function( parentModel ) { CnBaseAddFactory.construct( this, parentModel ); };
+    'CnBaseAddFactory', 'CnSession', '$state',
+    function( CnBaseAddFactory, CnSession, $state ) {
+      var object = function( parentModel ) {
+        CnBaseAddFactory.construct( this, parentModel );
+
+        // immediately view the user record after it has been created
+        this.transitionOnSave = function( record ) {
+          CnSession.workingTransition( function() {
+            $state.go( 'reqn_version.view', { identifier: 'identifier=' + record.identifier } );
+          } );
+        };
+      };
       return { instance: function( parentModel ) { return new object( parentModel ); } };
     }
   ] );
@@ -606,7 +645,7 @@ define( function() {
                   } ).show();
                 }
               } );
-            } 
+            }
 
             return this.$$onView( force );
           },

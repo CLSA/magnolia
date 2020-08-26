@@ -1,7 +1,7 @@
-<div class="utility-view rounded" style="padding-bottom: 2em;" ng-show="!isComplete">
+<div class="utility-view rounded" style="padding-bottom: 2em;" ng-show="!isComplete || model.viewModel.isLoading">
   <cn-loading></cn-loading>
 </div>
-<div class="utility-view rounded" ng-show="isComplete">
+<div class="utility-view rounded" ng-show="isComplete && !model.viewModel.isLoading">
   <div class="container-fluid bg-primary rounded-top">
     <h4>
       <button class="btn btn-menu btn-header btn-info pull-right"
