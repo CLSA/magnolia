@@ -619,6 +619,8 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
           coapplicantModel: CnCoapplicantModelFactory.instance(),
           referenceModel: CnReferenceModelFactory.instance(),
           ethicsApprovalModel: CnEthicsApprovalModelFactory.instance(),
+          // only allow editing the description elements when not in an amendment
+          isDescriptionConstant: function() { return '.' != self.record.amendment; },
           charCount: { lay_summary: 0, background: 0, objectives: 0, methodology: 0, analysis: 0 },
           minStartDate: null,
           noAmendmentTypes: false,

@@ -575,7 +575,8 @@
                   input="{
                     key: 'title',
                     title: t( 'part1.d.title' ),
-                    type: model.inputList.title.type
+                    type: model.inputList.title.type,
+                    isConstant: model.viewModel.isDescriptionConstant
                   }"
                   difference="model.viewModel.compareRecord.differences.part1.d.title"
                   model="model">
@@ -585,6 +586,7 @@
                     key: 'keywords',
                     title: t( 'part1.d.keywords' )+'<sup>ⓘ</sup>',
                     type: 'string',
+                    isConstant: model.viewModel.isDescriptionConstant,
                     help: t( 'part1.d.keywords_text' )
                   }"
                   difference="model.viewModel.compareRecord.differences.part1.d.keywords"
@@ -596,6 +598,7 @@
                     title: t( 'part1.d.lay_summary' ) + '<sup>ⓘ</sup><br><span class=text-info>(' +
                            model.viewModel.charCount.lay_summary + ' ' + t( 'misc.chars' ) + ')</span>',
                     type: model.inputList.lay_summary.type,
+                    isConstant: model.viewModel.isDescriptionConstant,
                     maxLength: 1000,
                     help: t( 'part1.d.lay_summary_text' )
                   }"
@@ -610,6 +613,7 @@
                     title: t( 'part1.d.background' ) + '<br><span class=text-info>(' +
                            model.viewModel.charCount.background + ' ' + t( 'misc.chars' ) + ')</span>',
                     type: model.inputList.background.type,
+                    isConstant: model.viewModel.isDescriptionConstant,
                     maxLength: 4500
                   }"
                   difference="model.viewModel.compareRecord.differences.part1.d.background"
@@ -621,6 +625,7 @@
                     title: t( 'part1.d.objectives' ) + '<br><span class=text-info>(' +
                            model.viewModel.charCount.objectives + ' ' + t( 'misc.chars' ) + ')</span>',
                     type: model.inputList.objectives.type,
+                    isConstant: model.viewModel.isDescriptionConstant,
                     maxLength: 4500
                   }"
                   difference="model.viewModel.compareRecord.differences.part1.d.objectives"
@@ -632,6 +637,7 @@
                     title: t( 'part1.d.methodology' )+'<sup>ⓘ</sup>' + '<br><span class=text-info>(' +
                            model.viewModel.charCount.methodology + ' ' + t( 'misc.chars' ) + ')</span>',
                     type: 'text',
+                    isConstant: model.viewModel.isDescriptionConstant,
                     maxLength: 4500,
                     help: t( 'part1.d.methodology_text' )
                   }"
@@ -644,6 +650,7 @@
                     title: t( 'part1.d.analysis' )+'<sup>ⓘ</sup>' + '<br><span class=text-info>(' +
                            model.viewModel.charCount.analysis + ' ' + t( 'misc.chars' ) + ')</span>',
                     type: 'text',
+                    isConstant: model.viewModel.isDescriptionConstant,
                     maxLength: 4500,
                     help: t( 'part1.d.analysis_text' )
                   }"
@@ -663,17 +670,17 @@
                         <tr>
                           <td ng-bind-html="t( 'part1.d.number' )"></td>
                           <td ng-bind-html="t( 'part1.d.reference' )"></td>
-                          <td ng-show="model.getEditEnabled()"></td>
+                          <td ng-show="model.getEditEnabled() && !model.viewModel.isDescriptionConstant()"></td>
                         </tr>
                       </thead>
                       <tbody>
                         <tr ng-repeat="reference in model.viewModel.record.referenceList | orderBy: 'rank'">
                           <td>
-                            <div class="btn-group">
-                              <button class="btn btn-info dropdown-toggle"
-                                      data-toggle="dropdown"
-                                      ng-enabled="model.getEditEnabled()"
-                                      type="button">
+                            <div ng-if="!model.getEditEnabled() || model.viewModel.isDescriptionConstant()">
+                              {{ reference.rank }}
+                            </div>
+                            <div class="btn-group" ng-if="model.getEditEnabled() && !model.viewModel.isDescriptionConstant()">
+                              <button class="btn btn-info dropdown-toggle" data-toggle="dropdown" type="button">
                                 {{ reference.rank }}
                               </button>
                               <ul class="dropdown-menu" role="menu">
@@ -687,7 +694,7 @@
                             </div>
                           </td>
                           <td class="text-left">{{ reference.reference }}</td>
-                          <td ng-show="model.getEditEnabled()">
+                          <td ng-show="model.getEditEnabled() && !model.viewModel.isDescriptionConstant()">
                             <button class="btn btn-xs btn-danger"
                                     ng-disabled="isDeletingReference.includes( reference.id )"
                                     ng-click="removeReference( reference.id )"
@@ -720,7 +727,7 @@
                     </div>
                   </div>
                 </div>
-                <div ng-show="model.getEditEnabled()">
+                <div ng-show="model.getEditEnabled() && !model.viewModel.isDescriptionConstant()">
                   <cn-add-input
                     class="col-sm-10"
                     input="{ key: 'reference', title: t( 'part1.d.reference' ), type: 'string' }"
