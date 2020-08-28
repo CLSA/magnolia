@@ -252,7 +252,8 @@ define( function() {
       type: 'text',
       isExcluded: function( $state, model ) {
         // show the amendment deferral note to admins when an amendment is active
-        return !model.isAdministrator() ||
+        return 'add' == model.getActionFromState() ||
+               !model.isAdministrator() ||
                angular.isUndefined( model.viewModel.record.amendment ) || '.' == model.viewModel.record.amendment;
       }
     },
@@ -348,7 +349,9 @@ define( function() {
 
   module.addExtraOperationGroup( 'view', {
     title: 'Proceed...',
-    isIncluded: function( $state, model ) { return model.viewModel.show( 'amendment proceed' ); },
+    isIncluded: function( $state, model ) {
+      return model.viewModel.show( 'amendment proceed' ) || model.viewModel.show( 'external proceed' );
+    },
     isDisabled: function( $state, model ) { return !model.viewModel.enabled( 'proceed' ); },
     classes: 'btn-success',
     operations: [ {
@@ -374,24 +377,18 @@ define( function() {
     }, {
       title: 'To Active',
       operation: function( $state, model ) { model.viewModel.proceed( 'Active' ); },
-      isIncluded: function( $state, model ) { return model.viewModel.show( 'amendment active' ); }
-    } ]
-  } );
-
-  module.addExtraOperationGroup( 'view', {
-    title: 'Proceed...',
-    isIncluded: function( $state, model ) { return model.viewModel.show( 'external proceed' ); },
-    isDisabled: function( $state, model ) { return !model.viewModel.enabled( 'proceed' ); },
-    classes: 'btn-success',
-    operations: [ {
-      title: 'To Active',
-      operation: function( $state, model ) { model.viewModel.proceed( 'Active' ); }
+      isIncluded: function( $state, model ) {
+        return model.viewModel.show( 'amendment active' ) ||
+               model.viewModel.show( 'external proceed' );
+      }
     }, {
       title: 'To Not Approved',
-      operation: function( $state, model ) { model.viewModel.proceed( 'Not Approved' ); }
+      operation: function( $state, model ) { model.viewModel.proceed( 'Not Approved' ); },
+      isIncluded: function( $state, model ) { return model.viewModel.show( 'external proceed' ); }
     }, {
       title: 'To Complete',
-      operation: function( $state, model ) { model.viewModel.proceed( 'Complete' ); }
+      operation: function( $state, model ) { model.viewModel.proceed( 'Complete' ); },
+      isIncluded: function( $state, model ) { return model.viewModel.show( 'external proceed' ); }
     } ]
   } );
 
