@@ -296,10 +296,7 @@ class patch extends \cenozo\service\patch
         {
           if( 'submit' == $action )
           {
-            if( $db_reqn->external )
-            {
-            }
-            else
+            if( !$db_reqn->external )
             {
               // trainees must be get approval from their supervisor
               if( $trainee )
