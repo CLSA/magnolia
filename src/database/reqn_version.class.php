@@ -208,6 +208,44 @@ class reqn_version extends \cenozo\database\record
   }
 
   /**
+   * Returns the date that the reqn version was approved.
+   * 
+   * Note that this date will only be returned on the most recent version of an amendment and the date of the first
+   * Decision Made stage is used for all reqn versions no matter if more recent Decision Made stages exist.  This is
+   * because the first decision made stage refers to when the reqn was approved and future decision made stages refer
+   * to when amendments were approved.
+   * @return \DateTime
+   */
+  public function get_date_of_approval()
+  {
+    $db_reqn = $this->get_reqn();
+
+    $date_of_approval = NULL;
+
+    // first see if this is a catalyst grant
+    if( 'Catalyst Grant' != $db_reqn->get_reqn_type()->name )
+    {
+      // next see if there is a newer version for this amendment
+      $reqn_version_mod = lib::create( 'database\modifier' );
+      $reqn_version_mod->where( 'amendment', '=', $this->amendment );
+      $reqn_version_mod->where( 'version', '>', $this->version );
+      if( 0 == $db_reqn->get_reqn_version_count( $reqn_version_mod ) )
+      {
+        $stage_mod = lib::create( 'database\modifier' );
+        $stage_mod->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
+        $stage_mod->where( 'stage_type.name', '=', 'Decision Made' );
+        $stage_mod->order( 'datetime' );
+        $stage_mod->limit( 1 );
+
+        $stage_list = $db_reqn->get_stage_object_list( $stage_mod );
+        if( 0 < count( $stage_list ) ) $date_of_approval = current( $stage_list )->datetime;
+      }
+    }
+
+    return $date_of_approval;
+  }
+
+  /**
    * Generates the coapplicant agreement PDF form template
    * 
    * @access public
@@ -219,14 +257,14 @@ class reqn_version extends \cenozo\database\record
     $db_pdf_form_type = $pdf_form_type_class_name::get_unique_record( 'name', 'Co-Applicant Agreement' );
     $db_pdf_form = $db_pdf_form_type->get_active_pdf_form();
     $agreement_filename = sprintf( '%s/%s.pdf', COAPPLICANT_AGREEMENT_TEMPLATE_PATH, $this->id );
+    $date_of_approval = $this->get_date_of_approval();
 
     // generate the agreement file
-    $data = array( 'identifier' => sprintf(
-      '%s / %s%s',
-      $db_reqn->identifier,
-      '.' == $this->amendment ? '' : $this->amendment,
-      $this->version
-    ) );
+    $data = array(
+      'identifier' => $db_reqn->identifier,
+      'version' => sprintf( '%s%s', '.' == $this->amendment ? '' : $this->amendment, $this->version ),
+      'dateofapproval' => is_null( $date_of_approval ) ? 'None' : $date_of_approval->format( 'Y-m-d' )
+    );
     
     // get a list of all new coapplicants who have access to the data by first finding the last amendment-version
     $reqn_version_mod = lib::create( 'database\modifier' );
@@ -307,9 +345,14 @@ class reqn_version extends \cenozo\database\record
     $db_language = $db_reqn->get_language();
     $db_user = $db_reqn->get_user();
     $db_trainee_user = $db_reqn->get_trainee_user();
+    $date_of_approval = $this->get_date_of_approval();
 
     // generate the application form
-    $data = array( 'identifier' => $db_reqn->identifier );
+    $data = array(
+      'identifier' => $db_reqn->identifier,
+      'version' => sprintf( '%s%s', '.' == $this->amendment ? '' : $this->amendment, $this->version ),
+      'dateofapproval' => is_null( $date_of_approval ) ? 'None' : $date_of_approval->format( 'Y-m-d' )
+    );
     $data['applicant_name'] = sprintf( '%s %s', $db_user->first_name, $db_user->last_name );
     if( !is_null( $this->title ) ) $data['title'] = $this->title;
 
@@ -398,7 +441,11 @@ class reqn_version extends \cenozo\database\record
     }
 
     // now generate the checklist form
-    $data = array( 'identifier' => $db_reqn->identifier );
+    $data = array(
+      'identifier' => $db_reqn->identifier,
+      'version' => sprintf( '%s%s', '.' == $this->amendment ? '' : $this->amendment, $this->version ),
+      'dateofapproval' => is_null( $date_of_approval ) ? 'None' : $date_of_approval->format( 'Y-m-d' )
+    );
     $data['applicant_name'] = sprintf( '%s %s', $db_user->first_name, $db_user->last_name );
     if( !is_null( $this->title ) ) $data['title'] = $this->title;
 
