@@ -670,7 +670,10 @@ class reqn extends \cenozo\database\record
       $this->refresh_study_data_files();
 
       // if ethics is "yes" then copy ethics file to the ethics_approval list
-      if( 'yes' == $db_reqn_version->ethics && !is_null( $db_reqn_version->ethics_filename ) )
+      // however, only do this the first time we get to active, do not repeat when going through an amendment
+      if( '.' == $db_reqn_version->amendment &&
+          'yes' == $db_reqn_version->ethics &&
+          !is_null( $db_reqn_version->ethics_filename ) )
       {
         // create the database record
         $db_ethics_approval = lib::create( 'database\ethics_approval' );
