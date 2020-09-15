@@ -649,38 +649,58 @@ define( function() {
 
           onPatch: function( data ) {
             var changingUser = angular.isDefined( data.user_id );
+            var changingTrainee = angular.isDefined( data.trainee_user_id );
             var promiseList = [];
 
-            // show a warning when changing the primary applicant
-            if( changingUser ) {
-              promiseList.push(
-                CnModalConfirmFactory.instance( {
-                  title: 'Change Owner',
-                  message:
-                    'Changing the ' + this.parentModel.module.name.possessive + ' primary applicant will immediately remove ' +
-                    'it from the old owner\'s ' + this.parentModel.module.name.singular + ' list and add it to the new ' +
-                    'owner\'s list.  Also, a notification will be sent to both the old and new applicants explaining the ' +
-                    'transfer of ownership.\n\nAre you sure you wish to proceed?'
-                } ).show().then( response => response )
-              );
-            }
-
-            return $q.all( promiseList ).then( function( response ) {
-              if( 0 == response.length || response[0] ) {
-                return self.$$onPatch( data ).then( function() {
-                  // Reload the view if we're changing the suggested revisions (the next stage will change)
-                  // or reqn type (the deadline might change)
-                  if( angular.isDefined( data.suggested_revisions ) || angular.isDefined( data.reqn_type_id ) ) return self.onView();
-
-                  // Reload the notification list if we're changing the user
-                  if( changingUser && angular.isDefined( self.notificationModel ) ) self.notificationModel.listModel.onList( true );
-                } );
-              } else if( changingUser ) {
+            // don't allow the user and trainee to be the same person
+            if( ( changingUser && self.record.trainee_user_id == data.user_id ) ||
+                ( changingTrainee && self.record.user_id == data.trainee_user_id ) ) {
+              return CnModalMessageFactory.instance( {
+                title: 'Invalid User Selection',
+                message: 'You cannot set the owner and trainee to be the same person.',
+                error: true
+              } ).show().then( function() {
                 // we're not making the change so put back the old user
-                self.record.user_id = self.backupRecord.user_id;
-                self.formattedRecord.user_id = self.backupRecord.formatted_user_id;
+                if( changingUser ) {
+                  self.record.user_id = self.backupRecord.user_id;
+                  self.formattedRecord.user_id = self.backupRecord.formatted_user_id;
+                } else {
+                  self.record.trainee_user_id = self.backupRecord.trainee_user_id;
+                  self.formattedRecord.trainee_user_id = self.backupRecord.formatted_trainee_user_id;
+                }
+              } );
+            } else {
+              // show a warning when changing the primary applicant
+              if( changingUser ) {
+                promiseList.push(
+                  CnModalConfirmFactory.instance( {
+                    title: 'Change Owner',
+                    message:
+                      'Changing the ' + this.parentModel.module.name.possessive + ' primary applicant will immediately remove ' +
+                      'it from the old owner\'s ' + this.parentModel.module.name.singular + ' list and add it to the new ' +
+                      'owner\'s list.  Also, a notification will be sent to both the old and new applicants explaining the ' +
+                      'transfer of ownership.\n\nAre you sure you wish to proceed?'
+                  } ).show().then( response => response )
+                );
               }
-            } );
+
+              return $q.all( promiseList ).then( function( response ) {
+                if( 0 == response.length || response[0] ) {
+                  return self.$$onPatch( data ).then( function() {
+                    // Reload the view if we're changing the suggested revisions (the next stage will change)
+                    // or reqn type (the deadline might change)
+                    if( angular.isDefined( data.suggested_revisions ) || angular.isDefined( data.reqn_type_id ) ) return self.onView();
+
+                    // Reload the notification list if we're changing the user
+                    if( changingUser && angular.isDefined( self.notificationModel ) ) self.notificationModel.listModel.onList( true );
+                  } );
+                } else if( changingUser ) {
+                  // we're not making the change so put back the old user
+                  self.record.user_id = self.backupRecord.user_id;
+                  self.formattedRecord.user_id = self.backupRecord.formatted_user_id;
+                }
+              } );
+            }
           },
 
           deferralNotesExist: function() {
