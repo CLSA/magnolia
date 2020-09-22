@@ -20,11 +20,21 @@ class notification extends \cenozo\database\record
    */
   public function add_email( $email, $name )
   {
-    $db_notification_email = lib::create( 'database\notification_email' );
-    $db_notification_email->notification_id = $this->id;
-    $db_notification_email->email = $email;
-    $db_notification_email->name = $name;
-    $db_notification_email->save();
+    // make sure the notification recipient doesn't already exist
+    $notification_email_class_name = lib::get_class_name( 'database\notification_email' );
+    $db_notification_email = $notification_email_class_name::get_unique_record(
+      array( 'notification_id', 'email' ),
+      array( $this->id, $email )
+    );
+
+    if( is_null( $db_notification_email ) )
+    {
+      $db_notification_email = lib::create( 'database\notification_email' );
+      $db_notification_email->notification_id = $this->id;
+      $db_notification_email->email = $email;
+      $db_notification_email->name = $name;
+      $db_notification_email->save();
+    }
   }
 
   /**
