@@ -94,15 +94,6 @@ class notification extends \cenozo\database\record
       'en' == $language ? $db_notification_type->title_en : $db_notification_type->title_fr
     );
 
-    if( is_null( $db_reqn->trainee_user_id ) )
-    {
-      $subject = preg_replace( '/{{if_trainee}}.*?{{endif_trainee}}/', '', $subject );
-    }
-    else
-    {
-      $subject = str_replace( array( '{{if_trainee}}', '{{endif_trainee}}' ), '', $subject );
-    }
-
     $message = str_replace(
       array(
         '{{reqn_type}}',
@@ -120,6 +111,17 @@ class notification extends \cenozo\database\record
       ),
       'en' == $language ? $db_notification_type->message_en : $db_notification_type->message_fr
     );
+
+    if( is_null( $db_reqn->trainee_user_id ) )
+    {
+      $subject = preg_replace( '/{{if_trainee}}.*?{{endif_trainee}}/', '', $subject );
+      $message = preg_replace( '/{{if_trainee}}.*?{{endif_trainee}}/', '', $message );
+    }
+    else
+    {
+      $subject = str_replace( array( '{{if_trainee}}', '{{endif_trainee}}' ), '', $subject );
+      $message = str_replace( array( '{{if_trainee}}', '{{endif_trainee}}' ), '', $message );
+    }
 
     $select = lib::create( 'database\select' );
     $select->add_column( 'email' );
