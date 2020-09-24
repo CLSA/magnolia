@@ -225,21 +225,23 @@ class reqn_version extends \cenozo\database\record
     // first see if this is a catalyst grant
     if( 'Catalyst Grant' != $db_reqn->get_reqn_type()->name )
     {
-      // next see if there is a newer version for this amendment
+      // get the date of the most recent reqn-version which is of the same amendment as the current reqn-version
       $reqn_version_mod = lib::create( 'database\modifier' );
       $reqn_version_mod->where( 'amendment', '=', $this->amendment );
-      $reqn_version_mod->where( 'version', '>', $this->version );
-      if( 0 == $db_reqn->get_reqn_version_count( $reqn_version_mod ) )
-      {
-        $stage_mod = lib::create( 'database\modifier' );
-        $stage_mod->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
-        $stage_mod->where( 'stage_type.name', '=', 'Decision Made' );
-        $stage_mod->order( 'datetime' );
-        $stage_mod->limit( 1 );
+      $reqn_version_mod->order_desc( 'version' );
+      $reqn_version_mod->limit( 1 );
+      $db_reqn_version = current( $db_reqn->get_reqn_version_object_list( $reqn_version_mod ) );
 
-        $stage_list = $db_reqn->get_stage_object_list( $stage_mod );
-        if( 0 < count( $stage_list ) ) $date_of_approval = current( $stage_list )->datetime;
-      }
+      // now find the most recent decision-made stage that comes after the reqn-version's datetime
+      $stage_mod = lib::create( 'database\modifier' );
+      $stage_mod->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
+      $stage_mod->where( 'stage_type.name', '=', 'Decision Made' );
+      $stage_mod->where( 'datetime', '>=', $db_reqn_version->datetime );
+      $stage_mod->order( 'datetime' );
+      $stage_mod->limit( 1 );
+
+      $stage_list = $db_reqn->get_stage_object_list( $stage_mod );
+      if( 0 < count( $stage_list ) ) $date_of_approval = current( $stage_list )->datetime;
     }
 
     return $date_of_approval;
