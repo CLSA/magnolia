@@ -497,6 +497,10 @@ cenozo.service( 'CnReqnHelper', [
                 en: 'Please note that ethics approval is NOT required at the time of this application, but <strong>no data or biospecimens will be released until proof of ethics approval has been received by the CLSA.</strong>',
                 fr: 'Notez que l’approbation éthique n’est PAS requise à cette étape de la demande, mais <strong>aucune donnée ou aucun échantillon ne seront transmis avant que l’ÉLCV ait reçu une preuve d’approbation éthique.</strong>'
               },
+              approvalListNote: {
+                en: 'Updated ethics approval documents can be added to your requisition <strong>without the need to create a new amendment</strong>.  Simply click the Add button below to upload the document.',
+                fr: 'Vous pouvez mettre à jour les documents d’approbation éthique relatifs à votre demande <strong>sans créer un nouvel amendement</strong>. Il suffit de cliquer sur le bouton « Ajouter » ci-dessous pour téléverser le document.'
+              },
               ethics: {
                 en: 'Has this project received ethics approval?',
                 fr: 'Ce projet a-t-il reçu une approbation éthique?'
