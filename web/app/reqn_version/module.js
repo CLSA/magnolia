@@ -523,6 +523,8 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                                 : moment();
 
               if( 'lite' != self.parentModel.type ) {
+                cenozoApp.setLang( self.record.lang );
+
                 var promiseList = [
                   self.getAmendmentTypeList(),
                   self.getCoapplicantList(),
@@ -637,6 +639,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
           toggleLanguage: function() {
             var parent = this.parentModel.getParentIdentifier();
             this.record.lang = 'en' == this.record.lang ? 'fr' : 'en';
+            cenozoApp.setLang( this.record.lang );
             return CnHttpFactory.instance( {
               path: parent.subject + '/' + parent.identifier,
               data: { language: this.record.lang }
