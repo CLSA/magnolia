@@ -24,6 +24,7 @@ define( [ cenozoApp.module( 'user' ).getFileUrl( 'module.js' ) ], function() {
       select: 'CONCAT( user.first_name, " ", user.last_name, " (", user.name, ")" )',
       where: [ 'user.first_name', 'user.last_name', 'user.name' ]
     },
+    isExcluded: 'add',
     help: 'If set then all new requisitions created by this user will define the supervisor as the primary applicant ' +
           'and this user as the trainee.'
   } );
