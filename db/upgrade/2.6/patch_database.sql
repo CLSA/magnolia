@@ -11,6 +11,7 @@ SOURCE ethics_approval_2.sql
 SOURCE reqn.sql
 SOURCE notification_type.sql
 SOURCE pdf_form.sql
+SOURCE stage.sql
 
 SOURCE update_version_number.sql
 
