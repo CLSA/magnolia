@@ -473,12 +473,18 @@ class reqn_version extends \cenozo\database\record
     if( $this->tonometry ) $data['tonometry'] = 'Yes';
 
     $additional_data_justification_list = array();
-    if( !is_null( $this->cimt_justification ) ) $additional_data_justification_list[] = $this->cimt_justification;
-    if( !is_null( $this->dxa_justification ) ) $additional_data_justification_list[] = $this->dxa_justification;
-    if( !is_null( $this->ecg_justification ) ) $additional_data_justification_list[] = $this->ecg_justification;
-    if( !is_null( $this->retinal_justification ) ) $additional_data_justification_list[] = $this->retinal_justification;
-    if( !is_null( $this->spirometry_justification ) ) $additional_data_justification_list[] = $this->spirometry_justification;
-    if( !is_null( $this->tonometry_justification ) ) $additional_data_justification_list[] = $this->tonometry_justification;
+    if( $this->cimt && !is_null( $this->cimt_justification ) )
+      $additional_data_justification_list[] = $this->cimt_justification;
+    if( $this->dxa && !is_null( $this->dxa_justification ) )
+      $additional_data_justification_list[] = $this->dxa_justification;
+    if( $this->ecg && !is_null( $this->ecg_justification ) )
+      $additional_data_justification_list[] = $this->ecg_justification;
+    if( $this->retinal && !is_null( $this->retinal_justification ) )
+      $additional_data_justification_list[] = $this->retinal_justification;
+    if( $this->spirometry && !is_null( $this->spirometry_justification ) )
+      $additional_data_justification_list[] = $this->spirometry_justification;
+    if( $this->tonometry && !is_null( $this->tonometry_justification ) )
+      $additional_data_justification_list[] = $this->tonometry_justification;
     if( 0 < count( $additional_data_justification_list ) )
       $data['additional_data_justification'] = implode( "\n", $additional_data_justification_list );
 
