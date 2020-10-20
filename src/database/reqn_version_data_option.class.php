@@ -20,6 +20,7 @@ class reqn_version_data_option extends \cenozo\database\record
   public static function get_record_from_identifier( $identifier )
   {
     $util_class_name = lib::get_class_name( 'util' );
+    $study_class_name = lib::get_class_name( 'database\study' ); 
     $study_phase_class_name = lib::get_class_name( 'database\study_phase' ); 
 
     // convert study_phase_code to study_phase_id
@@ -29,7 +30,11 @@ class reqn_version_data_option extends \cenozo\database\record
       $matches = array();
       if( preg_match( $regex, $identifier, $matches ) )
       {
-        $db_study_phase = $study_phase_class_name::get_unique_record( 'code', $matches[1] );
+        $db_study = $study_class_name::get_unique_record( 'name', 'CLSA' );
+        $db_study_phase = $study_phase_class_name::get_unique_record(
+          array( 'study_id', 'code' ),
+          array( $db_study->id, $matches[1] )
+        );
         if( !is_null( $db_study_phase ) )
           $identifier = preg_replace( $regex, sprintf( 'study_phase_id=%d', $db_study_phase->id ), $identifier );
       }

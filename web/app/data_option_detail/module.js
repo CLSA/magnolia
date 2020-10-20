@@ -164,7 +164,10 @@ define( [ 'data_option' ].reduce( function( list, name ) {
                 path: 'study_phase',
                 data: {
                   select: { column: [ 'id', 'name' ] },
-                  modifier: { order: 'name' }
+                  modifier: {
+                    where: { column: 'study.name', operator: '=', value: 'CLSA' },
+                    order: 'name'
+                  }
                 }
               } ).query().then( function success( response ) {
                 self.metadata.columnList.study_phase_id.enumList = [];

@@ -15,6 +15,7 @@ class post extends \cenozo\service\post
    */
   protected function prepare()
   {
+    $study_class_name = lib::get_class_name( 'database\study' );
     $study_phase_class_name = lib::get_class_name( 'database\study_phase' );
 
     parent::prepare();
@@ -24,7 +25,11 @@ class post extends \cenozo\service\post
     $post_object = $this->get_file_as_object();
     if( is_object( $post_object ) && property_exists( $post_object, 'study_phase_code' ) )
     {
-      $db_study_phase = $study_phase_class_name::get_unique_record( 'code', $post_object->study_phase_code );
+      $db_study = $study_class_name::get_unique_record( 'name', 'CLSA' );
+      $db_study_phase = $study_phase_class_name::get_unique_record(
+        array( 'study_id', 'code' ),
+        array( $db_study->id, $post_object->study_phase_code )
+      );
       if( !is_null( $db_study_phase ) ) $record->study_phase_id = $db_study_phase->id;
     }
   }
