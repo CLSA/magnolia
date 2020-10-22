@@ -12,4 +12,6 @@ INSERT IGNORE INTO service ( subject, method, resource, restricted ) VALUES
 ( 'ethics_approval', 'POST', 0, 1 ),
 ( 'pdf_form', 'DELETE', 1, 1 ),
 ( 'pdf_form', 'PATCH', 1, 1 ),
-( 'pdf_form', 'POST', 0, 1 );
+( 'pdf_form', 'POST', 0, 1 ),
+( 'region', 'GET', 0, 0 ),
+( 'region', 'GET', 1, 0 );
