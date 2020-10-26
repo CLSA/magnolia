@@ -760,7 +760,8 @@ class reqn extends \cenozo\database\record
       );
     }
 
-    if( 0 < count( $file_list ) ) {
+    if( 0 < count( $file_list ) )
+    {
       $zip = new \ZipArchive();
       if( true !== $zip->open( $zip_filename, \ZipArchive::CREATE | \ZipArchive::OVERWRITE ) )
       {
