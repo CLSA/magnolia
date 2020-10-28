@@ -375,7 +375,7 @@ class reqn_version extends \cenozo\database\record
       if( !is_null( $this->trainee_institution ) ) $data['graduate_institution'] = $this->trainee_institution;
       if( !is_null( $this->trainee_address ) ) $data['graduate_address'] = $this->trainee_address;
       if( !is_null( $this->trainee_phone ) ) $data['graduate_phone'] = $this->trainee_phone;
-      if( !is_null( $db_trainee_user ) ) $data['trainee_email'] = $db_trainee_user->email;
+      if( !is_null( $db_trainee_user ) ) $data['graduate_email'] = $db_trainee_user->email;
       if( !is_null( $this->waiver ) )
       {
         if( 'graduate' == $this->waiver ) $data['waiver_graduate'] = 'Yes';
