@@ -29,6 +29,7 @@ class ui extends \cenozo\ui\ui
     {
       $module->add_choose( 'study_phase' );
       $module->add_child( 'data_option_detail' );
+      $module->add_child( 'reqn' );
     }
 
     $module = $this->get_module( 'data_version' );

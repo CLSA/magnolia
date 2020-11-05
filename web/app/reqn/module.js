@@ -925,142 +925,150 @@ define( function() {
         this.listModel = CnReqnListFactory.instance( this );
         this.viewModel = CnReqnViewFactory.instance( this, root );
 
-        // override the service collection path so that applicants can view their reqns from the home screen
-        this.getServiceCollectionPath = function() {
-          // ignore the parent if it is the root state
-          return this.$$getServiceCollectionPath( 'root' == this.getSubjectFromState() );
-        };
+        angular.extend( this, {
 
-        // make the input lists from all groups more accessible
-        this.isApplicant = function() { return 'applicant' == CnSession.role.name; };
-        this.isAdministrator = function() { return 'administrator' == CnSession.role.name; };
-        this.isAdministratorOrCommunication = function() { return ['administrator','communication'].includes( CnSession.role.name ); };
-        this.isAdministratorOrReadonly = function() { return ['administrator','readonly'].includes( CnSession.role.name ); };
-        this.isAdministratorOrCommunicationOrReadonly = function() {
-          return ['administrator','communication','readonly'].includes( CnSession.role.name );
-        };
-        this.isReviewer = function() { return 'reviewer' == CnSession.role.name; };
+          // override the service collection path so that applicants can view their reqns from the home screen
+          getServiceCollectionPath: function() {
+            // ignore the parent if it is the root state
+            return this.$$getServiceCollectionPath( 'root' == this.getSubjectFromState() );
+          },
 
-        this.getEditEnabled = function() {
-          var phase = this.viewModel.record.phase ? this.viewModel.record.phase : '';
-          var state = this.viewModel.record.state ? this.viewModel.record.state : '';
-          return this.$$getEditEnabled() && (
-            'applicant' == CnSession.role.name ?
-            'new' == phase || ( 'deferred' == state && 'review' == phase ) :
-            ['administrator','communication'].includes( CnSession.role.name )
-          );
-        };
+          // make the input lists from all groups more accessible
+          isApplicant: function() { return 'applicant' == CnSession.role.name; },
+          isAdministrator: function() { return 'administrator' == CnSession.role.name; },
+          isAdministratorOrCommunication: function() { return ['administrator','communication'].includes( CnSession.role.name ); },
+          isAdministratorOrReadonly: function() { return ['administrator','readonly'].includes( CnSession.role.name ); },
+          isAdministratorOrCommunicationOrReadonly: function() {
+            return ['administrator','communication','readonly'].includes( CnSession.role.name );
+          },
 
-        this.getDeleteEnabled = function() {
-          return this.$$getDeleteEnabled() &&
-                 angular.isDefined( this.listModel.record ) &&
-                 'new' == this.listModel.record.phase;
-        };
+          isReviewer: function() { return 'reviewer' == CnSession.role.name; },
 
-        // override transitionToAddState (used when applicant creates a new reqn)
-        this.transitionToAddState = function() {
-          // for applicants immediately get a new reqn and view it (no add state required)
-          return 'applicant' != CnSession.role.name ? this.$$transitionToAddState() : CnHttpFactory.instance( {
-            path: 'reqn',
-            data: { user_id: CnSession.user.id }
-          } ).post().then( function ( response ) {
-            // get the new reqn version id
-            return CnHttpFactory.instance( {
-              path: 'reqn/' + response.data,
-              data: { select: { column: { table: 'reqn_version', column: 'id', alias: 'reqn_version_id' } } }
-            } ).get().then( function( response ) {
-              return $state.go( 'reqn_version.view', { identifier: response.data.reqn_version_id } );
-            } );
-          } )
-        };
+          getAddEnabled: function() {
+            return this.$$getAddEnabled() && 'reqn' == this.getSubjectFromState();
+          },
 
-        // override transitionToViewState (used when application views a reqn)
-        this.transitionToViewState = function( record ) {
-          if( this.isApplicant() ) $state.go( 'reqn_version.view', { identifier: record.reqn_version_id } );
-          else this.$$transitionToViewState( record );
-        };
+          getEditEnabled: function() {
+            var phase = this.viewModel.record.phase ? this.viewModel.record.phase : '';
+            var state = this.viewModel.record.state ? this.viewModel.record.state : '';
+            return this.$$getEditEnabled() && (
+              'applicant' == CnSession.role.name ?
+              'new' == phase || ( 'deferred' == state && 'review' == phase ) :
+              ['administrator','communication'].includes( CnSession.role.name )
+            );
+          },
 
-        // override the service collection
-        this.getServiceData = function( type, columnRestrictLists ) {
-          var data = this.$$getServiceData( type, columnRestrictLists );
+          getDeleteEnabled: function() {
+            return this.$$getDeleteEnabled() &&
+                   angular.isDefined( this.listModel.record ) &&
+                   'new' == this.listModel.record.phase;
+          },
 
-          // chairs only see DSAC reqns from the home screen
-          if( 'root' == this.getSubjectFromState() ) {
-            if( angular.isUndefined( data.modifier.where ) ) data.modifier.where = [];
-            if( 'chair' == CnSession.role.name ) {
-              data.modifier.where.push( {
-                column: 'stage_type.name',
-                operator: 'LIKE',
-                value: '%DSAC%'
+          // override transitionToAddState (used when applicant creates a new reqn)
+          transitionToAddState: function() {
+            // for applicants immediately get a new reqn and view it (no add state required)
+            return 'applicant' != CnSession.role.name ? this.$$transitionToAddState() : CnHttpFactory.instance( {
+              path: 'reqn',
+              data: { user_id: CnSession.user.id }
+            } ).post().then( function ( response ) {
+              // get the new reqn version id
+              return CnHttpFactory.instance( {
+                path: 'reqn/' + response.data,
+                data: { select: { column: { table: 'reqn_version', column: 'id', alias: 'reqn_version_id' } } }
+              } ).get().then( function( response ) {
+                return $state.go( 'reqn_version.view', { identifier: response.data.reqn_version_id } );
               } );
-            } else if( 'smt' == CnSession.role.name ) {
-              data.modifier.where.push( {
-                column: 'stage_type.name',
-                operator: 'LIKE',
-                value: '%SMT%'
-              } );
+            } )
+          },
+
+          // override transitionToViewState (used when application views a reqn)
+          transitionToViewState: function( record ) {
+            if( this.isApplicant() ) $state.go( 'reqn_version.view', { identifier: record.reqn_version_id } );
+            else this.$$transitionToViewState( record );
+          },
+
+          // override the service collection
+          getServiceData: function( type, columnRestrictLists ) {
+            var data = this.$$getServiceData( type, columnRestrictLists );
+
+            // chairs only see DSAC reqns from the home screen
+            if( 'root' == this.getSubjectFromState() ) {
+              if( angular.isUndefined( data.modifier.where ) ) data.modifier.where = [];
+              if( 'chair' == CnSession.role.name ) {
+                data.modifier.where.push( {
+                  column: 'stage_type.name',
+                  operator: 'LIKE',
+                  value: '%DSAC%'
+                } );
+              } else if( 'smt' == CnSession.role.name ) {
+                data.modifier.where.push( {
+                  column: 'stage_type.name',
+                  operator: 'LIKE',
+                  value: '%SMT%'
+                } );
+              }
             }
-          }
 
-          return data;
-        };
+            return data;
+          },
 
-        this.getMetadata = function() {
-          return self.$$getMetadata().then( function() {
-            return $q.all( [
-              CnHttpFactory.instance( {
-                path: 'reqn_type',
-                data: {
-                  select: { column: [ 'id', 'name' ] },
-                  modifier: { order: 'name' }
-                }
-              } ).query().then( function success( response ) {
-                self.metadata.columnList.reqn_type_id.enumList = [];
-                response.data.forEach( function( item ) {
-                  self.metadata.columnList.reqn_type_id.enumList.push( {
-                    value: item.id,
-                    name: item.name
-                  } );
-                } );
-              } ),
-
-              CnHttpFactory.instance( {
-                path: 'deadline',
-                data: {
-                  select: { column: [ 'id', 'name' ] },
-                  modifier: { order: 'date', desc: true }
-                }
-              } ).query().then( function success( response ) {
-                self.metadata.columnList.deadline_id.enumList = [];
-                response.data.forEach( function( item ) {
-                  self.metadata.columnList.deadline_id.enumList.push( {
-                    value: item.id,
-                    name: item.name
-                  } );
-                } );
-              } ),
-
-              CnHttpFactory.instance( {
-                path: 'language',
-                data: {
-                  select: { column: [ 'id', 'name' ] },
-                  modifier: {
-                    where: { column: 'active', operator: '=', value: true },
-                    order: 'name'
+          getMetadata: function() {
+            return self.$$getMetadata().then( function() {
+              return $q.all( [
+                CnHttpFactory.instance( {
+                  path: 'reqn_type',
+                  data: {
+                    select: { column: [ 'id', 'name' ] },
+                    modifier: { order: 'name' }
                   }
-                }
-              } ).query().then( function success( response ) {
-                self.metadata.columnList.language_id.enumList = [];
-                response.data.forEach( function( item ) {
-                  self.metadata.columnList.language_id.enumList.push( {
-                    value: item.id,
-                    name: item.name
+                } ).query().then( function success( response ) {
+                  self.metadata.columnList.reqn_type_id.enumList = [];
+                  response.data.forEach( function( item ) {
+                    self.metadata.columnList.reqn_type_id.enumList.push( {
+                      value: item.id,
+                      name: item.name
+                    } );
                   } );
-                } );
-              } )
-            ] );
-          } );
-        };
+                } ),
+
+                CnHttpFactory.instance( {
+                  path: 'deadline',
+                  data: {
+                    select: { column: [ 'id', 'name' ] },
+                    modifier: { order: 'date', desc: true }
+                  }
+                } ).query().then( function success( response ) {
+                  self.metadata.columnList.deadline_id.enumList = [];
+                  response.data.forEach( function( item ) {
+                    self.metadata.columnList.deadline_id.enumList.push( {
+                      value: item.id,
+                      name: item.name
+                    } );
+                  } );
+                } ),
+
+                CnHttpFactory.instance( {
+                  path: 'language',
+                  data: {
+                    select: { column: [ 'id', 'name' ] },
+                    modifier: {
+                      where: { column: 'active', operator: '=', value: true },
+                      order: 'name'
+                    }
+                  }
+                } ).query().then( function success( response ) {
+                  self.metadata.columnList.language_id.enumList = [];
+                  response.data.forEach( function( item ) {
+                    self.metadata.columnList.language_id.enumList.push( {
+                      value: item.id,
+                      name: item.name
+                    } );
+                  } );
+                } )
+              ] );
+            } );
+          }
+        } );
       };
 
       return {
