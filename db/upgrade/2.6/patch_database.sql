@@ -12,6 +12,7 @@ SOURCE reqn.sql
 SOURCE notification_type.sql
 SOURCE pdf_form.sql
 SOURCE stage.sql
+SOURCE data_option.sql
 
 SOURCE update_version_number.sql
 

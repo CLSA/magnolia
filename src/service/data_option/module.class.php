@@ -23,6 +23,15 @@ class module extends \cenozo\service\module
 
     $modifier->join( 'data_option_category', 'data_option.data_option_category_id', 'data_option_category.id' );
 
+    if( $select->has_column( 'has_condition' ) )
+    {
+      $select->add_column(
+        'data_option.condition_en IS NOT NULL OR data_option.condition_fr IS NOT NULL',
+        'has_condition',
+        false
+      );
+    }
+
     if( $select->has_column( 'bl' ) )
     {
       $join_sel = lib::create( 'database\select' );

@@ -1072,31 +1072,59 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
           },
 
           toggleDataOptionValue: function( studyPhaseCode, dataOptionId ) {
-            // toggle the option
-            this.record.dataOptionValueList[studyPhaseCode][dataOptionId] =
-              !this.record.dataOptionValueList[studyPhaseCode][dataOptionId];
+            var promiseList = [];
 
-            if( this.record.dataOptionValueList[studyPhaseCode][dataOptionId] ) {
-              // add the data-option
-              return CnHttpFactory.instance( {
-                path: this.parentModel.getServiceResourcePath() + '/reqn_version_data_option',
-                data: { data_option_id: dataOptionId, study_phase_code: studyPhaseCode },
-                onError: function( response ) {
-                  self.record.dataOptionValueList[studyPhaseCode][dataOptionId] =
-                    !self.record.dataOptionValueList[studyPhaseCode][dataOptionId];
+            // when selecting the data-option first check to see if the data option has a condition
+            if( !self.record.dataOptionValueList[studyPhaseCode][dataOptionId] ) {
+              var dataOption = null;
+              if( this.parentModel.dataOptionCategoryList.some( function( category, index ) {
+                dataOption = category.optionList.findByProperty( 'id', dataOptionId );
+                return null != dataOption;
+              } ) ) {
+                var column = 'condition_' + self.record.lang;
+                if( null != dataOption[column] ) {
+                  promiseList.push( CnModalConfirmFactory.instance( {
+                    title: this.translate( 'misc.pleaseConfirm' ),
+                    noText: 'applicant' == CnSession.role.name ? this.translate( 'misc.no' ) : 'No',
+                    yesText: 'applicant' == CnSession.role.name ? this.translate( 'misc.yes' ) : 'Yes',
+                    message: dataOption[column]
+                  } ).show().then( function( response ) {
+                    return response;
+                  } ) );
                 }
-              } ).post();
-            } else {
-              // delete the data-option
-              return CnHttpFactory.instance( {
-                path: this.parentModel.getServiceResourcePath() +
-                  '/reqn_version_data_option/data_option_id=' + dataOptionId + ';study_phase_code=' + studyPhaseCode,
-                onError: function( response ) {
-                  self.record.dataOptionValueList[studyPhaseCode][dataOptionId] =
-                    !self.record.dataOptionValueList[studyPhaseCode][dataOptionId];
-                }
-              } ).delete();
+              }
             }
+
+            $q.all( promiseList ).then( function( response ) {
+              // don't proceed if the confirm factory says no
+              if( 0 == response.length || response[0] ) {
+                // toggle the option
+                self.record.dataOptionValueList[studyPhaseCode][dataOptionId] =
+                  !self.record.dataOptionValueList[studyPhaseCode][dataOptionId];
+
+                if( self.record.dataOptionValueList[studyPhaseCode][dataOptionId] ) {
+                  // add the data-option
+                  return CnHttpFactory.instance( {
+                    path: self.parentModel.getServiceResourcePath() + '/reqn_version_data_option',
+                    data: { data_option_id: dataOptionId, study_phase_code: studyPhaseCode },
+                    onError: function( response ) {
+                      self.record.dataOptionValueList[studyPhaseCode][dataOptionId] =
+                        !self.record.dataOptionValueList[studyPhaseCode][dataOptionId];
+                    }
+                  } ).post();
+                } else {
+                  // delete the data-option
+                  return CnHttpFactory.instance( {
+                    path: self.parentModel.getServiceResourcePath() +
+                      '/reqn_version_data_option/data_option_id=' + dataOptionId + ';study_phase_code=' + studyPhaseCode,
+                    onError: function( response ) {
+                      self.record.dataOptionValueList[studyPhaseCode][dataOptionId] =
+                        !self.record.dataOptionValueList[studyPhaseCode][dataOptionId];
+                    }
+                  } ).delete();
+                }
+              }
+            } );
           },
 
           viewData: function() {
@@ -1721,7 +1749,15 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                 return CnHttpFactory.instance( {
                   path: 'data_option',
                   data: {
-                    select: { column: [ 'id', 'data_option_category_id', 'name_en', 'name_fr', 'note_en', 'note_fr', 'bl', 'f1' ] },
+                    select: { column: [
+                      'id',
+                      'data_option_category_id',
+                      'name_en', 'name_fr',
+                      'condition_en', 'condition_fr',
+                      'note_en', 'note_fr',
+                      'bl',
+                      'f1'
+                    ] },
                     modifier: { order: [ 'data_option_category_id', 'data_option.rank' ], limit: 1000000 }
                   }
                 } ).query().then( function( response ) {
