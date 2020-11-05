@@ -236,6 +236,7 @@ define( function() {
     current_reqn_version_id: { column: 'reqn_version.id', type: 'string', isExcluded: true },
     amendment: { column: 'reqn_version.amendment', type: 'string', isExcluded: true },
     funding_filename: { column: 'reqn_version.funding_filename', type: 'string', isExcluded: true },
+    ethics_date: { column: 'reqn_version.ethics_date', type: 'date', isExcluded: true },
     ethics_filename: { column: 'reqn_version.ethics_filename', type: 'string', isExcluded: true },
     has_agreements: { type: 'boolean', isExcluded: true },
     has_ethics_approval_list: { type: 'boolean', isExcluded: true },
@@ -727,8 +728,20 @@ define( function() {
             var message = 'Are you sure you wish to move this ' + this.parentModel.module.name.singular + ' to the "' +
               ( angular.isDefined( stageType ) ? stageType : this.record.next_stage_type ) + '" stage?';
             if( 'administrator' == CnSession.role.name && this.deferralNotesExist() ) {
-              message += '\n\nWARNING: there are deferral notes present, you may wish to remove them before proceeding.';
+              message += '\n\nWARNING: There are deferral notes present, you may wish to remove them before proceeding.';
             }
+              console.log( this.record.next_stage_type, this.record.ethics_date );
+            if( 'Data Release' == this.record.next_stage_type ) {
+              if( null == this.record.ethics_date ) {
+                message += '\n\nWARNING: This ' + self.parentModel.module.name.singular + ' has no ethics agreement, ' +
+                  'you may not wish to proceed until one has been uploaded.';
+              } else if( moment().isAfter( this.record.ethics_date, 'day' ) ) {
+                message += '\n\nWARNING: This ' + self.parentModel.module.name.possessive + ' ethics expired on ' +
+                  moment( this.record.ethics_date ).format( 'MMMM D, YYYY' ) + ', ' +
+                  'you may not wish to proceed until a new ethics agreement has been uploaded.';
+              }
+            }
+
             return CnModalConfirmFactory.instance( {
               message: message
             } ).show().then( function( response ) {
