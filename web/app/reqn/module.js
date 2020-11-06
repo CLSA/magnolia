@@ -17,12 +17,12 @@ define( function() {
       language: {
         title: 'Language',
         column: 'language.code',
-        isIncluded: function( $state, model ) { return !model.isApplicant(); }
+        isIncluded: function( $state, model ) { return !model.isRole( 'applicant' ); }
       },
       external: {
         title: 'External',
         type: 'boolean',
-        isIncluded: function( $state, model ) { return !model.isApplicant(); }
+        isIncluded: function( $state, model ) { return !model.isRole( 'applicant', 'typist' ); }
       },
       reqn_type: {
         column: 'reqn_type.name',
@@ -30,45 +30,48 @@ define( function() {
       },
       user_full_name: {
         title: 'Owner',
-        isIncluded: function( $state, model ) { return !model.isApplicant(); }
+        isIncluded: function( $state, model ) { return !model.isRole( 'applicant' ); }
       },
       trainee_full_name: {
         title: 'Trainee'
       },
       deadline: {
         column: 'deadline.name',
-        title: 'Deadline'
+        title: 'Deadline',
+        isIncluded: function( $state, model ) { return !model.isRole( 'typist' ); }
       },
       amendment_version: {
-        title: 'Version'
+        title: 'Version',
+        isIncluded: function( $state, model ) { return !model.isRole( 'typist' ); }
       },
       ethics_expiry: {
         column: 'ethics_approval.date',
         title: 'Ethics Expiry',
-        type: 'date'
+        type: 'date',
+        isIncluded: function( $state, model ) { return !model.isRole( 'typist' ); }
       },
       status: {
         column: 'stage_type.status',
         title: 'Status',
-        isIncluded: function( $state, model ) { return model.isApplicant(); }
+        isIncluded: function( $state, model ) { return model.isRole( 'applicant' ); }
       },
       state: {
         title: 'On Hold',
         type: 'string',
-        isIncluded: function( $state, model ) { return !model.isApplicant(); },
+        isIncluded: function( $state, model ) { return !model.isRole( 'applicant', 'typist' ); },
         help: 'The reason the requisition is on hold (empty if the requisition hasn\'t been held up)'
       },
       state_days: {
         title: 'Days On Hold',
         type: 'number',
-        isIncluded: function( $state, model ) { return !model.isApplicant(); },
+        isIncluded: function( $state, model ) { return !model.isRole( 'applicant', 'typist' ); },
         help: 'The number of days since the requisition was put on hold (empty if the requisition hasn\'t been held up)'
       },
       stage_type: {
         column: 'stage_type.name',
         title: 'Stage',
         type: 'string',
-        isIncluded: function( $state, model ) { return !model.isApplicant() && !model.isReviewer(); }
+        isIncluded: function( $state, model ) { return !model.isRole( 'applicant', 'reviewer' ); }
       },
       reqn_version_id: {
         column: 'reqn_version.id',
@@ -85,12 +88,13 @@ define( function() {
     identifier: {
       title: 'Identifier',
       type: 'string',
-      isConstant: function( $state, model ) { return !model.isAdministrator(); }
+      isConstant: function( $state, model ) { return !model.isRole( 'administrator', 'typist' ); }
     },
     external: {
       title: 'External',
       type: 'boolean',
       isConstant: function( $state, model ) { return 'view' == model.getActionFromState(); },
+      isExcluded: function( $state, model ) { return !model.isRole( 'administrator' ); },
       help: 'External requisitions are those which were submitted and reviewed outside of Magnolia.  Use this option ' +
             'when uploading pre-existing requisitions into Magnolia.'
     },
@@ -98,23 +102,23 @@ define( function() {
       title: 'Requisition Type',
       type: 'enum',
       isConstant: function( $state, model ) {
-        return model.isAdministrator() && (
+        return model.isRole( 'administrator' ) && (
           angular.isUndefined( model.viewModel.record.stage_type ) || 'New' == model.viewModel.record.stage_type
         ) ? false : 'view';
       },
-      isExcluded: function( $state, model ) { return !model.isAdministratorOrCommunicationOrReadonly(); }
+      isExcluded: function( $state, model ) { return !model.isRole( 'administrator', 'communication', 'readonly', 'typist' ); }
     },
     deadline_id: {
       title: 'Deadline',
       type: 'enum',
       isConstant: function( $state, model ) {
         // only allow the deadline to be changed while in the admin review stage (hide if there is no deadline)
-        return !model.isAdministrator() ||
+        return !model.isRole( 'administrator' ) ||
                angular.isUndefined( model.viewModel.record.phase ) ||
                'review' != model.viewModel.record.phase;
       },
       isExcluded: function( $state, model ) {
-        return !model.isAdministrator() ||
+        return !model.isRole( 'administrator' ) ||
                angular.isUndefined( model.viewModel.record.deadline_id ) ||
                null == model.viewModel.record.deadline_id ? true : 'add';
       }
@@ -132,7 +136,7 @@ define( function() {
         if( 'reqn.add' == $state.current.name ) return false;
 
         // if the reqn has an agreement then we can't directly change the primary applicant
-        return !model.isAdministrator() || 0 < model.viewModel.record.has_agreements;
+        return !model.isRole( 'administrator' ) || 0 < model.viewModel.record.has_agreements;
       }
     },
     trainee_user_id: {
@@ -145,40 +149,40 @@ define( function() {
       },
       isConstant: function( $state, model ) {
         // if the reqn has an agreement then we can't directly change the primary applicant
-        return !model.isAdministrator() || 0 < model.viewModel.record.has_agreements;
+        return !model.isRole( 'administrator' ) || 0 < model.viewModel.record.has_agreements;
       },
       isExcluded: 'add'
     },
     language_id: {
       title: 'Language',
       type: 'enum',
-      isConstant: function( $state, model ) { return !model.isAdministrator(); },
-      isExcluded: function( $state, model ) { return !model.isAdministratorOrReadonly(); }
+      isConstant: function( $state, model ) { return !model.isRole( 'administrator', 'typist' ); },
+      isExcluded: function( $state, model ) { return !model.isRole( 'administrator', 'readonly', 'typist' ); }
     },
     stage_type: {
       title: 'Current Stage',
       column: 'stage_type.name',
       type: 'string',
       isConstant: true,
-      isExcluded: function( $state, model ) { return model.isAdministratorOrCommunicationOrReadonly() ? 'add' : true; }
+      isExcluded: function( $state, model ) { return model.isRole( 'administrator', 'communication', 'readonly' ) ? 'add' : true; }
     },
     state: {
       title: 'State',
       type: 'enum',
       isConstant: true,
-      isExcluded: function( $state, model ) { return model.isAdministratorOrReadonly() ? 'add' : true; }
+      isExcluded: function( $state, model ) { return model.isRole( 'administrator', 'readonly' ) ? 'add' : true; }
     },
     state_date: {
       title: 'State Set On',
       type: 'date',
       isConstant: true,
-      isExcluded: function( $state, model ) { return model.isAdministratorOrReadonly() ? 'add' : true; }
+      isExcluded: function( $state, model ) { return model.isRole( 'administrator', 'readonly' ) ? 'add' : true; }
     },
     website: {
       title: 'Published on Website',
       type: 'boolean',
-      isConstant: function( $state, model ) { return !model.isAdministratorOrCommunication(); },
-      isExcluded: function( $state, model ) { return model.isAdministratorOrCommunication() ? 'add' : true; }
+      isConstant: function( $state, model ) { return !model.isRole( 'administrator', 'communication' ); },
+      isExcluded: function( $state, model ) { return model.isRole( 'administrator', 'communication' ) ? 'add' : true; }
     },
     data_expiry_date: {
       title: 'Data Expiry Date',
@@ -187,27 +191,27 @@ define( function() {
         // show the study data available if we're in the active phase
         return angular.isUndefined( model.viewModel.record.phase ) || 'active' != model.viewModel.record.phase;
       },
-      isExcluded: function( $state, model ) { return model.isAdministratorOrReadonly() ? 'add' : true; }
+      isExcluded: function( $state, model ) { return model.isRole( 'administrator', 'readonly' ) ? 'add' : true; }
     },
     title: {
       column: 'reqn_version.title',
       title: 'Title',
       type: 'string',
       isConstant: true,
-      isExcluded: function( $state, model ) { return model.isAdministratorOrReadonly(); }
+      isExcluded: function( $state, model ) { return model.isRole( 'administrator', 'readonly', 'typist' ); }
     },
     lay_summary: {
       column: 'reqn_version.lay_summary',
       title: 'Lay Summary',
       type: 'text',
       isConstant: true,
-      isExcluded: function( $state, model ) { return model.isAdministratorOrReadonly(); }
+      isExcluded: function( $state, model ) { return model.isRole( 'administrator', 'readonly', 'typist' ); }
     },
     instruction_filename: {
       column: 'instruction_filename',
       title: 'Additional Documentation',
       type: 'file',
-      isConstant: function( $state, model ) { return !model.isAdministrator(); },
+      isConstant: function( $state, model ) { return !model.isRole( 'administrator' ); },
       isExcluded: function( $state, model ) {
         // show the agreement and instruction files if we're past the review stage
         return 'add' == model.getActionFromState() ||
@@ -220,7 +224,7 @@ define( function() {
       type: 'boolean',
       isExcluded: function( $state, model ) {
         // show the suggested revisions checkbox to admins when in the decision made stage
-        return !model.isAdministrator() ||
+        return !model.isRole( 'administrator' ) ||
                angular.isUndefined( model.viewModel.record.stage_type ) ||
                'Decision Made' != model.viewModel.record.stage_type ||
                angular.isUndefined( model.viewModel.record.next_stage_type ) ||
@@ -230,7 +234,7 @@ define( function() {
     note: {
       title: 'Administrative Note',
       type: 'text',
-      isExcluded: function( $state, model ) { return !model.isAdministratorOrReadonly(); }
+      isExcluded: function( $state, model ) { return !model.isRole( 'administrator', 'readonly', 'typist' ); }
     },
 
     current_reqn_version_id: { column: 'reqn_version.id', type: 'string', isExcluded: true },
@@ -254,21 +258,87 @@ define( function() {
       isExcluded: function( $state, model ) {
         // show the amendment deferral note to admins when an amendment is active
         return 'add' == model.getActionFromState() ||
-               !model.isAdministrator() ||
+               !model.isRole( 'administrator' ) ||
                angular.isUndefined( model.viewModel.record.amendment ) || '.' == model.viewModel.record.amendment;
       }
     },
-    deferral_note_1a: { title: 'Part1: A1', type: 'text', isExcluded: 'add' },
-    deferral_note_1b: { title: 'Part1: A2', type: 'text', isExcluded: 'add' },
-    deferral_note_1c: { title: 'Part1: A3', type: 'text', isExcluded: 'add' },
-    deferral_note_1d: { title: 'Part1: A4', type: 'text', isExcluded: 'add' },
-    deferral_note_1e: { title: 'Part1: A5', type: 'text', isExcluded: 'add' },
-    deferral_note_1f: { title: 'Part1: A6', type: 'text', isExcluded: 'add' },
-    deferral_note_2a: { title: 'Part2: Questionnaires', type: 'text', isExcluded: 'add' },
-    deferral_note_2b: { title: 'Part2: Physical Assessment', type: 'text', isExcluded: 'add' },
-    deferral_note_2c: { title: 'Part2: Biomarkers', type: 'text', isExcluded: 'add' },
-    deferral_note_2d: { title: 'Part2: Genomics', type: 'text', isExcluded: 'add' },
-    deferral_note_2e: { title: 'Part2: Linked Data', type: 'text', isExcluded: 'add' }
+    deferral_note_1a: {
+      title: 'Part1: A1',
+      type: 'text',
+      isExcluded: function( $state, model ) {
+        return 'view' == model.getActionFromState() ? model.viewModel.record.external : 'add';
+      }
+    },
+    deferral_note_1b: {
+      title: 'Part1: A2',
+      type: 'text',
+      isExcluded: function( $state, model ) {
+        return 'view' == model.getActionFromState() ? model.viewModel.record.external : 'add';
+      }
+    },
+    deferral_note_1c: {
+      title: 'Part1: A3',
+      type: 'text',
+      isExcluded: function( $state, model ) {
+        return 'view' == model.getActionFromState() ? model.viewModel.record.external : 'add';
+      }
+    },
+    deferral_note_1d: {
+      title: 'Part1: A4',
+      type: 'text',
+      isExcluded: function( $state, model ) {
+        return 'view' == model.getActionFromState() ? model.viewModel.record.external : 'add';
+      }
+    },
+    deferral_note_1e: {
+      title: 'Part1: A5',
+      type: 'text',
+      isExcluded: function( $state, model ) {
+        return 'view' == model.getActionFromState() ? model.viewModel.record.external : 'add';
+      }
+    },
+    deferral_note_1f: {
+      title: 'Part1: A6',
+      type: 'text',
+      isExcluded: function( $state, model ) {
+        return 'view' == model.getActionFromState() ? model.viewModel.record.external : 'add';
+      }
+    },
+    deferral_note_2a: {
+      title: 'Part2: Questionnaires',
+      type: 'text',
+      isExcluded: function( $state, model ) {
+        return 'view' == model.getActionFromState() ? model.viewModel.record.external : 'add';
+      }
+    },
+    deferral_note_2b: {
+      title: 'Part2: Physical Assessment',
+      type: 'text',
+      isExcluded: function( $state, model ) {
+        return 'view' == model.getActionFromState() ? model.viewModel.record.external : 'add';
+      }
+    },
+    deferral_note_2c: {
+      title: 'Part2: Biomarkers',
+      type: 'text',
+      isExcluded: function( $state, model ) {
+        return 'view' == model.getActionFromState() ? model.viewModel.record.external : 'add';
+      }
+    },
+    deferral_note_2d: {
+      title: 'Part2: Genomics',
+      type: 'text',
+      isExcluded: function( $state, model ) {
+        return 'view' == model.getActionFromState() ? model.viewModel.record.external : 'add';
+      }
+    },
+    deferral_note_2e: {
+      title: 'Part2: Linked Data',
+      type: 'text',
+      isExcluded: function( $state, model ) {
+        return 'view' == model.getActionFromState() ? model.viewModel.record.external : 'add';
+      }
+    }
   } );
 
   module.addExtraOperation( 'view', {
@@ -730,7 +800,7 @@ define( function() {
             if( 'administrator' == CnSession.role.name && this.deferralNotesExist() ) {
               message += '\n\nWARNING: There are deferral notes present, you may wish to remove them before proceeding.';
             }
-              console.log( this.record.next_stage_type, this.record.ethics_date );
+
             if( 'Data Release' == this.record.next_stage_type ) {
               if( null == this.record.ethics_date ) {
                 message += '\n\nWARNING: This ' + self.parentModel.module.name.singular + ' has no ethics agreement, ' +
@@ -933,16 +1003,8 @@ define( function() {
             return this.$$getServiceCollectionPath( 'root' == this.getSubjectFromState() );
           },
 
-          // make the input lists from all groups more accessible
-          isApplicant: function() { return 'applicant' == CnSession.role.name; },
-          isAdministrator: function() { return 'administrator' == CnSession.role.name; },
-          isAdministratorOrCommunication: function() { return ['administrator','communication'].includes( CnSession.role.name ); },
-          isAdministratorOrReadonly: function() { return ['administrator','readonly'].includes( CnSession.role.name ); },
-          isAdministratorOrCommunicationOrReadonly: function() {
-            return ['administrator','communication','readonly'].includes( CnSession.role.name );
-          },
-
-          isReviewer: function() { return 'reviewer' == CnSession.role.name; },
+          // checks to see if the current role is included in any provided argument
+          isRole: function( ...args ) { return args.some( role => role == CnSession.role.name ); },
 
           getAddEnabled: function() {
             return this.$$getAddEnabled() && 'reqn' == this.getSubjectFromState();
@@ -983,7 +1045,8 @@ define( function() {
 
           // override transitionToViewState (used when application views a reqn)
           transitionToViewState: function( record ) {
-            if( this.isApplicant() ) $state.go( 'reqn_version.view', { identifier: record.reqn_version_id } );
+            if( this.isRole( 'applicant' ) || this.isRole( 'typist' ) )
+              $state.go( 'reqn_version.view', { identifier: record.reqn_version_id } );
             else this.$$transitionToViewState( record );
           },
 

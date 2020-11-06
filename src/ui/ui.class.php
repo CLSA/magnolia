@@ -102,16 +102,20 @@ class ui extends \cenozo\ui\ui
 
     $db_role = lib::create( 'business\session' )->get_role();
 
-    $this->add_listitem( 'Amendment Types', 'amendment_type' );
-    $this->add_listitem( 'Data Versions', 'data_version' );
-    $this->add_listitem( 'Deadlines', 'deadline' );
-    $this->add_listitem( 'Notification Types', 'notification_type' );
-    $this->add_listitem( 'PDF Form Templates', 'pdf_form_type' );
+    if( 'typist' != $db_role->name )
+    {
+      $this->add_listitem( 'Amendment Types', 'amendment_type' );
+      $this->add_listitem( 'Data Versions', 'data_version' );
+      $this->add_listitem( 'Deadlines', 'deadline' );
+      $this->add_listitem( 'Notification Types', 'notification_type' );
+      $this->add_listitem( 'PDF Form Templates', 'pdf_form_type' );
+      $this->add_listitem( 'Reviews', 'review' );
+      $this->add_listitem( 'Review Types', 'review_type' );
+      $this->add_listitem( 'Stage Types', 'stage_type' );
+      $this->add_listitem( 'Supplemental Files', 'supplemental_file' );
+    }
+
     $this->add_listitem( 'Requisitions', 'reqn' );
-    $this->add_listitem( 'Reviews', 'review' );
-    $this->add_listitem( 'Review Types', 'review_type' );
-    $this->add_listitem( 'Stage Types', 'stage_type' );
-    $this->add_listitem( 'Supplemental Files', 'supplemental_file' );
 
     $this->remove_listitem( 'Availability Types' );
     $this->remove_listitem( 'Consent Types' );

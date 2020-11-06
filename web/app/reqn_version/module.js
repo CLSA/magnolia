@@ -1540,7 +1540,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
             check = 'new' == phase || (
               'deferred' == state && ( 'review' == phase || ( 'lite' == this.type && 'Agreement' == stage_type ) )
             );
-          } else if( 'administrator' == CnSession.role.name ) {
+          } else if( ['administrator', 'typist'].includes( CnSession.role.name ) ) {
             check = 'new' == phase || (
               'abandoned' != state && ( 'review' == phase || 'Agreement' == stage_type || 'Data Release' == stage_type )
             );

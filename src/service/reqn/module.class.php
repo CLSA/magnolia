@@ -27,15 +27,27 @@ class module extends \cenozo\service\module
 
     if( 300 > $this->get_status()->get_code() )
     {
-      // make sure to restrict applicants to their own reqns which are not abandoned
       $db_reqn = $this->get_resource();
-      if( 'applicant' == $db_role->name && !is_null( $db_reqn ) )
+      if( !is_null( $db_reqn ) )
       {
-        $trainee = 'applicant' == $db_role->name && $db_reqn->trainee_user_id == $db_user->id;
-        if( ( $db_reqn->user_id != $db_user->id && !$trainee ) || 'abandoned' == $db_reqn->state )
+        // make sure to restrict applicants to their own reqns which are not abandoned
+        if( 'applicant' == $db_role->name )
         {
-          $this->get_status()->set_code( 404 );
-          return;
+          $trainee = 'applicant' == $db_role->name && $db_reqn->trainee_user_id == $db_user->id;
+          if( ( $db_reqn->user_id != $db_user->id && !$trainee ) || 'abandoned' == $db_reqn->state )
+          {
+            $this->get_status()->set_code( 404 );
+            return;
+          }
+        }
+        // typist can only see external reqns
+        else if( 'typist' == $db_role->name )
+        {
+          if( !$db_reqn->external )
+          {
+            $this->get_status()->set_code( 403 );
+            return;
+          }
         }
       }
     }
@@ -143,6 +155,11 @@ class module extends \cenozo\service\module
     {
       // restrict reviewers to seeing reqns in the DSAC Review stage only
       $modifier->where( 'stage_type.name', '=', 'DSAC Review' );
+    }
+    else if( 'typist' == $db_role->name )
+    {
+      // typists can only see external reqns
+      $modifier->where( 'reqn.external', '=', true );
     }
 
     if( $select->has_table_columns( 'stage_type' ) )

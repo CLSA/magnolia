@@ -78,7 +78,7 @@ class reqn extends \cenozo\database\record
 
     if( 'reqn_type_id' == $column_name )
     {
-      if( !$this->get_reqn_type()->is_deadline_required() ) $this->deadline_id = NULL;
+      if( $this->external || !$this->get_reqn_type()->is_deadline_required() ) $this->deadline_id = NULL;
       $this->assert_deadline();
     }
   }
@@ -1119,7 +1119,7 @@ class reqn extends \cenozo\database\record
     $deadline_class_name = lib::get_class_name( 'database\deadline' );
 
     $db_reqn_type = lib::create( 'database\reqn_type', $this->reqn_type_id );
-    if( $db_reqn_type->is_deadline_required() )
+    if( !$this->external && $db_reqn_type->is_deadline_required() )
     {
       $db_deadline = NULL;
       $change_deadline = false;
@@ -1156,6 +1156,7 @@ class reqn extends \cenozo\database\record
             'Cannot proceed since there are no future deadlines defined.',
             __METHOD__ );
         $this->deadline_id = $db_deadline->id;
+        log::error( 'test' );
       }
     }
   }
