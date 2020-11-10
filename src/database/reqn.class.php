@@ -1156,7 +1156,6 @@ class reqn extends \cenozo\database\record
             'Cannot proceed since there are no future deadlines defined.',
             __METHOD__ );
         $this->deadline_id = $db_deadline->id;
-        log::error( 'test' );
       }
     }
   }
