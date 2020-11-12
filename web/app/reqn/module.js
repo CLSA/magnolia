@@ -1007,7 +1007,10 @@ define( function() {
           isRole: function( ...args ) { return args.some( role => role == CnSession.role.name ); },
 
           getAddEnabled: function() {
-            return this.$$getAddEnabled() && 'reqn' == this.getSubjectFromState();
+            return this.$$getAddEnabled() && (
+              'reqn' == this.getSubjectFromState() ||
+              'root' == this.getSubjectFromState() && 'applicant' == CnSession.role.name
+            );
           },
 
           getEditEnabled: function() {
