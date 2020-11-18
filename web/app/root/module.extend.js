@@ -41,7 +41,7 @@ define( [ 'reqn', 'review', 'root' ].reduce( function( list, name ) {
             return function( scope, element, attrs ) {
               if( angular.isFunction( oldLink ) ) oldLink( scope, element, attrs );
               angular.element( element[0].querySelector( '.inner-view-frame div' ) ).append(
-                '<cn-reqn-list model="reqnModel"></cn-reqn-list>'
+                '<cn-reqn-list model="reqnModel" remove-columns="ethics_expiry state state_days"></cn-reqn-list>'
               );
               $compile( element.contents() )( scope );
             };

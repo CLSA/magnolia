@@ -67,6 +67,11 @@ define( function() {
         isIncluded: function( $state, model ) { return !model.isRole( 'applicant', 'typist' ); },
         help: 'The number of days since the requisition was put on hold (empty if the requisition hasn\'t been held up)'
       },
+      reviewers_completed: {
+        title: 'Reviewers Completed',
+        type: 'number',
+        isIncluded: function( $state, model ) { return model.isRole( 'chair' ) && 'root' == model.getSubjectFromState(); }
+      },
       stage_type: {
         column: 'stage_type.name',
         title: 'Stage',
@@ -549,7 +554,7 @@ define( function() {
       return {
         templateUrl: module.getFileUrl( 'list.tpl.html' ),
         restrict: 'E',
-        scope: { model: '=?' },
+        scope: { model: '=?', removeColumns: '@' },
         controller: function( $scope ) {
           if( angular.isUndefined( $scope.model ) ) $scope.model = CnReqnModelFactory.root;
         }

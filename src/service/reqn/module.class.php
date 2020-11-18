@@ -113,6 +113,29 @@ class module extends \cenozo\service\module
       $modifier->left_join( 'ethics_approval', 'reqn_last_ethics_approval.ethics_approval_id', 'ethics_approval.id' );
     }
 
+    if( $select->has_column( 'reviewers_completed' ) )
+    {
+      $join_sel = lib::create( 'database\select' );
+      $join_sel->from( 'reqn' );
+      $join_sel->add_column( 'id', 'reqn_id' );
+      $join_sel->add_column( 'IF( review.id IS NULL, 0, COUNT(*) )', 'total', false );
+
+      $join_mod = lib::create( 'database\modifier' );
+      $sub_mod = lib::create( 'database\modifier' );
+      $sub_mod->where( 'reqn.id', '=', 'review.reqn_id', false );
+      $sub_mod->where( 'review.review_type_id', 'IN', 'SELECT id FROM review_type WHERE name LIKE "Reviewer %"', false );
+      $sub_mod->where( 'review.recommendation_type_id', '!=', NULL );
+      $join_mod->join_modifier( 'review', $sub_mod, 'left' );
+      $join_mod->group( 'reqn.id' );
+
+      $modifier->join(
+        sprintf( '( %s %s ) AS reviewers_completed', $join_sel->get_sql(), $join_mod->get_sql() ),
+        'reqn.id',
+        'reviewers_completed.reqn_id'
+      );
+      $select->add_column( 'reviewers_completed.total', 'reviewers_completed', false );
+    }
+
     if( 'applicant' == $db_role->name )
     {
       // only show applicants their own reqns which aren't abandoned
