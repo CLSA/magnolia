@@ -49,8 +49,18 @@ class patch extends \cenozo\service\patch
       $code = NULL;
       if( 'reset_data' == $action )
       {
+        // make sure only admins can release data to reqns in the data-release or active stages
         if( 'administrator' != $db_role->name ||
             ( !in_array( $db_current_stage_type->name, array( 'Data Release', 'Active' ) ) ) ) $code = 403;
+        // make sure the reqn has at least one data-release
+        else if( 0 == $db_reqn->get_data_release_count() )
+        {
+          throw lib::create( 'exception\notice',
+            'The requisition has no data versions associated with it. '.
+            'You must add at least one data version before study data can be released to the applicant.',
+            __METHOD__
+          );
+        }
       }
       else if( 'abandon' == $action )
       {
