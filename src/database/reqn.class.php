@@ -466,6 +466,22 @@ class reqn extends \cenozo\database\record
     if( is_null( $db_next_stage_type ) )
       throw lib::create( 'exception\argument', 'stage_type', $stage_type, __METHOD__ );
 
+    // if moving to the data release or active stage then check for the correct linked-data agreement and approval
+    if( 'Data Release' == $db_next_stage_type->name || 'Active' == $db_next_stage_type->name )
+    {
+      if( $db_reqn_version->has_linked_data() &&
+          ( is_null( $db_reqn_version->data_sharing_filename ) || !$this->data_sharing_approved ) )
+      {
+        throw lib::create( 'exception\notice',
+          sprintf(
+            'Unable to proceed to the %s stage as this requisition requests linked data without an approved data sharing agreement.',
+            $db_next_stage_type->name
+          ),
+          __METHOD__
+        );
+      }
+    }
+
     // Note: there is a special circumstance where a reqn is being rejected during the DSAC selection stage (make note here)
     $reject_selection = !is_null( $db_current_stage_type ) &&
                         'DSAC Selection' == $db_current_stage_type->name &&

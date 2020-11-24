@@ -15,6 +15,7 @@ SOURCE notification_type.sql
 SOURCE pdf_form.sql
 SOURCE stage.sql
 SOURCE data_option.sql
+SOURCE data_option_category.sql
 
 SOURCE update_version_number.sql
 

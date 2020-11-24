@@ -144,6 +144,10 @@ class ui extends \cenozo\ui\ui
     if( array_key_exists( 'Participant Search', $list ) ) unset( $list['Participant Search'] );
     if( array_key_exists( 'Tracing', $list ) ) unset( $list['Tracing'] );
 
+    if( 'administrator' == $db_role->name ) $list['Manage CANUE Approvals'] = array(
+      'subject' => 'reqn',
+      'action' => 'data_sharing'
+    );
     if( array_key_exists( 'User Overview', $list ) )
       if( 'applicant' == $db_role->name || 'reviewer' == $db_role->name )
         unset( $list['User Overview'] );

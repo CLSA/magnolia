@@ -15,6 +15,34 @@ CREATE PROCEDURE patch_reqn()
       ALTER TABLE reqn ADD COLUMN external TINYINT(1) NOT NULL DEFAULT 0 AFTER identifier;
     END IF;
 
+    SELECT "Adding new data_sharing_approved column to reqn table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "data_sharing_approved";
+
+    IF @test = 0 THEN
+      ALTER TABLE reqn ADD COLUMN data_sharing_approved TINYINT(1) NULL DEFAULT NULL AFTER website;
+
+      -- set the column value for all reqns who have selected a linked-data option
+      UPDATE reqn
+      JOIN stage ON reqn.id = stage.reqn_id AND stage.datetime IS NULL
+      JOIN stage_type ON stage.stage_type_id = stage_type.id
+      JOIN reqn_current_reqn_version ON reqn.id = reqn_current_reqn_version.reqn_id
+      JOIN reqn_version ON reqn_current_reqn_version.reqn_version_id = reqn_version.id
+      JOIN reqn_version_data_option ON reqn_version.id = reqn_version_data_option.reqn_version_id 
+      JOIN data_option ON reqn_version_data_option.data_option_id = data_option.id 
+      JOIN data_option_category ON data_option.data_option_category_id = data_option_category.id
+      SET reqn.data_sharing_approved = IF(
+        "Data Release" = stage_type.name OR "Active" = stage_type.name,
+        true,
+        IF( reqn_version.data_sharing_filename IS NULL, NULL, false )
+      )
+      WHERE data_option_category.name_en = "Linked Data";
+    END IF;
+
   END //
 DELIMITER ;
 

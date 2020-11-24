@@ -17,12 +17,16 @@ define( function() {
       language: {
         title: 'Language',
         column: 'language.code',
-        isIncluded: function( $state, model ) { return !model.isRole( 'applicant' ); }
+        isIncluded: function( $state, model ) {
+          return !model.isRole( 'applicant' ) && 'data_sharing' != model.getActionFromState();
+        }
       },
       external: {
         title: 'External',
         type: 'boolean',
-        isIncluded: function( $state, model ) { return !model.isRole( 'applicant', 'typist' ); }
+        isIncluded: function( $state, model ) {
+          return !model.isRole( 'applicant', 'typist' ) && 'data_sharing' != model.getActionFromState();
+        }
       },
       reqn_type: {
         column: 'reqn_type.name',
@@ -42,29 +46,39 @@ define( function() {
       },
       amendment_version: {
         title: 'Version',
-        isIncluded: function( $state, model ) { return !model.isRole( 'typist' ); }
+        isIncluded: function( $state, model ) {
+          return !model.isRole( 'typist' ) && 'data_sharing' != model.getActionFromState();
+        }
       },
       ethics_expiry: {
         column: 'ethics_approval.date',
         title: 'Ethics Expiry',
         type: 'date',
-        isIncluded: function( $state, model ) { return !model.isRole( 'typist' ); }
+        isIncluded: function( $state, model ) {
+          return !model.isRole( 'typist' ) && 'data_sharing' != model.getActionFromState();
+        }
       },
       status: {
         column: 'stage_type.status',
         title: 'Status',
-        isIncluded: function( $state, model ) { return model.isRole( 'applicant' ); }
+        isIncluded: function( $state, model ) {
+          return model.isRole( 'applicant' ) && 'data_sharing' != model.getActionFromState();
+        }
       },
       state: {
         title: 'On Hold',
         type: 'string',
-        isIncluded: function( $state, model ) { return !model.isRole( 'applicant', 'typist' ); },
+        isIncluded: function( $state, model ) {
+          return !model.isRole( 'applicant', 'typist' ) && 'data_sharing' != model.getActionFromState();
+        },
         help: 'The reason the requisition is on hold (empty if the requisition hasn\'t been held up)'
       },
       state_days: {
         title: 'Days On Hold',
         type: 'number',
-        isIncluded: function( $state, model ) { return !model.isRole( 'applicant', 'typist' ); },
+        isIncluded: function( $state, model ) {
+          return !model.isRole( 'applicant', 'typist' ) && 'data_sharing' != model.getActionFromState();
+        },
         help: 'The number of days since the requisition was put on hold (empty if the requisition hasn\'t been held up)'
       },
       reviewers_completed: {
@@ -77,6 +91,17 @@ define( function() {
         title: 'Stage',
         type: 'string',
         isIncluded: function( $state, model ) { return !model.isRole( 'applicant', 'reviewer' ); }
+      },
+      has_data_sharing_filename: {
+        title: 'Has Agreement',
+        type: 'boolean',
+        isIncluded: function( $state, model ) { return 'data_sharing' == model.getActionFromState(); }
+      },
+      data_sharing_approved: {
+        title: 'Approved',
+        type: 'boolean',
+        isIncluded: function( $state, model ) { return 'data_sharing' == model.getActionFromState(); },
+        highlight: false // highlight any unapproved reqns
       },
       reqn_version_id: {
         column: 'reqn_version.id',
@@ -189,6 +214,21 @@ define( function() {
       isConstant: function( $state, model ) { return !model.isRole( 'administrator', 'communication' ); },
       isExcluded: function( $state, model ) { return model.isRole( 'administrator', 'communication' ) ? 'add' : true; }
     },
+    data_sharing_approved: {
+      title: 'CANUE Agreement Approved',
+      type: 'boolean',
+      isConstant: function( $state, model ) {
+        return !model.isRole( 'administrator' ) ||
+               null == model.viewModel.record.data_sharing_filename;
+      },
+      isExcluded: function( $state, model ) {
+        return !model.isRole( 'administrator' ) ||
+               'add' == model.getActionFromState() ||
+               !model.viewModel.record.has_linked_data;
+      },
+      help: 'Whether the requisition\'s CANUE agreement file has been approved. ' +
+        'Note that this can only set once a file has been uploaded.'
+    },
     data_expiry_date: {
       title: 'Data Expiry Date',
       type: 'date',
@@ -249,6 +289,8 @@ define( function() {
     ethics_filename: { column: 'reqn_version.ethics_filename', type: 'string', isExcluded: true },
     has_agreements: { type: 'boolean', isExcluded: true },
     has_ethics_approval_list: { type: 'boolean', isExcluded: true },
+    has_linked_data: { type: 'boolean', isExcluded: true },
+    data_sharing_filename: { column: 'reqn_version.data_sharing_filename', type: 'string', isExcluded: true },
     data_directory: { type: 'string', isExcluded: true },
     phase: { column: 'stage_type.phase', type: 'string', isExcluded: true },
     status: { column: 'stage_type.status', type: 'string', isExcluded: true },
@@ -563,6 +605,29 @@ define( function() {
   ] );
 
   /* ######################################################################################################## */
+  cenozo.providers.directive( 'cnReqnDataSharing', [
+    'CnReqnModelFactory', 'CnSession', '$state',
+    function( CnReqnModelFactory, CnSession, $state ) {
+      return {
+        templateUrl: module.getFileUrl( 'list.tpl.html' ),
+        restrict: 'E',
+        scope: { model: '=?', removeColumns: '@' },
+        controller: function( $scope ) {
+          if( angular.isUndefined( $scope.model ) ) $scope.model = CnReqnModelFactory.root;
+
+          CnSession.setBreadcrumbTrail( [ {
+              title: $scope.model.module.name.plural.ucWords(),
+              go: function() { $state.go( 'reqn.list' ); }
+            }, {
+              title: 'CANUE Approvals'
+            } ]
+          );
+        }
+      };
+    }
+  ] );
+
+  /* ######################################################################################################## */
   cenozo.providers.directive( 'cnReqnView', [
     'CnReqnModelFactory', 'CnSession',
     function( CnReqnModelFactory, CnSession ) {
@@ -607,7 +672,18 @@ define( function() {
   cenozo.providers.factory( 'CnReqnListFactory', [
     'CnBaseListFactory',
     function( CnBaseListFactory ) {
-      var object = function( parentModel ) { CnBaseListFactory.construct( this, parentModel ); };
+      var object = function( parentModel ) {
+        CnBaseListFactory.construct( this, parentModel );
+        
+        // Set the heading as part of the 'onList' function so that it updates if we switch from the main reqn list
+        // to/from the special data-sharing list
+        this.onList = function( replace ) {
+          this.heading = parentModel.module.name.plural.ucWords() + (
+            'data_sharing' == parentModel.getActionFromState() ? ' Requiring CANUE Agreements' : ' List'
+          );
+          return this.$$onList( replace );
+        }
+      };
       return { instance: function( parentModel ) { return new object( parentModel ); } };
     }
   ] );
@@ -652,8 +728,12 @@ define( function() {
           downloadApplicationAndChecklist: function() {
             return CnReqnHelper.download( 'application_and_checklist', this.record.current_reqn_version_id );
           },
-          downloadFundingLetter: function() { return CnReqnHelper.download( 'funding_filename', this.record.current_reqn_version_id ); },
-          downloadEthicsLetter: function() { return CnReqnHelper.download( 'ethics_filename', this.record.current_reqn_version_id ); },
+          downloadFundingLetter: function() {
+            return CnReqnHelper.download( 'funding_filename', this.record.current_reqn_version_id );
+          },
+          downloadEthicsLetter: function() {
+            return CnReqnHelper.download( 'ethics_filename', this.record.current_reqn_version_id );
+          },
           downloadAgreementLetters: function() {
             return CnHttpFactory.instance( {
               path: this.parentModel.getServiceResourcePath() + '?file=agreements',
@@ -1005,7 +1085,9 @@ define( function() {
           // override the service collection path so that applicants can view their reqns from the home screen
           getServiceCollectionPath: function() {
             // ignore the parent if it is the root state
-            return this.$$getServiceCollectionPath( 'root' == this.getSubjectFromState() );
+            return this.$$getServiceCollectionPath( 'root' == this.getSubjectFromState() ) + (
+              'data_sharing' == this.getActionFromState() ? '?data_sharing=1' : ''
+            );
           },
 
           // checks to see if the current role is included in any provided argument

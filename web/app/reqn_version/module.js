@@ -1074,23 +1074,64 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
           toggleDataOptionValue: function( studyPhaseCode, dataOptionId ) {
             var promiseList = [];
 
-            // when selecting the data-option first check to see if the data option has a condition
+            // when selecting the data-option first check to see if the category or data option have a condition
             if( !self.record.dataOptionValueList[studyPhaseCode][dataOptionId] ) {
+              var category = null;
               var dataOption = null;
-              if( this.parentModel.dataOptionCategoryList.some( function( category, index ) {
-                dataOption = category.optionList.findByProperty( 'id', dataOptionId );
+              if( this.parentModel.dataOptionCategoryList.some( function( cat ) {
+                dataOption = cat.optionList.findByProperty( 'id', dataOptionId );
+                category = cat;
                 return null != dataOption;
               } ) ) {
                 var column = 'condition_' + self.record.lang;
-                if( null != dataOption[column] ) {
-                  promiseList.push( CnModalConfirmFactory.instance( {
-                    title: this.translate( 'misc.pleaseConfirm' ),
-                    noText: 'applicant' == CnSession.role.name ? this.translate( 'misc.no' ) : 'No',
-                    yesText: 'applicant' == CnSession.role.name ? this.translate( 'misc.yes' ) : 'Yes',
-                    message: dataOption[column]
-                  } ).show().then( function( response ) {
-                    return response;
-                  } ) );
+
+                // create a modal for the category condition, if required
+                var categoryModal = null;
+                if( null != category[column] ) {
+                  // see if this is the first option in this category being selected
+                  var catAlreadySelected = false;
+                  var categoryOptionIdList = category.optionList.map( o => o.id );
+
+                  // see if any of the category's options are already selected
+                  var alreadySelected = false;
+                  for( var code in self.record.dataOptionValueList ) {
+                    if( categoryOptionIdList.some( id => self.record.dataOptionValueList[code][id] ) ) {
+                      alreadySelected = true;
+                      break;
+                    }
+                  }
+
+                  // only show the condition if none of the options is already selected
+                  if( !alreadySelected ) {
+                    categoryModal = CnModalConfirmFactory.instance( {
+                      title: this.translate( 'misc.pleaseConfirm' ),
+                      noText: 'applicant' == CnSession.role.name ? this.translate( 'misc.no' ) : 'No',
+                      yesText: 'applicant' == CnSession.role.name ? this.translate( 'misc.yes' ) : 'Yes',
+                      message: category[column]
+                    } );
+                  }
+                }
+
+                // create a modal for the option condition, if required
+                var optionModal = null != dataOption[column]
+                                ?  CnModalConfirmFactory.instance( {
+                                     title: self.translate( 'misc.pleaseConfirm' ),
+                                     noText: 'applicant' == CnSession.role.name ? self.translate( 'misc.no' ) : 'No',
+                                     yesText: 'applicant' == CnSession.role.name ? self.translate( 'misc.yes' ) : 'Yes',
+                                     message: dataOption[column]
+                                   } )
+                                : null;
+
+                // now show whichever condition modals are required, category first, then option
+                var promiseList = [];
+                if( null != categoryModal || null != optionModal ) {
+                  promiseList.push(
+                    null != categoryModal && null != optionModal ?
+                    categoryModal.show().then( function( response ) { return response ? optionModal.show() : false; } ) :
+                    null != categoryModal ?
+                    categoryModal.show() :
+                    optionModal.show()
+                  );
                 }
               }
             }
@@ -1727,7 +1768,13 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
               CnHttpFactory.instance( {
                 path: 'data_option_category',
                 data: {
-                  select: { column: [ 'id', 'rank', 'name_en', 'name_fr', 'note_en', 'note_fr' ] },
+                  select: { column: [
+                    'id',
+                    'rank',
+                    'name_en', 'name_fr',
+                    'condition_en', 'condition_fr',
+                    'note_en', 'note_fr'
+                  ] },
                   modifier: { order: 'rank', limit: 1000000 }
                 }
               } ).query().then( function( response ) {

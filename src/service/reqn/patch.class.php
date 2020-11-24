@@ -302,71 +302,68 @@ class patch extends \cenozo\service\patch
           $db_notification->set_reqn( $db_reqn ); // this saves the record
           $db_notification->mail();
         }
-        else if( 'submit' == $action || 'next_stage' == $action || 'reject' == $action )
+        else if( 'submit' == $action )
         {
-          if( 'submit' == $action )
+          if( !$db_reqn->external )
           {
-            if( !$db_reqn->external )
+            // trainees must be get approval from their supervisor
+            if( $trainee )
             {
-              // trainees must be get approval from their supervisor
-              if( $trainee )
+              // send a notification to the supervisor
+              $db_notification = lib::create( 'database\notification' );
+              $db_notification->notification_type_id =
+                $notification_type_class_name::get_unique_record( 'name', 'Approval Required' )->id;
+              $db_notification->set_reqn( $db_reqn );
+              $db_notification->mail();
+            }
+            else
+            {
+              if( 'deferred' == $db_reqn->state )
               {
-                // send a notification to the supervisor
-                $db_notification = lib::create( 'database\notification' );
-                $db_notification->notification_type_id =
-                  $notification_type_class_name::get_unique_record( 'name', 'Approval Required' )->id;
-                $db_notification->set_reqn( $db_reqn );
-                $db_notification->mail();
+                $db_reqn->state = NULL;
+                $db_reqn->save();
+
+                // when resubmitting set the version's datetime
+                $db_reqn_version->datetime = util::get_datetime_object();
+                $db_reqn_version->save();
               }
               else
               {
-                if( 'deferred' == $db_reqn->state )
-                {
-                  $db_reqn->state = NULL;
-                  $db_reqn->save();
-
-                  // when resubmitting set the version's datetime
-                  $db_reqn_version->datetime = util::get_datetime_object();
-                  $db_reqn_version->save();
-                }
-                else
-                {
-                  // this will submit the reqn for the first time
-                  $db_reqn->proceed_to_next_stage();
-                }
-
-                // send a notification
-                $db_reqn_user = $db_reqn->get_user();
-                $notification_class_name::mail_admin(
-                  sprintf( 'Requisition %s: submitted', $db_reqn->identifier ),
-                  sprintf(
-                    "The following requisition has been submitted:\n".
-                    "\n".
-                    "Type: %s\n".
-                    "Identifier: %s\n".
-                    "Amendment: %s\n".
-                    "Applicant: %s %s\n".
-                    "Title: %s\n",
-                    $db_reqn->get_reqn_type()->name,
-                    $db_reqn->identifier,
-                    str_replace( '.', 'no', $db_reqn_version->amendment ),
-                    $db_reqn_user->first_name, $db_reqn_user->last_name,
-                    $db_reqn_version->title
-                  )
-                );
+                // this will submit the reqn for the first time
+                $db_reqn->proceed_to_next_stage();
               }
+
+              // send a notification
+              $db_reqn_user = $db_reqn->get_user();
+              $notification_class_name::mail_admin(
+                sprintf( 'Requisition %s: submitted', $db_reqn->identifier ),
+                sprintf(
+                  "The following requisition has been submitted:\n".
+                  "\n".
+                  "Type: %s\n".
+                  "Identifier: %s\n".
+                  "Amendment: %s\n".
+                  "Applicant: %s %s\n".
+                  "Title: %s\n",
+                  $db_reqn->get_reqn_type()->name,
+                  $db_reqn->identifier,
+                  str_replace( '.', 'no', $db_reqn_version->amendment ),
+                  $db_reqn_user->first_name, $db_reqn_user->last_name,
+                  $db_reqn_version->title
+                )
+              );
             }
           }
-          else if( 'next_stage' == $action )
-          {
-            $db_reqn->proceed_to_next_stage( $this->get_argument( 'stage_type', NULL ) );
-          }
-          else if( 'reject' == $action )
-          {
-            // send directly to the decision-made stage type
-            $db_stage_type = $stage_type_class_name::get_unique_record( 'name', 'Decision Made' );
-            $db_reqn->proceed_to_next_stage( $db_stage_type );
-          }
+        }
+        else if( 'next_stage' == $action )
+        {
+          $db_reqn->proceed_to_next_stage( $this->get_argument( 'stage_type', NULL ) );
+        }
+        else if( 'reject' == $action )
+        {
+          // send directly to the decision-made stage type
+          $db_stage_type = $stage_type_class_name::get_unique_record( 'name', 'Decision Made' );
+          $db_reqn->proceed_to_next_stage( $db_stage_type );
         }
         else
         {

@@ -47,6 +47,17 @@ class reqn_version extends \cenozo\database\record
       $filename = $this->get_filename( 'agreement' );
       if( file_exists( $filename ) ) unlink( $filename );
     }
+
+    // if this is the current reqn then we may need to change the parent reqn's data_sharing_approved bit
+    $db_reqn = $this->get_reqn();
+    if( $db_reqn->get_current_reqn_version()->id == $this->id )
+    {
+      // no data sharing file means data_sharing_approved can't be answered
+      if( is_null( $this->data_sharing_filename ) ) $db_reqn->data_sharing_approved = NULL;
+      // if there is a data sharing file then make sure approval is possible
+      else if( is_null( $db_reqn->data_sharing_approved ) ) $db_reqn->data_sharing_approved = false;
+      $db_reqn->save();
+    }
   }
 
   /**
@@ -205,6 +216,25 @@ class reqn_version extends \cenozo\database\record
     }
 
     return parent::get_record_from_identifier( $identifier );
+  }
+
+  /** 
+   * Determines whether or not this reqn version has selected any Linked Data options
+   * @return boolean
+   */
+  public function has_linked_data()
+  {
+    $select = lib::create( 'database\select' );
+    $select->from( 'reqn_version' );
+    $select->add_column( '0 < COUNT(*)', 'has_linked_data', false );
+    $modifier = lib::create( 'database\modifier' );
+    $modifier->join( 'reqn_version_data_option', 'reqn_version.id', 'reqn_version_data_option.reqn_version_id' );
+    $modifier->join( 'data_option', 'reqn_version_data_option.data_option_id', 'data_option.id' );
+    $modifier->join( 'data_option_category', 'data_option.data_option_category_id', 'data_option_category.id' );
+    $modifier->where( 'reqn_version.id', '=', $this->id );
+    $modifier->where( 'data_option_category.name_en', '=', 'Linked Data' );
+
+    return static::db()->get_one( sprintf( '%s %s', $select->get_sql(), $modifier->get_sql() ) );
   }
 
   /**

@@ -58,7 +58,7 @@ class module extends \cenozo\service\module
    */
   public function prepare_read( $select, $modifier )
   {
-    $reqn_class_name = lib::get_class_name( 'database\reqn' );
+    $stage_type_class_name = lib::get_class_name( 'database\stage_type' );
 
     parent::prepare_read( $select, $modifier );
 
@@ -78,6 +78,50 @@ class module extends \cenozo\service\module
     $join_mod->where( 'stage.datetime', '=', NULL );
     $modifier->join_modifier( 'stage', $join_mod );
     $modifier->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
+
+    // restrict the list to reqns who have selected linked data
+    if( $this->get_argument( 'data_sharing', false ) || $select->has_column( 'has_linked_data' ) )
+    {
+      // get a list of all linked-data data-options
+      $category_sel = lib::create( 'database\select' );
+      $category_sel->from( 'data_option' );
+      $category_sel->add_column( 'id' );
+      $category_mod = lib::create( 'database\modifier' );
+      $category_mod->join( 'data_option_category', 'data_option.data_option_category_id', 'data_option_category.id' );
+      $category_mod->where( 'data_option_category.name_en', '=', 'Linked Data' );
+      $linked_data_sql = sprintf( '( %s %s )', $category_sel->get_sql(), $category_mod->get_sql() );
+
+      $join_sel = lib::create( 'database\select' );
+      $join_sel->from( 'reqn' );
+      $join_sel->add_column( 'id', 'reqn_id' );
+      $join_sel->add_column( 'reqn_version_data_option.id IS NOT NULL', 'exists', false );
+
+      $join_mod = lib::create( 'database\modifier' );
+      $join_mod->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
+      
+      $sub_mod = lib::create( 'database\modifier' );
+      $sub_mod->where( 'reqn_current_reqn_version.reqn_version_id', '=', 'reqn_version_data_option.reqn_version_id', false );
+      $sub_mod->where( 'reqn_version_data_option.data_option_id', 'IN', $linked_data_sql, false );
+      $join_mod->join_modifier( 'reqn_version_data_option', $sub_mod, 'left' );
+      $join_mod->group( 'reqn.id' );
+
+      $modifier->join(
+        sprintf( '( %s %s ) AS linked_data', $join_sel->get_sql(), $join_mod->get_sql() ),
+        'reqn.id',
+        'linked_data.reqn_id'
+      );
+      $select->add_column( 'linked_data.exists', 'has_linked_data', false, 'boolean' );
+
+      if( $this->get_argument( 'data_sharing', false ) )
+      {
+        $db_agreement_stage_type = $stage_type_class_name::get_unique_record( 'name', 'Agreement' );
+        $modifier->where( 'stage_type.rank', '<=', $db_agreement_stage_type->rank );
+        $modifier->where( 'linked_data.exists', '=', true );
+      }
+    }
+
+    if( $select->has_column( 'has_data_sharing_filename' ) )
+      $select->add_column( '( reqn_version.data_sharing_filename IS NOT NULL )', 'has_data_sharing_filename', false, 'boolean' );
 
     if( $select->has_column( 'state_days' ) )
       $select->add_column( 'DATEDIFF( NOW(), state_date )', 'state_days', false, 'integer' );

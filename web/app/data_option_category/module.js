@@ -12,6 +12,7 @@ define( function() {
     columnList: {
       rank: { title: 'Rank', type: 'rank' },
       name_en: { title: 'Name' },
+      has_condition: { title: 'Has Condition', type: 'boolean' },
       note_en: { title: 'Note', type: 'text', limit: 20 }
     },
     defaultOrder: { column: 'rank', reverse: false }
@@ -30,6 +31,18 @@ define( function() {
     name_fr: {
       title: 'Name (French)',
       type: 'string'
+    },
+    condition_en: {
+      title: 'Condition (English)',
+      type: 'text',
+      help: 'If provided then this statement must be agreed to by the applicant as a ' + 
+            'condition to checking off any data option belonging to this category'
+    },
+    condition_fr: {
+      title: 'Condition (French)',
+      type: 'text',
+      help: 'If provided then this statement must be agreed to by the applicant as a ' +
+            'condition to checking off any data option belonging to this category'
     },
     note_en: {
       title: 'Note (English)',
