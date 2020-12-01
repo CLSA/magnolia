@@ -289,13 +289,12 @@ class reqn_version extends \cenozo\database\record
     $db_pdf_form_type = $pdf_form_type_class_name::get_unique_record( 'name', 'Co-Applicant Agreement' );
     $db_pdf_form = $db_pdf_form_type->get_active_pdf_form();
     $agreement_filename = sprintf( '%s/%s.pdf', COAPPLICANT_AGREEMENT_TEMPLATE_PATH, $this->id );
-    $date_of_approval = $this->get_date_of_approval();
 
     // generate the agreement file
     $data = array(
       'identifier' => $db_reqn->identifier,
       'version' => sprintf( '%s%s', '.' == $this->amendment ? '' : $this->amendment, $this->version ),
-      'dateofapproval' => is_null( $date_of_approval ) ? 'None' : $date_of_approval->format( 'Y-m-d' )
+      'date_of_download' => util::get_datetime_object()->format( 'Y-m-d' )
     );
     
     // get a list of all new coapplicants who have access to the data by first finding the last amendment-version
