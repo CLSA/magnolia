@@ -863,7 +863,7 @@ class reqn extends \cenozo\database\record
     }
 
     // convert for Windows
-    $text = iconv( 'UTF-8', 'Windows-1252//TRANSLIT', str_replace( "\n", "\r\n", $text ) );
+    $text = util::convert_charset( str_replace( "\n", "\r\n", $text ) );
 
     $filename = sprintf( '%s/%s.txt', DATA_REVIEWS_PATH, $this->id );
     if( false === file_put_contents( $filename, $text, LOCK_EX ) )
