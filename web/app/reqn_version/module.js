@@ -518,9 +518,11 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
 
             return this.$$onView( force ).then( function() {
               // define the earliest date that the reqn may start (based on the deadline, or today if there is no deadline)
-              self.minStartDate = self.record.deadline
-                                ? moment( self.record.deadline ).add( CnSession.application.startDateDelay, 'months' )
-                                : moment();
+              if( !self.record.external ) {
+                self.minStartDate = self.record.deadline
+                                  ? moment( self.record.deadline ).add( CnSession.application.startDateDelay, 'months' )
+                                  : moment();
+              }
 
               if( 'lite' != self.parentModel.type ) {
                 cenozoApp.setLang( self.record.lang );
