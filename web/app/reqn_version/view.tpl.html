@@ -277,7 +277,7 @@
                 <cn-reqn-view-input
                   input="{
                     key: 'applicant_email',
-                    title: t( 'part1.a.applicant_email' )+'<sup>ⓘ</sup>',
+                    title: t( 'part1.a.applicant_email' ),
                     type: model.inputList.applicant_email.type,
                     constant: true,
                     help: t( 'misc.emailText' )
@@ -342,7 +342,7 @@
                 <cn-reqn-view-input
                   input="{
                     key: 'trainee_email',
-                    title: t( 'part1.a.trainee_email' )+'<sup>ⓘ</sup>',
+                    title: t( 'part1.a.trainee_email' ),
                     type: model.inputList.trainee_email.type,
                     constant: true,
                     help: t( 'misc.emailText' )
@@ -464,7 +464,7 @@
                   <cn-add-input
                     input="{
                       key: 'email',
-                      title: t( 'part1.b.email' )+'<sup>ⓘ</sup>',
+                      title: t( 'part1.b.email' ),
                       type: 'string',
                       help: t( 'misc.emailText' )
                     }"
@@ -584,7 +584,7 @@
                 <cn-reqn-view-input
                   input="{
                     key: 'keywords',
-                    title: t( 'part1.d.keywords' )+'<sup>ⓘ</sup>',
+                    title: t( 'part1.d.keywords' ),
                     type: 'string',
                     isConstant: model.viewModel.isDescriptionConstant,
                     help: t( 'part1.d.keywords_text' )
@@ -602,6 +602,7 @@
                     maxLength: 1000,
                     help: t( 'part1.d.lay_summary_text' )
                   }"
+                  no-help-indicator="true",
                   difference="model.viewModel.compareRecord.differences.part1.d.lay_summary"
                   model="model">
                 </cn-reqn-view-input>
@@ -641,6 +642,7 @@
                     maxLength: 4500,
                     help: t( 'part1.d.methodology_text' )
                   }"
+                  no-help-indicator="true",
                   difference="model.viewModel.compareRecord.differences.part1.d.methodology"
                   model="model">
                 </cn-reqn-view-input>
@@ -654,6 +656,7 @@
                     maxLength: 4500,
                     help: t( 'part1.d.analysis_text' )
                   }"
+                  no-help-indicator="true",
                   difference="model.viewModel.compareRecord.differences.part1.d.analysis"
                   model="model">
                 </cn-reqn-view-input>
@@ -930,7 +933,7 @@
                     no-cols=true
                     input="{
                       key: 'tracking',
-                      title: t( 'part2.cohort.tracking' )+'<sup>ⓘ</sup>',
+                      title: t( 'part2.cohort.tracking' ),
                       type: model.inputList.tracking.type,
                       enumList: model.metadata.yesNoEnumList[model.viewModel.record.lang],
                       help: t( 'part2.cohort.trackingHelp' )
@@ -942,7 +945,7 @@
                     no-cols=true
                     input="{
                       key: 'comprehensive',
-                      title: t( 'part2.cohort.comprehensive' )+'<sup>ⓘ</sup>',
+                      title: t( 'part2.cohort.comprehensive' ),
                       type: model.inputList.comprehensive.type,
                       enumList: model.metadata.yesNoEnumList[model.viewModel.record.lang],
                       help: t( 'part2.cohort.comprehensiveHelp' )
@@ -1005,6 +1008,7 @@
                           enumList: model.metadata.accessEnumList[model.viewModel.record.lang],
                           help: t( 'part2.e.specialDataNote' )
                         }"
+                        no-help-indicator="true"
                         difference="model.viewModel.compareRecord.differences.part2.e.cimt"
                         model="model">
                       </cn-reqn-view-input>
@@ -1027,6 +1031,7 @@
                           enumList: model.metadata.accessEnumList[model.viewModel.record.lang],
                           help: t( 'part2.e.specialDataNote' )
                         }"
+                        no-help-indicator="true"
                         difference="model.viewModel.compareRecord.differences.part2.e.dxa"
                         model="model">
                       </cn-reqn-view-input>
@@ -1091,6 +1096,7 @@
                           enumList: model.metadata.accessEnumList[model.viewModel.record.lang],
                           help: t( 'part2.e.specialDataNote' )
                         }"
+                        no-help-indicator="true"
                         difference="model.viewModel.compareRecord.differences.part2.e.spirometry"
                         model="model">
                       </cn-reqn-view-input>
@@ -1139,6 +1145,7 @@
                           type: model.inputList.fsa.type,
                           enumList: model.metadata.accessEnumList[model.viewModel.record.lang]
                         }"
+                        no-help-indicator="true"
                         difference="model.viewModel.compareRecord.differences.part2.e.fsa"
                         model="model">
                       </cn-reqn-view-input>
@@ -1160,6 +1167,7 @@
                           type: model.inputList.csd.type,
                           enumList: model.metadata.accessEnumList[model.viewModel.record.lang]
                         }"
+                        no-help-indicator="true"
                         difference="model.viewModel.compareRecord.differences.part2.e.csd"
                         model="model">
                       </cn-reqn-view-input>

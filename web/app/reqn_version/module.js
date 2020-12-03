@@ -145,6 +145,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
           model: '=',
           difference: '=',
           input: '=',
+          noHelpIndicator: '=',
           noCols: '='
         },
         controller: [ '$scope', function( $scope ) {
