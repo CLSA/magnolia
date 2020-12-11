@@ -1,12 +1,9 @@
 <cn-record-view model="model"></cn-record-view>
-<div class="vertical-spacer" ng-repeat="child in model.module.children">
-  <cn-record-list
-    ng-if="!model.viewModel.record.external &&
-           model.viewModel[child.subject.camel+'Model'] && (
-             'ethicsApproval' != child.subject.camel ||
-             model.viewModel.record.has_ethics_approval_list
-           )"
-    disable-empty-to-end="true"
-    model="model.viewModel[child.subject.camel+'Model']">
-  </cn-record-list>
+<div ng-if="!model.viewModel.record.external">
+  <cn-list-selector model="model"></cn-list-selector>
+  <div ng-show="null === model.viewModel.tab || child.subject.snake == model.viewModel.tab"
+       ng-repeat="child in model.viewModel.getChildList()"
+       class="vertical-spacer">
+    <cn-record-list disable-empty-to-end="true" model="model.viewModel[child.subject.camel+'Model']"></cn-record-list>
+  </div>
 </div>

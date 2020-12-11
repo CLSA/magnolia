@@ -696,7 +696,7 @@ define( function() {
               CnModalMessageFactory, CnModalConfirmFactory, CnModalNoticeListFactory, $window, $state, $q ) {
       var object = function( parentModel, root ) {
         var self = this;
-        CnBaseViewFactory.construct( this, parentModel, root );
+        CnBaseViewFactory.construct( this, parentModel, root, 'stage' );
 
         this.deferred.promise.then( function() {
           if( angular.isDefined( self.stageModel ) ) self.stageModel.listModel.heading = 'Stage History';
@@ -1058,6 +1058,17 @@ define( function() {
                 noticeList: response.data
               } ).printMessage();
             } );
+          },
+
+          getChildList: function() {
+            var list = this.$$getChildList();
+
+            // remove the ethics approval item if this reqn has no ethics approval list
+            if( !this.record.has_ethics_approval_list ) {
+              list = list.filter( child => 'ethics_approval' != child.subject.snake );
+            }
+
+            return list;
           }
 
         } );
