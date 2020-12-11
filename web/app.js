@@ -116,7 +116,7 @@ cenozo.service( 'CnReqnHelper', [
           return ( 'applicant' == role || 'administrator' == role ) &&
                  ( 'new' == phase || 'deferred' == state );
         } else if( 'view' == subject ) {
-          return 'applicant' != role && 'typist' != role;
+          return 'applicant' != role;
         } else if( 'abandon' == subject ) {
           return '.' == record.amendment ?
                  // non-amendment process

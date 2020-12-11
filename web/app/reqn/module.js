@@ -1106,7 +1106,7 @@ define( function() {
             return this.$$getEditEnabled() && (
               'applicant' == CnSession.role.name ?
               'new' == phase || ( 'deferred' == state && 'review' == phase ) :
-              ['administrator','communication'].includes( CnSession.role.name )
+              ['administrator','communication','typist'].includes( CnSession.role.name )
             );
           },
 
