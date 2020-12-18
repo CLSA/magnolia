@@ -149,7 +149,7 @@ define( [ 'data_option' ].reduce( function( list, name ) {
                 path: 'data_option',
                 data: {
                   select: { column: [ 'id', 'name_en' ] },
-                  modifier: { order: 'data_option.rank' }
+                  modifier: { order: 'data_option.rank', limit: 1000 }
                 }
               } ).query().then( function success( response ) {
                 self.metadata.columnList.data_option_id.enumList = [];
@@ -166,7 +166,8 @@ define( [ 'data_option' ].reduce( function( list, name ) {
                   select: { column: [ 'id', 'name' ] },
                   modifier: {
                     where: { column: 'study.name', operator: '=', value: 'CLSA' },
-                    order: 'name'
+                    order: 'name',
+                    limit: 1000
                   }
                 }
               } ).query().then( function success( response ) {

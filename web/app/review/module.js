@@ -263,7 +263,7 @@ define( function() {
               path: 'recommendation_type',
               data: {
                 select: { column: [ 'id', 'name', 'review_type_id_list' ] },
-                modifier: { order: 'id' }
+                modifier: { order: 'id', limit: 1000 }
               }
             } ).query().then( function success( response ) { 
               self.metadata.columnList.recommendation_type_id = { 

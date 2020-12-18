@@ -1183,7 +1183,7 @@ define( function() {
                   path: 'reqn_type',
                   data: {
                     select: { column: [ 'id', 'name' ] },
-                    modifier: { order: 'name' }
+                    modifier: { order: 'name', limit: 1000 }
                   }
                 } ).query().then( function success( response ) {
                   self.metadata.columnList.reqn_type_id.enumList = [];
@@ -1199,7 +1199,7 @@ define( function() {
                   path: 'deadline',
                   data: {
                     select: { column: [ 'id', 'name' ] },
-                    modifier: { order: 'date', desc: true }
+                    modifier: { order: 'date', desc: true, limit: 1000 }
                   }
                 } ).query().then( function success( response ) {
                   self.metadata.columnList.deadline_id.enumList = [];
@@ -1217,7 +1217,8 @@ define( function() {
                     select: { column: [ 'id', 'name' ] },
                     modifier: {
                       where: { column: 'active', operator: '=', value: true },
-                      order: 'name'
+                      order: 'name',
+                      limit: 1000
                     }
                   }
                 } ).query().then( function success( response ) {

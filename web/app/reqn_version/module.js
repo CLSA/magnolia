@@ -890,7 +890,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
               path: basePath + '/amendment_type',
               data: {
                 select: { column: [ 'id' ] },
-                modifier: { order: 'id', limit: 1000000 }
+                modifier: { order: 'id', limit: 1000 }
               }
             } ).query().then( function( response ) {
               response.data.forEach( function( row ) {
@@ -950,7 +950,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
               path: basePath + '/coapplicant',
               data: {
                 select: { column: [ 'id', 'name', 'position', 'affiliation', 'email', 'role', 'access' ] },
-                modifier: { order: 'id', limit: 1000000 }
+                modifier: { order: 'id', limit: 1000 }
               }
             } ).query().then( function( response ) {
               object.coapplicantList = response.data;
@@ -994,7 +994,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
               path: basePath + '/reference',
               data: {
                 select: { column: [ 'id', 'rank', 'reference' ] },
-                modifier: { order: 'rank', limit: 1000000 }
+                modifier: { order: 'rank', limit: 1000 }
               }
             } ).query().then( function( response ) {
               object.referenceList = response.data;
@@ -1023,7 +1023,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
               path: [ 'reqn', self.record.reqn_id, 'ethics_approval' ].join( '/' ),
               data: {
                 select: { column: [ 'id', 'filename', 'date', 'one_day_old' ] },
-                modifier: { order: { date: true }, limit: 1000000 }
+                modifier: { order: { date: true }, limit: 1000 }
               }
             } ).query().then( function( response ) {
               self.record.ethicsApprovalList = response.data;
@@ -1778,7 +1778,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                     'condition_en', 'condition_fr',
                     'note_en', 'note_fr'
                   ] },
-                  modifier: { order: 'rank', limit: 1000000 }
+                  modifier: { order: 'rank', limit: 1000 }
                 }
               } ).query().then( function( response ) {
                 var letter = 'a';
@@ -1808,7 +1808,10 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                       'bl',
                       'f1'
                     ] },
-                    modifier: { order: [ 'data_option_category_id', 'data_option.rank' ], limit: 1000000 }
+                    modifier: {
+                      order: [ 'data_option_category_id', 'data_option.rank' ],
+                      limit: 1000
+                    }
                   }
                 } ).query().then( function( response ) {
                   var category = null;
@@ -1837,7 +1840,10 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                         table: 'data_option',
                         column: 'data_option_category_id'
                       } ] },
-                      modifier: { order: [ 'data_option_id', 'study_phase_id', 'data_option_detail.rank' ], limit: 1000000 }
+                      modifier: {
+                        order: [ 'data_option_id', 'study_phase_id', 'data_option_detail.rank' ],
+                        limit: 1000
+                      }
                     }
                   } ).query().then( function( response ) {
                     var category = null;

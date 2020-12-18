@@ -146,7 +146,7 @@ define( function() {
               path: 'data_version',
               data: {
                 select: { column: [ 'id', 'name' ] },
-                modifier: { order: 'name' }
+                modifier: { order: 'name', limit: 1000 }
               }
             } ).query().then( function success( response ) {
               self.metadata.columnList.data_version_id.enumList = [];
