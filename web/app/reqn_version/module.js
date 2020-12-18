@@ -508,9 +508,9 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
 
           onView: function( force ) {
             // reset tab values
-            this.setTab( 0, this.parentModel.getQueryParameter( 't0' ), false );
-            this.setTab( 1, this.parentModel.getQueryParameter( 't1' ), false );
-            this.setTab( 2, this.parentModel.getQueryParameter( 't2' ), false );
+            this.setFormTab( 0, this.parentModel.getQueryParameter( 't0' ), false );
+            this.setFormTab( 1, this.parentModel.getQueryParameter( 't1' ), false );
+            this.setFormTab( 2, this.parentModel.getQueryParameter( 't2' ), false );
 
             // reset compare version and differences
             this.compareRecord = null;
@@ -650,7 +650,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
           },
 
           // the sequencial list of all tabs where every item has an array of the three indexed tab values
-          tab: [],
+          formTab: [],
           tabSectionList: [
             [ 'instructions', null, null ],
             [ 'part1', 'a', null ],
@@ -670,7 +670,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
             [ 'agreement', null, null ]
           ],
 
-          setTab: function( index, tab, transition ) {
+          setFormTab: function( index, tab, transition ) {
             if( angular.isUndefined( transition ) ) transition = true;
             if( !( 0 <= index && index <= 2 ) ) index = 0;
 
@@ -688,7 +688,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                 ? selectedTabSection[index]
                 : ( 0 == index ? 'instructions' : 1 == index ? 'a' : 'notes' );
 
-            self.tab[index] = tab;
+            self.formTab[index] = tab;
             self.parentModel.setQueryParameter( 't'+index, tab );
 
             if( transition ) this.parentModel.reloadState( false, false, 'replace' );
@@ -702,9 +702,9 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
 
             var currentTabSectionIndex = null;
             this.tabSectionList.some( function( tabSection, index ) {
-              if( self.tab[0] == tabSection[0] ) {
-                if( ( null == tabSection[1] || self.tab[1] == tabSection[1] ) &&
-                    ( null == tabSection[2] || self.tab[2] == tabSection[2] ) ) {
+              if( self.formTab[0] == tabSection[0] ) {
+                if( ( null == tabSection[1] || self.formTab[1] == tabSection[1] ) &&
+                    ( null == tabSection[2] || self.formTab[2] == tabSection[2] ) ) {
                   currentTabSectionIndex = index;
                   return true;
                 }
@@ -719,9 +719,9 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                 tabSection = this.tabSectionList[currentTabSectionIndex + (reverse?-2:2)];
 
               if( angular.isDefined( tabSection ) ) {
-                if( null != tabSection[2] ) this.setTab( 2, tabSection[2], false );
-                if( null != tabSection[1] ) this.setTab( 1, tabSection[1], false );
-                this.setTab( 0, tabSection[0] );
+                if( null != tabSection[2] ) this.setFormTab( 2, tabSection[2], false );
+                if( null != tabSection[1] ) this.setFormTab( 1, tabSection[1], false );
+                this.setFormTab( 0, tabSection[0] );
               }
             }
           },
@@ -1261,8 +1261,8 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                       var element = cenozo.getFormElement( 'start_date' );
                       element.$error.custom = self.translate( 'misc.invalidStartDateTitle' );
                       cenozo.updateFormElement( element, true );
-                      self.setTab( 0, 'part1', false );
-                      self.setTab( 1, 'c' );
+                      self.setFormTab( 0, 'part1', false );
+                      self.setFormTab( 1, 'c' );
                     } );
                   } else CnModalMessageFactory.httpError( response );
                 }
@@ -1430,14 +1430,14 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                       if( 'applicant' == CnSession.role.name ) error.closeText = self.translate( 'misc.close' );
                       CnModalMessageFactory.instance( error ).show().then( function() {
                         if( 'amendment' == errorTab ) {
-                          self.setTab( 0, 'amendment', false );
+                          self.setFormTab( 0, 'amendment', false );
                         } else {
                           if( 1 == errorTab.substr( 0, 1 ) ) {
-                            self.setTab( 0, 'part1', false );
-                            self.setTab( 1, errorTab.substr( 1 ) );
+                            self.setFormTab( 0, 'part1', false );
+                            self.setFormTab( 1, errorTab.substr( 1 ) );
                           } else {
-                            self.setTab( 0, 'part2', false );
-                            self.setTab( 2, errorTab.substr( 1 ) );
+                            self.setFormTab( 0, 'part2', false );
+                            self.setFormTab( 2, errorTab.substr( 1 ) );
                           }
                         }
                       } );

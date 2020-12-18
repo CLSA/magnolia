@@ -178,7 +178,7 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
             // we need to do some extra work when looking at the final_report form
             if( 'final_report' == this.parentModel.getSubjectFromState() && 'form' == this.parentModel.getActionFromState() ) {
               // reset tab value
-              this.setTab( this.parentModel.getQueryParameter( 't' ), false );
+              this.setFormTab( this.parentModel.getQueryParameter( 't' ), false );
 
               return $q.all( [
                 this.$$onView( force ),
@@ -203,12 +203,12 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
           productionList: [],
           productionTypeList: { en: [ { value: '', name: misc.choose.en } ], fr: [ { value: '', name: misc.choose.fr } ] },
 
-          tab: '',
+          formTab: '',
           tabSectionList: ['instructions','part1','part2','part3'],
-          setTab: function( tab, transition ) {
+          setFormTab: function( tab, transition ) {
             if( angular.isUndefined( transition ) ) transition = true;
             if( !this.tabSectionList.includes( tab ) ) tab = 'instructions';
-            this.tab = tab;
+            this.formTab = tab;
             this.parentModel.setQueryParameter( 't', tab );
             if( transition ) this.parentModel.reloadState( false, false, 'replace' );
 
@@ -219,10 +219,10 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
           nextSection: function( reverse ) {
             if( angular.isUndefined( reverse ) ) reverse = false;
 
-            var currentTabSectionIndex = this.tabSectionList.indexOf( this.tab );
+            var currentTabSectionIndex = this.tabSectionList.indexOf( this.formTab );
             if( null != currentTabSectionIndex ) {
               var tabSection = this.tabSectionList[currentTabSectionIndex + (reverse?-1:1)];
-              if( angular.isDefined( tabSection ) ) this.setTab( tabSection );
+              if( angular.isDefined( tabSection ) ) this.setFormTab( tabSection );
             }
           },
 

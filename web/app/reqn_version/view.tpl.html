@@ -96,8 +96,8 @@
   </div>
   <div class="container-fluid" style="padding-top: 1em;">
     <ul class="nav nav-tabs">
-      <li ng-class="{'active':'instructions'==model.viewModel.tab[0]}">
-        <a ng-click="model.viewModel.setTab(0,'instructions')"
+      <li ng-class="{'active':'instructions'==model.viewModel.formTab[0]}">
+        <a ng-click="model.viewModel.setFormTab(0,'instructions')"
            ng-class="{
              'text-warning flashing': model.getEditEnabled() && (
                model.viewModel.record.deferral_note_amendment
@@ -106,8 +106,8 @@
            }"
            ng-bind-html="t( 'instructions.tab' )"></a>
       </li>
-      <li ng-class="{'active':'part1'==model.viewModel.tab[0]}">
-        <a ng-click="model.viewModel.setTab(0,'part1')"
+      <li ng-class="{'active':'part1'==model.viewModel.formTab[0]}">
+        <a ng-click="model.viewModel.setFormTab(0,'part1')"
            ng-class="{
              'text-warning flashing': model.getEditEnabled() && (
                model.viewModel.record.deferral_note_1a || model.viewModel.record.deferral_note_1b ||
@@ -118,8 +118,8 @@
            }"
            ng-bind-html="t( 'part1.tab' )"></a>
       </li>
-      <li ng-class="{'active':'part2'==model.viewModel.tab[0]}">
-        <a ng-click="model.viewModel.setTab(0,'part2')"
+      <li ng-class="{'active':'part2'==model.viewModel.formTab[0]}">
+        <a ng-click="model.viewModel.setFormTab(0,'part2')"
            ng-class="{
              'text-warning flashing': model.getEditEnabled() && (
                model.viewModel.record.deferral_note_2a || model.viewModel.record.deferral_note_2b ||
@@ -130,14 +130,14 @@
            }"
            ng-bind-html="t( 'part2.tab' )"></a>
       </li>
-      <li ng-class="{'active':'part3'==model.viewModel.tab[0]}">
-        <a ng-click="model.viewModel.setTab(0,'part3')" ng-bind-html="t( 'part3.tab' )"></a>
+      <li ng-class="{'active':'part3'==model.viewModel.formTab[0]}">
+        <a ng-click="model.viewModel.setFormTab(0,'part3')" ng-bind-html="t( 'part3.tab' )"></a>
       </li>
-      <li ng-class="{'active':'agreement'==model.viewModel.tab[0]}" ng-if="model.viewModel.showAgreement()">
-        <a ng-click="model.viewModel.setTab(0,'agreement')">Agreement</a>
+      <li ng-class="{'active':'agreement'==model.viewModel.formTab[0]}" ng-if="model.viewModel.showAgreement()">
+        <a ng-click="model.viewModel.setFormTab(0,'agreement')">Agreement</a>
       </li>
     </ul>
-    <div ng-show="'instructions'==model.viewModel.tab[0]" class="panel panel-default" style="border-top-left-radius: 0px;">
+    <div ng-show="'instructions'==model.viewModel.formTab[0]" class="panel panel-default" style="border-top-left-radius: 0px;">
       <div class="panel-body" style="padding-bottom: 0px;" ng-if="'.' == model.viewModel.record.amendment">
         <h4 ng-bind-html="t( 'instructions.title' )"></h4>
         <ul class="list-group">
@@ -205,14 +205,14 @@
         </fieldset></form>
       </div>
     </div>
-    <div ng-show="'part1'==model.viewModel.tab[0]" class="panel panel-default">
+    <div ng-show="'part1'==model.viewModel.formTab[0]" class="panel panel-default">
       <div class="panel-body" style="padding-bottom: 0px;">
         <h4 style="margin-top: 0; margin-bottom: 1em;" ng-bind-html="t( 'part1.title' )"></h4>
         <ul class="nav nav-tabs">
           <li ng-repeat="section in model.viewModel.tabSectionList"
               ng-if="'part1' == section[0]"
-              ng-class="{'active':section[1] == model.viewModel.tab[1]}">
-            <a ng-click="model.viewModel.setTab(1,section[1])"
+              ng-class="{'active':section[1] == model.viewModel.formTab[1]}">
+            <a ng-click="model.viewModel.setFormTab(1,section[1])"
                ng-class="{
                  'text-warning flashing':model.getEditEnabled() && model.viewModel.record['deferral_note_1'+section[1]],
                  'bg-warning': model.viewModel.compareRecord.differences.part1[section[1]].diff
@@ -220,7 +220,7 @@
                ng-bind-html="t( 'part1.'+section[1]+'.tab' )"></a>
           </li>
         </ul>
-        <div ng-show="'a'==model.viewModel.tab[1]" class="panel panel-default" style="border-top-left-radius: 0px;">
+        <div ng-show="'a'==model.viewModel.formTab[1]" class="panel panel-default" style="border-top-left-radius: 0px;">
           <div class="panel-body">
             <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_1a" class="bg-info"></cn-reqn-deferral-note>
             <p class="text-primary" ng-bind-html="t( 'part1.a.text1' )"></p>
@@ -369,7 +369,7 @@
             </fieldset></form>
           </div>
         </div>
-        <div ng-show="'b'==model.viewModel.tab[1]" class="panel panel-default">
+        <div ng-show="'b'==model.viewModel.formTab[1]" class="panel panel-default">
           <div class="panel-body">
             <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_1b"></cn-reqn-deferral-note>
             <p class="text-primary" ng-bind-html="t( 'part1.b.text' )"></p>
@@ -516,7 +516,7 @@
             </div>
           </div>
         </div>
-        <div ng-show="'c'==model.viewModel.tab[1]" class="panel panel-default">
+        <div ng-show="'c'==model.viewModel.formTab[1]" class="panel panel-default">
           <div class="panel-body">
             <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_1c"></cn-reqn-deferral-note>
             <p class="text-primary" ng-bind-html="t( 'part1.c.text1' ) + startDateDelay + t( 'part1.c.text2' )"></p>
@@ -564,7 +564,7 @@
             </fieldset></form>
           </div>
         </div>
-        <div ng-show="'d'==model.viewModel.tab[1]" class="panel panel-default">
+        <div ng-show="'d'==model.viewModel.formTab[1]" class="panel panel-default">
           <div class="panel-body">
             <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_1d"></cn-reqn-deferral-note>
             <p class="text-primary" ng-bind-html="t( 'part1.d.text1' )"></p>
@@ -747,7 +747,7 @@
             </fieldset></form>
           </div>
         </div>
-        <div ng-show="'e'==model.viewModel.tab[1]" class="panel panel-default">
+        <div ng-show="'e'==model.viewModel.formTab[1]" class="panel panel-default">
           <div class="panel-body">
             <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_1e"></cn-reqn-deferral-note>
             <p class="text-primary" ng-bind-html="t( 'part1.e.text' )"></p>
@@ -800,7 +800,7 @@
             </fieldset></form>
           </div>
         </div>
-        <div ng-show="'f'==model.viewModel.tab[1]" class="panel panel-default">
+        <div ng-show="'f'==model.viewModel.formTab[1]" class="panel panel-default">
           <div class="panel-body">
             <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_1f"></cn-reqn-deferral-note>
             <p class="text-primary" ng-bind-html="t( 'part1.f.text' )"></p>
@@ -898,14 +898,14 @@
         </div>
       </div>
     </div>
-    <div ng-show="'part2'==model.viewModel.tab[0]" class="panel panel-default">
+    <div ng-show="'part2'==model.viewModel.formTab[0]" class="panel panel-default">
       <div class="panel-body" style="padding-bottom: 0px;">
         <h4 style="margin-top: 0; margin-bottom: 1em;" ng-bind-html="t( 'part2.title' )"></h4>
         <ul class="nav nav-tabs">
           <li ng-repeat="section in model.viewModel.tabSectionList"
               ng-if="'part2' == section[0]"
-              ng-class="{'active':section[2] == model.viewModel.tab[2]}">
-            <a ng-click="model.viewModel.setTab(2,section[2])"
+              ng-class="{'active':section[2] == model.viewModel.formTab[2]}">
+            <a ng-click="model.viewModel.setFormTab(2,section[2])"
                ng-class="{
                  'text-warning flashing':model.getEditEnabled() && model.viewModel.record['deferral_note_2'+section[2]],
                  'bg-warning': model.viewModel.compareRecord.differences.part2[section[2]].diff
@@ -913,7 +913,7 @@
                ng-bind-html="t( 'part2.'+section[2]+'.tab' )"></a>
           </li>
         </ul>
-        <div ng-show="'notes'==model.viewModel.tab[2]" class="panel panel-default" style="border-top-left-radius: 0px;">
+        <div ng-show="'notes'==model.viewModel.formTab[2]" class="panel panel-default" style="border-top-left-radius: 0px;">
           <div class="panel-body" style="padding-bottom: 0px;">
             <ul class="list-group">
               <li class="list-group-item" ng-bind-html="t( 'part2.notes.text1' )"></li>
@@ -923,7 +923,7 @@
             </ul>
           </div>
         </div>
-        <div ng-show="'cohort'==model.viewModel.tab[2]" class="panel panel-default" style="border-top-left-radius: 0px;">
+        <div ng-show="'cohort'==model.viewModel.formTab[2]" class="panel panel-default" style="border-top-left-radius: 0px;">
           <div class="panel-body" style="padding-bottom: 0px;">
             <form ng-attr-id="part2CohortForm" ng-attr-name="part2CohortForm" novalidate>
               <p class="text-primary" ng-bind-html="t( 'part2.cohort.text1' )"></p>
@@ -988,7 +988,7 @@
         </div>
         <div ng-repeat="part in ['a','b','c','d','e']"
              ng-init="partIndex = $index"
-             ng-show="part==model.viewModel.tab[2]"
+             ng-show="part==model.viewModel.formTab[2]"
              class="panel panel-default">
           <div class="panel-body">
             <form ng-attr-id="part2{{ part }}Form" ng-attr-name="part2{{ part }}Form" novalidate>
@@ -1292,13 +1292,13 @@
         </div>
       </div>
     </div>
-    <div ng-show="'part3'==model.viewModel.tab[0]" class="panel panel-default">
+    <div ng-show="'part3'==model.viewModel.formTab[0]" class="panel panel-default">
       <div class="panel-body" style="padding-bottom: 0px;">
         <h4 style="margin-top: 0; margin-bottom: 1em;" ng-bind-html="t( 'part3.title' )"></h4>
         <p class="text-primary" ng-bind-html="t( 'part3.text' )"></p>
       </div>
     </div>
-    <div ng-show="'agreement'==model.viewModel.tab[0]" class="panel panel-default" ng-if="model.viewModel.showAgreement()">
+    <div ng-show="'agreement'==model.viewModel.formTab[0]" class="panel panel-default" ng-if="model.viewModel.showAgreement()">
       <div class="panel-body" style="padding-bottom: 0px;">
         <h4 style="margin-top: 0; margin-bottom: 1em;">Agreement Details</h4>
         <form id="agreementForm" name="agreementForm" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
@@ -1346,12 +1346,12 @@
   </div>
   <div class="form-footer text-right rounded-bottom bg-info" style="height:4.6em;">
     <button class="btn btn-primary pull-left"
-            ng-if="'instructions' != model.viewModel.tab[0]"
+            ng-if="'instructions' != model.viewModel.formTab[0]"
             ng-click="model.viewModel.nextSection( true )"
             ng-bind-html="'<i class=\'glyphicon glyphicon-arrow-left\'></i> ' + t( 'misc.prevButton' )">
     </button>
     <button class="btn btn-primary"
-            ng-if="'part3' != model.viewModel.tab[0]"
+            ng-if="'part3' != model.viewModel.formTab[0]"
             ng-click="model.viewModel.nextSection( false )"
             ng-bind-html="t( 'misc.nextButton' ) + ' <i class=\'glyphicon glyphicon-arrow-right\'></i>'">
     </button>
