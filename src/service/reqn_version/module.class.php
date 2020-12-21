@@ -70,7 +70,7 @@ class module extends \cenozo\service\module
     if( $select->has_columns( 'has_agreement_filename' ) )
       $select->add_column( 'agreement_filename IS NOT NULL', 'has_agreement_filename', true, 'boolean' );
 
-    if( $select->has_table_columns( 'stage' ) || $select->has_table_columns( 'stage_type' ) ) 
+    if( $select->has_table_columns( 'stage' ) || $select->has_table_columns( 'stage_type' ) )
     {
       $join_mod = lib::create( 'database\modifier' );
       $join_mod->where( 'reqn.id', '=', 'stage.reqn_id', false );
@@ -103,6 +103,27 @@ class module extends \cenozo\service\module
       // include the user first/last/name as supplemental data
       $modifier->left_join( 'user', 'reqn_version.new_user_id', 'new_user.id', 'new_user' );
       $select->add_column( 'CONCAT( new_user.first_name, " ", new_user.last_name )', 'formatted_new_user_id', false );
+
+      if( $select->has_columns( 'has_unread_notice' ) )
+      {
+        // check if the most recent notice does not include the current user
+        $notice_mod = lib::create( 'database\modifier' );
+        $notice_mod->order_desc( 'datetime' );
+        $notice_mod->limit( 1 );
+        $notice_list = $db_reqn_version->get_reqn()->get_notice_object_list( $notice_mod );
+
+        $unread = false;
+        if( 0 < count( $notice_list ) )
+        {
+          $db_user = lib::create( 'business\session' )->get_user();
+          $db_notice = current( $notice_list );
+          $user_mod = lib::create( 'database\modifier' );
+          $user_mod->where( 'user.id', '=', $db_user->id );
+          if( 0 == $db_notice->get_user_count( $user_mod ) ) $unread = true;
+        }
+
+        $select->add_constant( $unread, 'has_unread_notice', 'boolean' );
+      }
 
       if( $select->has_column( 'has_ethics_approval_list' ) )
       {

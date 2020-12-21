@@ -104,6 +104,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
     state: { column: 'reqn.state', type: 'string' },
     data_directory: { column: 'reqn.data_directory', type: 'string' },
     status: { column: 'stage_type.status', type: 'string' },
+    has_unread_notice: { type: 'boolean' },
     has_ethics_approval_list: { type: 'boolean' },
     stage_type: { column: 'stage_type.name', type: 'string' },
     phase: { column: 'stage_type.phase', type: 'string' },
@@ -196,11 +197,8 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
           scope.model.viewModel.afterView( function() {
             var record = scope.model.viewModel.record;
 
-            // display the decision notice to the applicant under specific circumstances
-            if( 'applicant' == CnSession.role.name &&
-                [ 'Suggested Revisions', 'Data Release', 'Agreement', 'Not Approved' ].includes( record.stage_type ) ) {
-              scope.model.viewModel.displayDecisionNotice();
-            }
+            // display notices to the applicant if they've never seen it
+            if( 'applicant' == CnSession.role.name && record.has_unread_notice ) scope.model.viewModel.displayNotices();
           } );
 
           // fill in the start date delay
@@ -1507,7 +1505,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
             return this.parentModel.transitionToParentViewState( parent.subject, parent.identifier );
           },
 
-          displayDecisionNotice: function() {
+          displayNotices: function() {
             var noticeList = [];
             return CnHttpFactory.instance( {
               path: '/reqn/identifier=' + this.record.identifier + '/notice',

@@ -16,6 +16,7 @@ SOURCE pdf_form.sql
 SOURCE stage.sql
 SOURCE data_option.sql
 SOURCE data_option_category.sql
+SOURCE notice_has_user.sql
 
 SOURCE update_version_number.sql
 

@@ -17,7 +17,9 @@ define( function() {
     columnList: {
       identifier: { column: 'reqn.identifier', title: 'Requisition' },
       datetime: { title: 'Date & Time', type: 'datetime' },
-      title: { title: 'Title' }
+      title: { title: 'Title' },
+      viewed_by_user: { title: 'Primary Viewed', type: 'boolean' },
+      viewed_by_trainee_user: { title: 'Trainee Viewed', type: 'boolean' }
     },
     defaultOrder: {
       column: 'datetime',
@@ -33,12 +35,26 @@ define( function() {
     },
     title: {
       title: 'Title',
-      type: 'text'
+      type: 'string'
+    },
+    viewed_by_user: {
+      title: 'Viewed by Primary Applicant',
+      type: 'boolean',
+      isExcluded: 'add'
+    },
+    viewed_by_trainee_user: {
+      title: 'Viewed by Trainee',
+      type: 'boolean',
+      isExcluded: function( $state, model ) {
+        return 'add' == model.getActionFromState() ? true : null == model.viewModel.record.trainee_user_id;
+      }
     },
     description: {
       title: 'Description',
       type: 'text'
-    }
+    },
+    user_id: { column: 'reqn.user_id', type: 'hidden' },
+    trainee_user_id: { column: 'reqn.trainee_user_id', type: 'hidden' },
   } );
 
   /* ######################################################################################################## */
@@ -106,23 +122,62 @@ define( function() {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnNoticeViewFactory', [
-    'CnBaseViewFactory', 'CnReqnHelper', 'CnHttpFactory', 'CnSession',
-    function( CnBaseViewFactory, CnReqnHelper, CnHttpFactory, CnSession ) {
-      var object = function( parentModel, root ) { CnBaseViewFactory.construct( this, parentModel, root ); };
+    'CnBaseViewFactory', 'CnHttpFactory',
+    function( CnBaseViewFactory, CnHttpFactory ) {
+      var object = function( parentModel, root ) {
+        var self = this;
+        CnBaseViewFactory.construct( this, parentModel, root );
+
+        this.onPatch = function( data ) {
+          var promise = null;
+          if( angular.isDefined( data.viewed_by_user ) || angular.isDefined( data.viewed_by_trainee_user ) ) {
+            // handle the viewed-by data since it isn't a direct property of the notice record
+            var add = null;
+            var userId = null;
+
+            if( angular.isDefined( data.viewed_by_user ) ) {
+              add = data.viewed_by_user;
+              userId = self.record.user_id;
+            } else {
+              add = data.viewed_by_trainee_user;
+              userId = self.record.trainee_user_id;
+            }
+
+            promise = add ?
+              CnHttpFactory.instance( { path: self.parentModel.getServiceResourcePath() + '/user', data: userId } ).post() :
+              CnHttpFactory.instance( { path: self.parentModel.getServiceResourcePath() + '/user/' + userId } ).delete();
+          } else {
+            promise = self.$$onPatch( data );
+          }
+
+          return promise.then( function() { self.afterPatchFunctions.forEach( function( fn ) { fn(); } ) } );
+        };
+      };
       return { instance: function( parentModel, root ) { return new object( parentModel, root ); } };
     }
   ] );
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnNoticeModelFactory', [
-    'CnBaseModelFactory', 'CnNoticeAddFactory', 'CnNoticeListFactory', 'CnNoticeViewFactory', 'CnSession', 'CnHttpFactory',
-    function( CnBaseModelFactory, CnNoticeAddFactory, CnNoticeListFactory, CnNoticeViewFactory, CnSession, CnHttpFactory ) {
+    'CnBaseModelFactory', 'CnNoticeAddFactory', 'CnNoticeListFactory', 'CnNoticeViewFactory',
+    function( CnBaseModelFactory, CnNoticeAddFactory, CnNoticeListFactory, CnNoticeViewFactory ) {
       var object = function( root ) {
         var self = this;
         CnBaseModelFactory.construct( this, module );
         this.addModel = CnNoticeAddFactory.instance( this );
         this.listModel = CnNoticeListFactory.instance( this );
         this.viewModel = CnNoticeViewFactory.instance( this, root );
+
+        // extend getMetadata
+        this.getMetadata = function() {
+          return this.$$getMetadata().then( function() {
+            // fake the viewed-by columns
+            angular.extend( self.metadata.columnList, {
+              viewed_by_user: { data_type: 'tinyint', required: true },
+              viewed_by_trainee_user: { data_type: 'tinyint', required: true }
+            } );
+          } );
+        };
       };
 
       return {

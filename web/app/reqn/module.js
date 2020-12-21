@@ -543,7 +543,7 @@ define( function() {
       isDisabled: function( $state, model ) { return !model.viewModel.record.has_agreements; }
     }, {
       title: 'Notices',
-      operation: function( $state, model ) { model.viewModel.displayDecisionNotice(); }
+      operation: function( $state, model ) { model.viewModel.displayNotices(); }
     }, {
       title: 'Reviews',
       operation: function( $state, model ) { model.viewModel.downloadReviews(); }
@@ -800,7 +800,13 @@ define( function() {
               } );
             }
 
-            return this.$$onView( force );
+            return this.$$onView( force ).then( function() {
+              if( angular.isDefined( self.noticeModel ) ) {
+                self.noticeModel.columnList.viewed_by_trainee_user.isIncluded = null == self.record.trainee_user_id
+                                                                              ? function() { return false; }
+                                                                              : function() { return true; };
+              }
+            } );
           },
 
           onPatch: function( data ) {
@@ -1046,7 +1052,7 @@ define( function() {
             } );
           },
 
-          displayDecisionNotice: function() {
+          displayNotices: function() {
             var noticeList = [];
             return CnHttpFactory.instance( {
               path: this.parentModel.getServiceResourcePath() + '/notice',

@@ -31,7 +31,7 @@ class stage extends \cenozo\database\record
         if( is_null( $db_review->user_id ) )
           return 'Both reviewers must be selected before proceeding to the next stage.';
     }
-    else if( 'Decision Made' == $db_stage_type->name )
+    else if( 'Decision Made' == $db_stage_type->name || 'Data Release' == $db_stage_type->name )
     {
       // make sure that there is a recent notice (test against the datetime of the last stage)
       $stage_mod = lib::create( 'database\modifier' );
@@ -46,7 +46,9 @@ class stage extends \cenozo\database\record
       $notice_mod = lib::create( 'database\modifier' );
       $notice_mod->where( 'datetime', '>', $last_stage['datetime'] );
       if( 0 == $db_reqn->get_notice_count( $notice_mod ) )
-        return 'A new notice must be created before proceeding to the next stage.';
+        return 'Decision Made' == $db_stage_type->name ?
+          'A new notice outlining the decision must be created before proceeding to the next stage.' :
+          'A new notice outlining the released data must be created before proceeding to the next stage.';
     }
     else if( 'Agreement' == $db_stage_type->name )
     {

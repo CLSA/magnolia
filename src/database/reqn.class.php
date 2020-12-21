@@ -1077,6 +1077,29 @@ class reqn extends \cenozo\database\record
   }
 
   /**
+   * Marks all notices viewed by the given user
+   */
+  public function mark_notices_read_by_user( $type = 'primary' )
+  {
+    // get the notice list
+    $notice_sel = lib::create( 'database\select' );
+    $notice_sel->add_column( 'id' );
+    $notice_id_list = array();
+    foreach( $this->get_notice_list( $notice_sel ) as $notice ) $notice_id_list[] = $notice['id'];
+
+    $db_user = 'primary' == $type ? $this->get_user() : $this->get_trainee_user();
+    if( !is_null( $db_user ) ) $db_user->add_notice( $notice_id_list );
+  }
+
+  /**
+   * Convenience method
+   */
+  public function mark_notices_read_by_trainee()
+  {
+    $this->mark_notices_read_by_user( 'trainee' );
+  }
+
+  /**
    * Creates a unique directory for study data and returns the directory name
    * 
    * @access private
