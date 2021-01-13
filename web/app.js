@@ -105,7 +105,7 @@ cenozo.service( 'CnModalSubmitExternalFactory', [
 cenozo.service( 'CnReqnHelper', [
   'CnSession', 'CnHttpFactory', 'CnModalConfirmFactory', '$state',
   function( CnSession, CnHttpFactory, CnModalConfirmFactory, $state ) {
-    return {
+    var object = {
       showAction: function( subject, record ) {
         var role = CnSession.role.name;
         var phase = record.phase ? record.phase : '';
@@ -931,7 +931,24 @@ cenozo.service( 'CnReqnHelper', [
           }
         }
       }
-    }
+    };
+
+    // fill in dynamic content
+    object.promise = CnHttpFactory.instance( {
+      path: 'data_option_category',
+      data: {
+        select: { column: [ 'name_en', 'name_fr' ] },
+        modifier: { order: 'rank', limit: 1000 }
+      }
+    } ).query().then( function( response ) {
+      var letter = 'a'; 
+      response.data.forEach( function( cat ) {
+        object.lookupData.reqn.part2[letter].tab = { en: cat.name_en, fr: cat.name_fr };
+        letter = String.fromCharCode( letter.charCodeAt(0) + 1 );
+      } );
+    } );
+
+    return object;
   }
 ] );
 

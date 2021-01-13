@@ -1781,7 +1781,6 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                   modifier: { order: 'rank', limit: 1000 }
                 }
               } ).query().then( function( response ) {
-                var letter = 'a';
                 self.dataOptionCategoryList = response.data;
                 self.dataOptionCategoryList.forEach( function( dataOptionCategory ) {
                   dataOptionCategory.name = { en: dataOptionCategory.name_en, fr: dataOptionCategory.name_fr };
@@ -1791,9 +1790,6 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                   delete dataOptionCategory.note_en;
                   delete dataOptionCategory.note_fr;
                   dataOptionCategory.optionList = [];
-
-                  CnReqnHelper.lookupData.reqn.part2[letter].tab = dataOptionCategory.name;
-                  letter = String.fromCharCode( letter.charCodeAt(0) + 1 );
                 } );
 
                 return CnHttpFactory.instance( {
