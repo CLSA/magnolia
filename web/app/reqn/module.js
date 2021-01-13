@@ -310,77 +310,77 @@ define( function() {
       }
     },
     deferral_note_1a: {
-      title: 'Part1: A1',
+      title: '', // defined dynamically in the model
       type: 'text',
       isExcluded: function( $state, model ) {
         return 'view' == model.getActionFromState() ? model.viewModel.record.external : 'add';
       }
     },
     deferral_note_1b: {
-      title: 'Part1: A2',
+      title: '', // defined dynamically in the model
       type: 'text',
       isExcluded: function( $state, model ) {
         return 'view' == model.getActionFromState() ? model.viewModel.record.external : 'add';
       }
     },
     deferral_note_1c: {
-      title: 'Part1: A3',
+      title: '', // defined dynamically in the model
       type: 'text',
       isExcluded: function( $state, model ) {
         return 'view' == model.getActionFromState() ? model.viewModel.record.external : 'add';
       }
     },
     deferral_note_1d: {
-      title: 'Part1: A4',
+      title: '', // defined dynamically in the model
       type: 'text',
       isExcluded: function( $state, model ) {
         return 'view' == model.getActionFromState() ? model.viewModel.record.external : 'add';
       }
     },
     deferral_note_1e: {
-      title: 'Part1: A5',
+      title: '', // defined dynamically in the model
       type: 'text',
       isExcluded: function( $state, model ) {
         return 'view' == model.getActionFromState() ? model.viewModel.record.external : 'add';
       }
     },
     deferral_note_1f: {
-      title: 'Part1: A6',
+      title: '', // defined dynamically in the model
       type: 'text',
       isExcluded: function( $state, model ) {
         return 'view' == model.getActionFromState() ? model.viewModel.record.external : 'add';
       }
     },
     deferral_note_2a: {
-      title: 'Part2: Questionnaires',
+      title: '', // defined dynamically in the model
       type: 'text',
       isExcluded: function( $state, model ) {
         return 'view' == model.getActionFromState() ? model.viewModel.record.external : 'add';
       }
     },
     deferral_note_2b: {
-      title: 'Part2: Physical Assessment',
+      title: '', // defined dynamically in the model
       type: 'text',
       isExcluded: function( $state, model ) {
         return 'view' == model.getActionFromState() ? model.viewModel.record.external : 'add';
       }
     },
     deferral_note_2c: {
-      title: 'Part2: Biomarkers',
+      title: '', // defined dynamically in the model
       type: 'text',
       isExcluded: function( $state, model ) {
         return 'view' == model.getActionFromState() ? model.viewModel.record.external : 'add';
       }
     },
     deferral_note_2d: {
-      title: 'Part2: Genomics',
+      title: '', // defined dynamically in the model
       type: 'text',
       isExcluded: function( $state, model ) {
         return 'view' == model.getActionFromState() ? model.viewModel.record.external : 'add';
       }
     },
     deferral_note_2e: {
-      title: 'Part2: Linked Data',
+      title: '', // defined dynamically in the model
       type: 'text',
       isExcluded: function( $state, model ) {
         return 'view' == model.getActionFromState() ? model.viewModel.record.external : 'add';
@@ -1096,6 +1096,22 @@ define( function() {
         this.addModel = CnReqnAddFactory.instance( this );
         this.listModel = CnReqnListFactory.instance( this );
         this.viewModel = CnReqnViewFactory.instance( this, root );
+
+        CnReqnHelper.promise.then( function() {
+          module.inputGroupList.forEach( function( group ) {
+            if( 'Deferral Notes' == group.title ) {
+              for( var property in group.inputList ) {
+                if( group.inputList.hasOwnProperty( property ) ) {
+                  var parts = property.match( /deferral_note_([0-9]+)([a-z]+)/ );
+                  if( angular.isArray( parts ) ) {
+                    group.inputList[property].title =
+                      'Part ' + parts[1] + ': ' + CnReqnHelper.translate( 'reqn', 'part' + parts[1] + '.' + parts[2] + '.tab', 'en' );
+                  }
+                }
+              }
+            }
+          } )
+        } );
 
         angular.extend( this, {
 
