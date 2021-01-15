@@ -1319,7 +1319,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                     '1c': [ 'start_date', 'duration' ],
                     '1d': [ 'title', 'keywords', 'lay_summary', 'background', 'objectives', 'methodology', 'analysis' ],
                     '1e': [ 'funding', 'funding_filename', 'funding_agency', 'grant_number' ],
-                    '1f': [ 'ethics', 'ethics_filename' ],
+                    '1f': self.record.has_ethics_approval_list ? [ 'ethics' ] : [ 'ethics', 'ethics_filename' ],
                     '2cohort': [ 'tracking', 'comprehensive', 'longitudinal', 'last_identifier' ],
                     '2e': [
                       'cimt_justification', 'dxa_justification', 'ecg_justification', 'retinal_justification',
