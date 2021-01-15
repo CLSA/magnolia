@@ -83,20 +83,6 @@ class get extends \cenozo\service\downloadable
       $path = $this->get_downloadable_file_path();
       if( !is_null( $db_reqn ) && file_exists( $path ) ) $this->set_data( stat( $path )['size'] );
     }
-    else
-    {
-      parent::execute();
-
-      if( !$this->get_argument( 'download', false ) )
-      {
-        // add the next stage type
-        $db_reqn = $this->get_leaf_record();
-        $db_next_stage_type = $db_reqn->get_next_stage_type();
-
-        $data = $this->data;
-        $data['next_stage_type'] = is_null( $db_next_stage_type ) ? NULL : $db_next_stage_type->name;
-        $this->set_data( $data );
-      }
-    }
+    else parent::execute();
   }
 }

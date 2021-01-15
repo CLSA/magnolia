@@ -1,7 +1,207 @@
-<cn-record-view model="model"></cn-record-view>
-<cn-list-selector model="model"></cn-list-selector>
-<div ng-show="null === model.viewModel.tab || child.subject.snake == model.viewModel.tab"
-     ng-repeat="child in model.viewModel.getChildList()"
-     class="vertical-spacer">
-  <cn-record-list model="model.viewModel[child.subject.camel+'Model']"></cn-record-list>
+<div class="utility-view rounded" style="padding-bottom: 2em;" ng-if="!isComplete">
+  <cn-loading></cn-loading>
+</div>
+<div class="utility-view rounded" ng-if="isComplete">
+  <div class="container-fluid bg-primary rounded-top">
+    <h4>
+      <button class="btn btn-menu btn-header btn-info pull-right"
+              style="margin-top:-4px;"
+              ng-click="model.viewModel.toggleLanguage()">
+        {{ 'en'==model.viewModel.record.language ? 'Version française' : 'English Version' }}
+      </button>
+      <span ng-bind-html="t( 'heading' )"></span>
+    </h4>
+  </div>
+  <div class="container-fluid" style="margin-top: 1em;">
+    <ul class="nav nav-tabs nav-justified">
+      <li ng-class="{'active':'instructions'==model.viewModel.formTab}">
+        <a ng-click="model.viewModel.setFormTab('instructions')" ng-bind-html="t( 'instructions.tab' )"></a>
+      </li>
+      <li ng-class="{'active':'part1'==model.viewModel.formTab}">
+        <a ng-click="model.viewModel.setFormTab('part1')" ng-bind-html="t( 'part1.tab' )"></a>
+      </li>
+      <li ng-class="{'active':'part2'==model.viewModel.formTab}">
+        <a ng-click="model.viewModel.setFormTab('part2')" ng-bind-html="t( 'part2.tab' )"></a>
+      </li>
+      <li ng-class="{'active':'part3'==model.viewModel.formTab}">
+        <a ng-click="model.viewModel.setFormTab('part3')" ng-bind-html="t( 'part3.tab' )"></a>
+      </li>
+    </ul>
+    <div ng-if="'instructions'==model.viewModel.formTab"
+         class="panel panel-default"
+         style="border-top-left-radius: 0px;">
+      <div class="panel-body" style="padding-bottom: 0px;">
+        <h4 ng-bind-html="t( 'instructions.title' )"></h4>
+        <ul class="list-group">
+          <li class="list-group-item" ng-bind-html="t( 'instructions.text1' )"></li>
+          <li class="list-group-item" ng-bind-html="t( 'instructions.text2' )"></li>
+          <li class="list-group-item" ng-bind-html="t( 'instructions.text3' )"></li>
+          <li class="list-group-item" ng-bind-html="t( 'instructions.text4' )"></li>
+        </ul>
+      </div>
+    </div>
+    <div ng-if="'part1'==model.viewModel.formTab"
+         class="panel panel-default"
+         style="border-top-left-radius: 0px;">
+      <div class="panel-body">
+        <form name="part1Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
+          <div class="container-fluid vertical-spacer">
+            <h4 ng-bind-html="t( 'part1.a.question' )"></h4>
+            <cn-view-input
+              input="{ key: 'activities', title: t( 'part1.a.activities' ), type: 'text' }"
+              no-cols="true"
+              model="model"
+              state="$state">
+            </cn-view-input>
+            <cn-view-input
+              input="{ key: 'findings', title: t( 'part1.a.findings' ), type: 'text' }"
+              no-cols="true"
+              model="model"
+              state="$state">
+            </cn-view-input>
+            <cn-view-input
+              input="{ key: 'outcomes', title: t( 'part1.a.outcomes' ), type: 'text' }"
+              no-cols="true"
+              model="model"
+              state="$state">
+            </cn-view-input>
+          </div>
+          <div class="container-fluid vertical-spacer" ng-if="'graduate' == model.viewModel.record.waiver">
+            <h4 ng-bind-html="t( 'part1.b.question' )"></h4>
+            <p class="text-primary" ng-bind-html="t( 'part1.b.text' )"></p>
+            <cn-view-input
+              input="{ key: 'thesis_title', title: t( 'part1.b.thesis_title' ), type: 'text' }"
+              no-cols="true"
+              model="model"
+              state="$state">
+            </cn-view-input>
+            <cn-view-input
+              input="{ key: 'thesis_status', title: t( 'part1.b.thesis_status' ), type: 'text' }"
+              no-cols="true"
+              model="model"
+              state="$state">
+            </cn-view-input>
+          </div>
+        </fieldset></form>
+      </div>
+    </div>
+    <div ng-if="'part2'==model.viewModel.formTab"
+         class="panel panel-default"
+         style="border-top-left-radius: 0px;">
+      <div class="panel-body">
+        <form id="part2Form" name="part2Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
+          <div class="container-fluid">
+            <h4 ng-bind-html="t( 'part2.question' )"></h4>
+            <p class="text-primary" ng-bind-html="t( 'part2.text' )"></p>
+          </div>
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <span ng-show="0 == model.viewModel.productionList.length"
+                    ng-bind-html="t( 'part2.noProductions' )"></span>
+              <table class="table table-striped" ng-show="0 < model.viewModel.productionList.length">
+                <thead class="bg-info">
+                  <tr>
+                    <td ng-bind-html="t( 'part2.type' )"></td>
+                    <td ng-bind-html="t( 'part2.production' )"></td>
+                    <td ng-show="model.getEditEnabled()"></td>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr ng-repeat="production in model.viewModel.productionList | orderBy: 'rank'">
+                    <td>{{ production['name_'+model.viewModel.record.language] }}</td>
+                    <td class="text-left">{{ production.detail }}</td>
+                    <td ng-show="model.getEditEnabled()">
+                      <button class="btn btn-xs btn-danger"
+                              ng-disabled="isDeletingProduction.includes( production.id )"
+                              ng-click="removeProduction( production.id )"
+                              uib-tooltip-html="t( 'misc.remove' )">
+                        <i class="glyphicon glyphicon-remove"></i>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div ng-show="model.getEditEnabled()" class="form-horizontal">
+            <cn-add-input
+              input="{
+                key: 'production_type_id',
+                title: t( 'part2.productionType' ),
+                type: 'enum',
+                enumList: model.viewModel.productionTypeList[model.viewModel.record.language]
+              }"
+              record="productionRecord"
+              model="model.viewModel.productionModel"
+              first="true">
+            </cn-add-input>
+            <cn-add-input
+              input="{ key: 'detail', title: t( 'part2.details' ), type: 'string' }"
+              record="productionRecord"
+              model="model.viewModel.productionModel"
+              first="false">
+            </cn-add-input>
+            <div class="form-group" style="margin-top: -15px">
+              <div class="text-primary col-sm-offset-3 col-sm-9"
+                   ng-bind-html="model.viewModel.getProductionTypeNote( productionRecord.production_type_id )"></div>
+            </div>
+            <button class="btn btn-primary pull-right"
+                    ng-disabled="isAddingProduction"
+                    ng-click="addProduction()"
+                    ng-bind-html="t( 'part2.addProduction' )"></button>
+          </div>
+        </fieldset></form>
+      </div>
+    </div>
+    <div ng-if="'part3'==model.viewModel.formTab"
+         class="panel panel-default"
+         style="border-top-left-radius: 0px;">
+      <div class="panel-body">
+        <form name="part3Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
+          <div class="container-fluid vertical-spacer">
+            <h4 ng-bind-html="t( 'part3.a.question' )"></h4>
+            <p class="text-primary" ng-bind-html="t( 'part3.a.text' )"></p>
+            <cn-view-input
+              input="{ key: 'impact', title: '', type: 'text' }"
+              no-cols="true"
+              model="model"
+              state="$state">
+            </cn-view-input>
+          </div>
+          <div class="container-fluid vertical-spacer">
+            <h4 ng-bind-html="t( 'part3.b.question' )"></h4>
+            <p class="text-primary" ng-bind-html="t( 'part3.b.text' )"></p>
+            <cn-view-input
+              input="{ key: 'opportunities', title: '', type: 'text' }"
+              no-cols="true"
+              model="model"
+              state="$state">
+            </cn-view-input>
+          </div>
+          <div class="container-fluid vertical-spacer">
+            <h4 ng-bind-html="t( 'part3.c.question' )"></h4>
+            <p class="text-primary" ng-bind-html="t( 'part3.c.text' )"></p>
+            <cn-view-input
+              input="{ key: 'dissemination', title: '', type: 'text' }"
+              no-cols="true"
+              model="model"
+              state="$state">
+            </cn-view-input>
+          </div>
+        </fieldset></form>
+      </div>
+    </div>
+  </div>
+  <div class="form-footer text-right rounded-bottom bg-info" style="height:4.6em;">
+    <button class="btn btn-primary pull-left"
+            ng-if="'instructions' != model.viewModel.formTab"
+            ng-click="model.viewModel.nextSection( true )"
+            ng-bind-html="'<i class=\'glyphicon glyphicon-arrow-left\'></i> ' + t( 'misc.prevButton' )">
+    </button>
+    <button class="btn btn-primary"
+            ng-if="'part3' != model.viewModel.formTab"
+            ng-click="model.viewModel.nextSection( false )"
+            ng-bind-html="t( 'misc.nextButton' ) + ' <i class=\'glyphicon glyphicon-arrow-right\'></i>'">
+    </button>
+  </div>
 </div>

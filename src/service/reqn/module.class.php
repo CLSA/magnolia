@@ -255,6 +255,15 @@ class module extends \cenozo\service\module
     $db_reqn = $this->get_resource();
     if( $db_reqn )
     {
+      if( $select->has_column( 'next_stage_type' ) )
+      {
+        $db_next_stage_type = $db_reqn->get_next_stage_type();
+        $select->add_constant(
+          is_null( $db_next_stage_type ) ? NULL : $db_next_stage_type->name,
+          'next_stage_type'
+        );
+      }
+
       if( $select->has_column( 'has_ethics_approval_list' ) )
       {
         $select->add_constant(

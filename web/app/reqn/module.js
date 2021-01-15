@@ -283,6 +283,7 @@ define( function() {
     },
 
     current_reqn_version_id: { column: 'reqn_version.id', type: 'string', isExcluded: true },
+    next_stage_type: { type: 'string', isExcluded: true },
     amendment: { column: 'reqn_version.amendment', type: 'string', isExcluded: true },
     funding_filename: { column: 'reqn_version.funding_filename', type: 'string', isExcluded: true },
     ethics_date: { column: 'reqn_version.ethics_date', type: 'date', isExcluded: true },

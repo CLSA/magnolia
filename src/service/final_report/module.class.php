@@ -22,6 +22,8 @@ class module extends \cenozo\service\module
     parent::prepare_read( $select, $modifier );
 
     $modifier->join( 'reqn', 'final_report.reqn_id', 'reqn.id' );
+    $modifier->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
+    $modifier->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
     $modifier->join( 'language', 'reqn.language_id', 'language.id' );
   }
 }

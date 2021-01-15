@@ -38,19 +38,19 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
     impact: { type: 'text', isExcluded: true },
     opportunities: { type: 'text', isExcluded: true },
     dissemination: { type: 'text', isExcluded: true },
-    waiver: { column: 'reqn.waiver', type: 'string', isExcluded: true }
+    waiver: { column: 'reqn_version.waiver', type: 'string', isExcluded: true }
   } );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnFinalReportForm', [
-    'CnFinalReportModelFactory', 'cnRecordViewDirective', 'CnReqnModelFactory', 'CnSession', '$q',
-    function( CnFinalReportModelFactory, cnRecordViewDirective, CnReqnModelFactory, CnSession, $q ) {
-      // used to piggy-back on the basic view controller's functionality (but not used in the DOM)
+  cenozo.providers.directive( 'cnFinalReportView', [
+    'CnFinalReportModelFactory', 'cnRecordViewDirective', 'CnReqnModelFactory', 'CnReqnHelper', 'CnSession', '$q',
+    function( CnFinalReportModelFactory, cnRecordViewDirective, CnReqnModelFactory, CnReqnHelper, CnSession, $q ) {
+      // used to piggy-back on the basic view controller's functionality
       var cnRecordView = cnRecordViewDirective[0];
       var reqnModel = CnReqnModelFactory.instance();
 
       return {
-        templateUrl: module.getFileUrl( 'form.tpl.html' ),
+        templateUrl: module.getFileUrl( 'view.tpl.html' ),
         restrict: 'E',
         scope: { model: '=?' },
         link: function( scope, element, attrs ) {
@@ -81,7 +81,9 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
         controller: function( $scope ) {
           if( angular.isUndefined( $scope.model ) ) $scope.model = CnFinalReportModelFactory.root;
           cnRecordView.controller[1]( $scope );
-          $scope.t = function( value ) { return cenozoApp.translate( 'finalReport', value, $scope.model.viewModel.record.language ); };
+          $scope.t = function( value ) {
+            return CnReqnHelper.translate( 'finalReport', value, $scope.model.viewModel.record.language );
+          };
         
           // production resources
           var productionAddModel = $scope.model.viewModel.productionModel.addModel;
@@ -150,42 +152,23 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnFinalReportView', [
-    'CnFinalReportModelFactory',
-    function( CnFinalReportModelFactory ) {
-      return {
-        templateUrl: module.getFileUrl( 'view.tpl.html' ),
-        restrict: 'E',
-        scope: { model: '=?' },
-        controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnFinalReportModelFactory.root;
-        }
-      };
-    }
-  ] );
-
-  /* ######################################################################################################## */
   cenozo.providers.factory( 'CnFinalReportViewFactory', [
-    'CnBaseViewFactory', 'CnHttpFactory', 'CnProductionModelFactory', '$q',
-    function( CnBaseViewFactory, CnHttpFactory, CnProductionModelFactory, $q ) {
+    'CnBaseViewFactory', 'CnReqnHelper', 'CnHttpFactory', 'CnProductionModelFactory', '$q',
+    function( CnBaseViewFactory, CnReqnHelper, CnHttpFactory, CnProductionModelFactory, $q ) {
       var object = function( parentModel, root ) {
         var self = this;
         CnBaseViewFactory.construct( this, parentModel, root );
-        var misc = cenozoApp.lookupData.finalReport.misc;
 
         angular.extend( this, {
           onView: function( force ) {
-            // we need to do some extra work when looking at the final_report form
-            if( 'final_report' == this.parentModel.getSubjectFromState() && 'form' == this.parentModel.getActionFromState() ) {
-              // reset tab value
-              this.setFormTab( this.parentModel.getQueryParameter( 't' ), false );
+            // reset tab value
+            this.setFormTab( this.parentModel.getQueryParameter( 't' ), false );
 
-              return $q.all( [
-                this.$$onView( force ),
-                this.getProductionList(),
-                this.getProductionTypeList()
-              ] );
-            }
+            return $q.all( [
+              this.$$onView( force ),
+              this.getProductionList(),
+              this.getProductionTypeList()
+            ] );
 
             return this.$$onView( force );
           },
@@ -201,7 +184,10 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
 
           productionModel: CnProductionModelFactory.instance(),
           productionList: [],
-          productionTypeList: { en: [ { value: '', name: misc.choose.en } ], fr: [ { value: '', name: misc.choose.fr } ] },
+          productionTypeList: {
+            en: [ { value: '', name: CnReqnHelper.translate( 'finalReport', 'misc.choose', 'en' ) } ],
+            fr: [ { value: '', name: CnReqnHelper.translate( 'finalReport', 'misc.choose', 'fr' ) } ]
+          },
 
           formTab: '',
           tabSectionList: ['instructions','part1','part2','part3'],

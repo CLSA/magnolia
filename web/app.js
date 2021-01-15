@@ -242,7 +242,7 @@ cenozo.service( 'CnReqnHelper', [
       },
 
       viewReport: function( reqnIdentifier ) {
-        return $state.go( 'final_report.form', { identifier: reqnIdentifier } );
+        return $state.go( 'final_report.view', { identifier: 'identifier=' + reqnIdentifier } );
       },
 
       translate: function( subject, address, language ) {

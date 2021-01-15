@@ -1365,6 +1365,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                         }
 
                         if( missing ) {
+                          console.log( property );
                           var element = cenozo.getFormElement( property );
                           element.$error.required = true;
                           cenozo.updateFormElement( element, true );
