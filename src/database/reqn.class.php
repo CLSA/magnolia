@@ -704,6 +704,14 @@ class reqn extends \cenozo\database\record
         copy( $db_reqn_version->get_filename( 'ethics' ), $db_ethics_approval->get_filename() );
       }
     }
+    // if the final report is now required then automatically defer the reqn
+    else if( 'Report Required' == $db_next_stage_type->name )
+    {
+      $this->state = 'deferred';
+      $this->save();
+
+      // do not send a notification since there is one already sent after leaving the Decision Made stage
+    }
     else if( $incomplete || $withdrawn )
     {
       $this->state = NULL;
