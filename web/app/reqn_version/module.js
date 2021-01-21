@@ -197,6 +197,14 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
           scope.model.viewModel.afterView( function() {
             var record = scope.model.viewModel.record;
 
+            // display final report message if appropriate
+            var stage_type = record.stage_type ? record.stage_type : '';
+            if( 'applicant' == CnSession.role.name &&
+                'Report Required' == stage_type &&
+                'deferred' == scope.model.viewModel.record.state ) {
+              scope.model.viewModel.displayReportRequiredMessage();
+            }
+
             // display notices to the applicant if they've never seen it
             if( 'applicant' == CnSession.role.name && record.has_unread_notice ) scope.model.viewModel.displayNotices();
           } );
@@ -468,7 +476,13 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
           agreementDifferenceList: null,
           lastAmendmentVersion: null, // used to determine the addingCoapplicantWithData variable
           addingCoapplicantWithData: false, // used when an amendment is adding a new coap
-          show: function( subject ) { return CnReqnHelper.showAction( subject, this.record ); },
+          show: function( subject ) {
+            var stage_type = this.record.stage_type ? this.record.stage_type : '';
+            return CnReqnHelper.showAction( subject, this.record ) && (
+              // the submit button should be hidden once a report is required
+              'submit' != subject || 'Report Required' != stage_type
+            );
+          },
           showAgreement: function() {
             // only show the agreement tab to administrators
             return 'administrator' == CnSession.role.name && (
@@ -1504,6 +1518,17 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
           viewReqn: function() {
             var parent = this.parentModel.getParentIdentifier();
             return this.parentModel.transitionToParentViewState( parent.subject, parent.identifier );
+          },
+
+          displayReportRequiredMessage: function() {
+            return CnModalConfirmFactory.instance( {
+              title: self.translate( 'misc.pleaseConfirm' ),
+              noText: 'applicant' == CnSession.role.name ? self.translate( 'misc.no' ) : 'No',
+              yesText: 'applicant' == CnSession.role.name ? self.translate( 'misc.yes' ) : 'Yes',
+              message: self.translate( 'misc.reportRequiredWarning' )
+            } ).show().then( function( response ) {
+              if( response ) self.viewReport()
+            } );
           },
 
           displayNotices: function() {

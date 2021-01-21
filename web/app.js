@@ -680,6 +680,10 @@ cenozo.service( 'CnReqnHelper', [
             file: { en: 'File', fr: 'Fichier' },
             expirationDate: { en: 'Expiration Date', fr: 'Date limite' },
             addEthicsApproval: { en: 'Add Ethics Approval', fr: 'Ajouter une lettre d’approbation éthique' },
+            reportRequiredWarning: {
+              en: 'This application\'s final report is required, would you like to view it now?',
+              fr: 'TRANSLATION REQUIRED'
+            },
             amend: { en: 'Create Amendment', fr: 'Effectuer une modification' },
             amendWarning: {
               en: 'Are you sure you wish to create an amendment?\n\nThe application form will be re-opened and you will be able to make and submit changes.',
