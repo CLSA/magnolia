@@ -52,6 +52,8 @@ class module extends \cenozo\service\module
   {
     parent::prepare_read( $select, $modifier );
     $modifier->join( 'reqn', 'reqn_version.reqn_id', 'reqn.id' );
+    $modifier->join( 'reqn_current_final_report', 'reqn.id', 'reqn_current_final_report.reqn_id' );
+    $modifier->left_join( 'final_report', 'reqn_current_final_report.final_report_id', 'final_report.id' );
     $modifier->join( 'user', 'reqn.user_id', 'user.id' );
     $modifier->left_join( 'user', 'reqn.trainee_user_id', 'trainee_user.id', 'trainee_user' );
     $modifier->join( 'language', 'reqn.language_id', 'language.id' );
@@ -135,9 +137,7 @@ class module extends \cenozo\service\module
       }
 
       if( $select->has_column( 'has_changed' ) )
-      {
         $select->add_constant( $db_reqn_version->has_changed(), 'has_changed', 'boolean' );
-      }
     }
   }
 }

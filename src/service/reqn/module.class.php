@@ -69,6 +69,8 @@ class module extends \cenozo\service\module
     $modifier->join( 'reqn_type', 'reqn.reqn_type_id', 'reqn_type.id' );
     $modifier->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
     $modifier->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
+    $modifier->join( 'reqn_current_final_report', 'reqn.id', 'reqn_current_final_report.reqn_id' );
+    $modifier->left_join( 'final_report', 'reqn_current_final_report.final_report_id', 'final_report.id' );
     $modifier->left_join( 'deadline', 'reqn.deadline_id', 'deadline.id' );
     $modifier->join( 'user', 'reqn.user_id', 'user.id' );
     $modifier->left_join( 'user', 'reqn.trainee_user_id', 'trainee_user.id', 'trainee_user' );

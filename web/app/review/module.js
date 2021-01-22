@@ -24,7 +24,7 @@ define( function() {
       },
       user_full_name: {
         title: 'Reviewer',
-        isIncluded: function( $state, model ) { return !model.isReviewer(); }
+        isIncluded: function( $state, model ) { return !model.isRole( 'reviewer' ); }
       },
       date: { title: 'Created On' },
       recommendation: {
@@ -75,12 +75,12 @@ define( function() {
         select: 'CONCAT( user.first_name, " ", user.last_name, " (", user.name, ")" )',
         where: [ 'user.first_name', 'user.last_name', 'user.name' ]
       },
-      isConstant: function( $state, model ) { return !model.isAdministratorOrChair(); }
+      isConstant: function( $state, model ) { return !model.isRole( 'administrator', 'chair' ); }
     },
     date: {
       title: 'Created On',
       type: 'date',
-      isConstant: function( $state, model ) { return !model.isAdministratorOrChair(); }
+      isConstant: function( $state, model ) { return !model.isRole( 'administrator', 'chair' ); }
     },
     recommendation_type_id: {
       title: 'Recommendation',
@@ -227,9 +227,6 @@ define( function() {
         this.viewModel = CnReviewViewFactory.instance( this, root );
 
         this.recommendationList = {};
-
-        this.isAdministratorOrChair = function() { return ['administrator','chair'].includes( CnSession.role.name ); };
-        this.isReviewer = function() { return 'reviewer' == CnSession.role.name; };
 
         // override the service collection path so that reviewers can view their reviews from the home screen
         this.getServiceCollectionPath = function() {

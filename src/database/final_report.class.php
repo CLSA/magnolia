@@ -125,4 +125,50 @@ class final_report extends \cenozo\database\record
       );
     }
   }
+
+  /**
+   * Determines whether there is any difference between this version and the last
+   */
+  public function has_changed()
+  {
+    $production_class_name = lib::get_class_name( 'database\production' );
+
+    // get the two newest versions
+    $version_mod = lib::create( 'database\modifier' );
+    $version_mod->where( 'reqn_id', '=', $this->reqn_id );
+    $version_mod->order( 'version', true );
+    $version_mod->limit( 2 );
+    $final_report_list = static::select_objects( $version_mod );
+    if( 2 != count( $final_report_list ) ) return true;
+
+    $db_last_final_report = $final_report_list[1];
+
+    // check all column values except for id, version, datetime and timestamps
+    $ignore_columns = array( 'id', 'version', 'update_timestamp', 'create_timestamp' );
+    foreach( $this->get_column_names() as $column )
+      if( !in_array( $column, $ignore_columns ) && $this->$column != $db_last_final_report->$column )
+        return true;
+
+    // now check production records
+    foreach( $this->get_production_object_list() as $db_production )
+    {
+      // TODO: implement
+      /*
+      $db_last_production = $production_class_name::get_unique_record(
+        array( 'final_report_id', 'rank' ),
+        array( $db_last_final_report->id, $db_production->rank )
+      );
+      if( is_null( $db_last_production ) ) return true;
+
+      // check all column values except for id, final_report_id and timestamps
+      $ignore_columns = array( 'id', 'final_report_id', 'update_timestamp', 'create_timestamp' );
+      foreach( $db_production->get_column_names() as $column )
+        if( !in_array( $column, $ignore_columns ) && $db_production->$column != $db_last_production->$column )
+          return true;
+      */
+    }
+
+    // if we get here then everything is identical
+    return false;
+  }
 }

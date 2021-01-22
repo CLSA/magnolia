@@ -29,16 +29,22 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
     },
 
     // the following are for the form and will not appear in the view
-    language: { column: 'language.code', type: 'string', isExcluded: true },
-    activities: { type: 'text', isExcluded: true },
-    findings: { type: 'text', isExcluded: true },
-    outcomes: { type: 'text', isExcluded: true },
-    thesis_title: { type: 'text', isExcluded: true },
-    thesis_status: { type: 'text', isExcluded: true },
-    impact: { type: 'text', isExcluded: true },
-    opportunities: { type: 'text', isExcluded: true },
-    dissemination: { type: 'text', isExcluded: true },
-    waiver: { column: 'reqn_version.waiver', type: 'string', isExcluded: true }
+    version: { type: 'string' },
+    current_reqn_version_id: { column: 'reqn_version.id', type: 'string' },
+    trainee_user_id: { column: 'reqn.trainee_user_id', type: 'string' },
+    state: { column: 'reqn.state', type: 'string' },
+    stage_type: { column: 'stage_type.name', type: 'string' },
+    phase: { column: 'stage_type.phase', type: 'string' },
+    lang: { column: 'language.code', type: 'string' },
+    activities: { type: 'text' },
+    findings: { type: 'text' },
+    outcomes: { type: 'text' },
+    thesis_title: { type: 'text' },
+    thesis_status: { type: 'text' },
+    impact: { type: 'text' },
+    opportunities: { type: 'text' },
+    dissemination: { type: 'text' },
+    waiver: { column: 'reqn_version.waiver', type: 'string' }
   } );
 
   /* ######################################################################################################## */
@@ -57,6 +63,8 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
           cnRecordView.link( scope, element, attrs );
           scope.isAddingProduction = false;
           scope.isDeletingProduction = [];
+
+          scope.liteModel.viewModel.onView();
 
           scope.model.viewModel.afterView( function() {
             // setup the breadcrumbtrail
@@ -80,11 +88,12 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
         },
         controller: function( $scope ) {
           if( angular.isUndefined( $scope.model ) ) $scope.model = CnFinalReportModelFactory.root;
+          if( angular.isUndefined( $scope.liteModel ) ) $scope.liteModel = CnFinalReportModelFactory.lite;
           cnRecordView.controller[1]( $scope );
           $scope.t = function( value ) {
-            return CnReqnHelper.translate( 'finalReport', value, $scope.model.viewModel.record.language );
+            return CnReqnHelper.translate( 'finalReport', value, $scope.model.viewModel.record.lang );
           };
-        
+
           // production resources
           var productionAddModel = $scope.model.viewModel.productionModel.addModel;
           $scope.productionRecord = {};
@@ -110,7 +119,7 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
               }
               if( !valid ) {
                 // dirty all inputs so we can find the problem
-                cenozo.forEachFormElement( 'part2Form', function( element ) { element.$dirty = true; } ); 
+                cenozo.forEachFormElement( 'part2Form', function( element ) { element.$dirty = true; } );
               } else {
                 $scope.isAddingProduction = true;
                 productionAddModel.onAdd( $scope.productionRecord ).then( function( response ) {
@@ -119,7 +128,7 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
                     productionAddModel.onNew( $scope.productionRecord ),
                     $scope.model.viewModel.getProductionList()
                   ] );
-                } ).finally( function() { $scope.isAddingProduction = false; } ); 
+                } ).finally( function() { $scope.isAddingProduction = false; } );
               }
             }
           };
@@ -129,7 +138,7 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
               if( !$scope.isDeletingProduction.includes( id ) ) $scope.isDeletingProduction.push( id );
               var index = $scope.isDeletingProduction.indexOf( id );
               $scope.model.viewModel.removeProduction( id ).finally( function() {
-                if( 0 <= index ) $scope.isDeletingProduction.splice( index, 1 ); 
+                if( 0 <= index ) $scope.isDeletingProduction.splice( index, 1 );
               } );
             }
           };
@@ -153,49 +162,75 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnFinalReportViewFactory', [
-    'CnBaseViewFactory', 'CnReqnHelper', 'CnHttpFactory', 'CnProductionModelFactory', '$q',
-    function( CnBaseViewFactory, CnReqnHelper, CnHttpFactory, CnProductionModelFactory, $q ) {
+    'CnBaseViewFactory', 'CnReqnHelper', 'CnHttpFactory', 'CnProductionModelFactory',
+    'CnModalMessageFactory', 'CnModalConfirmFactory', 'CnModalSubmitExternalFactory', 'CnSession', '$q',
+    function( CnBaseViewFactory, CnReqnHelper, CnHttpFactory, CnProductionModelFactory,
+              CnModalMessageFactory, CnModalConfirmFactory, CnModalSubmitExternalFactory, CnSession, $q ) {
       var object = function( parentModel, root ) {
         var self = this;
         CnBaseViewFactory.construct( this, parentModel, root );
 
         angular.extend( this, {
+          translate: function( value ) { return CnReqnHelper.translate( 'finalReport', value, this.record.lang ); },
+          show: function( subject ) { return CnReqnHelper.showAction( subject, this.record ); },
+          viewReqn: function() {
+            return this.parentModel.transitionToParentViewState( 'reqn', 'identifier=' + this.record.identifier );
+          },
+          viewReqnVersion: function() {
+            return this.parentModel.transitionToParentViewState( 'reqn_version', this.record.current_reqn_version_id );
+          },
+
           onView: function( force ) {
             // reset tab value
             this.setFormTab( this.parentModel.getQueryParameter( 't' ), false );
 
-            return $q.all( [
-              this.$$onView( force ),
-              this.getProductionList(),
-              this.getProductionTypeList()
-            ] );
+            // reset compare version and differences
+            this.compareRecord = null;
 
-            return this.$$onView( force );
+            return this.$$onView( force ).then( function() {
+              if( 'lite' != self.parentModel.type ) {
+                cenozoApp.setLang( self.record.lang );
+
+                return $q.all( [
+                  self.getProductionList(),
+                  self.getProductionTypeList()
+                ] ).then( function() { return self.getVersionList(); } );
+              }
+            } );
           },
 
           // setup language and tab state parameters
           toggleLanguage: function() {
-            this.record.language = 'en' == this.record.language ? 'fr' : 'en';
+            this.record.lang = 'en' == this.record.lang ? 'fr' : 'en';
             return CnHttpFactory.instance( {
               path: 'reqn/identifier=' + this.record.identifier,
-              data: { language: this.record.language }
+              data: { lang: this.record.lang }
             } ).patch();
           },
 
           productionModel: CnProductionModelFactory.instance(),
           productionList: [],
-          productionTypeList: {
-            en: [ { value: '', name: CnReqnHelper.translate( 'finalReport', 'misc.choose', 'en' ) } ],
-            fr: [ { value: '', name: CnReqnHelper.translate( 'finalReport', 'misc.choose', 'fr' ) } ]
-          },
-
+          productionTypeList: {},
           formTab: '',
           tabSectionList: ['instructions','part1','part2','part3'],
           setFormTab: function( tab, transition ) {
             if( angular.isUndefined( transition ) ) transition = true;
-            if( !this.tabSectionList.includes( tab ) ) tab = 'instructions';
+
+            // find the tab section
+            var selectedTabSection = null;
+            this.tabSectionList.some( function( tabSection ) {
+              if( tab == tabSection ) {
+                selectedTabSection = tabSection;
+                return true;
+              }
+            } );
+
+            // get the tab (or default of none was found)
+            tab = null != selectedTabSection ? selectedTabSection : 'instructions';
+
             this.formTab = tab;
             this.parentModel.setQueryParameter( 't', tab );
+
             if( transition ) this.parentModel.reloadState( false, false, 'replace' );
 
             // update all textarea sizes
@@ -210,6 +245,16 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
               var tabSection = this.tabSectionList[currentTabSectionIndex + (reverse?-1:1)];
               if( angular.isDefined( tabSection ) ) this.setFormTab( tabSection );
             }
+          },
+
+          getVersionList: function() {
+            var parent = self.parentModel.getParentIdentifier();
+            this.versionList = [];
+            return CnHttpFactory.instance( {
+              path: parent.subject + '/' + parent.identifier + '/final_report'
+            } ).query().then( function( response ) {
+              // TODO: implement
+            } );
           },
 
           getProductionList: function() {
@@ -232,6 +277,11 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
           },
 
           getProductionTypeList: function() {
+            this.productionTypeList = {
+              en: [ { value: '', name: CnReqnHelper.translate( 'finalReport', 'misc.choose', 'en' ) } ],
+              fr: [ { value: '', name: CnReqnHelper.translate( 'finalReport', 'misc.choose', 'fr' ) } ]
+            };
+
             return CnHttpFactory.instance( {
               path: 'production_type',
               data: {
@@ -247,7 +297,10 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
           },
 
           getProductionTypeNote: function( productionTypeId ) {
-            var productionType = this.productionTypeList[this.record.language].findByProperty( 'value', productionTypeId );
+            var productionTypeList = this.productionTypeList[this.record.lang];
+            var productionType = productionTypeList
+                               ? productionTypeList.findByProperty( 'value', productionTypeId )
+                               : null;
             return null == productionType ? '' : productionType.note;
           },
 
@@ -257,6 +310,124 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
             } ).delete().then( function() {
               return self.getProductionList();
             } );
+          },
+
+         submit: function() {
+            // used below
+            function submitFinalReport() {
+              var parent = self.parentModel.getParentIdentifier();
+              return CnHttpFactory.instance( {
+                path: parent.subject + '/' + parent.identifier + "?action=submit"
+              } ).patch().then( function() {
+                var code = CnSession.user.id == self.record.trainee_user_id ?
+                  ( 'deferred' == self.record.state ? 'traineeResubmit' : 'traineeSubmit' ) :
+                  ( 'deferred' == self.record.state ? 'resubmit' : 'submit' );
+                return CnModalMessageFactory.instance( {
+                  title: self.translate( 'misc.' + code + 'Title' ),
+                  message: self.translate( 'misc.' + code + 'Message' ),
+                  closeText: 'applicant' == CnSession.role.name ? self.translate( 'misc.close' ) : 'Close'
+                } ).show().then( function() {
+                  return self.parentModel.isRole( 'applicant' ) ?
+                    $state.go( 'root.home' ) :
+                    self.onView( true ); // refresh
+                } );
+              } );
+            }
+
+            var record = this.record;
+
+            return ( this.record.external ?
+
+              // when submitting an external reqn's report don't validate and ask which stage to move to
+              CnModalSubmitExternalFactory.instance().show().then( function( response ) {
+                if( null != response ) {
+                  var parent = self.parentModel.getParentIdentifier();
+                  return CnHttpFactory.instance( {
+                    path: parent.subject + '/' + parent.identifier + '?action=next_stage&stage_type=' + response
+                  } ).patch().then( function() {
+                    self.onView();
+                    return CnModalMessageFactory.instance( {
+                      title: 'Requisition moved to "' + response + '" stage',
+                      message: 'The external requisition has been moved to the "' + response + '" stage.',
+                      closeText: 'Close'
+                    } ).show().then( function() {
+                      return self.onView( true );
+                    } );
+                  } );
+                }
+              } ) :
+
+              // when submitting a non-external reqn validate and submit the "regular" way
+              CnModalConfirmFactory.instance( {
+                title: this.translate( 'misc.pleaseConfirm' ),
+                noText: 'applicant' == CnSession.role.name ? this.translate( 'misc.no' ) : 'No',
+                yesText: 'applicant' == CnSession.role.name ? this.translate( 'misc.yes' ) : 'Yes',
+                message: this.translate( 'misc.submitWarning' )
+              } ).show().then( function( response ) {
+                if( response ) {
+                  // make sure that certain properties have been defined, one tab at a time
+                  var requiredTabList = {
+                    'part1': [ 'activities', 'findings', 'outcomes', 'thesis_title', 'thesis_status' ],
+                    'part3': [ 'impact', 'opportunities', 'dissemination' ]
+                  };
+
+                  var error = null;
+                  var errorTab = null;
+                  for( var tab in requiredTabList ) {
+                    var firstProperty = null;
+                    requiredTabList[tab].filter( function( property ) {
+                      if( 'part1' == tab ) {
+                        // only check thesis properties if the reqn has a trainee
+                        return null == property.match( /thesis/ ) || self.record.trainee_user_id;
+                      }
+
+                      // check everything else
+                      return true;
+                    } ).forEach( function( property ) {
+                      // check for the property's value
+                      if( null === record[property] || '' === record[property] ) {
+                        var element = cenozo.getFormElement( property );
+                        element.$error.required = true;
+                        cenozo.updateFormElement( element, true );
+                        if( null == errorTab ) errorTab = tab;
+                        if( null == error ) error = {
+                          title: self.translate( 'misc.missingFieldTitle' ),
+                          message: self.translate( 'misc.missingFieldMessage' ),
+                          error: true
+                        };
+                      }
+                    } );
+                  }
+
+                  if( null != error ) {
+                    // if there was an error then display it now
+                    if( 'applicant' == CnSession.role.name ) error.closeText = self.translate( 'misc.close' );
+                    CnModalMessageFactory.instance( error ).show().then( function() {
+                      self.setFormTab( errorTab );
+                    } );
+                  } else {
+                    // now check to make sure this version is different from the last (the first is always different)
+                    return CnHttpFactory.instance( {
+                      path: self.parentModel.getServiceResourcePath(),
+                      data: { select: { column: 'has_changed' } }
+                    } ).get().then( function( response ) {
+                      return response.data.has_changed ?
+                        // changes have been made, so submit now
+                        submitFinalReport() :
+                        // no changes made so warn the user before proceeding
+                        CnModalConfirmFactory.instance( {
+                          title: self.translate( 'misc.pleaseConfirm' ),
+                          noText: 'applicant' == CnSession.role.name ? self.translate( 'misc.no' ) : 'No',
+                          yesText: 'applicant' == CnSession.role.name ? self.translate( 'misc.yes' ) : 'Yes',
+                          message: self.translate( 'misc.noChangesMessage' )
+                        } ).show().then( function( response ) {
+                          if( response ) return submitFinalReport();
+                        } );
+                    } );
+                  }
+                }
+              } )
+            );
           }
         } );
 
@@ -268,16 +439,43 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnFinalReportModelFactory', [
-    'CnBaseModelFactory', 'CnFinalReportViewFactory', 'CnHttpFactory', '$state',
-    function( CnBaseModelFactory, CnFinalReportViewFactory, CnHttpFactory, $state ) {
-      var object = function( root ) {
+    'CnBaseModelFactory', 'CnFinalReportViewFactory', 'CnSession', '$state',
+    function( CnBaseModelFactory, CnFinalReportViewFactory, CnSession, $state ) {
+      var object = function( type ) {
         var self = this;
         CnBaseModelFactory.construct( this, module );
-        this.viewModel = CnFinalReportViewFactory.instance( this, root );
+
+        angular.extend( this, {
+          viewModel: CnFinalReportViewFactory.instance( this, 'root' == this.type ),
+
+          setupBreadcrumbTrail: function() {
+            var trail = [];
+
+            if( this.isRole( 'applicant' ) ) {
+              trail = [
+                { title: 'Requisition' },
+                { title: this.viewModel.record.identifier }
+              ];
+            } else {
+              trail = [ {
+                title: 'Requisitions',
+                go: function() { return $state.go( 'reqn.list' ); }
+              }, {
+                title: this.viewModel.record.identifier,
+                go: function() { return $state.go( 'reqn.view', { identifier: 'identifier=' + self.viewModel.record.identifier } ); }
+              }, {
+                title: 'Final Report version ' + this.viewModel.record.version
+              } ];
+            }
+
+            CnSession.setBreadcrumbTrail( trail );
+          }
+        } );
       };
 
       return {
-        root: new object( true ),
+        root: new object( 'root' ),
+        lite: new object( 'lite' ),
         instance: function() { return new object( false ); }
       };
     }

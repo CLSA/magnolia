@@ -1,4 +1,4 @@
-<span ng-show="$parent.model.isAdministrator()">
+<span ng-show="$parent.model.isRole( 'administrator' )">
   <div class="container-fluid bg-warning" style="padding: 0.5em 1em 1em;">
     <cn-view-input
       no-cols=true
@@ -12,7 +12,7 @@
     </cn-view-input>
   </div>
 </span>
-<span ng-show="!$parent.model.isAdministrator() && $parent.model.viewModel.record[note]">
+<span ng-show="!$parent.model.isRole( 'administrator' ) && $parent.model.viewModel.record[note]">
   <div class="vertical-spacer bg-warning rounded" style="padding: 0.5em 1em 1em;">
     <h4 class="text-danger flashing"><i class="glyphicon glyphicon-warning-sign"></i> Attention</h4>
     <pre class="text-danger"

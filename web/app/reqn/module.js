@@ -283,6 +283,7 @@ define( function() {
     },
 
     current_reqn_version_id: { column: 'reqn_version.id', type: 'string', isExcluded: true },
+    current_final_report_id: { column: 'final_report.id', type: 'string', isExcluded: true },
     next_stage_type: { type: 'string', isExcluded: true },
     amendment: { column: 'reqn_version.amendment', type: 'string', isExcluded: true },
     funding_filename: { column: 'reqn_version.funding_filename', type: 'string', isExcluded: true },
@@ -393,6 +394,14 @@ define( function() {
     title: 'View Form',
     operation: function( $state, model ) {
       $state.go( 'reqn_version.view', { identifier: model.viewModel.record.current_reqn_version_id } );
+    }
+  } );
+
+  module.addExtraOperation( 'view', {
+    title: 'View Report',
+    isIncluded: function( $state, model ) { return model.viewModel.record.current_final_report_id; },
+    operation: function( $state, model ) {
+      $state.go( 'final_report.view', { identifier: model.viewModel.record.current_final_report_id } );
     }
   } );
 
@@ -747,12 +756,7 @@ define( function() {
               format: 'txt'
             } ).file();
           },
-          downloadFinalReport: function() {
-            return CnHttpFactory.instance( {
-              path: this.parentModel.getServiceResourcePath().replace( 'reqn', 'final_report' ),
-              format: 'pdf'
-            } ).file();
-          },
+          downloadFinalReport: function() { return CnReqnHelper.download( 'final_report', this.record.current_final_report_id ); },
 
           resetData: function() {
             CnHttpFactory.instance( {
@@ -1123,9 +1127,6 @@ define( function() {
               'data_sharing' == this.getActionFromState() ? '?data_sharing=1' : ''
             );
           },
-
-          // checks to see if the current role is included in any provided argument
-          isRole: function( ...args ) { return args.some( role => role == CnSession.role.name ); },
 
           getAddEnabled: function() {
             return this.$$getAddEnabled() && (

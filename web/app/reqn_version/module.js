@@ -98,6 +98,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
     csd_justification: { type: 'text' },
     amendment_justification: { type: 'text' },
 
+    current_final_report_id: { column: 'final_report.id', type: 'string' },
     trainee_user_id: { column: 'reqn.trainee_user_id', type: 'string' },
     identifier: { column: 'reqn.identifier', type: 'string' },
     external: { column: 'reqn.external', type: 'string' },
@@ -191,6 +192,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
           scope.isAddingReference = false;
           scope.isDeletingReference = [];
           scope.isDeletingEthicsApproval = [];
+          scope.reportRequiredWarningShown = false;
 
           scope.liteModel.viewModel.onView();
 
@@ -201,8 +203,10 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
             var stage_type = record.stage_type ? record.stage_type : '';
             if( 'applicant' == CnSession.role.name &&
                 'Report Required' == stage_type &&
-                'deferred' == scope.model.viewModel.record.state ) {
-              scope.model.viewModel.displayReportRequiredMessage();
+                'deferred' == scope.model.viewModel.record.state &&
+                !scope.reportRequiredWarningShown ) {
+              scope.model.viewModel.displayReportRequiredWarning();
+              scope.reportRequiredWarningShown = true;
             }
 
             // display notices to the applicant if they've never seen it
@@ -251,9 +255,9 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
           coapplicantAddModel.onNew( $scope.coapplicantRecord );
 
           $scope.getHeading = function() {
-            var status = $scope.model.viewModel.record[$scope.model.isApplicant() ? 'status' : 'stage_type'];
+            var status = $scope.model.viewModel.record[$scope.model.isRole( 'applicant' ) ? 'status' : 'stage_type'];
             if( 'deferred' == $scope.model.viewModel.record.state ) {
-              status = $scope.model.isApplicant() ? 'Action Required' : 'Deferred to Applicant';
+              status = $scope.model.isRole( 'applicant' ) ? 'Action Required' : 'Deferred to Applicant';
             } else if( $scope.model.viewModel.record.state ) {
               status = $scope.model.viewModel.record.state.ucWords();
             }
@@ -504,7 +508,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
           },
           delete: function() { return CnReqnHelper.delete( 'identifier=' + this.record.identifier, this.record.lang ); },
           translate: function( value ) { return CnReqnHelper.translate( 'reqn', value, this.record.lang ); },
-          viewReport: function() { return CnReqnHelper.viewReport( this.record.identifier ); },
+          viewReport: function() { $state.go( 'final_report.view', { identifier: this.record.current_final_report_id } ); },
           downloadApplication: function() { return CnReqnHelper.download( 'application', this.record.getIdentifier() ); },
           downloadChecklist: function() { return CnReqnHelper.download( 'checklist', this.record.getIdentifier() ); },
           downloadApplicationAndChecklist: function() {
@@ -1287,7 +1291,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                   message: self.translate( 'misc.' + code + 'Message' ),
                   closeText: 'applicant' == CnSession.role.name ? self.translate( 'misc.close' ) : 'Close'
                 } ).show().then( function() {
-                  return self.parentModel.isApplicant() ?
+                  return self.parentModel.isRole( 'applicant' ) ?
                     $state.go( 'root.home' ) :
                     self.onView( true ); // refresh
                 } );
@@ -1379,7 +1383,6 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                         }
 
                         if( missing ) {
-                          console.log( property );
                           var element = cenozo.getFormElement( property );
                           element.$error.required = true;
                           cenozo.updateFormElement( element, true );
@@ -1516,11 +1519,10 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
           },
 
           viewReqn: function() {
-            var parent = this.parentModel.getParentIdentifier();
-            return this.parentModel.transitionToParentViewState( parent.subject, parent.identifier );
+            return this.parentModel.transitionToParentViewState( 'reqn', 'identifier=' + this.record.identifier );
           },
 
-          displayReportRequiredMessage: function() {
+          displayReportRequiredWarning: function() {
             return CnModalConfirmFactory.instance( {
               title: self.translate( 'misc.pleaseConfirm' ),
               noText: 'applicant' == CnSession.role.name ? self.translate( 'misc.no' ) : 'No',
@@ -1545,6 +1547,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
             } );
           }
         } );
+
         this.coapplicantModel.metadata.getPromise(); // needed to get the coapplicant's metadata
         this.referenceModel.metadata.getPromise(); // needed to get the reference's metadata
       };
@@ -1564,351 +1567,348 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
         CnBaseModelFactory.construct( this, module );
         this.type = type;
         if( 'lite' != this.type ) this.listModel = CnReqnVersionListFactory.instance( this );
-        this.viewModel = CnReqnVersionViewFactory.instance( this, 'root' == this.type );
-
-        // override the service collection
-        this.getServiceData = function( type, columnRestrictLists ) {
-          // Only include the coapplicant_agreement, funding, ethics, data_sharing and agreement filenames in the
-          // view type in the lite instance
-          return 'lite' == this.type ? {
-            select: {
-              column: [
-                'is_current_version',
-                'coapplicant_agreement_filename',
-                'funding_filename',
-                'ethics_filename',
-                'data_sharing_filename',
-                'agreement_filename',
-                { table: 'reqn', column: 'state' },
-                { table: 'stage_type', column: 'phase' },
-                { table: 'stage_type', column: 'name', alias: 'stage_type' }
-              ]
-            }
-          } : this.$$getServiceData( type, columnRestrictLists );
-        };
-
-        // we'll need to track which amendment type changes the reqn's owner
-        this.newUserAmendmentTypeId = null;
-
-        // make the input lists from all groups more accessible
-        this.inputList = {};
-        module.inputGroupList.forEach( group => Object.assign( self.inputList, group.inputList ) );
-
-        this.isApplicant = function() { return 'applicant' == CnSession.role.name; }
-        this.isAdministrator = function() { return 'administrator' == CnSession.role.name; }
-
-        this.getEditEnabled = function() {
-          var is_current_version = this.viewModel.record.is_current_version ? this.viewModel.record.is_current_version : '';
-          var phase = this.viewModel.record.phase ? this.viewModel.record.phase : '';
-          var state = this.viewModel.record.state ? this.viewModel.record.state : '';
-          var stage_type = this.viewModel.record.stage_type ? this.viewModel.record.stage_type : '';
-
-          var check = false;
-          if( 'applicant' == CnSession.role.name ) {
-            check = 'new' == phase || (
-              'deferred' == state && ( 'review' == phase || ( 'lite' == this.type && 'Agreement' == stage_type ) )
-            );
-          } else if( ['administrator', 'typist'].includes( CnSession.role.name ) ) {
-            check = 'new' == phase || (
-              'abandoned' != state && ( 'review' == phase || 'Agreement' == stage_type || 'Data Release' == stage_type )
-            );
-          }
-
-          return this.$$getEditEnabled() && is_current_version && check;
-        };
-
-        this.getDeleteEnabled = function() {
-          return this.$$getDeleteEnabled() &&
-                 angular.isDefined( this.viewModel.record ) &&
-                 'new' == this.viewModel.record.phase;
-        };
-
-        this.setupBreadcrumbTrail = function() {
-          var trail = [];
-
-          if( this.isApplicant() ) {
-            trail = [
-              { title: 'Requisition' },
-              { title: this.viewModel.record.identifier }
-            ];
-          } else {
-            trail = [ {
-              title: 'Requisitions',
-              go: function() { return $state.go( 'reqn.list' ); }
-            }, {
-              title: this.viewModel.record.identifier,
-              go: function() { return $state.go( 'reqn.view', { identifier: 'identifier=' + self.viewModel.record.identifier } ); }
-            }, {
-              title: 'version ' + this.viewModel.record.amendment_version
-            } ];
-          }
-
-          CnSession.setBreadcrumbTrail( trail );
-        };
 
         var misc = CnReqnHelper.lookupData.reqn.misc;
-        this.dataOptionCategoryList = [];
+        angular.extend( this, {
+          viewModel: CnReqnVersionViewFactory.instance( this, 'root' == this.type ),
 
-        this.getMetadata = function() {
-          return $q.all( [
-            $q.all( [
-              self.$$getMetadata(),
-              CnHttpFactory.instance( {
-                path: 'reqn_version'
-              } ).head().then( function( response ) {
-                var columnList = angular.fromJson( response.headers( 'Columns' ) );
-                for( var column in columnList ) {
-                  columnList[column].required = '1' == columnList[column].required;
-                  if( 'enum' == columnList[column].data_type ) { // parse out the enum values
-                    columnList[column].enumList = [];
-                    cenozo.parseEnumList( columnList[column] ).forEach( function( item ) {
-                      columnList[column].enumList.push( { value: item, name: item } );
-                    } );
-                  }
-                  if( angular.isUndefined( self.metadata.columnList[column] ) )
-                    self.metadata.columnList[column] = {};
-                  angular.extend( self.metadata.columnList[column], columnList[column] );
-                }
+          // we'll need to track which amendment type changes the reqn's owner
+          newUserAmendmentTypeId: null,
+          inputList: {},
+          dataOptionCategoryList: [],
 
-                return CnHttpFactory.instance( {
-                  path: 'amendment_type',
-                  data: { modifier: { order: 'rank' } }
-                } ).query().then( function success( response ) {
-                  self.amendmentTypeList = { en: [], fr: [] };
-                  response.data.forEach( function( item ) {
-                    if( item.new_user ) self.newUserAmendmentTypeId = item.id;
-
-                    self.amendmentTypeList.en.push( {
-                      id: item.id,
-                      newUser: item.new_user,
-                      name: item.reason_en,
-                      justificationPrompt: item.justification_prompt_en
-                    } );
-                    self.amendmentTypeList.fr.push( {
-                      id: item.id,
-                      newUser: item.new_user,
-                      name: item.reason_fr,
-                      justificationPrompt: item.justification_prompt_fr
-                    } );
-                  } );
-                } )
-              } ),
-            ] ).then( function() {
-              // only do the following for the root instance
-              if( 'root' == self.type ) {
-                // create coapplicant access enum
-                self.metadata.accessEnumList = {
-                  en: [ { value: true, name: misc.yes.en }, { value: false, name: misc.no.en } ],
-                  fr: [ { value: true, name: misc.yes.fr }, { value: false, name: misc.no.fr } ]
-                };
-
-                // create generic yes/no enum
-                self.metadata.yesNoEnumList = {
-                  en: [ { value: '', name: misc.choose.en }, { value: true, name: misc.yes.en }, { value: false, name: misc.no.en } ],
-                  fr: [ { value: '', name: misc.choose.fr }, { value: true, name: misc.yes.fr }, { value: false, name: misc.no.fr } ]
-                };
-
-                // create duration enums
-                self.metadata.columnList.duration.standardEnumList = {
-                  en: [
-                    { value: '', name: misc.choose.en },
-                    { value: '2 years', name: misc.duration2Years.en },
-                    { value: '3 years', name: misc.duration3Years.en }
-                  ],
-                  fr: [
-                    { value: '', name: misc.choose.fr },
-                    { value: '2 years', name: misc.duration2Years.fr },
-                    { value: '3 years', name: misc.duration3Years.fr }
-                  ]
-                };
-
-                self.metadata.columnList.duration.amendment2EnumList = {
-                  en: [
-                    { value: '2 years', name: misc.duration2Years.en },
-                    { value: '2 years + 1 additional year', name: misc.duration2p1Years.en },
-                    { value: '2 years + 2 additional years', name: misc.duration2p2Years.en },
-                    { value: '2 years + 3 additional years', name: misc.duration2p3Years.en }
-                  ],
-                  fr: [
-                    { value: '2 years', name: misc.duration2Years.fr },
-                    { value: '2 years + 1 additional year', name: misc.duration2p1Years.fr },
-                    { value: '2 years + 2 additional years', name: misc.duration2p2Years.fr },
-                    { value: '2 years + 3 additional years', name: misc.duration2p3Years.fr }
-                  ]
-                };
-
-                self.metadata.columnList.duration.amendment3EnumList = {
-                  en: [
-                    { value: '3 years', name: misc.duration3Years.en },
-                    { value: '3 years + 1 additional year', name: misc.duration3p1Years.en },
-                    { value: '3 years + 2 additional years', name: misc.duration3p2Years.en },
-                    { value: '3 years + 3 additional years', name: misc.duration3p3Years.en }
-                  ],
-                  fr: [
-                    { value: '3 years', name: misc.duration3Years.fr },
-                    { value: '3 years + 1 additional year', name: misc.duration3p1Years.fr },
-                    { value: '3 years + 2 additional years', name: misc.duration3p2Years.fr },
-                    { value: '3 years + 3 additional years', name: misc.duration3p3Years.fr }
-                  ]
-                };
-
-                // translate funding enum
-                self.metadata.columnList.funding.enumList = {
-                  en: self.metadata.columnList.funding.enumList,
-                  fr: angular.copy( self.metadata.columnList.funding.enumList )
-                };
-                self.metadata.columnList.funding.enumList.fr[0].name = misc.yes.fr.toLowerCase();
-                self.metadata.columnList.funding.enumList.fr[1].name = misc.no.fr.toLowerCase();
-                self.metadata.columnList.funding.enumList.fr[2].name = misc.requested.fr.toLowerCase();
-
-                self.metadata.columnList.funding.enumList.en.unshift( { value: '', name: misc.choose.en } );
-                self.metadata.columnList.funding.enumList.fr.unshift( { value: '', name: misc.choose.fr } );
-
-                // translate ethics enum
-                self.metadata.columnList.ethics.enumList = {
-                  en: self.metadata.columnList.ethics.enumList,
-                  fr: angular.copy( self.metadata.columnList.ethics.enumList )
-                };
-                self.metadata.columnList.ethics.enumList.fr[0].name = misc.yes.fr.toLowerCase();
-                self.metadata.columnList.ethics.enumList.fr[1].name = misc.no.fr.toLowerCase();
-                self.metadata.columnList.ethics.enumList.fr[2].name = misc.exempt.fr.toLowerCase();
-
-                self.metadata.columnList.ethics.enumList.en.unshift( { value: '', name: misc.choose.en } );
-                self.metadata.columnList.ethics.enumList.fr.unshift( { value: '', name: misc.choose.fr } );
-
-                // translate waiver enum
-                self.metadata.columnList.waiver.enumList.unshift( { value: '', name: misc.none.en } );
-                self.metadata.columnList.waiver.enumList = {
-                  en: self.metadata.columnList.waiver.enumList,
-                  fr: angular.copy( self.metadata.columnList.waiver.enumList )
-                };
-                self.metadata.columnList.waiver.enumList.en[1].name = misc.traineeFeeWaiver.en;
-                self.metadata.columnList.waiver.enumList.en[2].name = misc.postdocFeeWaiver.en;
-                self.metadata.columnList.waiver.enumList.fr[0].name = misc.none.fr;
-                self.metadata.columnList.waiver.enumList.fr[1].name = misc.traineeFeeWaiver.fr;
-                self.metadata.columnList.waiver.enumList.fr[2].name = misc.postdocFeeWaiver.fr;
+          // override the service collection
+          getServiceData: function( type, columnRestrictLists ) {
+            // Only include the coapplicant_agreement, funding, ethics, data_sharing and agreement filenames in the
+            // view type in the lite instance
+            return 'lite' == this.type ? {
+              select: {
+                column: [
+                  'is_current_version',
+                  'coapplicant_agreement_filename',
+                  'funding_filename',
+                  'ethics_filename',
+                  'data_sharing_filename',
+                  'agreement_filename',
+                  { table: 'reqn', column: 'state' },
+                  { table: 'stage_type', column: 'phase' },
+                  { table: 'stage_type', column: 'name', alias: 'stage_type' }
+                ]
               }
-            } ),
+            } : this.$$getServiceData( type, columnRestrictLists );
+          },
 
-            // only do the following for the root instance
-            'root' != self.type ? $q.all() : $q.all( [
-              CnHttpFactory.instance( {
-                path: 'data_option_category',
-                data: {
-                  select: { column: [
-                    'id',
-                    'rank',
-                    'name_en', 'name_fr',
-                    'condition_en', 'condition_fr',
-                    'note_en', 'note_fr'
-                  ] },
-                  modifier: { order: 'rank', limit: 1000 }
+          getEditEnabled: function() {
+            var is_current_version = this.viewModel.record.is_current_version ? this.viewModel.record.is_current_version : '';
+            var phase = this.viewModel.record.phase ? this.viewModel.record.phase : '';
+            var state = this.viewModel.record.state ? this.viewModel.record.state : '';
+            var stage_type = this.viewModel.record.stage_type ? this.viewModel.record.stage_type : '';
+
+            var check = false;
+            if( 'applicant' == CnSession.role.name ) {
+              check = 'new' == phase || (
+                'deferred' == state && ( 'review' == phase || ( 'lite' == this.type && 'Agreement' == stage_type ) )
+              );
+            } else if( ['administrator', 'typist'].includes( CnSession.role.name ) ) {
+              check = 'new' == phase || (
+                'abandoned' != state && ( 'review' == phase || 'Agreement' == stage_type || 'Data Release' == stage_type )
+              );
+            }
+
+            return this.$$getEditEnabled() && is_current_version && check;
+          },
+
+          getDeleteEnabled: function() {
+            return this.$$getDeleteEnabled() &&
+                   angular.isDefined( this.viewModel.record ) &&
+                   'new' == this.viewModel.record.phase;
+          },
+
+          setupBreadcrumbTrail: function() {
+            var trail = [];
+
+            if( this.isRole( 'applicant' ) ) {
+              trail = [
+                { title: 'Requisition' },
+                { title: this.viewModel.record.identifier }
+              ];
+            } else {
+              trail = [ {
+                title: 'Requisitions',
+                go: function() { return $state.go( 'reqn.list' ); }
+              }, {
+                title: this.viewModel.record.identifier,
+                go: function() { return $state.go( 'reqn.view', { identifier: 'identifier=' + self.viewModel.record.identifier } ); }
+              }, {
+                title: 'version ' + this.viewModel.record.amendment_version
+              } ];
+            }
+
+            CnSession.setBreadcrumbTrail( trail );
+          },
+
+          getMetadata: function() {
+            return $q.all( [
+              $q.all( [
+                self.$$getMetadata(),
+                CnHttpFactory.instance( {
+                  path: 'reqn_version'
+                } ).head().then( function( response ) {
+                  var columnList = angular.fromJson( response.headers( 'Columns' ) );
+                  for( var column in columnList ) {
+                    columnList[column].required = '1' == columnList[column].required;
+                    if( 'enum' == columnList[column].data_type ) { // parse out the enum values
+                      columnList[column].enumList = [];
+                      cenozo.parseEnumList( columnList[column] ).forEach( function( item ) {
+                        columnList[column].enumList.push( { value: item, name: item } );
+                      } );
+                    }
+                    if( angular.isUndefined( self.metadata.columnList[column] ) )
+                      self.metadata.columnList[column] = {};
+                    angular.extend( self.metadata.columnList[column], columnList[column] );
+                  }
+
+                  return CnHttpFactory.instance( {
+                    path: 'amendment_type',
+                    data: { modifier: { order: 'rank' } }
+                  } ).query().then( function success( response ) {
+                    self.amendmentTypeList = { en: [], fr: [] };
+                    response.data.forEach( function( item ) {
+                      if( item.new_user ) self.newUserAmendmentTypeId = item.id;
+
+                      self.amendmentTypeList.en.push( {
+                        id: item.id,
+                        newUser: item.new_user,
+                        name: item.reason_en,
+                        justificationPrompt: item.justification_prompt_en
+                      } );
+                      self.amendmentTypeList.fr.push( {
+                        id: item.id,
+                        newUser: item.new_user,
+                        name: item.reason_fr,
+                        justificationPrompt: item.justification_prompt_fr
+                      } );
+                    } );
+                  } )
+                } ),
+              ] ).then( function() {
+                // only do the following for the root instance
+                if( 'root' == self.type ) {
+                  // create coapplicant access enum
+                  self.metadata.accessEnumList = {
+                    en: [ { value: true, name: misc.yes.en }, { value: false, name: misc.no.en } ],
+                    fr: [ { value: true, name: misc.yes.fr }, { value: false, name: misc.no.fr } ]
+                  };
+
+                  // create generic yes/no enum
+                  self.metadata.yesNoEnumList = {
+                    en: [ { value: '', name: misc.choose.en }, { value: true, name: misc.yes.en }, { value: false, name: misc.no.en } ],
+                    fr: [ { value: '', name: misc.choose.fr }, { value: true, name: misc.yes.fr }, { value: false, name: misc.no.fr } ]
+                  };
+
+                  // create duration enums
+                  self.metadata.columnList.duration.standardEnumList = {
+                    en: [
+                      { value: '', name: misc.choose.en },
+                      { value: '2 years', name: misc.duration2Years.en },
+                      { value: '3 years', name: misc.duration3Years.en }
+                    ],
+                    fr: [
+                      { value: '', name: misc.choose.fr },
+                      { value: '2 years', name: misc.duration2Years.fr },
+                      { value: '3 years', name: misc.duration3Years.fr }
+                    ]
+                  };
+
+                  self.metadata.columnList.duration.amendment2EnumList = {
+                    en: [
+                      { value: '2 years', name: misc.duration2Years.en },
+                      { value: '2 years + 1 additional year', name: misc.duration2p1Years.en },
+                      { value: '2 years + 2 additional years', name: misc.duration2p2Years.en },
+                      { value: '2 years + 3 additional years', name: misc.duration2p3Years.en }
+                    ],
+                    fr: [
+                      { value: '2 years', name: misc.duration2Years.fr },
+                      { value: '2 years + 1 additional year', name: misc.duration2p1Years.fr },
+                      { value: '2 years + 2 additional years', name: misc.duration2p2Years.fr },
+                      { value: '2 years + 3 additional years', name: misc.duration2p3Years.fr }
+                    ]
+                  };
+
+                  self.metadata.columnList.duration.amendment3EnumList = {
+                    en: [
+                      { value: '3 years', name: misc.duration3Years.en },
+                      { value: '3 years + 1 additional year', name: misc.duration3p1Years.en },
+                      { value: '3 years + 2 additional years', name: misc.duration3p2Years.en },
+                      { value: '3 years + 3 additional years', name: misc.duration3p3Years.en }
+                    ],
+                    fr: [
+                      { value: '3 years', name: misc.duration3Years.fr },
+                      { value: '3 years + 1 additional year', name: misc.duration3p1Years.fr },
+                      { value: '3 years + 2 additional years', name: misc.duration3p2Years.fr },
+                      { value: '3 years + 3 additional years', name: misc.duration3p3Years.fr }
+                    ]
+                  };
+
+                  // translate funding enum
+                  self.metadata.columnList.funding.enumList = {
+                    en: self.metadata.columnList.funding.enumList,
+                    fr: angular.copy( self.metadata.columnList.funding.enumList )
+                  };
+                  self.metadata.columnList.funding.enumList.fr[0].name = misc.yes.fr.toLowerCase();
+                  self.metadata.columnList.funding.enumList.fr[1].name = misc.no.fr.toLowerCase();
+                  self.metadata.columnList.funding.enumList.fr[2].name = misc.requested.fr.toLowerCase();
+
+                  self.metadata.columnList.funding.enumList.en.unshift( { value: '', name: misc.choose.en } );
+                  self.metadata.columnList.funding.enumList.fr.unshift( { value: '', name: misc.choose.fr } );
+
+                  // translate ethics enum
+                  self.metadata.columnList.ethics.enumList = {
+                    en: self.metadata.columnList.ethics.enumList,
+                    fr: angular.copy( self.metadata.columnList.ethics.enumList )
+                  };
+                  self.metadata.columnList.ethics.enumList.fr[0].name = misc.yes.fr.toLowerCase();
+                  self.metadata.columnList.ethics.enumList.fr[1].name = misc.no.fr.toLowerCase();
+                  self.metadata.columnList.ethics.enumList.fr[2].name = misc.exempt.fr.toLowerCase();
+
+                  self.metadata.columnList.ethics.enumList.en.unshift( { value: '', name: misc.choose.en } );
+                  self.metadata.columnList.ethics.enumList.fr.unshift( { value: '', name: misc.choose.fr } );
+
+                  // translate waiver enum
+                  self.metadata.columnList.waiver.enumList.unshift( { value: '', name: misc.none.en } );
+                  self.metadata.columnList.waiver.enumList = {
+                    en: self.metadata.columnList.waiver.enumList,
+                    fr: angular.copy( self.metadata.columnList.waiver.enumList )
+                  };
+                  self.metadata.columnList.waiver.enumList.en[1].name = misc.traineeFeeWaiver.en;
+                  self.metadata.columnList.waiver.enumList.en[2].name = misc.postdocFeeWaiver.en;
+                  self.metadata.columnList.waiver.enumList.fr[0].name = misc.none.fr;
+                  self.metadata.columnList.waiver.enumList.fr[1].name = misc.traineeFeeWaiver.fr;
+                  self.metadata.columnList.waiver.enumList.fr[2].name = misc.postdocFeeWaiver.fr;
                 }
-              } ).query().then( function( response ) {
-                self.dataOptionCategoryList = response.data;
-                self.dataOptionCategoryList.forEach( function( dataOptionCategory ) {
-                  dataOptionCategory.name = { en: dataOptionCategory.name_en, fr: dataOptionCategory.name_fr };
-                  delete dataOptionCategory.name_en;
-                  delete dataOptionCategory.name_fr;
-                  dataOptionCategory.note = { en: dataOptionCategory.note_en, fr: dataOptionCategory.note_fr };
-                  delete dataOptionCategory.note_en;
-                  delete dataOptionCategory.note_fr;
-                  dataOptionCategory.optionList = [];
-                } );
+              } ),
 
-                return CnHttpFactory.instance( {
-                  path: 'data_option',
+              // only do the following for the root instance
+              'root' != self.type ? $q.all() : $q.all( [
+                CnHttpFactory.instance( {
+                  path: 'data_option_category',
                   data: {
                     select: { column: [
                       'id',
-                      'data_option_category_id',
+                      'rank',
                       'name_en', 'name_fr',
                       'condition_en', 'condition_fr',
-                      'note_en', 'note_fr',
-                      'bl',
-                      'f1'
+                      'note_en', 'note_fr'
                     ] },
-                    modifier: {
-                      order: [ 'data_option_category_id', 'data_option.rank' ],
-                      limit: 1000
-                    }
+                    modifier: { order: 'rank', limit: 1000 }
                   }
                 } ).query().then( function( response ) {
-                  var category = null;
-                  response.data.forEach( function( option ) {
-                    if( null == category || option.data_option_category_id != category.id )
-                      category = self.dataOptionCategoryList.findByProperty( 'id', option.data_option_category_id );
-
-                    option.name = { en: option.name_en, fr: option.name_fr };
-                    delete option.name_en;
-                    delete option.name_fr;
-                    option.note = { en: option.note_en, fr: option.note_fr };
-                    delete option.note_en;
-                    delete option.note_fr;
-                    option.detailCategoryList = [];
-                    category.optionList.push( option );
+                  self.dataOptionCategoryList = response.data;
+                  self.dataOptionCategoryList.forEach( function( dataOptionCategory ) {
+                    dataOptionCategory.name = { en: dataOptionCategory.name_en, fr: dataOptionCategory.name_fr };
+                    delete dataOptionCategory.name_en;
+                    delete dataOptionCategory.name_fr;
+                    dataOptionCategory.note = { en: dataOptionCategory.note_en, fr: dataOptionCategory.note_fr };
+                    delete dataOptionCategory.note_en;
+                    delete dataOptionCategory.note_fr;
+                    dataOptionCategory.optionList = [];
                   } );
 
                   return CnHttpFactory.instance( {
-                    path: 'data_option_detail',
+                    path: 'data_option',
                     data: {
-                      select: { column: [ 'id', 'data_option_id', 'name_en', 'name_fr', 'note_en', 'note_fr', 'study_phase_id', {
-                        table: 'study_phase',
-                        column: 'name',
-                        alias: 'study_phase'
-                      }, {
-                        table: 'data_option',
-                        column: 'data_option_category_id'
-                      } ] },
+                      select: { column: [
+                        'id',
+                        'data_option_category_id',
+                        'name_en', 'name_fr',
+                        'condition_en', 'condition_fr',
+                        'note_en', 'note_fr',
+                        'bl',
+                        'f1'
+                      ] },
                       modifier: {
-                        order: [ 'data_option_id', 'study_phase_id', 'data_option_detail.rank' ],
+                        order: [ 'data_option_category_id', 'data_option.rank' ],
                         limit: 1000
                       }
                     }
                   } ).query().then( function( response ) {
                     var category = null;
-                    var option = null;
-                    response.data.forEach( function( detail ) {
-                      var detailList = {};
-                      if( null == category || detail.data_option_category_id != category.id )
-                        category = self.dataOptionCategoryList.findByProperty( 'id', detail.data_option_category_id );
-                      if( null == option || detail.data_option_id != option.id )
-                        option = category.optionList.findByProperty( 'id', detail.data_option_id );
+                    response.data.forEach( function( option ) {
+                      if( null == category || option.data_option_category_id != category.id )
+                        category = self.dataOptionCategoryList.findByProperty( 'id', option.data_option_category_id );
 
-                      detail.name = { en: detail.name_en, fr: detail.name_fr };
-                      delete detail.name_en;
-                      delete detail.name_fr;
-                      detail.note = { en: detail.note_en, fr: detail.note_fr };
-                      delete detail.note_en;
-                      delete detail.note_fr;
-                      var studyPhaseId = detail.study_phase_id;
-                      var studyPhase = detail.study_phase;
-                      delete detail.study_phase;
-                      delete detail.study_phase_id;
+                      option.name = { en: option.name_en, fr: option.name_fr };
+                      delete option.name_en;
+                      delete option.name_fr;
+                      option.note = { en: option.note_en, fr: option.note_fr };
+                      delete option.note_en;
+                      delete option.note_fr;
+                      option.detailCategoryList = [];
+                      category.optionList.push( option );
+                    } );
 
-                      var studyPhaseFr = misc.baseline.fr;
-                      var match = studyPhase.match( /Follow-up ([0-9]+)/ );
-                      if( null != match ) {
-                        var lookup = 'followup' + match[1];
-                        studyPhaseFr = misc[lookup].fr;
+                    return CnHttpFactory.instance( {
+                      path: 'data_option_detail',
+                      data: {
+                        select: { column: [ 'id', 'data_option_id', 'name_en', 'name_fr', 'note_en', 'note_fr', 'study_phase_id', {
+                          table: 'study_phase',
+                          column: 'name',
+                          alias: 'study_phase'
+                        }, {
+                          table: 'data_option',
+                          column: 'data_option_category_id'
+                        } ] },
+                        modifier: {
+                          order: [ 'data_option_id', 'study_phase_id', 'data_option_detail.rank' ],
+                          limit: 1000
+                        }
                       }
+                    } ).query().then( function( response ) {
+                      var category = null;
+                      var option = null;
+                      response.data.forEach( function( detail ) {
+                        var detailList = {};
+                        if( null == category || detail.data_option_category_id != category.id )
+                          category = self.dataOptionCategoryList.findByProperty( 'id', detail.data_option_category_id );
+                        if( null == option || detail.data_option_id != option.id )
+                          option = category.optionList.findByProperty( 'id', detail.data_option_id );
 
-                      var detailCategory = option.detailCategoryList.findByProperty( 'study_phase_id', studyPhaseId );
-                      if( detailCategory ) detailCategory.detailList.push( detail );
-                      else option.detailCategoryList.push( {
-                        study_phase_id: studyPhaseId,
-                        name: { en: studyPhase, fr: studyPhaseFr },
-                        detailList: [ detail ]
+                        detail.name = { en: detail.name_en, fr: detail.name_fr };
+                        delete detail.name_en;
+                        delete detail.name_fr;
+                        detail.note = { en: detail.note_en, fr: detail.note_fr };
+                        delete detail.note_en;
+                        delete detail.note_fr;
+                        var studyPhaseId = detail.study_phase_id;
+                        var studyPhase = detail.study_phase;
+                        delete detail.study_phase;
+                        delete detail.study_phase_id;
+
+                        var studyPhaseFr = misc.baseline.fr;
+                        var match = studyPhase.match( /Follow-up ([0-9]+)/ );
+                        if( null != match ) {
+                          var lookup = 'followup' + match[1];
+                          studyPhaseFr = misc[lookup].fr;
+                        }
+
+                        var detailCategory = option.detailCategoryList.findByProperty( 'study_phase_id', studyPhaseId );
+                        if( detailCategory ) detailCategory.detailList.push( detail );
+                        else option.detailCategoryList.push( {
+                          study_phase_id: studyPhaseId,
+                          name: { en: studyPhase, fr: studyPhaseFr },
+                          detailList: [ detail ]
+                        } );
                       } );
                     } );
                   } );
-                } );
-              } )
+                } )
+              ] )
+            ] );
+          }
+        } );
 
-            ] )
-
-          ] );
-        };
+        // make the input lists from all groups more accessible
+        module.inputGroupList.forEach( group => Object.assign( self.inputList, group.inputList ) );
 
       };
 
