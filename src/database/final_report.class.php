@@ -60,7 +60,10 @@ class final_report extends \cenozo\database\record
     $db_user = $db_reqn->get_user();
     $db_trainee_user = $db_reqn->get_trainee_user();
     $db_reqn_version = $db_reqn->get_current_reqn_version();
-    $data = array( 'identifier' => $db_reqn->identifier );
+    $data = array(
+      'identifier' => $db_reqn->identifier,
+      'version' => $this->version // TODO: make sure version is in the PDF
+    );
 
     $data['applicant_name'] = sprintf( '%s %s', $db_user->first_name, $db_user->last_name );
     if( !is_null( $db_reqn_version->applicant_affiliation ) )

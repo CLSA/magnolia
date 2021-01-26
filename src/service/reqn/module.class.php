@@ -198,27 +198,36 @@ class module extends \cenozo\service\module
       $modifier->where_bracket( false );
 
       // don't show applicants the deferral notes unless the reqn is deferred
+      if( $select->has_column( 'deferral_note_amendment' ) )
+        $select->add_column( 'IF( "deferred" = reqn.state, deferral_note_amendment, NULL )', 'deferral_note_amendment', false );
       if( $select->has_column( 'deferral_note_1a' ) )
-      {
-        $select->add_column(
-          'IF( "deferred" = reqn.state, deferral_note_1a, NULL )', 'deferral_note_1a', false );
-        $select->add_column(
-          'IF( "deferred" = reqn.state, deferral_note_1b, NULL )', 'deferral_note_1b', false );
-        $select->add_column(
-          'IF( "deferred" = reqn.state, deferral_note_1c, NULL )', 'deferral_note_1c', false );
-        $select->add_column(
-          'IF( "deferred" = reqn.state, deferral_note_1d, NULL )', 'deferral_note_1d', false );
-        $select->add_column(
-          'IF( "deferred" = reqn.state, deferral_note_1e, NULL )', 'deferral_note_1e', false );
-        $select->add_column(
-          'IF( "deferred" = reqn.state, deferral_note_1f, NULL )', 'deferral_note_1f', false );
-        $select->add_column(
-          'IF( "deferred" = reqn.state, deferral_note_2a, NULL )', 'deferral_note_2a', false );
-        $select->add_column(
-          'IF( "deferred" = reqn.state, deferral_note_2b, NULL )', 'deferral_note_2b', false );
-        $select->add_column(
-          'IF( "deferred" = reqn.state, deferral_note_2c, NULL )', 'deferral_note_2c', false );
-      }
+        $select->add_column( 'IF( "deferred" = reqn.state, deferral_note_1a, NULL )', 'deferral_note_1a', false );
+      if( $select->has_column( 'deferral_note_1b' ) )
+        $select->add_column( 'IF( "deferred" = reqn.state, deferral_note_1b, NULL )', 'deferral_note_1b', false );
+      if( $select->has_column( 'deferral_note_1c' ) )
+        $select->add_column( 'IF( "deferred" = reqn.state, deferral_note_1c, NULL )', 'deferral_note_1c', false );
+      if( $select->has_column( 'deferral_note_1d' ) )
+        $select->add_column( 'IF( "deferred" = reqn.state, deferral_note_1d, NULL )', 'deferral_note_1d', false );
+      if( $select->has_column( 'deferral_note_1e' ) )
+        $select->add_column( 'IF( "deferred" = reqn.state, deferral_note_1e, NULL )', 'deferral_note_1e', false );
+      if( $select->has_column( 'deferral_note_1f' ) )
+        $select->add_column( 'IF( "deferred" = reqn.state, deferral_note_1f, NULL )', 'deferral_note_1f', false );
+      if( $select->has_column( 'deferral_note_2a' ) )
+        $select->add_column( 'IF( "deferred" = reqn.state, deferral_note_2a, NULL )', 'deferral_note_2a', false );
+      if( $select->has_column( 'deferral_note_2b' ) )
+        $select->add_column( 'IF( "deferred" = reqn.state, deferral_note_2b, NULL )', 'deferral_note_2b', false );
+      if( $select->has_column( 'deferral_note_2c' ) )
+        $select->add_column( 'IF( "deferred" = reqn.state, deferral_note_2c, NULL )', 'deferral_note_2c', false );
+      if( $select->has_column( 'deferral_note_2d' ) )
+        $select->add_column( 'IF( "deferred" = reqn.state, deferral_note_2d, NULL )', 'deferral_note_2d', false );
+      if( $select->has_column( 'deferral_note_2e' ) )
+        $select->add_column( 'IF( "deferred" = reqn.state, deferral_note_2e, NULL )', 'deferral_note_2e', false );
+      if( $select->has_column( 'deferral_note_report1' ) )
+        $select->add_column( 'IF( "deferred" = reqn.state, deferral_note_report1, NULL )', 'deferral_note_report1', false );
+      if( $select->has_column( 'deferral_note_report2' ) )
+        $select->add_column( 'IF( "deferred" = reqn.state, deferral_note_report2, NULL )', 'deferral_note_report2', false );
+      if( $select->has_column( 'deferral_note_report3' ) )
+        $select->add_column( 'IF( "deferred" = reqn.state, deferral_note_report3, NULL )', 'deferral_note_report3', false );
     }
     else if( 'reviewer' == $db_role->name )
     {

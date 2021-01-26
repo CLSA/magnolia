@@ -43,6 +43,20 @@ CREATE PROCEDURE patch_reqn()
       WHERE data_option_category.name_en = "Linked Data";
     END IF;
 
+    SELECT "Adding new deferral_note_report* columns to reqn table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "deferral_note_report1";
+
+    IF @test = 0 THEN
+      ALTER TABLE reqn ADD COLUMN deferral_note_report3 TEXT NULL DEFAULT NULL AFTER deferral_note_2e;
+      ALTER TABLE reqn ADD COLUMN deferral_note_report2 TEXT NULL DEFAULT NULL AFTER deferral_note_2e;
+      ALTER TABLE reqn ADD COLUMN deferral_note_report1 TEXT NULL DEFAULT NULL AFTER deferral_note_2e;
+    END IF;
+
   END //
 DELIMITER ;
 

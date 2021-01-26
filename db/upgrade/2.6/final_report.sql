@@ -26,3 +26,20 @@ DELIMITER ;
 
 CALL patch_final_report();
 DROP PROCEDURE IF EXISTS patch_final_report;
+
+
+DELIMITER $$
+
+DROP TRIGGER IF EXISTS final_report_AFTER_INSERT$$
+CREATE DEFINER = CURRENT_USER TRIGGER final_report_AFTER_INSERT AFTER INSERT ON final_report FOR EACH ROW
+BEGIN
+  CALL update_reqn_current_final_report( NEW.reqn_id );
+END$$
+
+DROP TRIGGER IF EXISTS final_report_AFTER_DELETE$$
+CREATE DEFINER = CURRENT_USER TRIGGER final_report_AFTER_DELETE AFTER DELETE ON final_report FOR EACH ROW
+BEGIN
+  CALL update_reqn_current_final_report( OLD.reqn_id );
+END$$
+
+DELIMITER ;

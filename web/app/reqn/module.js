@@ -300,7 +300,7 @@ define( function() {
     deadline: { type: 'date', column: 'deadline.date', isExcluded: true }
   } );
 
-  module.addInputGroup( 'Deferral Notes', {
+  module.addInputGroup( 'Requisition Deferral Notes', {
     deferral_note_amendment: {
       title: 'Amendment',
       type: 'text',
@@ -315,77 +315,129 @@ define( function() {
       title: '', // defined dynamically in the model
       type: 'text',
       isExcluded: function( $state, model ) {
-        return 'view' == model.getActionFromState() ? model.viewModel.record.external : 'add';
+        return 'add' == model.getActionFromState() ||
+               model.viewModel.record.external ||
+               'Report Required' == model.viewModel.record.stage_type;
       }
     },
     deferral_note_1b: {
       title: '', // defined dynamically in the model
       type: 'text',
       isExcluded: function( $state, model ) {
-        return 'view' == model.getActionFromState() ? model.viewModel.record.external : 'add';
+        return 'add' == model.getActionFromState() ||
+               model.viewModel.record.external ||
+               'Report Required' == model.viewModel.record.stage_type;
       }
     },
     deferral_note_1c: {
       title: '', // defined dynamically in the model
       type: 'text',
       isExcluded: function( $state, model ) {
-        return 'view' == model.getActionFromState() ? model.viewModel.record.external : 'add';
+        return 'add' == model.getActionFromState() ||
+               model.viewModel.record.external ||
+               'Report Required' == model.viewModel.record.stage_type;
       }
     },
     deferral_note_1d: {
       title: '', // defined dynamically in the model
       type: 'text',
       isExcluded: function( $state, model ) {
-        return 'view' == model.getActionFromState() ? model.viewModel.record.external : 'add';
+        return 'add' == model.getActionFromState() ||
+               model.viewModel.record.external ||
+               'Report Required' == model.viewModel.record.stage_type;
       }
     },
     deferral_note_1e: {
       title: '', // defined dynamically in the model
       type: 'text',
       isExcluded: function( $state, model ) {
-        return 'view' == model.getActionFromState() ? model.viewModel.record.external : 'add';
+        return 'add' == model.getActionFromState() ||
+               model.viewModel.record.external ||
+               'Report Required' == model.viewModel.record.stage_type;
       }
     },
     deferral_note_1f: {
       title: '', // defined dynamically in the model
       type: 'text',
       isExcluded: function( $state, model ) {
-        return 'view' == model.getActionFromState() ? model.viewModel.record.external : 'add';
+        return 'add' == model.getActionFromState() ||
+               model.viewModel.record.external ||
+               'Report Required' == model.viewModel.record.stage_type;
       }
     },
     deferral_note_2a: {
       title: '', // defined dynamically in the model
       type: 'text',
       isExcluded: function( $state, model ) {
-        return 'view' == model.getActionFromState() ? model.viewModel.record.external : 'add';
+        return 'add' == model.getActionFromState() ||
+               model.viewModel.record.external ||
+               'Report Required' == model.viewModel.record.stage_type;
       }
     },
     deferral_note_2b: {
       title: '', // defined dynamically in the model
       type: 'text',
       isExcluded: function( $state, model ) {
-        return 'view' == model.getActionFromState() ? model.viewModel.record.external : 'add';
+        return 'add' == model.getActionFromState() ||
+               model.viewModel.record.external ||
+               'Report Required' == model.viewModel.record.stage_type;
       }
     },
     deferral_note_2c: {
       title: '', // defined dynamically in the model
       type: 'text',
       isExcluded: function( $state, model ) {
-        return 'view' == model.getActionFromState() ? model.viewModel.record.external : 'add';
+        return 'add' == model.getActionFromState() ||
+               model.viewModel.record.external ||
+               'Report Required' == model.viewModel.record.stage_type;
       }
     },
     deferral_note_2d: {
       title: '', // defined dynamically in the model
       type: 'text',
       isExcluded: function( $state, model ) {
-        return 'view' == model.getActionFromState() ? model.viewModel.record.external : 'add';
+        return 'add' == model.getActionFromState() ||
+               model.viewModel.record.external ||
+               'Report Required' == model.viewModel.record.stage_type;
       }
     },
     deferral_note_2e: {
       title: '', // defined dynamically in the model
       type: 'text',
       isExcluded: function( $state, model ) {
-        return 'view' == model.getActionFromState() ? model.viewModel.record.external : 'add';
+        return 'add' == model.getActionFromState() ||
+               model.viewModel.record.external ||
+               'Report Required' == model.viewModel.record.stage_type;
+      }
+    }
+  } );
+
+  module.addInputGroup( 'Review Deferral Notes', {
+    deferral_note_report1: {
+      title: 'Part 1',
+      type: 'text',
+      isExcluded: function( $state, model ) {
+        return 'add' == model.getActionFromState() ||
+               model.viewModel.record.external ||
+               'Report Required' != model.viewModel.record.stage_type;
+      }
+    },
+    deferral_note_report2: {
+      title: 'Part 2',
+      type: 'text',
+      isExcluded: function( $state, model ) {
+        return 'add' == model.getActionFromState() ||
+               model.viewModel.record.external ||
+               'Report Required' != model.viewModel.record.stage_type;
+      }
+    },
+    deferral_note_report3: {
+      title: 'Part 3',
+      type: 'text',
+      isExcluded: function( $state, model ) {
+        return 'add' == model.getActionFromState() ||
+               model.viewModel.record.external ||
+               'Report Required' != model.viewModel.record.stage_type;
       }
     }
   } );
@@ -648,10 +700,12 @@ define( function() {
         controller: function( $scope ) {
           if( angular.isUndefined( $scope.model ) ) $scope.model = CnReqnModelFactory.root;
 
-          // remove the decision and deferral note input group if we're not an admin
+          // remove the deferral note input groups if we're not an admin
           if( 3 > CnSession.role.tier ) {
             $scope.$on( 'cnRecordView linked', function( event, data ) {
-              var index = data.dataArray.findIndexByProperty( 'title', 'Decision and Deferral Notes' );
+              var index = data.dataArray.findIndexByProperty( 'title', 'Requisition Deferral Notes' );
+              if( null != index ) data.dataArray.splice( index, 1 );
+              var index = data.dataArray.findIndexByProperty( 'title', 'Report Deferral Notes' );
               if( null != index ) data.dataArray.splice( index, 1 );
             } );
           }
@@ -870,14 +924,26 @@ define( function() {
             }
           },
 
-          deferralNotesExist: function() {
-            return this.record.deferral_note_amendment ||
-                   this.record.deferral_note_1a || this.record.deferral_note_1b ||
-                   this.record.deferral_note_1c || this.record.deferral_note_1d ||
-                   this.record.deferral_note_1e || this.record.deferral_note_1f ||
-                   this.record.deferral_note_2a || this.record.deferral_note_2b ||
-                   this.record.deferral_note_2c || this.record.deferral_note_2d ||
-                   this.record.deferral_note_2e;
+          reqnDeferralNotesExist: function() {
+            var stage_type = this.record.stage_type ? this.record.stage_type : '';
+            return 'Report Required' != stage_type && (
+              this.record.deferral_note_amendment ||
+              this.record.deferral_note_1a || this.record.deferral_note_1b ||
+              this.record.deferral_note_1c || this.record.deferral_note_1d ||
+              this.record.deferral_note_1e || this.record.deferral_note_1f ||
+              this.record.deferral_note_2a || this.record.deferral_note_2b ||
+              this.record.deferral_note_2c || this.record.deferral_note_2d ||
+              this.record.deferral_note_2e
+            );
+          },
+
+          reportDeferralNotesExist: function() {
+            var stage_type = this.record.stage_type ? this.record.stage_type : '';
+            return 'Report Required' == stage_type && (
+              this.record.deferral_note_report1 ||
+              this.record.deferral_note_report2 ||
+              this.record.deferral_note_report3
+            );
           },
 
           enabled: function( subject ) {
@@ -893,7 +959,7 @@ define( function() {
           proceed: function( stageType ) {
             var message = 'Are you sure you wish to move this ' + this.parentModel.module.name.singular + ' to the "' +
               ( angular.isDefined( stageType ) ? stageType : this.record.next_stage_type ) + '" stage?';
-            if( 'administrator' == CnSession.role.name && this.deferralNotesExist() ) {
+            if( 'administrator' == CnSession.role.name && ( this.reqnDeferralNotesExist() || this.reportDeferralNotesExist() ) ) {
               message += '\n\nWARNING: There are deferral notes present, you may wish to remove them before proceeding.';
             }
 
@@ -947,7 +1013,7 @@ define( function() {
           defer: function() {
             var message = 'Are you sure you wish to defer to the applicant?  ' +
               'A notification will be sent indicating that an action is required by the applicant.'
-            if( !this.deferralNotesExist() ) {
+            if( !this.reqnDeferralNotesExist() && !this.reportDeferralNotesExist() ) {
               message += '\n\nWARNING: there are currently no deferral notes to instruct the applicant why ' +
                          'their attention is required.';
             }
@@ -1104,7 +1170,7 @@ define( function() {
 
         CnReqnHelper.promise.then( function() {
           module.inputGroupList.forEach( function( group ) {
-            if( 'Deferral Notes' == group.title ) {
+            if( 'Requisition Deferral Notes' == group.title ) {
               for( var property in group.inputList ) {
                 if( group.inputList.hasOwnProperty( property ) ) {
                   var parts = property.match( /deferral_note_([0-9]+)([a-z]+)/ );

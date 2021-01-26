@@ -44,7 +44,10 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
     impact: { type: 'text' },
     opportunities: { type: 'text' },
     dissemination: { type: 'text' },
-    waiver: { column: 'reqn_version.waiver', type: 'string' }
+    waiver: { column: 'reqn_version.waiver', type: 'string' },
+    deferral_note_report1: { column: 'reqn.deferral_note_report1', type: 'text' },
+    deferral_note_report2: { column: 'reqn.deferral_note_report2', type: 'text' },
+    deferral_note_report3: { column: 'reqn.deferral_note_report3', type: 'text' }
   } );
 
   /* ######################################################################################################## */
@@ -199,12 +202,31 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
             } );
           },
 
+          onPatch: function( data ) {
+            var property = Object.keys( data )[0];
+            if( !this.parentModel.getEditEnabled() ) throw new Error( 'Calling onPatch() but edit is not enabled.' );
+
+            if( null == property.match( /^deferral_note/ ) ) {
+              return self.$$onPatch( data );
+            } else { // make sure to send patches to deferral notes to the parent reqn
+              var parent = this.parentModel.getParentIdentifier();
+              var httpObj = {
+                path: parent.subject + '/' + parent.identifier,
+                data: data
+              };
+              httpObj.onError = function( response ) { self.onPatchError( response ); };
+              return CnHttpFactory.instance( httpObj ).patch().then( function() {
+                self.afterPatchFunctions.forEach( function( fn ) { fn(); } );
+              } );
+            }
+          },
+
           // setup language and tab state parameters
           toggleLanguage: function() {
             this.record.lang = 'en' == this.record.lang ? 'fr' : 'en';
             return CnHttpFactory.instance( {
               path: 'reqn/identifier=' + this.record.identifier,
-              data: { lang: this.record.lang }
+              data: { language: this.record.lang }
             } ).patch();
           },
 
@@ -447,6 +469,7 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
 
         angular.extend( this, {
           viewModel: CnFinalReportViewFactory.instance( this, 'root' == this.type ),
+          inputList: {},
 
           setupBreadcrumbTrail: function() {
             var trail = [];
@@ -471,6 +494,9 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
             CnSession.setBreadcrumbTrail( trail );
           }
         } );
+
+        // make the input lists from all groups more accessible
+        module.inputGroupList.forEach( group => Object.assign( self.inputList, group.inputList ) );
       };
 
       return {

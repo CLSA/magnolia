@@ -557,7 +557,8 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
           },
 
           onPatch: function( data ) {
-            // make sure to send patches to deferral notes to the parent reqn
+            if( !this.parentModel.getEditEnabled() ) throw new Error( 'Calling onPatch() but edit is not enabled.' );
+
             var property = Object.keys( data )[0];
             if( null == property.match( /^deferral_note/ ) ) {
               var promiseList = [];
@@ -614,8 +615,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                 } );
               } );
             } else {
-              if( !this.parentModel.getEditEnabled() ) throw new Error( 'Calling onPatch() but edit is not enabled.' );
-
+              // make sure to send patches to deferral notes to the parent reqn
               var parent = this.parentModel.getParentIdentifier();
               var httpObj = {
                 path: parent.subject + '/' + parent.identifier,

@@ -8,10 +8,10 @@ CREATE PROCEDURE update_reqn_current_final_report(IN proc_reqn_id INT(10) UNSIGN
 BEGIN
   REPLACE INTO reqn_current_final_report( reqn_id, final_report_id )
   SELECT reqn.id, final_report.id
-  FROM reqn 
+  FROM reqn
   LEFT JOIN final_report ON reqn.id = final_report.reqn_id
-  AND CONCAT( final_report.amendment, final_report.version ) <=> (
-    SELECT MAX( CONCAT( amendment, version ) )
+  AND final_report.version <=> (
+    SELECT MAX( version )
     FROM final_report
     WHERE reqn.id = final_report.reqn_id
     GROUP BY final_report.reqn_id

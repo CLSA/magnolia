@@ -37,14 +37,14 @@
                 data-toggle="dropdown"
                 aria-haspopup="true"
                 aria-expanded="false">
-          Compare {{ null == model.viewModel.compareRecord ? '' : 'Version ' + model.viewModel.compareRecord.amendment_version }}
+          Compare {{ null == model.viewModel.compareRecord ? '' : 'Version ' + model.viewModel.compareRecord.version }}
           <span class="caret"></span>
         </button>
         <ul class="dropdown-menu full-width" aria-labelledby="versionList">
           <li ng-repeat="version in model.viewModel.versionList">
             <a ng-if="version.id != model.viewModel.record.id && model.viewModel.compareRecord != version"
                ng-click="compareTo( version )">
-              {{ null == version ? 'none' : 'Version ' + version.amendment_version }}
+              {{ null == version ? 'none' : 'Version ' + version.version }}
             </a>
           </li>
         </ul>
@@ -78,13 +78,25 @@
         <a ng-click="model.viewModel.setFormTab('instructions')" ng-bind-html="t( 'instructions.tab' )"></a>
       </li>
       <li ng-class="{'active':'part1'==model.viewModel.formTab}">
-        <a ng-click="model.viewModel.setFormTab('part1')" ng-bind-html="t( 'part1.tab' )"></a>
+        <a ng-click="model.viewModel.setFormTab('part1')"
+           ng-class="{
+             'text-warning flashing': model.getEditEnabled() && model.viewModel.record.deferral_note_report1
+           }"
+           ng-bind-html="t( 'part1.tab' )"></a>
       </li>
       <li ng-class="{'active':'part2'==model.viewModel.formTab}">
-        <a ng-click="model.viewModel.setFormTab('part2')" ng-bind-html="t( 'part2.tab' )"></a>
+        <a ng-click="model.viewModel.setFormTab('part2')"
+           ng-class="{
+             'text-warning flashing': model.getEditEnabled() && model.viewModel.record.deferral_note_report2
+           }"
+           ng-bind-html="t( 'part2.tab' )"></a>
       </li>
       <li ng-class="{'active':'part3'==model.viewModel.formTab}">
-        <a ng-click="model.viewModel.setFormTab('part3')" ng-bind-html="t( 'part3.tab' )"></a>
+        <a ng-click="model.viewModel.setFormTab('part3')"
+           ng-class="{
+             'text-warning flashing': model.getEditEnabled() && model.viewModel.record.deferral_note_report3
+           }"
+           ng-bind-html="t( 'part3.tab' )"></a>
       </li>
     </ul>
     <div ng-show="'instructions'==model.viewModel.formTab"
@@ -104,6 +116,7 @@
          class="panel panel-default"
          style="border-top-left-radius: 0px;">
       <div class="panel-body">
+        <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_report1" class="bg-info"></cn-reqn-deferral-note>
         <form name="part1Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
           <div class="container-fluid vertical-spacer">
             <h4 ng-bind-html="t( 'part1.a.question' )"></h4>
@@ -144,6 +157,7 @@
          class="panel panel-default"
          style="border-top-left-radius: 0px;">
       <div class="panel-body">
+        <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_report2" class="bg-info"></cn-reqn-deferral-note>
         <form id="part2Form" name="part2Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
           <div class="container-fluid">
             <h4 ng-bind-html="t( 'part2.question' )"></h4>
@@ -212,6 +226,7 @@
          class="panel panel-default"
          style="border-top-left-radius: 0px;">
       <div class="panel-body">
+        <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_report3" class="bg-info"></cn-reqn-deferral-note>
         <form name="part3Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
           <div class="container-fluid vertical-spacer">
             <h4 ng-bind-html="t( 'part3.a.question' )"></h4>
