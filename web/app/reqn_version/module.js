@@ -1047,9 +1047,9 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                 self.versionList.push( version );
               } );
 
-              var amendmentVersion = self.parentModel.getQueryParameter( 'c' );
-              if( angular.isDefined( amendmentVersion ) )
-                self.compareRecord = self.versionList.findByProperty( 'amendment_version', amendmentVersion );
+              var compareVersion = self.parentModel.getQueryParameter( 'c' );
+              if( angular.isDefined( compareVersion ) )
+                self.compareRecord = self.versionList.findByProperty( 'amendment_version', compareVersion );
 
               if( 1 < self.versionList.length ) {
                 // add a null object to the version list so we can turn off comparisons
@@ -1115,7 +1115,6 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
 
               // When an amendment is made which adds coapplicants with access to data we need to get a signed agreement
               // form from the user.  In order to do this we need a variable that tracks when this is the case:
-              var versions = self.versionList.length;
               if( '.' != this.record.amendment && self.lastAmendmentVersion == version.amendment_version ) {
                 self.addingCoapplicantWithData = false;
                 if( version.coapplicantDiff ) {

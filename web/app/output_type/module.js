@@ -1,18 +1,18 @@
 define( function() {
   'use strict';
 
-  try { var module = cenozoApp.module( 'production_type', true ); } catch( err ) { console.warn( err ); return; }
+  try { var module = cenozoApp.module( 'output_type', true ); } catch( err ) { console.warn( err ); return; }
   angular.extend( module, {
     identifier: {},
     name: {
-      singular: 'production type',
-      plural: 'production types',
-      possessive: 'production type\'s'
+      singular: 'output type',
+      plural: 'output types',
+      possessive: 'output type\'s'
     }
   } );
 
   /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnProductionTypeAddFactory', [
+  cenozo.providers.factory( 'CnOutputTypeAddFactory', [
     'CnBaseAddFactory',
     function( CnBaseAddFactory ) {
       var object = function( parentModel ) { CnBaseAddFactory.construct( this, parentModel ); };
@@ -21,13 +21,13 @@ define( function() {
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnProductionTypeModelFactory', [
-    'CnBaseModelFactory', 'CnProductionTypeAddFactory',
-    function( CnBaseModelFactory, CnProductionTypeAddFactory ) {
+  cenozo.providers.factory( 'CnOutputTypeModelFactory', [
+    'CnBaseModelFactory', 'CnOutputTypeAddFactory',
+    function( CnBaseModelFactory, CnOutputTypeAddFactory ) {
       var object = function( root ) {
         var self = this;
         CnBaseModelFactory.construct( this, module );
-        this.addModel = CnProductionTypeAddFactory.instance( this );
+        this.addModel = CnOutputTypeAddFactory.instance( this );
       };
 
       return { instance: function() { return new object( false ); } };

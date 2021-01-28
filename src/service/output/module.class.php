@@ -6,7 +6,7 @@
  * @filesource
  */
 
-namespace magnolia\service\production;
+namespace magnolia\service\output;
 use cenozo\lib, cenozo\log, magnolia\util;
 
 /**
@@ -21,6 +21,6 @@ class module extends \cenozo\service\module
   {
     parent::prepare_read( $select, $modifier );
 
-    $modifier->join( 'production_type', 'production.production_type_id', 'production_type.id' );
+    $modifier->join( 'output_type', 'output.output_type_id', 'output_type.id' );
   }
 }

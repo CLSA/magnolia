@@ -1,6 +1,6 @@
 <?php
 /**
- * production.class.php
+ * output.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
  * @filesource
@@ -10,6 +10,6 @@ namespace magnolia\database;
 use cenozo\lib, cenozo\log, magnolia\util;
 
 /**
- * production: record
+ * output: record
  */
-class production extends \cenozo\database\record {}
+class output extends \cenozo\database\record {}

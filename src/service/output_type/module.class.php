@@ -6,7 +6,7 @@
  * @filesource
  */
 
-namespace magnolia\service\production_type;
+namespace magnolia\service\output_type;
 use cenozo\lib, cenozo\log, magnolia\util;
 
 /**

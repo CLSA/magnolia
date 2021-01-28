@@ -20,6 +20,8 @@ SOURCE notice_has_user.sql
 SOURCE final_report.sql
 SOURCE update_reqn_current_final_report.sql
 SOURCE reqn_current_final_report.sql
+SOURCE production_type.sql
+SOURCE production.sql
 
 SOURCE update_version_number.sql
 

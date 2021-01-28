@@ -919,11 +919,11 @@ cenozo.service( 'CnReqnHelper', [
             },
             number: { en: 'Number', fr: 'Numéro' },
             type: { en: 'Type', fr: 'Type' },
-            production: { en: 'Production', fr: 'Produit' },
-            productionType: { en: 'Production Type', fr: 'Type de produit' },
+            output: { en: 'Output', fr: 'TRANSLATION REQUIRED' },
+            outputType: { en: 'Output Type', fr: 'TRANSLATION REQUIRED' },
             details: { en: 'Details', fr: 'Description' },
-            noProductions: { en: 'No productions have been added.', fr: 'Aucun produit n’a été ajouté' },
-            addProduction: { en: 'Add Production', fr: 'Ajouter un produit' },
+            noOutputs: { en: 'No outputs have been added.', fr: 'TRANSLATION REQUIRED' },
+            addOutput: { en: 'Add Output', fr: 'TRANSLATION REQUIRED' },
             attachment: { en: 'Attachment', fr: 'Pièce jointe' }
           },
           part3: {

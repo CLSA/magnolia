@@ -1,7 +1,7 @@
 define( function() {
   'use strict';
 
-  try { var module = cenozoApp.module( 'production', true ); } catch( err ) { console.warn( err ); return; }
+  try { var module = cenozoApp.module( 'output', true ); } catch( err ) { console.warn( err ); return; }
   angular.extend( module, {
     identifier: {
       parent: {
@@ -10,20 +10,20 @@ define( function() {
       }
     },
     name: {
-      singular: 'production',
-      plural: 'productions',
-      possessive: 'production\'s'
+      singular: 'output',
+      plural: 'outputs',
+      possessive: 'output\'s'
     }
   } );
 
   module.addInputGroup( '', {
-    production_type_id: { title: 'Production Type', type: 'enum' },
+    output_type_id: { title: 'Output Type', type: 'enum' },
     detail: { title: 'Details', type: 'string' },
     filename: { title: 'Attachment', type: 'file' }
   } );
 
   /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnProductionAddFactory', [
+  cenozo.providers.factory( 'CnOutputAddFactory', [
     'CnBaseAddFactory',
     function( CnBaseAddFactory ) {
       var object = function( parentModel ) {
@@ -32,7 +32,7 @@ define( function() {
         this.onNew = function( record ) {
           return this.$$onNew( record ).then( function() {
             // convert blank enum to empty string
-            record.production_type_id = '';
+            record.output_type_id = '';
           } );
         }
       };
@@ -41,13 +41,13 @@ define( function() {
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnProductionModelFactory', [
-    'CnBaseModelFactory', 'CnProductionAddFactory',
-    function( CnBaseModelFactory, CnProductionAddFactory ) {
+  cenozo.providers.factory( 'CnOutputModelFactory', [
+    'CnBaseModelFactory', 'CnOutputAddFactory',
+    function( CnBaseModelFactory, CnOutputAddFactory ) {
       var object = function( root ) {
         var self = this;
         CnBaseModelFactory.construct( this, module );
-        this.addModel = CnProductionAddFactory.instance( this );
+        this.addModel = CnOutputAddFactory.instance( this );
       };
 
       return { instance: function() { return new object( false ); } };

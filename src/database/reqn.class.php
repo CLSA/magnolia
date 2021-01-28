@@ -224,13 +224,13 @@ class reqn extends \cenozo\database\record
 
     if( !is_null( $db_current_final_report ) )
     {
-      // copy production records
-      foreach( $db_current_final_report->get_production_object_list() as $db_production )
+      // copy output records
+      foreach( $db_current_final_report->get_output_object_list() as $db_output )
       {
-        $db_new_production = lib::create( 'database\production' );
-        $db_new_production->copy( $db_production );
-        $db_new_production->final_report_id = $db_final_report->id;
-        $db_new_production->save();
+        $db_new_output = lib::create( 'database\output' );
+        $db_new_output->copy( $db_output );
+        $db_new_output->final_report_id = $db_final_report->id;
+        $db_new_output->save();
       }
     }
   }

@@ -25,9 +25,7 @@ INSERT IGNORE INTO notification_type SET
   title_fr = "TRANSLATION REQUIRED",
   message_en = "Dear Dr. {{applicant_name}},
 
-TODO
-
-If you have any questions, please contact us at access@clsa-elcv.ca.
+This is a reminder that your CLSA Access Agreement, for project number {{identifier}}, entitled \"{{title}}\", is due to expire in approximately one (1) month. Once your agreement expires you will be required to submit a final report to CLSA, cease analysis of the data, and destroy all transferred materials in your possession. Following termination of the Agreement, the Approved User’s right to publish pursuant to Section 8 of the agreement will also end. If you require an extension to the agreement to complete analysis or to publish your results please contact us immediately at access@clsa-elcv.ca.
 
 The CLSA Data Access Team",
   message_fr = "TRANSLATION REQUIRED";

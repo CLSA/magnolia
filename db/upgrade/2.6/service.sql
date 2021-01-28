@@ -15,3 +15,7 @@ INSERT IGNORE INTO service ( subject, method, resource, restricted ) VALUES
 ( 'pdf_form', 'POST', 0, 1 ),
 ( 'region', 'GET', 0, 0 ),
 ( 'region', 'GET', 1, 0 );
+
+SELECT "Renaming production services to output" AS "";
+UPDATE service SET subject = "output" WHERE subject = "production";
+UPDATE service SET subject = "output_type" WHERE subject = "production_type";

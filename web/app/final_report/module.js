@@ -1,11 +1,11 @@
-define( [ 'production', 'production_type' ].reduce( function( list, name ) {
+define( [ 'output', 'output_type' ].reduce( function( list, name ) {
   return list.concat( cenozoApp.module( name ).getRequiredFiles() );
 }, [] ), function() {
   'use strict';
 
   try { var module = cenozoApp.module( 'final_report', true ); } catch( err ) { console.warn( err ); return; }
 
-  var productionModule = cenozoApp.module( 'production' );
+  var outputModule = cenozoApp.module( 'output' );
 
   angular.extend( module, {
     identifier: {
@@ -93,8 +93,8 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
         scope: { model: '=?' },
         link: function( scope, element, attrs ) {
           cnRecordView.link( scope, element, attrs );
-          scope.isAddingProduction = false;
-          scope.isDeletingProduction = [];
+          scope.isAddingOutput = false;
+          scope.isDeletingOutput = [];
 
           scope.liteModel.viewModel.onView();
 
@@ -126,10 +126,10 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
             return CnReqnHelper.translate( 'finalReport', value, $scope.model.viewModel.record.lang );
           };
 
-          // production resources
-          var productionAddModel = $scope.model.viewModel.productionModel.addModel;
-          $scope.productionRecord = {};
-          productionAddModel.onNew( $scope.productionRecord );
+          // output resources
+          var outputAddModel = $scope.model.viewModel.outputModel.addModel;
+          $scope.outputRecord = {};
+          outputAddModel.onNew( $scope.outputRecord );
 
           $scope.getHeading = function() {
             var status = null;
@@ -144,7 +144,7 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
               '-',
               $scope.model.viewModel.record.identifier,
               'version',
-              $scope.model.viewModel.record.amendment_version,
+              $scope.model.viewModel.record.version,
               null != status ? '(' + status + ')' : ''
             ].join( ' ' );
           };
@@ -152,17 +152,17 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
           $scope.compareTo = function( version ) {
             $scope.model.viewModel.compareRecord = version;
             $scope.liteModel.viewModel.compareRecord = version;
-            $scope.model.setQueryParameter( 'c', null == version ? undefined : version.amendment_version );
+            $scope.model.setQueryParameter( 'c', null == version ? undefined : version.version );
             $scope.model.reloadState( false, false, 'replace' );
           };
 
-          $scope.addProduction = function() {
-            if( $scope.model.viewModel.productionModel.getAddEnabled() ) {
+          $scope.addOutput = function() {
+            if( $scope.model.viewModel.outputModel.getAddEnabled() ) {
               var form = cenozo.getScopeByQuerySelector( '#part2Form' ).part2Form;
 
               // we need to check each add-input for errors
               var valid = true;
-              for( var property in $scope.model.viewModel.productionModel.module.inputGroupList[0].inputList ) {
+              for( var property in $scope.model.viewModel.outputModel.module.inputGroupList[0].inputList ) {
                 // get the property's form element and remove any conflict errors, then see if it's invalid
                 var currentElement = cenozo.getFormElement( property );
                 if( currentElement ) {
@@ -178,24 +178,26 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
                 // dirty all inputs so we can find the problem
                 cenozo.forEachFormElement( 'part2Form', function( element ) { element.$dirty = true; } );
               } else {
-                $scope.isAddingProduction = true;
-                productionAddModel.onAdd( $scope.productionRecord ).then( function( response ) {
+                $scope.isAddingOutput = true;
+                outputAddModel.onAdd( $scope.outputRecord ).then( function( response ) {
                   form.$setPristine();
                   return $q.all( [
-                    productionAddModel.onNew( $scope.productionRecord ),
-                    $scope.model.viewModel.getProductionList()
+                    outputAddModel.onNew( $scope.outputRecord ),
+                    $scope.model.viewModel.getOutputList().then( function() {
+                      $scope.model.viewModel.determineOutputDiffs();
+                    } )
                   ] );
-                } ).finally( function() { $scope.isAddingProduction = false; } );
+                } ).finally( function() { $scope.isAddingOutput = false; } );
               }
             }
           };
 
-          $scope.removeProduction = function( id ) {
-            if( $scope.model.viewModel.productionModel.getDeleteEnabled() ) {
-              if( !$scope.isDeletingProduction.includes( id ) ) $scope.isDeletingProduction.push( id );
-              var index = $scope.isDeletingProduction.indexOf( id );
-              $scope.model.viewModel.removeProduction( id ).finally( function() {
-                if( 0 <= index ) $scope.isDeletingProduction.splice( index, 1 );
+          $scope.removeOutput = function( id ) {
+            if( $scope.model.viewModel.outputModel.getDeleteEnabled() ) {
+              if( !$scope.isDeletingOutput.includes( id ) ) $scope.isDeletingOutput.push( id );
+              var index = $scope.isDeletingOutput.indexOf( id );
+              $scope.model.viewModel.removeOutput( id ).finally( function() {
+                if( 0 <= index ) $scope.isDeletingOutput.splice( index, 1 );
               } );
             }
           };
@@ -206,8 +208,8 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
             // that function is usually in the cn-record-add directive we have to implement on here instead.
             var element = cenozo.getFormElement( property );
             if( element ) {
-              element.$error.format = !$scope.model.viewModel.productionModel.testFormat(
-                property, $scope.productionRecord[property]
+              element.$error.format = !$scope.model.viewModel.outputModel.testFormat(
+                property, $scope.outputRecord[property]
               );
               cenozo.updateFormElement( element, true );
             }
@@ -228,9 +230,9 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnFinalReportViewFactory', [
-    'CnBaseViewFactory', 'CnReqnHelper', 'CnHttpFactory', 'CnProductionModelFactory',
+    'CnBaseViewFactory', 'CnReqnHelper', 'CnHttpFactory', 'CnOutputModelFactory',
     'CnModalMessageFactory', 'CnModalConfirmFactory', 'CnModalSubmitExternalFactory', 'CnSession', '$q',
-    function( CnBaseViewFactory, CnReqnHelper, CnHttpFactory, CnProductionModelFactory,
+    function( CnBaseViewFactory, CnReqnHelper, CnHttpFactory, CnOutputModelFactory,
               CnModalMessageFactory, CnModalConfirmFactory, CnModalSubmitExternalFactory, CnSession, $q ) {
       var object = function( parentModel, root ) {
         var self = this;
@@ -260,8 +262,8 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
                 cenozoApp.setLang( self.record.lang );
 
                 return $q.all( [
-                  self.getProductionList(),
-                  self.getProductionTypeList()
+                  self.getOutputList(),
+                  self.getOutputTypeList()
                 ] ).then( function() { return self.getVersionList(); } );
               }
             } );
@@ -295,9 +297,8 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
             } ).patch();
           },
 
-          productionModel: CnProductionModelFactory.instance(),
-          productionList: [],
-          productionTypeList: {},
+          outputModel: CnOutputModelFactory.instance(),
+          outputTypeList: {},
           formTab: '',
           tabSectionList: ['instructions','part1','part2','part3'],
           setFormTab: function( tab, transition ) {
@@ -334,78 +335,78 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
             }
           },
 
-          getProductionList: function( finalReportId, object ) {
+          getOutputList: function( finalReportId, object ) {
             var basePath = angular.isDefined( finalReportId )
                          ? 'final_report/' + finalReportId
                          : this.parentModel.getServiceResourcePath();
             if( angular.isUndefined( object ) ) object = self.record;
 
             return CnHttpFactory.instance( {
-              path: basePath + '/production',
+              path: basePath + '/output',
               data: {
                 select: {
                   column: [
                     'id', 'detail',
-                    { table: 'production_type', column: 'rank' },
-                    { table: 'production_type', column: 'name_en' },
-                    { table: 'production_type', column: 'name_fr' }
+                    { table: 'output_type', column: 'rank' },
+                    { table: 'output_type', column: 'name_en' },
+                    { table: 'output_type', column: 'name_fr' }
                   ]
                 },
                 modifier: { limit: 1000 }
               }
             } ).query().then( function( response ) {
-              object.productionList = response.data;
+              object.outputList = response.data;
             } );
           },
 
-          getProductionTypeList: function() {
-            this.productionTypeList = {
+          getOutputTypeList: function() {
+            this.outputTypeList = {
               en: [ { value: '', name: CnReqnHelper.translate( 'finalReport', 'misc.choose', 'en' ) } ],
               fr: [ { value: '', name: CnReqnHelper.translate( 'finalReport', 'misc.choose', 'fr' ) } ]
             };
 
             return CnHttpFactory.instance( {
-              path: 'production_type',
+              path: 'output_type',
               data: {
                 select: { column: [ 'id', 'rank', 'name_en', 'name_fr', 'note_en', 'note_fr' ] },
                 modifier: { order: 'rank', limit: 1000000 }
               }
             } ).query().then( function( response ) {
               response.data.forEach( function( item ) {
-                self.productionTypeList.en.push( { value: item.id, name: item.name_en, note: item.note_en } );
-                self.productionTypeList.fr.push( { value: item.id, name: item.name_fr, note: item.note_fr } );
+                self.outputTypeList.en.push( { value: item.id, name: item.name_en, note: item.note_en } );
+                self.outputTypeList.fr.push( { value: item.id, name: item.name_fr, note: item.note_fr } );
               } );
             } );
           },
 
-          getProductionTypeNote: function( productionTypeId ) {
-            var productionTypeList = this.productionTypeList[this.record.lang];
-            var productionType = productionTypeList
-                               ? productionTypeList.findByProperty( 'value', productionTypeId )
+          getOutputTypeNote: function( outputTypeId ) {
+            var outputTypeList = this.outputTypeList[this.record.lang];
+            var outputType = outputTypeList
+                               ? outputTypeList.findByProperty( 'value', outputTypeId )
                                : null;
-            return null == productionType ? '' : productionType.note;
+            return null == outputType ? '' : outputType.note;
           },
 
-          removeProduction: function( id ) {
+          removeOutput: function( id ) {
             return CnHttpFactory.instance( {
-              path: this.parentModel.getServiceResourcePath() + '/production/' + id
+              path: this.parentModel.getServiceResourcePath() + '/output/' + id
             } ).delete().then( function() {
-              return self.getProductionList();
+              return self.getOutputList();
             } );
           },
 
-          determineProductionDiffs: function() {
-            this.versionList.forEach( version => self.setProductionDiff( version ) );
+          determineOutputDiffs: function() {
+            this.versionList.forEach( version => self.setOutputDiff( version ) );
           },
 
-          setProductionDiff: function( version ) {
+          setOutputDiff: function( version ) {
             if( null != version ) {
               // see if there is a difference between this list and the view's list
-              version.productionDiff =
-                version.productionList.length != self.record.productionList.length ||
-                version.productionList.some(
-                  c1 => !self.record.productionList.some(
-                    c2 => ![ 'rank', 'production' ].some(
+              version.outputDiff =
+                version.outputList.length != self.record.outputList.length ||
+                version.outputList.some(
+                  c1 => !self.record.outputList.some(
+                    c2 => ![ 'rank', 'output' ].some(
                       prop => c1[prop] != c2[prop]
                     )
                   )
@@ -427,7 +428,7 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
               },
               part2: {
                 diff: false,
-                productionList: []
+                outputList: []
               },
               part3: {
                 diff: false,
@@ -446,23 +447,23 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
                   if( !differences[part].hasOwnProperty( property ) ) continue;
                   if( angular.isArray( differences[part][property] ) ) {
                     // an array means we have a list go check through
-                    if( 'productionList' == property ) {
-                      // loop through finalReport1's productions to see if any were added or changed
-                      finalReport1.productionList.forEach( function( p1 ) {
-                        var p2 = finalReport2.productionList.findByProperty( 'detail', p1.detail );
+                    if( 'outputList' == property ) {
+                      // loop through finalReport1's outputs to see if any were added or changed
+                      finalReport1.outputList.forEach( function( p1 ) {
+                        var p2 = finalReport2.outputList.findByProperty( 'detail', p1.detail );
                         if( null == p2 ) {
-                          // finalReport1 has production that compared finalReport2 doesn't
+                          // finalReport1 has output that compared finalReport2 doesn't
                           differences.diff = true;
                           differences[part].diff = true;
                           differences[part][property].push( { name: p1.detail, diff: 'added' } );
                         }
                       } );
 
-                      // loop through compared finalReport2's productions to see if any were removed
-                      finalReport2.productionList.forEach( function( p2 ) {
-                        var p1 = finalReport1.productionList.findByProperty( 'detail', p2.detail );
+                      // loop through compared finalReport2's outputs to see if any were removed
+                      finalReport2.outputList.forEach( function( p2 ) {
+                        var p1 = finalReport1.outputList.findByProperty( 'detail', p2.detail );
                         if( null == p1 ) {
-                          // finalReport1 has production that compared finalReport2 doesn't
+                          // finalReport1 has output that compared finalReport2 doesn't
                           differences.diff = true;
                           differences[part].diff = true;
                           differences[part][property].push( { name: p2.detail, diff: 'removed' } );
@@ -497,14 +498,18 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
 
               response.data.forEach( function( version ) {
                 promiseList = promiseList.concat( [
-                  self.getProductionList( version.id, version ).then( function() {
+                  self.getOutputList( version.id, version ).then( function() {
                     // see if there is a difference between this list and the view's list
-                    self.setProductionDiff( version );
+                    self.setOutputDiff( version );
                   } )
                 ] );
 
                 self.versionList.push( version );
               } );
+
+              var compareVersion = self.parentModel.getQueryParameter( 'c' );
+              if( angular.isDefined( compareVersion ) ) 
+                self.compareRecord = self.versionList.findByProperty( 'version', compareVersion );
 
               if( 1 < self.versionList.length ) {
                 // add a null object to the version list so we can turn off comparisons
@@ -648,7 +653,7 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
           }
         } );
 
-        this.productionModel.metadata.getPromise(); // needed to get the production's metadata
+        this.outputModel.metadata.getPromise(); // needed to get the output's metadata
       };
       return { instance: function( parentModel, root ) { return new object( parentModel, root ); } };
     }
@@ -661,6 +666,8 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
       var object = function( type ) {
         var self = this;
         CnBaseModelFactory.construct( this, module );
+        this.type = type;
+        if( 'lite' != this.type ) this.listModel = CnFinalReportListFactory.instance( this );
 
         angular.extend( this, {
           viewModel: CnFinalReportViewFactory.instance( this, 'root' == this.type ),
@@ -690,7 +697,6 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
           }
         } );
 
-        if( 'lite' != this.type ) this.listModel = CnFinalReportListFactory.instance( this );
 
         // make the input lists from all groups more accessible
         module.inputGroupList.forEach( group => Object.assign( self.inputList, group.inputList ) );
@@ -699,7 +705,7 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
       return {
         root: new object( 'root' ),
         lite: new object( 'lite' ),
-        instance: function() { return new object( false ); }
+        instance: function() { return new object(); }
       };
     }
   ] );

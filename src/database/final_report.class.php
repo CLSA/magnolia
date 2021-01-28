@@ -93,24 +93,24 @@ class final_report extends \cenozo\database\record
     $data['signature_name'] = $data['applicant_name'];
     $data['signature_date'] = util::get_datetime_object()->format( 'd-m-Y' );
 
-    $production_sel = lib::create( 'database\select' );
-    $production_sel->add_column( 'production_type_id' );
-    $production_sel->add_column( 'detail' );
-    $production_mod = lib::create( 'database\modifier' );
-    $production_mod->order( 'production_type_id', 'id' );
+    $output_sel = lib::create( 'database\select' );
+    $output_sel->add_column( 'output_type_id' );
+    $output_sel->add_column( 'detail' );
+    $output_mod = lib::create( 'database\modifier' );
+    $output_mod->order( 'output_type_id', 'id' );
 
-    // the form supports a limited number of production for each type
-    $production_limit_list = array( 1=>5, 2=>5, 3=>3, 4=>3, 5=>2, 6=>2, 7=>2 );
+    // the form supports a limited number of output for each type
+    $output_limit_list = array( 1=>5, 2=>5, 3=>3, 4=>3, 5=>2, 6=>2, 7=>2 );
 
-    $last_production_type_id = NULL;
+    $last_output_type_id = NULL;
     $count = NULL;
-    foreach( $this->get_production_list( $production_sel, $production_mod ) as $production )
+    foreach( $this->get_output_list( $output_sel, $output_mod ) as $output )
     {
-      $count = $last_production_type_id == $production['production_type_id'] ? $count+1 : 1;
-      if( $count <= $production_limit_list[$production['production_type_id']] )
-        $data[sprintf( 'production_%d_%d', $production['production_type_id'], $count )] = $production['detail'];
+      $count = $last_output_type_id == $output['output_type_id'] ? $count+1 : 1;
+      if( $count <= $output_limit_list[$output['output_type_id']] )
+        $data[sprintf( 'output_%d_%d', $output['output_type_id'], $count )] = $output['detail'];
 
-      $last_production_type_id = $production['production_type_id'];
+      $last_output_type_id = $output['output_type_id'];
     }
 
     $pdf_writer->fill_form( $data );
@@ -134,7 +134,7 @@ class final_report extends \cenozo\database\record
    */
   public function has_changed()
   {
-    $production_class_name = lib::get_class_name( 'database\production' );
+    $output_class_name = lib::get_class_name( 'database\output' );
 
     // get the two newest versions
     $version_mod = lib::create( 'database\modifier' );
@@ -152,19 +152,19 @@ class final_report extends \cenozo\database\record
       if( !in_array( $column, $ignore_columns ) && $this->$column != $db_last_final_report->$column )
         return true;
 
-    // now check production records
-    foreach( $this->get_production_object_list() as $db_production )
+    // now check output records
+    foreach( $this->get_output_object_list() as $db_output )
     {
-      $db_last_production = $production_class_name::get_unique_record(
+      $db_last_output = $output_class_name::get_unique_record(
         array( 'final_report_id', 'detail' ),
-        array( $db_last_final_report->id, $db_production->detail )
+        array( $db_last_final_report->id, $db_output->detail )
       );
-      if( is_null( $db_last_production ) ) return true;
+      if( is_null( $db_last_output ) ) return true;
 
       // check all column values except for id, final_report_id and timestamps
       $ignore_columns = array( 'id', 'final_report_id', 'update_timestamp', 'create_timestamp' );
-      foreach( $db_production->get_column_names() as $column )
-        if( !in_array( $column, $ignore_columns ) && $db_production->$column != $db_last_production->$column )
+      foreach( $db_output->get_column_names() as $column )
+        if( !in_array( $column, $ignore_columns ) && $db_output->$column != $db_last_output->$column )
           return true;
     }
 

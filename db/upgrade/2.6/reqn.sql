@@ -62,6 +62,7 @@ DELIMITER ;
 
 CALL patch_reqn();
 DROP PROCEDURE IF EXISTS patch_reqn;
+
 SELECT "Adding triggers to reqn table" AS "";
 
 DELIMITER $$
