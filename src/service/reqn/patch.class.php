@@ -196,6 +196,7 @@ class patch extends \cenozo\service\patch
     }
     else
     {
+      $report_required = 'Report Required' == $db_reqn->get_current_stage_type()->name;
       $action = $this->get_argument( 'action', false );
       if( $action )
       {
@@ -251,7 +252,8 @@ class patch extends \cenozo\service\patch
           $db_reqn->save();
 
           // create a new reqn version
-          $db_reqn->create_version();
+          if( $report_required ) $db_reqn->create_final_report();
+          else $db_reqn->create_version();
 
           // send a notification
           $db_notification = lib::create( 'database\notification' );
@@ -311,8 +313,10 @@ class patch extends \cenozo\service\patch
             {
               // send a notification to the supervisor
               $db_notification = lib::create( 'database\notification' );
-              $db_notification->notification_type_id =
-                $notification_type_class_name::get_unique_record( 'name', 'Approval Required' )->id;
+              $db_notification->notification_type_id = $notification_type_class_name::get_unique_record(
+                'name',
+                $report_required ? 'Approval Required, Final Report' : 'Approval Required'
+              )->id;
               $db_notification->set_reqn( $db_reqn );
               $db_notification->mail();
             }
@@ -323,9 +327,18 @@ class patch extends \cenozo\service\patch
                 $db_reqn->state = NULL;
                 $db_reqn->save();
 
-                // when resubmitting set the version's datetime
-                $db_reqn_version->datetime = util::get_datetime_object();
-                $db_reqn_version->save();
+                // when resubmitting set the version/report datetime
+                if( $report_required )
+                {
+                  $db_final_report = $db_reqn->get_current_final_report();
+                  $db_final_report->datetime = util::get_datetime_object();
+                  $db_final_report->save();
+                }
+                else
+                {
+                  $db_reqn_version->datetime = util::get_datetime_object();
+                  $db_reqn_version->save();
+                }
               }
               else
               {
@@ -336,18 +349,17 @@ class patch extends \cenozo\service\patch
               // send a notification
               $db_reqn_user = $db_reqn->get_user();
               $notification_class_name::mail_admin(
-                sprintf( 'Requisition %s: submitted', $db_reqn->identifier ),
+                sprintf( '%s %s: submitted', $report_required ? 'Final Report' : 'Requisition', $db_reqn->identifier ),
                 sprintf(
-                  "The following requisition has been submitted:\n".
+                  "The following %s has been submitted:\n".
                   "\n".
                   "Type: %s\n".
                   "Identifier: %s\n".
-                  "Amendment: %s\n".
                   "Applicant: %s %s\n".
                   "Title: %s\n",
+                  $report_required ? 'final report' : 'requisition',
                   $db_reqn->get_reqn_type()->name,
                   $db_reqn->identifier,
-                  str_replace( '.', 'no', $db_reqn_version->amendment ),
                   $db_reqn_user->first_name, $db_reqn_user->last_name,
                   $db_reqn_version->title
                 )

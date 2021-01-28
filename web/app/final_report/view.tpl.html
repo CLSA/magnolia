@@ -80,21 +80,24 @@
       <li ng-class="{'active':'part1'==model.viewModel.formTab}">
         <a ng-click="model.viewModel.setFormTab('part1')"
            ng-class="{
-             'text-warning flashing': model.getEditEnabled() && model.viewModel.record.deferral_note_report1
+             'text-warning flashing': model.getEditEnabled() && model.viewModel.record.deferral_note_report1,
+             'bg-warning': model.viewModel.compareRecord.differences.part1.diff
            }"
            ng-bind-html="t( 'part1.tab' )"></a>
       </li>
       <li ng-class="{'active':'part2'==model.viewModel.formTab}">
         <a ng-click="model.viewModel.setFormTab('part2')"
            ng-class="{
-             'text-warning flashing': model.getEditEnabled() && model.viewModel.record.deferral_note_report2
+             'text-warning flashing': model.getEditEnabled() && model.viewModel.record.deferral_note_report2,
+             'bg-warning': model.viewModel.compareRecord.differences.part2.diff
            }"
            ng-bind-html="t( 'part2.tab' )"></a>
       </li>
       <li ng-class="{'active':'part3'==model.viewModel.formTab}">
         <a ng-click="model.viewModel.setFormTab('part3')"
            ng-class="{
-             'text-warning flashing': model.getEditEnabled() && model.viewModel.record.deferral_note_report3
+             'text-warning flashing': model.getEditEnabled() && model.viewModel.record.deferral_note_report3,
+             'bg-warning': model.viewModel.compareRecord.differences.part3.diff
            }"
            ng-bind-html="t( 'part3.tab' )"></a>
       </li>
@@ -112,52 +115,53 @@
         </ul>
       </div>
     </div>
-    <div ng-show="'part1'==model.viewModel.formTab"
-         class="panel panel-default"
-         style="border-top-left-radius: 0px;">
+    <div ng-show="'part1'==model.viewModel.formTab" class="panel panel-default" style="border-top-left-radius: 0px;">
       <div class="panel-body">
-        <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_report1" class="bg-info"></cn-reqn-deferral-note>
+        <cn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_report1" class="bg-info"></cn-deferral-note>
         <form name="part1Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
           <div class="container-fluid vertical-spacer">
             <h4 ng-bind-html="t( 'part1.a.question' )"></h4>
-            <cn-view-input
+            <cn-view-input-with-differences
               input="{ key: 'activities', title: t( 'part1.a.activities' ), type: 'text' }"
               no-cols="true"
+              difference="model.viewModel.compareRecord.differences.part1.activities"
               model="model">
-            </cn-view-input>
-            <cn-view-input
+            </cn-view-input-with-differences>
+            <cn-view-input-with-differences
               input="{ key: 'findings', title: t( 'part1.a.findings' ), type: 'text' }"
               no-cols="true"
+              difference="model.viewModel.compareRecord.differences.part1.findings"
               model="model">
-            </cn-view-input>
-            <cn-view-input
+            </cn-view-input-with-differences>
+            <cn-view-input-with-differences
               input="{ key: 'outcomes', title: t( 'part1.a.outcomes' ), type: 'text' }"
               no-cols="true"
+              difference="model.viewModel.compareRecord.differences.part1.outcomes"
               model="model">
-            </cn-view-input>
+            </cn-view-input-with-differences>
           </div>
           <div class="container-fluid vertical-spacer" ng-if="'graduate' == model.viewModel.record.waiver">
             <h4 ng-bind-html="t( 'part1.b.question' )"></h4>
             <p class="text-primary" ng-bind-html="t( 'part1.b.text' )"></p>
-            <cn-view-input
+            <cn-view-input-with-differences
               input="{ key: 'thesis_title', title: t( 'part1.b.thesis_title' ), type: 'text' }"
               no-cols="true"
+              difference="model.viewModel.compareRecord.differences.part1.thesis_title"
               model="model">
-            </cn-view-input>
-            <cn-view-input
+            </cn-view-input-with-differences>
+            <cn-view-input-with-differences
               input="{ key: 'thesis_status', title: t( 'part1.b.thesis_status' ), type: 'text' }"
               no-cols="true"
+              difference="model.viewModel.compareRecord.differences.part1.thesis_status"
               model="model">
-            </cn-view-input>
+            </cn-view-input-with-differences>
           </div>
         </fieldset></form>
       </div>
     </div>
-    <div ng-show="'part2'==model.viewModel.formTab"
-         class="panel panel-default"
-         style="border-top-left-radius: 0px;">
+    <div ng-show="'part2'==model.viewModel.formTab" class="panel panel-default" style="border-top-left-radius: 0px;">
       <div class="panel-body">
-        <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_report2" class="bg-info"></cn-reqn-deferral-note>
+        <cn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_report2" class="bg-info"></cn-deferral-note>
         <form id="part2Form" name="part2Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
           <div class="container-fluid">
             <h4 ng-bind-html="t( 'part2.question' )"></h4>
@@ -222,35 +226,36 @@
         </fieldset></form>
       </div>
     </div>
-    <div ng-show="'part3'==model.viewModel.formTab"
-         class="panel panel-default"
-         style="border-top-left-radius: 0px;">
+    <div ng-show="'part3'==model.viewModel.formTab" class="panel panel-default" style="border-top-left-radius: 0px;">
       <div class="panel-body">
-        <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_report3" class="bg-info"></cn-reqn-deferral-note>
+        <cn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_report3" class="bg-info"></cn-deferral-note>
         <form name="part3Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
           <div class="container-fluid vertical-spacer">
             <h4 ng-bind-html="t( 'part3.a.question' )"></h4>
-            <cn-view-input
+            <cn-view-input-with-differences
               input="{ key: 'impact', title: t( 'part3.a.text' ), type: 'text' }"
               no-cols="true"
+              difference="model.viewModel.compareRecord.differences.part3.impact"
               model="model">
-            </cn-view-input>
+            </cn-view-input-with-differences>
           </div>
           <div class="container-fluid vertical-spacer">
             <h4 ng-bind-html="t( 'part3.b.question' )"></h4>
-            <cn-view-input
+            <cn-view-input-with-differences
               input="{ key: 'opportunities', title: t( 'part3.b.text' ), type: 'text' }"
               no-cols="true"
+              difference="model.viewModel.compareRecord.differences.part3.opportunities"
               model="model">
-            </cn-view-input>
+            </cn-view-input-with-differences>
           </div>
           <div class="container-fluid vertical-spacer">
             <h4 ng-bind-html="t( 'part3.c.question' )"></h4>
-            <cn-view-input
+            <cn-view-input-with-differences
               input="{ key: 'dissemination', title: t( 'part3.c.text' ), type: 'text' }"
               no-cols="true"
+              difference="model.viewModel.compareRecord.differences.part3.dissemination"
               model="model">
-            </cn-view-input>
+            </cn-view-input-with-differences>
           </div>
         </fieldset></form>
       </div>

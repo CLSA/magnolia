@@ -623,20 +623,6 @@ define( function() {
   } );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnReqnDeferralNote',
-    function() {
-      return {
-        templateUrl: module.getFileUrl( 'deferral-note.tpl.html' ),
-        restrict: 'E',
-        scope: { note: '@' },
-        controller: [ '$scope', function( $scope ) {
-          $scope.directive = 'cnReqnDeferralNote';
-        } ]
-      };
-    }
-  );
-
-  /* ######################################################################################################## */
   cenozo.providers.directive( 'cnReqnAdd', [
     'CnReqnModelFactory',
     function( CnReqnModelFactory ) {
@@ -1027,6 +1013,7 @@ define( function() {
                   self.record.state = 'deferred';
                   self.record.state_date = moment().format( 'YYYY-MM-DD' );
                   self.updateFormattedRecord( 'state_date', 'date' );
+                  self.onView();
                   if( angular.isDefined( self.reqnVersionModel ) ) self.reqnVersionModel.listModel.onList( true );
                   if( angular.isDefined( self.notificationModel ) ) self.notificationModel.listModel.onList( true );
                 } );
@@ -1137,8 +1124,17 @@ define( function() {
             } );
           },
 
+          getChildTitle: function( child ) {
+            return 'stage' == child.subject.snake ? 'Stage History' : this.$$getChildTitle( child );
+          },
+
           getChildList: function() {
             var list = this.$$getChildList();
+
+            // remove the final report item if not in the report-required stage or complete phase
+            if( !['Complete', 'Report Required'].includes( this.record.stage_type ) ) {
+              list = list.filter( child => 'final_report' != child.subject.snake );
+            }
 
             // remove the ethics approval item if this reqn has no ethics approval list
             if( !this.record.has_ethics_approval_list ) {

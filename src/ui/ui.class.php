@@ -41,6 +41,7 @@ class ui extends \cenozo\ui\ui
     $module = $this->get_module( 'reqn' );
     if( !is_null( $module ) )
     {
+      $module->add_child( 'final_report' );
       $module->add_child( 'reqn_version' );
       $module->add_child( 'review' );
       $module->add_child( 'stage' );
@@ -73,7 +74,7 @@ class ui extends \cenozo\ui\ui
     if( !is_null( $module ) ) $module->add_child( 'pdf_form' );
 
     $module = $this->get_module( 'final_report' );
-    if( !is_null( $module ) ) $module->append_action_query( 'view', '?{t}' );
+    if( !is_null( $module ) ) $module->append_action_query( 'view', '?{t}&{c}' );
 
     $module = $this->get_module( 'stage_type' );
     if( !is_null( $module ) ) $module->add_child( 'reqn' );

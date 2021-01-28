@@ -18,6 +18,20 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
       singular: 'final report',
       plural: 'final reports',
       possessive: 'final report\'s'
+    },
+    columnList: {
+      version: {
+        title: 'Version',
+        type: 'rank'
+      },
+      datetime: {
+        title: 'Date & Time',
+        type: 'datetime'
+      }
+    },
+    defaultOrder: {
+      column: 'final_report.version',
+      reverse: false
     }
   } );
 
@@ -49,6 +63,21 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
     deferral_note_report2: { column: 'reqn.deferral_note_report2', type: 'text' },
     deferral_note_report3: { column: 'reqn.deferral_note_report3', type: 'text' }
   } );
+
+  /* ######################################################################################################## */
+  cenozo.providers.directive( 'cnFinalReportList', [
+    'CnFinalReportModelFactory',
+    function( CnFinalReportModelFactory ) {
+      return {
+        templateUrl: module.getFileUrl( 'list.tpl.html' ),
+        restrict: 'E',
+        scope: { model: '=?' },
+        controller: function( $scope ) {
+          if( angular.isUndefined( $scope.model ) ) $scope.model = CnFinalReportModelFactory.root;
+        }
+      };
+    }
+  ] );
 
   /* ######################################################################################################## */
   cenozo.providers.directive( 'cnFinalReportView', [
@@ -101,6 +130,31 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
           var productionAddModel = $scope.model.viewModel.productionModel.addModel;
           $scope.productionRecord = {};
           productionAddModel.onNew( $scope.productionRecord );
+
+          $scope.getHeading = function() {
+            var status = null;
+            if( 'deferred' == $scope.model.viewModel.record.state ) {
+              status = $scope.model.isRole( 'applicant' ) ? 'Action Required' : 'Deferred to Applicant';
+            } else if( $scope.model.viewModel.record.state ) {
+              status = $scope.model.viewModel.record.state.ucWords();
+            }
+
+            return [
+              $scope.t( 'heading' ),
+              '-',
+              $scope.model.viewModel.record.identifier,
+              'version',
+              $scope.model.viewModel.record.amendment_version,
+              null != status ? '(' + status + ')' : ''
+            ].join( ' ' );
+          };
+
+          $scope.compareTo = function( version ) {
+            $scope.model.viewModel.compareRecord = version;
+            $scope.liteModel.viewModel.compareRecord = version;
+            $scope.model.setQueryParameter( 'c', null == version ? undefined : version.amendment_version );
+            $scope.model.reloadState( false, false, 'replace' );
+          };
 
           $scope.addProduction = function() {
             if( $scope.model.viewModel.productionModel.getAddEnabled() ) {
@@ -164,6 +218,15 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
   ] );
 
   /* ######################################################################################################## */
+  cenozo.providers.factory( 'CnFinalReportListFactory', [
+    'CnBaseListFactory',
+    function( CnBaseListFactory ) {
+      var object = function( parentModel ) { CnBaseListFactory.construct( this, parentModel ); };
+      return { instance: function( parentModel ) { return new object( parentModel ); } };
+    }
+  ] );
+
+  /* ######################################################################################################## */
   cenozo.providers.factory( 'CnFinalReportViewFactory', [
     'CnBaseViewFactory', 'CnReqnHelper', 'CnHttpFactory', 'CnProductionModelFactory',
     'CnModalMessageFactory', 'CnModalConfirmFactory', 'CnModalSubmitExternalFactory', 'CnSession', '$q',
@@ -174,6 +237,8 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
         CnBaseViewFactory.construct( this, parentModel, root );
 
         angular.extend( this, {
+          compareRecord: null,
+          versionList: [],
           translate: function( value ) { return CnReqnHelper.translate( 'finalReport', value, this.record.lang ); },
           show: function( subject ) { return CnReqnHelper.showAction( subject, this.record ); },
           viewReqn: function() {
@@ -269,19 +334,14 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
             }
           },
 
-          getVersionList: function() {
-            var parent = self.parentModel.getParentIdentifier();
-            this.versionList = [];
-            return CnHttpFactory.instance( {
-              path: parent.subject + '/' + parent.identifier + '/final_report'
-            } ).query().then( function( response ) {
-              // TODO: implement
-            } );
-          },
+          getProductionList: function( finalReportId, object ) {
+            var basePath = angular.isDefined( finalReportId )
+                         ? 'final_report/' + finalReportId
+                         : this.parentModel.getServiceResourcePath();
+            if( angular.isUndefined( object ) ) object = self.record;
 
-          getProductionList: function() {
             return CnHttpFactory.instance( {
-              path: this.parentModel.getServiceResourcePath() + '/production',
+              path: basePath + '/production',
               data: {
                 select: {
                   column: [
@@ -291,10 +351,10 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
                     { table: 'production_type', column: 'name_fr' }
                   ]
                 },
-                modifier: { limit: 1000000 }
+                modifier: { limit: 1000 }
               }
             } ).query().then( function( response ) {
-              self.productionList = response.data;
+              object.productionList = response.data;
             } );
           },
 
@@ -334,7 +394,142 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
             } );
           },
 
-         submit: function() {
+          determineProductionDiffs: function() {
+            this.versionList.forEach( version => self.setProductionDiff( version ) );
+          },
+
+          setProductionDiff: function( version ) {
+            if( null != version ) {
+              // see if there is a difference between this list and the view's list
+              version.productionDiff =
+                version.productionList.length != self.record.productionList.length ||
+                version.productionList.some(
+                  c1 => !self.record.productionList.some(
+                    c2 => ![ 'rank', 'production' ].some(
+                      prop => c1[prop] != c2[prop]
+                    )
+                  )
+                );
+            }
+          },
+
+          getDifferences: function( finalReport2 ) {
+            var finalReport1 = this.record;
+            var differences = {
+              diff: false,
+              part1: {
+                diff: false,
+                activities: false,
+                findings: false,
+                outcomes: false,
+                thesis_title: false,
+                thesis_status: false
+              },
+              part2: {
+                diff: false,
+                productionList: []
+              },
+              part3: {
+                diff: false,
+                impact: false,
+                opportunities: false,
+                dissemination: false
+              }
+            };
+
+            if( null != finalReport2 ) {
+              for( var part in differences ) {
+                if( !differences.hasOwnProperty( part ) ) continue;
+                if( 'diff' == part ) continue; // used to track overall diff
+
+                for( var property in differences[part] ) {
+                  if( !differences[part].hasOwnProperty( property ) ) continue;
+                  if( angular.isArray( differences[part][property] ) ) {
+                    // an array means we have a list go check through
+                    if( 'productionList' == property ) {
+                      // loop through finalReport1's productions to see if any were added or changed
+                      finalReport1.productionList.forEach( function( p1 ) {
+                        var p2 = finalReport2.productionList.findByProperty( 'detail', p1.detail );
+                        if( null == p2 ) {
+                          // finalReport1 has production that compared finalReport2 doesn't
+                          differences.diff = true;
+                          differences[part].diff = true;
+                          differences[part][property].push( { name: p1.detail, diff: 'added' } );
+                        }
+                      } );
+
+                      // loop through compared finalReport2's productions to see if any were removed
+                      finalReport2.productionList.forEach( function( p2 ) {
+                        var p1 = finalReport1.productionList.findByProperty( 'detail', p2.detail );
+                        if( null == p1 ) {
+                          // finalReport1 has production that compared finalReport2 doesn't
+                          differences.diff = true;
+                          differences[part].diff = true;
+                          differences[part][property].push( { name: p2.detail, diff: 'removed' } );
+                        }
+                      } );
+                    }
+                  } else {
+                    // not an array means we have a property to directly check
+                    // note: we need to convert empty strings to null to make sure they compare correctly
+                    var value1 = '' === finalReport1[property] ? null : finalReport1[property];
+                    var value2 = '' === finalReport2[property] ? null : finalReport2[property];
+                    if( value1 != value2 ) {
+                      differences.diff = true;
+                      differences[part].diff = true;
+                      differences[part][property] = true;
+                    }
+                  }
+                }
+              }
+            }
+
+            return differences;
+          },
+
+          getVersionList: function() {
+            var parent = self.parentModel.getParentIdentifier();
+            this.versionList = [];
+            return CnHttpFactory.instance( {
+              path: parent.subject + '/' + parent.identifier + '/final_report'
+            } ).query().then( function( response ) {
+              var promiseList = [];
+
+              response.data.forEach( function( version ) {
+                promiseList = promiseList.concat( [
+                  self.getProductionList( version.id, version ).then( function() {
+                    // see if there is a difference between this list and the view's list
+                    self.setProductionDiff( version );
+                  } )
+                ] );
+
+                self.versionList.push( version );
+              } );
+
+              if( 1 < self.versionList.length ) {
+                // add a null object to the version list so we can turn off comparisons
+                self.versionList.unshift( null );
+              }
+
+              return $q.all( promiseList ).then( function() {
+                // Calculate all differences for all versions (in reverse order so we can find the last agreement version)
+                self.versionList.reverse();
+
+                self.lastAgreementVersion = null;
+                self.versionList.forEach( function( version ) {
+                  if( null != version ) version.differences = self.getDifferences( version );
+                } );
+
+                // if no different list was defined then make it an empty list
+                if( null == self.agreementDifferenceList ) self.agreementDifferenceList = [];
+
+                // put the order of the version list back to normal
+                self.versionList.reverse();
+              } );
+            } );
+          },
+
+          submit: function() {
             // used below
             function submitFinalReport() {
               var parent = self.parentModel.getParentIdentifier();
@@ -461,8 +656,8 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnFinalReportModelFactory', [
-    'CnBaseModelFactory', 'CnFinalReportViewFactory', 'CnSession', '$state',
-    function( CnBaseModelFactory, CnFinalReportViewFactory, CnSession, $state ) {
+    'CnBaseModelFactory', 'CnFinalReportListFactory', 'CnFinalReportViewFactory', 'CnSession', '$state',
+    function( CnBaseModelFactory, CnFinalReportListFactory, CnFinalReportViewFactory, CnSession, $state ) {
       var object = function( type ) {
         var self = this;
         CnBaseModelFactory.construct( this, module );
@@ -494,6 +689,8 @@ define( [ 'production', 'production_type' ].reduce( function( list, name ) {
             CnSession.setBreadcrumbTrail( trail );
           }
         } );
+
+        if( 'lite' != this.type ) this.listModel = CnFinalReportListFactory.instance( this );
 
         // make the input lists from all groups more accessible
         module.inputGroupList.forEach( group => Object.assign( self.inputList, group.inputList ) );

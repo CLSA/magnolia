@@ -46,7 +46,6 @@
               ng-click="model.viewModel.viewReport()"
               ng-bind-html="t( 'misc.finalReport' )"
               type="button"></button>
-
       <div class="btn-group dropdown" ng-if="model.viewModel.show( 'compare' ) && 1 < model.viewModel.versionList.length">
         <button type="button"
                 class="btn btn-info dropdown-toggle"
@@ -151,7 +150,7 @@
       </div>
       <div class="panel-body" style="padding-bottom: 0px;" ng-if="'.' != model.viewModel.record.amendment">
         <h4 style="margin-top: 0; margin-bottom: 1em;" ng-bind-html="t( 'amendment.title' )"></h4>
-        <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_amendment" class="bg-info"></cn-reqn-deferral-note>
+        <cn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_amendment" class="bg-info"></cn-deferral-note>
         <ul class="list-group">
           <li class="list-group-item" ng-bind-html="t( 'amendment.text1' )"></li>
           <li class="list-group-item" ng-bind-html="t( 'amendment.text2' )"></li>
@@ -172,7 +171,7 @@
                        ng-model="model.viewModel.record['amendmentType'+amendmentType.id]"
                        ng-change="model.viewModel.toggleAmendmentTypeValue( amendmentType.id )"></input>
                 <label for="amendmentType{{ amendmentType.id }}" class="control-label" ng-bind-html="amendmentType.name"></label>
-                <cn-reqn-view-input
+                <cn-view-input-with-differences
                   ng-if="amendmentType.newUser && model.viewModel.record['amendmentType'+amendmentType.id]"
                   no-cols=true
                   input="{
@@ -182,7 +181,7 @@
                     typeahead: model.inputList.new_user_id.typeahead
                   }"
                   model="model">
-                </cn-reqn-view-input>
+                </cn-view-input-with-differences>
               </div>
               <div style="padding: 0 2em;"
                    ng-if="amendmentType.justificationPrompt && model.viewModel.record['amendmentType'+amendmentType.id]">
@@ -190,7 +189,7 @@
               </div>
             </div>
             <span ng-if="model.viewModel.noAmendmentTypes" class="help-block" ng-bind-html="t( 'amendment.atLeastOne' )"></span>
-            <cn-reqn-view-input
+            <cn-view-input-with-differences
               ng-if="model.viewModel.amendmentTypeWithJustificationSelected()"
               no-cols=true
               input="{
@@ -200,7 +199,7 @@
               }"
               difference="model.viewModel.compareRecord.differences.amendment.a.amendment_justification"
               model="model">
-            </cn-reqn-view-input>
+            </cn-view-input-with-differences>
           </div>
         </fieldset></form>
       </div>
@@ -222,13 +221,13 @@
         </ul>
         <div ng-show="'a'==model.viewModel.formTab[1]" class="panel panel-default" style="border-top-left-radius: 0px;">
           <div class="panel-body">
-            <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_1a" class="bg-info"></cn-reqn-deferral-note>
+            <cn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_1a" class="bg-info"></cn-deferral-note>
             <p class="text-primary" ng-bind-html="t( 'part1.a.text1' )"></p>
             <p class="text-primary" ng-bind-html="t( 'part1.a.text2' )"></p>
             <hr/>
             <form id="part1aForm" name="part1aForm" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
               <div class="form-horizontal">
-                <cn-reqn-view-input
+                <cn-view-input-with-differences
                   input="{
                     key: 'applicant_name',
                     title: t( 'part1.a.applicant_name' ),
@@ -237,8 +236,8 @@
                   }"
                   difference="model.viewModel.compareRecord.differences.part1.a.applicant_name"
                   model="model">
-                </cn-reqn-view-input>
-                <cn-reqn-view-input
+                </cn-view-input-with-differences>
+                <cn-view-input-with-differences
                   input="{
                     key: 'applicant_position',
                     title: t( 'part1.a.applicant_position' ),
@@ -246,8 +245,8 @@
                   }"
                   difference="model.viewModel.compareRecord.differences.part1.a.applicant_position"
                   model="model">
-                </cn-reqn-view-input>
-                <cn-reqn-view-input
+                </cn-view-input-with-differences>
+                <cn-view-input-with-differences
                   input="{
                     key: 'applicant_affiliation',
                     title: t( 'part1.a.applicant_affiliation' ),
@@ -255,8 +254,8 @@
                   }"
                   difference="model.viewModel.compareRecord.differences.part1.a.applicant_affiliation"
                   model="model">
-                </cn-reqn-view-input>
-                <cn-reqn-view-input
+                </cn-view-input-with-differences>
+                <cn-view-input-with-differences
                   input="{
                     key: 'applicant_address',
                     title: t( 'part1.a.applicant_address' ),
@@ -264,8 +263,8 @@
                   }"
                   difference="model.viewModel.compareRecord.differences.part1.a.applicant_address"
                   model="model">
-                </cn-reqn-view-input>
-                <cn-reqn-view-input
+                </cn-view-input-with-differences>
+                <cn-view-input-with-differences
                   input="{
                     key: 'applicant_phone',
                     title: t( 'part1.a.applicant_phone' ),
@@ -273,8 +272,8 @@
                   }"
                   difference="model.viewModel.compareRecord.differences.part1.a.applicant_phone"
                   model="model">
-                </cn-reqn-view-input>
-                <cn-reqn-view-input
+                </cn-view-input-with-differences>
+                <cn-view-input-with-differences
                   input="{
                     key: 'applicant_email',
                     title: t( 'part1.a.applicant_email' ),
@@ -284,12 +283,12 @@
                   }"
                   difference="model.viewModel.compareRecord.differences.part1.a.applicant_email"
                   model="model">
-                </cn-reqn-view-input>
+                </cn-view-input-with-differences>
               </div>
               <hr />
               <p class="text-primary" ng-bind-html="t( 'part1.a.text3' )"></p>
               <div class="form-horizontal">
-                <cn-reqn-view-input
+                <cn-view-input-with-differences
                   input="{
                     key: 'trainee_name',
                     title: t( 'part1.a.trainee_name' ),
@@ -298,8 +297,8 @@
                   }"
                   difference="model.viewModel.compareRecord.differences.part1.a.trainee_name"
                   model="model">
-                </cn-reqn-view-input>
-                <cn-reqn-view-input
+                </cn-view-input-with-differences>
+                <cn-view-input-with-differences
                   input="{
                     key: 'trainee_program',
                     title: t( 'part1.a.trainee_program' ),
@@ -308,8 +307,8 @@
                   }"
                   difference="model.viewModel.compareRecord.differences.part1.a.trainee_program"
                   model="model">
-                </cn-reqn-view-input>
-                <cn-reqn-view-input
+                </cn-view-input-with-differences>
+                <cn-view-input-with-differences
                   input="{
                     key: 'trainee_institution',
                     title: t( 'part1.a.trainee_institution' ),
@@ -318,8 +317,8 @@
                   }"
                   difference="model.viewModel.compareRecord.differences.part1.a.trainee_institution"
                   model="model">
-                </cn-reqn-view-input>
-                <cn-reqn-view-input
+                </cn-view-input-with-differences>
+                <cn-view-input-with-differences
                   input="{
                     key: 'trainee_address',
                     title: t( 'part1.a.trainee_address' ),
@@ -328,8 +327,8 @@
                   }"
                   difference="model.viewModel.compareRecord.differences.part1.a.trainee_address"
                   model="model">
-                </cn-reqn-view-input>
-                <cn-reqn-view-input
+                </cn-view-input-with-differences>
+                <cn-view-input-with-differences
                   input="{
                     key: 'trainee_phone',
                     title: t( 'part1.a.trainee_phone' ),
@@ -338,8 +337,8 @@
                   }"
                   difference="model.viewModel.compareRecord.differences.part1.a.trainee_phone"
                   model="model">
-                </cn-reqn-view-input>
-                <cn-reqn-view-input
+                </cn-view-input-with-differences>
+                <cn-view-input-with-differences
                   input="{
                     key: 'trainee_email',
                     title: t( 'part1.a.trainee_email' ),
@@ -349,12 +348,12 @@
                   }"
                   difference="model.viewModel.compareRecord.differences.part1.a.trainee_email"
                   model="model">
-                </cn-reqn-view-input>
+                </cn-view-input-with-differences>
               </div>
               <hr />
               <p class="text-primary" ng-bind-html="t( 'part1.a.text4' )"></p>
               <div class="form-horizontal">
-                <cn-reqn-view-input
+                <cn-view-input-with-differences
                   input="{
                     key: 'waiver',
                     title: t( 'part1.a.waiver' ),
@@ -364,14 +363,14 @@
                   }"
                   difference="model.viewModel.compareRecord.differences.part1.a.waiver"
                   model="model">
-                </cn-reqn-view-input>
+                </cn-view-input-with-differences>
               </div>
             </fieldset></form>
           </div>
         </div>
         <div ng-show="'b'==model.viewModel.formTab[1]" class="panel panel-default">
           <div class="panel-body">
-            <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_1b"></cn-reqn-deferral-note>
+            <cn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_1b"></cn-deferral-note>
             <p class="text-primary" ng-bind-html="t( 'part1.b.text' )"></p>
             <div class="panel panel-default">
               <div class="panel-body"
@@ -503,7 +502,7 @@
                       ng-click="model.viewModel.downloadCoapplicantAgreementTemplate()"
                       ng-bind-html="t( 'part1.b.coapplicantAgreementButton' )"></button>
               <fieldset ng-disabled="!liteModel.getEditEnabled()">
-                <cn-reqn-view-input
+                <cn-view-input-with-differences
                   input="{
                     key: 'coapplicant_agreement_filename',
                     title: t( 'part1.b.coapplicantAgreement' ),
@@ -511,14 +510,14 @@
                   }"
                   difference="model.viewModel.compareRecord.differences.part1.b.coapplicant_agreement_filename"
                   model="liteModel">
-                </cn-reqn-view-input>
+                </cn-view-input-with-differences>
               </fieldset>
             </div>
           </div>
         </div>
         <div ng-show="'c'==model.viewModel.formTab[1]" class="panel panel-default">
           <div class="panel-body">
-            <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_1c"></cn-reqn-deferral-note>
+            <cn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_1c"></cn-deferral-note>
             <p class="text-primary" ng-bind-html="t( 'part1.c.text1' ) + startDateDelay + t( 'part1.c.text2' )"></p>
             <p class="text-primary" ng-bind-html="t( 'part1.c.text3' )"></p>
             <p class="text-primary" ng-bind-html="t( 'part1.c.text4' )"></p>
@@ -536,7 +535,7 @@
                   difference="model.viewModel.compareRecord.differences.part1.c.deadline"
                   model="model">
                 </cn-view-input>
-                <cn-reqn-view-input
+                <cn-view-input-with-differences
                   input="{
                     key: 'start_date',
                     title: t( 'part1.c.start_date' ),
@@ -545,8 +544,8 @@
                   }"
                   difference="model.viewModel.compareRecord.differences.part1.c.start_date"
                   model="model">
-                </cn-reqn-view-input>
-                <cn-reqn-view-input
+                </cn-view-input-with-differences>
+                <cn-view-input-with-differences
                   input="{
                     key: 'duration',
                     title: t( 'part1.c.duration' ),
@@ -559,19 +558,19 @@
                   }"
                   difference="model.viewModel.compareRecord.differences.part1.c.duration"
                   model="model">
-                </cn-reqn-view-input>
+                </cn-view-input-with-differences>
               </div>
             </fieldset></form>
           </div>
         </div>
         <div ng-show="'d'==model.viewModel.formTab[1]" class="panel panel-default">
           <div class="panel-body">
-            <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_1d"></cn-reqn-deferral-note>
+            <cn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_1d"></cn-deferral-note>
             <p class="text-primary" ng-bind-html="t( 'part1.d.text1' )"></p>
             <hr/>
             <form id="part1dForm" name="part1dForm" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
               <div class="form-horizontal">
-                <cn-reqn-view-input
+                <cn-view-input-with-differences
                   input="{
                     key: 'title',
                     title: t( 'part1.d.title' ),
@@ -580,8 +579,8 @@
                   }"
                   difference="model.viewModel.compareRecord.differences.part1.d.title"
                   model="model">
-                </cn-reqn-view-input>
-                <cn-reqn-view-input
+                </cn-view-input-with-differences>
+                <cn-view-input-with-differences
                   input="{
                     key: 'keywords',
                     title: t( 'part1.d.keywords' ),
@@ -591,8 +590,8 @@
                   }"
                   difference="model.viewModel.compareRecord.differences.part1.d.keywords"
                   model="model">
-                </cn-reqn-view-input>
-                <cn-reqn-view-input
+                </cn-view-input-with-differences>
+                <cn-view-input-with-differences
                   input="{
                     key: 'lay_summary',
                     title: t( 'part1.d.lay_summary' ) + '<sup>ⓘ</sup><br><span class=text-info>(' +
@@ -605,10 +604,10 @@
                   no-help-indicator="true",
                   difference="model.viewModel.compareRecord.differences.part1.d.lay_summary"
                   model="model">
-                </cn-reqn-view-input>
+                </cn-view-input-with-differences>
                 <hr/>
                 <p class="text-primary" ng-bind-html="t( 'part1.d.text2' )"></p>
-                <cn-reqn-view-input
+                <cn-view-input-with-differences
                   input="{
                     key: 'background',
                     title: t( 'part1.d.background' ) + '<br><span class=text-info>(' +
@@ -619,8 +618,8 @@
                   }"
                   difference="model.viewModel.compareRecord.differences.part1.d.background"
                   model="model">
-                </cn-reqn-view-input>
-                <cn-reqn-view-input
+                </cn-view-input-with-differences>
+                <cn-view-input-with-differences
                   input="{
                     key: 'objectives',
                     title: t( 'part1.d.objectives' ) + '<br><span class=text-info>(' +
@@ -631,8 +630,8 @@
                   }"
                   difference="model.viewModel.compareRecord.differences.part1.d.objectives"
                   model="model">
-                </cn-reqn-view-input>
-                <cn-reqn-view-input
+                </cn-view-input-with-differences>
+                <cn-view-input-with-differences
                   input="{
                     key: 'methodology',
                     title: t( 'part1.d.methodology' )+'<sup>ⓘ</sup>' + '<br><span class=text-info>(' +
@@ -645,8 +644,8 @@
                   no-help-indicator="true",
                   difference="model.viewModel.compareRecord.differences.part1.d.methodology"
                   model="model">
-                </cn-reqn-view-input>
-                <cn-reqn-view-input
+                </cn-view-input-with-differences>
+                <cn-view-input-with-differences
                   input="{
                     key: 'analysis',
                     title: t( 'part1.d.analysis' )+'<sup>ⓘ</sup>' + '<br><span class=text-info>(' +
@@ -659,7 +658,7 @@
                   no-help-indicator="true",
                   difference="model.viewModel.compareRecord.differences.part1.d.analysis"
                   model="model">
-                </cn-reqn-view-input>
+                </cn-view-input-with-differences>
                 <hr/>
                 <p class="text-primary" ng-bind-html="t( 'part1.d.text3' ) + maxReferencesPerReqn + t( 'part1.d.text4' )"></p>
                 <div class="panel panel-default">
@@ -749,12 +748,12 @@
         </div>
         <div ng-show="'e'==model.viewModel.formTab[1]" class="panel panel-default">
           <div class="panel-body">
-            <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_1e"></cn-reqn-deferral-note>
+            <cn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_1e"></cn-deferral-note>
             <p class="text-primary" ng-bind-html="t( 'part1.e.text' )"></p>
             <hr/>
             <form id="part1eForm" name="part1eForm" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
               <div class="form-horizontal">
-                <cn-reqn-view-input
+                <cn-view-input-with-differences
                   input="{
                     key: 'funding',
                     title: t( 'part1.e.funding' ),
@@ -763,8 +762,8 @@
                   }"
                   difference="model.viewModel.compareRecord.differences.part1.e.funding"
                   model="model">
-                </cn-reqn-view-input>
-                <cn-reqn-view-input
+                </cn-view-input-with-differences>
+                <cn-view-input-with-differences
                   input="{
                     key: 'funding_agency',
                     title: t( 'part1.e.funding_agency' ),
@@ -773,8 +772,8 @@
                   ng-if="'no' != model.viewModel.record.funding"
                   difference="model.viewModel.compareRecord.differences.part1.e.funding_agency"
                   model="model">
-                </cn-reqn-view-input>
-                <cn-reqn-view-input
+                </cn-view-input-with-differences>
+                <cn-view-input-with-differences
                   input="{
                     key: 'grant_number',
                     title: t( 'part1.e.grant_number' ),
@@ -783,9 +782,9 @@
                   ng-if="'no' != model.viewModel.record.funding"
                   difference="model.viewModel.compareRecord.differences.part1.e.grant_number"
                   model="model">
-                </cn-reqn-view-input>
+                </cn-view-input-with-differences>
                 <fieldset ng-disabled="!liteModel.getEditEnabled()">
-                  <cn-reqn-view-input
+                  <cn-view-input-with-differences
                     ng-if="'yes' === model.viewModel.record.funding"
                     input="{
                       key: 'funding_filename',
@@ -794,7 +793,7 @@
                     }"
                     difference="model.viewModel.compareRecord.differences.part1.e.funding_filename"
                     model="liteModel">
-                  </cn-reqn-view-input>
+                  </cn-view-input-with-differences>
                 </fieldset>
               </div>
             </fieldset></form>
@@ -802,13 +801,13 @@
         </div>
         <div ng-show="'f'==model.viewModel.formTab[1]" class="panel panel-default">
           <div class="panel-body">
-            <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_1f"></cn-reqn-deferral-note>
+            <cn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_1f"></cn-deferral-note>
             <p class="text-primary" ng-bind-html="t( 'part1.f.text' )"></p>
             <hr/>
             <form id="part1fForm" name="part1fForm" novalidate>
               <div class="form-horizontal">
                 <fieldset ng-disabled="!model.getEditEnabled()">
-                  <cn-reqn-view-input
+                  <cn-view-input-with-differences
                     input="{
                       key: 'ethics',
                       title: t( 'part1.f.ethics' ),
@@ -817,9 +816,9 @@
                     }"
                     difference="model.viewModel.compareRecord.differences.part1.f.ethics"
                     model="model">
-                  </cn-reqn-view-input>
+                  </cn-view-input-with-differences>
                   <div ng-if="!model.viewModel.record.has_ethics_approval_list">
-                    <cn-reqn-view-input
+                    <cn-view-input-with-differences
                       ng-if="'yes' === model.viewModel.record.ethics"
                       input="{
                         key: 'ethics_date',
@@ -828,8 +827,8 @@
                       }"
                       difference="model.viewModel.compareRecord.differences.part1.f.ethics_date"
                       model="model">
-                    </cn-reqn-view-input>
-                    <cn-reqn-view-input
+                    </cn-view-input-with-differences>
+                    <cn-view-input-with-differences
                       ng-if="'no' === model.viewModel.record.ethics"
                       input="{
                         key: 'ethics_date',
@@ -838,11 +837,11 @@
                       }"
                       difference="model.viewModel.compareRecord.differences.part1.f.response"
                       model="model">
-                    </cn-reqn-view-input>
+                    </cn-view-input-with-differences>
                   </div>
                 </fieldset>
                 <fieldset ng-if="!model.viewModel.record.has_ethics_approval_list" ng-disabled="!liteModel.getEditEnabled()">
-                  <cn-reqn-view-input
+                  <cn-view-input-with-differences
                     ng-if="'yes' === model.viewModel.record.ethics || 'exempt' === model.viewModel.record.ethics"
                     input="{
                       key: 'ethics_filename',
@@ -851,7 +850,7 @@
                     }"
                     difference="model.viewModel.compareRecord.differences.part1.f.ethics_filename"
                     model="liteModel">
-                  </cn-reqn-view-input>
+                  </cn-view-input-with-differences>
                 </fieldset>
                 <div ng-if="model.viewModel.record.has_ethics_approval_list">
                   <div class="panel panel-default">
@@ -929,7 +928,7 @@
               <p class="text-primary" ng-bind-html="t( 'part2.cohort.text1' )"></p>
               <div class="container-fluid form-horizontal">
                 <fieldset ng-disabled="!model.getEditEnabled()">
-                  <cn-reqn-view-input
+                  <cn-view-input-with-differences
                     no-cols=true
                     input="{
                       key: 'tracking',
@@ -940,8 +939,8 @@
                     }"
                     difference="model.viewModel.compareRecord.differences.part2.cohort.tracking"
                     model="model">
-                  </cn-reqn-view-input>
-                  <cn-reqn-view-input
+                  </cn-view-input-with-differences>
+                  <cn-view-input-with-differences
                     no-cols=true
                     input="{
                       key: 'comprehensive',
@@ -952,14 +951,14 @@
                     }"
                     difference="model.viewModel.compareRecord.differences.part2.cohort.comprehensive"
                     model="model">
-                  </cn-reqn-view-input>
+                  </cn-view-input-with-differences>
                 </fieldset>
               </div>
               <p class="text-primary" ng-bind-html="t( 'part2.cohort.text2' )"></p>
               <hr/>
               <div class="container-fluid form-horizontal">
                 <fieldset ng-disabled="!model.getEditEnabled()">
-                  <cn-reqn-view-input
+                  <cn-view-input-with-differences
                     no-cols=true
                     input="{
                       key: 'longitudinal',
@@ -969,8 +968,8 @@
                     }"
                     difference="model.viewModel.compareRecord.differences.part2.cohort.longitudinal"
                     model="model">
-                  </cn-reqn-view-input>
-                  <cn-reqn-view-input
+                  </cn-view-input-with-differences>
+                  <cn-view-input-with-differences
                     ng-if="model.viewModel.record.longitudinal"
                     no-cols=true
                     input="{
@@ -980,7 +979,7 @@
                     }"
                     difference="model.viewModel.compareRecord.differences.part2.cohort.last_identifier"
                     model="model">
-                  </cn-reqn-view-input>
+                  </cn-view-input-with-differences>
                 </fieldset>
               </div>
             </form>
@@ -992,7 +991,7 @@
              class="panel panel-default">
           <div class="panel-body">
             <form ng-attr-id="part2{{ part }}Form" ng-attr-name="part2{{ part }}Form" novalidate>
-              <cn-reqn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_2{{ part }}"></cn-reqn-deferral-note>
+              <cn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_2{{ part }}"></cn-deferral-note>
               <div class="form-horizontal">
                 <p ng-if="'d'==part" class="text-primary" ng-bind-html="t( 'part2.d.text' )"></p>
                 <ul class="list-group" ng-if="'e'==part">
@@ -1000,7 +999,7 @@
                     <h4 ng-bind-html="t( 'part2.e.title1' )"></h4>
                     <div ng-bind-html="t( 'part2.e.text1' )"></div>
                     <div class="form-body">
-                      <cn-reqn-view-input
+                      <cn-view-input-with-differences
                         input="{
                           key: 'cimt',
                           title: t( 'part2.e.cimt' ),
@@ -1011,9 +1010,9 @@
                         no-help-indicator="true"
                         difference="model.viewModel.compareRecord.differences.part2.e.cimt"
                         model="model">
-                      </cn-reqn-view-input>
+                      </cn-view-input-with-differences>
                       <div style="margin-top: -1em;" ng-if="model.viewModel.record.cimt">
-                        <cn-reqn-view-input
+                        <cn-view-input-with-differences
                           input="{
                             key: 'cimt_justification',
                             title: 'Justification',
@@ -1021,9 +1020,9 @@
                           }"
                           difference="model.viewModel.compareRecord.differences.part2.e.cimt_justification"
                           model="model">
-                        </cn-reqn-view-input>
+                        </cn-view-input-with-differences>
                       </div>
-                      <cn-reqn-view-input
+                      <cn-view-input-with-differences
                         input="{
                           key: 'dxa',
                           title: t( 'part2.e.dxa' ),
@@ -1034,9 +1033,9 @@
                         no-help-indicator="true"
                         difference="model.viewModel.compareRecord.differences.part2.e.dxa"
                         model="model">
-                      </cn-reqn-view-input>
+                      </cn-view-input-with-differences>
                       <div style="margin-top: -1em;" ng-if="model.viewModel.record.dxa">
-                        <cn-reqn-view-input
+                        <cn-view-input-with-differences
                           input="{
                             key: 'dxa_justification',
                             title: 'Justification',
@@ -1044,9 +1043,9 @@
                           }"
                           difference="model.viewModel.compareRecord.differences.part2.e.dxa_justification"
                           model="model">
-                        </cn-reqn-view-input>
+                        </cn-view-input-with-differences>
                       </div>
-                      <cn-reqn-view-input
+                      <cn-view-input-with-differences
                         input="{
                           key: 'ecg',
                           title: t( 'part2.e.ecg' ),
@@ -1055,9 +1054,9 @@
                         }"
                         difference="model.viewModel.compareRecord.differences.part2.e.ecg"
                         model="model">
-                      </cn-reqn-view-input>
+                      </cn-view-input-with-differences>
                       <div style="margin-top: -1em;" ng-if="model.viewModel.record.ecg">
-                        <cn-reqn-view-input
+                        <cn-view-input-with-differences
                           input="{
                             key: 'ecg_justification',
                             title: 'Justification',
@@ -1065,9 +1064,9 @@
                           }"
                           difference="model.viewModel.compareRecord.differences.part2.e.ecg_justification"
                           model="model">
-                        </cn-reqn-view-input>
+                        </cn-view-input-with-differences>
                       </div>
-                      <cn-reqn-view-input
+                      <cn-view-input-with-differences
                         input="{
                           key: 'retinal',
                           title: t( 'part2.e.retinal' ),
@@ -1076,9 +1075,9 @@
                         }"
                         difference="model.viewModel.compareRecord.differences.part2.e.retinal"
                         model="model">
-                      </cn-reqn-view-input>
+                      </cn-view-input-with-differences>
                       <div style="margin-top: -1em;" ng-if="model.viewModel.record.retinal">
-                        <cn-reqn-view-input
+                        <cn-view-input-with-differences
                           input="{
                             key: 'retinal_justification',
                             title: 'Justification',
@@ -1086,9 +1085,9 @@
                           }"
                           difference="model.viewModel.compareRecord.differences.part2.e.retinal_justification"
                           model="model">
-                        </cn-reqn-view-input>
+                        </cn-view-input-with-differences>
                       </div>
-                      <cn-reqn-view-input
+                      <cn-view-input-with-differences
                         input="{
                           key: 'spirometry',
                           title: t( 'part2.e.spirometry' ),
@@ -1099,9 +1098,9 @@
                         no-help-indicator="true"
                         difference="model.viewModel.compareRecord.differences.part2.e.spirometry"
                         model="model">
-                      </cn-reqn-view-input>
+                      </cn-view-input-with-differences>
                       <div style="margin-top: -1em;" ng-if="model.viewModel.record.spirometry">
-                        <cn-reqn-view-input
+                        <cn-view-input-with-differences
                           input="{
                             key: 'spirometry_justification',
                             title: 'Justification',
@@ -1109,9 +1108,9 @@
                           }"
                           difference="model.viewModel.compareRecord.differences.part2.e.spirometry_justification"
                           model="model">
-                        </cn-reqn-view-input>
+                        </cn-view-input-with-differences>
                       </div>
-                      <cn-reqn-view-input
+                      <cn-view-input-with-differences
                         input="{
                           key: 'tonometry',
                           title: t( 'part2.e.tonometry' ),
@@ -1120,9 +1119,9 @@
                         }"
                         difference="model.viewModel.compareRecord.differences.part2.e.tonometry"
                         model="model">
-                      </cn-reqn-view-input>
+                      </cn-view-input-with-differences>
                       <div style="margin-top: -1em;" ng-if="model.viewModel.record.tonometry">
-                        <cn-reqn-view-input
+                        <cn-view-input-with-differences
                           input="{
                             key: 'tonometry_justification',
                             title: 'Justification',
@@ -1130,7 +1129,7 @@
                           }"
                           difference="model.viewModel.compareRecord.differences.part2.e.tonometry_justification"
                           model="model">
-                        </cn-reqn-view-input>
+                        </cn-view-input-with-differences>
                       </div>
                     </div>
                   </li>
@@ -1138,7 +1137,7 @@
                     <h4 ng-bind-html="t( 'part2.e.title2' )"></h4>
                     <div ng-bind-html="t( 'part2.e.text2' )"></div>
                     <div class="form-body">
-                      <cn-reqn-view-input
+                      <cn-view-input-with-differences
                         input="{
                           key: 'fsa',
                           title: t( 'part2.e.fsa' ),
@@ -1148,9 +1147,9 @@
                         no-help-indicator="true"
                         difference="model.viewModel.compareRecord.differences.part2.e.fsa"
                         model="model">
-                      </cn-reqn-view-input>
+                      </cn-view-input-with-differences>
                       <div style="margin-top: -1em;" ng-if="model.viewModel.record.fsa">
-                        <cn-reqn-view-input
+                        <cn-view-input-with-differences
                           input="{
                             key: 'fsa_justification',
                             title: 'Justification',
@@ -1158,9 +1157,9 @@
                           }"
                           difference="model.viewModel.compareRecord.differences.part2.e.fsa_justification"
                           model="model">
-                        </cn-reqn-view-input>
+                        </cn-view-input-with-differences>
                       </div>
-                      <cn-reqn-view-input
+                      <cn-view-input-with-differences
                         input="{
                           key: 'csd',
                           title: t( 'part2.e.csd' ),
@@ -1170,9 +1169,9 @@
                         no-help-indicator="true"
                         difference="model.viewModel.compareRecord.differences.part2.e.csd"
                         model="model">
-                      </cn-reqn-view-input>
+                      </cn-view-input-with-differences>
                       <div style="margin-top: -1em;" ng-if="model.viewModel.record.csd">
-                        <cn-reqn-view-input
+                        <cn-view-input-with-differences
                           input="{
                             key: 'csd_justification',
                             title: 'Justification',
@@ -1180,7 +1179,7 @@
                           }"
                           difference="model.viewModel.compareRecord.differences.part2.e.csd_justification"
                           model="model">
-                        </cn-reqn-view-input>
+                        </cn-view-input-with-differences>
                       </div>
                     </div>
                   </li>
@@ -1260,7 +1259,7 @@
                 <hr/>
                 <div ng-if="'d'==part" class="container-fluid form-horizontal">
                   <fieldset ng-disabled="!model.getEditEnabled()">
-                    <cn-reqn-view-input
+                    <cn-view-input-with-differences
                       no-cols=true
                       input="{
                         key: 'data_sharing_filename',
@@ -1269,12 +1268,12 @@
                       }"
                       difference="model.viewModel.compareRecord.differences.part2.d.data_sharing_filename"
                       model="liteModel">
-                    </cn-reqn-view-input>
+                    </cn-view-input-with-differences>
                   </fieldset>
                   </fieldset>
                 </div>
                 <div class="container-fluid">
-                  <cn-reqn-view-input
+                  <cn-view-input-with-differences
                     no-cols=true
                     ng-if="'e'!=part"
                     input="{
@@ -1284,7 +1283,7 @@
                     }"
                     difference="model.viewModel.compareRecord.differences.part2[part]['part2_' + part + '_comment']"
                     model="model">
-                  </cn-reqn-view-input>
+                  </cn-view-input-with-differences>
                 </div>
               </div>
             </form>
@@ -1330,14 +1329,14 @@
                   </ul>
                 </div>
               </div>
-              <cn-reqn-view-input
+              <cn-view-input-with-differences
                 input="{
                   key: 'agreement_filename',
                   title: 'Agreement File',
                   type: 'file'
                 }"
                 model="liteModel">
-              </cn-reqn-view-input>
+              </cn-view-input-with-differences>
             </fieldset>
           </div>
         </fieldset></form>

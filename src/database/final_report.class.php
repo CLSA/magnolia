@@ -155,11 +155,9 @@ class final_report extends \cenozo\database\record
     // now check production records
     foreach( $this->get_production_object_list() as $db_production )
     {
-      // TODO: implement
-      /*
       $db_last_production = $production_class_name::get_unique_record(
-        array( 'final_report_id', 'rank' ),
-        array( $db_last_final_report->id, $db_production->rank )
+        array( 'final_report_id', 'detail' ),
+        array( $db_last_final_report->id, $db_production->detail )
       );
       if( is_null( $db_last_production ) ) return true;
 
@@ -168,7 +166,6 @@ class final_report extends \cenozo\database\record
       foreach( $db_production->get_column_names() as $column )
         if( !in_array( $column, $ignore_columns ) && $db_production->$column != $db_last_production->$column )
           return true;
-      */
     }
 
     // if we get here then everything is identical

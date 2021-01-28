@@ -201,6 +201,41 @@ class reqn extends \cenozo\database\record
   }
 
   /**
+   * Creates a new version of the requisition's final report
+   * 
+   * If no final report exists then the first (empty) version will be created.  Otherwise the current final report
+   * will be copied exactly into a new version
+   */
+  public function create_final_report()
+  {
+    // first get the current final_report to determine the next version number
+    $db_current_final_report = $this->get_current_final_report();
+    $version = is_null( $db_current_final_report ) ? 1 : $db_current_final_report->version + 1;
+
+    // create the new record and copy the current record (if it exists)
+    $db_final_report = lib::create( 'database\final_report' );
+    if( !is_null( $db_current_final_report ) ) $db_final_report->copy( $db_current_final_report );
+
+    // set the parent, datetime, version and agreement_filename (never use the current)
+    $db_final_report->reqn_id = $this->id;
+    $db_final_report->datetime = util::get_datetime_object();
+    $db_final_report->version = $version;
+    $db_final_report->save();
+
+    if( !is_null( $db_current_final_report ) )
+    {
+      // copy production records
+      foreach( $db_current_final_report->get_production_object_list() as $db_production )
+      {
+        $db_new_production = lib::create( 'database\production' );
+        $db_new_production->copy( $db_production );
+        $db_new_production->final_report_id = $db_final_report->id;
+        $db_new_production->save();
+      }
+    }
+  }
+
+  /**
    * Returns the path to various files associated with the reqn
    * 
    * @param string $type Should be 'agreement' or 'instruction'
@@ -710,6 +745,9 @@ class reqn extends \cenozo\database\record
       $this->state = 'deferred';
       $this->save();
 
+      // create a new final report
+      $this->create_final_report();
+
       // do not send a notification since there is one already sent after leaving the Decision Made stage
     }
     else if( $incomplete || $withdrawn )
@@ -763,6 +801,30 @@ class reqn extends \cenozo\database\record
 
     $reqn_version_id = static::db()->get_one( sprintf( '%s %s', $select->get_sql(), $modifier->get_sql() ) );
     return $reqn_version_id ? lib::create( 'database\reqn_version', $reqn_version_id ) : NULL;
+  }
+
+  /**
+   * Returns this reqn's latest final_report record
+   * 
+   * @access public
+   */
+  public function get_current_final_report()
+  {
+    // check the primary key value
+    if( is_null( $this->id ) )
+    {
+      log::warning( 'Tried to query reqn with no primary key.' );
+      return NULL;
+    }
+
+    $select = lib::create( 'database\select' );
+    $select->from( 'reqn_current_final_report' );
+    $select->add_column( 'final_report_id' );
+    $modifier = lib::create( 'database\modifier' );
+    $modifier->where( 'reqn_id', '=', $this->id );
+
+    $final_report_id = static::db()->get_one( sprintf( '%s %s', $select->get_sql(), $modifier->get_sql() ) );
+    return $final_report_id ? lib::create( 'database\final_report', $final_report_id ) : NULL;
   }
 
   /**
@@ -1071,6 +1133,41 @@ class reqn extends \cenozo\database\record
     $modifier->where( 'TIMESTAMPDIFF( MONTH, date, UTC_TIMESTAMP() )', '=', 1 );
     $modifier->where( 'DAY( date )', '=', 'DAY( UTC_TIMESTAMP() )', false );
     $modifier->where( 'notification.id', '=', NULL );
+
+    $reqn_list = static::select_objects( $modifier );
+    foreach( $reqn_list as $db_reqn )
+    {
+      $db_notification = lib::create( 'database\notification' );
+      $db_notification->notification_type_id = $db_notification_type->id;
+      $db_notification->set_reqn( $db_reqn ); // this saves the record
+      $db_notification->mail();
+    }
+
+    return count( $reqn_list );
+  }
+
+  /**
+   * Sends expired agreement notifications
+   */
+  public static function send_expired_approval_notifications()
+  {
+    $notification_type_class_name = lib::get_class_name( 'database\notification_type' );
+    $db_notification_type = $notification_type_class_name::get_unique_record( 'name', 'Agreement Expiry Notice' );
+
+    /*
+    TODO: Determine when agreement expires here
+    $modifier = lib::create( 'database\modifier' );
+    $modifier->join( 'reqn_last_approval_approval', 'reqn.id', 'reqn_last_approval_approval.reqn_id' );
+    $modifier->join( 'approval_approval', 'reqn_last_approval_approval.approval_approval_id', 'approval_approval.id' );
+    $join_mod = lib::create( 'database\modifier' );
+    $join_mod->where( 'reqn.id', '=', 'notification.reqn_id', false );
+    $join_mod->where( 'notification.notification_type_id', '=', $db_notification_type->id );
+    $join_mod->where( 'TIMESTAMPDIFF( DAY, notification.datetime, UTC_TIMESTAMP() )', '=', 0 );
+    $modifier->join_modifier( 'notification', $join_mod, 'left' );
+    $modifier->where( 'TIMESTAMPDIFF( MONTH, date, UTC_TIMESTAMP() )', '=', 1 );
+    $modifier->where( 'DAY( date )', '=', 'DAY( UTC_TIMESTAMP() )', false );
+    $modifier->where( 'notification.id', '=', NULL );
+    */
 
     $reqn_list = static::select_objects( $modifier );
     foreach( $reqn_list as $db_reqn )

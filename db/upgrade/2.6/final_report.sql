@@ -21,6 +21,20 @@ CREATE PROCEDURE patch_final_report()
       ADD UNIQUE INDEX uq_reqn_id_version (reqn_id ASC, version ASC);
     END IF;
 
+    SELECT "Adding new datetime column to final_report table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "final_report"
+    AND column_name = "datetime";
+
+    IF @test = 0 THEN
+      ALTER TABLE final_report
+      ADD COLUMN datetime DATETIME NOT NULL
+      AFTER version;
+    END IF;
+
   END //
 DELIMITER ;
 

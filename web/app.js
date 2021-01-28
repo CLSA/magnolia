@@ -10,6 +10,41 @@ cenozo.controller( 'HeaderCtrl', [
   }
 ] );
 
+/* ######################################################################################################## */
+cenozo.directive( 'cnViewInputWithDifferences',
+  function() {
+    return {
+      templateUrl: cenozoApp.getFileUrl( 'magnolia', 'view-input-with-differences.tpl.html' ),
+      restrict: 'E',
+      scope: {
+        model: '=',
+        difference: '=',
+        input: '=',
+        noHelpIndicator: '=',
+        noCols: '='
+      },
+      controller: [ '$scope', function( $scope ) {
+        $scope.directive = 'cnViewInputWithDifferences';
+      } ]
+    };
+  }
+);
+
+/* ######################################################################################################## */
+cenozo.directive( 'cnDeferralNote',
+  function() {
+    return {
+      templateUrl: cenozoApp.getFileUrl( 'magnolia', 'deferral-note.tpl.html' ),
+      restrict: 'E',
+      scope: { note: '@' },
+      controller: [ '$scope', function( $scope ) {
+        $scope.directive = 'cnDeferralNote';
+      } ]
+    };
+  }
+);
+
+/* ######################################################################################################## */
 cenozo.service( 'CnModalNoticeListFactory', [
   'CnModalMessageFactory', '$uibModal', '$state', '$window', '$filter',
   function( CnModalMessageFactory, $uibModal, $state, $window, $filter ) {
@@ -992,7 +1027,7 @@ cenozo.service( 'CnReqnHelper', [
         modifier: { order: 'rank', limit: 1000 }
       }
     } ).query().then( function( response ) {
-      var letter = 'a'; 
+      var letter = 'a';
       response.data.forEach( function( cat ) {
         object.lookupData.reqn.part2[letter].tab = { en: cat.name_en, fr: cat.name_fr };
         letter = String.fromCharCode( letter.charCodeAt(0) + 1 );
@@ -1000,281 +1035,5 @@ cenozo.service( 'CnReqnHelper', [
     } );
 
     return object;
-  }
-] );
-
-cenozo.service( 'CnReqnVersionHelper', [
-  'CnHttpFactory',
-  function( CnHttpFactory ) {
-    return {
-      getDifferences: function( v1, v2, model ) {
-        var differences = {
-          diff: false,
-          amendment: {
-            diff: false,
-            a: { // the only unnamed amendment category
-              diff: false,
-              new_user_id: false,
-              amendment_justification: false
-            }
-          },
-          part1: {
-            diff: false,
-            a: { // applicant
-              diff: false,
-              applicant_position: false,
-              applicant_affiliation: false,
-              applicant_address: false,
-              applicant_phone: false,
-              trainee_program: false,
-              trainee_institution: false,
-              trainee_address: false,
-              trainee_phone: false,
-              waiver: false
-            },
-            b: { // project team
-              diff: false,
-              coapplicantList: [],
-              coapplicant_agreement_filename: false
-            },
-            c: { // timeline
-              diff: false,
-              start_date: false,
-              duration: false
-            },
-            d: { // description
-              diff: false,
-              title: false,
-              keywords: false,
-              lay_summary: false,
-              background: false,
-              objectives: false,
-              methodology: false,
-              analysis: false,
-              referenceList: []
-            },
-            e: { // scientific review
-              diff: false,
-              funding: false,
-              funding_filename: false,
-              funding_agency: false,
-              grant_number: false
-            },
-            f: { // ethics
-              diff: false,
-              ethics: false,
-              ethics_date: false,
-              ethics_filename: false
-            }
-          },
-          part2: {
-            diff: false,
-            cohort: {
-              diff: false,
-              comprehensive: false,
-              tracking: false
-            },
-            a: { // questionnaires
-              diff: false,
-              baselineDataOptionList: [],
-              followUp1DataOptionList: [],
-              part2_a_comment: false
-            },
-            b: { // physical assessments
-              diff: false,
-              baselineDataOptionList: [],
-              followUp1DataOptionList: [],
-              part2_b_comment: false
-            },
-            c: { // biomarkers
-              diff: false,
-              baselineDataOptionList: [],
-              followUp1DataOptionList: [],
-              part2_c_comment: false
-            },
-            d: { // linked data
-              diff: false,
-              data_sharing_filename: false,
-              baselineDataOptionList: [],
-              followUp1DataOptionList: [],
-              part2_d_comment: false
-            },
-            e: { // additional data
-              diff: false,
-              cimt: false,
-              cimt_justification: false,
-              dxa: false,
-              dxa_justification: false,
-              ecg: false,
-              ecg_justification: false,
-              retinal: false,
-              retinal_justification: false,
-              spirometry: false,
-              spirometry_justification: false,
-              tonometry: false,
-              tonometry_justification: false,
-              fsa: false,
-              fsa_justification: false,
-              csd: false,
-              csd_justification: false,
-            }
-          }
-        };
-
-        // add all amendment types
-        model.amendmentTypeList.en.forEach( function( amendmentType ) {
-          differences.amendment.a['amendmentType'+amendmentType.id] = false;
-        } );
-
-        if( null != v2 ) {
-          for( var part in differences ) {
-            if( !differences.hasOwnProperty( part ) ) continue;
-            if( 'diff' == part ) continue; // used to track overall diff
-
-            for( var section in differences[part] ) {
-              if( !differences[part].hasOwnProperty( section ) ) continue;
-              if( 'diff' == section ) continue; // used to track overall diff
-
-              for( var property in differences[part][section] ) {
-                if( !differences[part][section].hasOwnProperty( property ) ) continue;
-                if( angular.isArray( differences[part][section][property] ) ) {
-                  // an array means we have a list go check through
-                  if( 'coapplicantList' == property ) {
-                    // loop through v1's coapplicants to see if any were added or changed
-                    v1.coapplicantList.forEach( function( c1 ) {
-                      var c2 = v2.coapplicantList.findByProperty( 'name', c1.name );
-                      if( null == c2 ) {
-                        // v1 has coapplicant that v2 doesn't
-                        differences.diff = true;
-                        differences[part].diff = true;
-                        differences[part][section].diff = true;
-                        differences[part][section][property].push( { name: c1.name, diff: 'added' } );
-                      } else {
-                        if( ['position', 'affiliation', 'email', 'role', 'access'].some( function( p ) {
-                          return c1[p] != c2[p];
-                        } ) ) {
-                          // v1 has coapplicant which is different than v2
-                          differences.diff = true;
-                          differences[part].diff = true;
-                          differences[part][section].diff = true;
-                          differences[part][section][property].push( { name: c1.name, diff: 'changed' } );
-                        }
-                      }
-                    } );
-
-                    // loop through v2's coapplicants to see if any were removed
-                    v2.coapplicantList.forEach( function( c2 ) {
-                      var c1 = v1.coapplicantList.findByProperty( 'name', c2.name );
-                      if( null == c2 ) {
-                        // v1 has coapplicant that v2 doesn't
-                        differences.diff = true;
-                        differences[part].diff = true;
-                        differences[part][section].diff = true;
-                        differences[part][section][property].push( { name: c2.name, diff: 'removed' } );
-                      }
-                    } );
-                  } else if( 'referenceList' == property ) {
-                    // loop through v1's references to see if any were added or changed
-                    v1.referenceList.forEach( function( r1 ) {
-                      var r2 = v2.referenceList.findByProperty( 'reference', r1.reference );
-                      if( null == r2 ) {
-                        // v1 has reference that v2 doesn't
-                        differences.diff = true;
-                        differences[part].diff = true;
-                        differences[part][section].diff = true;
-                        differences[part][section][property].push( { name: r1.reference, diff: 'added' } );
-                      }
-                    } );
-
-                    // loop through v2's references to see if any were removed
-                    v2.referenceList.forEach( function( r2 ) {
-                      var r1 = v1.referenceList.findByProperty( 'reference', r2.reference );
-                      if( null == r1 ) {
-                        // v1 has reference that v2 doesn't
-                        differences.diff = true;
-                        differences[part].diff = true;
-                        differences[part][section].diff = true;
-                        differences[part][section][property].push( { name: r2.reference, diff: 'removed' } );
-                      }
-                    } );
-                  } else if( 'baselineDataOptionList' == property ) {
-                    model.dataOptionCategoryList.forEach( function( dataOptionCategory ) {
-                      // section a checks rank 1, section b checks rank 2, etc
-                      if( dataOptionCategory.rank == section.charCodeAt() - 'a'.charCodeAt() + 1 ) {
-                        dataOptionCategory.optionList.forEach( function( dataOption ) {
-                          if( dataOption.bl ) {
-                            if( v1.dataOptionValueList.bl[dataOption.id] != v2.dataOptionValueList.bl[dataOption.id] ) {
-                              differences.diff = true;
-                              differences[part].diff = true;
-                              differences[part][section].diff = true;
-                              differences[part][section][property].push( {
-                                id: dataOption.id,
-                                name: dataOption.name.en,
-                                diff: v1.dataOptionValueList.bl[dataOption.id] ? 'added' : 'removed'
-                              } );
-                            }
-                          }
-                        } );
-                      }
-                    } );
-                  } else if( 'followUp1DataOptionList' == property ) {
-                    model.dataOptionCategoryList.forEach( function( dataOptionCategory ) {
-                      // section a checks rank 1, section b checks rank 2, etc
-                      if( dataOptionCategory.rank == section.charCodeAt() - 'a'.charCodeAt() + 1 ) {
-                        dataOptionCategory.optionList.forEach( function( dataOption ) {
-                          if( dataOption.f1 ) {
-                            if( v1.dataOptionValueList.f1[dataOption.id] != v2.dataOptionValueList.f1[dataOption.id] ) {
-                              differences.diff = true;
-                              differences[part].diff = true;
-                              differences[part][section].diff = true;
-                              differences[part][section][property].push( {
-                                id: dataOption.id,
-                                name: dataOption.name.en,
-                                diff: v1.dataOptionValueList.f1[dataOption.id] ? 'added' : 'removed'
-                              } );
-                            }
-                          }
-                        } );
-                      }
-                    } );
-                  }
-                } else if( null != property.match( /_filename$/ ) ) {
-                  // if both file names are empty or null then assume there is no difference
-                  var recordName = angular.isUndefined( v1[property] ) ? null : v1[property];
-                  var compareName = angular.isUndefined( v2[property] ) ? null : v2[property];
-
-                  if( !( recordName == null && compareName == null ) ) {
-                    // file size are compared instead of filename
-                    var fileDetails = model.viewModel.fileList.findByProperty( 'key', property );
-                    var sizeProperty = property.replace( '_filename', '_size' );
-                    var recordSize = angular.isObject( fileDetails ) && fileDetails.size ? fileDetails.size : null;
-                    var compareSize = v2[sizeProperty] ? v2[sizeProperty] : null;
-                    if( ( null != recordSize || null != compareSize ) && recordSize != compareSize ) {
-                      differences.diff = true;
-                      differences[part].diff = true;
-                      differences[part][section].diff = true;
-                      differences[part][section][property] = true;
-                    }
-                  }
-                } else {
-                  // not an array means we have a property to directly check
-                  // note: we need to convert empty strings to null to make sure they compare correctly
-                  var value1 = '' === v1[property] ? null : v1[property];
-                  var value2 = '' === v2[property] ? null : v2[property];
-                  if( value1 != value2 ) {
-                    differences.diff = true;
-                    differences[part].diff = true;
-                    differences[part][section].diff = true;
-                    differences[part][section][property] = true;
-                  }
-                }
-              }
-            }
-          }
-        }
-
-        return differences;
-      }
-    };
   }
 ] );

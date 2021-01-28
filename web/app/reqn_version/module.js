@@ -138,26 +138,6 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
   } );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnReqnViewInput',
-    function() {
-      return {
-        templateUrl: module.getFileUrl( 'reqn-view-input.tpl.html' ),
-        restrict: 'E',
-        scope: {
-          model: '=',
-          difference: '=',
-          input: '=',
-          noHelpIndicator: '=',
-          noCols: '='
-        },
-        controller: [ '$scope', function( $scope ) {
-          $scope.directive = 'cnReqnViewInput';
-        } ]
-      };
-    }
-  );
-
-  /* ######################################################################################################## */
   cenozo.providers.directive( 'cnReqnVersionList', [
     'CnReqnVersionModelFactory',
     function( CnReqnVersionModelFactory ) {
@@ -450,11 +430,11 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnReqnVersionViewFactory', [
-    'CnReqnHelper', 'CnReqnVersionHelper', 'CnModalNoticeListFactory',
+    'CnReqnHelper', 'CnModalNoticeListFactory',
     'CnCoapplicantModelFactory', 'CnReferenceModelFactory', 'CnEthicsApprovalModelFactory', 'CnBaseViewFactory',
     'CnSession', 'CnHttpFactory', 'CnModalMessageFactory', 'CnModalConfirmFactory', 'CnModalSubmitExternalFactory',
     '$state', '$q', '$window',
-    function( CnReqnHelper, CnReqnVersionHelper, CnModalNoticeListFactory,
+    function( CnReqnHelper, CnModalNoticeListFactory,
               CnCoapplicantModelFactory, CnReferenceModelFactory, CnEthicsApprovalModelFactory, CnBaseViewFactory,
               CnSession, CnHttpFactory, CnModalMessageFactory, CnModalConfirmFactory, CnModalSubmitExternalFactory,
               $state, $q, $window ) {
@@ -742,6 +722,278 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
             }
           },
 
+          getDifferences: function( reqnVersion2 ) {
+            var reqnVersion1 = this.record;
+            var differences = {
+              diff: false,
+              amendment: {
+                diff: false,
+                a: { // the only unnamed amendment category
+                  diff: false,
+                  new_user_id: false,
+                  amendment_justification: false
+                }
+              },
+              part1: {
+                diff: false,
+                a: { // applicant
+                  diff: false,
+                  applicant_position: false,
+                  applicant_affiliation: false,
+                  applicant_address: false,
+                  applicant_phone: false,
+                  trainee_program: false,
+                  trainee_institution: false,
+                  trainee_address: false,
+                  trainee_phone: false,
+                  waiver: false
+                },
+                b: { // project team
+                  diff: false,
+                  coapplicantList: [],
+                  coapplicant_agreement_filename: false
+                },
+                c: { // timeline
+                  diff: false,
+                  start_date: false,
+                  duration: false
+                },
+                d: { // description
+                  diff: false,
+                  title: false,
+                  keywords: false,
+                  lay_summary: false,
+                  background: false,
+                  objectives: false,
+                  methodology: false,
+                  analysis: false,
+                  referenceList: []
+                },
+                e: { // scientific review
+                  diff: false,
+                  funding: false,
+                  funding_filename: false,
+                  funding_agency: false,
+                  grant_number: false
+                },
+                f: { // ethics
+                  diff: false,
+                  ethics: false,
+                  ethics_date: false,
+                  ethics_filename: false
+                }
+              },
+              part2: {
+                diff: false,
+                cohort: {
+                  diff: false,
+                  comprehensive: false,
+                  tracking: false
+                },
+                a: { // questionnaires
+                  diff: false,
+                  baselineDataOptionList: [],
+                  followUp1DataOptionList: [],
+                  part2_a_comment: false
+                },
+                b: { // physical assessments
+                  diff: false,
+                  baselineDataOptionList: [],
+                  followUp1DataOptionList: [],
+                  part2_b_comment: false
+                },
+                c: { // biomarkers
+                  diff: false,
+                  baselineDataOptionList: [],
+                  followUp1DataOptionList: [],
+                  part2_c_comment: false
+                },
+                d: { // linked data
+                  diff: false,
+                  data_sharing_filename: false,
+                  baselineDataOptionList: [],
+                  followUp1DataOptionList: [],
+                  part2_d_comment: false
+                },
+                e: { // additional data
+                  diff: false,
+                  cimt: false,
+                  cimt_justification: false,
+                  dxa: false,
+                  dxa_justification: false,
+                  ecg: false,
+                  ecg_justification: false,
+                  retinal: false,
+                  retinal_justification: false,
+                  spirometry: false,
+                  spirometry_justification: false,
+                  tonometry: false,
+                  tonometry_justification: false,
+                  fsa: false,
+                  fsa_justification: false,
+                  csd: false,
+                  csd_justification: false,
+                }
+              }
+            };
+
+            // add all amendment types
+            self.parentModel.amendmentTypeList.en.forEach( function( amendmentType ) {
+              differences.amendment.a['amendmentType'+amendmentType.id] = false;
+            } );
+
+            if( null != reqnVersion2 ) {
+              for( var part in differences ) {
+                if( !differences.hasOwnProperty( part ) ) continue;
+                if( 'diff' == part ) continue; // used to track overall diff
+
+                for( var section in differences[part] ) {
+                  if( !differences[part].hasOwnProperty( section ) ) continue;
+                  if( 'diff' == section ) continue; // used to track overall diff
+
+                  for( var property in differences[part][section] ) {
+                    if( !differences[part][section].hasOwnProperty( property ) ) continue;
+                    if( angular.isArray( differences[part][section][property] ) ) {
+                      // an array means we have a list go check through
+                      if( 'coapplicantList' == property ) {
+                        // loop through reqnVersion1's coapplicants to see if any were added or changed
+                        reqnVersion1.coapplicantList.forEach( function( c1 ) {
+                          var c2 = reqnVersion2.coapplicantList.findByProperty( 'name', c1.name );
+                          if( null == c2 ) {
+                            // reqnVersion1 has coapplicant that compared reqnVersion2 doesn't
+                            differences.diff = true;
+                            differences[part].diff = true;
+                            differences[part][section].diff = true;
+                            differences[part][section][property].push( { name: c1.name, diff: 'added' } );
+                          } else {
+                            if( ['position', 'affiliation', 'email', 'role', 'access'].some( function( p ) {
+                              return c1[p] != c2[p];
+                            } ) ) {
+                              // reqnVersion1 has coapplicant which is different than compared reqnVersion2
+                              differences.diff = true;
+                              differences[part].diff = true;
+                              differences[part][section].diff = true;
+                              differences[part][section][property].push( { name: c1.name, diff: 'changed' } );
+                            }
+                          }
+                        } );
+
+                        // loop through compared reqnVersion2's coapplicants to see if any were removed
+                        reqnVersion2.coapplicantList.forEach( function( c2 ) {
+                          var c1 = reqnVersion1.coapplicantList.findByProperty( 'name', c2.name );
+                          if( null == c2 ) {
+                            // reqnVersion1 has coapplicant that compared reqnVersion2 doesn't
+                            differences.diff = true;
+                            differences[part].diff = true;
+                            differences[part][section].diff = true;
+                            differences[part][section][property].push( { name: c2.name, diff: 'removed' } );
+                          }
+                        } );
+                      } else if( 'referenceList' == property ) {
+                        // loop through reqnVersion1's references to see if any were added or changed
+                        reqnVersion1.referenceList.forEach( function( r1 ) {
+                          var r2 = reqnVersion2.referenceList.findByProperty( 'reference', r1.reference );
+                          if( null == r2 ) {
+                            // reqnVersion1 has reference that compared reqnVersion2 doesn't
+                            differences.diff = true;
+                            differences[part].diff = true;
+                            differences[part][section].diff = true;
+                            differences[part][section][property].push( { name: r1.reference, diff: 'added' } );
+                          }
+                        } );
+
+                        // loop through compared reqnVersion2's references to see if any were removed
+                        reqnVersion2.referenceList.forEach( function( r2 ) {
+                          var r1 = reqnVersion1.referenceList.findByProperty( 'reference', r2.reference );
+                          if( null == r1 ) {
+                            // reqnVersion1 has reference that compared reqnVersion2 doesn't
+                            differences.diff = true;
+                            differences[part].diff = true;
+                            differences[part][section].diff = true;
+                            differences[part][section][property].push( { name: r2.reference, diff: 'removed' } );
+                          }
+                        } );
+                      } else if( 'baselineDataOptionList' == property ) {
+                        self.parentModel.dataOptionCategoryList.forEach( function( dataOptionCategory ) {
+                          // section a checks rank 1, section b checks rank 2, etc
+                          if( dataOptionCategory.rank == section.charCodeAt() - 'a'.charCodeAt() + 1 ) {
+                            dataOptionCategory.optionList.forEach( function( dataOption ) {
+                              if( dataOption.bl ) {
+                                if( reqnVersion1.dataOptionValueList.bl[dataOption.id] !=
+                                    reqnVersion2.dataOptionValueList.bl[dataOption.id] ) {
+                                  differences.diff = true;
+                                  differences[part].diff = true;
+                                  differences[part][section].diff = true;
+                                  differences[part][section][property].push( {
+                                    id: dataOption.id,
+                                    name: dataOption.name.en,
+                                    diff: reqnVersion1.dataOptionValueList.bl[dataOption.id] ? 'added' : 'removed'
+                                  } );
+                                }
+                              }
+                            } );
+                          }
+                        } );
+                      } else if( 'followUp1DataOptionList' == property ) {
+                        self.parentModel.dataOptionCategoryList.forEach( function( dataOptionCategory ) {
+                          // section a checks rank 1, section b checks rank 2, etc
+                          if( dataOptionCategory.rank == section.charCodeAt() - 'a'.charCodeAt() + 1 ) {
+                            dataOptionCategory.optionList.forEach( function( dataOption ) {
+                              if( dataOption.f1 ) {
+                                if( reqnVersion1.dataOptionValueList.f1[dataOption.id] !=
+                                    reqnVersion2.dataOptionValueList.f1[dataOption.id] ) {
+                                  differences.diff = true;
+                                  differences[part].diff = true;
+                                  differences[part][section].diff = true;
+                                  differences[part][section][property].push( {
+                                    id: dataOption.id,
+                                    name: dataOption.name.en,
+                                    diff: reqnVersion1.dataOptionValueList.f1[dataOption.id] ? 'added' : 'removed'
+                                  } );
+                                }
+                              }
+                            } );
+                          }
+                        } );
+                      }
+                    } else if( null != property.match( /_filename$/ ) ) {
+                      // if both file names are empty or null then assume there is no difference
+                      var recordName = angular.isUndefined( reqnVersion1[property] ) ? null : reqnVersion1[property];
+                      var compareName = angular.isUndefined( reqnVersion2[property] ) ? null : reqnVersion2[property];
+
+                      if( !( recordName == null && compareName == null ) ) {
+                        // file size are compared instead of filename
+                        var fileDetails = self.parentModel.viewModel.fileList.findByProperty( 'key', property );
+                        var sizeProperty = property.replace( '_filename', '_size' );
+                        var recordSize = angular.isObject( fileDetails ) && fileDetails.size ? fileDetails.size : null;
+                        var compareSize = reqnVersion2[sizeProperty] ? reqnVersion2[sizeProperty] : null;
+                        if( ( null != recordSize || null != compareSize ) && recordSize != compareSize ) {
+                          differences.diff = true;
+                          differences[part].diff = true;
+                          differences[part][section].diff = true;
+                          differences[part][section][property] = true;
+                        }
+                      }
+                    } else {
+                      // not an array means we have a property to directly check
+                      // note: we need to convert empty strings to null to make sure they compare correctly
+                      var value1 = '' === reqnVersion1[property] ? null : reqnVersion1[property];
+                      var value2 = '' === reqnVersion2[property] ? null : reqnVersion2[property];
+                      if( value1 != value2 ) {
+                        differences.diff = true;
+                        differences[part].diff = true;
+                        differences[part][section].diff = true;
+                        differences[part][section][property] = true;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+
+            return differences;
+          },
+
           getVersionList: function() {
             var parent = self.parentModel.getParentIdentifier();
             this.versionList = [];
@@ -823,7 +1075,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                 self.lastAgreementVersion = null;
                 self.versionList.forEach( function( version ) {
                   if( null != version ) {
-                    version.differences = CnReqnVersionHelper.getDifferences( self.record, version, self.parentModel );
+                    version.differences = self.getDifferences( version );
 
                     // while we're at it determine the list of coapplicant agreements
                     if( null != version.coapplicant_agreement_filename )
@@ -1003,7 +1255,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
           getReferenceList: function( reqnVersionId, object ) {
             var basePath = angular.isDefined( reqnVersionId )
                          ? 'reqn_version/' + reqnVersionId
-                         : this.parentModel.getServiceResourcePath()
+                         : this.parentModel.getServiceResourcePath();
             if( angular.isUndefined( object ) ) object = self.record;
 
             return CnHttpFactory.instance( {

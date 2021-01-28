@@ -28,5 +28,11 @@ class query extends \cenozo\service\query
       $reqn_class_name = lib::get_class_name( 'database\reqn' );
       $this->set_data( $reqn_class_name::send_expired_ethics_notifications() );
     }
+
+    if( $this->get_argument( 'send_expired_agreement_notifications', false ) )
+    {
+      $reqn_class_name = lib::get_class_name( 'database\reqn' );
+      $this->set_data( $reqn_class_name::send_expired_agreement_notifications() );
+    }
   }
 }
