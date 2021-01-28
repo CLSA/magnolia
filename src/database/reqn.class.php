@@ -1130,8 +1130,8 @@ class reqn extends \cenozo\database\record
     $join_mod->where( 'notification.notification_type_id', '=', $db_notification_type->id );
     $join_mod->where( 'TIMESTAMPDIFF( DAY, notification.datetime, UTC_TIMESTAMP() )', '=', 0 );
     $modifier->join_modifier( 'notification', $join_mod, 'left' );
-    $modifier->where( 'TIMESTAMPDIFF( MONTH, date, UTC_TIMESTAMP() )', '=', 1 );
-    $modifier->where( 'DAY( date )', '=', 'DAY( UTC_TIMESTAMP() )', false );
+    $modifier->where( 'TIMESTAMPDIFF( MONTH, ethics_approval.date, UTC_TIMESTAMP() )', '=', 1 );
+    $modifier->where( 'DAY( ethics_approval.date )', '=', 'DAY( UTC_TIMESTAMP() )', false );
     $modifier->where( 'notification.id', '=', NULL );
 
     $reqn_list = static::select_objects( $modifier );
@@ -1149,25 +1149,22 @@ class reqn extends \cenozo\database\record
   /**
    * Sends expired agreement notifications
    */
-  public static function send_expired_approval_notifications()
+  public static function send_expired_agreement_notifications()
   {
     $notification_type_class_name = lib::get_class_name( 'database\notification_type' );
     $db_notification_type = $notification_type_class_name::get_unique_record( 'name', 'Agreement Expiry Notice' );
 
-    /*
-    TODO: Determine when agreement expires here
     $modifier = lib::create( 'database\modifier' );
-    $modifier->join( 'reqn_last_approval_approval', 'reqn.id', 'reqn_last_approval_approval.reqn_id' );
-    $modifier->join( 'approval_approval', 'reqn_last_approval_approval.approval_approval_id', 'approval_approval.id' );
+    $modifier->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
+    $modifier->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
     $join_mod = lib::create( 'database\modifier' );
     $join_mod->where( 'reqn.id', '=', 'notification.reqn_id', false );
     $join_mod->where( 'notification.notification_type_id', '=', $db_notification_type->id );
     $join_mod->where( 'TIMESTAMPDIFF( DAY, notification.datetime, UTC_TIMESTAMP() )', '=', 0 );
     $modifier->join_modifier( 'notification', $join_mod, 'left' );
-    $modifier->where( 'TIMESTAMPDIFF( MONTH, date, UTC_TIMESTAMP() )', '=', 1 );
-    $modifier->where( 'DAY( date )', '=', 'DAY( UTC_TIMESTAMP() )', false );
+    $modifier->where( 'TIMESTAMPDIFF( MONTH, reqn_version.agreement_end_date, UTC_TIMESTAMP() )', '=', 1 );
+    $modifier->where( 'DAY( reqn_version.agreement_end_date )', '=', 'DAY( UTC_TIMESTAMP() )', false );
     $modifier->where( 'notification.id', '=', NULL );
-    */
 
     $reqn_list = static::select_objects( $modifier );
     foreach( $reqn_list as $db_reqn )
