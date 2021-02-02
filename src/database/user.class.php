@@ -34,7 +34,8 @@ class user extends \cenozo\database\user
   public function set_newsletter( $newsletter )
   {
     return static::db()->execute( sprintf(
-      'REPLACE INTO applicant( user_id, newsletter ) VALUES ( %s, %s )',
+      'INSERT INTO applicant( user_id, newsletter ) VALUES ( %s, %s ) '.
+      'ON DUPLICATE KEY UPDATE newsletter = VALUES( newsletter )',
       static::db()->format_string( $this->id ),
       static::db()->format_string( $newsletter )
     ) );
