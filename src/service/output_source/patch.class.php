@@ -5,7 +5,7 @@
  * @author Patrick Emond <emondpd@mcmaster.ca>
  */
 
-namespace magnolia\service\reqn\publication;
+namespace magnolia\service\output_source;
 use cenozo\lib, cenozo\log, magnolia\util;
 
 class patch extends \cenozo\service\patch

@@ -6,7 +6,7 @@
  * @filesource
  */
 
-namespace magnolia\service\output_type;
+namespace magnolia\service\output_source;
 use cenozo\lib, cenozo\log, magnolia\util;
 
 /**
@@ -21,8 +21,7 @@ class module extends \cenozo\service\module
   {
     parent::prepare_read( $select, $modifier );
 
-    // add the total number of outputs
-    if( $select->has_column( 'output_count' ) )
-      $this->add_count_column( 'output_count', 'output', $select, $modifier );
+    $modifier->join( 'output', 'output_source.output_id', 'output.id' );
+    $modifier->join( 'reqn', 'output.reqn_id', 'reqn.id' );
   }
 }

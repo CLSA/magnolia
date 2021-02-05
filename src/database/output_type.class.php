@@ -12,4 +12,4 @@ use cenozo\lib, cenozo\log, magnolia\util;
 /**
  * output_type: record
  */
-class output_type extends \cenozo\database\has_rank {}
+class output_type extends \cenozo\database\record {}

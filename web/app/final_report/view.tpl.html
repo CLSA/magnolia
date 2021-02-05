@@ -88,8 +88,7 @@
       <li ng-class="{'active':'part2'==model.viewModel.formTab}">
         <a ng-click="model.viewModel.setFormTab('part2')"
            ng-class="{
-             'text-warning flashing': model.getEditEnabled() && model.viewModel.record.deferral_note_report2,
-             'bg-warning': model.viewModel.compareRecord.differences.part2.diff
+             'text-warning flashing': model.getEditEnabled() && model.viewModel.record.deferral_note_report2
            }"
            ng-bind-html="t( 'part2.tab' )"></a>
       </li>
@@ -162,90 +161,17 @@
     <div ng-show="'part2'==model.viewModel.formTab" class="panel panel-default" style="border-top-left-radius: 0px;">
       <div class="panel-body">
         <cn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_report2" class="bg-info"></cn-deferral-note>
-        <form id="part2Form" name="part2Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
-          <div class="container-fluid">
-            <h4 ng-bind-html="t( 'part2.question' )"></h4>
-            <p class="text-primary" ng-bind-html="t( 'part2.text' )"></p>
-          </div>
-          <div class="panel panel-default">
-            <div class="panel-body"
-                 ng-class="{ 'bg-warning': 0 < model.viewModel.compareRecord.differences.part2.outputList.length }">
-              <h4 ng-if="0 < model.viewModel.compareRecord.differences.part2.outputList.length">Current Version List</h4>
-              <span ng-show="0 == model.viewModel.record.outputList.length"
-                    ng-bind-html="t( 'part2.noOutputs' )"></span>
-              <table class="table table-striped" ng-show="0 < model.viewModel.record.outputList.length">
-                <thead class="bg-info">
-                  <tr>
-                    <td ng-bind-html="t( 'part2.type' )"></td>
-                    <td ng-bind-html="t( 'part2.output' )"></td>
-                    <td ng-show="model.getEditEnabled()"></td>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr ng-repeat="output in model.viewModel.record.outputList">
-                    <td>{{ output['name_'+model.viewModel.record.lang] }}</td>
-                    <td class="text-left">{{ output.detail }}</td>
-                    <td ng-show="model.getEditEnabled()">
-                      <button class="btn btn-xs btn-danger"
-                              ng-disabled="isDeletingOutput.includes( output.id )"
-                              ng-click="removeOutput( output.id )"
-                              uib-tooltip-html="t( 'misc.remove' )">
-                        <i class="glyphicon glyphicon-remove"></i>
-                      </button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-              <div ng-if="0 < model.viewModel.compareRecord.differences.part2.outputList.length">
-                <hr style="border-top-color: gray;"/>
-                <h4>Version {{ model.viewModel.compareRecord.version }} List</h4>
-                <span ng-show="0 == model.viewModel.compareRecord.outputList.length"
-                      ng-bind-html="t( 'part2.noOutputs' )"></span>
-                <table class="table table-striped" ng-show="0 < model.viewModel.compareRecord.outputList.length">
-                  <thead class="bg-info">
-                    <tr>
-                      <td ng-bind-html="t( 'part2.type' )"></td>
-                      <td ng-bind-html="t( 'part2.output' )"></td>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr ng-repeat="output in model.viewModel.compareRecord.outputList">
-                      <td>{{ output['name_'+model.viewModel.record.lang] }}</td>
-                      <td class="text-left">{{ output.detail }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-          <div ng-show="model.getEditEnabled()" class="form-horizontal">
-            <cn-add-input
-              input="{
-                key: 'output_type_id',
-                title: t( 'part2.outputType' ),
-                type: 'enum',
-                enumList: model.viewModel.outputTypeList[model.viewModel.record.lang]
-              }"
-              record="outputRecord"
-              model="model.viewModel.outputModel"
-              first="true">
-            </cn-add-input>
-            <cn-add-input
-              input="{ key: 'detail', title: t( 'part2.details' ), type: 'string' }"
-              record="outputRecord"
-              model="model.viewModel.outputModel"
-              first="false">
-            </cn-add-input>
-            <div class="form-group" style="margin-top: -15px">
-              <div class="text-primary col-sm-offset-3 col-sm-9"
-                   ng-bind-html="model.viewModel.getOutputTypeNote( outputRecord.output_type_id )"></div>
-            </div>
-            <button class="btn btn-primary pull-right"
-                    ng-disabled="isAddingOutput"
-                    ng-click="addOutput()"
-                    ng-bind-html="t( 'part2.addOutput' )"></button>
-          </div>
-        </fieldset></form>
+        <div class="container-fluid">
+          <h4 ng-bind-html="t( 'part2.question' )"></h4>
+          <p class="text-primary" ng-bind-html="t( 'part2.text' )"></p>
+        </div>
+        <div>
+          <cn-output-list simple="true">
+          </cn-output-list>
+          <button class="btn btn-primary pull-right vertical-spacer"
+                  ng-click="model.viewModel.addOutput()"
+                  ng-bind-html="t( 'part2.addOutput' )"></button>
+        </div>
       </div>
     </div>
     <div ng-show="'part3'==model.viewModel.formTab" class="panel panel-default" style="border-top-left-radius: 0px;">

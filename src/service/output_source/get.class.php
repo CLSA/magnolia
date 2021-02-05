@@ -5,7 +5,7 @@
  * @author Patrick Emond <emondpd@mcmaster.ca>
  */
 
-namespace magnolia\service\publication;
+namespace magnolia\service\output_source;
 use cenozo\lib, cenozo\log, magnolia\util;
 
 class get extends \cenozo\service\downloadable
@@ -13,7 +13,7 @@ class get extends \cenozo\service\downloadable
   /**
    * Replace parent method
    * 
-   * Letters use octet-stream, publication forms use pdf
+   * Letters use octet-stream, output_source forms use pdf
    */
   protected function get_downloadable_mime_type_list()
   {
@@ -49,9 +49,9 @@ class get extends \cenozo\service\downloadable
   {
     if( 'application/json' == $this->get_mime_type() && $this->get_argument( 'file', false ) )
     {
-      $db_publication = $this->get_leaf_record();
+      $db_output_source = $this->get_leaf_record();
       $path = $this->get_downloadable_file_path();
-      if( !is_null( $db_publication ) && file_exists( $path ) ) $this->set_data( stat( $path )['size'] );
+      if( !is_null( $db_output_source ) && file_exists( $path ) ) $this->set_data( stat( $path )['size'] );
     }
     else
     {

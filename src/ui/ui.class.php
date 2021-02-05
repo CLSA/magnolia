@@ -48,8 +48,8 @@ class ui extends \cenozo\ui\ui
       $module->add_child( 'data_release' );
       $module->add_child( 'notice' );
       $module->add_child( 'ethics_approval' );
-      $module->add_child( 'publication' );
       $module->add_child( 'notification' );
+      $module->add_child( 'output' );
     }
 
     $module = $this->get_module( 'reqn_type' );
@@ -70,11 +70,35 @@ class ui extends \cenozo\ui\ui
       $module->add_child( 'stage_type' );
     }
 
+    $module = $this->get_module( 'output' );
+    if( !is_null( $module ) )
+    {
+      $module->add_child( 'output_source' );
+      // origin helps to define reqn vs final-report context
+      $module->append_action_query( 'add', '?{origin}' );
+      $module->append_action_query( 'view', '?{origin}' );
+    }
+
+    $module = $this->get_module( 'output_source' );
+    if( !is_null( $module ) )
+    {
+      // origin helps to define reqn vs final-report context
+      $module->append_action_query( 'add', '?{origin}' );
+      $module->append_action_query( 'view', '?{origin}' );
+    }
+
+    $module = $this->get_module( 'output_type' );
+    if( !is_null( $module ) ) $module->add_child( 'output' );
+
     $module = $this->get_module( 'pdf_form_type' );
     if( !is_null( $module ) ) $module->add_child( 'pdf_form' );
 
     $module = $this->get_module( 'final_report' );
-    if( !is_null( $module ) ) $module->append_action_query( 'view', '?{t}&{c}' );
+    if( !is_null( $module ) )
+    {
+      $module->add_child( 'output' );
+      $module->append_action_query( 'view', '?{t}&{c}' );
+    }
 
     $module = $this->get_module( 'stage_type' );
     if( !is_null( $module ) ) $module->add_child( 'reqn' );
@@ -127,7 +151,11 @@ class ui extends \cenozo\ui\ui
 
     if( 'applicant' == $db_role->name ) $this->remove_listitem( 'Requisitions' );
     if( 'administrator' != $db_role->name ) $this->remove_listitem( 'Users' );
-    if( 'administrator' == $db_role->name ) $this->add_listitem( 'Data Option Categories', 'data_option_category' );
+    if( 'administrator' == $db_role->name )
+    {
+      $this->add_listitem( 'Data Option Categories', 'data_option_category' );
+      $this->add_listitem( 'Output Types', 'output_type' );
+    }
     if( in_array( $db_role->name, [ 'administrator', 'readonly' ] ) ) $this->add_listitem( 'Requisition Types', 'reqn_type' );
   }
 

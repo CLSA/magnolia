@@ -22,5 +22,12 @@ class module extends \cenozo\service\module
     parent::prepare_read( $select, $modifier );
 
     $modifier->join( 'output_type', 'output.output_type_id', 'output_type.id' );
+    $modifier->join( 'reqn', 'output.reqn_id', 'reqn.id' );
+    $modifier->join( 'reqn_current_final_report', 'reqn.id', 'reqn_current_final_report.reqn_id' );
+    $modifier->left_join( 'final_report', 'reqn_current_final_report.final_report_id', 'final_report.id' );
+
+    // add the total number of output_sources
+    if( $select->has_column( 'output_source_count' ) )
+      $this->add_count_column( 'output_source_count', 'output_source', $select, $modifier );
   }
 }

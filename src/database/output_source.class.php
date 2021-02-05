@@ -1,6 +1,6 @@
 <?php
 /**
- * publication.class.php
+ * output_source.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
  * @filesource
@@ -10,10 +10,25 @@ namespace magnolia\database;
 use cenozo\lib, cenozo\log, magnolia\util;
 
 /**
- * publication: record
+ * output_source: record
  */
-class publication extends \cenozo\database\record
+class output_source extends \cenozo\database\record
 {
+  /**
+   * Override the parent method
+   */
+  public function save()
+  {
+    parent::save();
+
+    // delete the file if it is being set to null
+    if( is_null( $this->filename ) )
+    {
+      $filename = $this->get_filename();
+      if( file_exists( $filename ) ) unlink( $filename );
+    }
+  }
+
   /**
    * Override the parent method
    */
@@ -32,6 +47,6 @@ class publication extends \cenozo\database\record
    */
   public function get_filename()
   {
-    return sprintf( '%s/%s', PUBLICATION_PATH, $this->id );
+    return sprintf( '%s/%s', OUTPUT_SOURCE_PATH, $this->id );
   }
 }

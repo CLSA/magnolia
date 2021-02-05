@@ -3,13 +3,93 @@ define( function() {
 
   try { var module = cenozoApp.module( 'output_type', true ); } catch( err ) { console.warn( err ); return; }
   angular.extend( module, {
-    identifier: {},
+    identifier: { column: 'name_en' },
     name: {
       singular: 'output type',
       plural: 'output types',
       possessive: 'output type\'s'
+    },
+    columnList: {
+      name_en: {
+        title: 'Name (English)'
+      },
+      name_fr: {
+        title: 'Name (French)'
+      },
+      output_count: {
+        title: 'Outputs',
+        type: 'number'
+      }
+    },
+    defaultOrder: {
+      column: 'name_en',
+      reverse: false
     }
   } );
+
+  module.addInputGroup( '', {
+    name_en: {
+      title: 'Name (English)',
+      type: 'string'
+    },
+    name_fr: {
+      title: 'Name (French)',
+      type: 'string'
+    },
+    note_en: {
+      title: 'Note (English)',
+      type: 'text'
+    },
+    note_fr: {
+      title: 'Note (French)',
+      type: 'text'
+    }
+  } );
+
+  /* ######################################################################################################## */
+  cenozo.providers.directive( 'cnOutputTypeAdd', [
+    'CnOutputTypeModelFactory',
+    function( CnOutputTypeModelFactory ) {
+      return {
+        templateUrl: module.getFileUrl( 'add.tpl.html' ),
+        restrict: 'E',
+        scope: { model: '=?' },
+        controller: function( $scope ) {
+          if( angular.isUndefined( $scope.model ) ) $scope.model = CnOutputTypeModelFactory.root;
+        }
+      };
+    }
+  ] );
+
+  /* ######################################################################################################## */
+  cenozo.providers.directive( 'cnOutputTypeList', [
+    'CnOutputTypeModelFactory',
+    function( CnOutputTypeModelFactory ) {
+      return {
+        templateUrl: module.getFileUrl( 'list.tpl.html' ),
+        restrict: 'E',
+        scope: { model: '=?' },
+        controller: function( $scope ) {
+          if( angular.isUndefined( $scope.model ) ) $scope.model = CnOutputTypeModelFactory.root;
+        }
+      };
+    }
+  ] );
+
+  /* ######################################################################################################## */
+  cenozo.providers.directive( 'cnOutputTypeView', [
+    'CnOutputTypeModelFactory',
+    function( CnOutputTypeModelFactory ) {
+      return {
+        templateUrl: module.getFileUrl( 'view.tpl.html' ),
+        restrict: 'E',
+        scope: { model: '=?' },
+        controller: function( $scope ) {
+          if( angular.isUndefined( $scope.model ) ) $scope.model = CnOutputTypeModelFactory.root;
+        }
+      };
+    }
+  ] );
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnOutputTypeAddFactory', [
@@ -21,16 +101,39 @@ define( function() {
   ] );
 
   /* ######################################################################################################## */
+  cenozo.providers.factory( 'CnOutputTypeListFactory', [
+    'CnBaseListFactory',
+    function( CnBaseListFactory ) {
+      var object = function( parentModel ) { CnBaseListFactory.construct( this, parentModel ); };
+      return { instance: function( parentModel ) { return new object( parentModel ); } };
+    }
+  ] );
+
+  /* ######################################################################################################## */
+  cenozo.providers.factory( 'CnOutputTypeViewFactory', [
+    'CnBaseViewFactory',
+    function( CnBaseViewFactory ) {
+      var object = function( parentModel, root ) { CnBaseViewFactory.construct( this, parentModel, root ); }
+      return { instance: function( parentModel, root ) { return new object( parentModel, root ); } };
+    }
+  ] );
+
+  /* ######################################################################################################## */
   cenozo.providers.factory( 'CnOutputTypeModelFactory', [
-    'CnBaseModelFactory', 'CnOutputTypeAddFactory',
-    function( CnBaseModelFactory, CnOutputTypeAddFactory ) {
+    'CnBaseModelFactory', 'CnOutputTypeAddFactory', 'CnOutputTypeListFactory', 'CnOutputTypeViewFactory',
+    function( CnBaseModelFactory, CnOutputTypeAddFactory, CnOutputTypeListFactory, CnOutputTypeViewFactory ) {
       var object = function( root ) {
         var self = this;
         CnBaseModelFactory.construct( this, module );
         this.addModel = CnOutputTypeAddFactory.instance( this );
+        this.listModel = CnOutputTypeListFactory.instance( this );
+        this.viewModel = CnOutputTypeViewFactory.instance( this, root );
       };
 
-      return { instance: function() { return new object( false ); } };
+      return {
+        root: new object( true ),
+        instance: function() { return new object( false ); }
+      };
     }
   ] );
 

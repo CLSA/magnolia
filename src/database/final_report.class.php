@@ -38,6 +38,17 @@ class final_report extends \cenozo\database\record
   }
 
   /**
+   * Override parent method
+   */
+  public function get_record_list( $record_type, $select = NULL, $modifier = NULL, $return_alternate = '', $distinct = false )
+  {
+    // when selecting outputs get the records from the parent reqn
+    return 'output' == $record_type ?
+      $this->get_reqn()->get_record_list( $record_type, $select, $modifier, $return_alternate, $distinct ) :
+      parent::get_record_list( $record_type, $select, $modifier, $return_alternate, $distinct );
+  }
+
+  /**
    * Generates a PDF form version of the reqn (overwritting the previous version)
    * 
    * @access public

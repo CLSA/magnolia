@@ -97,6 +97,30 @@ class reqn extends \cenozo\database\record
   }
 
   /**
+   * Override parent method
+   */
+  public static function get_record_from_identifier( $identifier )
+  {
+    $util_class_name = lib::get_class_name( 'util' );
+    $reqn_class_name = lib::get_class_name( 'database\reqn' );
+
+    // convert final_report_id to reqn_id
+    if( !$util_class_name::string_matches_int( $identifier ) && false === strpos( 'final_report_id=', $identifier ) )
+    {
+      $regex = '/final_report_id=([0-9]+)/';
+      $matches = array();
+      if( preg_match( $regex, $identifier, $matches ) )
+      {
+        $db_final_report = lib::create( 'database\final_report', $matches[1] );
+        $db_reqn = is_null( $db_final_report ) ? NULL : lib::create( 'database\reqn', $db_final_report->reqn_id );
+        if( !is_null( $db_reqn ) ) $identifier = $db_reqn->id;
+      }
+    }
+
+    return parent::get_record_from_identifier( $identifier );
+  }
+
+  /**
    * Returns whether the reqn is using a full ethics approval list or a single-file ethics system
    * 
    * All reqns start with a simple one-file ethics system.  Once they've reached the active stage and if

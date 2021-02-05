@@ -23,6 +23,9 @@ SOURCE update_reqn_current_final_report.sql
 SOURCE reqn_current_final_report.sql
 SOURCE production_type.sql
 SOURCE production.sql
+SOURCE publication.sql
+SOURCE output.sql
+SOURCE output_source.sql
 
 SOURCE update_version_number.sql
 

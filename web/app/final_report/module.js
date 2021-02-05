@@ -1,11 +1,9 @@
-define( [ 'output', 'output_type' ].reduce( function( list, name ) {
+define( [ 'output' ].reduce( function( list, name ) {
   return list.concat( cenozoApp.module( name ).getRequiredFiles() );
 }, [] ), function() {
   'use strict';
 
   try { var module = cenozoApp.module( 'final_report', true ); } catch( err ) { console.warn( err ); return; }
-
-  var outputModule = cenozoApp.module( 'output' );
 
   angular.extend( module, {
     identifier: {
@@ -93,8 +91,6 @@ define( [ 'output', 'output_type' ].reduce( function( list, name ) {
         scope: { model: '=?' },
         link: function( scope, element, attrs ) {
           cnRecordView.link( scope, element, attrs );
-          scope.isAddingOutput = false;
-          scope.isDeletingOutput = [];
 
           scope.liteModel.viewModel.onView();
 
@@ -126,11 +122,6 @@ define( [ 'output', 'output_type' ].reduce( function( list, name ) {
             return CnReqnHelper.translate( 'finalReport', value, $scope.model.viewModel.record.lang );
           };
 
-          // output resources
-          var outputAddModel = $scope.model.viewModel.outputModel.addModel;
-          $scope.outputRecord = {};
-          outputAddModel.onNew( $scope.outputRecord );
-
           $scope.getHeading = function() {
             var status = null;
             if( 'deferred' == $scope.model.viewModel.record.state ) {
@@ -155,65 +146,6 @@ define( [ 'output', 'output_type' ].reduce( function( list, name ) {
             $scope.model.setQueryParameter( 'c', null == version ? undefined : version.version );
             $scope.model.reloadState( false, false, 'replace' );
           };
-
-          $scope.addOutput = function() {
-            if( $scope.model.viewModel.outputModel.getAddEnabled() ) {
-              var form = cenozo.getScopeByQuerySelector( '#part2Form' ).part2Form;
-
-              // we need to check each add-input for errors
-              var valid = true;
-              for( var property in $scope.model.viewModel.outputModel.module.inputGroupList[0].inputList ) {
-                // get the property's form element and remove any conflict errors, then see if it's invalid
-                var currentElement = cenozo.getFormElement( property );
-                if( currentElement ) {
-                  currentElement.$error.conflict = false;
-                  cenozo.updateFormElement( currentElement );
-                  if( currentElement.$invalid ) {
-                    valid = false;
-                    break;
-                  }
-                }
-              }
-              if( !valid ) {
-                // dirty all inputs so we can find the problem
-                cenozo.forEachFormElement( 'part2Form', function( element ) { element.$dirty = true; } );
-              } else {
-                $scope.isAddingOutput = true;
-                outputAddModel.onAdd( $scope.outputRecord ).then( function( response ) {
-                  form.$setPristine();
-                  return $q.all( [
-                    outputAddModel.onNew( $scope.outputRecord ),
-                    $scope.model.viewModel.getOutputList().then( function() {
-                      $scope.model.viewModel.determineOutputDiffs();
-                    } )
-                  ] );
-                } ).finally( function() { $scope.isAddingOutput = false; } );
-              }
-            }
-          };
-
-          $scope.removeOutput = function( id ) {
-            if( $scope.model.viewModel.outputModel.getDeleteEnabled() ) {
-              if( !$scope.isDeletingOutput.includes( id ) ) $scope.isDeletingOutput.push( id );
-              var index = $scope.isDeletingOutput.indexOf( id );
-              $scope.model.viewModel.removeOutput( id ).finally( function() {
-                if( 0 <= index ) $scope.isDeletingOutput.splice( index, 1 );
-              } );
-            }
-          };
-
-          $scope.check = function( property ) {
-            // The cn-final-report-form directive makes use of cn-add-input directives.  These directives need their
-            // parent to have a check() function which checks to see whether the input is valid or not.  Since
-            // that function is usually in the cn-record-add directive we have to implement on here instead.
-            var element = cenozo.getFormElement( property );
-            if( element ) {
-              element.$error.format = !$scope.model.viewModel.outputModel.testFormat(
-                property, $scope.outputRecord[property]
-              );
-              cenozo.updateFormElement( element, true );
-            }
-          };
         }
       };
     }
@@ -230,10 +162,10 @@ define( [ 'output', 'output_type' ].reduce( function( list, name ) {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnFinalReportViewFactory', [
-    'CnBaseViewFactory', 'CnReqnHelper', 'CnHttpFactory', 'CnOutputModelFactory',
-    'CnModalMessageFactory', 'CnModalConfirmFactory', 'CnModalSubmitExternalFactory', 'CnSession', '$q',
-    function( CnBaseViewFactory, CnReqnHelper, CnHttpFactory, CnOutputModelFactory,
-              CnModalMessageFactory, CnModalConfirmFactory, CnModalSubmitExternalFactory, CnSession, $q ) {
+    'CnBaseViewFactory', 'CnOutputModelFactory', 'CnReqnHelper', 'CnHttpFactory',
+    'CnModalMessageFactory', 'CnModalConfirmFactory', 'CnModalSubmitExternalFactory', 'CnSession', '$q', '$state',
+    function( CnBaseViewFactory, CnOutputModelFactory, CnReqnHelper, CnHttpFactory,
+              CnModalMessageFactory, CnModalConfirmFactory, CnModalSubmitExternalFactory, CnSession, $q, $state ) {
       var object = function( parentModel, root ) {
         var self = this;
         CnBaseViewFactory.construct( this, parentModel, root );
@@ -261,10 +193,7 @@ define( [ 'output', 'output_type' ].reduce( function( list, name ) {
               if( 'lite' != self.parentModel.type ) {
                 cenozoApp.setLang( self.record.lang );
 
-                return $q.all( [
-                  self.getOutputList(),
-                  self.getOutputTypeList()
-                ] ).then( function() { return self.getVersionList(); } );
+                return self.getVersionList();
               }
             } );
           },
@@ -297,8 +226,6 @@ define( [ 'output', 'output_type' ].reduce( function( list, name ) {
             } ).patch();
           },
 
-          outputModel: CnOutputModelFactory.instance(),
-          outputTypeList: {},
           formTab: '',
           tabSectionList: ['instructions','part1','part2','part3'],
           setFormTab: function( tab, transition ) {
@@ -335,83 +262,8 @@ define( [ 'output', 'output_type' ].reduce( function( list, name ) {
             }
           },
 
-          getOutputList: function( finalReportId, object ) {
-            var basePath = angular.isDefined( finalReportId )
-                         ? 'final_report/' + finalReportId
-                         : this.parentModel.getServiceResourcePath();
-            if( angular.isUndefined( object ) ) object = self.record;
-
-            return CnHttpFactory.instance( {
-              path: basePath + '/output',
-              data: {
-                select: {
-                  column: [
-                    'id', 'detail',
-                    { table: 'output_type', column: 'rank' },
-                    { table: 'output_type', column: 'name_en' },
-                    { table: 'output_type', column: 'name_fr' }
-                  ]
-                },
-                modifier: { limit: 1000 }
-              }
-            } ).query().then( function( response ) {
-              object.outputList = response.data;
-            } );
-          },
-
-          getOutputTypeList: function() {
-            this.outputTypeList = {
-              en: [ { value: '', name: CnReqnHelper.translate( 'finalReport', 'misc.choose', 'en' ) } ],
-              fr: [ { value: '', name: CnReqnHelper.translate( 'finalReport', 'misc.choose', 'fr' ) } ]
-            };
-
-            return CnHttpFactory.instance( {
-              path: 'output_type',
-              data: {
-                select: { column: [ 'id', 'rank', 'name_en', 'name_fr', 'note_en', 'note_fr' ] },
-                modifier: { order: 'rank', limit: 1000000 }
-              }
-            } ).query().then( function( response ) {
-              response.data.forEach( function( item ) {
-                self.outputTypeList.en.push( { value: item.id, name: item.name_en, note: item.note_en } );
-                self.outputTypeList.fr.push( { value: item.id, name: item.name_fr, note: item.note_fr } );
-              } );
-            } );
-          },
-
-          getOutputTypeNote: function( outputTypeId ) {
-            var outputTypeList = this.outputTypeList[this.record.lang];
-            var outputType = outputTypeList
-                               ? outputTypeList.findByProperty( 'value', outputTypeId )
-                               : null;
-            return null == outputType ? '' : outputType.note;
-          },
-
-          removeOutput: function( id ) {
-            return CnHttpFactory.instance( {
-              path: this.parentModel.getServiceResourcePath() + '/output/' + id
-            } ).delete().then( function() {
-              return self.getOutputList();
-            } );
-          },
-
-          determineOutputDiffs: function() {
-            this.versionList.forEach( version => self.setOutputDiff( version ) );
-          },
-
-          setOutputDiff: function( version ) {
-            if( null != version ) {
-              // see if there is a difference between this list and the view's list
-              version.outputDiff =
-                version.outputList.length != self.record.outputList.length ||
-                version.outputList.some(
-                  c1 => !self.record.outputList.some(
-                    c2 => ![ 'rank', 'output' ].some(
-                      prop => c1[prop] != c2[prop]
-                    )
-                  )
-                );
-            }
+          addOutput: function() {
+            CnOutputModelFactory.root.transitionToAddState();
           },
 
           getDifferences: function( finalReport2 ) {
@@ -425,10 +277,6 @@ define( [ 'output', 'output_type' ].reduce( function( list, name ) {
                 outcomes: false,
                 thesis_title: false,
                 thesis_status: false
-              },
-              part2: {
-                diff: false,
-                outputList: []
               },
               part3: {
                 diff: false,
@@ -445,41 +293,15 @@ define( [ 'output', 'output_type' ].reduce( function( list, name ) {
 
                 for( var property in differences[part] ) {
                   if( !differences[part].hasOwnProperty( property ) ) continue;
-                  if( angular.isArray( differences[part][property] ) ) {
-                    // an array means we have a list go check through
-                    if( 'outputList' == property ) {
-                      // loop through finalReport1's outputs to see if any were added or changed
-                      finalReport1.outputList.forEach( function( p1 ) {
-                        var p2 = finalReport2.outputList.findByProperty( 'detail', p1.detail );
-                        if( null == p2 ) {
-                          // finalReport1 has output that compared finalReport2 doesn't
-                          differences.diff = true;
-                          differences[part].diff = true;
-                          differences[part][property].push( { name: p1.detail, diff: 'added' } );
-                        }
-                      } );
 
-                      // loop through compared finalReport2's outputs to see if any were removed
-                      finalReport2.outputList.forEach( function( p2 ) {
-                        var p1 = finalReport1.outputList.findByProperty( 'detail', p2.detail );
-                        if( null == p1 ) {
-                          // finalReport1 has output that compared finalReport2 doesn't
-                          differences.diff = true;
-                          differences[part].diff = true;
-                          differences[part][property].push( { name: p2.detail, diff: 'removed' } );
-                        }
-                      } );
-                    }
-                  } else {
-                    // not an array means we have a property to directly check
-                    // note: we need to convert empty strings to null to make sure they compare correctly
-                    var value1 = '' === finalReport1[property] ? null : finalReport1[property];
-                    var value2 = '' === finalReport2[property] ? null : finalReport2[property];
-                    if( value1 != value2 ) {
-                      differences.diff = true;
-                      differences[part].diff = true;
-                      differences[part][property] = true;
-                    }
+                  // not an array means we have a property to directly check
+                  // note: we need to convert empty strings to null to make sure they compare correctly
+                  var value1 = '' === finalReport1[property] ? null : finalReport1[property];
+                  var value2 = '' === finalReport2[property] ? null : finalReport2[property];
+                  if( value1 != value2 ) {
+                    differences.diff = true;
+                    differences[part].diff = true;
+                    differences[part][property] = true;
                   }
                 }
               }
@@ -494,18 +316,7 @@ define( [ 'output', 'output_type' ].reduce( function( list, name ) {
             return CnHttpFactory.instance( {
               path: parent.subject + '/' + parent.identifier + '/final_report'
             } ).query().then( function( response ) {
-              var promiseList = [];
-
-              response.data.forEach( function( version ) {
-                promiseList = promiseList.concat( [
-                  self.getOutputList( version.id, version ).then( function() {
-                    // see if there is a difference between this list and the view's list
-                    self.setOutputDiff( version );
-                  } )
-                ] );
-
-                self.versionList.push( version );
-              } );
+              self.versionList = response.data;
 
               var compareVersion = self.parentModel.getQueryParameter( 'c' );
               if( angular.isDefined( compareVersion ) ) 
@@ -516,21 +327,19 @@ define( [ 'output', 'output_type' ].reduce( function( list, name ) {
                 self.versionList.unshift( null );
               }
 
-              return $q.all( promiseList ).then( function() {
-                // Calculate all differences for all versions (in reverse order so we can find the last agreement version)
-                self.versionList.reverse();
+              // Calculate all differences for all versions (in reverse order so we can find the last agreement version)
+              self.versionList.reverse();
 
-                self.lastAgreementVersion = null;
-                self.versionList.forEach( function( version ) {
-                  if( null != version ) version.differences = self.getDifferences( version );
-                } );
-
-                // if no different list was defined then make it an empty list
-                if( null == self.agreementDifferenceList ) self.agreementDifferenceList = [];
-
-                // put the order of the version list back to normal
-                self.versionList.reverse();
+              self.lastAgreementVersion = null;
+              self.versionList.forEach( function( version ) {
+                if( null != version ) version.differences = self.getDifferences( version );
               } );
+
+              // if no different list was defined then make it an empty list
+              if( null == self.agreementDifferenceList ) self.agreementDifferenceList = [];
+
+              // put the order of the version list back to normal
+              self.versionList.reverse();
             } );
           },
 
@@ -652,8 +461,6 @@ define( [ 'output', 'output_type' ].reduce( function( list, name ) {
             );
           }
         } );
-
-        this.outputModel.metadata.getPromise(); // needed to get the output's metadata
       };
       return { instance: function( parentModel, root ) { return new object( parentModel, root ); } };
     }
@@ -678,7 +485,7 @@ define( [ 'output', 'output_type' ].reduce( function( list, name ) {
 
             if( this.isRole( 'applicant' ) ) {
               trail = [
-                { title: 'Requisition' },
+                { title: 'Final Report' },
                 { title: this.viewModel.record.identifier }
               ];
             } else {
