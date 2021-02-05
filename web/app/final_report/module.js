@@ -192,7 +192,7 @@ define( [ 'output' ].reduce( function( list, name ) {
             return this.$$onView( force ).then( function() {
               if( 'lite' != self.parentModel.type ) {
                 cenozoApp.setLang( self.record.lang );
-
+                self.updateOutputListLanguage();
                 return self.getVersionList();
               }
             } );
@@ -217,9 +217,21 @@ define( [ 'output' ].reduce( function( list, name ) {
             }
           },
 
+          updateOutputListLanguage: function() {
+            var columnList = cenozoApp.module( 'output' ).columnList;
+            columnList.output_type_en.isIncluded = function( $state, model ) { return 'en' == self.record.lang; };
+            columnList.output_type_fr.isIncluded = function( $state, model ) { return 'fr' == self.record.lang; };
+            columnList.output_type_en.title = CnReqnHelper.translate( 'output', 'output_type', 'en' );
+            columnList.output_type_fr.title = CnReqnHelper.translate( 'output', 'output_type', 'fr' );
+            columnList.detail.title = CnReqnHelper.translate( 'output', 'detail', self.record.lang );
+            columnList.output_source_count.title = CnReqnHelper.translate( 'output', 'output_source_count', self.record.lang );
+          },
+
           // setup language and tab state parameters
           toggleLanguage: function() {
             this.record.lang = 'en' == this.record.lang ? 'fr' : 'en';
+            this.updateOutputListLanguage();
+
             return CnHttpFactory.instance( {
               path: 'reqn/identifier=' + this.record.identifier,
               data: { language: this.record.lang }
@@ -319,7 +331,7 @@ define( [ 'output' ].reduce( function( list, name ) {
               self.versionList = response.data;
 
               var compareVersion = self.parentModel.getQueryParameter( 'c' );
-              if( angular.isDefined( compareVersion ) ) 
+              if( angular.isDefined( compareVersion ) )
                 self.compareRecord = self.versionList.findByProperty( 'version', compareVersion );
 
               if( 1 < self.versionList.length ) {

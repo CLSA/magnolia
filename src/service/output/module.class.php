@@ -23,6 +23,7 @@ class module extends \cenozo\service\module
 
     $modifier->join( 'output_type', 'output.output_type_id', 'output_type.id' );
     $modifier->join( 'reqn', 'output.reqn_id', 'reqn.id' );
+    $modifier->join( 'language', 'reqn.language_id', 'language.id' );
     $modifier->join( 'reqn_current_final_report', 'reqn.id', 'reqn_current_final_report.reqn_id' );
     $modifier->left_join( 'final_report', 'reqn_current_final_report.final_report_id', 'final_report.id' );
 

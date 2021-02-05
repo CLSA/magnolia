@@ -920,11 +920,12 @@ cenozo.service( 'CnReqnHelper', [
             number: { en: 'Number', fr: 'Numéro' },
             type: { en: 'Type', fr: 'Type' },
             output: { en: 'Output', fr: 'TRANSLATION REQUIRED' },
-            outputType: { en: 'Output Type', fr: 'TRANSLATION REQUIRED' },
-            details: { en: 'Details', fr: 'Description' },
-            noOutputs: { en: 'No outputs have been added.', fr: 'TRANSLATION REQUIRED' },
-            addOutput: { en: 'Add Output', fr: 'TRANSLATION REQUIRED' },
-            attachment: { en: 'Attachment', fr: 'Pièce jointe' }
+            columns: {
+              outputType: { en: 'Output Type', fr: 'TRANSLATION REQUIRED' },
+              details: { en: 'Details', fr: 'TRANSLATION REQUIRED' },
+              sources: { en: 'Sources', fr: 'TRANSLATION REQUIRED' }
+            },
+            addOutput: { en: 'Add Output', fr: 'TRANSLATION REQUIRED' }
           },
           part3: {
             tab: { en: 'Part 3', fr: '3<sup>e</sup> partie' },
@@ -1015,6 +1016,11 @@ cenozo.service( 'CnReqnHelper', [
               fr: 'TRANSLATION REQUIRED'
             }
           }
+        },
+        output: {
+          output_type: { en: 'Output Type', fr: 'TRANSLATION REQUIRED' },
+          detail: { en: 'Details', fr: 'TRANSLATION REQUIRED' },
+          output_source_count: { en: 'Sources', fr: 'TRANSLATION REQUIRED' }
         }
       }
     };

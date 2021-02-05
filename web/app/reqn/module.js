@@ -1,4 +1,6 @@
-define( function() {
+define( [ 'output' ].reduce( function( list, name ) {
+  return list.concat( cenozoApp.module( name ).getRequiredFiles() );
+}, [] ), function() {
   'use strict';
 
   try { var module = cenozoApp.module( 'reqn', true ); } catch( err ) { console.warn( err ); return; }
@@ -724,7 +726,7 @@ define( function() {
     function( CnBaseListFactory ) {
       var object = function( parentModel ) {
         CnBaseListFactory.construct( this, parentModel );
-        
+
         // Set the heading as part of the 'onList' function so that it updates if we switch from the main reqn list
         // to/from the special data-sharing list
         this.onList = function( replace ) {
@@ -829,6 +831,9 @@ define( function() {
                    ( 'applicant' == CnSession.role.name && 'Active' == stage_type );
           },
           onView: function( force ) {
+            // update the output list language
+            self.updateOutputListLanguage();
+
             if( 'reviewer' == CnSession.role.name ) {
               // If we are a reviewer assigned to this reqn and haven't completed our review then show a reminder
               CnHttpFactory.instance( {
@@ -845,6 +850,8 @@ define( function() {
               } );
             }
 
+            // update the column languages in case they were changed while viewing a final report
+
             return this.$$onView( force ).then( function() {
               if( angular.isDefined( self.noticeModel ) ) {
                 self.noticeModel.columnList.viewed_by_trainee_user.isIncluded = null == self.record.trainee_user_id
@@ -852,6 +859,16 @@ define( function() {
                                                                               : function() { return true; };
               }
             } );
+          },
+
+          updateOutputListLanguage: function() {
+            var columnList = cenozoApp.module( 'output' ).columnList;
+            columnList.output_type_en.isIncluded = function( $state, model ) { return true; };
+            columnList.output_type_fr.isIncluded = function( $state, model ) { return false; };
+            columnList.output_type_en.title = CnReqnHelper.translate( 'output', 'output_type', 'en' );
+            columnList.output_type_fr.title = CnReqnHelper.translate( 'output', 'output_type', 'fr' );
+            columnList.detail.title = CnReqnHelper.translate( 'output', 'detail', 'en' );
+            columnList.output_source_count.title = CnReqnHelper.translate( 'output', 'output_source_count', 'en' );
           },
 
           onPatch: function( data ) {

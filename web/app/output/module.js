@@ -26,15 +26,21 @@ define( [ 'reqn' ].reduce( function( list, name ) {
         title: 'Requisition',
         isIncluded: function( $state, model ) { return 'output_type' == model.getSubjectFromState(); }
       },
-      output_type: {
+      output_type_en: {
         column: 'output_type.name_en',
-        title: 'Output Type'
+        title: '', // defined by the reqn and final_report modules
+        isIncluded: function() { return true; }
+      },
+      output_type_fr: {
+        column: 'output_type.name_fr',
+        title: '', // defined by the reqn and final_report modules
+        isIncluded: function() { return false; }
       },
       detail: {
-        title: 'Detail'
+        title: '' // defined by the reqn and final_report modules
       },
       output_source_count: {
-        title: 'Sources'
+        title: '' // defined by the reqn and final_report modules
       }
     },
     defaultOrder: {

@@ -111,9 +111,30 @@ define( function() {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnOutputTypeViewFactory', [
-    'CnBaseViewFactory',
-    function( CnBaseViewFactory ) {
-      var object = function( parentModel, root ) { CnBaseViewFactory.construct( this, parentModel, root ); }
+    'CnBaseViewFactory', 'CnReqnHelper',
+    function( CnBaseViewFactory, CnReqnHelper ) {
+      var object = function( parentModel, root ) {
+        var self = this;
+        CnBaseViewFactory.construct( this, parentModel, root );
+
+        angular.extend( this, {
+          onView: function( force ) {
+            self.updateOutputListLanguage();
+            return this.$$onView( force );
+          },
+
+          updateOutputListLanguage: function() {
+            //console.log( cenozoApp.module( 'output' ) );
+            var columnList = cenozoApp.module( 'output' ).columnList;
+            columnList.output_type_en.isIncluded = function( $state, model ) { return true; };
+            columnList.output_type_fr.isIncluded = function( $state, model ) { return false; };
+            columnList.output_type_en.title = CnReqnHelper.translate( 'output', 'output_type', 'en' );
+            columnList.output_type_fr.title = CnReqnHelper.translate( 'output', 'output_type', 'fr' );
+            columnList.detail.title = CnReqnHelper.translate( 'output', 'detail', 'en' );
+            columnList.output_source_count.title = CnReqnHelper.translate( 'output', 'output_source_count', 'en' );
+          }
+        } );
+      }
       return { instance: function( parentModel, root ) { return new object( parentModel, root ); } };
     }
   ] );
