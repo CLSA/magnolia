@@ -192,7 +192,7 @@ define( [ 'output' ].reduce( function( list, name ) {
             return this.$$onView( force ).then( function() {
               if( 'lite' != self.parentModel.type ) {
                 cenozoApp.setLang( self.record.lang );
-                self.updateOutputListLanguage();
+                self.updateOutputListLanguage( self.record.lang );
                 return self.getVersionList();
               }
             } );
@@ -217,20 +217,20 @@ define( [ 'output' ].reduce( function( list, name ) {
             }
           },
 
-          updateOutputListLanguage: function() {
+          updateOutputListLanguage: function( lang ) {
             var columnList = cenozoApp.module( 'output' ).columnList;
-            columnList.output_type_en.isIncluded = function( $state, model ) { return 'en' == self.record.lang; };
-            columnList.output_type_fr.isIncluded = function( $state, model ) { return 'fr' == self.record.lang; };
+            columnList.output_type_en.isIncluded = function( $state, model ) { return 'en' == lang; };
+            columnList.output_type_fr.isIncluded = function( $state, model ) { return 'fr' == lang; };
             columnList.output_type_en.title = CnReqnHelper.translate( 'output', 'output_type', 'en' );
             columnList.output_type_fr.title = CnReqnHelper.translate( 'output', 'output_type', 'fr' );
-            columnList.detail.title = CnReqnHelper.translate( 'output', 'detail', self.record.lang );
-            columnList.output_source_count.title = CnReqnHelper.translate( 'output', 'output_source_count', self.record.lang );
+            columnList.detail.title = CnReqnHelper.translate( 'output', 'detail', lang );
+            columnList.output_source_count.title = CnReqnHelper.translate( 'output', 'output_source_count', lang );
           },
 
           // setup language and tab state parameters
           toggleLanguage: function() {
             this.record.lang = 'en' == this.record.lang ? 'fr' : 'en';
-            this.updateOutputListLanguage();
+            this.updateOutputListLanguage( this.record.lang );
 
             return CnHttpFactory.instance( {
               path: 'reqn/identifier=' + this.record.identifier,

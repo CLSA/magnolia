@@ -917,14 +917,6 @@ cenozo.service( 'CnReqnHelper', [
               en: 'List any products resulting from the project during the reporting period. Please provide references where available, and for peer-reviewed publications please specify if ‘in press’, ‘submitted’ or ‘published’. If you have not yet done so, please provide a copy of peer-reviewed publications to the CLSA when submitting this report.',
               fr: 'Énumérer les produits qui ont été développés dans le cadre de votre projet pendant la période en question. Veuillez fournir les références lorsqu’elles sont disponibles. Pour les articles évalués par des pairs, veuillez spécifier s’ils sont « sous presse », « soumis » ou « publiés ». Si ce n’est pas déjà fait, veuillez fournir une copie des articles évalués par des pairs à l’ÉLCV en soumettant ce rapport.'
             },
-            number: { en: 'Number', fr: 'Numéro' },
-            type: { en: 'Type', fr: 'Type' },
-            output: { en: 'Output', fr: 'TRANSLATION REQUIRED' },
-            columns: {
-              outputType: { en: 'Output Type', fr: 'TRANSLATION REQUIRED' },
-              details: { en: 'Details', fr: 'TRANSLATION REQUIRED' },
-              sources: { en: 'Sources', fr: 'TRANSLATION REQUIRED' }
-            },
             addOutput: { en: 'Add Output', fr: 'TRANSLATION REQUIRED' }
           },
           part3: {
@@ -1018,9 +1010,26 @@ cenozo.service( 'CnReqnHelper', [
           }
         },
         output: {
+          add: { en: 'Add', fr: 'Ajouter' },
           output_type: { en: 'Output Type', fr: 'TRANSLATION REQUIRED' },
           detail: { en: 'Details', fr: 'TRANSLATION REQUIRED' },
-          output_source_count: { en: 'Sources', fr: 'TRANSLATION REQUIRED' }
+          filename: { en: 'Attachment', fr: 'TRANSLATION REQUIRED' },
+          url: { en: 'Web Link', fr: 'TRANSLATION REQUIRED' },
+          addOutputSource: { en: 'Add Source', fr: 'TRANSLATION REQUIRED' },
+          outputSourceListHeading: { en: 'Source List', fr: 'TRANSLATION REQUIRED' },
+          output_source_count: { en: 'Sources', fr: 'TRANSLATION REQUIRED' },
+          createOutput: { en: 'Create Output', fr: 'TRANSLATION REQUIRED' },
+          createOutputSource: { en: 'Create Output Source', fr: 'TRANSLATION REQUIRED' },
+          viewFinalReport: { en: 'View Final Report', fr: 'TRANSLATION REQUIRED' },
+          viewOutput: { en: 'View Output', fr: 'TRANSLATION REQUIRED' },
+          outputDetails: { en: 'Output Details', fr: 'TRANSLATION REQUIRED' },
+          outputSourceDetails: { en: 'Output Source Details', fr: 'TRANSLATION REQUIRED' },
+          save: { en: 'Save', fr: 'TRANSLATION REQUIRED' },
+          cancel: { en: 'Cancel', fr: 'Annuler' },
+          delete: { en: 'Delete', fr: 'Effacer' },
+          choose: { en: '(choose)', fr: '(choisir)' },
+          newOutputSourceTitle: { en: 'Please Note', fr: 'Notez bien' },
+          newOutputSourceMessage: { en: 'You must provide either a file or web link (URL)', fr: 'TRANSLATION REQUIRED' }
         }
       }
     };

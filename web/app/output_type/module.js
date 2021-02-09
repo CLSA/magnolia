@@ -124,7 +124,6 @@ define( function() {
           },
 
           updateOutputListLanguage: function() {
-            //console.log( cenozoApp.module( 'output' ) );
             var columnList = cenozoApp.module( 'output' ).columnList;
             columnList.output_type_en.isIncluded = function( $state, model ) { return true; };
             columnList.output_type_fr.isIncluded = function( $state, model ) { return false; };

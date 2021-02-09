@@ -23,5 +23,6 @@ class module extends \cenozo\service\module
 
     $modifier->join( 'output', 'output_source.output_id', 'output.id' );
     $modifier->join( 'reqn', 'output.reqn_id', 'reqn.id' );
+    $modifier->join( 'language', 'reqn.language_id', 'language.id' );
   }
 }

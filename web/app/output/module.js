@@ -28,19 +28,19 @@ define( [ 'reqn' ].reduce( function( list, name ) {
       },
       output_type_en: {
         column: 'output_type.name_en',
-        title: '', // defined by the reqn and final_report modules
+        title: '', // defined by the reqn, output_type and final_report modules
         isIncluded: function() { return true; }
       },
       output_type_fr: {
         column: 'output_type.name_fr',
-        title: '', // defined by the reqn and final_report modules
+        title: '', // defined by the reqn, output_type and final_report modules
         isIncluded: function() { return false; }
       },
       detail: {
-        title: '' // defined by the reqn and final_report modules
+        title: '' // defined by the reqn, output_type and final_report modules
       },
       output_source_count: {
-        title: '' // defined by the reqn and final_report modules
+        title: '' // defined by the reqn, output_type and final_report modules
       }
     },
     defaultOrder: {
@@ -64,11 +64,11 @@ define( [ 'reqn' ].reduce( function( list, name ) {
       }
     },
     output_type_id: {
-      title: 'Output Type',
+      title: '', // defined below
       type: 'enum'
     },
     detail: {
-      title: 'Detail',
+      title: '', // defined below
       type: 'string'
     },
     identifier: {
@@ -80,19 +80,43 @@ define( [ 'reqn' ].reduce( function( list, name ) {
       column: 'final_report.id',
       type: 'string',
       isExcluded: true
-    }
+    },
+    lang: { column: 'language.code', type: 'string', isExcluded: true }
   } );
 
   /* ######################################################################################################## */
   cenozo.providers.directive( 'cnOutputAdd', [
-    'CnOutputModelFactory',
-    function( CnOutputModelFactory ) {
+    'CnOutputModelFactory', 'CnHttpFactory', 'CnReqnHelper', '$q',
+    function( CnOutputModelFactory, CnHttpFactory, CnReqnHelper, $q ) {
       return {
         templateUrl: module.getFileUrl( 'add.tpl.html' ),
         restrict: 'E',
         scope: { model: '=?' },
         controller: function( $scope ) {
           if( angular.isUndefined( $scope.model ) ) $scope.model = CnOutputModelFactory.root;
+
+          $scope.$on( 'cnRecordAdd ready', function( event, data ) {
+            var cnRecordAddView = data;
+            var parent = $scope.model.getParentIdentifier();
+            var promiseList = [];
+            var len = promiseList.length;
+            if( 'final_report' == parent.subject ) {
+              promiseList.push( CnHttpFactory.instance( {
+                path: 'final_report/' + parent.identifier,
+                data: { select: { column: { table: 'language', column: 'code', alias: 'lang' } } }
+              } ).get().then( response => response.data.lang ) );
+            }
+
+            $q.all( promiseList ).then( function( response ) {
+              var lang = len == response.length ? 'en' : response[len];
+              var enumListItem = cnRecordAddView.dataArray[0].inputArray.findByProperty( 'key', 'output_type_id' ).enumList[0];
+              enumListItem.name = CnReqnHelper.translate( 'output', 'choose', lang );
+              angular.extend( cnRecordAddView, {
+                getCancelText: function() { return CnReqnHelper.translate( 'output', 'cancel', lang ); },
+                getSaveText: function() { return CnReqnHelper.translate( 'output', 'save', lang ); }
+              } );
+            } );
+          } );
         }
       };
     }
@@ -118,8 +142,8 @@ define( [ 'reqn' ].reduce( function( list, name ) {
 
   /* ######################################################################################################## */
   cenozo.providers.directive( 'cnOutputView', [
-    'CnOutputModelFactory',
-    function( CnOutputModelFactory ) {
+    'CnOutputModelFactory', 'CnReqnHelper',
+    function( CnOutputModelFactory, CnReqnHelper ) {
       return {
         templateUrl: module.getFileUrl( 'view.tpl.html' ),
         restrict: 'E',
@@ -130,12 +154,30 @@ define( [ 'reqn' ].reduce( function( list, name ) {
           // get the child cn-record-add's scope
           $scope.$on( 'cnRecordView ready', function( event, data ) {
             var cnRecordViewScope = data;
-
-            // don't show the option to view the parent reqn to the applicant
+            var origin = $scope.model.getQueryParameter( 'origin', true );
+            var lang = 'final_report' == origin ? $scope.model.viewModel.record.lang : 'en';
             var parentExistsFn = cnRecordViewScope.parentExists;
-            cnRecordViewScope.parentExists = function( subject ) {
-              return $scope.model.isRole( 'applicant' ) && 'reqn' == subject ? false : parentExistsFn( subject );
-            };
+            angular.extend( cnRecordViewScope, {
+              // don't show the option to view the parent reqn to the applicant
+              parentExists: function( subject ) {
+                return $scope.model.isRole( 'applicant' ) && 'reqn' == subject ? false : parentExistsFn( subject );
+              },
+              getDeleteText: function() { return CnReqnHelper.translate( 'output', 'delete', lang ); },
+              getViewText: function( subject ) {
+                return 'final_report' == subject && 'final_report' == origin ?
+                  CnReqnHelper.translate( 'output', 'viewFinalReport', lang ) : 'View ' + cnRecordViewScope.parentName( subject );
+              }
+            } );
+          } );
+
+          // note, we are changing the output-source list, not the output list
+          $scope.$on( 'cnRecordList ready', function( event, data ) {
+            var cnRecordListScope = data;
+            var origin = $scope.model.getQueryParameter( 'origin', true );
+            var lang = 'final_report' == origin ? $scope.model.viewModel.record.lang : 'en';
+            angular.extend( cnRecordListScope, {
+              getAddText: function() { return CnReqnHelper.translate( 'output', 'add', lang ); }
+            } );
           } );
         }
       };
@@ -144,9 +186,31 @@ define( [ 'reqn' ].reduce( function( list, name ) {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnOutputAddFactory', [
-    'CnBaseAddFactory',
-    function( CnBaseAddFactory ) {
-      var object = function( parentModel ) { CnBaseAddFactory.construct( this, parentModel ); };
+    'CnBaseAddFactory', 'CnHttpFactory', 'CnReqnHelper', '$q',
+    function( CnBaseAddFactory, CnHttpFactory, CnReqnHelper, $q ) {
+      var object = function( parentModel ) {
+        var self = this;
+        CnBaseAddFactory.construct( this, parentModel );
+
+        this.onNew = function( record ) {
+          var parent = self.parentModel.getParentIdentifier();
+          var promiseList = [ self.$$onNew( record ) ];
+          var len = promiseList.length;
+
+          if( 'final_report' == parent.subject ) {
+            promiseList.push( CnHttpFactory.instance( {
+              path: 'final_report/' + parent.identifier,
+              data: { select: { column: { table: 'language', column: 'code', alias: 'lang' } } }
+            } ).get().then( response => response.data.lang ) );
+          }
+
+          return $q.all( promiseList ).then( function( response ) {
+            var lang = len == response.length ? 'en' : response[len];
+            self.parentModel.updateLanguage( lang );
+            self.heading = CnReqnHelper.translate( 'output', 'createOutput', lang );
+          } );
+        };
+      };
       return { instance: function( parentModel ) { return new object( parentModel ); } };
     }
   ] );
@@ -173,11 +237,32 @@ define( [ 'reqn' ].reduce( function( list, name ) {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnOutputViewFactory', [
-    'CnBaseViewFactory', 'CnReqnModelFactory',
-    function( CnBaseViewFactory, CnReqnModelFactory ) {
+    'CnBaseViewFactory', 'CnReqnModelFactory', 'CnReqnHelper',
+    function( CnBaseViewFactory, CnReqnModelFactory, CnReqnHelper ) {
       var object = function( parentModel, root ) {
+        var self = this;
         CnBaseViewFactory.construct( this, parentModel, root );
-        this.getViewReqnEnabled = function() { return CnReqnModelFactory.root.getViewEnabled(); }
+
+        angular.extend( this, {
+          getViewReqnEnabled: function() { return CnReqnModelFactory.root.getViewEnabled(); },
+
+          updateOutputSourceListLanguage: function( lang ) {
+            var columnList = cenozoApp.module( 'output_source' ).columnList;
+            columnList.filename.title = CnReqnHelper.translate( 'output', 'filename', lang );
+            columnList.url.title = CnReqnHelper.translate( 'output', 'url', lang );
+          },
+
+          onView: function( force ) {
+            return self.$$onView( force ).then( function() {
+              var origin = self.parentModel.getQueryParameter( 'origin', true );
+              var lang = 'final_report' == origin ? self.record.lang : 'en';
+              self.parentModel.updateLanguage( lang );
+              self.updateOutputSourceListLanguage( lang );
+              self.outputSourceModel.listModel.heading = CnReqnHelper.translate( 'output', 'outputSourceListHeading', lang );
+              self.heading = CnReqnHelper.translate( 'output', 'outputDetails', lang );
+            } );
+          }
+        } );
       }
       return { instance: function( parentModel, root ) { return new object( parentModel, root ); } };
     }
@@ -186,9 +271,9 @@ define( [ 'reqn' ].reduce( function( list, name ) {
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnOutputModelFactory', [
     'CnBaseModelFactory', 'CnOutputAddFactory', 'CnOutputListFactory', 'CnOutputViewFactory',
-    'CnSession', 'CnHttpFactory', '$state',
+    'CnSession', 'CnHttpFactory', 'CnReqnHelper', '$state',
     function( CnBaseModelFactory, CnOutputAddFactory, CnOutputListFactory, CnOutputViewFactory,
-              CnSession, CnHttpFactory, $state ) {
+              CnSession, CnHttpFactory, CnReqnHelper, $state ) {
       var object = function( root ) {
         var self = this;
         CnBaseModelFactory.construct( this, module );
@@ -197,6 +282,16 @@ define( [ 'reqn' ].reduce( function( list, name ) {
         this.viewModel = CnOutputViewFactory.instance( this, root );
 
         angular.extend( this, {
+          updateLanguage: function( lang ) {
+            var group = self.module.inputGroupList.findByProperty( 'title', '' );
+            group.inputList.output_type_id.title = CnReqnHelper.translate( 'output', 'output_type', lang );
+            group.inputList.detail.title = CnReqnHelper.translate( 'output', 'detail', lang );
+            self.metadata.getPromise().then( function() {
+              self.metadata.columnList.output_type_id.enumList =
+                self.metadata.columnList.output_type_id.enumLists[lang];
+            } );
+          },
+
           setupBreadcrumbTrail: function() {
             // change the breadcrumb trail based on the origin parameter
             self.$$setupBreadcrumbTrail();
@@ -268,17 +363,27 @@ define( [ 'reqn' ].reduce( function( list, name ) {
               return CnHttpFactory.instance( {
                 path: 'output_type',
                 data: {
-                  select: { column: [ 'id', 'name_en' ] },
+                  select: { column: [ 'id', 'name_en', 'name_fr' ] },
                   modifier: { order: 'name_en', limit: 1000 }
                 }
               } ).query().then( function success( response ) {
-                self.metadata.columnList.output_type_id.enumList = [];
+                // we need both languages, we'll dynamically choose which one to use
+                self.metadata.columnList.output_type_id.enumLists = { en: [], fr: [] };
                 response.data.forEach( function( item ) {
-                  self.metadata.columnList.output_type_id.enumList.push( {
+                  self.metadata.columnList.output_type_id.enumLists.en.push( {
                     value: item.id,
                     name: item.name_en
                   } );
+                  self.metadata.columnList.output_type_id.enumLists.fr.push( {
+                    value: item.id,
+                    name: item.name_fr
+                  } );
                 } );
+
+                // sort the french enum list
+                self.metadata.columnList.output_type_id.enumLists.fr.sort(
+                  (a, b) => (a.name < b.name ? -1 : a.name == b.name ? 0 : 1)
+                );
               } );
             } );
           }
