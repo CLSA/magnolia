@@ -773,7 +773,9 @@ define( [ 'output' ].reduce( function( list, name ) {
             } );
           },
           delete: function() { return CnReqnHelper.delete( this.record.getIdentifier(), this.record.lang ); },
-          translate: function( value ) { return CnReqnHelper.translate( 'reqn', value, this.record.lang ); },
+          translate: function( value ) {
+            return this.record.lang ? CnReqnHelper.translate( 'reqn', value, this.record.lang ) : '';
+          },
           viewReport: function() { return CnReqnHelper.viewReport( this.record.getIdentifier() ); },
           downloadApplication: function() { return CnReqnHelper.download( 'application', this.record.current_reqn_version_id ); },
           downloadChecklist: function() { return CnReqnHelper.download( 'checklist', this.record.current_reqn_version_id ); },

@@ -119,7 +119,8 @@ define( [ 'output' ].reduce( function( list, name ) {
           if( angular.isUndefined( $scope.liteModel ) ) $scope.liteModel = CnFinalReportModelFactory.lite;
           cnRecordView.controller[1]( $scope );
           $scope.t = function( value ) {
-            return CnReqnHelper.translate( 'finalReport', value, $scope.model.viewModel.record.lang );
+            return $scope.model.viewModel.record.lang ?
+              CnReqnHelper.translate( 'finalReport', value, $scope.model.viewModel.record.lang ) : '';
           };
 
           $scope.getHeading = function() {
@@ -173,7 +174,9 @@ define( [ 'output' ].reduce( function( list, name ) {
         angular.extend( this, {
           compareRecord: null,
           versionList: [],
-          translate: function( value ) { return CnReqnHelper.translate( 'finalReport', value, this.record.lang ); },
+          translate: function( value ) {
+            return this.record.lang ? CnReqnHelper.translate( 'finalReport', value, this.record.lang ) : '';
+          },
           show: function( subject ) { return CnReqnHelper.showAction( subject, this.record ); },
           viewReqn: function() {
             return this.parentModel.transitionToParentViewState( 'reqn', 'identifier=' + this.record.identifier );

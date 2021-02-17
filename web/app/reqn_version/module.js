@@ -487,7 +487,9 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
             } );
           },
           delete: function() { return CnReqnHelper.delete( 'identifier=' + this.record.identifier, this.record.lang ); },
-          translate: function( value ) { return CnReqnHelper.translate( 'reqn', value, this.record.lang ); },
+          translate: function( value ) {
+            return this.record.lang ? CnReqnHelper.translate( 'reqn', value, this.record.lang ) : '';
+          },
           viewReport: function() { $state.go( 'final_report.view', { identifier: this.record.current_final_report_id } ); },
           downloadApplication: function() { return CnReqnHelper.download( 'application', this.record.getIdentifier() ); },
           downloadChecklist: function() { return CnReqnHelper.download( 'checklist', this.record.getIdentifier() ); },

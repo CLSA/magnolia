@@ -119,13 +119,17 @@ define( function() {
           $scope.$on( 'cnRecordView ready', function( event, data ) {
             var cnRecordViewScope = data;
             var origin = $scope.model.getQueryParameter( 'origin', true );
-            var lang = 'final_report' == origin ? $scope.model.viewModel.record.lang : 'en';
             var patchFn = cnRecordViewScope.patch;
             angular.extend( cnRecordViewScope, {
-              getDeleteText: function() { return CnReqnHelper.translate( 'output', 'delete', lang ); },
+              getDeleteText: function() {
+                return 'final_report' == origin ?
+                  CnReqnHelper.translate( 'output', 'delete', $scope.model.viewModel.record.lang ) :
+                  'Delete';
+              },
               getViewText: function( subject ) {
                 return 'final_report' == origin ?
-                  CnReqnHelper.translate( 'output', 'viewOutput', lang ) : 'View ' + cnRecordViewScope.parentName( subject );
+                  CnReqnHelper.translate( 'output', 'viewOutput', $scope.model.viewModel.record.lang ) :
+                  'View ' + cnRecordViewScope.parentName( subject );
               },
               patch: function() {
                 if( !$scope.model.viewModel.record.filename && !$scope.model.viewModel.record.url ) {

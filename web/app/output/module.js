@@ -155,17 +155,21 @@ define( [ 'reqn' ].reduce( function( list, name ) {
           $scope.$on( 'cnRecordView ready', function( event, data ) {
             var cnRecordViewScope = data;
             var origin = $scope.model.getQueryParameter( 'origin', true );
-            var lang = 'final_report' == origin ? $scope.model.viewModel.record.lang : 'en';
             var parentExistsFn = cnRecordViewScope.parentExists;
             angular.extend( cnRecordViewScope, {
               // don't show the option to view the parent reqn to the applicant
               parentExists: function( subject ) {
                 return $scope.model.isRole( 'applicant' ) && 'reqn' == subject ? false : parentExistsFn( subject );
               },
-              getDeleteText: function() { return CnReqnHelper.translate( 'output', 'delete', lang ); },
+              getDeleteText: function() {
+                return 'final_report' == origin ?
+                  CnReqnHelper.translate( 'output', 'delete', $scope.model.viewModel.record.lang ) :
+                  'Delete';
+              },
               getViewText: function( subject ) {
                 return 'final_report' == subject && 'final_report' == origin ?
-                  CnReqnHelper.translate( 'output', 'viewFinalReport', lang ) : 'View ' + cnRecordViewScope.parentName( subject );
+                  CnReqnHelper.translate( 'output', 'viewFinalReport', $scope.model.viewModel.record.lang ) :
+                  'View ' + cnRecordViewScope.parentName( subject );
               }
             } );
           } );
@@ -174,9 +178,10 @@ define( [ 'reqn' ].reduce( function( list, name ) {
           $scope.$on( 'cnRecordList ready', function( event, data ) {
             var cnRecordListScope = data;
             var origin = $scope.model.getQueryParameter( 'origin', true );
-            var lang = 'final_report' == origin ? $scope.model.viewModel.record.lang : 'en';
             angular.extend( cnRecordListScope, {
-              getAddText: function() { return CnReqnHelper.translate( 'output', 'add', lang ); }
+              getAddText: function() {
+                return CnReqnHelper.translate( 'output', 'add', 'final_report' == origin ? $scope.model.viewModel.record.lang : 'en' );
+              }
             } );
           } );
         }
