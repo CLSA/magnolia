@@ -86,8 +86,8 @@ define( [ 'reqn' ].reduce( function( list, name ) {
 
   /* ######################################################################################################## */
   cenozo.providers.directive( 'cnOutputAdd', [
-    'CnOutputModelFactory', 'CnHttpFactory', 'CnReqnHelper', '$q',
-    function( CnOutputModelFactory, CnHttpFactory, CnReqnHelper, $q ) {
+    'CnOutputModelFactory', 'CnHttpFactory', 'CnReqnHelper', '$q', '$timeout',
+    function( CnOutputModelFactory, CnHttpFactory, CnReqnHelper, $q, $timeout ) {
       return {
         templateUrl: module.getFileUrl( 'add.tpl.html' ),
         restrict: 'E',
@@ -109,11 +109,16 @@ define( [ 'reqn' ].reduce( function( list, name ) {
 
             $q.all( promiseList ).then( function( response ) {
               var lang = len == response.length ? 'en' : response[len];
-              var enumListItem = cnRecordAddView.dataArray[0].inputArray.findByProperty( 'key', 'output_type_id' ).enumList[0];
-              enumListItem.name = CnReqnHelper.translate( 'output', 'choose', lang );
-              angular.extend( cnRecordAddView, {
-                getCancelText: function() { return CnReqnHelper.translate( 'output', 'cancel', lang ); },
-                getSaveText: function() { return CnReqnHelper.translate( 'output', 'save', lang ); }
+              $scope.model.updateLanguage( lang ).then( function() {
+                // we need to wait for the next event cycle for some reason, so use timeout with a 0ms delay
+                $timeout( function() {
+                  var enumListItem = cnRecordAddView.dataArray[0].inputArray.findByProperty( 'key', 'output_type_id' ).enumList[0];
+                  enumListItem.name = CnReqnHelper.translate( 'output', 'choose', lang );
+                  angular.extend( cnRecordAddView, {
+                    getCancelText: function() { return CnReqnHelper.translate( 'output', 'cancel', lang ); },
+                    getSaveText: function() { return CnReqnHelper.translate( 'output', 'save', lang ); }
+                  } );
+                } );
               } );
             } );
           } );
@@ -291,9 +296,8 @@ define( [ 'reqn' ].reduce( function( list, name ) {
             var group = self.module.inputGroupList.findByProperty( 'title', '' );
             group.inputList.output_type_id.title = CnReqnHelper.translate( 'output', 'output_type', lang );
             group.inputList.detail.title = CnReqnHelper.translate( 'output', 'detail', lang );
-            self.metadata.getPromise().then( function() {
-              self.metadata.columnList.output_type_id.enumList =
-                self.metadata.columnList.output_type_id.enumLists[lang];
+            return self.metadata.getPromise().then( function() {
+              self.metadata.columnList.output_type_id.enumList = self.metadata.columnList.output_type_id.enumLists[lang];
             } );
           },
 
