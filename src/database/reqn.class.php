@@ -1214,7 +1214,7 @@ class reqn extends \cenozo\database\record
     foreach( $this->get_notice_list( $notice_sel ) as $notice ) $notice_id_list[] = $notice['id'];
 
     $db_user = 'primary' == $type ? $this->get_user() : $this->get_trainee_user();
-    if( !is_null( $db_user ) ) $db_user->add_notice( $notice_id_list );
+    if( !is_null( $db_user ) && 0 < count( $notice_id_list ) ) $db_user->add_notice( $notice_id_list );
   }
 
   /**
