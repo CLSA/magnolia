@@ -16,8 +16,8 @@ define( function() {
       possessive: 'source\'s'
     },
     columnList: {
-      filename: { title: '' }, // defined by TODO
-      url: { title: '' } // defined by TODO
+      filename: { title: '' }, // defined by directives at run-time
+      url: { title: '' } // defined by directives at run-time
     },
     defaultOrder: {
       column: 'output_source.id',
