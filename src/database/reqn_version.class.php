@@ -494,35 +494,34 @@ class reqn_version extends \cenozo\database\record
     if( !is_null( $this->part2_b_comment ) ) $data['part2_b_comment'] = $this->part2_b_comment;
     if( !is_null( $this->part2_c_comment ) ) $data['part2_c_comment'] = $this->part2_c_comment;
     if( !is_null( $this->part2_d_comment ) ) $data['part2_d_comment'] = $this->part2_d_comment;
-    if( $this->cimt ) $data['cimt'] = 'Yes';
-    if( $this->dxa ) $data['dxa'] = 'Yes';
-    if( $this->ecg ) $data['ecg'] = 'Yes';
-    if( $this->retinal ) $data['retinal'] = 'Yes';
-    if( $this->spirometry ) $data['spirometry'] = 'Yes';
-    if( $this->tonometry ) $data['tonometry'] = 'Yes';
+
+    $justification_sel = lib::create( 'database\select' );
+    $justification_sel->add_column( 'description' );
+    $justification_mod = lib::create( 'database\modfier' );
+    $justification_mod->join( 'data_option', 'reqn_version_justification.data_option_id', 'data_option.id' );
+    $justification_mod->join( 'data_option_category', 'data_option.data_option_category_id', 'data_option_category.id' );
+    $justification_mod->where( 'description', '!=', NULL );
+    $justification_mod->where( 'data_option_category.name_en', '=', 'Additional Data' );
+    $justification_mod->order( 'data_option.rank' );
 
     $additional_data_justification_list = array();
-    if( $this->cimt && !is_null( $this->cimt_justification ) )
-      $additional_data_justification_list[] = $this->cimt_justification;
-    if( $this->dxa && !is_null( $this->dxa_justification ) )
-      $additional_data_justification_list[] = $this->dxa_justification;
-    if( $this->ecg && !is_null( $this->ecg_justification ) )
-      $additional_data_justification_list[] = $this->ecg_justification;
-    if( $this->retinal && !is_null( $this->retinal_justification ) )
-      $additional_data_justification_list[] = $this->retinal_justification;
-    if( $this->spirometry && !is_null( $this->spirometry_justification ) )
-      $additional_data_justification_list[] = $this->spirometry_justification;
-    if( $this->tonometry && !is_null( $this->tonometry_justification ) )
-      $additional_data_justification_list[] = $this->tonometry_justification;
+    foreach( $this->get_reqn_version_justification_list() as $reqn_version_justification )
+      $additional_data_justification_list[] = $reqn_version_justification['description'];
     if( 0 < count( $additional_data_justification_list ) )
       $data['additional_data_justification'] = implode( "\n", $additional_data_justification_list );
 
-    if( $this->fsa ) $data['fsa'] = 'Yes';
-    if( $this->csd ) $data['csd'] = 'Yes';
+    $justification_sel = lib::create( 'database\select' );
+    $justification_sel->add_column( 'description' );
+    $justification_mod = lib::create( 'database\modfier' );
+    $justification_mod->join( 'data_option', 'reqn_version_justification.data_option_id', 'data_option.id' );
+    $justification_mod->join( 'data_option_category', 'data_option.data_option_category_id', 'data_option_category.id' );
+    $justification_mod->where( 'description', '!=', NULL );
+    $justification_mod->where( 'data_option_category.name_en', '=', 'Geographic Indicators' );
+    $justification_mod->order( 'data_option.rank' );
 
     $geographic_location_justification_list = array();
-    if( !is_null( $this->fsa_justification ) ) $geographic_location_justification_list[] = $this->fsa_justification;
-    if( !is_null( $this->csd_justification ) ) $geographic_location_justification_list[] = $this->csd_justification;
+    foreach( $this->get_reqn_version_justification_list() as $reqn_version_justification )
+      $geographic_location_justification_list[] = $reqn_version_justification['description'];
     if( 0 < count( $geographic_location_justification_list ) )
       $data['geographic_location_justification'] = implode( "\n", $geographic_location_justification_list );
 
