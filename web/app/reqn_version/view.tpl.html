@@ -985,7 +985,7 @@
             </form>
           </div>
         </div>
-        <div ng-repeat="part in ['a','b','c','d','e']"
+        <div ng-repeat="part in ['a','b','c','d','e','f']"
              ng-init="partIndex = $index"
              ng-show="part==model.viewModel.formTab[2]"
              class="panel panel-default">
@@ -993,196 +993,8 @@
             <form ng-attr-id="part2{{ part }}Form" ng-attr-name="part2{{ part }}Form" novalidate>
               <cn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_2{{ part }}"></cn-deferral-note>
               <div class="form-horizontal">
-                <p ng-if="'d'==part" class="text-primary" ng-bind-html="t( 'part2.d.text' )"></p>
-                <ul class="list-group" ng-if="'e'==part">
-                  <li class="list-group-item">
-                    <h4 ng-bind-html="t( 'part2.e.title1' )"></h4>
-                    <div ng-bind-html="t( 'part2.e.text1' )"></div>
-                    <div class="form-body">
-                      <cn-view-input-with-differences
-                        input="{
-                          key: 'cimt',
-                          title: t( 'part2.e.cimt' ),
-                          type: model.inputList.cimt.type,
-                          enumList: model.metadata.accessEnumList[model.viewModel.record.lang],
-                          help: t( 'part2.e.specialDataNote' )
-                        }"
-                        no-help-indicator="true"
-                        difference="model.viewModel.compareRecord.differences.part2.e.cimt"
-                        model="model">
-                      </cn-view-input-with-differences>
-                      <div style="margin-top: -1em;" ng-if="model.viewModel.record.cimt">
-                        <cn-view-input-with-differences
-                          input="{
-                            key: 'cimt_justification',
-                            title: 'Justification',
-                            type: model.inputList.cimt_justification.type
-                          }"
-                          difference="model.viewModel.compareRecord.differences.part2.e.cimt_justification"
-                          model="model">
-                        </cn-view-input-with-differences>
-                      </div>
-                      <cn-view-input-with-differences
-                        input="{
-                          key: 'dxa',
-                          title: t( 'part2.e.dxa' ),
-                          type: model.inputList.dxa.type,
-                          enumList: model.metadata.accessEnumList[model.viewModel.record.lang],
-                          help: t( 'part2.e.specialDataNote' )
-                        }"
-                        no-help-indicator="true"
-                        difference="model.viewModel.compareRecord.differences.part2.e.dxa"
-                        model="model">
-                      </cn-view-input-with-differences>
-                      <div style="margin-top: -1em;" ng-if="model.viewModel.record.dxa">
-                        <cn-view-input-with-differences
-                          input="{
-                            key: 'dxa_justification',
-                            title: 'Justification',
-                            type: model.inputList.dxa_justification.type
-                          }"
-                          difference="model.viewModel.compareRecord.differences.part2.e.dxa_justification"
-                          model="model">
-                        </cn-view-input-with-differences>
-                      </div>
-                      <cn-view-input-with-differences
-                        input="{
-                          key: 'ecg',
-                          title: t( 'part2.e.ecg' ),
-                          type: model.inputList.ecg.type,
-                          enumList: model.metadata.accessEnumList[model.viewModel.record.lang]
-                        }"
-                        difference="model.viewModel.compareRecord.differences.part2.e.ecg"
-                        model="model">
-                      </cn-view-input-with-differences>
-                      <div style="margin-top: -1em;" ng-if="model.viewModel.record.ecg">
-                        <cn-view-input-with-differences
-                          input="{
-                            key: 'ecg_justification',
-                            title: 'Justification',
-                            type: model.inputList.ecg_justification.type
-                          }"
-                          difference="model.viewModel.compareRecord.differences.part2.e.ecg_justification"
-                          model="model">
-                        </cn-view-input-with-differences>
-                      </div>
-                      <cn-view-input-with-differences
-                        input="{
-                          key: 'retinal',
-                          title: t( 'part2.e.retinal' ),
-                          type: model.inputList.retinal.type,
-                          enumList: model.metadata.accessEnumList[model.viewModel.record.lang]
-                        }"
-                        difference="model.viewModel.compareRecord.differences.part2.e.retinal"
-                        model="model">
-                      </cn-view-input-with-differences>
-                      <div style="margin-top: -1em;" ng-if="model.viewModel.record.retinal">
-                        <cn-view-input-with-differences
-                          input="{
-                            key: 'retinal_justification',
-                            title: 'Justification',
-                            type: model.inputList.retinal_justification.type
-                          }"
-                          difference="model.viewModel.compareRecord.differences.part2.e.retinal_justification"
-                          model="model">
-                        </cn-view-input-with-differences>
-                      </div>
-                      <cn-view-input-with-differences
-                        input="{
-                          key: 'spirometry',
-                          title: t( 'part2.e.spirometry' ),
-                          type: model.inputList.spirometry.type,
-                          enumList: model.metadata.accessEnumList[model.viewModel.record.lang],
-                          help: t( 'part2.e.specialDataNote' )
-                        }"
-                        no-help-indicator="true"
-                        difference="model.viewModel.compareRecord.differences.part2.e.spirometry"
-                        model="model">
-                      </cn-view-input-with-differences>
-                      <div style="margin-top: -1em;" ng-if="model.viewModel.record.spirometry">
-                        <cn-view-input-with-differences
-                          input="{
-                            key: 'spirometry_justification',
-                            title: 'Justification',
-                            type: model.inputList.spirometry_justification.type
-                          }"
-                          difference="model.viewModel.compareRecord.differences.part2.e.spirometry_justification"
-                          model="model">
-                        </cn-view-input-with-differences>
-                      </div>
-                      <cn-view-input-with-differences
-                        input="{
-                          key: 'tonometry',
-                          title: t( 'part2.e.tonometry' ),
-                          type: model.inputList.tonometry.type,
-                          enumList: model.metadata.accessEnumList[model.viewModel.record.lang]
-                        }"
-                        difference="model.viewModel.compareRecord.differences.part2.e.tonometry"
-                        model="model">
-                      </cn-view-input-with-differences>
-                      <div style="margin-top: -1em;" ng-if="model.viewModel.record.tonometry">
-                        <cn-view-input-with-differences
-                          input="{
-                            key: 'tonometry_justification',
-                            title: 'Justification',
-                            type: model.inputList.tonometry_justification.type
-                          }"
-                          difference="model.viewModel.compareRecord.differences.part2.e.tonometry_justification"
-                          model="model">
-                        </cn-view-input-with-differences>
-                      </div>
-                    </div>
-                  </li>
-                  <li class="list-group-item">
-                    <h4 ng-bind-html="t( 'part2.e.title2' )"></h4>
-                    <div ng-bind-html="t( 'part2.e.text2' )"></div>
-                    <div class="form-body">
-                      <cn-view-input-with-differences
-                        input="{
-                          key: 'fsa',
-                          title: t( 'part2.e.fsa' ),
-                          type: model.inputList.fsa.type,
-                          enumList: model.metadata.accessEnumList[model.viewModel.record.lang]
-                        }"
-                        no-help-indicator="true"
-                        difference="model.viewModel.compareRecord.differences.part2.e.fsa"
-                        model="model">
-                      </cn-view-input-with-differences>
-                      <div style="margin-top: -1em;" ng-if="model.viewModel.record.fsa">
-                        <cn-view-input-with-differences
-                          input="{
-                            key: 'fsa_justification',
-                            title: 'Justification',
-                            type: model.inputList.fsa_justification.type
-                          }"
-                          difference="model.viewModel.compareRecord.differences.part2.e.fsa_justification"
-                          model="model">
-                        </cn-view-input-with-differences>
-                      </div>
-                      <cn-view-input-with-differences
-                        input="{
-                          key: 'csd',
-                          title: t( 'part2.e.csd' ),
-                          type: model.inputList.csd.type,
-                          enumList: model.metadata.accessEnumList[model.viewModel.record.lang]
-                        }"
-                        no-help-indicator="true"
-                        difference="model.viewModel.compareRecord.differences.part2.e.csd"
-                        model="model">
-                      </cn-view-input-with-differences>
-                      <div style="margin-top: -1em;" ng-if="model.viewModel.record.csd">
-                        <cn-view-input-with-differences
-                          input="{
-                            key: 'csd_justification',
-                            title: 'Justification',
-                            type: model.inputList.csd_justification.type
-                          }"
-                          difference="model.viewModel.compareRecord.differences.part2.e.csd_justification"
-                          model="model">
-                        </cn-view-input-with-differences>
-                      </div>
-                    </div>
-                  </li>
+                <ul class="list-group" ng-if="t( 'part2.' + part + '.heading' )">
+                  <li class="list-group-item"><div ng-bind-html="t( 'part2.' + part + '.heading' )"></div></li>
                 </ul>
                 <table class="table table-hover" ng-if="model.dataOptionCategoryList[partIndex].optionList.length">
                   <thead class="bg-info">
@@ -1238,7 +1050,7 @@
                         <span style="line-height: 28px;">({{ t( 'c' == part && !dataOption.name.en.includes( 'Report' ) ? 'misc.notApplicable' : 'misc.notAvailable' ) }})</span>
                       </td>
                     </tr>
-                    <tr ng-repeat-end data-toggle="collapse" data-target="#accordion{{ dataOption.id }}" style="background: white">
+                    <tr ng-repeat-end style="background: white">
                       <td colspan="3">
                         <div id="accordion{{ dataOption.id }}" class="collapse text-primary text-left">
                           <div ng-repeat="detailCat in dataOption.detailCategoryList track by $index">
@@ -1251,6 +1063,20 @@
                               </span>
                             </div>
                           </div>
+                        </div>
+                        <div ng-if="dataOption.justification && (
+                                      model.viewModel.record.dataOptionValueList.bl[dataOption.id] ||
+                                      model.viewModel.record.dataOptionValueList.f1[dataOption.id]
+                                    )">
+                          <cn-view-input-with-differences
+                            input="{
+                              key: 'justification_' + dataOption.id,
+                              title: 'Justification',
+                              type: 'text'
+                            }"
+                            difference="model.viewModel.compareRecord.differences.part2[part].dataOptionJustificationList.findByProperty( 'id', dataOption.id )"
+                            model="model">
+                          </cn-view-input-with-differences>
                         </div>
                       </td>
                     </tr>
@@ -1275,7 +1101,7 @@
                 <div class="container-fluid">
                   <cn-view-input-with-differences
                     no-cols=true
-                    ng-if="'e'!=part"
+                    ng-if="'e'!=part && 'f'!=part"
                     input="{
                       key: 'part2_' + part + '_comment',
                       title: t( 'misc.comments' ),

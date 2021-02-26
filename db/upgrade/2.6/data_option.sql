@@ -3,6 +3,19 @@ DELIMITER //
 CREATE PROCEDURE patch_data_option()
   BEGIN
 
+    SELECT "Adding new justification column to data_option table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "data_option"
+    AND column_name = "justification";
+
+    IF @test = 0 THEN
+      ALTER TABLE data_option
+      ADD COLUMN justification TINYINT(1) NOT NULL DEFAULT 0 AFTER rank;
+    END IF;
+
     SELECT "Adding new condition_en and condition_fr columns to data_option table" AS "";
 
     SELECT COUNT(*) INTO @test
@@ -37,6 +50,49 @@ CREATE PROCEDURE patch_data_option()
         note_en = "Medications Module (MEDI) includes information on prescription and non-prescription medications used regularly by CLSA Comprehensive Cohort participants. Main variables include: DIN, name, dosage, frequency, start date & duration of use, reason of use.",
         note_fr = "TODO: TRANSLATION";
     END IF;
+
+    SELECT "Adding new additiona data data options" AS "";
+
+    SELECT ad.id, gi.id INTO @ad_id, @gi_id
+    FROM data_option_category ad, data_option_category gi
+    WHERE ad.name_en = "Additional Data"
+    AND gi.name_en = "Geographic Indicators";
+
+    INSERT IGNORE INTO data_option ( data_option_category_id, rank, justification, name_en, name_fr, note_en, note_fr ) VALUES (
+      @ad_id,
+      1,
+      true,
+      "cIMT (Still image / Cineloops)",
+      "cIMT (image fixe / Cineloops)",
+      "Please consult the CLSA Data Availability Table on our website for additional information/conditions if requesting these data",
+      "Vous trouverez des informations supplémentaires et les conditions associées à la demande de ces données dans le tableau de disponibilité des données de l’ÉLCV sur notre site Web."
+    ), (
+      @ad_id,
+      2,
+      true,
+      "DXA (Forearm / Hip / IVA Lateral Spine / AP Lumbar Spine / Whole Body)",
+      "DEXA (avant-bras / hanche / colonne latérale IVA / colonne vertébrale lombaire AP (1er suivi) / corps entier)",
+      "Please consult the CLSA Data Availability Table on our website for additional information/conditions if requesting these data",
+      "Vous trouverez des informations supplémentaires et les conditions associées à la demande de ces données dans le tableau de disponibilité des données de l’ÉLCV sur notre site Web."
+    ), (
+      @ad_id, 3, true, "ECG (RAW+ / Images)", "ECG (RAW+ / Images)", NULL, NULL
+    ), (
+      @ad_id, 4, true, "Retinal Scan (Image)", "Scan rétinien (image)", NULL, NULL
+    ), (
+      @ad_id,
+      5,
+      true,
+      "Spirometry (RAW+ / Images)",
+      "Spirométrie (RAW+ / Images)",
+      "Please consult the CLSA Data Availability Table on our website for additional information/conditions if requesting these data",
+      "Vous trouverez des informations supplémentaires et les conditions associées à la demande de ces données dans le tableau de disponibilité des données de l’ÉLCV sur notre site Web."
+    ), (
+      @ad_id, 6, true, "Tonometry (Pressure and applination data)", "Tonométrie (données sur la pression et l’aplanissement)", NULL, NULL
+    ), (
+      @gi_id, 1, true, "FSA", "RTA", NULL, NULL
+    ), (
+      @gi_id, 2, true, "CSD", "SDR", NULL, NULL
+    );
 
   END //
 DELIMITER ;

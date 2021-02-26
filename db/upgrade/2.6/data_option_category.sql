@@ -17,6 +17,13 @@ CREATE PROCEDURE patch_data_option_category()
       ADD COLUMN condition_en TEXT NULL DEFAULT NULL AFTER name_fr;
     END IF;
 
+    SELECT "Adding new data_option_category" AS "";
+
+    SELECT MAX( rank ) INTO @max_rank FROM data_option_category;
+
+    INSERT IGNORE INTO data_option_category( rank, name_en, name_fr )
+    VALUES( @max_rank + 1, "Geographic Indicators", "TODO: TRANSLATE" );
+
   END //
 DELIMITER ;
 

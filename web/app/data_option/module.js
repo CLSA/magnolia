@@ -18,6 +18,7 @@ define( function() {
       category_rank: { column: 'data_option_category.rank', title: 'Category Rank', type: 'rank' },
       category_name_en: { column: 'data_option_category.name_en', title: 'Category Name' },
       rank: { title: 'Rank', type: 'rank' },
+      justification: { title: 'Justification', type: 'boolean' },
       name_en: { title: 'Name' },
       has_condition: { title: 'Has Condition', type: 'boolean' },
       note_en: { title: 'Note', type: 'text', limit: 20 }
@@ -36,6 +37,11 @@ define( function() {
       title: 'Rank',
       type: 'rank',
       isConstant: true
+    },
+    justification: {
+      title: 'Justification',
+      type: 'boolean',
+      help: 'Whether the applicant must provide a justification when selecting this data-option.'
     },
     name_en: {
       title: 'Name (English)',
