@@ -46,6 +46,82 @@ CREATE PROCEDURE patch_reqn_version()
     EXECUTE statement;
     DEALLOCATE PREPARE statement;
 
+    SELECT "Replacing part2_a_comment column with rows in reqn_ersion_comment" AS "";
+
+    SELECT id INTO @data_option_category_id FROM data_option_category WHERE rank = 1;
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn_version"
+    AND column_name = "part2_a_comment";
+
+    IF @test = 1 THEN
+      UPDATE reqn_version_comment
+      JOIN reqn_version ON reqn_version_comment.reqn_version_id = reqn_version.id
+      SET description = part2_a_comment
+      WHERE reqn_version_comment.data_option_category_id = @data_option_category_id;
+
+      ALTER TABLE reqn_version DROP COLUMN part2_a_comment;
+    END IF;
+
+    SELECT "Replacing part2_b_comment column with rows in reqn_ersion_comment" AS "";
+
+    SELECT id INTO @data_option_category_id FROM data_option_category WHERE rank = 2;
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn_version"
+    AND column_name = "part2_b_comment";
+
+    IF @test = 1 THEN
+      UPDATE reqn_version_comment
+      JOIN reqn_version ON reqn_version_comment.reqn_version_id = reqn_version.id
+      SET description = part2_b_comment
+      WHERE reqn_version_comment.data_option_category_id = @data_option_category_id;
+
+      ALTER TABLE reqn_version DROP COLUMN part2_b_comment;
+    END IF;
+
+    SELECT "Replacing part2_c_comment column with rows in reqn_ersion_comment" AS "";
+
+    SELECT id INTO @data_option_category_id FROM data_option_category WHERE rank = 3;
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn_version"
+    AND column_name = "part2_c_comment";
+
+    IF @test = 1 THEN
+      UPDATE reqn_version_comment
+      JOIN reqn_version ON reqn_version_comment.reqn_version_id = reqn_version.id
+      SET description = part2_c_comment
+      WHERE reqn_version_comment.data_option_category_id = @data_option_category_id;
+
+      ALTER TABLE reqn_version DROP COLUMN part2_c_comment;
+    END IF;
+
+    SELECT "Replacing part2_d_comment column with rows in reqn_ersion_comment" AS "";
+
+    SELECT id INTO @data_option_category_id FROM data_option_category WHERE rank = 4;
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn_version"
+    AND column_name = "part2_d_comment";
+
+    IF @test = 1 THEN
+      UPDATE reqn_version_comment
+      JOIN reqn_version ON reqn_version_comment.reqn_version_id = reqn_version.id
+      SET description = part2_d_comment
+      WHERE reqn_version_comment.data_option_category_id = @data_option_category_id;
+
+      ALTER TABLE reqn_version DROP COLUMN part2_d_comment;
+    END IF;
+
     SELECT "Replacing cimt column with rows in reqn_version_data_option" AS "";
 
     SELECT id INTO @data_option_id FROM data_option WHERE name_en = "cIMT (Still image / Cineloops)";

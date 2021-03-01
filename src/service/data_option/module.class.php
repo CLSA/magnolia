@@ -38,11 +38,12 @@ class module extends \cenozo\service\module
       $join_sel->from( 'data_option_has_study_phase' );
       $join_sel->add_column( 'data_option_id' );
 
+      // NOTE: This is tricky since we want to link to ANY study's baseline phase.  In the future this
+      // may cause issues of there are multiple rows returned because of this design.
       $join_mod = lib::create( 'database\modifier' );
       $join_mod->join( 'study_phase', 'data_option_has_study_phase.study_phase_id', 'study_phase.id' );
       $join_mod->join( 'study', 'study_phase.study_id', 'study.id' );
       $join_mod->where( 'study_phase.code', '=', 'bl' );
-      $join_mod->where( 'study.name', '=', 'CLSA' );
       
       $modifier->left_join(
         sprintf( '( %s %s ) AS data_option_has_bl', $join_sel->get_sql(), $join_mod->get_sql() ),
@@ -58,11 +59,12 @@ class module extends \cenozo\service\module
       $join_sel->from( 'data_option_has_study_phase' );
       $join_sel->add_column( 'data_option_id' );
 
+      // NOTE: This is tricky since we want to link to ANY study's baseline phase.  In the future this
+      // may cause issues of there are multiple rows returned because of this design.
       $join_mod = lib::create( 'database\modifier' );
       $join_mod->join( 'study_phase', 'data_option_has_study_phase.study_phase_id', 'study_phase.id' );
       $join_mod->join( 'study', 'study_phase.study_id', 'study.id' );
       $join_mod->where( 'study_phase.code', '=', 'f1' );
-      $join_mod->where( 'study.name', '=', 'CLSA' );
       
       $modifier->left_join(
         sprintf( '( %s %s ) AS data_option_has_f1', $join_sel->get_sql(), $join_mod->get_sql() ),

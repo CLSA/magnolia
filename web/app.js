@@ -642,6 +642,14 @@ cenozo.service( 'CnReqnHelper', [
                 fr: '<ol><li>Région de tri d’acheminement (Une région de tri d’acheminement (RTA) est une region géographique où tous les codes postaux ont les mêmes trois premiers caractères.)</li><li>Codes et noms des subdivisions de recensement déterminé à l’aide du Fichier de conversion des codes postaux (FCCP) de Statistique Canada. Une subdivision de recensement (SDR) est une unité géographique définie par Statistique Canada correspondant approximativement aux municipalités, dont les codes uniques peuvent être liés à d’autres données sociodémographiques ou de recensement.</li></ol>En raison de la nature de ces indicateurs géographiques, une demande spéciale doit être faite pour que les SDR et les RTA soient incluses dans votre ensemble de données. Une justification adéquate doit être fournie dans la description du projet (partie 1 de la demande). En demandant ces données, vous acceptez également de ne pas présenter sous quelque forme que ce soit (présentation, publication, affiche) une illustration des zones géographiques habitées par moins de 50 participants à l’ÉLCV. Pour toute information supplémentaire, veuillez écrire à <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.'
               }
             },
+            g: {
+              tab: { en: '', fr: '' },
+              module: { en: '', fr: '' },
+              heading: {
+                en: 'Please mark the sections containing the modules in the CLSA dataset that you are requesting.',
+                fr: 'TODO: TRANSLATE'
+              }
+            }
           },
           part3: {
             tab: { en: 'Part 3', fr: '3<sup>e</sup> partie' },

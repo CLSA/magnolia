@@ -985,7 +985,7 @@
             </form>
           </div>
         </div>
-        <div ng-repeat="part in ['a','b','c','d','e','f']"
+        <div ng-repeat="part in ['a','b','c','d','e','f','g']"
              ng-init="partIndex = $index"
              ng-show="part==model.viewModel.formTab[2]"
              class="panel panel-default">
@@ -998,20 +998,20 @@
                 </ul>
                 <table class="table table-hover" ng-if="model.dataOptionCategoryList[partIndex].optionList.length">
                   <thead class="bg-info">
-                    <tr>
-                      <td width="33%"
+                    <tr ng-if="'g' != part">
+                      <td width="50%"
                           style="vertical-align: middle;"
                           uib-tooltip-html="model.dataOptionCategoryList[partIndex].note[model.viewModel.record.lang] | cnNewlines"
                           tooltip-popup-delay="100">
                         {{ t( 'part2.' + part + '.module' ) }}<sup ng-if="model.dataOptionCategoryList[partIndex].note[model.viewModel.record.lang]">ⓘ</sup>
                       </td>
-                      <td width="33%" style="vertical-align: middle;" ng-bind-html="t( 'misc.baseline' )"></td>
-                      <td width="33%" style="vertical-align: middle;" ng-bind-html="t( 'misc.followup1' )"></td>
+                      <td width="25%" style="vertical-align: middle;" ng-bind-html="t( 'misc.baseline' )"></td>
+                      <td width="25%" style="vertical-align: middle;" ng-bind-html="t( 'misc.followup1' )"></td>
                     </tr>
                   </thead>
                   <tbody>
                     <tr ng-repeat-start="dataOption in model.dataOptionCategoryList[partIndex].optionList">
-                      <td data-toggle="collapse" data-target="#accordion{{ dataOption.id }}" style="vertical-align: middle">
+                      <td width="50%" data-toggle="collapse" data-target="#accordion{{ dataOption.id }}" style="vertical-align: middle">
                         <a uib-tooltip-html="dataOption.note[model.viewModel.record.lang] | cnNewlines"
                            tooltip-popup-delay="100">
                           <span style="text-decoration: underline">
@@ -1019,7 +1019,7 @@
                           </span><sup ng-if="dataOption.note[model.viewModel.record.lang]">ⓘ</sup>
                         </a>
                       </td>
-                      <td ng-if="dataOption.bl" ng-class="{ 'bg-warning': model.viewModel.compareRecord.differences.part2[part].baselineDataOptionList.findByProperty( 'id', dataOption.id ) }">
+                      <td ng-style="{ 'width': 'g' == part ? '50%' : '25%' }" ng-if="dataOption.bl" ng-class="{ 'bg-warning': model.viewModel.compareRecord.differences.part2[part].baselineDataOptionList.findByProperty( 'id', dataOption.id ) }">
                         <button class="btn full-width"
                                 ng-class="model.viewModel.record.dataOptionValueList.bl[dataOption.id] ?
                                   'btn-success' : 'btn-default'"
@@ -1032,8 +1032,8 @@
                                 ng-bind-html="t( 'misc.clickToSelect' )"></span>
                         </button>
                       </td>
-                      <td ng-if="!dataOption.bl" ng-bind-html="t( 'misc.notAvailable' )"></td>
-                      <td ng-if="dataOption.f1" ng-class="{ 'bg-warning': model.viewModel.compareRecord.differences.part2[part].followUp1DataOptionList.findByProperty( 'id', dataOption.id ) }">
+                      <td ng-style="{ 'width': 'g' == part ? '50%' : '25%' }" ng-if="!dataOption.bl" ng-bind-html="t( 'misc.notAvailable' )"></td>
+                      <td width="25%" ng-if="'g' != part && dataOption.f1" ng-class="{ 'bg-warning': model.viewModel.compareRecord.differences.part2[part].followUp1DataOptionList.findByProperty( 'id', dataOption.id ) }">
                         <button class="btn full-width"
                                 ng-class="model.viewModel.record.dataOptionValueList.f1[dataOption.id] ?
                                   'btn-success' : 'btn-default'"
@@ -1046,7 +1046,7 @@
                                 ng-bind-html="t( 'misc.clickToSelect' )"></span>
                         </button>
                       </td>
-                      <td ng-if="!dataOption.f1">
+                      <td width="25%" ng-if="'g' != part && !dataOption.f1">
                         <span style="line-height: 28px;">({{ t( 'c' == part && !dataOption.name.en.includes( 'Report' ) ? 'misc.notApplicable' : 'misc.notAvailable' ) }})</span>
                       </td>
                     </tr>
@@ -1101,13 +1101,13 @@
                 <div class="container-fluid">
                   <cn-view-input-with-differences
                     no-cols=true
-                    ng-if="'e'!=part && 'f'!=part"
+                    ng-if="model.dataOptionCategoryList[partIndex].comment"
                     input="{
-                      key: 'part2_' + part + '_comment',
+                      key: 'comment_' + model.dataOptionCategoryList[partIndex].id,
                       title: t( 'misc.comments' ),
-                      type: model.inputList['part2_' + part + '_comment'].type
+                      type: 'text'
                     }"
-                    difference="model.viewModel.compareRecord.differences.part2[part]['part2_' + part + '_comment']"
+                    difference="model.viewModel.compareRecord.differences.part2[part].comment"
                     model="model">
                   </cn-view-input-with-differences>
                 </div>

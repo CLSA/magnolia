@@ -76,10 +76,6 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
     tracking: { type: 'boolean' },
     longitudinal: { type: 'boolean' },
     last_identifier: { type: 'string' },
-    part2_a_comment: { type: 'text' },
-    part2_b_comment: { type: 'text' },
-    part2_c_comment: { type: 'text' },
-    part2_d_comment: { type: 'text' },
     amendment_justification: { type: 'text' },
 
     current_final_report_id: { column: 'final_report.id', type: 'string' },
@@ -531,18 +527,34 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
             if( null != property.match( /^justification_/ ) ) {
               // justifications have their own service
               var match = property.match( /^justification_([0-9]+)$/ );
-              var data_option_id = match[1];
+              var dataOptionId = match[1];
 
               promise = CnHttpFactory.instance( {
                 path: [
                   'reqn_version',
                   self.record.id,
                   'reqn_version_justification',
-                  'data_option_id=' + data_option_id
+                  'data_option_id=' + dataOptionId
                 ].join( '/' ),
                 data: { description: data[property] }
               } ).patch().then( function() {
-                self.record['justification_' + data_option_id] = data[property];
+                self.record['justification_' + dataOptionId] = data[property];
+              } );
+            } else if( null != property.match( /^comment_/ ) ) {
+              // comments have their own service
+              var match = property.match( /^comment_([0-9]+)$/ );
+              var dataOptionCategoryId = match[1];
+
+              promise = CnHttpFactory.instance( {
+                path: [
+                  'reqn_version',
+                  self.record.id,
+                  'reqn_version_comment',
+                  'data_option_category_id=' + dataOptionCategoryId
+                ].join( '/' ),
+                data: { description: data[property] }
+              } ).patch().then( function() {
+                self.record['comment_' + dataOptionCategoryId] = data[property];
               } );
             } else if( null != property.match( /^deferral_note/ ) ) {
               // make sure to send patches to deferral notes to the parent reqn
@@ -669,6 +681,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
             [ 'part2', null, 'd' ],
             [ 'part2', null, 'e' ],
             [ 'part2', null, 'f' ],
+            [ 'part2', null, 'g' ],
             [ 'part3', null, null ],
             [ 'agreement', null, null ]
           ],
@@ -802,21 +815,21 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                   baselineDataOptionList: [],
                   followUp1DataOptionList: [],
                   dataOptionJustificationList: [],
-                  part2_a_comment: false
+                  comment: false
                 },
                 b: { // physical assessments
                   diff: false,
                   baselineDataOptionList: [],
                   followUp1DataOptionList: [],
                   dataOptionJustificationList: [],
-                  part2_b_comment: false
+                  comment: false
                 },
                 c: { // biomarkers
                   diff: false,
                   baselineDataOptionList: [],
                   followUp1DataOptionList: [],
                   dataOptionJustificationList: [],
-                  part2_c_comment: false
+                  comment: false
                 },
                 d: { // linked data
                   diff: false,
@@ -824,19 +837,28 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                   baselineDataOptionList: [],
                   followUp1DataOptionList: [],
                   dataOptionJustificationList: [],
-                  part2_d_comment: false
+                  comment: false
                 },
                 e: { // additional data
                   diff: false,
                   baselineDataOptionList: [],
                   followUp1DataOptionList: [],
-                  dataOptionJustificationList: []
+                  dataOptionJustificationList: [],
+                  comment: false
                 },
-                f: { // additional data
+                f: { // geographic indicators
                   diff: false,
                   baselineDataOptionList: [],
                   followUp1DataOptionList: [],
-                  dataOptionJustificationList: []
+                  dataOptionJustificationList: [],
+                  comment: false
+                },
+                g: { // covid-19
+                  diff: false,
+                  baselineDataOptionList: [],
+                  followUp1DataOptionList: [],
+                  dataOptionJustificationList: [],
+                  comment: false
                 }
               }
             };
@@ -993,6 +1015,23 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                           differences[part].diff = true;
                           differences[part][section].diff = true;
                           differences[part][section][property] = true;
+                        }
+                      }
+                    } else if( 'comment' == property ) {
+                      // only check comments if they are activated for this category
+                      if( 'comment' == property ) {
+                        var dataOptionCategory = self.parentModel.dataOptionCategoryList.findByProperty( 'charCode', section );
+                        if( dataOptionCategory.comment ) {
+                          // a comment's property in the record is followed by the data_category_id
+                          var commentProperty = 'comment_' + dataOptionCategory.id;
+                          var value1 = '' === reqnVersion1[commentProperty] ? null : reqnVersion1[commentProperty];
+                          var value2 = '' === reqnVersion2[commentProperty] ? null : reqnVersion2[commentProperty];
+                          if( value1 != value2 ) {
+                            differences.diff = true;
+                            differences[part].diff = true;
+                            differences[part][section].diff = true;
+                            differences[part][section][property] = true;
+                          }
                         }
                       }
                     } else {
@@ -1351,6 +1390,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
               }
             } ).then( function() {
               return $q.all( [
+
                 CnHttpFactory.instance( {
                   path: basePath + '/reqn_version_data_option',
                   data: { select: { column: [ 'data_option_id', { table: 'study_phase', column: 'code', alias: 'phase' } ] } }
@@ -1360,6 +1400,18 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                       object.dataOptionValueList[dataOption.phase][dataOption.data_option_id] = true;
                   } );
                 } ),
+
+                CnHttpFactory.instance( {
+                  path: basePath + '/reqn_version_comment',
+                  data: { select: { column: [ 'data_option_category_id', 'description' ] } }
+                } ).query().then( function( response ) {
+                  response.data.forEach( function( comment ) {
+                    var column = 'comment_' + comment.data_option_category_id;
+                    object[column] = comment.description;
+                    self.backupRecord[column] = object[column];
+                  } );
+                } ),
+
                 CnHttpFactory.instance( {
                   path: basePath + '/reqn_version_justification',
                   data: { select: { column: [ 'data_option_id', 'description' ] } }
@@ -1370,6 +1422,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                     self.backupRecord[column] = object[column];
                   } );
                 } )
+
               ] );
             } );
           },
@@ -2120,6 +2173,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                     select: { column: [
                       'id',
                       'rank',
+                      'comment',
                       'name_en', 'name_fr',
                       'condition_en', 'condition_fr',
                       'note_en', 'note_fr'

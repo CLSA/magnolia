@@ -51,12 +51,13 @@ CREATE PROCEDURE patch_data_option()
         note_fr = "TODO: TRANSLATION";
     END IF;
 
-    SELECT "Adding new additiona data data options" AS "";
+    SELECT "Adding new data options for additional data, geographic indicators and COVID-19" AS "";
 
-    SELECT ad.id, gi.id INTO @ad_id, @gi_id
-    FROM data_option_category ad, data_option_category gi
+    SELECT ad.id, gi.id, co.id INTO @ad_id, @gi_id, @co_id
+    FROM data_option_category ad, data_option_category gi, data_option_category co
     WHERE ad.name_en = "Additional Data"
-    AND gi.name_en = "Geographic Indicators";
+    AND gi.name_en = "Geographic Indicators"
+    AND co.name_en = "COVID-19 Data";
 
     INSERT IGNORE INTO data_option ( data_option_category_id, rank, justification, name_en, name_fr, note_en, note_fr ) VALUES (
       @ad_id,
@@ -92,6 +93,8 @@ CREATE PROCEDURE patch_data_option()
       @gi_id, 1, true, "FSA", "RTA", NULL, NULL
     ), (
       @gi_id, 2, true, "CSD", "SDR", NULL, NULL
+    ), (
+      @co_id, 1, false, "COVID-19 Questionnaire Study Data", "TODO: TRANSLATE", NULL, NULL
     );
 
   END //

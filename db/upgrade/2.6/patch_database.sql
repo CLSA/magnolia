@@ -15,6 +15,7 @@ SOURCE data_option.sql
 SOURCE data_option_has_study_phase.sql
 SOURCE data_option_detail.sql
 SOURCE reqn.sql
+SOURCE reqn_version_comment.sql
 SOURCE reqn_version_justification.sql
 SOURCE reqn_version.sql
 SOURCE reqn_version_data_option.sql
