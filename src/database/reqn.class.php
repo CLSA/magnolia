@@ -921,7 +921,7 @@ class reqn extends \cenozo\database\record
     $review_sel->add_column( 'amendment' );
     $review_sel->add_table_column( 'user', 'first_name' );
     $review_sel->add_table_column( 'user', 'last_name' );
-    $review_sel->add_column( 'date' );
+    $review_sel->add_column( 'DATE( review.datetime )', 'date', false );
     $review_sel->add_table_column( 'review_type', 'name', 'type' );
     $review_sel->add_table_column( 'recommendation_type', 'name', 'recommendation' );
     $review_sel->add_column( 'note' );
@@ -930,7 +930,7 @@ class reqn extends \cenozo\database\record
     $review_mod->left_join( 'user', 'review.user_id', 'user.id' );
     $review_mod->join( 'review_type', 'review.review_type_id', 'review_type.id' );
     $review_mod->join( 'recommendation_type', 'review.recommendation_type_id', 'recommendation_type.id' );
-    $review_mod->order( 'date' );
+    $review_mod->order( 'review.datetime' );
     $review_mod->order( 'stage_type_id' );
 
     // make sure to only get reviews for the current amendment

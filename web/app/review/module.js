@@ -26,7 +26,7 @@ define( function() {
         title: 'Reviewer',
         isIncluded: function( $state, model ) { return !model.isRole( 'reviewer' ); }
       },
-      date: { title: 'Created On' },
+      datetime: { title: 'Created On', type: 'date' },
       recommendation: {
         column: 'recommendation_type.name',
         title: 'Recommendation'
@@ -38,7 +38,7 @@ define( function() {
       }
     },
     defaultOrder: {
-      column: 'date',
+      column: 'datetime',
       reverse: false
     }
   } );
@@ -77,7 +77,7 @@ define( function() {
       },
       isConstant: function( $state, model ) { return !model.isRole( 'administrator', 'chair' ); }
     },
-    date: {
+    datetime: {
       title: 'Created On',
       type: 'date',
       isConstant: function( $state, model ) { return !model.isRole( 'administrator', 'chair' ); }

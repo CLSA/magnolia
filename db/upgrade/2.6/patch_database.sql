@@ -31,6 +31,7 @@ SOURCE production.sql
 SOURCE publication.sql
 SOURCE output.sql
 SOURCE output_source.sql
+SOURCE review.sql
 
 SOURCE update_version_number.sql
 
