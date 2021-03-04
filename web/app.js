@@ -647,7 +647,7 @@ cenozo.service( 'CnReqnHelper', [
               module: { en: '', fr: '' },
               heading: {
                 en: 'Please mark the sections containing the modules in the CLSA dataset that you are requesting.',
-                fr: 'TODO: TRANSLATE'
+                fr: 'Veuillez cocher les sections contenant les modules de l’ensemble de données de l’ÉLCV que vous demandez.'
               }
             }
           },
@@ -694,7 +694,7 @@ cenozo.service( 'CnReqnHelper', [
             addEthicsApproval: { en: 'Add Ethics Approval', fr: 'Ajouter une lettre d’approbation éthique' },
             reportRequiredWarning: {
               en: 'This application\'s final report is required, would you like to view it now?',
-              fr: 'TRANSLATION REQUIRED'
+              fr: 'Il faut fournir un rapport final pour cette demande, souhaitez-vous l’afficher maintenant?'
             },
             amend: { en: 'Create Amendment', fr: 'Effectuer une modification' },
             amendWarning: {
@@ -897,7 +897,7 @@ cenozo.service( 'CnReqnHelper', [
               en: 'List any products resulting from the project during the reporting period. Please provide references where available, and for peer-reviewed publications please specify if ‘in press’, ‘submitted’ or ‘published’. If you have not yet done so, please provide a copy of peer-reviewed publications to the CLSA when submitting this report.',
               fr: 'Énumérer les produits qui ont été développés dans le cadre de votre projet pendant la période en question. Veuillez fournir les références lorsqu’elles sont disponibles. Pour les articles évalués par des pairs, veuillez spécifier s’ils sont « sous presse », « soumis » ou « publiés ». Si ce n’est pas déjà fait, veuillez fournir une copie des articles évalués par des pairs à l’ÉLCV en soumettant ce rapport.'
             },
-            addOutput: { en: 'Add Output', fr: 'TRANSLATION REQUIRED' }
+            addOutput: { en: 'Add Output', fr: 'Ajouter une réalisation' }
           },
           part3: {
             tab: { en: 'Part 3', fr: '3<sup>e</sup> partie' },
@@ -948,15 +948,15 @@ cenozo.service( 'CnReqnHelper', [
             },
             submitMessage: {
               en: 'You have successfully submitted your Final Report and it will now be reviewed. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.',
-              fr: 'TRANSLATION REQUIRED'
+              fr: 'Votre rapport final a été soumis avec succès. Il sera maintenant examiné. Vous recevrez un courriel avec des instructions supplémentaires en cas de besoin et lorsque le processus d’examen sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour consulter l’état de votre rapport.'
             },
             traineeSubmitTitle: {
               en: 'Final Report Submitted for Supervisor Approval',
-              fr: 'TRANSLATION REQUIRED'
+              fr: 'Rapport final soumis au superviseur pour approbation'
             },
             traineeSubmitMessage: {
               en: 'You have successfully submitted your Final Report and your supervisor will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.',
-              fr: 'TRANSLATION REQUIRED'
+              fr: 'Votre rapport final a été soumis avec succès. Votre superviseur recevra un courriel lui demandant son approbation. Vous recevrez un courriel avec des instructions supplémentaires en cas de besoin et lorsque le processus d’examen sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour consulter l’état de votre rapport.'
             },
             resubmitTitle: {
               en: 'Final Report Resubmitted',
@@ -964,7 +964,7 @@ cenozo.service( 'CnReqnHelper', [
             },
             resubmitMessage: {
               en: 'You have successfully resubmitted your Final Report. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your application.',
-              fr: 'TRANSLATION REQUIRED'
+              fr: 'Votre rapport final a été resoumis avec succès. Vous recevrez un courriel avec des instructions supplémentaires en cas de besoin et lorsque le processus d’examen sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour voir l’état de votre demande.'
             },
             traineeResubmitTitle: {
               en: 'Final Report Resubmitted for Supervisor Approval',
@@ -972,44 +972,44 @@ cenozo.service( 'CnReqnHelper', [
             },
             traineeResubmitMessage: {
               en: 'You have successfully resubmitted your Final Report and your supervisor will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.',
-              fr: 'TRANSLATION REQUIRED'
+              fr: 'Votre rapport final a été resoumis avec succès. Votre superviseur recevra un courriel lui demandant son approbation. Vous recevrez un courriel avec des instructions supplémentaires en cas de besoin et lorsque le processus d’examen sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour consulter l’état de votre rapport.'
             },
             submitWarning: {
               en: 'Are you sure that all changes are complete and the report is ready to be submitted?',
-              fr: 'TRANSLATION REQUIRED'
+              fr: 'Êtes-vous sûr d’avoir apporté toutes les modifications souhaitées et de vouloir soumettre le rapport?'
             },
             missingFieldTitle: { en: 'Missing mandatory field', fr: 'Champ obligatoire manquant' },
             missingFieldMessage: {
               en: 'There are mandatory fields which are missing. You will now be redirected to where the incomplete fields can be found. Please try re-submitting once all mandatory fields have been filled out.',
-              fr: 'TRANSLATION REQUIRED'
+              fr: 'Des champs obligatoires sont manquants. Vous allez maintenant être redirigé vers les champs incomplets. Veuillez réessayer lorsque tous les champs obligatoires auront été remplis.'
             },
             noChangesMessage: {
               en: 'You have not made any changes to the report since your last submission.  Are you sure you wish to proceed?',
-              fr: 'TRANSLATION REQUIRED'
+              fr: 'Vous n’avez apporté aucune modification au rapport depuis votre dernière soumission. Êtes-vous sûr de vouloir continuer?'
             }
           }
         },
         output: {
           add: { en: 'Add', fr: 'Ajouter' },
-          output_type: { en: 'Output Type', fr: 'TRANSLATION REQUIRED' },
-          detail: { en: 'Details', fr: 'TRANSLATION REQUIRED' },
-          filename: { en: 'Attachment', fr: 'TRANSLATION REQUIRED' },
-          url: { en: 'Web Link', fr: 'TRANSLATION REQUIRED' },
-          addOutputSource: { en: 'Add Source', fr: 'TRANSLATION REQUIRED' },
-          outputSourceListHeading: { en: 'Source List', fr: 'TRANSLATION REQUIRED' },
-          output_source_count: { en: 'Sources', fr: 'TRANSLATION REQUIRED' },
-          createOutput: { en: 'Create Output', fr: 'TRANSLATION REQUIRED' },
-          createOutputSource: { en: 'Create Output Source', fr: 'TRANSLATION REQUIRED' },
-          viewFinalReport: { en: 'View Final Report', fr: 'TRANSLATION REQUIRED' },
-          viewOutput: { en: 'View Output', fr: 'TRANSLATION REQUIRED' },
-          outputDetails: { en: 'Output Details', fr: 'TRANSLATION REQUIRED' },
-          outputSourceDetails: { en: 'Output Source Details', fr: 'TRANSLATION REQUIRED' },
-          save: { en: 'Save', fr: 'TRANSLATION REQUIRED' },
+          output_type: { en: 'Output Type', fr: 'Type de réalisation' },
+          detail: { en: 'Details', fr: 'Informations' },
+          filename: { en: 'Attachment', fr: 'Pièce jointe' },
+          url: { en: 'URL', fr: 'URL' },
+          addOutputSource: { en: 'Add Source', fr: 'Ajouter une source' },
+          outputSourceListHeading: { en: 'Source List', fr: 'Liste des sources' },
+          output_source_count: { en: 'Sources', fr: 'Sources' },
+          createOutput: { en: 'Create Output', fr: 'Créer une réalisation' },
+          createOutputSource: { en: 'Create Output Source', fr: 'Créer une source pour une réalisation' },
+          viewFinalReport: { en: 'View Final Report', fr: 'Afficher le rapport final' },
+          viewOutput: { en: 'View Output', fr: 'Afficher la réalisation' },
+          outputDetails: { en: 'Output Details', fr: 'Informations sur la réalisation' },
+          outputSourceDetails: { en: 'Output Source Details', fr: 'Informations sur la source de la réalisation' },
+          save: { en: 'Save', fr: 'Sauvegarder' },
           cancel: { en: 'Cancel', fr: 'Annuler' },
           delete: { en: 'Delete', fr: 'Effacer' },
           choose: { en: '(choose)', fr: '(choisir)' },
           newOutputSourceTitle: { en: 'Please Note', fr: 'Notez bien' },
-          newOutputSourceMessage: { en: 'You must provide either a file or web link (URL)', fr: 'TRANSLATION REQUIRED' }
+          newOutputSourceMessage: { en: 'You must provide either a file or URL', fr: 'Vous devez fournir un fichier ou une URL' }
         }
       }
     };

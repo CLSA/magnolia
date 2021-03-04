@@ -38,8 +38,8 @@ CREATE PROCEDURE patch_data_option_category()
     SELECT MAX( rank ) INTO @max_rank FROM data_option_category;
 
     INSERT IGNORE INTO data_option_category( rank, comment, name_en, name_fr ) VALUES
-    ( @max_rank + 1, false, "Geographic Indicators", "TODO: TRANSLATE 1" ),
-    ( @max_rank + 2, true, "COVID-19 Data", "TODO: TRANSLATE 2" );
+    ( @max_rank + 1, false, "Geographic Indicators", "Indicateurs géographiques" ),
+    ( @max_rank + 2, true, "COVID-19 Data", "Données sur la COVID-19" );
 
   END //
 DELIMITER ;

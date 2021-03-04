@@ -46,9 +46,9 @@ CREATE PROCEDURE patch_data_option()
         data_option_category_id = @data_option_category_id,
         rank = @rank + 1,
         name_en = "Medications",
-        name_fr = "TODO: TRANSLATION",
+        name_fr = "Médicaments",
         note_en = "Medications Module (MEDI) includes information on prescription and non-prescription medications used regularly by CLSA Comprehensive Cohort participants. Main variables include: DIN, name, dosage, frequency, start date & duration of use, reason of use.",
-        note_fr = "TODO: TRANSLATION";
+        note_fr = "Le module Médicaments (MEDI) comprend des informations sur les médicaments sur ordonnance et en vente libre utilisés régulièrement par les participants à la cohorte globale de l’ÉLCV. Les principales variables comprennent : DIN, nom, posologie, fréquence, date de début et durée d’utilisation, raison de l’utilisation.";
     END IF;
 
     SELECT "Adding new data options for additional data, geographic indicators and COVID-19" AS "";
@@ -94,7 +94,7 @@ CREATE PROCEDURE patch_data_option()
     ), (
       @gi_id, 2, true, "CSD", "SDR", NULL, NULL
     ), (
-      @co_id, 1, false, "COVID-19 Questionnaire Study Data", "TODO: TRANSLATE", NULL, NULL
+      @co_id, 1, false, "COVID-19 Questionnaire Study Data", "Données du questionnaire de l’étude sur la COVID-19", NULL, NULL
     );
 
   END //
