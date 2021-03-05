@@ -20,7 +20,7 @@ CREATE PROCEDURE patch_data_option_has_study_phase()
       "JOIN ", @cenozo, ".study_phase ON study.id = study_phase.study_id ",
       "WHERE data_option.name_en = 'Medications' ",
       "AND study.name = 'CLSA' "
-      "AND study_phase.name IN( 'Baseline', 'Follow-up 1' ) "
+      "AND study_phase.name = 'Baseline'"
     );
     PREPARE statement FROM @sql;
     EXECUTE statement;
