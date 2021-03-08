@@ -385,7 +385,7 @@ cenozo.service( 'CnReqnHelper', [
               },
               applicant_name: { en: 'Name', fr: 'Nom' },
               applicant_position: { en: 'Position', fr: 'Poste' },
-              applicant_affiliation: { en: 'Affiliation', fr: 'Organisme d’appartenance' },
+              applicant_affiliation: { en: 'Institution', fr: 'Établissement' },
               applicant_address: { en: 'Mailing Address', fr: 'Adresse de correspondance' },
               applicant_phone: { en: 'Phone', fr: 'Téléphone' },
               applicant_email: { en: 'E-mail', fr: 'Courriel' },
