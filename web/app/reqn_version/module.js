@@ -81,7 +81,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
     current_final_report_id: { column: 'final_report.id', type: 'string' },
     trainee_user_id: { column: 'reqn.trainee_user_id', type: 'string' },
     identifier: { column: 'reqn.identifier', type: 'string' },
-    external: { column: 'reqn.external', type: 'string' },
+    legacy: { column: 'reqn.legacy', type: 'string' },
     state: { column: 'reqn.state', type: 'string' },
     data_directory: { column: 'reqn.data_directory', type: 'string' },
     status: { column: 'stage_type.status', type: 'string' },
@@ -412,11 +412,11 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
   cenozo.providers.factory( 'CnReqnVersionViewFactory', [
     'CnReqnHelper', 'CnModalNoticeListFactory',
     'CnCoapplicantModelFactory', 'CnReferenceModelFactory', 'CnEthicsApprovalModelFactory', 'CnBaseViewFactory',
-    'CnSession', 'CnHttpFactory', 'CnModalMessageFactory', 'CnModalConfirmFactory', 'CnModalSubmitExternalFactory',
+    'CnSession', 'CnHttpFactory', 'CnModalMessageFactory', 'CnModalConfirmFactory', 'CnModalSubmitLegacyFactory',
     '$state', '$q', '$window',
     function( CnReqnHelper, CnModalNoticeListFactory,
               CnCoapplicantModelFactory, CnReferenceModelFactory, CnEthicsApprovalModelFactory, CnBaseViewFactory,
-              CnSession, CnHttpFactory, CnModalMessageFactory, CnModalConfirmFactory, CnModalSubmitExternalFactory,
+              CnSession, CnHttpFactory, CnModalMessageFactory, CnModalConfirmFactory, CnModalSubmitLegacyFactory,
               $state, $q, $window ) {
       var object = function( parentModel, root ) {
         var self = this;
@@ -497,7 +497,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
 
             return this.$$onView( force ).then( function() {
               // define the earliest date that the reqn may start (based on the deadline, or today if there is no deadline)
-              if( !self.record.external ) {
+              if( !self.record.legacy ) {
                 self.minStartDate = self.record.deadline
                                   ? moment( self.record.deadline ).add( CnSession.application.startDateDelay, 'months' )
                                   : moment();
@@ -1654,10 +1654,10 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
             // TODO: either comment why this is here or remove it
             var record = this.record;
 
-            return ( this.record.external ?
+            return ( this.record.legacy ?
 
-              // when submitting an external reqn don't validate and ask which stage to move to
-              CnModalSubmitExternalFactory.instance().show().then( function( response ) {
+              // when submitting an legacy reqn don't validate and ask which stage to move to
+              CnModalSubmitLegacyFactory.instance().show().then( function( response ) {
                 if( null != response ) {
                   var parent = self.parentModel.getParentIdentifier();
                   return CnHttpFactory.instance( {
@@ -1666,7 +1666,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                     self.onView();
                     return CnModalMessageFactory.instance( {
                       title: 'Requisition moved to "' + response + '" stage',
-                      message: 'The external requisition has been moved to the "' + response + '" stage and is now visible ' +
+                      message: 'The legacy requisition has been moved to the "' + response + '" stage and is now visible ' +
                                'to the applicant.',
                       closeText: 'Close'
                     } ).show().then( function() {
@@ -1676,7 +1676,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                 }
               } ) :
 
-              // when submitting a non-external reqn validate and submit the "regular" way
+              // when submitting a non-legacy reqn validate and submit the "regular" way
               CnModalConfirmFactory.instance( {
                 title: this.translate( 'misc.pleaseConfirm' ),
                 noText: 'applicant' == CnSession.role.name ? this.translate( 'misc.no' ) : 'No',

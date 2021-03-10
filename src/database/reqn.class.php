@@ -78,7 +78,7 @@ class reqn extends \cenozo\database\record
 
     if( 'reqn_type_id' == $column_name )
     {
-      if( $this->external || !$this->get_reqn_type()->is_deadline_required() ) $this->deadline_id = NULL;
+      if( $this->legacy || !$this->get_reqn_type()->is_deadline_required() ) $this->deadline_id = NULL;
       $this->assert_deadline();
     }
   }
@@ -1284,7 +1284,7 @@ class reqn extends \cenozo\database\record
     $deadline_class_name = lib::get_class_name( 'database\deadline' );
 
     $db_reqn_type = lib::create( 'database\reqn_type', $this->reqn_type_id );
-    if( !$this->external && $db_reqn_type->is_deadline_required() )
+    if( !$this->legacy && $db_reqn_type->is_deadline_required() )
     {
       $db_deadline = NULL;
       $change_deadline = false;

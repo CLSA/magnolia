@@ -40,10 +40,10 @@ class module extends \cenozo\service\module
             return;
           }
         }
-        // typist can only see external reqns
+        // typist can only see legacy reqns
         else if( 'typist' == $db_role->name )
         {
-          if( !$db_reqn->external )
+          if( !$db_reqn->legacy )
           {
             $this->get_status()->set_code( 403 );
             return;
@@ -191,9 +191,9 @@ class module extends \cenozo\service\module
       $modifier->where_bracket( false );
       $modifier->where( 'IFNULL( reqn.state, "" )', '!=', 'abandoned' );
 
-      // do not show external reqns which are still in the new phase
+      // do not show legacy reqns which are still in the new phase
       $modifier->where_bracket( true );
-      $modifier->where( 'reqn.external', '=', false );
+      $modifier->where( 'reqn.legacy', '=', false );
       $modifier->or_where( 'stage_type.phase', '!=', 'new' );
       $modifier->where_bracket( false );
 
@@ -236,8 +236,8 @@ class module extends \cenozo\service\module
     }
     else if( 'typist' == $db_role->name )
     {
-      // typists can only see external reqns
-      $modifier->where( 'reqn.external', '=', true );
+      // typists can only see legacy reqns
+      $modifier->where( 'reqn.legacy', '=', true );
     }
 
     if( $select->has_table_columns( 'stage_type' ) )

@@ -33,11 +33,11 @@ class post extends \cenozo\service\post
       $db_reqn->note = sprintf( 'Cloned from requisition %s', $db_cloned_reqn->identifier );
     }
 
-    // typists can only create external reqns
+    // typists can only create legacy reqns
     if( 'typist' == lib::create( 'business\session' )->get_role()->name )
     {
       $db_reqn = $this->get_leaf_record();
-      $db_reqn->external = true;
+      $db_reqn->legacy = true;
       $db_reqn->deadline_id = NULL;
     }
   }

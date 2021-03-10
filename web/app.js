@@ -108,7 +108,7 @@ cenozo.service( 'CnModalNoticeListFactory', [
   }
 ] );
 
-cenozo.service( 'CnModalSubmitExternalFactory', [
+cenozo.service( 'CnModalSubmitLegacyFactory', [
   '$uibModal',
   function( $uibModal ) {
     var object = function( params ) {
@@ -121,7 +121,7 @@ cenozo.service( 'CnModalSubmitExternalFactory', [
             backdrop: 'static',
             keyboard: true,
             modalFade: true,
-            templateUrl: cenozoApp.getFileUrl( 'magnolia', 'modal-submit-external.tpl.html' ),
+            templateUrl: cenozoApp.getFileUrl( 'magnolia', 'modal-submit-legacy.tpl.html' ),
             controller: [ '$scope', '$uibModalInstance', function( $scope, $uibModalInstance ) {
               $scope.model = self;
               $scope.stage_type = 'Active';
@@ -199,8 +199,8 @@ cenozo.service( 'CnReqnHelper', [
                  ['administrator','chair'].includes( role );
         } else if( 'compare' == subject ) {
           return 'applicant' != role;
-        } else if( 'external proceed' == subject ) {
-          return record.external &&
+        } else if( 'legacy proceed' == subject ) {
+          return record.legacy &&
                  'new' == phase &&
                  'administrator' == role;
         } else if( 'amendment proceed' == subject ) {

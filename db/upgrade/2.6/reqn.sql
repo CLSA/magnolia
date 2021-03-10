@@ -3,16 +3,16 @@ DELIMITER //
 CREATE PROCEDURE patch_reqn()
   BEGIN
 
-    SELECT "Adding new external column to reqn table" AS "";
+    SELECT "Adding new legacy column to reqn table" AS "";
 
     SELECT COUNT(*) INTO @test
     FROM information_schema.COLUMNS
     WHERE table_schema = DATABASE()
     AND table_name = "reqn"
-    AND column_name = "external";
+    AND column_name = "legacy";
 
     IF @test = 0 THEN
-      ALTER TABLE reqn ADD COLUMN external TINYINT(1) NOT NULL DEFAULT 0 AFTER identifier;
+      ALTER TABLE reqn ADD COLUMN legacy TINYINT(1) NOT NULL DEFAULT 0 AFTER identifier;
     END IF;
 
     SELECT "Adding new data_sharing_approved column to reqn table" AS "";

@@ -104,7 +104,7 @@ class patch extends \cenozo\service\patch
         if( 'applicant' == $db_role->name || 'administrator' == $db_role->name )
         {
           if( 'new' != $phase && 'deferred' != $state ) $code = 403;
-          else if( !$db_reqn->external && 'new' == $phase )
+          else if( !$db_reqn->legacy && 'new' == $phase )
           {
             // check to make sure the start date is appropriate
             $delay = lib::create( 'business\setting_manager' )->get_setting( 'general', 'start_date_delay' );
@@ -306,7 +306,7 @@ class patch extends \cenozo\service\patch
         }
         else if( 'submit' == $action )
         {
-          if( !$db_reqn->external )
+          if( !$db_reqn->legacy )
           {
             // trainees must be get approval from their supervisor
             if( $trainee )

@@ -1,5 +1,5 @@
 <cn-record-view model="model"></cn-record-view>
-<div ng-if="!model.viewModel.record.external">
+<div ng-if="!model.viewModel.record.legacy">
   <cn-list-selector model="model"></cn-list-selector>
   <div ng-show="null === model.viewModel.tab || child.subject.snake == model.viewModel.tab"
        ng-repeat="child in model.viewModel.getChildList()"

@@ -164,9 +164,9 @@ define( [ 'output' ].reduce( function( list, name ) {
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnFinalReportViewFactory', [
     'CnBaseViewFactory', 'CnOutputModelFactory', 'CnReqnHelper', 'CnHttpFactory',
-    'CnModalMessageFactory', 'CnModalConfirmFactory', 'CnModalSubmitExternalFactory', 'CnSession', '$q', '$state',
+    'CnModalMessageFactory', 'CnModalConfirmFactory', 'CnModalSubmitLegacyFactory', 'CnSession', '$q', '$state',
     function( CnBaseViewFactory, CnOutputModelFactory, CnReqnHelper, CnHttpFactory,
-              CnModalMessageFactory, CnModalConfirmFactory, CnModalSubmitExternalFactory, CnSession, $q, $state ) {
+              CnModalMessageFactory, CnModalConfirmFactory, CnModalSubmitLegacyFactory, CnSession, $q, $state ) {
       var object = function( parentModel, root ) {
         var self = this;
         CnBaseViewFactory.construct( this, parentModel, root );
@@ -382,10 +382,10 @@ define( [ 'output' ].reduce( function( list, name ) {
 
             var record = this.record;
 
-            return ( this.record.external ?
+            return ( this.record.legacy ?
 
-              // when submitting an external reqn's report don't validate and ask which stage to move to
-              CnModalSubmitExternalFactory.instance().show().then( function( response ) {
+              // when submitting an legacy reqn's report don't validate and ask which stage to move to
+              CnModalSubmitLegacyFactory.instance().show().then( function( response ) {
                 if( null != response ) {
                   var parent = self.parentModel.getParentIdentifier();
                   return CnHttpFactory.instance( {
@@ -394,7 +394,7 @@ define( [ 'output' ].reduce( function( list, name ) {
                     self.onView();
                     return CnModalMessageFactory.instance( {
                       title: 'Requisition moved to "' + response + '" stage',
-                      message: 'The external requisition has been moved to the "' + response + '" stage.',
+                      message: 'The legacy requisition has been moved to the "' + response + '" stage.',
                       closeText: 'Close'
                     } ).show().then( function() {
                       return self.onView( true );
@@ -403,7 +403,7 @@ define( [ 'output' ].reduce( function( list, name ) {
                 }
               } ) :
 
-              // when submitting a non-external reqn validate and submit the "regular" way
+              // when submitting a non-legacy reqn validate and submit the "regular" way
               CnModalConfirmFactory.instance( {
                 title: this.translate( 'misc.pleaseConfirm' ),
                 noText: 'applicant' == CnSession.role.name ? this.translate( 'misc.no' ) : 'No',

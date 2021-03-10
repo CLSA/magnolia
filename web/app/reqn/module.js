@@ -23,8 +23,8 @@ define( [ 'output' ].reduce( function( list, name ) {
           return !model.isRole( 'applicant' ) && 'data_sharing' != model.getActionFromState();
         }
       },
-      external: {
-        title: 'External',
+      legacy: {
+        title: 'Legacy',
         type: 'boolean',
         isIncluded: function( $state, model ) {
           return !model.isRole( 'applicant', 'typist' ) && 'data_sharing' != model.getActionFromState();
@@ -122,13 +122,13 @@ define( [ 'output' ].reduce( function( list, name ) {
       type: 'string',
       isConstant: function( $state, model ) { return !model.isRole( 'administrator', 'typist' ); }
     },
-    external: {
-      title: 'External',
+    legacy: {
+      title: 'Legacy',
       type: 'boolean',
       isConstant: function( $state, model ) { return 'view' == model.getActionFromState(); },
       isExcluded: function( $state, model ) { return !model.isRole( 'administrator' ); },
-      help: 'External requisitions are those which were submitted and reviewed outside of Magnolia.  Use this option ' +
-            'when uploading pre-existing requisitions into Magnolia.'
+      help: 'Legacy requisitions are those which were created outside of Magnolia. ' +
+            'Use this option when uploading pre-existing requisitions into the software.'
     },
     reqn_type_id: {
       title: 'Requisition Type',
@@ -318,7 +318,7 @@ define( [ 'output' ].reduce( function( list, name ) {
       type: 'text',
       isExcluded: function( $state, model ) {
         return 'add' == model.getActionFromState() ||
-               model.viewModel.record.external ||
+               model.viewModel.record.legacy ||
                'Report Required' == model.viewModel.record.stage_type;
       }
     },
@@ -327,7 +327,7 @@ define( [ 'output' ].reduce( function( list, name ) {
       type: 'text',
       isExcluded: function( $state, model ) {
         return 'add' == model.getActionFromState() ||
-               model.viewModel.record.external ||
+               model.viewModel.record.legacy ||
                'Report Required' == model.viewModel.record.stage_type;
       }
     },
@@ -336,7 +336,7 @@ define( [ 'output' ].reduce( function( list, name ) {
       type: 'text',
       isExcluded: function( $state, model ) {
         return 'add' == model.getActionFromState() ||
-               model.viewModel.record.external ||
+               model.viewModel.record.legacy ||
                'Report Required' == model.viewModel.record.stage_type;
       }
     },
@@ -345,7 +345,7 @@ define( [ 'output' ].reduce( function( list, name ) {
       type: 'text',
       isExcluded: function( $state, model ) {
         return 'add' == model.getActionFromState() ||
-               model.viewModel.record.external ||
+               model.viewModel.record.legacy ||
                'Report Required' == model.viewModel.record.stage_type;
       }
     },
@@ -354,7 +354,7 @@ define( [ 'output' ].reduce( function( list, name ) {
       type: 'text',
       isExcluded: function( $state, model ) {
         return 'add' == model.getActionFromState() ||
-               model.viewModel.record.external ||
+               model.viewModel.record.legacy ||
                'Report Required' == model.viewModel.record.stage_type;
       }
     },
@@ -363,7 +363,7 @@ define( [ 'output' ].reduce( function( list, name ) {
       type: 'text',
       isExcluded: function( $state, model ) {
         return 'add' == model.getActionFromState() ||
-               model.viewModel.record.external ||
+               model.viewModel.record.legacy ||
                'Report Required' == model.viewModel.record.stage_type;
       }
     },
@@ -372,7 +372,7 @@ define( [ 'output' ].reduce( function( list, name ) {
       type: 'text',
       isExcluded: function( $state, model ) {
         return 'add' == model.getActionFromState() ||
-               model.viewModel.record.external ||
+               model.viewModel.record.legacy ||
                'Report Required' == model.viewModel.record.stage_type;
       }
     },
@@ -381,7 +381,7 @@ define( [ 'output' ].reduce( function( list, name ) {
       type: 'text',
       isExcluded: function( $state, model ) {
         return 'add' == model.getActionFromState() ||
-               model.viewModel.record.external ||
+               model.viewModel.record.legacy ||
                'Report Required' == model.viewModel.record.stage_type;
       }
     },
@@ -390,7 +390,7 @@ define( [ 'output' ].reduce( function( list, name ) {
       type: 'text',
       isExcluded: function( $state, model ) {
         return 'add' == model.getActionFromState() ||
-               model.viewModel.record.external ||
+               model.viewModel.record.legacy ||
                'Report Required' == model.viewModel.record.stage_type;
       }
     },
@@ -399,7 +399,7 @@ define( [ 'output' ].reduce( function( list, name ) {
       type: 'text',
       isExcluded: function( $state, model ) {
         return 'add' == model.getActionFromState() ||
-               model.viewModel.record.external ||
+               model.viewModel.record.legacy ||
                'Report Required' == model.viewModel.record.stage_type;
       }
     },
@@ -408,7 +408,7 @@ define( [ 'output' ].reduce( function( list, name ) {
       type: 'text',
       isExcluded: function( $state, model ) {
         return 'add' == model.getActionFromState() ||
-               model.viewModel.record.external ||
+               model.viewModel.record.legacy ||
                'Report Required' == model.viewModel.record.stage_type;
       }
     }
@@ -420,7 +420,7 @@ define( [ 'output' ].reduce( function( list, name ) {
       type: 'text',
       isExcluded: function( $state, model ) {
         return 'add' == model.getActionFromState() ||
-               model.viewModel.record.external ||
+               model.viewModel.record.legacy ||
                'Report Required' != model.viewModel.record.stage_type;
       }
     },
@@ -429,7 +429,7 @@ define( [ 'output' ].reduce( function( list, name ) {
       type: 'text',
       isExcluded: function( $state, model ) {
         return 'add' == model.getActionFromState() ||
-               model.viewModel.record.external ||
+               model.viewModel.record.legacy ||
                'Report Required' != model.viewModel.record.stage_type;
       }
     },
@@ -438,7 +438,7 @@ define( [ 'output' ].reduce( function( list, name ) {
       type: 'text',
       isExcluded: function( $state, model ) {
         return 'add' == model.getActionFromState() ||
-               model.viewModel.record.external ||
+               model.viewModel.record.legacy ||
                'Report Required' != model.viewModel.record.stage_type;
       }
     }
@@ -532,7 +532,7 @@ define( [ 'output' ].reduce( function( list, name ) {
   module.addExtraOperationGroup( 'view', {
     title: 'Proceed...',
     isIncluded: function( $state, model ) {
-      return model.viewModel.show( 'amendment proceed' ) || model.viewModel.show( 'external proceed' );
+      return model.viewModel.show( 'amendment proceed' ) || model.viewModel.show( 'legacy proceed' );
     },
     isDisabled: function( $state, model ) { return !model.viewModel.enabled( 'proceed' ); },
     classes: 'btn-success',
@@ -561,16 +561,16 @@ define( [ 'output' ].reduce( function( list, name ) {
       operation: function( $state, model ) { model.viewModel.proceed( 'Active' ); },
       isIncluded: function( $state, model ) {
         return model.viewModel.show( 'amendment active' ) ||
-               model.viewModel.show( 'external proceed' );
+               model.viewModel.show( 'legacy proceed' );
       }
     }, {
       title: 'To Not Approved',
       operation: function( $state, model ) { model.viewModel.proceed( 'Not Approved' ); },
-      isIncluded: function( $state, model ) { return model.viewModel.show( 'external proceed' ); }
+      isIncluded: function( $state, model ) { return model.viewModel.show( 'legacy proceed' ); }
     }, {
       title: 'To Complete',
       operation: function( $state, model ) { model.viewModel.proceed( 'Complete' ); },
-      isIncluded: function( $state, model ) { return model.viewModel.show( 'external proceed' ); }
+      isIncluded: function( $state, model ) { return model.viewModel.show( 'legacy proceed' ); }
     } ]
   } );
 
