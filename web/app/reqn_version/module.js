@@ -1702,11 +1702,14 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                     if( null != property.match( /^justification_/ ) ) {
                       // find which tab the justification belongs to
                       var match = property.match( /^justification_([0-9]+)$/ );
-                      var tab = '2' + self.parentModel.getCategoryAndDataOption( match[1] ).category.charCode;
-                      
-                      // add it to the required tab list
-                      if( angular.isUndefined( requiredTabList[tab] ) ) requiredTabList[tab] = [];
-                      requiredTabList[tab].push( property );
+                      var obj = self.parentModel.getCategoryAndDataOption( match[1] );
+                      if( obj.dataOption.justification ) {
+                        var tab = '2' + obj.category.charCode;
+
+                        // add it to the required tab list
+                        if( angular.isUndefined( requiredTabList[tab] ) ) requiredTabList[tab] = [];
+                        requiredTabList[tab].push( property );
+                      }
                     }
                   }
 

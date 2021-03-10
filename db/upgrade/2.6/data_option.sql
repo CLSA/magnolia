@@ -94,7 +94,13 @@ CREATE PROCEDURE patch_data_option()
     ), (
       @gi_id, 2, true, "CSD", "SDR", NULL, NULL
     ), (
-      @co_id, 1, false, "COVID-19 Questionnaire Study Data", "Données du questionnaire de l’étude sur la COVID-19", NULL, NULL
+      @co_id,
+      1,
+      false,
+      "COVID-19 Questionnaire Study Data (N= 28,565)",
+      "Données de l’étude par questionnaires sur la COVID-19 (N= 28,565)",
+      "The CLSA COVID-19 Questionnaire study collected longitudinal data from April 2020 to December 2020. The baseline and final exit questionnaire captured information on COVID-19 symptoms and status, risk factors, healthcare use, health behaviours, psychosocial and economic consequences of the pandemic. The weekly, biweekly, and monthly questionnaires focused on symptoms, COVID status, and behaviours.",
+      "L’étude par questionnaires sur la COVID-19 a recueilli des données longitudinales d’avril à décembre 2020. Le questionnaire de référence et le questionnaire de sortie ont recueilli des informations sur les symptômes et le statut COVID-19, les facteurs de risque, l’utilisation des soins de santé, les comportements de santé ainsi que les conséquences psychosociales et économiques de la pandémie. Les questionnaires hebdomadaires, bimensuels et mensuels se sont concentrés sur les symptômes, le statut COVID-19 et les comportements."
     );
 
   END //

@@ -646,8 +646,8 @@ cenozo.service( 'CnReqnHelper', [
               tab: { en: '', fr: '' },
               module: { en: '', fr: '' },
               heading: {
-                en: 'Please mark the sections containing the modules in the CLSA dataset that you are requesting.',
-                fr: 'Veuillez cocher les sections contenant les modules de l’ensemble de données de l’ÉLCV que vous demandez.'
+                en: 'Please mark the datasets that you are requesting.',
+                fr: 'Veuillez cocher les ensembles de données que vous demandez.'
               }
             }
           },
