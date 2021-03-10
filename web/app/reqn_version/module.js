@@ -1651,9 +1651,6 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
               } );
             }
 
-            // TODO: either comment why this is here or remove it
-            var record = this.record;
-
             return ( this.record.legacy ?
 
               // when submitting an legacy reqn don't validate and ask which stage to move to
@@ -1721,13 +1718,13 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                           return self.addingCoapplicantWithData;
                         } else if( '1e' == tab ) {
                           // only check 1e properties if funding=yes
-                          return 'funding' != property ? 'yes' == record.funding : true;
+                          return 'funding' != property ? 'yes' == self.record.funding : true;
                         } else if( 'ethics_filename' == property ) {
                           // only check the ethics filename if ethics=yes or exempt
-                          return ['yes', 'exempt'].includes( record.ethics );
+                          return ['yes', 'exempt'].includes( self.record.ethics );
                         } else if( 'last_identifier' == property ) {
                           // only check the last_identifier if longitidunal=yes (it's a boolean var)
-                          return record.longitudinal;
+                          return self.record.longitudinal;
                         }
 
                         // check everything else
@@ -1740,7 +1737,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                           missing = !angular.isObject( fileDetails ) || 0 == fileDetails.size;
                         } else {
                           // check for the property's value
-                          missing = null === record[property] || '' === record[property];
+                          missing = null === self.record[property] || '' === self.record[property];
                         }
 
                         if( missing ) {
@@ -1776,7 +1773,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                       }
 
                       // make sure the new user field is filled out when changing the primary applicant
-                      if( self.record['amendmentType' + self.parentModel.newUserAmendmentTypeId] && null == record.new_user_id ) {
+                      if( self.record['amendmentType' + self.parentModel.newUserAmendmentTypeId] && null == self.record.new_user_id ) {
                         var element = cenozo.getFormElement( 'new_user_id' );
                         element.$error.required = true;
                         cenozo.updateFormElement( element, true );
@@ -1789,7 +1786,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                       }
 
                       // make sure the justification is filled out if necessary
-                      if( self.amendmentTypeWithJustificationSelected() && null == record.amendment_justification ) {
+                      if( self.amendmentTypeWithJustificationSelected() && null == self.record.amendment_justification ) {
                         var element = cenozo.getFormElement( 'amendment_justification' );
                         element.$error.required = true;
                         cenozo.updateFormElement( element, true );
