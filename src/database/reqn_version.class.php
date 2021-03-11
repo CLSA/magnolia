@@ -491,6 +491,28 @@ class reqn_version extends \cenozo\database\record
                              ? ( 'fr' == $db_language->code ? 'S. o.' : 'N/A' )
                              : $this->last_identifier;
 
+    $reqn_version_data_option_list = array();
+    $reqn_version_data_option_sel = lib::create( 'database\select' );
+    $reqn_version_data_option_sel->add_table_column( 'data_option_category', 'rank', 'data_option_category_rank' );
+    $reqn_version_data_option_sel->add_table_column( 'data_option', 'rank', 'data_option_rank' );
+    $reqn_version_data_option_sel->add_table_column( 'study_phase', 'code' );
+    $reqn_version_data_option_mod = lib::create( 'database\modifier' );
+    $reqn_version_data_option_mod->join( 'data_option', 'reqn_version_data_option.data_option_id', 'data_option.id' );
+    $reqn_version_data_option_mod->join( 'data_option_category', 'data_option.data_option_category_id', 'data_option_category.id' );
+    $reqn_version_data_option_mod->join( 'study_phase', 'reqn_version_data_option.study_phase_id', 'study_phase.id' );
+    $reqn_version_data_option_mod->order( 'data_option_category.rank' );
+    $reqn_version_data_option_mod->order( 'data_option.rank' );
+    $list = $this->get_reqn_version_data_option_list( $reqn_version_data_option_sel, $reqn_version_data_option_mod );
+    foreach( $list as $reqn_version_data_option )
+    {
+      $data[ sprintf(
+        'c%d_o%d_%s',
+        $reqn_version_data_option['data_option_category_rank'],
+        $reqn_version_data_option['data_option_rank'],
+        $reqn_version_data_option['code']
+      ) ] = 'Yes';
+    }
+
     $comment_sel = lib::create( 'database\select' );
     $comment_sel->add_table_column( 'data_option_category', 'rank' );
     $comment_sel->add_column( 'description' );
@@ -500,24 +522,28 @@ class reqn_version extends \cenozo\database\record
     $comment_mod->order( 'data_option_category.rank' );
 
     foreach( $this->get_reqn_version_comment_list( $comment_sel, $comment_mod ) as $reqn_version_comment )
-    {
-      // convert the category's rank to a letter
-      $letter = 'a';
-      for( $i = 0; $i < $reqn_version_comment['rank']-1; $i++ ) $letter++;
-      $data['part2_'.$letter.'_comment'] = $reqn_version_comment['description'];
-    }
+      $data[ sprintf( 'c%d_comment', $reqn_version_comment['rank'] ) ] = $reqn_version_comment['description'];
 
     $justification_sel = lib::create( 'database\select' );
-    $justification_sel->add_column( 'data_option_id' );
+    $justification_sel->add_table_column( 'data_option_category', 'rank', 'data_option_category_rank' );
+    $justification_sel->add_table_column( 'data_option', 'rank', 'data_option_rank' );
     $justification_sel->add_column( 'description' );
     $justification_mod = lib::create( 'database\modifier' );
     $justification_mod->join( 'data_option', 'reqn_version_justification.data_option_id', 'data_option.id' );
+    $justification_mod->join( 'data_option_category', 'data_option.data_option_category_id', 'data_option_category.id' );
     $justification_mod->where( 'description', '!=', NULL );
     $justification_mod->where( 'data_option.justification', '=', true );
+    $justification_mod->order( 'data_option_category.rank' );
     $justification_mod->order( 'data_option.rank' );
 
     foreach( $this->get_reqn_version_justification_list( $justification_sel, $justification_mod ) as $reqn_version_justification )
-      $data['justification_'.$reqn_version_justification['data_option_id']] = $reqn_version_justification['description'];
+    {
+      $data[ sprintf(
+        'c%d_o%d_justification',
+        $reqn_version_justification['data_option_category_rank'],
+        $reqn_version_justification['data_option_rank']
+      ) ] = $reqn_version_justification['description'];
+    }
 
     if( is_null( $db_pdf_form ) )
       throw lib::create( 'exception\runtime',
