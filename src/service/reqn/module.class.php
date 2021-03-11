@@ -222,6 +222,10 @@ class module extends \cenozo\service\module
         $select->add_column( 'IF( "deferred" = reqn.state, deferral_note_2d, NULL )', 'deferral_note_2d', false );
       if( $select->has_column( 'deferral_note_2e' ) )
         $select->add_column( 'IF( "deferred" = reqn.state, deferral_note_2e, NULL )', 'deferral_note_2e', false );
+      if( $select->has_column( 'deferral_note_2f' ) )
+        $select->add_column( 'IF( "deferred" = reqn.state, deferral_note_2f, NULL )', 'deferral_note_2f', false );
+      if( $select->has_column( 'deferral_note_2g' ) )
+        $select->add_column( 'IF( "deferred" = reqn.state, deferral_note_2g, NULL )', 'deferral_note_2g', false );
       if( $select->has_column( 'deferral_note_report1' ) )
         $select->add_column( 'IF( "deferred" = reqn.state, deferral_note_report1, NULL )', 'deferral_note_report1', false );
       if( $select->has_column( 'deferral_note_report2' ) )
