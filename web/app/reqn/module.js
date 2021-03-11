@@ -411,6 +411,24 @@ define( [ 'output' ].reduce( function( list, name ) {
                model.viewModel.record.external ||
                'Report Required' == model.viewModel.record.stage_type;
       }
+    },
+    deferral_note_2f: {
+      title: '', // defined dynamically in the model
+      type: 'text',
+      isExcluded: function( $state, model ) {
+        return 'add' == model.getActionFromState() ||
+               model.viewModel.record.external ||
+               'Report Required' == model.viewModel.record.stage_type;
+      }
+    },
+    deferral_note_2g: {
+      title: '', // defined dynamically in the model
+      type: 'text',
+      isExcluded: function( $state, model ) {
+        return 'add' == model.getActionFromState() ||
+               model.viewModel.record.external ||
+               'Report Required' == model.viewModel.record.stage_type;
+      }
     }
   } );
 
@@ -938,7 +956,8 @@ define( [ 'output' ].reduce( function( list, name ) {
               this.record.deferral_note_1e || this.record.deferral_note_1f ||
               this.record.deferral_note_2a || this.record.deferral_note_2b ||
               this.record.deferral_note_2c || this.record.deferral_note_2d ||
-              this.record.deferral_note_2e
+              this.record.deferral_note_2e || this.record.deferral_note_2f ||
+              this.record.deferral_note_2g
             );
           },
 
