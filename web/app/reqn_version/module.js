@@ -1240,6 +1240,8 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                 promiseList.push(
                   CnModalConfirmFactory.instance( {
                     title: self.translate( 'amendment.newUserNoticeTitle'),
+                    noText: self.translate( 'misc.no' ),
+                    yesText: self.translate( 'misc.yes' ),
                     message: self.translate( 'amendment.newUserNotice' )
                   } ).show().then( response => response )
                 );
@@ -1461,8 +1463,8 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                 if( !alreadySelected ) {
                   categoryModal = CnModalConfirmFactory.instance( {
                     title: this.translate( 'misc.pleaseConfirm' ),
-                    noText: 'applicant' == CnSession.role.name ? this.translate( 'misc.no' ) : 'No',
-                    yesText: 'applicant' == CnSession.role.name ? this.translate( 'misc.yes' ) : 'Yes',
+                    noText: this.translate( 'misc.no' ),
+                    yesText: this.translate( 'misc.yes' ),
                     message: category[column]
                   } );
                 }
@@ -1472,8 +1474,8 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
               var optionModal = null != dataOption[column]
                               ?  CnModalConfirmFactory.instance( {
                                    title: self.translate( 'misc.pleaseConfirm' ),
-                                   noText: 'applicant' == CnSession.role.name ? self.translate( 'misc.no' ) : 'No',
-                                   yesText: 'applicant' == CnSession.role.name ? self.translate( 'misc.yes' ) : 'Yes',
+                                   noText: self.translate( 'misc.no' ),
+                                   yesText: self.translate( 'misc.yes' ),
                                    message: dataOption[column]
                                  } )
                               : null;
@@ -1678,8 +1680,8 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
               // when submitting a non-legacy reqn validate and submit the "regular" way
               CnModalConfirmFactory.instance( {
                 title: this.translate( 'misc.pleaseConfirm' ),
-                noText: 'applicant' == CnSession.role.name ? this.translate( 'misc.no' ) : 'No',
-                yesText: 'applicant' == CnSession.role.name ? this.translate( 'misc.yes' ) : 'Yes',
+                noText: this.translate( 'misc.no' ),
+                yesText: this.translate( 'misc.yes' ),
                 message: this.translate( 'misc.submitWarning' )
               } ).show().then( function( response ) {
                 if( response ) {
@@ -1832,8 +1834,8 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                           // no changes made so warn the user before proceeding
                           CnModalConfirmFactory.instance( {
                             title: self.translate( 'misc.pleaseConfirm' ),
-                            noText: 'applicant' == CnSession.role.name ? self.translate( 'misc.no' ) : 'No',
-                            yesText: 'applicant' == CnSession.role.name ? self.translate( 'misc.yes' ) : 'Yes',
+                            noText: self.translate( 'misc.no' ),
+                            yesText: self.translate( 'misc.yes' ),
                             message: self.translate( 'misc.noChangesMessage' )
                           } ).show().then( function( response ) {
                             if( response ) return submitReqn();
@@ -1850,8 +1852,8 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
           amend: function() {
             return CnModalConfirmFactory.instance( {
               title: self.translate( 'misc.pleaseConfirm' ),
-              noText: 'applicant' == CnSession.role.name ? self.translate( 'misc.no' ) : 'No',
-              yesText: 'applicant' == CnSession.role.name ? self.translate( 'misc.yes' ) : 'Yes',
+              noText: self.translate( 'misc.no' ),
+              yesText: self.translate( 'misc.yes' ),
               message: self.translate( 'misc.amendWarning' )
             } ).show().then( function( response ) {
               if( response ) {
@@ -1888,8 +1890,8 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
           displayReportRequiredWarning: function() {
             return CnModalConfirmFactory.instance( {
               title: self.translate( 'misc.pleaseConfirm' ),
-              noText: 'applicant' == CnSession.role.name ? self.translate( 'misc.no' ) : 'No',
-              yesText: 'applicant' == CnSession.role.name ? self.translate( 'misc.yes' ) : 'Yes',
+              noText: self.translate( 'misc.no' ),
+              yesText: self.translate( 'misc.yes' ),
               message: self.translate( 'misc.reportRequiredWarning' )
             } ).show().then( function( response ) {
               if( response ) self.viewReport()

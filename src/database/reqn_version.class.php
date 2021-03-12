@@ -85,6 +85,8 @@ class reqn_version extends \cenozo\database\record
     $coapplicant_class_name = lib::get_class_name( 'database\coapplicant' );
     $reference_class_name = lib::get_class_name( 'database\reference' );
     $reqn_version_data_option_class_name = lib::get_class_name( 'database\reqn_version_data_option' );
+    $reqn_version_comment_class_name = lib::get_class_name( 'database\reqn_version_comment' );
+    $reqn_version_justification_class_name = lib::get_class_name( 'database\reqn_version_justification' );
 
     // get the two newest versions
     $version_mod = lib::create( 'database\modifier' );
@@ -156,19 +158,59 @@ class reqn_version extends \cenozo\database\record
     }
 
     // do the same check but from the last version instead
-    foreach( $db_last_reqn_version->get_reqn_version_data_option_object_list() as $db_rvdo )
+    foreach( $db_last_reqn_version->get_reqn_version_data_option_object_list() as $db_last_rvdo )
     {
-      $db_last_rvdo = $reqn_version_data_option_class_name::get_unique_record(
+      $db_rvdo = $reqn_version_data_option_class_name::get_unique_record(
         array( 'reqn_version_id', 'data_option_id', 'study_phase_id' ),
-        array( $this->id, $db_rvdo->data_option_id, $db_rvdo->study_phase_id )
+        array( $this->id, $db_last_rvdo->data_option_id, $db_last_rvdo->study_phase_id )
       );
-      if( is_null( $db_last_rvdo ) ) return true;
+      if( is_null( $db_rvdo ) ) return true;
 
       // check all column values except for id, reqn_version_id and timestamps
       $ignore_columns = array( 'id', 'reqn_version_id', 'update_timestamp', 'create_timestamp' );
-      foreach( $db_rvdo->get_column_names() as $column )
-        if( !in_array( $column, $ignore_columns ) && $db_rvdo->$column != $db_last_rvdo->$column )
+      foreach( $db_last_rvdo->get_column_names() as $column )
+        if( !in_array( $column, $ignore_columns ) && $db_last_rvdo->$column != $db_rvdo->$column )
           return true;
+    }
+
+    // check comments
+    foreach( $this->get_reqn_version_comment_object_list() as $db_reqn_version_comment )
+    {
+      $db_last_reqn_version_comment = $reqn_version_comment_class_name::get_unique_record(
+        array( 'reqn_version_id', 'data_option_category_id' ),
+        array( $db_last_reqn_version->id, $db_reqn_version_comment->data_option_category_id )
+      );
+      if( $db_reqn_version_comment->description != $db_last_reqn_version_comment->description ) return true;
+    }
+
+    // see if there is a different number of justifications
+    if( $this->get_reqn_version_justification_count() != $db_last_reqn_version->get_reqn_version_justification_count() )
+      return true;
+
+    // now check reqn_version_justification records
+    foreach( $this->get_reqn_version_justification_object_list() as $db_rvj )
+    {
+      $db_last_rvj = $reqn_version_justification_class_name::get_unique_record(
+        array( 'reqn_version_id', 'data_option_id' ),
+        array( $db_last_reqn_version->id, $db_rvj->data_option_id )
+      );
+      if( is_null( $db_last_rvj ) ) return true;
+
+      // check that the description matches
+      if( $db_rvj->description != $db_last_rvj->description ) return true;
+    }
+
+    // do the same check but from the last version instead
+    foreach( $db_last_reqn_version->get_reqn_version_justification_object_list() as $db_last_rvj )
+    {
+      $db_rvj = $reqn_version_justification_class_name::get_unique_record(
+        array( 'reqn_version_id', 'data_option_id' ),
+        array( $this->id, $db_last_rvj->data_option_id )
+      );
+      if( is_null( $db_rvj ) ) return true;
+
+      // check that the description matches
+      if( $db_rvj->description != $db_last_rvj->description ) return true;
     }
 
     // if we get here then everything is identical
