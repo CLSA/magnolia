@@ -582,7 +582,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                         CnModalMessageFactory.instance( {
                           title: self.translate( 'misc.invalidNewApplicantTitle' ),
                           message: self.translate( 'misc.invalidNewApplicantMessage' ),
-                          closeText: 'applicant' == CnSession.role.name ? self.translate( 'misc.close' ) : 'Close',
+                          closeText: self.translate( 'misc.close' ),
                           error: true
                         } ).show().then( function() {
                           // failed to set the new user so put it back
@@ -596,7 +596,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                       return CnModalMessageFactory.instance( {
                         title: self.translate( 'amendment.newUserIsTraineeNoticeTitle' ),
                         message: self.translate( 'amendment.newUserIsTraineeNotice' ),
-                        closeText: 'applicant' == CnSession.role.name ? self.translate( 'misc.close' ) : 'Close',
+                        closeText: self.translate( 'misc.close' ),
                         error: true
                       } ).show().then( function() {
                         // failed to set the new user so put it back
@@ -617,7 +617,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                       CnModalMessageFactory.instance( {
                         title: self.translate( 'part2.cohort.bothCohortNoticeTitle' ),
                         message: self.translate( 'part2.cohort.bothCohortNotice' ),
-                        closeText: 'applicant' == CnSession.role.name ? self.translate( 'misc.close' ) : 'Close'
+                        closeText: self.translate( 'misc.close' ),
                       } ).show();
                     }
                   }
@@ -1628,7 +1628,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                     CnModalMessageFactory.instance( {
                       title: self.translate( 'misc.invalidStartDateTitle' ),
                       message: self.translate( 'misc.invalidStartDateMessage' ),
-                      closeText: 'applicant' == CnSession.role.name ? self.translate( 'misc.close' ) : 'Close',
+                      closeText: self.translate( 'misc.close' ),
                       error: true
                     } ).show().then( function() {
                       var element = cenozo.getFormElement( 'start_date' );
@@ -1646,7 +1646,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                 return CnModalMessageFactory.instance( {
                   title: self.translate( 'misc.' + code + 'Title' ),
                   message: self.translate( 'misc.' + code + 'Message' ),
-                  closeText: 'applicant' == CnSession.role.name ? self.translate( 'misc.close' ) : 'Close'
+                  closeText: self.translate( 'misc.close' )
                 } ).show().then( function() {
                   return self.parentModel.isRole( 'applicant' ) ?
                     $state.go( 'root.home' ) :
