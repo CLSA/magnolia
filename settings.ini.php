@@ -79,7 +79,7 @@ $SETTINGS['module']['pdf'] = true;
 $SETTINGS['general']['start_date_delay'] = 6;
 
 // how many months past a requisition's deadline must its start date be?
-$SETTINGS['general']['max_references_per_reqn'] = 15;
+$SETTINGS['general']['max_references_per_reqn'] = 20;
 
 // how many days that study data remains available to the user
 $SETTINGS['general']['study_data_expiry'] = 7;
