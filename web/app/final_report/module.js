@@ -371,7 +371,7 @@ define( [ 'output' ].reduce( function( list, name ) {
                 return CnModalMessageFactory.instance( {
                   title: self.translate( 'misc.' + code + 'Title' ),
                   message: self.translate( 'misc.' + code + 'Message' ),
-                  closeText: 'applicant' == CnSession.role.name ? self.translate( 'misc.close' ) : 'Close'
+                  closeText: self.translate( 'misc.close' )
                 } ).show().then( function() {
                   return self.parentModel.isRole( 'applicant' ) ?
                     $state.go( 'root.home' ) :
@@ -463,8 +463,8 @@ define( [ 'output' ].reduce( function( list, name ) {
                         // no changes made so warn the user before proceeding
                         CnModalConfirmFactory.instance( {
                           title: self.translate( 'misc.pleaseConfirm' ),
-                          noText: 'applicant' == CnSession.role.name ? self.translate( 'misc.no' ) : 'No',
-                          yesText: 'applicant' == CnSession.role.name ? self.translate( 'misc.yes' ) : 'Yes',
+                          noText: self.translate( 'misc.no' ),
+                          yesText: self.translate( 'misc.yes' ),
                           message: self.translate( 'misc.noChangesMessage' )
                         } ).show().then( function( response ) {
                           if( response ) return submitFinalReport();
