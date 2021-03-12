@@ -1621,232 +1621,229 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
             // used below
             function submitReqn() {
               var parent = self.parentModel.getParentIdentifier();
-              return CnHttpFactory.instance( {
-                path: parent.subject + '/' + parent.identifier + "?action=submit",
-                onError: function( response ) {
-                  if( 409 == response.status ) {
-                    CnModalMessageFactory.instance( {
-                      title: self.translate( 'misc.invalidStartDateTitle' ),
-                      message: self.translate( 'misc.invalidStartDateMessage' ),
-                      closeText: self.translate( 'misc.close' ),
-                      error: true
-                    } ).show().then( function() {
-                      var element = cenozo.getFormElement( 'start_date' );
-                      element.$error.custom = self.translate( 'misc.invalidStartDateTitle' );
-                      cenozo.updateFormElement( element, true );
-                      self.setFormTab( 0, 'part1', false );
-                      self.setFormTab( 1, 'c' );
+
+              // when submitting a new legacy reqn ask which stage to move to
+              return self.record.legacy && '.' == self.record.amendment ?
+              
+                CnModalSubmitLegacyFactory.instance().show().then( function( response ) {
+                  if( null != response ) {
+                    return CnHttpFactory.instance( {
+                      path: parent.subject + '/' + parent.identifier + '?action=next_stage&stage_type=' + response
+                    } ).patch().then( function() {
+                      self.onView();
+                      return CnModalMessageFactory.instance( {
+                        title: 'Requisition moved to "' + response + '" stage',
+                        message: 'The legacy requisition has been moved to the "' + response + '" stage and is now visible ' +
+                                 'to the applicant.',
+                        closeText: 'Close'
+                      } ).show().then( function() {
+                        return self.onView( true );
+                      } );
                     } );
-                  } else CnModalMessageFactory.httpError( response );
-                }
-              } ).patch().then( function() {
-                var code = CnSession.user.id == self.record.trainee_user_id ?
-                  ( 'deferred' == self.record.state ? 'traineeResubmit' : 'traineeSubmit' ) :
-                  ( 'deferred' == self.record.state ? 'resubmit' : 'submit' );
-                return CnModalMessageFactory.instance( {
-                  title: self.translate( 'misc.' + code + 'Title' ),
-                  message: self.translate( 'misc.' + code + 'Message' ),
-                  closeText: self.translate( 'misc.close' )
-                } ).show().then( function() {
-                  return self.parentModel.isRole( 'applicant' ) ?
-                    $state.go( 'root.home' ) :
-                    self.onView( true ); // refresh
+                  }
+                } ) :
+              
+                CnHttpFactory.instance( {
+                  path: parent.subject + '/' + parent.identifier + "?action=submit",
+                  onError: function( response ) {
+                    if( 409 == response.status ) {
+                      CnModalMessageFactory.instance( {
+                        title: self.translate( 'misc.invalidStartDateTitle' ),
+                        message: self.translate( 'misc.invalidStartDateMessage' ),
+                        closeText: self.translate( 'misc.close' ),
+                        error: true
+                      } ).show().then( function() {
+                        var element = cenozo.getFormElement( 'start_date' );
+                        element.$error.custom = self.translate( 'misc.invalidStartDateTitle' );
+                        cenozo.updateFormElement( element, true );
+                        self.setFormTab( 0, 'part1', false );
+                        self.setFormTab( 1, 'c' );
+                      } );
+                    } else CnModalMessageFactory.httpError( response );
+                  }
+                } ).patch().then( function() {
+                  var code = CnSession.user.id == self.record.trainee_user_id ?
+                    ( 'deferred' == self.record.state ? 'traineeResubmit' : 'traineeSubmit' ) :
+                    ( 'deferred' == self.record.state ? 'resubmit' : 'submit' );
+                  return CnModalMessageFactory.instance( {
+                    title: self.translate( 'misc.' + code + 'Title' ),
+                    message: self.translate( 'misc.' + code + 'Message' ),
+                    closeText: self.translate( 'misc.close' )
+                  } ).show().then( function() {
+                    return self.parentModel.isRole( 'applicant' ) ?
+                      $state.go( 'root.home' ) :
+                      self.onView( true ); // refresh
+                  } );
                 } );
-              } );
             }
 
-            return ( this.record.legacy ?
+            return CnModalConfirmFactory.instance( {
+              title: this.translate( 'misc.pleaseConfirm' ),
+              noText: 'applicant' == CnSession.role.name ? this.translate( 'misc.no' ) : 'No',
+              yesText: 'applicant' == CnSession.role.name ? this.translate( 'misc.yes' ) : 'Yes',
+              message: this.translate( 'misc.submitWarning' )
+            } ).show().then( function( response ) {
+              if( response ) {
+                // make sure that certain properties have been defined, one tab at a time
+                var requiredTabList = {
+                  '1a': [ 'applicant_position', 'applicant_affiliation', 'applicant_address', 'applicant_phone' ],
+                  '1b': [ 'coapplicant_agreement_filename' ],
+                  '1c': [ 'start_date', 'duration' ],
+                  '1d': [ 'title', 'keywords', 'lay_summary', 'background', 'objectives', 'methodology', 'analysis' ],
+                  '1e': [ 'funding', 'funding_filename', 'funding_agency', 'grant_number' ],
+                  '1f': self.record.has_ethics_approval_list ? [ 'ethics' ] : [ 'ethics', 'ethics_filename' ],
+                  '2cohort': [ 'tracking', 'comprehensive', 'longitudinal', 'last_identifier' ]
+                };
 
-              // when submitting an legacy reqn don't validate and ask which stage to move to
-              CnModalSubmitLegacyFactory.instance().show().then( function( response ) {
-                if( null != response ) {
-                  var parent = self.parentModel.getParentIdentifier();
-                  return CnHttpFactory.instance( {
-                    path: parent.subject + '/' + parent.identifier + '?action=next_stage&stage_type=' + response
-                  } ).patch().then( function() {
-                    self.onView();
-                    return CnModalMessageFactory.instance( {
-                      title: 'Requisition moved to "' + response + '" stage',
-                      message: 'The legacy requisition has been moved to the "' + response + '" stage and is now visible ' +
-                               'to the applicant.',
-                      closeText: 'Close'
-                    } ).show().then( function() {
-                      return self.onView( true );
-                    } );
-                  } );
+                // Now add the data option justifications
+                // We have to do this dynamically because they only exist if their parent data option is selected and
+                // have the "jurisdiction" property
+                for( var property in self.record ) {
+                  if( null != property.match( /^justification_/ ) ) {
+                    // find which tab the justification belongs to
+                    var match = property.match( /^justification_([0-9]+)$/ );
+                    var obj = self.parentModel.getCategoryAndDataOption( match[1] );
+                    if( obj.dataOption.justification ) {
+                      var tab = '2' + obj.category.charCode;
+
+                      // add it to the required tab list
+                      if( angular.isUndefined( requiredTabList[tab] ) ) requiredTabList[tab] = [];
+                      requiredTabList[tab].push( property );
+                    }
+                  }
                 }
-              } ) :
 
-              // when submitting a non-legacy reqn validate and submit the "regular" way
-              CnModalConfirmFactory.instance( {
-                title: this.translate( 'misc.pleaseConfirm' ),
-                noText: this.translate( 'misc.no' ),
-                yesText: this.translate( 'misc.yes' ),
-                message: this.translate( 'misc.submitWarning' )
-              } ).show().then( function( response ) {
-                if( response ) {
-                  // make sure that certain properties have been defined, one tab at a time
-                  var requiredTabList = {
-                    '1a': [ 'applicant_position', 'applicant_affiliation', 'applicant_address', 'applicant_phone' ],
-                    '1b': [ 'coapplicant_agreement_filename' ],
-                    '1c': [ 'start_date', 'duration' ],
-                    '1d': [ 'title', 'keywords', 'lay_summary', 'background', 'objectives', 'methodology', 'analysis' ],
-                    '1e': [ 'funding', 'funding_filename', 'funding_agency', 'grant_number' ],
-                    '1f': self.record.has_ethics_approval_list ? [ 'ethics' ] : [ 'ethics', 'ethics_filename' ],
-                    '2cohort': [ 'tracking', 'comprehensive', 'longitudinal', 'last_identifier' ]
-                  };
-
-                  // Now add the data option justifications
-                  // We have to do this dynamically because they only exist if their parent data option is selected and
-                  // have the "jurisdiction" property
-                  for( var property in self.record ) {
-                    if( null != property.match( /^justification_/ ) ) {
-                      // find which tab the justification belongs to
-                      var match = property.match( /^justification_([0-9]+)$/ );
-                      var obj = self.parentModel.getCategoryAndDataOption( match[1] );
-                      if( obj.dataOption.justification ) {
-                        var tab = '2' + obj.category.charCode;
-
-                        // add it to the required tab list
-                        if( angular.isUndefined( requiredTabList[tab] ) ) requiredTabList[tab] = [];
-                        requiredTabList[tab].push( property );
+                $q.all( self.fileList.map( file => file.updateFileSize() ) ).then( function() {
+                  var error = null;
+                  var errorTab = null;
+                  for( var tab in requiredTabList ) {
+                    var firstProperty = null;
+                    requiredTabList[tab].filter( function( property ) {
+                      if( '1b' == tab ) {
+                        // only check 1b properties if there is a new coapplication with access to data
+                        return self.addingCoapplicantWithData;
+                      } else if( '1e' == tab ) {
+                        // only check 1e properties if funding=yes
+                        return 'funding' != property ? 'yes' == self.record.funding : true;
+                      } else if( 'ethics_filename' == property ) {
+                        // only check the ethics filename if ethics=yes or exempt
+                        return ['yes', 'exempt'].includes( self.record.ethics );
+                      } else if( 'last_identifier' == property ) {
+                        // only check the last_identifier if longitidunal=yes (it's a boolean var)
+                        return self.record.longitudinal;
                       }
+
+                      // check everything else
+                      return true;
+                    } ).forEach( function( property ) {
+                      var missing = false;
+                      if( property.match( '_filename' ) ) {
+                        // check for the file size
+                        var fileDetails = self.fileList.findByProperty( 'key', property );
+                        missing = !angular.isObject( fileDetails ) || 0 == fileDetails.size;
+                      } else {
+                        // check for the property's value
+                        missing = null === self.record[property] || '' === self.record[property];
+                      }
+
+                      if( missing ) {
+                        var element = cenozo.getFormElement( property );
+                        element.$error.required = true;
+                        cenozo.updateFormElement( element, true );
+                        if( null == errorTab ) errorTab = tab;
+                        if( null == error ) error = {
+                          title: self.translate( 'misc.missingFieldTitle' ),
+                          message: self.translate( 'misc.missingFieldMessage' ),
+                          error: true
+                        };
+                      }
+                    } );
+                  }
+
+                  if( '.' != self.record.amendment ) {
+                    // reset the no-amendment-types indicator
+                    self.noAmendmentTypes = false;
+
+                    // for amendments make sure that at least one amendment type has been selected
+                    if( !self.parentModel.amendmentTypeList.en.some( function( amendmentType ) {
+                      var property = 'amendmentType' + amendmentType.id;
+                      return self.record[property];
+                    } ) ) {
+                      self.noAmendmentTypes = true;
+                      if( null == errorTab ) errorTab = 'amendment';
+                      if( null == error ) error = {
+                        title: self.translate( 'misc.missingFieldTitle' ),
+                        message: self.translate( 'misc.missingFieldMessage' ),
+                        error: true
+                      };
+                    }
+
+                    // make sure the new user field is filled out when changing the primary applicant
+                    if( self.record['amendmentType' + self.parentModel.newUserAmendmentTypeId] && null == self.record.new_user_id ) {
+                      var element = cenozo.getFormElement( 'new_user_id' );
+                      element.$error.required = true;
+                      cenozo.updateFormElement( element, true );
+                      if( null == errorTab ) errorTab = 'amendment';
+                      if( null == error ) error = {
+                        title: self.translate( 'misc.missingFieldTitle' ),
+                        message: self.translate( 'misc.missingFieldMessage' ),
+                        error: true
+                      };
+                    }
+
+                    // make sure the justification is filled out if necessary
+                    if( self.amendmentTypeWithJustificationSelected() && null == self.record.amendment_justification ) {
+                      var element = cenozo.getFormElement( 'amendment_justification' );
+                      element.$error.required = true;
+                      cenozo.updateFormElement( element, true );
+                      if( null == errorTab ) errorTab = 'amendment';
+                      if( null == error ) error = {
+                        title: self.translate( 'misc.missingFieldTitle' ),
+                        message: self.translate( 'misc.missingFieldMessage' ),
+                        error: true
+                      };
                     }
                   }
 
-                  $q.all( self.fileList.map( file => file.updateFileSize() ) ).then( function() {
-                    var error = null;
-                    var errorTab = null;
-                    for( var tab in requiredTabList ) {
-                      var firstProperty = null;
-                      requiredTabList[tab].filter( function( property ) {
-                        if( '1b' == tab ) {
-                          // only check 1b properties if there is a new coapplication with access to data
-                          return self.addingCoapplicantWithData;
-                        } else if( '1e' == tab ) {
-                          // only check 1e properties if funding=yes
-                          return 'funding' != property ? 'yes' == self.record.funding : true;
-                        } else if( 'ethics_filename' == property ) {
-                          // only check the ethics filename if ethics=yes or exempt
-                          return ['yes', 'exempt'].includes( self.record.ethics );
-                        } else if( 'last_identifier' == property ) {
-                          // only check the last_identifier if longitidunal=yes (it's a boolean var)
-                          return self.record.longitudinal;
-                        }
-
-                        // check everything else
-                        return true;
-                      } ).forEach( function( property ) {
-                        var missing = false;
-                        if( property.match( '_filename' ) ) {
-                          // check for the file size
-                          var fileDetails = self.fileList.findByProperty( 'key', property );
-                          missing = !angular.isObject( fileDetails ) || 0 == fileDetails.size;
+                  if( null != error ) {
+                    // if there was an error then display it now
+                    if( 'applicant' == CnSession.role.name ) error.closeText = self.translate( 'misc.close' );
+                    CnModalMessageFactory.instance( error ).show().then( function() {
+                      if( 'amendment' == errorTab ) {
+                        self.setFormTab( 0, 'amendment', false );
+                      } else {
+                        if( 1 == errorTab.substr( 0, 1 ) ) {
+                          self.setFormTab( 0, 'part1', false );
+                          self.setFormTab( 1, errorTab.substr( 1 ) );
                         } else {
-                          // check for the property's value
-                          missing = null === self.record[property] || '' === self.record[property];
+                          self.setFormTab( 0, 'part2', false );
+                          self.setFormTab( 2, errorTab.substr( 1 ) );
                         }
-
-                        if( missing ) {
-                          var element = cenozo.getFormElement( property );
-                          element.$error.required = true;
-                          cenozo.updateFormElement( element, true );
-                          if( null == errorTab ) errorTab = tab;
-                          if( null == error ) error = {
-                            title: self.translate( 'misc.missingFieldTitle' ),
-                            message: self.translate( 'misc.missingFieldMessage' ),
-                            error: true
-                          };
-                        }
-                      } );
-                    }
-
-                    if( '.' != self.record.amendment ) {
-                      // reset the no-amendment-types indicator
-                      self.noAmendmentTypes = false;
-
-                      // for amendments make sure that at least one amendment type has been selected
-                      if( !self.parentModel.amendmentTypeList.en.some( function( amendmentType ) {
-                        var property = 'amendmentType' + amendmentType.id;
-                        return self.record[property];
-                      } ) ) {
-                        self.noAmendmentTypes = true;
-                        if( null == errorTab ) errorTab = 'amendment';
-                        if( null == error ) error = {
-                          title: self.translate( 'misc.missingFieldTitle' ),
-                          message: self.translate( 'misc.missingFieldMessage' ),
-                          error: true
-                        };
                       }
-
-                      // make sure the new user field is filled out when changing the primary applicant
-                      if( self.record['amendmentType' + self.parentModel.newUserAmendmentTypeId] && null == self.record.new_user_id ) {
-                        var element = cenozo.getFormElement( 'new_user_id' );
-                        element.$error.required = true;
-                        cenozo.updateFormElement( element, true );
-                        if( null == errorTab ) errorTab = 'amendment';
-                        if( null == error ) error = {
-                          title: self.translate( 'misc.missingFieldTitle' ),
-                          message: self.translate( 'misc.missingFieldMessage' ),
-                          error: true
-                        };
-                      }
-
-                      // make sure the justification is filled out if necessary
-                      if( self.amendmentTypeWithJustificationSelected() && null == self.record.amendment_justification ) {
-                        var element = cenozo.getFormElement( 'amendment_justification' );
-                        element.$error.required = true;
-                        cenozo.updateFormElement( element, true );
-                        if( null == errorTab ) errorTab = 'amendment';
-                        if( null == error ) error = {
-                          title: self.translate( 'misc.missingFieldTitle' ),
-                          message: self.translate( 'misc.missingFieldMessage' ),
-                          error: true
-                        };
-                      }
-                    }
-
-                    if( null != error ) {
-                      // if there was an error then display it now
-                      if( 'applicant' == CnSession.role.name ) error.closeText = self.translate( 'misc.close' );
-                      CnModalMessageFactory.instance( error ).show().then( function() {
-                        if( 'amendment' == errorTab ) {
-                          self.setFormTab( 0, 'amendment', false );
-                        } else {
-                          if( 1 == errorTab.substr( 0, 1 ) ) {
-                            self.setFormTab( 0, 'part1', false );
-                            self.setFormTab( 1, errorTab.substr( 1 ) );
-                          } else {
-                            self.setFormTab( 0, 'part2', false );
-                            self.setFormTab( 2, errorTab.substr( 1 ) );
-                          }
-                        }
-                      } );
-                    } else {
-                      // now check to make sure this version is different from the last (the first is always different)
-                      return CnHttpFactory.instance( {
-                        path: self.parentModel.getServiceResourcePath(),
-                        data: { select: { column: 'has_changed' } }
-                      } ).get().then( function( response ) {
-                        return response.data.has_changed ?
-                          // changes have been made, so submit now
-                          submitReqn() :
-                          // no changes made so warn the user before proceeding
-                          CnModalConfirmFactory.instance( {
-                            title: self.translate( 'misc.pleaseConfirm' ),
-                            noText: self.translate( 'misc.no' ),
-                            yesText: self.translate( 'misc.yes' ),
-                            message: self.translate( 'misc.noChangesMessage' )
-                          } ).show().then( function( response ) {
-                            if( response ) return submitReqn();
-                          } );
-                      } );
-
-                    }
-                  } );
-                }
-              } )
-            );
+                    } );
+                  } else {
+                    // now check to make sure this version is different from the last (the first is always different)
+                    return CnHttpFactory.instance( {
+                      path: self.parentModel.getServiceResourcePath(),
+                      data: { select: { column: 'has_changed' } }
+                    } ).get().then( function( response ) {
+                      return response.data.has_changed ?
+                        // changes have been made, so submit now
+                        submitReqn() :
+                        // no changes made so warn the user before proceeding
+                        CnModalConfirmFactory.instance( {
+                          title: self.translate( 'misc.pleaseConfirm' ),
+                          noText: self.translate( 'misc.no' ),
+                          yesText: self.translate( 'misc.yes' ),
+                          message: self.translate( 'misc.noChangesMessage' )
+                        } ).show().then( function( response ) {
+                          if( response ) return submitReqn();
+                        } );
+                    } );
+                  }
+                } );
+              }
+            } );
           },
 
           amend: function() {

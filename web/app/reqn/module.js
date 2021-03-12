@@ -317,99 +317,77 @@ define( [ 'output' ].reduce( function( list, name ) {
       title: '', // defined dynamically in the model
       type: 'text',
       isExcluded: function( $state, model ) {
-        return 'add' == model.getActionFromState() ||
-               model.viewModel.record.legacy ||
-               'Report Required' == model.viewModel.record.stage_type;
+        return 'add' == model.getActionFromState() || 'Report Required' == model.viewModel.record.stage_type;
       }
     },
     deferral_note_1b: {
       title: '', // defined dynamically in the model
       type: 'text',
       isExcluded: function( $state, model ) {
-        return 'add' == model.getActionFromState() ||
-               model.viewModel.record.legacy ||
-               'Report Required' == model.viewModel.record.stage_type;
+        return 'add' == model.getActionFromState() || 'Report Required' == model.viewModel.record.stage_type;
       }
     },
     deferral_note_1c: {
       title: '', // defined dynamically in the model
       type: 'text',
       isExcluded: function( $state, model ) {
-        return 'add' == model.getActionFromState() ||
-               model.viewModel.record.legacy ||
-               'Report Required' == model.viewModel.record.stage_type;
+        return 'add' == model.getActionFromState() || 'Report Required' == model.viewModel.record.stage_type;
       }
     },
     deferral_note_1d: {
       title: '', // defined dynamically in the model
       type: 'text',
       isExcluded: function( $state, model ) {
-        return 'add' == model.getActionFromState() ||
-               model.viewModel.record.legacy ||
-               'Report Required' == model.viewModel.record.stage_type;
+        return 'add' == model.getActionFromState() || 'Report Required' == model.viewModel.record.stage_type;
       }
     },
     deferral_note_1e: {
       title: '', // defined dynamically in the model
       type: 'text',
       isExcluded: function( $state, model ) {
-        return 'add' == model.getActionFromState() ||
-               model.viewModel.record.legacy ||
-               'Report Required' == model.viewModel.record.stage_type;
+        return 'add' == model.getActionFromState() || 'Report Required' == model.viewModel.record.stage_type;
       }
     },
     deferral_note_1f: {
       title: '', // defined dynamically in the model
       type: 'text',
       isExcluded: function( $state, model ) {
-        return 'add' == model.getActionFromState() ||
-               model.viewModel.record.legacy ||
-               'Report Required' == model.viewModel.record.stage_type;
+        return 'add' == model.getActionFromState() || 'Report Required' == model.viewModel.record.stage_type;
       }
     },
     deferral_note_2a: {
       title: '', // defined dynamically in the model
       type: 'text',
       isExcluded: function( $state, model ) {
-        return 'add' == model.getActionFromState() ||
-               model.viewModel.record.legacy ||
-               'Report Required' == model.viewModel.record.stage_type;
+        return 'add' == model.getActionFromState() || 'Report Required' == model.viewModel.record.stage_type;
       }
     },
     deferral_note_2b: {
       title: '', // defined dynamically in the model
       type: 'text',
       isExcluded: function( $state, model ) {
-        return 'add' == model.getActionFromState() ||
-               model.viewModel.record.legacy ||
-               'Report Required' == model.viewModel.record.stage_type;
+        return 'add' == model.getActionFromState() || 'Report Required' == model.viewModel.record.stage_type;
       }
     },
     deferral_note_2c: {
       title: '', // defined dynamically in the model
       type: 'text',
       isExcluded: function( $state, model ) {
-        return 'add' == model.getActionFromState() ||
-               model.viewModel.record.legacy ||
-               'Report Required' == model.viewModel.record.stage_type;
+        return 'add' == model.getActionFromState() || 'Report Required' == model.viewModel.record.stage_type;
       }
     },
     deferral_note_2d: {
       title: '', // defined dynamically in the model
       type: 'text',
       isExcluded: function( $state, model ) {
-        return 'add' == model.getActionFromState() ||
-               model.viewModel.record.legacy ||
-               'Report Required' == model.viewModel.record.stage_type;
+        return 'add' == model.getActionFromState() || 'Report Required' == model.viewModel.record.stage_type;
       }
     },
     deferral_note_2e: {
       title: '', // defined dynamically in the model
       type: 'text',
       isExcluded: function( $state, model ) {
-        return 'add' == model.getActionFromState() ||
-               model.viewModel.record.legacy ||
-               'Report Required' == model.viewModel.record.stage_type;
+        return 'add' == model.getActionFromState() || 'Report Required' == model.viewModel.record.stage_type;
       }
     },
     deferral_note_2f: {
@@ -437,27 +415,21 @@ define( [ 'output' ].reduce( function( list, name ) {
       title: 'Part 1',
       type: 'text',
       isExcluded: function( $state, model ) {
-        return 'add' == model.getActionFromState() ||
-               model.viewModel.record.legacy ||
-               'Report Required' != model.viewModel.record.stage_type;
+        return 'add' == model.getActionFromState() || 'Report Required' != model.viewModel.record.stage_type;
       }
     },
     deferral_note_report2: {
       title: 'Part 2',
       type: 'text',
       isExcluded: function( $state, model ) {
-        return 'add' == model.getActionFromState() ||
-               model.viewModel.record.legacy ||
-               'Report Required' != model.viewModel.record.stage_type;
+        return 'add' == model.getActionFromState() || 'Report Required' != model.viewModel.record.stage_type;
       }
     },
     deferral_note_report3: {
       title: 'Part 3',
       type: 'text',
       isExcluded: function( $state, model ) {
-        return 'add' == model.getActionFromState() ||
-               model.viewModel.record.legacy ||
-               'Report Required' != model.viewModel.record.stage_type;
+        return 'add' == model.getActionFromState() || 'Report Required' != model.viewModel.record.stage_type;
       }
     }
   } );
@@ -549,9 +521,7 @@ define( [ 'output' ].reduce( function( list, name ) {
 
   module.addExtraOperationGroup( 'view', {
     title: 'Proceed...',
-    isIncluded: function( $state, model ) {
-      return model.viewModel.show( 'amendment proceed' ) || model.viewModel.show( 'legacy proceed' );
-    },
+    isIncluded: function( $state, model ) { return model.viewModel.show( 'amendment proceed' ); },
     isDisabled: function( $state, model ) { return !model.viewModel.enabled( 'proceed' ); },
     classes: 'btn-success',
     operations: [ {
@@ -577,18 +547,7 @@ define( [ 'output' ].reduce( function( list, name ) {
     }, {
       title: 'To Active',
       operation: function( $state, model ) { model.viewModel.proceed( 'Active' ); },
-      isIncluded: function( $state, model ) {
-        return model.viewModel.show( 'amendment active' ) ||
-               model.viewModel.show( 'legacy proceed' );
-      }
-    }, {
-      title: 'To Not Approved',
-      operation: function( $state, model ) { model.viewModel.proceed( 'Not Approved' ); },
-      isIncluded: function( $state, model ) { return model.viewModel.show( 'legacy proceed' ); }
-    }, {
-      title: 'To Complete',
-      operation: function( $state, model ) { model.viewModel.proceed( 'Complete' ); },
-      isIncluded: function( $state, model ) { return model.viewModel.show( 'legacy proceed' ); }
+      isIncluded: function( $state, model ) { return model.viewModel.show( 'amendment active' ); }
     } ]
   } );
 

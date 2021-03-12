@@ -306,7 +306,7 @@ class patch extends \cenozo\service\patch
         }
         else if( 'submit' == $action )
         {
-          if( !$db_reqn->legacy )
+          if( !$db_reqn->legacy || '.' != $db_reqn_version->amendment )
           {
             // trainees must be get approval from their supervisor
             if( $trainee )

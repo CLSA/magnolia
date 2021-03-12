@@ -199,10 +199,6 @@ cenozo.service( 'CnReqnHelper', [
                  ['administrator','chair'].includes( role );
         } else if( 'compare' == subject ) {
           return 'applicant' != role;
-        } else if( 'legacy proceed' == subject ) {
-          return record.legacy &&
-                 'new' == phase &&
-                 'administrator' == role;
         } else if( 'amendment proceed' == subject ) {
           return '.' != record.amendment &&
                  ['Admin Review','Feasibility Review','Decision Made','Agreement'].includes( stage_type ) &&

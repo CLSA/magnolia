@@ -79,8 +79,8 @@ define( [ 'output' ].reduce( function( list, name ) {
 
   /* ######################################################################################################## */
   cenozo.providers.directive( 'cnFinalReportView', [
-    'CnFinalReportModelFactory', 'cnRecordViewDirective', 'CnReqnModelFactory', 'CnReqnHelper', 'CnSession', '$q',
-    function( CnFinalReportModelFactory, cnRecordViewDirective, CnReqnModelFactory, CnReqnHelper, CnSession, $q ) {
+    'CnFinalReportModelFactory', 'cnRecordViewDirective', 'CnReqnModelFactory', 'CnReqnHelper', 'CnSession',
+    function( CnFinalReportModelFactory, cnRecordViewDirective, CnReqnModelFactory, CnReqnHelper, CnSession ) {
       // used to piggy-back on the basic view controller's functionality
       var cnRecordView = cnRecordViewDirective[0];
       var reqnModel = CnReqnModelFactory.instance();
@@ -164,9 +164,9 @@ define( [ 'output' ].reduce( function( list, name ) {
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnFinalReportViewFactory', [
     'CnBaseViewFactory', 'CnOutputModelFactory', 'CnReqnHelper', 'CnHttpFactory',
-    'CnModalMessageFactory', 'CnModalConfirmFactory', 'CnModalSubmitLegacyFactory', 'CnSession', '$q', '$state',
+    'CnModalMessageFactory', 'CnModalConfirmFactory', 'CnSession', '$state',
     function( CnBaseViewFactory, CnOutputModelFactory, CnReqnHelper, CnHttpFactory,
-              CnModalMessageFactory, CnModalConfirmFactory, CnModalSubmitLegacyFactory, CnSession, $q, $state ) {
+              CnModalMessageFactory, CnModalConfirmFactory, CnSession, $state ) {
       var object = function( parentModel, root ) {
         var self = this;
         CnBaseViewFactory.construct( this, parentModel, root );
@@ -382,98 +382,75 @@ define( [ 'output' ].reduce( function( list, name ) {
 
             var record = this.record;
 
-            return ( this.record.legacy ?
+            return CnModalConfirmFactory.instance( {
+              title: this.translate( 'misc.pleaseConfirm' ),
+              noText: 'applicant' == CnSession.role.name ? this.translate( 'misc.no' ) : 'No',
+              yesText: 'applicant' == CnSession.role.name ? this.translate( 'misc.yes' ) : 'Yes',
+              message: this.translate( 'misc.submitWarning' )
+            } ).show().then( function( response ) {
+              if( response ) {
+                // make sure that certain properties have been defined, one tab at a time
+                var requiredTabList = {
+                  'part1': [ 'activities', 'findings', 'outcomes', 'thesis_title', 'thesis_status' ],
+                  'part3': [ 'impact', 'opportunities', 'dissemination' ]
+                };
 
-              // when submitting an legacy reqn's report don't validate and ask which stage to move to
-              CnModalSubmitLegacyFactory.instance().show().then( function( response ) {
-                if( null != response ) {
-                  var parent = self.parentModel.getParentIdentifier();
-                  return CnHttpFactory.instance( {
-                    path: parent.subject + '/' + parent.identifier + '?action=next_stage&stage_type=' + response
-                  } ).patch().then( function() {
-                    self.onView();
-                    return CnModalMessageFactory.instance( {
-                      title: 'Requisition moved to "' + response + '" stage',
-                      message: 'The legacy requisition has been moved to the "' + response + '" stage.',
-                      closeText: 'Close'
-                    } ).show().then( function() {
-                      return self.onView( true );
-                    } );
+                var error = null;
+                var errorTab = null;
+                for( var tab in requiredTabList ) {
+                  var firstProperty = null;
+                  requiredTabList[tab].filter( function( property ) {
+                    if( 'part1' == tab ) {
+                      // only check thesis properties if the reqn has a trainee
+                      return null == property.match( /thesis/ ) || self.record.trainee_user_id;
+                    }
+
+                    // check everything else
+                    return true;
+                  } ).forEach( function( property ) {
+                    // check for the property's value
+                    if( null === record[property] || '' === record[property] ) {
+                      var element = cenozo.getFormElement( property );
+                      element.$error.required = true;
+                      cenozo.updateFormElement( element, true );
+                      if( null == errorTab ) errorTab = tab;
+                      if( null == error ) error = {
+                        title: self.translate( 'misc.missingFieldTitle' ),
+                        message: self.translate( 'misc.missingFieldMessage' ),
+                        error: true
+                      };
+                    }
                   } );
                 }
-              } ) :
 
-              // when submitting a non-legacy reqn validate and submit the "regular" way
-              CnModalConfirmFactory.instance( {
-                title: this.translate( 'misc.pleaseConfirm' ),
-                noText: 'applicant' == CnSession.role.name ? this.translate( 'misc.no' ) : 'No',
-                yesText: 'applicant' == CnSession.role.name ? this.translate( 'misc.yes' ) : 'Yes',
-                message: this.translate( 'misc.submitWarning' )
-              } ).show().then( function( response ) {
-                if( response ) {
-                  // make sure that certain properties have been defined, one tab at a time
-                  var requiredTabList = {
-                    'part1': [ 'activities', 'findings', 'outcomes', 'thesis_title', 'thesis_status' ],
-                    'part3': [ 'impact', 'opportunities', 'dissemination' ]
-                  };
-
-                  var error = null;
-                  var errorTab = null;
-                  for( var tab in requiredTabList ) {
-                    var firstProperty = null;
-                    requiredTabList[tab].filter( function( property ) {
-                      if( 'part1' == tab ) {
-                        // only check thesis properties if the reqn has a trainee
-                        return null == property.match( /thesis/ ) || self.record.trainee_user_id;
-                      }
-
-                      // check everything else
-                      return true;
-                    } ).forEach( function( property ) {
-                      // check for the property's value
-                      if( null === record[property] || '' === record[property] ) {
-                        var element = cenozo.getFormElement( property );
-                        element.$error.required = true;
-                        cenozo.updateFormElement( element, true );
-                        if( null == errorTab ) errorTab = tab;
-                        if( null == error ) error = {
-                          title: self.translate( 'misc.missingFieldTitle' ),
-                          message: self.translate( 'misc.missingFieldMessage' ),
-                          error: true
-                        };
-                      }
-                    } );
-                  }
-
-                  if( null != error ) {
-                    // if there was an error then display it now
-                    if( 'applicant' == CnSession.role.name ) error.closeText = self.translate( 'misc.close' );
-                    CnModalMessageFactory.instance( error ).show().then( function() {
-                      self.setFormTab( errorTab );
-                    } );
-                  } else {
-                    // now check to make sure this version is different from the last (the first is always different)
-                    return CnHttpFactory.instance( {
-                      path: self.parentModel.getServiceResourcePath(),
-                      data: { select: { column: 'has_changed' } }
-                    } ).get().then( function( response ) {
-                      return response.data.has_changed ?
-                        // changes have been made, so submit now
-                        submitFinalReport() :
-                        // no changes made so warn the user before proceeding
-                        CnModalConfirmFactory.instance( {
-                          title: self.translate( 'misc.pleaseConfirm' ),
-                          noText: self.translate( 'misc.no' ),
-                          yesText: self.translate( 'misc.yes' ),
-                          message: self.translate( 'misc.noChangesMessage' )
-                        } ).show().then( function( response ) {
-                          if( response ) return submitFinalReport();
-                        } );
-                    } );
-                  }
+                if( null != error ) {
+                  // if there was an error then display it now
+                  if( 'applicant' == CnSession.role.name ) error.closeText = self.translate( 'misc.close' );
+                  CnModalMessageFactory.instance( error ).show().then( function() {
+                    self.setFormTab( errorTab );
+                  } );
+                } else {
+                  // now check to make sure this version is different from the last (the first is always different)
+                  return CnHttpFactory.instance( {
+                    path: self.parentModel.getServiceResourcePath(),
+                    data: { select: { column: 'has_changed' } }
+                  } ).get().then( function( response ) {
+                    return response.data.has_changed ?
+                      // changes have been made, so submit now
+                      submitFinalReport() :
+                      // no changes made so warn the user before proceeding
+                      CnModalConfirmFactory.instance( {
+                        title: self.translate( 'misc.pleaseConfirm' ),
+                        noText: self.translate( 'misc.no' ),
+                        yesText: self.translate( 'misc.yes' ),
+                        message: self.translate( 'misc.noChangesMessage' )
+                      } ).show().then( function( response ) {
+                        if( response ) return submitFinalReport();
+                      } );
+                  } );
                 }
-              } )
-            );
+              }
+            } );
           }
         } );
       };
