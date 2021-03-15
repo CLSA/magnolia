@@ -1622,10 +1622,9 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
             function submitReqn() {
               var parent = self.parentModel.getParentIdentifier();
 
-              // when submitting a new legacy reqn ask which stage to move to
-              return self.record.legacy && '.' == self.record.amendment ?
-              
-                CnModalSubmitLegacyFactory.instance().show().then( function( response ) {
+              if( self.record.legacy && '.' == self.record.amendment ) {
+                // when submitting a new legacy reqn ask which stage to move to
+                return CnModalSubmitLegacyFactory.instance().show().then( function( response ) {
                   if( null != response ) {
                     return CnHttpFactory.instance( {
                       path: parent.subject + '/' + parent.identifier + '?action=next_stage&stage_type=' + response
@@ -1641,40 +1640,68 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                       } );
                     } );
                   }
-                } ) :
-              
-                CnHttpFactory.instance( {
-                  path: parent.subject + '/' + parent.identifier + "?action=submit",
-                  onError: function( response ) {
-                    if( 409 == response.status ) {
-                      CnModalMessageFactory.instance( {
-                        title: self.translate( 'misc.invalidStartDateTitle' ),
-                        message: self.translate( 'misc.invalidStartDateMessage' ),
-                        closeText: self.translate( 'misc.close' ),
-                        error: true
-                      } ).show().then( function() {
-                        var element = cenozo.getFormElement( 'start_date' );
-                        element.$error.custom = self.translate( 'misc.invalidStartDateTitle' );
-                        cenozo.updateFormElement( element, true );
-                        self.setFormTab( 0, 'part1', false );
-                        self.setFormTab( 1, 'c' );
-                      } );
-                    } else CnModalMessageFactory.httpError( response );
+                } );
+              } else {
+                var promiseList = [];
+                if( self.record.legacy && self.parentModel.isRole( 'administrator' ) ) {
+                  // if an admin is submitting the amendment then ask if we want to skip the review process
+                  promiseList.push(
+                    CnModalConfirmFactory.instance( {
+                      title: 'Submit legacy amendment',
+                      message:
+                        'Do you wish to submit the amendment for review or should the review system be skipped? ' +
+                        'If you skip the review the requisition will immediately return to the active stage.',
+                      yesText: 'Review',
+                      noText: 'Do Not Review'
+                    } ).show().then( function( response ) { return response; } )
+                  );
+                }
+
+                return $q.all( promiseList ).then( function( response ) {
+                  var noReview = false;
+                  var path = parent.subject + '/' + parent.identifier + "?action=submit";
+
+                  // determine whether we're skipping a legacy amendment's review
+                  if( self.record.legacy && self.parentModel.isRole( 'administrator' ) && !response[0] ) {
+                    noReview = true;
+                    path += '&review=0';
                   }
-                } ).patch().then( function() {
-                  var code = CnSession.user.id == self.record.trainee_user_id ?
-                    ( 'deferred' == self.record.state ? 'traineeResubmit' : 'traineeSubmit' ) :
-                    ( 'deferred' == self.record.state ? 'resubmit' : 'submit' );
-                  return CnModalMessageFactory.instance( {
-                    title: self.translate( 'misc.' + code + 'Title' ),
-                    message: self.translate( 'misc.' + code + 'Message' ),
-                    closeText: self.translate( 'misc.close' )
-                  } ).show().then( function() {
-                    return self.parentModel.isRole( 'applicant' ) ?
-                      $state.go( 'root.home' ) :
-                      self.onView( true ); // refresh
+
+                  CnHttpFactory.instance( {
+                    path: path,
+                    onError: function( response ) {
+                      if( 409 == response.status ) {
+                        CnModalMessageFactory.instance( {
+                          title: self.translate( 'misc.invalidStartDateTitle' ),
+                          message: self.translate( 'misc.invalidStartDateMessage' ),
+                          closeText: self.translate( 'misc.close' ),
+                          error: true
+                        } ).show().then( function() {
+                          var element = cenozo.getFormElement( 'start_date' );
+                          element.$error.custom = self.translate( 'misc.invalidStartDateTitle' );
+                          cenozo.updateFormElement( element, true );
+                          self.setFormTab( 0, 'part1', false );
+                          self.setFormTab( 1, 'c' );
+                        } );
+                      } else CnModalMessageFactory.httpError( response );
+                    }
+                  } ).patch().then( function() {
+                    var noReviewMessage = 'The amendment is now complete and the requisition has been returned to the Active stage.';
+                    var code = CnSession.user.id == self.record.trainee_user_id ?
+                      ( 'deferred' == self.record.state ? 'traineeResubmit' : 'traineeSubmit' ) :
+                      ( 'deferred' == self.record.state ? 'resubmit' : 'submit' );
+                    return CnModalMessageFactory.instance( {
+                      title: noReview ? 'Amendment Complete' : self.translate( 'misc.' + code + 'Title' ),
+                      message: noReview ? noReviewMessage : self.translate( 'misc.' + code + 'Message' ),
+                      closeText: self.translate( 'misc.close' )
+                    } ).show().then( function() {
+                      return self.parentModel.isRole( 'applicant' ) ?
+                        $state.go( 'root.home' ) :
+                        self.onView( true ); // refresh
+                    } );
                   } );
                 } );
+              }
             }
 
             return CnModalConfirmFactory.instance( {
