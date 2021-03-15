@@ -37,6 +37,7 @@ class patch extends \cenozo\service\patch
     parent::validate();
 
     $action = $this->get_argument( 'action', false );
+    $review = $this->get_argument( 'review', true );
     if( $action )
     {
       // define whether the action is allowed
@@ -116,6 +117,22 @@ class patch extends \cenozo\service\patch
               if( $db_reqn_version->start_date < $deadline ) $code = 409;
             }
           }
+          else if( !$review )
+          {
+            // only administrators can skip a legacy amendment's review process
+            if( 'administrator' != $db_role->name )
+            {
+              $code = 403;
+            }
+            // only legacy amendment reviews can be skipped
+            else if( '.' == $db_reqn_version->amendment || !$db_reqn->legacy )
+            {
+              throw lib::create( 'exception\notice',
+                'Only legacy amendments can skip the review process.',
+                __METHOD__
+              );
+            }
+          }
         }
         else $code = 403;
       }
@@ -177,6 +194,9 @@ class patch extends \cenozo\service\patch
     $notification_type_class_name = lib::get_class_name( 'database\notification_type' );
     $notification_class_name = lib::get_class_name( 'database\notification' );
     $stage_type_class_name = lib::get_class_name( 'database\stage_type' );
+    $review_type_class_name = lib::get_class_name( 'database\review_type' );
+    $review_class_name = lib::get_class_name( 'database\review' );
+    $recommendation_type_class_name = lib::get_class_name( 'database\recommendation_type' );
     $session = lib::create( 'business\session' );
     $db_role = $session->get_role();
     $db_user = $session->get_user();
@@ -198,6 +218,7 @@ class patch extends \cenozo\service\patch
     {
       $report_required = 'Report Required' == $db_reqn->get_current_stage_type()->name;
       $action = $this->get_argument( 'action', false );
+      $review = $this->get_argument( 'review', true );
       if( $action )
       {
         if( 'reset_data' == $action )
@@ -306,7 +327,32 @@ class patch extends \cenozo\service\patch
         }
         else if( 'submit' == $action )
         {
-          if( !$db_reqn->legacy || '.' != $db_reqn_version->amendment )
+          if( !$review )
+          {
+            // this is a legacy amendment that will skip the review process
+
+            // first fill in the admin review
+            $db_review = $review_class_name::get_unique_record(
+              array( 'reqn_id', 'amendment', 'review_type_id' ),
+              array( $db_reqn->id, $db_reqn_version->amendment, $review_type_class_name::get_unique_record( 'name', 'Admin' )->id )
+            );
+            $db_review->user_id = $db_user->id;
+            $db_review->recommendation_type_id = $recommendation_type_class_name::get_unique_record( 'name', 'Satisfactory' )->id;
+            $db_review->datetime = util::get_datetime_object();
+            $db_review->note = 'Legacy amendment review process skipped.';
+            $db_review->save();
+
+            // remove from the deferred state
+            $db_reqn->state = NULL;
+            $db_reqn->save();
+
+            // when resubmitting set the version/report datetime
+            $db_reqn_version->datetime = util::get_datetime_object();
+            $db_reqn_version->save();
+
+            $db_reqn->proceed_to_next_stage( 'Active' );
+          }
+          else if( !$db_reqn->legacy || '.' != $db_reqn_version->amendment )
           {
             // trainees must be get approval from their supervisor
             if( $trainee )
