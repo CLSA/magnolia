@@ -163,7 +163,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
 
             // display final report message if appropriate
             var stage_type = record.stage_type ? record.stage_type : '';
-            if( 'applicant' == CnSession.role.name &&
+            if( scope.model.isRole( 'applicant' ) &&
                 'Report Required' == stage_type &&
                 'deferred' == scope.model.viewModel.record.state &&
                 !scope.reportRequiredWarningShown ) {
@@ -172,7 +172,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
             }
 
             // display notices to the applicant if they've never seen it
-            if( 'applicant' == CnSession.role.name && record.has_unread_notice ) scope.model.viewModel.displayNotices();
+            if( scope.model.isRole( 'applicant' ) && record.has_unread_notice ) scope.model.viewModel.displayNotices();
           } );
 
           // fill in the start date delay
@@ -355,8 +355,8 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
 
           $scope.isRemoveEthicsApprovalAllowed = function( id ) {
             if( $scope.model.viewModel.ethicsApprovalModel.getDeleteEnabled() ) {
-              if( 'administrator' == CnSession.role.name ) return true;
-              else if( 'applicant' == CnSession.role.name ) {
+              if( $scope.model.isRole( 'administrator' ) ) return true;
+              else if( $scope.model.isRole( 'applicant' ) ) {
                 var ethicsApproval = $scope.model.viewModel.record.ethicsApprovalList.findByProperty( 'id', id );
                 return null != ethicsApproval && ethicsApproval.one_day_old;
               }
@@ -451,7 +451,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
           },
           showAgreement: function() {
             // only show the agreement tab to administrators
-            return 'administrator' == CnSession.role.name && (
+            return this.parentModel.isRole( 'administrator' ) && (
               // and when there is an agreement
               this.record.has_agreement_filename || (
                 // or when we're looking at the current version and we're in the active or complete phases
@@ -465,7 +465,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
               '.' != this.record.amendment,
               this.record.lang
             ).then( function( response ) {
-              if( response ) $state.go( 'applicant' == CnSession.role.name ? 'root.home' : 'reqn.list' );
+              if( response ) $state.go( self.parentModel.isRole( 'applicant' ) ? 'root.home' : 'reqn.list' );
             } );
           },
           delete: function() { return CnReqnHelper.delete( 'identifier=' + this.record.identifier, this.record.lang ); },
@@ -1551,7 +1551,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
           canViewData: function() {
             // administrators and applicants can view data when in the active stage
             var stage_type = this.record.stage_type ? this.record.stage_type : '';
-            return ['administrator','applicant'].includes( CnSession.role.name ) && 'Active' == stage_type;
+            return this.parentModel.isRole( 'administrator', 'applicant' ) && 'Active' == stage_type;
           },
 
           getDifferenceList: function( version ) {
@@ -1643,7 +1643,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                 } );
               } else {
                 var promiseList = [];
-                if( self.record.legacy && self.parentModel.isRole( 'administrator' ) ) {
+                if( self.record.legacy && self.parentModel.isRole( 'administrator', 'typist' ) ) {
                   // if an admin is submitting the amendment then ask if we want to skip the review process
                   promiseList.push(
                     CnModalConfirmFactory.instance( {
@@ -1652,7 +1652,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                         'Do you wish to submit the amendment for review or should the review system be skipped? ' +
                         'If you skip the review the requisition will immediately return to the active stage.',
                       yesText: 'Review',
-                      noText: 'Do Not Review'
+                      noText: 'Skip Review'
                     } ).show().then( function( response ) { return response; } )
                   );
                 }
@@ -1662,7 +1662,10 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                   var path = parent.subject + '/' + parent.identifier + "?action=submit";
 
                   // determine whether we're skipping a legacy amendment's review
-                  if( self.record.legacy && self.parentModel.isRole( 'administrator' ) && !response[0] ) {
+                  if( self.record.legacy &&
+                      '.' != self.record.amendment &&
+                      self.parentModel.isRole( 'administrator', 'typist' ) &&
+                      !response[0] ) {
                     noReview = true;
                     path += '&review=0';
                   }
@@ -1706,8 +1709,8 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
 
             return CnModalConfirmFactory.instance( {
               title: this.translate( 'misc.pleaseConfirm' ),
-              noText: 'applicant' == CnSession.role.name ? this.translate( 'misc.no' ) : 'No',
-              yesText: 'applicant' == CnSession.role.name ? this.translate( 'misc.yes' ) : 'Yes',
+              noText: self.parentModel.isRole( 'applicant' ) ? this.translate( 'misc.no' ) : 'No',
+              yesText: self.parentModel.isRole( 'applicant' ) ? this.translate( 'misc.yes' ) : 'Yes',
               message: this.translate( 'misc.submitWarning' )
             } ).show().then( function( response ) {
               if( response ) {
@@ -1834,7 +1837,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
 
                   if( null != error ) {
                     // if there was an error then display it now
-                    if( 'applicant' == CnSession.role.name ) error.closeText = self.translate( 'misc.close' );
+                    if( self.parentModel.isRole( 'applicant' ) ) error.closeText = self.translate( 'misc.close' );
                     CnModalMessageFactory.instance( error ).show().then( function() {
                       if( 'amendment' == errorTab ) {
                         self.setFormTab( 0, 'amendment', false );
@@ -2010,11 +2013,11 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
             var stage_type = this.viewModel.record.stage_type ? this.viewModel.record.stage_type : '';
 
             var check = false;
-            if( 'applicant' == CnSession.role.name ) {
+            if( self.isRole( 'applicant' ) ) {
               check = 'new' == phase || (
                 'deferred' == state && ( 'review' == phase || ( 'lite' == this.type && 'Agreement' == stage_type ) )
               );
-            } else if( ['administrator', 'typist'].includes( CnSession.role.name ) ) {
+            } else if( self.isRole( 'administrator', 'typist' ) ) {
               check = 'new' == phase || (
                 'abandoned' != state && ( 'review' == phase || 'Agreement' == stage_type || 'Data Release' == stage_type )
               );
