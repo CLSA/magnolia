@@ -78,6 +78,15 @@ class reqn_version extends \cenozo\database\record
   }
 
   /**
+   * Returns the amendment and version number of the reqn version (1, 2, 3, A1, A2, A3, B1, B2, B3, etc)
+   * @return string
+   */
+  public function get_amendment_version()
+  {
+    return sprintf( '%s%s', '.' == $this->amendment ? '' : $this->amendment, $this->version );
+  }
+
+  /**
    * Determines whether there is any difference between this version and the last
    */
   public function has_changed()
@@ -335,7 +344,7 @@ class reqn_version extends \cenozo\database\record
     // generate the agreement file
     $data = array(
       'identifier' => $db_reqn->identifier,
-      'version' => sprintf( '%s%s', '.' == $this->amendment ? '' : $this->amendment, $this->version ),
+      'version' => $this->get_amendment_version(),
       'date_of_download' => util::get_datetime_object()->format( 'Y-m-d' )
     );
     
@@ -423,7 +432,7 @@ class reqn_version extends \cenozo\database\record
     // generate the application form
     $data = array(
       'identifier' => $db_reqn->identifier,
-      'version' => sprintf( '%s%s', '.' == $this->amendment ? '' : $this->amendment, $this->version ),
+      'version' => $this->get_amendment_version(),
       'dateofapproval' => is_null( $date_of_approval ) ? 'None' : $date_of_approval->format( 'Y-m-d' )
     );
     $data['applicant_name'] = sprintf( '%s %s', $db_user->first_name, $db_user->last_name );
@@ -516,7 +525,7 @@ class reqn_version extends \cenozo\database\record
     // now generate the checklist form
     $data = array(
       'identifier' => $db_reqn->identifier,
-      'version' => sprintf( '%s%s', '.' == $this->amendment ? '' : $this->amendment, $this->version ),
+      'version' => $this->get_amendment_version(),
       'dateofapproval' => is_null( $date_of_approval ) ? 'None' : $date_of_approval->format( 'Y-m-d' )
     );
     $data['applicant_name'] = sprintf( '%s %s', $db_user->first_name, $db_user->last_name );
