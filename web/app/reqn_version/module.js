@@ -412,11 +412,11 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnReqnVersionViewFactory', [
-    'CnReqnHelper', 'CnModalNoticeListFactory',
+    'CnReqnHelper', 'CnModalNoticeListFactory', 'CnModalUploadAgreementFactory',
     'CnCoapplicantModelFactory', 'CnReferenceModelFactory', 'CnEthicsApprovalModelFactory', 'CnBaseViewFactory',
     'CnSession', 'CnHttpFactory', 'CnModalMessageFactory', 'CnModalConfirmFactory', 'CnModalSubmitLegacyFactory',
     '$state', '$q', '$window',
-    function( CnReqnHelper, CnModalNoticeListFactory,
+    function( CnReqnHelper, CnModalNoticeListFactory, CnModalUploadAgreementFactory,
               CnCoapplicantModelFactory, CnReferenceModelFactory, CnEthicsApprovalModelFactory, CnBaseViewFactory,
               CnSession, CnHttpFactory, CnModalMessageFactory, CnModalConfirmFactory, CnModalSubmitLegacyFactory,
               $state, $q, $window ) {
@@ -1625,19 +1625,52 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
               if( self.record.legacy && '.' == self.record.amendment ) {
                 // when submitting a new legacy reqn ask which stage to move to
                 return CnModalSubmitLegacyFactory.instance().show().then( function( response ) {
-                  if( null != response ) {
-                    return CnHttpFactory.instance( {
-                      path: parent.subject + '/' + parent.identifier + '?action=next_stage&stage_type=' + response
-                    } ).patch().then( function() {
-                      self.onView();
-                      return CnModalMessageFactory.instance( {
-                        title: 'Requisition moved to "' + response + '" stage',
-                        message: 'The legacy requisition has been moved to the "' + response + '" stage and is now visible ' +
-                                 'to the applicant.',
-                        closeText: 'Close'
-                      } ).show().then( function() {
-                        return self.onView( true );
-                      } );
+                  var stageType = response;
+                  if( null != stageType ) {
+                    var promiseList = [];
+
+                    // when moving to the active or completed stage an agreement file must be provided
+                    if( 'Active' == stageType || 'Complete' == stageType )
+                      promiseList.push( CnModalUploadAgreementFactory.instance().show() );
+
+                    return $q.all( promiseList ).then( function( response ) {
+                      // if response is an array containing false then we've cancelled, so do nothing
+                      if( 0 == response.length || response[0] ) {
+                        var promiseList = [];
+                        if( 0 < response.length ) {
+                          var file = response[0].file;
+                          var date = response[0].date;
+                          var path = self.parentModel.getServiceResourcePath();
+                          promiseList.push(
+                            CnHttpFactory.instance( {
+                              path: path,
+
+                              data: { agreement_filename: file.getFilename() }
+                            } ).patch().then( function( response ) {
+                              return file.upload( path );
+                            } )
+                          );
+                        }
+
+                        return $q.all( promiseList ).then( function( response ) {
+                          if( 0 == response.length || response[0] ) {
+                            // finally, we can move to the next requested stage
+                            return CnHttpFactory.instance( {
+                              path: parent.subject + '/' + parent.identifier + '?action=next_stage&stage_type=' + stageType
+                            } ).patch().then( function() {
+                              self.onView();
+                              return CnModalMessageFactory.instance( {
+                                title: 'Requisition moved to "' + stageType + '" stage',
+                                message: 'The legacy requisition has been moved to the "' + stageType + '" stage and is now visible ' +
+                                         'to the applicant.',
+                                closeText: 'Close'
+                              } ).show().then( function() {
+                                return self.onView( true );
+                              } );
+                            } );
+                          }
+                        } );
+                      }
                     } );
                   }
                 } );

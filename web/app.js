@@ -108,6 +108,7 @@ cenozo.service( 'CnModalNoticeListFactory', [
   }
 ] );
 
+/* ######################################################################################################## */
 cenozo.service( 'CnModalSubmitLegacyFactory', [
   '$uibModal',
   function( $uibModal ) {
@@ -137,6 +138,61 @@ cenozo.service( 'CnModalSubmitLegacyFactory', [
   }
 ] );
 
+/* ######################################################################################################## */
+cenozo.service( 'CnModalUploadAgreementFactory', [
+  'CnHttpFactory', '$uibModal',
+  function( CnHttpFactory, $uibModal ) {
+    var object = function( params ) {
+      var self = this;
+      angular.extend( this, params );
+
+      this.show = function() {
+        return $uibModal.open( {
+          backdrop: 'static',
+          keyboard: true,
+          modalFade: true,
+          templateUrl: cenozoApp.getFileUrl( 'magnolia', 'modal-upload-agreement.tpl.html' ),
+          controller: [ '$scope', '$uibModalInstance', function( $scope, $uibModalInstance ) {
+            angular.extend( $scope, {
+              file: {
+                key: 'agreement_filename',
+                file: null,
+                uploading: false,
+                getFilename: function() {
+                  var obj = this;
+                  var data = new FormData();
+                  data.append( 'file', obj.file );
+                  var fileDetails = data.get( 'file' );
+                  return fileDetails.name;
+                },
+                upload: function( path ) {
+                  var obj = this;
+                  obj.uploading = true;
+
+                  // upload the file
+                  return CnHttpFactory.instance( {
+                    path: path + '?file=agreement_filename',
+                    data: obj.file,
+                    format: 'unknown'
+                  } ).patch().finally( function() { obj.uploading = false; } );
+                }
+              },
+              filename: null,
+              ok: function() {
+                $uibModalInstance.close( { file: $scope.file } );
+              },
+              cancel: function() { $uibModalInstance.close( false ); }
+            } );
+          } ]
+        } ).result;
+      };
+    };
+
+    return { instance: function( params ) { return new object( angular.isUndefined( params ) ? {} : params ); } };
+  }
+] );
+
+/* ######################################################################################################## */
 cenozo.service( 'CnReqnHelper', [
   'CnSession', 'CnHttpFactory', 'CnModalConfirmFactory', '$state',
   function( CnSession, CnHttpFactory, CnModalConfirmFactory, $state ) {

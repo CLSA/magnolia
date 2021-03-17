@@ -1,0 +1,25 @@
+<form ng-submit="ok()" novalidate name="form" class="noselect">
+  <div class="modal-header bg-primary">
+    <h4 class="modal-title">Upload Agreement</h4>
+  </div>
+  <div class="modal-body">
+    <span style="white-space: pre-wrap;">Please provide the agreement file to attach to this requisition.</span>
+    <div class="row container-fluid vertical-spacer">
+      <label for="filename" class="control-label col-sm-3">File</label>
+      <div class="col-sm-9">
+        <input
+          type="file"
+          id="filename"
+          name="filename"
+          class="form-control"
+          ng-model="file.file"
+          cn-upload="file.getFilename()">
+        </input>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer bg-info">
+    <button type="button" class="btn btn-default" ng-click="cancel()">Cancel</button>
+    <button type="submit" class="btn btn-primary" ng-disabled="!file.file" cn-autofocus>OK</button>
+  </div>
+</form>
