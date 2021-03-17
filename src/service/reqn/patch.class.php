@@ -140,8 +140,9 @@ class patch extends \cenozo\service\patch
       {
         if( $this->get_argument( 'stage_type', false ) )
         {
-          // only administrators can proceed to a specific stage type
-          if( !is_null( $db_reqn->state ) || 'administrator' != $db_role->name ) $code = 403;
+          // only administrators or typists with legacy applications can proceed to a specific stage type
+          if( !is_null( $db_reqn->state ) ||
+              ( 'administrator' != $db_role->name && ( 'typist' != $db_role->name || !$db_reqn->legacy ) ) ) $code = 403;
         }
         else
         {
