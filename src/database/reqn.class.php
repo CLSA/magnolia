@@ -890,10 +890,13 @@ class reqn extends \cenozo\database\record
     foreach( $this->get_reqn_version_object_list() as $db_reqn_version )
     {
       $agreement_filename = $db_reqn_version->get_filename( 'agreement' );
-      if( file_exists( $agreement_filename ) ) $file_list[] = array(
-        'path' => $agreement_filename,
-        'name' => sprintf( '%s version %s.pdf', $this->identifier, $db_reqn_version->version )
-      );
+      if( file_exists( $agreement_filename ) )
+      {
+        $file_list[] = array(
+          'path' => $agreement_filename,
+          'name' => sprintf( '%s version %s.pdf', $this->identifier, $db_reqn_version->get_amendment_version() )
+        );
+      }
     }
 
     if( 0 < count( $file_list ) )
