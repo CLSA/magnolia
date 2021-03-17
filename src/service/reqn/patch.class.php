@@ -82,7 +82,7 @@ class patch extends \cenozo\service\patch
       }
       else if( 'amend' == $action )
       {
-        if( !in_array( $db_role->name, array( 'applicant', 'administrator' ) ) ||
+        if( !in_array( $db_role->name, array( 'applicant', 'administrator', 'typist' ) ) ||
             'active' != $phase ||
             'Report Required' == $db_current_stage_type->name ) $code = 403;
       }
@@ -102,7 +102,7 @@ class patch extends \cenozo\service\patch
       }
       else if( 'submit' == $action )
       {
-        if( 'applicant' == $db_role->name || 'administrator' == $db_role->name )
+        if( in_array( $db_role->name, array( 'applicant', 'administrator', 'typist' ) ) )
         {
           if( 'new' != $phase && 'deferred' != $state ) $code = 403;
           else if( !$db_reqn->legacy && 'new' == $phase )
@@ -119,8 +119,8 @@ class patch extends \cenozo\service\patch
           }
           else if( !$review )
           {
-            // only administrators can skip a legacy amendment's review process
-            if( 'administrator' != $db_role->name )
+            // only administrators and typists can skip a legacy amendment's review process
+            if( 'administrator' != $db_role->name && 'typist' != $db_role->name )
             {
               $code = 403;
             }

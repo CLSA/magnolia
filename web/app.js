@@ -148,7 +148,7 @@ cenozo.service( 'CnReqnHelper', [
         var stage_type = record.stage_type ? record.stage_type : '';
 
         if( 'submit' == subject ) {
-          return ( 'applicant' == role || 'administrator' == role ) &&
+          return ( ['applicant', 'administrator', 'typist'].includes( role ) ) &&
                  ( 'new' == phase || 'deferred' == state );
         } else if( 'view' == subject ) {
           return 'applicant' != role;
@@ -168,7 +168,7 @@ cenozo.service( 'CnReqnHelper', [
                  !['abandoned','inactive','deferred'].includes( state ) &&
                  ['review','active'].includes( phase );
         } else if( 'amend' == subject ) {
-          return ['administrator','applicant'].includes( role ) &&
+          return ['administrator','applicant','typist'].includes( role ) &&
                  !['abandoned','deferred'].includes( state ) &&
                  'active' == phase && 'Report Required' != stage_type;
         } else if( 'deactivate' == subject ) {
