@@ -454,8 +454,10 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
             return this.parentModel.isRole( 'administrator' ) && (
               // and when there is an agreement
               this.record.has_agreement_filename || (
-                // or when we're looking at the current version and we're in the active or complete phases
-                this.record.is_current_version && ['active','complete'].includes( self.record.phase )
+                // or when we're looking at the current version and we're in the active phase or Complete stage
+                this.record.is_current_version && (
+                  'active' == self.record.phase || 'Complete' == self.record.stage_type
+                )
               )
             );
           },
@@ -1617,7 +1619,16 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
             return differenceList;
           },
 
-          submit: function() {
+          submit: function( data ) {
+            function submitAgreement( data ) {
+              var file = data.file;
+              var path = self.parentModel.getServiceResourcePath();
+              return CnHttpFactory.instance( {
+                path: path,
+                data: { agreement_filename: file.getFilename() }
+              } ).patch().then( function() { return file.upload( path ); } );
+            }
+
             // used below
             function submitReqn() {
               var parent = self.parentModel.getParentIdentifier();
@@ -1634,25 +1645,13 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                       promiseList.push( CnModalUploadAgreementFactory.instance().show() );
 
                     return $q.all( promiseList ).then( function( response ) {
-                      // if response is an array containing false then we've cancelled, so do nothing
+                      // only proceed if we didn't cancel (response will be an array containing false if we did)
                       if( 0 == response.length || response[0] ) {
                         var promiseList = [];
-                        if( 0 < response.length ) {
-                          var file = response[0].file;
-                          var date = response[0].date;
-                          var path = self.parentModel.getServiceResourcePath();
-                          promiseList.push(
-                            CnHttpFactory.instance( {
-                              path: path,
-
-                              data: { agreement_filename: file.getFilename() }
-                            } ).patch().then( function( response ) {
-                              return file.upload( path );
-                            } )
-                          );
-                        }
+                        if( 0 < response.length ) promiseList.push( submitAgreement( response[0] ) );
 
                         return $q.all( promiseList ).then( function( response ) {
+                          // only proceed if we didn't cancel (response will be an array containing false if we did)
                           if( 0 == response.length || response[0] ) {
                             // finally, we can move to the next requested stage
                             return CnHttpFactory.instance( {
@@ -1664,9 +1663,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                                 message: 'The legacy requisition has been moved to the "' + stageType + '" stage and is now visible ' +
                                          'to the applicant.',
                                 closeText: 'Close'
-                              } ).show().then( function() {
-                                return self.onView( true );
-                              } );
+                              } ).show().then( function() { return self.onView( true ); } );
                             } );
                           }
                         } );
@@ -1677,7 +1674,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
               } else {
                 var promiseList = [];
                 if( self.record.legacy && self.parentModel.isRole( 'administrator', 'typist' ) ) {
-                  // if an admin is submitting the amendment then ask if we want to skip the review process
+                  // if an admin or typist is submitting the amendment then ask if we want to skip the review process
                   promiseList.push(
                     CnModalConfirmFactory.instance( {
                       title: 'Submit legacy amendment',
@@ -1686,7 +1683,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                         'If you skip the review the requisition will immediately return to the active stage.',
                       yesText: 'Review',
                       noText: 'Skip Review'
-                    } ).show().then( function( response ) { return response; } )
+                    } ).show()
                   );
                 }
 
@@ -1703,38 +1700,67 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                     path += '&review=0';
                   }
 
-                  CnHttpFactory.instance( {
-                    path: path,
-                    onError: function( response ) {
-                      if( 409 == response.status ) {
-                        CnModalMessageFactory.instance( {
-                          title: self.translate( 'misc.invalidStartDateTitle' ),
-                          message: self.translate( 'misc.invalidStartDateMessage' ),
-                          closeText: self.translate( 'misc.close' ),
-                          error: true
+                  // if we're skipping the review then give the option to upload an agreement
+                  var promiseList = [];
+                  if( noReview ) {
+                    promiseList.push(
+                      CnModalConfirmFactory.instance( {
+                        message: 'Do you wish to upload an agreement associated with this legacy amendment?'
+                      } ).show().then( function( response ) {
+                        return response ?
+                          CnModalUploadAgreementFactory.instance().show().then( function( response ) {
+                            return response ? submitAgreement( response ) : false;
+                          } ) : true;
+                      } )
+                    );
+                  }
+
+                  $q.all( promiseList ).then( function( response ) {
+                    // Only proceed if we didn't cancel the file upload
+                    // In this case response will be one of the following:
+                    //   When doing a review: []
+                    //   When not doing a review...
+                    //     ...and an agreement isn't included: [true]
+                    //     ...and uploading an agreement is cancelled: [false] <-- this is the only way we don't proceed
+                    //     ...and uploading an agreement succeeds: [file]
+                    if( 0 == response.length || response[0] ) {
+                      CnHttpFactory.instance( {
+                        path: path,
+                        onError: function( response ) {
+                          if( 409 == response.status ) {
+                            CnModalMessageFactory.instance( {
+                              title: self.translate( 'misc.invalidStartDateTitle' ),
+                              message: self.translate( 'misc.invalidStartDateMessage' ),
+                              closeText: self.translate( 'misc.close' ),
+                              error: true
+                            } ).show().then( function() {
+                              var element = cenozo.getFormElement( 'start_date' );
+                              element.$error.custom = self.translate( 'misc.invalidStartDateTitle' );
+                              cenozo.updateFormElement( element, true );
+                              self.setFormTab( 0, 'part1', false );
+                              self.setFormTab( 1, 'c' );
+                            } );
+                          } else CnModalMessageFactory.httpError( response );
+                        }
+                      } ).patch().then( function() {
+                        var code = CnSession.user.id == self.record.trainee_user_id ?
+                          ( 'deferred' == self.record.state ? 'traineeResubmit' : 'traineeSubmit' ) :
+                          ( 'deferred' == self.record.state ? 'resubmit' : 'submit' );
+                        return CnModalMessageFactory.instance( {
+                          title: noReview
+                            ? 'Amendment Complete'
+                            : self.translate( 'misc.' + code + 'Title' ),
+                          message: noReview
+                            ? 'The amendment is now complete and the requisition has been returned to the Active stage.'
+                            : self.translate( 'misc.' + code + 'Message' ),
+                          closeText: self.translate( 'misc.close' )
                         } ).show().then( function() {
-                          var element = cenozo.getFormElement( 'start_date' );
-                          element.$error.custom = self.translate( 'misc.invalidStartDateTitle' );
-                          cenozo.updateFormElement( element, true );
-                          self.setFormTab( 0, 'part1', false );
-                          self.setFormTab( 1, 'c' );
+                          return self.parentModel.isRole( 'applicant' ) ?
+                            $state.go( 'root.home' ) :
+                            self.onView( true ); // refresh
                         } );
-                      } else CnModalMessageFactory.httpError( response );
+                      } );
                     }
-                  } ).patch().then( function() {
-                    var noReviewMessage = 'The amendment is now complete and the requisition has been returned to the Active stage.';
-                    var code = CnSession.user.id == self.record.trainee_user_id ?
-                      ( 'deferred' == self.record.state ? 'traineeResubmit' : 'traineeSubmit' ) :
-                      ( 'deferred' == self.record.state ? 'resubmit' : 'submit' );
-                    return CnModalMessageFactory.instance( {
-                      title: noReview ? 'Amendment Complete' : self.translate( 'misc.' + code + 'Title' ),
-                      message: noReview ? noReviewMessage : self.translate( 'misc.' + code + 'Message' ),
-                      closeText: self.translate( 'misc.close' )
-                    } ).show().then( function() {
-                      return self.parentModel.isRole( 'applicant' ) ?
-                        $state.go( 'root.home' ) :
-                        self.onView( true ); // refresh
-                    } );
                   } );
                 } );
               }
