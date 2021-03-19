@@ -164,7 +164,7 @@ class reqn extends \cenozo\database\record
     $db_reqn_version->datetime = util::get_datetime_object();
     $db_reqn_version->version = $version;
     $db_reqn_version->agreement_filename = NULL;
-    $db_reqn_version->amendment_justification = NULL;
+    if( $new_amendment ) $db_reqn_version->amendment_justification = NULL;
 
     // determine the amendment
     if( $new_amendment )
