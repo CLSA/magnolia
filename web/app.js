@@ -651,8 +651,8 @@ cenozo.service( 'CnReqnHelper', [
                 fr: 'À la « Partie 1 - Description » de votre demande d’accès, assurez-vous de bien expliquer comment les données des cohortes globale et de surveillance seront utilisées dans vos analyses, en tenant compte des différences entre les données disponibles pour chaque cohorte. Pour plus d’informations sur les données disponibles pour la cohorte de surveillance et la cohorte globale, consultez le tableau de disponibilité des données de l’ÉLCV sur notre site Web.'
               },
               longitudinal: {
-                en: 'Is this project part of longitudinal analyses involving a previously approved project using CLSA data?',
-                fr: 'Ce projet fait-il partie d’analyses longitudinales en lien avec un projet utilisant les données de l’ÉLCV déjà approuvé?'
+                en: 'Is this project part of longitudinal or integrative analyses involving previously approved project using CLSA data?',
+                fr: 'Ce projet fait-il partie d’analyses longitudinales ou intégratives en lien avec un projet utilisant les données de l’ELCV déjà approuvé?'
               },
               last_identifier: {
                 en: 'Please enter the application number of the related CLSA approved project',
