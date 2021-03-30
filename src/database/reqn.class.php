@@ -178,6 +178,9 @@ class reqn extends \cenozo\database\record
     if( !is_null( $db_clone_reqn_version ) )
     {
       // copy the files as well
+      $existing_file = $db_clone_reqn_version->get_filename( 'peer_review' );
+      if( file_exists( $existing_file ) ) copy( $existing_file, $db_reqn_version->get_filename( 'peer_review' ) );
+
       $existing_file = $db_clone_reqn_version->get_filename( 'funding' );
       if( file_exists( $existing_file ) ) copy( $existing_file, $db_reqn_version->get_filename( 'funding' ) );
 

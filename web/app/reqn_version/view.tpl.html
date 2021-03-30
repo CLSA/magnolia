@@ -756,6 +756,28 @@
               <div class="form-horizontal">
                 <cn-view-input-with-differences
                   input="{
+                    key: 'peer_review',
+                    title: t( 'part1.e.peer_review' ),
+                    type: model.inputList.peer_review.type,
+                    enumList: model.metadata.yesNoEnumList[model.viewModel.record.lang],
+                  }"
+                  difference="model.viewModel.compareRecord.differences.part1.e.peer_review"
+                  model="model">
+                </cn-view-input-with-differences>
+                <fieldset ng-disabled="!liteModel.getEditEnabled()">
+                  <cn-view-input-with-differences
+                    ng-if="model.viewModel.record.peer_review"
+                    input="{
+                      key: 'peer_review_filename',
+                      title: t( 'part1.e.peer_review_filename' ),
+                      type: 'file'
+                    }"
+                    difference="model.viewModel.compareRecord.differences.part1.e.peer_review_filename"
+                    model="liteModel">
+                  </cn-view-input-with-differences>
+                </fieldset>
+                <cn-view-input-with-differences
+                  input="{
                     key: 'funding',
                     title: t( 'part1.e.funding' ),
                     type: 'enum',
@@ -770,7 +792,7 @@
                     title: t( 'part1.e.funding_agency' ),
                     type: model.inputList.funding_agency.type
                   }"
-                  ng-if="'no' != model.viewModel.record.funding"
+                  ng-if="['yes', 'requested'].includes( model.viewModel.record.funding )"
                   difference="model.viewModel.compareRecord.differences.part1.e.funding_agency"
                   model="model">
                 </cn-view-input-with-differences>
@@ -780,7 +802,7 @@
                     title: t( 'part1.e.grant_number' ),
                     type: model.inputList.grant_number.type
                   }"
-                  ng-if="'no' != model.viewModel.record.funding"
+                  ng-if="['yes', 'requested'].includes( model.viewModel.record.funding )"
                   difference="model.viewModel.compareRecord.differences.part1.e.grant_number"
                   model="model">
                 </cn-view-input-with-differences>

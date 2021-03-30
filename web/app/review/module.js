@@ -93,6 +93,7 @@ define( function() {
     reqn_id: { type: 'hidden' },
     review_type_id: { type: 'hidden' },
     current_reqn_version_id: { column: 'reqn_version.id', type: 'hidden' },
+    peer_review_filename: { column: 'reqn_version.peer_review_filename', type: 'hidden' },
     funding_filename: { column: 'reqn_version.funding_filename', type: 'hidden' },
     ethics_filename: { column: 'reqn_version.ethics_filename', type: 'hidden' },
     agreement_filename: { column: 'reqn_version.agreement_filename', type: 'hidden' },
@@ -114,6 +115,10 @@ define( function() {
     }, {
       title: 'Data Checklist',
       operation: function( $state, model ) { model.viewModel.downloadChecklist(); }
+    }, {
+      title: 'Proof of Peer Review',
+      operation: function( $state, model ) { model.viewModel.downloadFundingLetter(); },
+      isDisabled: function( $state, model ) { return !model.viewModel.record.peer_review_filename; }
     }, {
       title: 'Funding Letter',
       operation: function( $state, model ) { model.viewModel.downloadFundingLetter(); },
@@ -194,10 +199,21 @@ define( function() {
             } );
           },
 
-          downloadApplication: function() { return CnReqnHelper.download( 'application', this.record.current_reqn_version_id ); },
-          downloadChecklist: function() { return CnReqnHelper.download( 'checklist', this.record.current_reqn_version_id ); },
-          downloadFundingLetter: function() { return CnReqnHelper.download( 'funding_filename', this.record.current_reqn_version_id ); },
-          downloadEthicsLetter: function() { return CnReqnHelper.download( 'ethics_filename', this.record.current_reqn_version_id ); },
+          downloadApplication: function() {
+            return CnReqnHelper.download( 'application', this.record.current_reqn_version_id );
+          },
+          downloadChecklist: function() {
+            return CnReqnHelper.download( 'checklist', this.record.current_reqn_version_id );
+          },
+          downloadPeerReview: function() {
+            return CnReqnHelper.download( 'peer_review_filename', this.record.current_reqn_version_id );
+          },
+          downloadFundingLetter: function() {
+            return CnReqnHelper.download( 'funding_filename', this.record.current_reqn_version_id );
+          },
+          downloadEthicsLetter: function() {
+            return CnReqnHelper.download( 'ethics_filename', this.record.current_reqn_version_id );
+          },
           downloadAgreementLetter: function() {
             return CnReqnHelper.download( 'agreement_filename', this.record.current_reqn_version_id );
           },

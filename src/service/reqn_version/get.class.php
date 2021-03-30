@@ -29,6 +29,7 @@ class get extends \cenozo\service\downloadable
     $db_reqn_version = $this->get_leaf_record();
     $db_reqn = $db_reqn_version->get_reqn();
     if( 'coapplicant_agreement_filename' == $file ) return $db_reqn_version->coapplicant_agreement_filename;
+    else if( 'peer_review_filename' == $file ) return $db_reqn_version->peer_review_filename;
     else if( 'funding_filename' == $file ) return $db_reqn_version->funding_filename;
     else if( 'ethics_filename' == $file ) return $db_reqn_version->ethics_filename;
     else if( 'data_sharing_filename' == $file ) return $db_reqn_version->data_sharing_filename;
@@ -81,6 +82,7 @@ class get extends \cenozo\service\downloadable
     $file = $this->get_argument( 'file', NULL );
     $db_reqn_version = $this->get_leaf_record();
     if( 'coapplicant_agreement_filename' == $file ) return sprintf( '%s/%s', COAPPLICANT_AGREEMENT_PATH, $db_reqn_version->id );
+    else if( 'peer_review_filename' == $file ) return sprintf( '%s/%s', PEER_REVIEW_PATH, $db_reqn_version->id );
     else if( 'funding_filename' == $file ) return sprintf( '%s/%s', FUNDING_LETTER_PATH, $db_reqn_version->id );
     else if( 'ethics_filename' == $file ) return sprintf( '%s/%s', ETHICS_LETTER_PATH, $db_reqn_version->id );
     else if( 'data_sharing_filename' == $file ) return sprintf( '%s/%s', DATA_SHARING_LETTER_PATH, $db_reqn_version->id );

@@ -564,10 +564,15 @@ cenozo.service( 'CnReqnHelper', [
             e: {
               tab: { en: 'Scientific Review', fr: 'Évaluation scientifique' },
               text: {
-                en: 'Evidence of peer reviewed funding will be considered evidence of scientific review. <strong>If you have selected "yes", please upload proof of funding notification.</strong> If there are no plans to submit an application for financial support for this project please provide evidence of peer review (e.g. internal departmental review, thesis protocol defense, etc.) if available. If no evidence of scientific peer review is provided with this application then the project will undergo scientific review by the DSAC.',
-                fr: 'Les documents attestant l’attribution du financement seront considérés comme une preuve d’évaluation par les pairs. <strong>Si vous avez sélectionné « oui », veuillez télécharger une preuve de l’avis de financement.</strong> Si vous ne planifiez pas demander de l’aide financière pour ce projet, veuillez fournir la preuve qu’une évaluation par les pairs a été réalisée (p. ex. évaluation départementale, défense du protocole de thèse, etc.) si disponible. Si aucune preuve d’évaluation scientifique par les pairs n’est soumise avec la demande, le DSAC procédera à l’évaluation scientifique du projet.'
+                en: 'Evidence of peer reviewed funding will be considered evidence of scientific review. <strong>If you have selected "yes", please upload proof of funding notification.</strong> If there are no plans to submit an application for financial support for this project please provide evidence of peer review (e.g. internal departmental review, thesis protocol defense, etc.) if available.',
+                fr: 'Les documents attestant l’attribution du financement seront considérés comme une preuve d’évaluation par les pairs. <strong>Si vous avez sélectionné « oui », veuillez télécharger une preuve de l’avis de financement.</strong> Si vous ne planifiez pas demander de l’aide financière pour ce projet, veuillez fournir la preuve qu’une évaluation par les pairs a été réalisée (p. ex. évaluation départementale, défense du protocole de thèse, etc.) si disponible.'
               },
-              funding: { en: 'Peer Reviewed Funding', fr: 'Financement évalué par les pairs' },
+              peer_review: { en: 'Has the project been scientifically reviewed?', fr: 'Le projet a-t-il fait l’objet d’un examen scientifique?' },
+              peer_review_filename: {
+                en: 'Digital copy of proof of peer review',
+                fr: 'Copie numérique de la preuve de l’examen par les pairs'
+              },
+              funding: { en: 'Has the project received approval for funding?', fr: 'Le financement pour le projet a-t-il approuvé?' },
               funding_agency: { en: 'Funding agency', fr: 'L’Organisme de financement' },
               grant_number: { en: 'Grant Number', fr: 'Numéro de la subvention' },
               letter: {

@@ -66,6 +66,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
     objectives: { type: 'text' },
     methodology: { type: 'text' },
     analysis: { type: 'text' },
+    peer_review: { type: 'boolean' },
     funding: { type: 'enum' },
     funding_agency: { type: 'string' },
     grant_number: { type: 'string' },
@@ -107,6 +108,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
     deferral_note_2g: { column: 'reqn.deferral_note_2g', type: 'text' },
 
     coapplicant_agreement_filename: { type: 'string' },
+    peer_review_filename: { type: 'string' },
     funding_filename: { type: 'string' },
     ethics_filename: { type: 'string' },
     new_user_id: {
@@ -429,6 +431,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
         } );
 
         this.configureFileInput( 'coapplicant_agreement_filename' );
+        this.configureFileInput( 'peer_review_filename' );
         this.configureFileInput( 'funding_filename' );
         this.configureFileInput( 'ethics_filename' );
         this.configureFileInput( 'data_sharing_filename' );
@@ -795,6 +798,8 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                 },
                 e: { // scientific review
                   diff: false,
+                  peer_review: false,
+                  peer_review_filename: false,
                   funding: false,
                   funding_filename: false,
                   funding_agency: false,
@@ -1087,6 +1092,12 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                     path: 'reqn_version/' + version.id + '?file=coapplicant_agreement_filename'
                   } ).get().then( function( response ) {
                     version.coapplicant_agreement_size = response.data;
+                  } ),
+
+                  CnHttpFactory.instance( {
+                    path: 'reqn_version/' + version.id + '?file=peer_review_filename'
+                  } ).get().then( function( response ) {
+                    version.peer_review_size = response.data;
                   } ),
 
                   CnHttpFactory.instance( {
@@ -1779,7 +1790,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                   '1b': [ 'coapplicant_agreement_filename' ],
                   '1c': [ 'start_date', 'duration' ],
                   '1d': [ 'title', 'keywords', 'lay_summary', 'background', 'objectives', 'methodology', 'analysis' ],
-                  '1e': [ 'funding', 'funding_filename', 'funding_agency', 'grant_number' ],
+                  '1e': [ 'peer_review', 'funding', 'funding_filename', 'funding_agency', 'grant_number' ],
                   '1f': self.record.has_ethics_approval_list ? [ 'ethics' ] : [ 'ethics', 'ethics_filename' ],
                   '2cohort': [ 'tracking', 'comprehensive', 'longitudinal', 'last_identifier' ]
                 };
@@ -1812,8 +1823,8 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                         // only check 1b properties if there is a new coapplication with access to data
                         return self.addingCoapplicantWithData;
                       } else if( '1e' == tab ) {
-                        // only check 1e properties if funding=yes
-                        return 'funding' != property ? 'yes' == self.record.funding : true;
+                        // only check 1e funding properties if funding=yes
+                        return !['peer_review', 'funding'].includes( property ) ? 'yes' == self.record.funding : true;
                       } else if( 'ethics_filename' == property ) {
                         // only check the ethics filename if ethics=yes or exempt
                         return ['yes', 'exempt'].includes( self.record.ethics );
@@ -2046,13 +2057,14 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
 
           // override the service collection
           getServiceData: function( type, columnRestrictLists ) {
-            // Only include the coapplicant_agreement, funding, ethics, data_sharing and agreement filenames in the
+            // Only include the coapplicant_agreement, peer_review, funding, ethics, data_sharing and agreement filenames in the
             // view type in the lite instance
             return 'lite' == this.type ? {
               select: {
                 column: [
                   'is_current_version',
                   'coapplicant_agreement_filename',
+                  'peer_review_filename',
                   'funding_filename',
                   'ethics_filename',
                   'data_sharing_filename',

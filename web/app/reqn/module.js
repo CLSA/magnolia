@@ -288,6 +288,7 @@ define( [ 'output' ].reduce( function( list, name ) {
     current_final_report_id: { column: 'final_report.id', type: 'string', isExcluded: true },
     next_stage_type: { type: 'string', isExcluded: true },
     amendment: { column: 'reqn_version.amendment', type: 'string', isExcluded: true },
+    peer_review_filename: { column: 'reqn_version.peer_review_filename', type: 'string', isExcluded: true },
     funding_filename: { column: 'reqn_version.funding_filename', type: 'string', isExcluded: true },
     ethics_date: { column: 'reqn_version.ethics_date', type: 'date', isExcluded: true },
     ethics_filename: { column: 'reqn_version.ethics_filename', type: 'string', isExcluded: true },
@@ -571,6 +572,10 @@ define( [ 'output' ].reduce( function( list, name ) {
       title: 'Application + Data Checklist',
       operation: function( $state, model ) { model.viewModel.downloadApplicationAndChecklist(); }
     }, {
+      title: 'Proof of Peer Review',
+      operation: function( $state, model ) { model.viewModel.downloadPeerReview(); },
+      isDisabled: function( $state, model ) { return !model.viewModel.record.peer_review_filename; }
+    }, {
       title: 'Funding Letter',
       operation: function( $state, model ) { model.viewModel.downloadFundingLetter(); },
       isDisabled: function( $state, model ) { return !model.viewModel.record.funding_filename; }
@@ -758,6 +763,9 @@ define( [ 'output' ].reduce( function( list, name ) {
           downloadChecklist: function() { return CnReqnHelper.download( 'checklist', this.record.current_reqn_version_id ); },
           downloadApplicationAndChecklist: function() {
             return CnReqnHelper.download( 'application_and_checklist', this.record.current_reqn_version_id );
+          },
+          downloadPeerReview: function() {
+            return CnReqnHelper.download( 'peer_review_filename', this.record.current_reqn_version_id );
           },
           downloadFundingLetter: function() {
             return CnReqnHelper.download( 'funding_filename', this.record.current_reqn_version_id );
