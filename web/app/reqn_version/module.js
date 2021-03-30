@@ -160,6 +160,11 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
 
           scope.liteModel.viewModel.onView();
 
+          scope.$on( 'file removed', function( event, key ) {
+            scope.liteModel.viewModel.record.funding_filename = null;
+            scope.liteModel.viewModel.fileList.findByProperty( 'key', key ).size = '';
+          } );
+
           scope.model.viewModel.afterView( function() {
             var record = scope.model.viewModel.record;
 
@@ -417,11 +422,11 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
     'CnReqnHelper', 'CnModalNoticeListFactory', 'CnModalUploadAgreementFactory',
     'CnCoapplicantModelFactory', 'CnReferenceModelFactory', 'CnEthicsApprovalModelFactory', 'CnBaseViewFactory',
     'CnSession', 'CnHttpFactory', 'CnModalMessageFactory', 'CnModalConfirmFactory', 'CnModalSubmitLegacyFactory',
-    '$state', '$q', '$window',
+    '$state', '$q', '$window', '$rootScope',
     function( CnReqnHelper, CnModalNoticeListFactory, CnModalUploadAgreementFactory,
               CnCoapplicantModelFactory, CnReferenceModelFactory, CnEthicsApprovalModelFactory, CnBaseViewFactory,
               CnSession, CnHttpFactory, CnModalMessageFactory, CnModalConfirmFactory, CnModalSubmitLegacyFactory,
-              $state, $q, $window ) {
+              $state, $q, $window, $rootScope ) {
       var object = function( parentModel, root ) {
         var self = this;
         CnBaseViewFactory.construct( this, parentModel, root );
@@ -624,6 +629,18 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                         message: self.translate( 'part2.cohort.bothCohortNotice' ),
                         closeText: self.translate( 'misc.close' ),
                       } ).show();
+                    }
+                  } else if( angular.isDefined( data.peer_review ) ) {
+                    // use the root scope to get the view directive to remove the lite model's file
+                    $rootScope.$broadcast( 'file removed', 'peer_review_filename' );
+                  } else if( angular.isDefined( data.funding ) ) {
+                    if( 'yes' != data.funding ) {
+                      if( 'requested' != data.funding ) {
+                        self.record.funding_agency = null;
+                        self.record.grant_number = null;
+                      }
+                      // use the root scope to get the view directive to remove the lite model's file
+                      $rootScope.$broadcast( 'file removed', 'funding_filename' );
                     }
                   }
                 } );

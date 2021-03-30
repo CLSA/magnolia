@@ -19,6 +19,18 @@ class reqn_version extends \cenozo\database\record
    */
   public function save()
   {
+    // delete files if peer-review or funding are not selected
+    if( !$this->peer_review ) $this->peer_review_filename = NULL;
+    if( 'yes' != $this->funding )
+    {
+      if( 'requested' != $this->funding )
+      {
+        $this->funding_agency = NULL;
+        $this->grant_number = NULL;
+      }
+      $this->funding_filename = NULL;
+    }
+
     parent::save();
 
     // delete files if they are being set to null
