@@ -97,6 +97,8 @@ define( function() {
     funding_filename: { column: 'reqn_version.funding_filename', type: 'hidden' },
     ethics_filename: { column: 'reqn_version.ethics_filename', type: 'hidden' },
     agreement_filename: { column: 'reqn_version.agreement_filename', type: 'hidden' },
+    agreement_start_date: { column: 'reqn_version.agreement_start_date', type: 'date' },
+    agreement_end_date: { column: 'reqn_version.agreement_end_date', type: 'date' },
     editable: { type: 'boolean', isExcluded: true }
   } );
 

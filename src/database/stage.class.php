@@ -52,7 +52,7 @@ class stage extends \cenozo\database\record
     }
     else if( 'Agreement' == $db_stage_type->name )
     {
-      // make sure both the agreement and ethics files have been attached
+      // make sure all mandatory fields are filled and files are attached
       $db_reqn = $this->get_reqn();
       $db_reqn_version = $db_reqn->get_current_reqn_version();
 
@@ -64,9 +64,11 @@ class stage extends \cenozo\database\record
         );
       }
 
-      if( is_null( $db_reqn_version->agreement_filename ) )
+      if( is_null( $db_reqn_version->agreement_filename ) ||
+          is_null( $db_reqn_version->agreement_start_date ) ||
+          is_null( $db_reqn_version->agreement_end_date ) )
       {
-        return 'The agreement letter must be attached before proceeding to the next stage.';
+        return 'The agreement letter must be attached with start and end dates defined before proceeding to the next stage.';
       }
     }
     else

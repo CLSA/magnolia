@@ -164,6 +164,8 @@ class reqn extends \cenozo\database\record
     $db_reqn_version->datetime = util::get_datetime_object();
     $db_reqn_version->version = $version;
     $db_reqn_version->agreement_filename = NULL;
+    $db_reqn_version->agreement_start_date = NULL;
+    $db_reqn_version->agreement_end_date = NULL;
     if( $new_amendment ) $db_reqn_version->amendment_justification = NULL;
 
     // determine the amendment
@@ -269,7 +271,7 @@ class reqn extends \cenozo\database\record
     $db_final_report = lib::create( 'database\final_report' );
     if( !is_null( $db_current_final_report ) ) $db_final_report->copy( $db_current_final_report );
 
-    // set the parent, datetime, version and agreement_filename (never use the current)
+    // define some of the column values insetad of using the clone
     $db_final_report->reqn_id = $this->id;
     $db_final_report->datetime = util::get_datetime_object();
     $db_final_report->version = $version;
@@ -291,7 +293,7 @@ class reqn extends \cenozo\database\record
   /**
    * Returns the path to various files associated with the reqn
    * 
-   * @param string $type Should be 'agreement' or 'instruction'
+   * @param string $type Should be 'agreement', 'instruction', or 'reviews'
    * @return string
    * @access public
    */
@@ -299,8 +301,8 @@ class reqn extends \cenozo\database\record
   {
     $directory = '';
     if( 'agreements' == $type ) return sprintf( '%s/%s.zip', AGREEMENT_LETTER_PATH, $this->id );
-    else if( 'reviews' == $type ) return sprintf( '%s/%s.txt', DATA_REVIEWS_PATH, $this->id );
     else if( 'instruction' == $type ) $directory = INSTRUCTION_FILE_PATH;
+    else if( 'reviews' == $type ) return sprintf( '%s/%s.txt', DATA_REVIEWS_PATH, $this->id );
     else throw lib::create( 'exception\argument', 'type', $type, __METHOD__ );
     return sprintf( '%s/%s', $directory, $this->id );
   }
@@ -1201,8 +1203,32 @@ class reqn extends \cenozo\database\record
    */
   public static function send_expired_agreement_notifications()
   {
-    // not yet implemented
-    return 0;
+    $notification_type_class_name = lib::get_class_name( 'database\notification_type' );
+    $db_notification_type = $notification_type_class_name::get_unique_record( 'name', 'Agreement Expiry Notice' );
+
+    $modifier = lib::create( 'database\modifier' );
+    $modifier->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
+    $modifier->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
+    $join_mod = lib::create( 'database\modifier' );
+    $join_mod->where( 'reqn.id', '=', 'notification.reqn_id', false );
+    $join_mod->where( 'notification.notification_type_id', '=', $db_notification_type->id );
+    $join_mod->where( 'TIMESTAMPDIFF( DAY, UTC_TIMESTAMP(), notification.datetime )', '=', 0 );
+    $modifier->join_modifier( 'notification', $join_mod, 'left' );
+    $modifier->where( 'TIMESTAMPDIFF( MONTH, UTC_TIMESTAMP(), reqn_version.agreement_end_date + INTERVAL 1 DAY )', '=', 1 );
+    $modifier->where( 'DAY( reqn_version.agreement_end_date )', '=', 'DAY( UTC_TIMESTAMP() )', false );
+    $modifier->where( 'notification.id', '=', NULL );
+
+    $reqn_list = static::select_objects( $modifier );
+
+    foreach( $reqn_list as $db_reqn )
+    {
+      $db_notification = lib::create( 'database\notification' );
+      $db_notification->notification_type_id = $db_notification_type->id;
+      $db_notification->set_reqn( $db_reqn ); // this saves the record
+      $db_notification->mail();
+    }
+
+    return count( $reqn_list );
   }
 
   /**
