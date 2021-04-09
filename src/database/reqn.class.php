@@ -1177,13 +1177,14 @@ class reqn extends \cenozo\database\record
     $join_mod = lib::create( 'database\modifier' );
     $join_mod->where( 'reqn.id', '=', 'notification.reqn_id', false );
     $join_mod->where( 'notification.notification_type_id', '=', $db_notification_type->id );
-    $join_mod->where( 'TIMESTAMPDIFF( DAY, notification.datetime, UTC_TIMESTAMP() )', '=', 0 );
+    $join_mod->where( 'TIMESTAMPDIFF( DAY, UTC_TIMESTAMP(), notification.datetime )', '=', 0 );
     $modifier->join_modifier( 'notification', $join_mod, 'left' );
-    $modifier->where( 'TIMESTAMPDIFF( MONTH, ethics_approval.date, UTC_TIMESTAMP() )', '=', 1 );
+    $modifier->where( 'TIMESTAMPDIFF( MONTH, UTC_TIMESTAMP(), ethics_approval.date + INTERVAL 1 DAY )', '=', 1 );
     $modifier->where( 'DAY( ethics_approval.date )', '=', 'DAY( UTC_TIMESTAMP() )', false );
     $modifier->where( 'notification.id', '=', NULL );
 
     $reqn_list = static::select_objects( $modifier );
+
     foreach( $reqn_list as $db_reqn )
     {
       $db_notification = lib::create( 'database\notification' );
@@ -1200,31 +1201,8 @@ class reqn extends \cenozo\database\record
    */
   public static function send_expired_agreement_notifications()
   {
-    $notification_type_class_name = lib::get_class_name( 'database\notification_type' );
-    $db_notification_type = $notification_type_class_name::get_unique_record( 'name', 'Agreement Expiry Notice' );
-
-    $modifier = lib::create( 'database\modifier' );
-    $modifier->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
-    $modifier->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
-    $join_mod = lib::create( 'database\modifier' );
-    $join_mod->where( 'reqn.id', '=', 'notification.reqn_id', false );
-    $join_mod->where( 'notification.notification_type_id', '=', $db_notification_type->id );
-    $join_mod->where( 'TIMESTAMPDIFF( DAY, notification.datetime, UTC_TIMESTAMP() )', '=', 0 );
-    $modifier->join_modifier( 'notification', $join_mod, 'left' );
-    $modifier->where( 'TIMESTAMPDIFF( MONTH, reqn_version.agreement_end_date, UTC_TIMESTAMP() )', '=', 1 );
-    $modifier->where( 'DAY( reqn_version.agreement_end_date )', '=', 'DAY( UTC_TIMESTAMP() )', false );
-    $modifier->where( 'notification.id', '=', NULL );
-
-    $reqn_list = static::select_objects( $modifier );
-    foreach( $reqn_list as $db_reqn )
-    {
-      $db_notification = lib::create( 'database\notification' );
-      $db_notification->notification_type_id = $db_notification_type->id;
-      $db_notification->set_reqn( $db_reqn ); // this saves the record
-      $db_notification->mail();
-    }
-
-    return count( $reqn_list );
+    // not yet implemented
+    return 0;
   }
 
   /**
