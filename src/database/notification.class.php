@@ -45,7 +45,6 @@ class notification extends \cenozo\database\record
   {
     $db_user = $db_reqn->get_user();
     $db_trainee_user = $db_reqn->get_trainee_user();
-    $db_reqn_version = $db_reqn->get_current_reqn_version();
     $this->reqn_id = $db_reqn->id;
     $this->datetime = util::get_datetime_object();
     $this->save();
@@ -68,68 +67,21 @@ class notification extends \cenozo\database\record
     $setting_manager = lib::create( 'business\setting_manager' );
     $mail_manager = lib::create( 'business\mail_manager' );
 
-    $db_reqn = $this->get_reqn();
-    $db_user = $db_reqn->get_user();
-    $db_trainee_user = $db_reqn->get_trainee_user();
-    $db_reqn_version = $db_reqn->get_current_reqn_version();
-    $language = $db_reqn->get_language()->code;
+    $language = $this->get_reqn()->get_language()->code;
     $db_notification_type = $this->get_notification_type();
-
-    // fill in dynamic details in the message subject
-    $subject = str_replace(
-      array(
-        '{{reqn_type}}',
-        '{{identifier}}',
-        '{{title}}',
-        '{{applicant_name}}',
-        '{{trainee_name}}'
-      ),
-      array(
-        $db_reqn->get_reqn_type()->name,
-        $db_reqn->identifier,
-        $db_reqn_version->title,
-        sprintf( '%s %s', $db_user->first_name, $db_user->last_name ),
-        is_null( $db_trainee_user ) ? '' : sprintf( '%s %s', $db_trainee_user->first_name, $db_trainee_user->last_name )
-      ),
-      'en' == $language ? $db_notification_type->title_en : $db_notification_type->title_fr
-    );
-
-    $message = str_replace(
-      array(
-        '{{reqn_type}}',
-        '{{identifier}}',
-        '{{title}}',
-        '{{applicant_name}}',
-        '{{trainee_name}}'
-      ),
-      array(
-        $db_reqn->get_reqn_type()->name,
-        $db_reqn->identifier,
-        $db_reqn_version->title,
-        sprintf( '%s %s', $db_user->first_name, $db_user->last_name ),
-        is_null( $db_trainee_user ) ? '' : sprintf( '%s %s', $db_trainee_user->first_name, $db_trainee_user->last_name )
-      ),
-      'en' == $language ? $db_notification_type->message_en : $db_notification_type->message_fr
-    );
-
-    if( is_null( $db_reqn->trainee_user_id ) )
-    {
-      $subject = preg_replace( '/{{if_trainee}}.*?{{endif_trainee}}/', '', $subject );
-      $message = preg_replace( '/{{if_trainee}}.*?{{endif_trainee}}/', '', $message );
-    }
-    else
-    {
-      $subject = str_replace( array( '{{if_trainee}}', '{{endif_trainee}}' ), '', $subject );
-      $message = str_replace( array( '{{if_trainee}}', '{{endif_trainee}}' ), '', $message );
-    }
 
     $select = lib::create( 'database\select' );
     $select->add_column( 'email' );
     $select->add_column( 'name' );
     foreach( $this->get_notification_email_list() as $email ) $mail_manager->to( $email['email'], $email['name'] );
 
-    $mail_manager->set_subject( $subject );
-    $mail_manager->set_body( $message );
+    // fill in dynamic details in the message's subject and body
+    $mail_manager->set_subject(
+      $this->compile( 'en' == $language ? $db_notification_type->title_en : $db_notification_type->title_fr )
+    );
+    $mail_manager->set_body(
+      $this->compile( 'en' == $language ? $db_notification_type->message_en : $db_notification_type->message_fr )
+    );
 
     // add cc and bcc recipients
     $select = lib::create( 'database\select' );
@@ -160,5 +112,44 @@ class notification extends \cenozo\database\record
       $mail_manager->set_body( $message );
       $mail_manager->send();
     }
+  }
+
+  /**
+   * Fills in dynamic text
+   */
+  private function compile( $string )
+  {
+    $db_reqn = $this->get_reqn();
+    $db_reqn_version = $db_reqn->get_current_reqn_version();
+    $db_user = $db_reqn->get_user();
+    $db_trainee_user = $db_reqn->get_trainee_user();
+
+    // fill in dynamic details in the message subject
+
+    return preg_replace(
+      // remove all trainee text if no trainee, otherwise just remove the if/endif syntax
+      is_null( $db_reqn->trainee_user_id ) ?
+        '/{{if_trainee}}.*?{{endif_trainee}}/' :
+        array( '{{if_trainee}}', '{{endif_trainee}}' ),
+      '',
+      // search/replace dynamic text
+      str_replace(
+        array(
+          '{{reqn_type}}',
+          '{{identifier}}',
+          '{{title}}',
+          '{{applicant_name}}',
+          '{{trainee_name}}'
+        ),
+        array(
+          $db_reqn->get_reqn_type()->name,
+          $db_reqn->identifier,
+          $db_reqn_version->title,
+          sprintf( '%s %s', $db_user->first_name, $db_user->last_name ),
+          is_null( $db_trainee_user ) ? '' : sprintf( '%s %s', $db_trainee_user->first_name, $db_trainee_user->last_name )
+        ),
+        $string
+      )
+    );
   }
 }

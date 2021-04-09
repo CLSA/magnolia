@@ -77,6 +77,8 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
     tracking: { type: 'boolean' },
     longitudinal: { type: 'boolean' },
     last_identifier: { type: 'string' },
+    agreement_start_date: { type: 'date' },
+    agreement_end_date: { type: 'date' },
     amendment_justification: { type: 'text' },
 
     current_final_report_id: { column: 'final_report.id', type: 'string' },

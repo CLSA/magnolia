@@ -164,6 +164,8 @@ class reqn extends \cenozo\database\record
     $db_reqn_version->datetime = util::get_datetime_object();
     $db_reqn_version->version = $version;
     $db_reqn_version->agreement_filename = NULL;
+    $db_reqn_version->agreement_start_date = NULL;
+    $db_reqn_version->agreement_end_date = NULL;
     if( $new_amendment ) $db_reqn_version->amendment_justification = NULL;
 
     // determine the amendment
@@ -269,7 +271,7 @@ class reqn extends \cenozo\database\record
     $db_final_report = lib::create( 'database\final_report' );
     if( !is_null( $db_current_final_report ) ) $db_final_report->copy( $db_current_final_report );
 
-    // set the parent, datetime, version and agreement_filename (never use the current)
+    // define some of the column values insetad of using the clone
     $db_final_report->reqn_id = $this->id;
     $db_final_report->datetime = util::get_datetime_object();
     $db_final_report->version = $version;
@@ -291,7 +293,7 @@ class reqn extends \cenozo\database\record
   /**
    * Returns the path to various files associated with the reqn
    * 
-   * @param string $type Should be 'agreement' or 'instruction'
+   * @param string $type Should be 'agreement', 'instruction', or 'reviews'
    * @return string
    * @access public
    */
@@ -299,8 +301,8 @@ class reqn extends \cenozo\database\record
   {
     $directory = '';
     if( 'agreements' == $type ) return sprintf( '%s/%s.zip', AGREEMENT_LETTER_PATH, $this->id );
-    else if( 'reviews' == $type ) return sprintf( '%s/%s.txt', DATA_REVIEWS_PATH, $this->id );
     else if( 'instruction' == $type ) $directory = INSTRUCTION_FILE_PATH;
+    else if( 'reviews' == $type ) return sprintf( '%s/%s.txt', DATA_REVIEWS_PATH, $this->id );
     else throw lib::create( 'exception\argument', 'type', $type, __METHOD__ );
     return sprintf( '%s/%s', $directory, $this->id );
   }
@@ -1177,13 +1179,14 @@ class reqn extends \cenozo\database\record
     $join_mod = lib::create( 'database\modifier' );
     $join_mod->where( 'reqn.id', '=', 'notification.reqn_id', false );
     $join_mod->where( 'notification.notification_type_id', '=', $db_notification_type->id );
-    $join_mod->where( 'TIMESTAMPDIFF( DAY, notification.datetime, UTC_TIMESTAMP() )', '=', 0 );
+    $join_mod->where( 'TIMESTAMPDIFF( DAY, UTC_TIMESTAMP(), notification.datetime )', '=', 0 );
     $modifier->join_modifier( 'notification', $join_mod, 'left' );
-    $modifier->where( 'TIMESTAMPDIFF( MONTH, ethics_approval.date, UTC_TIMESTAMP() )', '=', 1 );
+    $modifier->where( 'TIMESTAMPDIFF( MONTH, UTC_TIMESTAMP(), ethics_approval.date + INTERVAL 1 DAY )', '=', 1 );
     $modifier->where( 'DAY( ethics_approval.date )', '=', 'DAY( UTC_TIMESTAMP() )', false );
     $modifier->where( 'notification.id', '=', NULL );
 
     $reqn_list = static::select_objects( $modifier );
+
     foreach( $reqn_list as $db_reqn )
     {
       $db_notification = lib::create( 'database\notification' );
@@ -1209,13 +1212,14 @@ class reqn extends \cenozo\database\record
     $join_mod = lib::create( 'database\modifier' );
     $join_mod->where( 'reqn.id', '=', 'notification.reqn_id', false );
     $join_mod->where( 'notification.notification_type_id', '=', $db_notification_type->id );
-    $join_mod->where( 'TIMESTAMPDIFF( DAY, notification.datetime, UTC_TIMESTAMP() )', '=', 0 );
+    $join_mod->where( 'TIMESTAMPDIFF( DAY, UTC_TIMESTAMP(), notification.datetime )', '=', 0 );
     $modifier->join_modifier( 'notification', $join_mod, 'left' );
-    $modifier->where( 'TIMESTAMPDIFF( MONTH, reqn_version.agreement_end_date, UTC_TIMESTAMP() )', '=', 1 );
+    $modifier->where( 'TIMESTAMPDIFF( MONTH, UTC_TIMESTAMP(), reqn_version.agreement_end_date + INTERVAL 1 DAY )', '=', 1 );
     $modifier->where( 'DAY( reqn_version.agreement_end_date )', '=', 'DAY( UTC_TIMESTAMP() )', false );
     $modifier->where( 'notification.id', '=', NULL );
 
     $reqn_list = static::select_objects( $modifier );
+
     foreach( $reqn_list as $db_reqn )
     {
       $db_notification = lib::create( 'database\notification' );
