@@ -1031,18 +1031,6 @@ class reqn extends \cenozo\database\record
   }
 
   /**
-   * Returns the requisition's study-data paths
-   * 
-   * @param string $type One of "data" or "web"
-   * @return string
-   */
-  public function get_study_data_path( $type )
-  {
-    if( !in_array( $type, array( 'data', 'web' ) ) ) throw lib::create( 'exception\argument', 'type', $type, __METHOD__ );
-    return sprintf( '%s/%s/%s', STUDY_DATA_PATH, $type, 'data' == $type ? $this->identifier : $this->data_directory );
-  }
-
-  /**
    * Returns the number of days left before the reqn's study-data will expire
    * 
    * @return integer
@@ -1063,25 +1051,79 @@ class reqn extends \cenozo\database\record
     $web_path = $this->get_study_data_path( 'web' );
     $db_reqn_version = $this->get_current_reqn_version();
 
-    // delete all existing links
-    util::exec_timeout( sprintf( 'rm -rf %s/*', $web_path ) );
-
-    // by default we'll remove the expiry date (possible set below if a data exists)
-    $this->data_expiry_date = NULL;
-
-    // create a relative link to the data files
-    $list = glob( $data_path.'/*' );
-    if( false !== $list )
+    // we might not have a web path at this point, so ignore if we don't
+    if( !is_null( $data_path ) && !is_null( $web_path ) )
     {
-      $files_exist = false;
-      foreach( $list as $file )
-      {
-        if( is_file( $file ) )
-        {
-          $files_exist = true;
-          $filename = sprintf( '../../data/%s%s', $this->identifier, str_replace( $data_path, '', $file ) );
-          $link = str_replace( $data_path, $web_path, $file );
+      // delete all existing links
+      util::exec_timeout( sprintf( 'rm -rf %s/*', $web_path ) );
 
+      // by default we'll remove the expiry date (possible set below if a data exists)
+      $this->data_expiry_date = NULL;
+
+      // create a relative link to the data files
+      $list = glob( $data_path.'/*' );
+      if( false !== $list )
+      {
+        $files_exist = false;
+        foreach( $list as $file )
+        {
+          if( is_file( $file ) )
+          {
+            $files_exist = true;
+            $filename = sprintf( '../../data/%s%s', $this->identifier, str_replace( $data_path, '', $file ) );
+            $link = str_replace( $data_path, $web_path, $file );
+
+            $result = symlink( $filename, $link );
+            if( !$result )
+            {
+              throw lib::create( 'exception\runtime', sprintf(
+                'Unable to create link to "%s" named "%s".',
+                $link,
+                $filename
+              ), __METHOD__ );
+            }
+          }
+        }
+
+        if( $files_exist )
+        {
+          // update the data expiry date
+          $expiry = util::get_datetime_object();
+          $expiry->add( new \DateInterval( sprintf(
+            'P%dD', $setting_manager->get_setting( 'general', 'study_data_expiry' )
+          ) ) );
+          $this->data_expiry_date = $expiry;
+        }
+      }
+
+      $this->save();
+
+      // add the instructions
+      $filename = $this->get_filename( 'instruction' );
+      if( is_file( $filename ) )
+      {
+        $link = sprintf( '%s/%s', $web_path, $this->instruction_filename );
+        $result = symlink( $filename, $link );
+        if( !$result )
+        {
+          throw lib::create( 'exception\runtime', sprintf(
+            'Unable to create link to "%s" named "%s".',
+            $link,
+            $filename
+          ), __METHOD__ );
+        }
+      }
+
+      // add all supplemental files
+      $lang = $this->get_language()->code;
+      foreach( $supplemental_file_class_name::select_objects() as $db_supplemental_file )
+      {
+        $name = sprintf( 'name_%s', $lang );
+        $filename = $db_supplemental_file->get_filename( $lang );
+        $link = sprintf( '%s/%s', $web_path, $db_supplemental_file->$name );
+
+        if( is_file( $filename ) )
+        {
           $result = symlink( $filename, $link );
           if( !$result )
           {
@@ -1091,56 +1133,6 @@ class reqn extends \cenozo\database\record
               $filename
             ), __METHOD__ );
           }
-        }
-      }
-
-      if( $files_exist )
-      {
-        // update the data expiry date
-        $expiry = util::get_datetime_object();
-        $expiry->add( new \DateInterval( sprintf(
-          'P%dD', $setting_manager->get_setting( 'general', 'study_data_expiry' )
-        ) ) );
-        $this->data_expiry_date = $expiry;
-      }
-    }
-
-    $this->save();
-
-    // add the instructions
-    $filename = $this->get_filename( 'instruction' );
-    if( is_file( $filename ) )
-    {
-      $link = sprintf( '%s/%s', $web_path, $this->instruction_filename );
-      $result = symlink( $filename, $link );
-      if( !$result )
-      {
-        throw lib::create( 'exception\runtime', sprintf(
-          'Unable to create link to "%s" named "%s".',
-          $link,
-          $filename
-        ), __METHOD__ );
-      }
-    }
-
-    // add all supplemental files
-    $lang = $this->get_language()->code;
-    foreach( $supplemental_file_class_name::select_objects() as $db_supplemental_file )
-    {
-      $name = sprintf( 'name_%s', $lang );
-      $filename = $db_supplemental_file->get_filename( $lang );
-      $link = sprintf( '%s/%s', $web_path, $db_supplemental_file->$name );
-
-      if( is_file( $filename ) )
-      {
-        $result = symlink( $filename, $link );
-        if( !$result )
-        {
-          throw lib::create( 'exception\runtime', sprintf(
-            'Unable to create link to "%s" named "%s".',
-            $link,
-            $filename
-          ), __METHOD__ );
         }
       }
     }
@@ -1160,7 +1152,8 @@ class reqn extends \cenozo\database\record
     foreach( $reqn_list as $db_reqn )
     {
       // delete all existing links
-      util::exec_timeout( sprintf( 'rm -rf %s/*', $db_reqn->get_study_data_path( 'web' ) ) );
+      $web_path = $db_reqn->get_study_data_path( 'web' );
+      if( !is_null( $web_path ) ) util::exec_timeout( sprintf( 'rm -rf %s/*', $web_path ) );
 
       // remove the expiry date
       $db_reqn->data_expiry_date = NULL;
@@ -1255,6 +1248,28 @@ class reqn extends \cenozo\database\record
   public function mark_notices_read_by_trainee()
   {
     $this->mark_notices_read_by_user( 'trainee' );
+  }
+
+  /**
+   * Returns the requisition's study-data paths
+   * 
+   * @param string $type One of "data" or "web"
+   * @return string
+   */
+  private function get_study_data_path( $type )
+  {
+    if( !in_array( $type, array( 'data', 'web' ) ) ) throw lib::create( 'exception\argument', 'type', $type, __METHOD__ );
+
+    // the web path may not exist, return NULL if it doesn't
+    $path_postfix = 'data' == $type ? $this->identifier : $this->data_directory;
+    return is_null( $path_postfix ) ?
+      NULL :
+      sprintf(
+        '%s/%s/%s',
+        STUDY_DATA_PATH,
+        $type,
+        'data' == $type ? $this->identifier : $this->data_directory
+      );
   }
 
   /**
