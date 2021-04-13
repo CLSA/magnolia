@@ -72,6 +72,9 @@ class module extends \cenozo\service\module
     if( $select->has_columns( 'has_agreement_filename' ) )
       $select->add_column( 'agreement_filename IS NOT NULL', 'has_agreement_filename', true, 'boolean' );
 
+    if( $select->has_table_columns( 'reqn_type' ) )
+      $modifier->join( 'reqn_type', 'reqn.reqn_type_id', 'reqn_type.id' );
+
     if( $select->has_table_columns( 'stage' ) || $select->has_table_columns( 'stage_type' ) )
     {
       $join_mod = lib::create( 'database\modifier' );
