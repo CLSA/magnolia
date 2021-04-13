@@ -1207,8 +1207,8 @@ class reqn extends \cenozo\database\record
     $db_notification_type = $notification_type_class_name::get_unique_record( 'name', 'Agreement Expiry Notice' );
 
     $modifier = lib::create( 'database\modifier' );
-    $modifier->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
-    $modifier->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
+    $modifier->join( 'reqn_last_reqn_version_with_agreement', 'reqn.id', 'reqn_last_reqn_version_with_agreement.reqn_id' );
+    $modifier->join( 'reqn_version', 'reqn_last_reqn_version_with_agreement.reqn_version_id', 'reqn_version.id' );
     $join_mod = lib::create( 'database\modifier' );
     $join_mod->where( 'reqn.id', '=', 'notification.reqn_id', false );
     $join_mod->where( 'notification.notification_type_id', '=', $db_notification_type->id );
