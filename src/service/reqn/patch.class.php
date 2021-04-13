@@ -65,7 +65,7 @@ class patch extends \cenozo\service\patch
       }
       else if( 'abandon' == $action )
       {
-        if( !in_array( $db_role->name, array( 'applicant', 'administrator' ) ) || 'deferred' != $state ) $code = 403;
+        if( !in_array( $db_role->name, array( 'applicant', 'administrator' ) ) ) $code = 403;
         else if( '.' != $db_reqn_version->amendment )
         {
           // do not allow an amendment to be abandoned once it has gone past the admin review
