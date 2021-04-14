@@ -108,7 +108,7 @@ class patch extends \cenozo\service\patch
           else if( !$db_reqn->legacy && 'new' == $phase )
           {
             // check to make sure the start date is appropriate (for non-consortium reqns)
-            if( 'Consortium' != $db_reqn->get_reqn_type() )
+            if( 'Consortium' != $db_reqn->get_reqn_type()->name )
             {
               $delay = lib::create( 'business\setting_manager' )->get_setting( 'general', 'start_date_delay' );
               $db_reqn->save(); // this will make sure the deadline is appropriate
