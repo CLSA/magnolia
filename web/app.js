@@ -324,7 +324,7 @@ cenozo.service( 'CnReqnHelper', [
       download: function( subject, id ) {
         var http = {
           path: 'final_report' == subject ? 'final_report/' + id : 'reqn_version/' + id + '?file=' + subject,
-          format: 'final_report' == subject ? 'pdf' : 'unknown'
+          format: 'final_report' == subject ? 'pdf' : 'data_options' == subject ? 'csv' : 'unknown'
         };
         return CnHttpFactory.instance( http ).file();
       },

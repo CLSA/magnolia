@@ -13,7 +13,7 @@ global $SETTINGS;
 $SETTINGS['general']['application_name'] = 'magnolia';
 $SETTINGS['general']['instance_name'] = $SETTINGS['general']['application_name'];
 $SETTINGS['general']['version'] = '2.7';
-$SETTINGS['general']['build'] = '14f035b';
+$SETTINGS['general']['build'] = '277918e';
 
 // the location of magnolia internal path
 $SETTINGS['path']['APPLICATION'] = str_replace( '/settings.ini.php', '', __FILE__ );
@@ -26,6 +26,9 @@ $SETTINGS['path']['DATA_CHECKLIST'] = str_replace( 'settings.ini.php', 'doc/data
 
 // the location of data application forms (defaults to magnolia/doc/data_application)
 $SETTINGS['path']['DATA_APPLICATION_AND_CHECKLIST'] = str_replace( 'settings.ini.php', 'doc/data_application_and_checklist', __FILE__ );
+
+// the location of data checklist forms (defaults to magnolia/doc/data_checklist)
+$SETTINGS['path']['DATA_OPTION_LIST'] = str_replace( 'settings.ini.php', 'doc/data_option_list', __FILE__ );
 
 // the location of data reviews forms (defaults to magnolia/doc/data_reviews)
 $SETTINGS['path']['DATA_REVIEWS'] = str_replace( 'settings.ini.php', 'doc/data_reviews', __FILE__ );

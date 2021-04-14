@@ -17,7 +17,9 @@ class get extends \cenozo\service\downloadable
    */
   protected function get_downloadable_mime_type_list()
   {
-    return array( 'application/octet-stream', 'application/pdf' );
+    return 'data_options' == $this->get_argument( 'file' ) ?
+      array( 'text/csv' ) :
+      array( 'application/octet-stream', 'application/pdf' );
   }
 
   /**
@@ -70,6 +72,15 @@ class get extends \cenozo\service\downloadable
         $db_reqn_version->version
       );
     }
+    else if( 'data_options' == $file )
+    {
+      return sprintf(
+        'Data Options %s version %s%d.csv',
+        $db_reqn->identifier,
+        '.' == $db_reqn_version->amendment ? '' : $db_reqn_version->amendment,
+        $db_reqn_version->version
+      );
+    }
 
     throw lib::create( 'exception\argument', 'file', $file, __METHOD__ );
   }
@@ -93,6 +104,7 @@ class get extends \cenozo\service\downloadable
     else if( 'application' == $file ) return sprintf( '%s/%s.pdf', DATA_APPLICATION_PATH, $db_reqn_version->id );
     else if( 'application_and_checklist' == $file )
       return sprintf( '%s/%s.pdf', DATA_APPLICATION_AND_CHECKLIST_PATH, $db_reqn_version->id );
+    else if( 'data_options' == $file ) return sprintf( '%s/%s.csv', DATA_OPTION_LIST_PATH, $db_reqn_version->id );
 
     throw lib::create( 'exception\argument', 'file', $file, __METHOD__ );
   }
@@ -110,6 +122,7 @@ class get extends \cenozo\service\downloadable
     $db_reqn_version = $this->get_leaf_record();
     $file = $this->get_argument( 'file', NULL );
     if( in_array( $file, ['application', 'checklist', 'application_and_checklist'] ) ) $db_reqn_version->generate_pdf_forms();
+    else if( 'data_options' == $file ) $db_reqn_version->generate_data_option_list_csv();
     else if( 'coapplicant_agreement_template' == $file ) $db_reqn_version->generate_coapplicant_agreement_template_form();
   }
 
