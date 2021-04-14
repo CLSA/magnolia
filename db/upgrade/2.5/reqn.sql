@@ -3,6 +3,14 @@ DELIMITER //
 CREATE PROCEDURE patch_reqn()
   BEGIN
 
+    -- determine the @cenozo database name
+    SET @cenozo = (
+      SELECT unique_constraint_schema
+      FROM information_schema.referential_constraints
+      WHERE constraint_schema = DATABASE()
+      AND constraint_name = "fk_access_site_id"
+    );
+
     SELECT "Adding 'inactive' option to state enum in reqn table" AS "";
 
     SELECT COUNT(*) INTO @test
