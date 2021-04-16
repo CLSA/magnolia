@@ -16,7 +16,7 @@ DROP PROCEDURE IF EXISTS patch_report_restriction;
     SET @sql = CONCAT(
       "INSERT IGNORE INTO ", @cenozo, ".report_restriction ( ",
         "report_type_id, rank, name, title, mandatory, null_allowed, restriction_type, custom, subject, description ) ",
-      "SELECT report_type.id, 1, 'deadline', 'Deadline', 0, 0, 'table', 1, 'deadline', ",
+      "SELECT report_type.id, 1, 'deadline', 'Deadline', 0, 0, 'table', 0, 'deadline', ",
              "'Which deadline to select requisitions from.' ",
       "FROM ", @cenozo, ".report_type ",
       "WHERE report_type.name = 'deadline_data_option'" );
