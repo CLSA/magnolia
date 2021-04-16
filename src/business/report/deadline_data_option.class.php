@@ -53,14 +53,14 @@ class deadline_data_option extends \cenozo\business\report\base_report
     $join_mod = lib::create( 'database\modifier' );
     $join_mod->where( 'data_option.id', '=', 'bl_reqn_version_data_option.data_option_id', false );
     $join_mod->where( 'bl_reqn_version_data_option.study_phase_id', '=', $bl_id );
-    $join_mod->where( 'bl_reqn_version_data_option.reqn_version_id', '=', 'reqn.id', false );
+    $join_mod->where( 'bl_reqn_version_data_option.reqn_version_id', '=', 'reqn_version.id', false );
     $modifier->join_modifier( 'reqn_version_data_option', $join_mod, 'left', 'bl_reqn_version_data_option' );
 
     // join to whether the reqn selected each data option for follow-up 1
     $join_mod = lib::create( 'database\modifier' );
     $join_mod->where( 'data_option.id', '=', 'f1_reqn_version_data_option.data_option_id', false );
     $join_mod->where( 'f1_reqn_version_data_option.study_phase_id', '=', $f1_id );
-    $join_mod->where( 'f1_reqn_version_data_option.reqn_version_id', '=', 'reqn.id', false );
+    $join_mod->where( 'f1_reqn_version_data_option.reqn_version_id', '=', 'reqn_version.id', false );
     $modifier->join_modifier( 'reqn_version_data_option', $join_mod, 'left', 'f1_reqn_version_data_option' );
 
     $this->apply_restrictions( $modifier );
