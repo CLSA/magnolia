@@ -572,6 +572,9 @@ define( [ 'output' ].reduce( function( list, name ) {
       title: 'Application + Data Checklist',
       operation: function( $state, model ) { model.viewModel.downloadApplicationAndChecklist(); }
     }, {
+      title: 'Selected Data Options',
+      operation: function( $state, model ) { model.viewModel.downloadDataOptions(); }
+    }, {
       title: 'Proof of Peer Review',
       operation: function( $state, model ) { model.viewModel.downloadPeerReview(); },
       isDisabled: function( $state, model ) { return !model.viewModel.record.peer_review_filename; }
@@ -764,6 +767,7 @@ define( [ 'output' ].reduce( function( list, name ) {
           downloadApplicationAndChecklist: function() {
             return CnReqnHelper.download( 'application_and_checklist', this.record.current_reqn_version_id );
           },
+          downloadDataOptions: function() { return CnReqnHelper.download( 'data_options', this.record.current_reqn_version_id ); },
           downloadPeerReview: function() {
             return CnReqnHelper.download( 'peer_review_filename', this.record.current_reqn_version_id );
           },

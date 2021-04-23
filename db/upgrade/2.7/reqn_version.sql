@@ -64,3 +64,36 @@ DELIMITER ;
 
 CALL patch_reqn_version();
 DROP PROCEDURE IF EXISTS patch_reqn_version;
+
+
+DELIMITER $$
+
+DROP TRIGGER IF EXISTS reqn_version_AFTER_INSERT $$
+CREATE DEFINER = CURRENT_USER TRIGGER reqn_version_AFTER_INSERT AFTER INSERT ON reqn_version FOR EACH ROW
+BEGIN
+  CALL update_reqn_current_reqn_version( NEW.reqn_id );
+  CALL update_reqn_last_reqn_version_with_agreement( NEW.reqn_id );
+
+  -- create reqn_version_comment
+  INSERT INTO reqn_version_comment( create_timestamp, reqn_version_id, data_option_category_id )
+  SELECT NEW.create_timestamp, NEW.id, data_option_category.id
+  FROM data_option_category
+  WHERE comment = true;
+END$$
+
+DROP TRIGGER IF EXISTS reqn_version_AFTER_DELETE $$
+CREATE DEFINER = CURRENT_USER TRIGGER reqn_version_AFTER_DELETE AFTER DELETE ON reqn_version FOR EACH ROW
+BEGIN
+  CALL update_reqn_current_reqn_version( OLD.reqn_id );
+  CALL update_reqn_last_reqn_version_with_agreement( OLD.reqn_id );
+END$$
+
+DROP TRIGGER IF EXISTS reqn_version_AFTER_UPDATE $$
+CREATE DEFINER = CURRENT_USER TRIGGER reqn_version_AFTER_UPDATE AFTER UPDATE ON reqn_version FOR EACH ROW
+BEGIN
+  IF NEW.agreement_filename != OLD.agreement_filename THEN
+    CALL update_reqn_last_reqn_version_with_agreement( NEW.reqn_id );
+  END IF;
+END$$
+
+DELIMITER ;

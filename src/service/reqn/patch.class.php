@@ -65,7 +65,7 @@ class patch extends \cenozo\service\patch
       }
       else if( 'abandon' == $action )
       {
-        if( !in_array( $db_role->name, array( 'applicant', 'administrator' ) ) || 'deferred' != $state ) $code = 403;
+        if( !in_array( $db_role->name, array( 'applicant', 'administrator' ) ) ) $code = 403;
         else if( '.' != $db_reqn_version->amendment )
         {
           // do not allow an amendment to be abandoned once it has gone past the admin review
@@ -107,14 +107,17 @@ class patch extends \cenozo\service\patch
           if( 'new' != $phase && 'deferred' != $state ) $code = 403;
           else if( !$db_reqn->legacy && 'new' == $phase )
           {
-            // check to make sure the start date is appropriate
-            $delay = lib::create( 'business\setting_manager' )->get_setting( 'general', 'start_date_delay' );
-            $db_reqn->save(); // this will make sure the deadline is appropriate
-            if( $db_reqn->deadline_id )
+            // check to make sure the start date is appropriate (for non-consortium reqns)
+            if( 'Consortium' != $db_reqn->get_reqn_type()->name )
             {
-              $deadline = util::get_datetime_object( $db_reqn->get_deadline()->date );
-              $deadline->add( new \DateInterval( sprintf( 'P%dM', $delay ) ) );
-              if( $db_reqn_version->start_date < $deadline ) $code = 409;
+              $delay = lib::create( 'business\setting_manager' )->get_setting( 'general', 'start_date_delay' );
+              $db_reqn->save(); // this will make sure the deadline is appropriate
+              if( $db_reqn->deadline_id )
+              {
+                $deadline = util::get_datetime_object( $db_reqn->get_deadline()->date );
+                $deadline->add( new \DateInterval( sprintf( 'P%dM', $delay ) ) );
+                if( $db_reqn_version->start_date < $deadline ) $code = 409;
+              }
             }
           }
           else if( !$review )

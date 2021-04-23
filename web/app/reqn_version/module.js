@@ -42,6 +42,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
 
   module.addInputGroup( '', {
     reqn_id: { column: 'reqn.id', type: 'string' },
+    reqn_type: { column: 'reqn_type.name', type: 'string' },
     amendment_version: { type: 'string' },
     amendment: { type: 'string' },
     is_current_version: { type: 'boolean' },
@@ -511,7 +512,8 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
 
             return this.$$onView( force ).then( function() {
               // define the earliest date that the reqn may start (based on the deadline, or today if there is no deadline)
-              if( !self.record.legacy ) {
+              // note that consortium reqns have no restriction on their start date
+              if( !self.record.legacy && 'Consortium' != self.record.reqn_type ) {
                 self.minStartDate = self.record.deadline
                                   ? moment( self.record.deadline ).add( CnSession.application.startDateDelay, 'months' )
                                   : moment();

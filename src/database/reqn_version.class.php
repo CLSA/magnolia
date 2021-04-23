@@ -250,7 +250,6 @@ class reqn_version extends \cenozo\database\record
    * @param string $type Should be 'agreement', 'coapplicant_agreement', 'peer_review', 'funding',
    *                     'ethics', 'data_sharing' or 'instruction'
    * @return string
-   * @access public
    */
   public function get_filename( $type )
   {
@@ -350,8 +349,6 @@ class reqn_version extends \cenozo\database\record
 
   /**
    * Generates the coapplicant agreement PDF form template
-   * 
-   * @access public
    */
   public function generate_coapplicant_agreement_template_form()
   {
@@ -438,7 +435,6 @@ class reqn_version extends \cenozo\database\record
    * Generates all PDF forms of the reqn version (overwritting the previous versions)
    * 
    * This includes the application, checklist and application+checklist PDF files
-   * @access public
    */
   public function generate_pdf_forms()
   {
@@ -654,6 +650,89 @@ class reqn_version extends \cenozo\database\record
           $db_reqn->identifier,
           "\n".$pdf_writer->get_error()
         ),
+        __METHOD__
+      );
+    }
+  }
+
+  /**
+   * Generates a CSV file indicating all data options which have been selected
+   */
+  public function generate_data_option_list_csv()
+  {
+    $study_class_name = lib::get_class_name( 'database\study' );
+    $study_id = $study_class_name::get_unique_record( 'name', 'CLSA' )->id;
+    $study_phase_class_name = lib::get_class_name( 'database\study_phase' );
+    $bl_id = $study_phase_class_name::get_unique_record( array( 'study_id', 'code' ), array( $study_id, 'bl' ) )->id;
+    $f1_id = $study_phase_class_name::get_unique_record( array( 'study_id', 'code' ), array( $study_id, 'f1' ) )->id;
+
+    $db_user = lib::create( 'business\session' )->get_user();
+    $date_of_approval = $this->get_date_of_approval();
+    $date_of_approval = is_null( $date_of_approval ) ? 'N/A' : $date_of_approval->format( 'Y-m-d' );
+
+    $select = lib::create( 'database\select' );
+    $select->from( 'reqn_version' );
+    $select->add_table_column( 'reqn', 'identifier', 'Identifier' );
+    $select->add_column(
+      'CONCAT( IF( "." = reqn_version.amendment, "", reqn_version.amendment ), reqn_version.version )',
+      'Version',
+      false
+    );
+    $select->add_constant( $date_of_approval, 'Date of Approval', false );
+    $select->add_column( 'CONCAT( user.first_name, " ", user.last_name )', 'Primary Applicant', false );
+    $select->add_column( 'applicant_affiliation', 'Affiliation' );
+    $select->add_column( 'title', 'Project Title' );
+    $select->add_column( 'tracking', 'Tracking' );
+    $select->add_column( 'comprehensive', 'Comprehensive' );
+    $select->add_column( 'IFNULL( reqn_version.last_identifier, "N/A" )', 'Related Project', false );
+
+    $modifier = lib::create( 'database\modifier' );
+    $modifier->join( 'reqn', 'reqn_version.reqn_id', 'reqn.id' );
+    $modifier->join( 'user', 'reqn.user_id', 'user.id' );
+    $modifier->where( 'reqn_version.id', '=', $this->id );
+
+    $output = util::get_data_as_csv(
+      static::db()->get_all( sprintf( '%s %s', $select->get_sql(), $modifier->get_sql() ) ),
+      $db_user,
+      true
+    );
+
+    $select = lib::create( 'database\select' );
+    $select->from( 'data_option_category' );
+    $select->add_column( 'name_en', 'Category' );
+    $select->add_table_column( 'data_option', 'name_en', 'Data Option' );
+    $select->add_table_column( 'bl_reqn_version_data_option', 'reqn_version_id IS NOT NULL', 'Baseline' );
+    $select->add_table_column( 'f1_reqn_version_data_option', 'reqn_version_id IS NOT NULL', 'Follow-up 1' );
+
+    $modifier = lib::create( 'database\modifier' );
+    $modifier->join( 'data_option', 'data_option_category.id', 'data_option.data_option_category_id' );
+
+    $join_mod = lib::create( 'database\modifier' );
+    $join_mod->where( 'data_option.id', '=', 'bl_reqn_version_data_option.data_option_id', false );
+    $join_mod->where( 'bl_reqn_version_data_option.study_phase_id', '=', $bl_id );
+    $join_mod->where( 'bl_reqn_version_data_option.reqn_version_id', '=', $this->id );
+    $modifier->join_modifier( 'reqn_version_data_option', $join_mod, 'left', 'bl_reqn_version_data_option' );
+
+    $join_mod = lib::create( 'database\modifier' );
+    $join_mod->where( 'data_option.id', '=', 'f1_reqn_version_data_option.data_option_id', false );
+    $join_mod->where( 'f1_reqn_version_data_option.study_phase_id', '=', $f1_id );
+    $join_mod->where( 'f1_reqn_version_data_option.reqn_version_id', '=', $this->id );
+    $modifier->join_modifier( 'reqn_version_data_option', $join_mod, 'left', 'f1_reqn_version_data_option' );
+
+    $modifier->order( 'data_option_category.rank' );
+    $modifier->order( 'data_option.rank' );
+
+    $output .= "\n".util::get_data_as_csv(
+      static::db()->get_all( sprintf( '%s %s', $select->get_sql(), $modifier->get_sql() ) ),
+      $db_user
+    );
+
+    $filename = sprintf( '%s/%s.csv', DATA_OPTION_LIST_PATH, $this->id );
+    $result = file_put_contents( $filename, $output );
+    if( false === $result )
+    {
+      throw lib::create( 'exception\runtime',
+        sprintf( 'Failed to generate CSV file "%s"', $filename ),
         __METHOD__
       );
     }
