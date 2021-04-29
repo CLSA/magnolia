@@ -99,17 +99,17 @@ define( [ 'output' ].reduce( function( list, name ) {
             CnSession.setBreadcrumbTrail(
               [ {
                 title: reqnModel.module.name.plural.ucWords(),
-                go: function() { reqnModel.transitionToListState(); }
+                go: async function() { await reqnModel.transitionToListState(); }
               }, {
                 title: scope.model.viewModel.record.identifier,
-                go: function() {
-                  reqnModel.transitionToViewState( {
+                go: async function() {
+                  await reqnModel.transitionToViewState( {
                     getIdentifier: function() { return 'identifier=' + scope.model.viewModel.record.identifier; }
                   } );
                 }
               }, {
                 title: scope.model.module.name.singular.ucWords(),
-                go: function() { scope.model.transitionToViewState( scope.model.viewModel.record ); }
+                go: async function() { await scope.model.transitionToViewState( scope.model.viewModel.record ); }
               } ]
             );
           } );
