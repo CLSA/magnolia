@@ -43,8 +43,8 @@ define( function() {
 
   /* ######################################################################################################## */
   cenozo.providers.directive( 'cnOutputSourceAdd', [
-    'CnOutputSourceModelFactory', 'CnModalMessageFactory', 'CnHttpFactory', 'CnReqnHelper', '$q',
-    function( CnOutputSourceModelFactory, CnModalMessageFactory, CnHttpFactory, CnReqnHelper, $q ) {
+    'CnOutputSourceModelFactory', 'CnModalMessageFactory', 'CnHttpFactory', 'CnReqnHelper',
+    function( CnOutputSourceModelFactory, CnModalMessageFactory, CnHttpFactory, CnReqnHelper ) {
       return {
         templateUrl: module.getFileUrl( 'add.tpl.html' ),
         restrict: 'E',
@@ -53,35 +53,32 @@ define( function() {
           if( angular.isUndefined( $scope.model ) ) $scope.model = CnOutputSourceModelFactory.root;
 
           // get the child cn-record-add's scope
-          $scope.$on( 'cnRecordAdd ready', function( event, data ) {
+          $scope.$on( 'cnRecordAdd ready', async function( event, data ) {
             var cnRecordAddScope = data;
             var parent = $scope.model.getParentIdentifier();
             var origin = $scope.model.getQueryParameter( 'origin', true );
-            var promiseList = [];
-            var len = promiseList.length;
+            var lang = 'en';
             if( 'final_report' == origin ) {
-              promiseList.push( CnHttpFactory.instance( {
+              var response = await CnHttpFactory.instance( {
                 path: 'output/' + parent.identifier,
                 data: { select: { column: { table: 'language', column: 'code', alias: 'lang' } } }
-              } ).get().then( response => response.data.lang ) );
+              } ).get();
+              lang = response.data.lang;
             }
 
-            $q.all( promiseList ).then( function( response ) {
-              var lang = len == response.length ? 'en' : response[len];
-              var saveFn = cnRecordAddScope.save;
-              angular.extend( cnRecordAddScope, {
-                getCancelText: function() { return CnReqnHelper.translate( 'output', 'cancel', lang ); },
-                getSaveText: function() { return CnReqnHelper.translate( 'output', 'save', lang ); },
-                save: function() {
-                  if( !$scope.model.addModel.hasFile( 'filename' ) && angular.isUndefined( cnRecordAddScope.record.url ) ) {
-                    CnModalMessageFactory.instance( {
-                      title: CnReqnHelper.translate( 'output', 'newOutputSourceTitle', lang ),
-                      message: CnReqnHelper.translate( 'output', 'newOutputSourceMessage', lang ),
-                      error: true
-                    } ).show();
-                  } else saveFn();
-                }
-              } );
+            var saveFn = cnRecordAddScope.save;
+            angular.extend( cnRecordAddScope, {
+              getCancelText: function() { return CnReqnHelper.translate( 'output', 'cancel', lang ); },
+              getSaveText: function() { return CnReqnHelper.translate( 'output', 'save', lang ); },
+              save: function() {
+                if( !$scope.model.addModel.hasFile( 'filename' ) && angular.isUndefined( cnRecordAddScope.record.url ) ) {
+                  CnModalMessageFactory.instance( {
+                    title: CnReqnHelper.translate( 'output', 'newOutputSourceTitle', lang ),
+                    message: CnReqnHelper.translate( 'output', 'newOutputSourceMessage', lang ),
+                    error: true
+                  } ).show();
+                } else saveFn();
+              }
             } );
           } );
         }
@@ -157,31 +154,27 @@ define( function() {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnOutputSourceAddFactory', [
-    'CnBaseAddFactory', 'CnHttpFactory', 'CnReqnHelper', '$q',
-    function( CnBaseAddFactory, CnHttpFactory, CnReqnHelper, $q ) {
+    'CnBaseAddFactory', 'CnHttpFactory', 'CnReqnHelper',
+    function( CnBaseAddFactory, CnHttpFactory, CnReqnHelper ) {
       var object = function( parentModel ) {
-        var self = this;
         CnBaseAddFactory.construct( this, parentModel );
         this.configureFileInput( 'filename' );
 
-        this.onNew = function( record ) {
-          var parent = self.parentModel.getParentIdentifier();
-          var origin = self.parentModel.getQueryParameter( 'origin', true );
-          var promiseList = [ self.$$onNew( record ) ];
-          var len = promiseList.length;
+        this.onNew = async function( record ) {
+          var parent = this.parentModel.getParentIdentifier();
+          var origin = this.parentModel.getQueryParameter( 'origin', true );
+          var lang = 'en';
 
           if( 'final_report' == origin ) {
-            promiseList.push( CnHttpFactory.instance( {
+            var response = await CnHttpFactory.instance( {
               path: 'output/' + parent.identifier,
               data: { select: { column: { table: 'language', column: 'code', alias: 'lang' } } }
-            } ).get().then( response => response.data.lang ) );
+            } ).get();
+            lang = response.data.lang;
           }
 
-          return $q.all( promiseList ).then( function( response ) {
-            var lang = len == response.length ? 'en' : response[len];
-            self.parentModel.updateLanguage( lang );
-            self.heading = CnReqnHelper.translate( 'output', 'createOutputSource', lang );
-          } );
+          this.parentModel.updateLanguage( lang );
+          this.heading = CnReqnHelper.translate( 'output', 'createOutputSource', lang );
         };
       };
       return { instance: function( parentModel ) { return new object( parentModel ); } };
@@ -202,17 +195,16 @@ define( function() {
     'CnBaseViewFactory', 'CnReqnHelper',
     function( CnBaseViewFactory, CnReqnHelper ) {
       var object = function( parentModel, root ) {
-        var self = this;
         CnBaseViewFactory.construct( this, parentModel, root );
         this.configureFileInput( 'filename' );
 
-        this.onView = function( force ) {
-          return self.$$onView( force ).then( function() {
-            var origin = self.parentModel.getQueryParameter( 'origin', true );
-            var lang = 'final_report' == origin ? self.record.lang : 'en';
-            self.parentModel.updateLanguage( lang );
-            self.heading = CnReqnHelper.translate( 'output', 'outputSourceDetails', lang );
-          } );
+        this.onView = async function( force ) {
+          await this.$$onView( force );
+
+          var origin = this.parentModel.getQueryParameter( 'origin', true );
+          var lang = 'final_report' == origin ? this.record.lang : 'en';
+          this.parentModel.updateLanguage( lang );
+          this.heading = CnReqnHelper.translate( 'output', 'outputSourceDetails', lang );
         };
       }
       return { instance: function( parentModel, root ) { return new object( parentModel, root ); } };
@@ -226,7 +218,6 @@ define( function() {
     function( CnBaseModelFactory, CnOutputSourceAddFactory, CnOutputSourceListFactory, CnOutputSourceViewFactory,
               CnSession, CnReqnHelper, $state ) {
       var object = function( root ) {
-        var self = this;
         CnBaseModelFactory.construct( this, module );
         this.addModel = CnOutputSourceAddFactory.instance( this );
         this.listModel = CnOutputSourceListFactory.instance( this );
@@ -234,59 +225,63 @@ define( function() {
 
         angular.extend( this, {
           updateLanguage: function( lang ) {
-            var group = self.module.inputGroupList.findByProperty( 'title', '' );
+            var group = this.module.inputGroupList.findByProperty( 'title', '' );
             group.inputList.filename.title = CnReqnHelper.translate( 'output', 'filename', lang );
             group.inputList.url.title = CnReqnHelper.translate( 'output', 'url', lang );
           },
 
           setupBreadcrumbTrail: function() {
             // change the breadcrumb trail based on the origin parameter
-            self.$$setupBreadcrumbTrail();
-            var origin = self.getQueryParameter( 'origin', true );
+            this.$$setupBreadcrumbTrail();
+            var origin = this.getQueryParameter( 'origin', true );
             if( 'final_report' == origin ) {
-              var parent = self.getParentIdentifier();
+              var parent = this.getParentIdentifier();
               var index = CnSession.breadcrumbTrail.findIndexByProperty( 'title', 'Output' );
-              CnSession.breadcrumbTrail[index+1].go = function() {
-                $state.go( 'output.view', { identifier: parent.identifier, origin: origin } );
+              CnSession.breadcrumbTrail[index+1].go = async function() {
+                await $state.go( 'output.view', { identifier: parent.identifier, origin: origin } );
               };
               delete CnSession.breadcrumbTrail[index].go;
             }
           },
 
-          transitionToAddState: function() {
-            var origin = self.getQueryParameter( 'origin', true );
+          transitionToAddState: async function() {
+            var origin = this.getQueryParameter( 'origin', true );
             if( 'final_report' == origin ) {
-              $state.go(
-                '^.add_' + self.module.subject.snake,
+              await $state.go(
+                '^.add_' + this.module.subject.snake,
                 { parentIdentifier: $state.params.identifier, origin: origin }
               );
-            } else self.$$transitionToAddState();
+            } else {
+              await this.$$transitionToAddState();
+            }
           },
 
-          transitionToViewState: function( record ) {
-            var origin = self.getQueryParameter( 'origin', true );
+          transitionToViewState: async function( record ) {
+            var origin = this.getQueryParameter( 'origin', true );
             if( 'final_report' == origin ) {
-              $state.go(
+              await $state.go(
                 'output_source.view',
                 { identifier: record.getIdentifier(), parentIdentifier: $state.params.identifier, origin: origin }
               );
-            } else self.$$transitionToViewState( record );
+            } else {
+              await this.$$transitionToViewState( record );
+            }
           },
 
-          transitionToLastState: function() {
+          transitionToLastState: async function() {
             // include the origin in the parent output's state
-            var stateParams = { identifier: self.getParentIdentifier().identifier };
-            var origin = self.getQueryParameter( 'origin', true );
+            var stateParams = { identifier: this.getParentIdentifier().identifier };
+            var origin = this.getQueryParameter( 'origin', true );
             if( angular.isDefined( origin ) ) stateParams.origin = origin;
-            return $state.go( 'output.view', stateParams );
+            await $state.go( 'output.view', stateParams );
           },
 
-          transitionToParentViewState: function( subject, identifier ) {
+          transitionToParentViewState: async function( subject, identifier ) {
             // include the origin in the parent output's state
             var stateParams = { identifier: identifier };
-            var origin = self.getQueryParameter( 'origin', true );
+            var origin = this.getQueryParameter( 'origin', true );
             if( angular.isDefined( origin ) ) stateParams.origin = origin;
-            return $state.go( subject + '.view', stateParams );
+            await $state.go( subject + '.view', stateParams );
           }
         } );
       };

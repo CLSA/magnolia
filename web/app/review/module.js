@@ -102,8 +102,8 @@ define( function() {
 
   module.addExtraOperation( 'view', {
     title: 'View Form',
-    operation: function( $state, model ) {
-      $state.go( 'reqn_version.view', { identifier: model.viewModel.record.current_reqn_version_id } );
+    operation: async function( $state, model ) {
+      await $state.go( 'reqn_version.view', { identifier: model.viewModel.record.current_reqn_version_id } );
     }
   } );
 
@@ -111,29 +111,29 @@ define( function() {
     title: 'Download',
     operations: [ {
       title: 'Application',
-      operation: function( $state, model ) { model.viewModel.downloadApplication(); }
+      operation: async function( $state, model ) { await model.viewModel.downloadApplication(); }
     }, {
       title: 'Data Checklist',
-      operation: function( $state, model ) { model.viewModel.downloadChecklist(); }
+      operation: async function( $state, model ) { await model.viewModel.downloadChecklist(); }
     }, {
       title: 'Proof of Peer Review',
-      operation: function( $state, model ) { model.viewModel.downloadFundingLetter(); },
+      operation: async function( $state, model ) { await model.viewModel.downloadFundingLetter(); },
       isDisabled: function( $state, model ) { return !model.viewModel.record.peer_review_filename; }
     }, {
       title: 'Funding Letter',
-      operation: function( $state, model ) { model.viewModel.downloadFundingLetter(); },
+      operation: async function( $state, model ) { await model.viewModel.downloadFundingLetter(); },
       isDisabled: function( $state, model ) { return !model.viewModel.record.funding_filename; }
     }, {
       title: 'Ethics Letter/Exemption',
-      operation: function( $state, model ) { model.viewModel.downloadEthicsLetter(); },
+      operation: async function( $state, model ) { await model.viewModel.downloadEthicsLetter(); },
       isDisabled: function( $state, model ) { return !model.viewModel.record.ethics_filename; }
     }, {
       title: 'Agreement Letter',
-      operation: function( $state, model ) { model.viewModel.downloadAgreementLetter(); },
+      operation: async function( $state, model ) { await model.viewModel.downloadAgreementLetter(); },
       isDisabled: function( $state, model ) { return !model.viewModel.record.agreement_filename; }
     }, {
       title: 'Reviews',
-      operation: function( $state, model ) { model.viewModel.downloadReviews(); }
+      operation: async function( $state, model ) { await model.viewModel.downloadReviews(); }
     } ]
   } );
 
@@ -181,44 +181,45 @@ define( function() {
     'CnBaseViewFactory', 'CnReqnHelper', 'CnHttpFactory', 'CnSession',
     function( CnBaseViewFactory, CnReqnHelper, CnHttpFactory, CnSession ) {
       var object = function( parentModel, root ) {
-        var self = this;
         CnBaseViewFactory.construct( this, parentModel, root );
 
         // administrators can edit any review, but other roles only have access to specific reviews
         // (updated after the record is loaded)
         angular.extend( this, {
           mayEdit: 'administrator' == CnSession.role.name,
-          onView: function( force ) {
-            self.mayEdit = false;
-            return self.$$onView( force ).then( function() {
-              self.mayEdit = self.record.editable;
+          onView: async function( force ) {
+            this.mayEdit = false;
+            try {
+              await this.$$onView( force );
 
               // determine which recommendation_type enum list to use based on the review type
-              self.parentModel.metadata.columnList.recommendation_type_id.enumList =
-                self.parentModel.recommendationList[self.record.review_type_id];
-            } );
+              this.parentModel.metadata.columnList.recommendation_type_id.enumList =
+                this.parentModel.recommendationList[this.record.review_type_id];
+            } finally {
+              this.mayEdit = this.record.editable;
+            }
           },
 
-          downloadApplication: function() {
-            return CnReqnHelper.download( 'application', this.record.current_reqn_version_id );
+          downloadApplication: async function() {
+            await CnReqnHelper.download( 'application', this.record.current_reqn_version_id );
           },
-          downloadChecklist: function() {
-            return CnReqnHelper.download( 'checklist', this.record.current_reqn_version_id );
+          downloadChecklist: async function() {
+            await CnReqnHelper.download( 'checklist', this.record.current_reqn_version_id );
           },
-          downloadPeerReview: function() {
-            return CnReqnHelper.download( 'peer_review_filename', this.record.current_reqn_version_id );
+          downloadPeerReview: async function() {
+            await CnReqnHelper.download( 'peer_review_filename', this.record.current_reqn_version_id );
           },
-          downloadFundingLetter: function() {
-            return CnReqnHelper.download( 'funding_filename', this.record.current_reqn_version_id );
+          downloadFundingLetter: async function() {
+            await CnReqnHelper.download( 'funding_filename', this.record.current_reqn_version_id );
           },
-          downloadEthicsLetter: function() {
-            return CnReqnHelper.download( 'ethics_filename', this.record.current_reqn_version_id );
+          downloadEthicsLetter: async function() {
+            await CnReqnHelper.download( 'ethics_filename', this.record.current_reqn_version_id );
           },
-          downloadAgreementLetter: function() {
-            return CnReqnHelper.download( 'agreement_filename', this.record.current_reqn_version_id );
+          downloadAgreementLetter: async function() {
+            await CnReqnHelper.download( 'agreement_filename', this.record.current_reqn_version_id );
           },
-          downloadReviews: function() {
-            return CnHttpFactory.instance( {
+          downloadReviews: async function() {
+            await CnHttpFactory.instance( {
               path: 'reqn/' + this.record.reqn_id + '?file=reviews',
               format: 'txt'
             } ).file();
@@ -226,6 +227,7 @@ define( function() {
         } );
 
         // add an additional check to see if the review is editable
+        var self = this;
         this.parentModel.getEditEnabled = function() { return self.parentModel.$$getEditEnabled() && self.mayEdit; };
       };
       return { instance: function( parentModel, root ) { return new object( parentModel, root ); } };
@@ -237,7 +239,6 @@ define( function() {
     'CnBaseModelFactory', 'CnReviewListFactory', 'CnReviewViewFactory', 'CnSession', 'CnHttpFactory',
     function( CnBaseModelFactory, CnReviewListFactory, CnReviewViewFactory, CnSession, CnHttpFactory ) {
       var object = function( root ) {
-        var self = this;
         CnBaseModelFactory.construct( this, module );
         this.listModel = CnReviewListFactory.instance( this );
         this.viewModel = CnReviewViewFactory.instance( this, root );
@@ -270,25 +271,26 @@ define( function() {
         };
       
         // extend getMetadata
-        this.getMetadata = function() {
-          return this.$$getMetadata().then( function() {
-            return CnHttpFactory.instance( {
-              path: 'recommendation_type',
-              data: {
-                select: { column: [ 'id', 'name', 'review_type_id_list' ] },
-                modifier: { order: 'id', limit: 1000 }
-              }
-            } ).query().then( function success( response ) { 
-              self.metadata.columnList.recommendation_type_id = { 
-                required: false,
-                enumList: [],
-              };
-              response.data.forEach( function( item ) { 
-                item.review_type_id_list.split( ',' ).forEach( function( reviewTypeId ) {
-                  if( angular.isUndefined( self.recommendationList[reviewTypeId] ) ) self.recommendationList[reviewTypeId] = [];
-                  self.recommendationList[reviewTypeId].push( { value: item.id, name: item.name } );
-                } );
-              } );
+        this.getMetadata = async function() {
+          var self = this;
+          await this.$$getMetadata();
+
+          var response = await CnHttpFactory.instance( {
+            path: 'recommendation_type',
+            data: {
+              select: { column: [ 'id', 'name', 'review_type_id_list' ] },
+              modifier: { order: 'id', limit: 1000 }
+            }
+          } ).query();
+
+          this.metadata.columnList.recommendation_type_id = { 
+            required: false,
+            enumList: [],
+          };
+          response.data.forEach( function( item ) { 
+            item.review_type_id_list.split( ',' ).forEach( function( reviewTypeId ) {
+              if( angular.isUndefined( self.recommendationList[reviewTypeId] ) ) self.recommendationList[reviewTypeId] = [];
+              self.recommendationList[reviewTypeId].push( { value: item.id, name: item.name } );
             } );
           } );
         };

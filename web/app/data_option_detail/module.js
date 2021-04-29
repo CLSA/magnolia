@@ -128,11 +128,10 @@ define( [ 'data_option' ].reduce( function( list, name ) {
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnDataOptionDetailModelFactory', [
     'CnBaseModelFactory', 'CnDataOptionDetailAddFactory', 'CnDataOptionDetailListFactory', 'CnDataOptionDetailViewFactory',
-    'CnHttpFactory', '$q',
+    'CnHttpFactory',
     function( CnBaseModelFactory, CnDataOptionDetailAddFactory, CnDataOptionDetailListFactory, CnDataOptionDetailViewFactory,
-              CnHttpFactory, $q ) {
+              CnHttpFactory ) {
       var object = function( root ) {
-        var self = this;
         CnBaseModelFactory.construct( this, module );
         this.addModel = CnDataOptionDetailAddFactory.instance( this );
         this.listModel = CnDataOptionDetailListFactory.instance( this );
@@ -141,45 +140,42 @@ define( [ 'data_option' ].reduce( function( list, name ) {
         var studyDataModule = cenozoApp.module( 'data_option' );
 
         // extend getMetadata
-        this.getMetadata = function() {
-          return this.$$getMetadata().then( function() {
-            return $q.all( [
+        this.getMetadata = async function() {
+          var self = this;
+          await this.$$getMetadata();
 
-              CnHttpFactory.instance( {
-                path: 'data_option',
-                data: {
-                  select: { column: [ 'id', 'name_en' ] },
-                  modifier: { order: 'data_option.rank', limit: 1000 }
-                }
-              } ).query().then( function success( response ) {
-                self.metadata.columnList.data_option_id.enumList = [];
-                response.data.forEach( function( item ) {
-                  self.metadata.columnList.data_option_id.enumList.push( {
-                    value: item.id, name: item.name_en
-                  } );
-                } );
-              } ),
+          var response = await CnHttpFactory.instance( {
+            path: 'data_option',
+            data: {
+              select: { column: [ 'id', 'name_en' ] },
+              modifier: { order: 'data_option.rank', limit: 1000 }
+            }
+          } ).query();
 
-              CnHttpFactory.instance( {
-                path: 'study_phase',
-                data: {
-                  select: { column: [ 'id', 'name' ] },
-                  modifier: {
-                    where: { column: 'study.name', operator: '=', value: 'CLSA' },
-                    order: 'name',
-                    limit: 1000
-                  }
-                }
-              } ).query().then( function success( response ) {
-                self.metadata.columnList.study_phase_id.enumList = [];
-                response.data.forEach( function( item ) {
-                  self.metadata.columnList.study_phase_id.enumList.push( {
-                    value: item.id, name: item.name
-                  } );
-                } );
-              } )
+          this.metadata.columnList.data_option_id.enumList = [];
+          response.data.forEach( function( item ) {
+            self.metadata.columnList.data_option_id.enumList.push( {
+              value: item.id, name: item.name_en
+            } );
+          } );
 
-            ] );
+          var response = await CnHttpFactory.instance( {
+            path: 'study_phase',
+            data: {
+              select: { column: [ 'id', 'name' ] },
+              modifier: {
+                where: { column: 'study.name', operator: '=', value: 'CLSA' },
+                order: 'name',
+                limit: 1000
+              }
+            }
+          } ).query();
+
+          this.metadata.columnList.study_phase_id.enumList = [];
+          response.data.forEach( function( item ) {
+            self.metadata.columnList.study_phase_id.enumList.push( {
+              value: item.id, name: item.name
+            } );
           } );
         };
       };

@@ -70,8 +70,8 @@ define( function() {
         };
 
         // When in the stage.list state transition to the reqn when clicking the stage record
-        this.transitionToViewState = function( record ) {
-          $state.go( 'reqn.view', { identifier: 'identifier=' + record.identifier } );
+        this.transitionToViewState = async function( record ) {
+          await $state.go( 'reqn.view', { identifier: 'identifier=' + record.identifier } );
         };
       };
 

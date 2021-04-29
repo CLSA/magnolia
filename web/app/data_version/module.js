@@ -94,18 +94,22 @@ define( function() {
     'CnBaseViewFactory', '$state',
     function( CnBaseViewFactory, $state ) {
       var object = function( parentModel, root ) {
-        var self = this;
         CnBaseViewFactory.construct( this, parentModel, root );
 
-        // Have the data release model point to the requisition instead
-        this.deferred.promise.then( function() {
+        var self = this;
+        async function init() {
+          // Have the data release model point to the requisition instead
+          await deferred.promise;
+
           if( angular.isDefined( self.dataReleaseModel ) ) {
             self.dataReleaseModel.listModel.heading = 'Requisition List';
-            self.dataReleaseModel.listModel.parentModel.transitionToViewState = function( record ) {
-              return $state.go( 'reqn.view', { identifier: 'identifier=' + record.identifier } );
+            self.dataReleaseModel.listModel.parentModel.transitionToViewState = async function( record ) {
+              await $state.go( 'reqn.view', { identifier: 'identifier=' + record.identifier } );
             };
           }
-        } );
+        }
+
+        init();
       }
       return { instance: function( parentModel, root ) { return new object( parentModel, root ); } };
     }
@@ -116,7 +120,6 @@ define( function() {
     'CnBaseModelFactory', 'CnDataVersionAddFactory', 'CnDataVersionListFactory', 'CnDataVersionViewFactory',
     function( CnBaseModelFactory, CnDataVersionAddFactory, CnDataVersionListFactory, CnDataVersionViewFactory ) {
       var object = function( root ) {
-        var self = this;
         CnBaseModelFactory.construct( this, module );
         this.addModel = CnDataVersionAddFactory.instance( this );
         this.listModel = CnDataVersionListFactory.instance( this );

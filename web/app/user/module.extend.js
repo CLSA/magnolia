@@ -31,23 +31,19 @@ define( [ cenozoApp.module( 'user' ).getFileUrl( 'module.js' ) ], function() {
 
   // extend the model factory
   cenozo.providers.decorator( 'CnUserModelFactory', [
-    '$delegate', '$state', 'CnHttpFactory',
-    function( $delegate, $state, CnHttpFactory ) {
+    '$delegate', 'CnHttpFactory',
+    function( $delegate, CnHttpFactory ) {
       var instance = $delegate.instance;
       function extendObject( object ) {
         var getMetadata = object.getMetadata;
         angular.extend( object, {
           // extend getMetadata
-          getMetadata: function() {
-            return getMetadata().then( function() {
-              return CnHttpFactory.instance( {
-                path: 'applicant'
-              } ).head().then( function success( response ) {
-                var columnMetadata = angular.fromJson( response.headers( 'Columns' ) ).supervisor_user_id;
-                columnMetadata.required = '1' == columnMetadata.required;
-                object.metadata.columnList.supervisor_user_id = columnMetadata;
-              } );
-            } );
+          getMetadata: async function() {
+            await getMetadata();
+            var response = await CnHttpFactory.instance( { path: 'applicant' } ).head();
+            var columnMetadata = angular.fromJson( response.headers( 'Columns' ) ).supervisor_user_id;
+            columnMetadata.required = '1' == columnMetadata.required;
+            object.metadata.columnList.supervisor_user_id = columnMetadata;
           }
         } );
       }
