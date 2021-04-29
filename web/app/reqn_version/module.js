@@ -247,11 +247,11 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
             ].join( ' ' );
           };
 
-          $scope.compareTo = function( version ) {
+          $scope.compareTo = async function( version ) {
             $scope.model.viewModel.compareRecord = version;
             $scope.liteModel.viewModel.compareRecord = version;
             $scope.model.setQueryParameter( 'c', null == version ? undefined : version.amendment_version );
-            $scope.model.reloadState( false, false, 'replace' );
+            await $scope.model.reloadState( false, false, 'replace' );
           };
 
           $scope.addCoapplicant = async function() {
@@ -489,7 +489,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
           },
 
           onView: async function( force ) {
-            // reset tab values
+            // reset tab values (none transition so we don't have to await them)
             this.setFormTab( 0, this.parentModel.getQueryParameter( 't0' ), false );
             this.setFormTab( 1, this.parentModel.getQueryParameter( 't1' ), false );
             this.setFormTab( 2, this.parentModel.getQueryParameter( 't2' ), false );
@@ -707,7 +707,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
             [ 'agreement', null, null ]
           ],
 
-          setFormTab: function( index, tab, transition ) {
+          setFormTab: async function( index, tab, transition ) {
             if( angular.isUndefined( transition ) ) transition = true;
             if( !( 0 <= index && index <= 2 ) ) index = 0;
 
@@ -728,13 +728,13 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
             this.formTab[index] = tab;
             this.parentModel.setQueryParameter( 't'+index, tab );
 
-            if( transition ) this.parentModel.reloadState( false, false, 'replace' );
+            if( transition ) await this.parentModel.reloadState( false, false, 'replace' );
 
             // update all textarea sizes
             angular.element( 'textarea[cn-elastic]' ).trigger( 'elastic' );
           },
 
-          nextSection: function( reverse ) {
+          nextSection: async function( reverse ) {
             if( angular.isUndefined( reverse ) ) reverse = false;
 
             var currentTabSectionIndex = null;
@@ -759,7 +759,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
               if( angular.isDefined( tabSection ) ) {
                 if( null != tabSection[2] ) this.setFormTab( 2, tabSection[2], false );
                 if( null != tabSection[1] ) this.setFormTab( 1, tabSection[1], false );
-                this.setFormTab( 0, tabSection[0] );
+                await this.setFormTab( 0, tabSection[0] );
               }
             }
           },
@@ -1796,10 +1796,10 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                 } else {
                   if( 1 == errorTab.substr( 0, 1 ) ) {
                     this.setFormTab( 0, 'part1', false );
-                    this.setFormTab( 1, errorTab.substr( 1 ) );
+                    await this.setFormTab( 1, errorTab.substr( 1 ) );
                   } else {
                     this.setFormTab( 0, 'part2', false );
-                    this.setFormTab( 2, errorTab.substr( 1 ) );
+                    await this.setFormTab( 2, errorTab.substr( 1 ) );
                   }
                 }
               } else {
@@ -1925,7 +1925,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                               element.$error.custom = self.translate( 'misc.invalidStartDateTitle' );
                               cenozo.updateFormElement( element, true );
                               self.setFormTab( 0, 'part1', false );
-                              self.setFormTab( 1, 'c' );
+                              await self.setFormTab( 1, 'c' );
                             } else CnModalMessageFactory.httpError( error );
                           }
                         } ).patch();

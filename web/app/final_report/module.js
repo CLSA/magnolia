@@ -141,11 +141,11 @@ define( [ 'output' ].reduce( function( list, name ) {
             ].join( ' ' );
           };
 
-          $scope.compareTo = function( version ) {
+          $scope.compareTo = async function( version ) {
             $scope.model.viewModel.compareRecord = version;
             $scope.liteModel.viewModel.compareRecord = version;
             $scope.model.setQueryParameter( 'c', null == version ? undefined : version.version );
-            $scope.model.reloadState( false, false, 'replace' );
+            await $scope.model.reloadState( false, false, 'replace' );
           };
         }
       };
@@ -246,7 +246,7 @@ define( [ 'output' ].reduce( function( list, name ) {
 
           formTab: '',
           tabSectionList: ['instructions','part1','part2','part3'],
-          setFormTab: function( tab, transition ) {
+          setFormTab: async function( tab, transition ) {
             if( angular.isUndefined( transition ) ) transition = true;
 
             // find the tab section
@@ -264,19 +264,19 @@ define( [ 'output' ].reduce( function( list, name ) {
             this.formTab = tab;
             this.parentModel.setQueryParameter( 't', tab );
 
-            if( transition ) this.parentModel.reloadState( false, false, 'replace' );
+            if( transition ) await this.parentModel.reloadState( false, false, 'replace' );
 
             // update all textarea sizes
             angular.element( 'textarea[cn-elastic]' ).trigger( 'elastic' );
           },
 
-          nextSection: function( reverse ) {
+          nextSection: async function( reverse ) {
             if( angular.isUndefined( reverse ) ) reverse = false;
 
             var currentTabSectionIndex = this.tabSectionList.indexOf( this.formTab );
             if( null != currentTabSectionIndex ) {
               var tabSection = this.tabSectionList[currentTabSectionIndex + (reverse?-1:1)];
-              if( angular.isDefined( tabSection ) ) this.setFormTab( tabSection );
+              if( angular.isDefined( tabSection ) ) await this.setFormTab( tabSection );
             }
           },
 
@@ -409,7 +409,7 @@ define( [ 'output' ].reduce( function( list, name ) {
                 // if there was an error then display it now
                 if( 'applicant' == CnSession.role.name ) error.closeText = this.translate( 'misc.close' );
                 await CnModalMessageFactory.instance( error ).show();
-                this.setFormTab( errorTab );
+                await this.setFormTab( errorTab );
               } else {
                 // now check to make sure this version is different from the last (the first is always different)
                 var response = await CnHttpFactory.instance( {
