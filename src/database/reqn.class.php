@@ -342,7 +342,7 @@ class reqn extends \cenozo\database\record
     // if there is a first chair review then use that decision
     else if( array_key_exists( 'Chair', $review_list ) ) $recommendation = $review_list['Chair'];
     // if there is a Feasibility review then use that decision
-    else if( array_key_exists( 'Feasibility', $review_list ) )
+    else if( array_key_exists( 'Feasibility', $review_list ) && 'Unable to Assess' != $review_list['Feasibility'] )
       $recommendation = 'Not Feasible' == $review_list['Feasibility'] ? 'Not Approved' : 'Approved';
     // if there is an admin review then use that decision
     else if( array_key_exists( 'Admin', $review_list ) )
@@ -464,6 +464,7 @@ class reqn extends \cenozo\database\record
         else if( 'Decision Made' == $db_current_stage_type->name )
         {
           $recommendation = $this->get_recommendation();
+          log::debug( $recommendation );
           if( !is_null( $recommendation ) )
           {
             // NOTE: when approved check if this is not an amendment and revisions have been suggested
