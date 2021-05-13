@@ -35,11 +35,11 @@ define( [ cenozoApp.module( 'user' ).getFileUrl( 'module.js' ) ], function() {
     function( $delegate, CnHttpFactory ) {
       var instance = $delegate.instance;
       function extendObject( object ) {
-        var getMetadata = object.getMetadata;
+        object.baseGetMetadataFn = object.getMetadata;
         angular.extend( object, {
           // extend getMetadata
           getMetadata: async function() {
-            await getMetadata();
+            await object.baseGetMetadataFn();
             var response = await CnHttpFactory.instance( { path: 'applicant' } ).head();
             var columnMetadata = angular.fromJson( response.headers( 'Columns' ) ).supervisor_user_id;
             columnMetadata.required = '1' == columnMetadata.required;
