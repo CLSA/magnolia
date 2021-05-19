@@ -19,7 +19,8 @@ define( function() {
       datetime: { title: 'Date & Time', type: 'datetime' },
       title: { title: 'Title' },
       viewed_by_user: { title: 'Primary Viewed', type: 'boolean' },
-      viewed_by_trainee_user: { title: 'Trainee Viewed', type: 'boolean' }
+      viewed_by_trainee_user: { title: 'Trainee Viewed', type: 'boolean' },
+      viewed_by_designate_user: { title: 'Designate Viewed', type: 'boolean' }
     },
     defaultOrder: {
       column: 'datetime',
@@ -49,12 +50,20 @@ define( function() {
         return 'add' == model.getActionFromState() ? true : null == model.viewModel.record.trainee_user_id;
       }
     },
+    viewed_by_designate_user: {
+      title: 'Viewed by Designate',
+      type: 'boolean',
+      isExcluded: function( $state, model ) {
+        return 'add' == model.getActionFromState() ? true : null == model.viewModel.record.designate_user_id;
+      }
+    },
     description: {
       title: 'Description',
       type: 'text'
     },
     user_id: { column: 'reqn.user_id', type: 'hidden' },
     trainee_user_id: { column: 'reqn.trainee_user_id', type: 'hidden' },
+    designate_user_id: { column: 'reqn.designate_user_id', type: 'hidden' }
   } );
 
   /* ######################################################################################################## */
@@ -128,17 +137,22 @@ define( function() {
         CnBaseViewFactory.construct( this, parentModel, root );
 
         this.onPatch = async function( data ) {
-          if( angular.isDefined( data.viewed_by_user ) || angular.isDefined( data.viewed_by_trainee_user ) ) {
+          if( angular.isDefined( data.viewed_by_user ) ||
+              angular.isDefined( data.viewed_by_trainee_user ) ||
+              angular.isDefined( data.viewed_by_designate_user ) ) {
             // handle the viewed-by data since it isn't a direct property of the notice record
             var add = null;
             var userId = null;
 
             if( angular.isDefined( data.viewed_by_user ) ) {
               add = data.viewed_by_user;
-              userId = this.record.user_id;
-            } else {
+              userId = self.record.user_id;
+            } else if( angular.isDefined( data.viewed_by_trainee_user ) ) {
               add = data.viewed_by_trainee_user;
-              userId = this.record.trainee_user_id;
+              userId = self.record.trainee_user_id;
+            } else {
+              add = data.viewed_by_designate_user;
+              userId = self.record.designate_user_id;
             }
 
             if( add ) {
@@ -174,7 +188,8 @@ define( function() {
           // fake the viewed-by columns
           angular.extend( this.metadata.columnList, {
             viewed_by_user: { data_type: 'tinyint', required: true },
-            viewed_by_trainee_user: { data_type: 'tinyint', required: true }
+            viewed_by_trainee_user: { data_type: 'tinyint', required: true },
+            viewed_by_designate_user: { data_type: 'tinyint', required: true }
           } );
         };
       };

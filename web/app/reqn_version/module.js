@@ -84,6 +84,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
 
     current_final_report_id: { column: 'final_report.id', type: 'string' },
     trainee_user_id: { column: 'reqn.trainee_user_id', type: 'string' },
+    designate_user_id: { column: 'reqn.designate_user_id', type: 'string' },
     identifier: { column: 'reqn.identifier', type: 'string' },
     legacy: { column: 'reqn.legacy', type: 'string' },
     state: { column: 'reqn.state', type: 'string' },
@@ -1930,9 +1931,11 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                           }
                         } ).patch();
 
-                        var code = CnSession.user.id == this.record.trainee_user_id ?
-                          ( 'deferred' == this.record.state ? 'traineeResubmit' : 'traineeSubmit' ) :
-                          ( 'deferred' == this.record.state ? 'resubmit' : 'submit' );
+                        var code = CnSession.user.id == self.record.trainee_user_id ?
+                          ( 'deferred' == self.record.state ? 'traineeResubmit' : 'traineeSubmit' ) :
+                          CnSession.user.id == self.record.designate_user_id ?
+                          ( 'deferred' == self.record.state ? 'designateResubmit' : 'designateSubmit' ) :
+                          ( 'deferred' == self.record.state ? 'resubmit' : 'submit' );
                         
                         await CnModalMessageFactory.instance( {
                           title: noReview

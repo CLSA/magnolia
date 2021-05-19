@@ -41,6 +41,9 @@ define( [ 'output' ].reduce( function( list, name ) {
       trainee_full_name: {
         title: 'Trainee'
       },
+      designate_full_name: {
+        title: 'Designate'
+      },
       deadline: {
         column: 'deadline.name',
         title: 'Deadline',
@@ -184,6 +187,15 @@ define( [ 'output' ].reduce( function( list, name ) {
         return !model.isRole( 'administrator' ) || 0 < model.viewModel.record.has_agreements;
       },
       isExcluded: 'add'
+    },
+    designate_user_id: {
+      title: 'Designate',
+      type: 'lookup-typeahead',
+      typeahead: {
+        table: 'user',
+        select: 'CONCAT( user.first_name, " ", user.last_name, " (", user.name, ")" )',
+        where: [ 'user.first_name', 'user.last_name', 'user.name' ]
+      }
     },
     language_id: {
       title: 'Language',
@@ -848,6 +860,8 @@ define( [ 'output' ].reduce( function( list, name ) {
             if( angular.isDefined( this.noticeModel ) ) {
               this.noticeModel.columnList.viewed_by_trainee_user.isIncluded =
                 null == this.record.trainee_user_id ? function() { return false; } : function() { return true; };
+              this.noticeModel.columnList.viewed_by_designate_user.isIncluded =
+                null == this.record.designate_user_id ? function() { return false; } : function() { return true; };
             }
           },
 

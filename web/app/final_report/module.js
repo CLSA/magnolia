@@ -44,6 +44,7 @@ define( [ 'output' ].reduce( function( list, name ) {
     version: { type: 'string' },
     current_reqn_version_id: { column: 'reqn_version.id', type: 'string' },
     trainee_user_id: { column: 'reqn.trainee_user_id', type: 'string' },
+    designate_user_id: { column: 'reqn.designate_user_id', type: 'string' },
     state: { column: 'reqn.state', type: 'string' },
     stage_type: { column: 'stage_type.name', type: 'string' },
     phase: { column: 'stage_type.phase', type: 'string' },

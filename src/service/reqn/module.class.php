@@ -34,7 +34,8 @@ class module extends \cenozo\service\module
         if( 'applicant' == $db_role->name )
         {
           $trainee = 'applicant' == $db_role->name && $db_reqn->trainee_user_id == $db_user->id;
-          if( ( $db_reqn->user_id != $db_user->id && !$trainee ) || 'abandoned' == $db_reqn->state )
+          $designate = 'applicant' == $db_role->name && $db_reqn->designate_user_id == $db_user->id;
+          if( ( $db_reqn->user_id != $db_user->id && !$trainee && !$designate ) || 'abandoned' == $db_reqn->state )
           {
             $this->get_status()->set_code( 404 );
             return;
@@ -74,6 +75,7 @@ class module extends \cenozo\service\module
     $modifier->left_join( 'deadline', 'reqn.deadline_id', 'deadline.id' );
     $modifier->join( 'user', 'reqn.user_id', 'user.id' );
     $modifier->left_join( 'user', 'reqn.trainee_user_id', 'trainee_user.id', 'trainee_user' );
+    $modifier->left_join( 'user', 'reqn.designate_user_id', 'designate_user.id', 'designate_user' );
 
     $join_mod = lib::create( 'database\modifier' );
     $join_mod->where( 'reqn.id', '=', 'stage.reqn_id', false );
@@ -144,6 +146,16 @@ class module extends \cenozo\service\module
       );
     }
 
+    if( $select->has_column( 'designate_full_name' ) )
+    {
+      $select->add_table_column(
+        'designate_user',
+        'IF( designate_user.id IS NULL, NULL, CONCAT_WS( " ", designate_user.first_name, designate_user.last_name ) )',
+        'designate_full_name',
+        false
+      );
+    }
+
     if( $select->has_column( 'amendment_version' ) )
     {
       $select->add_column(
@@ -188,6 +200,7 @@ class module extends \cenozo\service\module
       $modifier->where_bracket( true );
       $modifier->where( 'reqn.user_id', '=', $db_user->id );
       $modifier->or_where( 'reqn.trainee_user_id', '=', $db_user->id );
+      $modifier->or_where( 'reqn.designate_user_id', '=', $db_user->id );
       $modifier->where_bracket( false );
       $modifier->where( 'IFNULL( reqn.state, "" )', '!=', 'abandoned' );
 
@@ -298,6 +311,12 @@ class module extends \cenozo\service\module
       $select->add_column(
         'CONCAT( trainee_user.first_name, " ", trainee_user.last_name, " (", trainee_user.name, ")" )',
         'formatted_trainee_user_id',
+        false
+      );
+
+      $select->add_column(
+        'CONCAT( designate_user.first_name, " ", designate_user.last_name, " (", designate_user.name, ")" )',
+        'formatted_designate_user_id',
         false
       );
 

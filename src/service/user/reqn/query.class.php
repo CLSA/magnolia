@@ -23,11 +23,12 @@ class query extends \cenozo\service\query
     $reqn_class_name = lib::get_class_name( 'database\reqn' );
     $db_user = $this->get_parent_record();
 
-    // show both owned and trainee reqns
+    // show both owned and trainee or designate reqns
     $modifier = clone $this->modifier;
     $modifier->where_bracket( true );
     $modifier->where( 'reqn.user_id', '=', $db_user->id );
     $modifier->or_where( 'reqn.trainee_user_id', '=', $db_user->id );
+    $modifier->or_where( 'reqn.designate_user_id', '=', $db_user->id );
     $modifier->where_bracket( false );
     return $reqn_class_name::count( $modifier );
   }
@@ -42,11 +43,12 @@ class query extends \cenozo\service\query
     $reqn_class_name = lib::get_class_name( 'database\reqn' );
     $db_user = $this->get_parent_record();
 
-    // show both owned and trainee reqns
+    // show both owned and trainee or designate reqns
     $modifier = clone $this->modifier;
     $modifier->where_bracket( true );
     $modifier->where( 'reqn.user_id', '=', $db_user->id );
     $modifier->or_where( 'reqn.trainee_user_id', '=', $db_user->id );
+    $modifier->or_where( 'reqn.designate_user_id', '=', $db_user->id );
     $modifier->where_bracket( false );
     return $reqn_class_name::select( $this->select, $modifier );
   }
