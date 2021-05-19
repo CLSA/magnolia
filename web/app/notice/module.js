@@ -125,11 +125,9 @@ define( function() {
     'CnBaseViewFactory', 'CnHttpFactory',
     function( CnBaseViewFactory, CnHttpFactory ) {
       var object = function( parentModel, root ) {
-        var self = this;
         CnBaseViewFactory.construct( this, parentModel, root );
 
-        this.onPatch = function( data ) {
-          var promise = null;
+        this.onPatch = async function( data ) {
           if( angular.isDefined( data.viewed_by_user ) || angular.isDefined( data.viewed_by_trainee_user ) ) {
             // handle the viewed-by data since it isn't a direct property of the notice record
             var add = null;
@@ -137,20 +135,22 @@ define( function() {
 
             if( angular.isDefined( data.viewed_by_user ) ) {
               add = data.viewed_by_user;
-              userId = self.record.user_id;
+              userId = this.record.user_id;
             } else {
               add = data.viewed_by_trainee_user;
-              userId = self.record.trainee_user_id;
+              userId = this.record.trainee_user_id;
             }
 
-            promise = add ?
-              CnHttpFactory.instance( { path: self.parentModel.getServiceResourcePath() + '/user', data: userId } ).post() :
-              CnHttpFactory.instance( { path: self.parentModel.getServiceResourcePath() + '/user/' + userId } ).delete();
+            if( add ) {
+              await CnHttpFactory.instance( { path: this.parentModel.getServiceResourcePath() + '/user', data: userId } ).post();
+            } else {
+              await CnHttpFactory.instance( { path: this.parentModel.getServiceResourcePath() + '/user/' + userId } ).delete();
+            }
           } else {
-            promise = self.$$onPatch( data );
+            await this.$$onPatch( data );
           }
 
-          return promise.then( function() { self.afterPatchFunctions.forEach( function( fn ) { fn(); } ) } );
+          this.afterPatchFunctions.forEach( function( fn ) { fn(); } );
         };
       };
       return { instance: function( parentModel, root ) { return new object( parentModel, root ); } };
@@ -162,20 +162,19 @@ define( function() {
     'CnBaseModelFactory', 'CnNoticeAddFactory', 'CnNoticeListFactory', 'CnNoticeViewFactory',
     function( CnBaseModelFactory, CnNoticeAddFactory, CnNoticeListFactory, CnNoticeViewFactory ) {
       var object = function( root ) {
-        var self = this;
         CnBaseModelFactory.construct( this, module );
         this.addModel = CnNoticeAddFactory.instance( this );
         this.listModel = CnNoticeListFactory.instance( this );
         this.viewModel = CnNoticeViewFactory.instance( this, root );
 
         // extend getMetadata
-        this.getMetadata = function() {
-          return this.$$getMetadata().then( function() {
-            // fake the viewed-by columns
-            angular.extend( self.metadata.columnList, {
-              viewed_by_user: { data_type: 'tinyint', required: true },
-              viewed_by_trainee_user: { data_type: 'tinyint', required: true }
-            } );
+        this.getMetadata = async function() {
+          await this.$$getMetadata();
+
+          // fake the viewed-by columns
+          angular.extend( this.metadata.columnList, {
+            viewed_by_user: { data_type: 'tinyint', required: true },
+            viewed_by_trainee_user: { data_type: 'tinyint', required: true }
           } );
         };
       };

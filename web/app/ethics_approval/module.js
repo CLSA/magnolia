@@ -104,8 +104,8 @@ define( function() {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnEthicsApprovalViewFactory', [
-    'CnBaseViewFactory', 'CnReqnHelper', 'CnHttpFactory', 'CnSession',
-    function( CnBaseViewFactory, CnReqnHelper, CnHttpFactory, CnSession ) {
+    'CnBaseViewFactory',
+    function( CnBaseViewFactory ) {
       var object = function( parentModel, root ) {
         CnBaseViewFactory.construct( this, parentModel, root );
         this.configureFileInput( 'filename' );
@@ -119,7 +119,6 @@ define( function() {
     'CnHttpFactory', 'CnReqnHelper', 'CnModalDatetimeFactory', '$uibModal',
     function( CnHttpFactory, CnReqnHelper, CnModalDatetimeFactory, $uibModal ) {
       var object = function( params ) {
-        var self = this;
         this.language = 'en';
         angular.extend( this, params );
 
@@ -142,32 +141,37 @@ define( function() {
                     var fileDetails = data.get( 'file' );
                     return fileDetails.name;
                   },
-                  upload: function( path ) {
+                  upload: async function( path ) {
                     var obj = this;
-                    obj.uploading = true;
 
-                    // upload the file
-                    return CnHttpFactory.instance( {
-                      path: path + '?file=filename',
-                      data: obj.file,
-                      format: 'unknown'
-                    } ).patch().finally( function() { obj.uploading = false; } );
+                    try {
+                      obj.uploading = true;
+
+                      // upload the file
+                      await CnHttpFactory.instance( {
+                        path: path + '?file=filename',
+                        data: obj.file,
+                        format: 'unknown'
+                      } ).patch()
+                    } finally {
+                      obj.uploading = false;
+                    }
                   }
                 },
                 filename: null,
                 date: null,
-                selectDate: function() {
-                  CnModalDatetimeFactory.instance( {
+                selectDate: async function() {
+                  var response = await CnModalDatetimeFactory.instance( {
                     title: $scope.t( 'misc.expirationDate' ).toLowerCase(),
-                    date: self.date,
+                    date: this.date,
                     pickerType: 'date',
                     emptyAllowed: false,
-                    locale: self.language
-                  } ).show().then( function( response ) {
-                    if( response ) $scope.date = response.replace( /T.*/, '' );
-                  } );
+                    locale: this.language
+                  } ).show();
+
+                  if( response ) $scope.date = response.replace( /T.*/, '' );
                 },
-                t: function( value ) { return CnReqnHelper.translate( 'reqn', value, self.language ); },
+                t: function( value ) { return CnReqnHelper.translate( 'reqn', value, this.language ); },
                 ok: function() {
                   $uibModalInstance.close( { file: $scope.file, date: $scope.date } );
                 },
@@ -190,7 +194,6 @@ define( function() {
     function( CnBaseModelFactory, CnEthicsApprovalAddFactory, CnEthicsApprovalListFactory, CnEthicsApprovalViewFactory,
               CnSession, CnHttpFactory ) {
       var object = function( root ) {
-        var self = this;
         CnBaseModelFactory.construct( this, module );
         this.addModel = CnEthicsApprovalAddFactory.instance( this );
         this.listModel = CnEthicsApprovalListFactory.instance( this );

@@ -29,7 +29,7 @@ define( [ 'reqn', 'review', 'root' ].reduce( function( list, name ) {
               CnHttpFactory.instance( {
                 path: 'self/0',
                 data: { applicant: { newsletter: $scope.user.newsletter } },
-                onError: function( response ) { $scope.user.newsletter = !$scope.user.newsletter; }
+                onError: function( error ) { $scope.user.newsletter = !$scope.user.newsletter; }
               } ).patch();
             };
           }

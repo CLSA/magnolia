@@ -114,13 +114,12 @@ define( function() {
     'CnBaseViewFactory', 'CnReqnHelper',
     function( CnBaseViewFactory, CnReqnHelper ) {
       var object = function( parentModel, root ) {
-        var self = this;
         CnBaseViewFactory.construct( this, parentModel, root );
 
         angular.extend( this, {
-          onView: function( force ) {
-            self.updateOutputListLanguage();
-            return this.$$onView( force );
+          onView: async function( force ) {
+            this.updateOutputListLanguage();
+            await this.$$onView( force );
           },
 
           updateOutputListLanguage: function() {
@@ -143,7 +142,6 @@ define( function() {
     'CnBaseModelFactory', 'CnOutputTypeAddFactory', 'CnOutputTypeListFactory', 'CnOutputTypeViewFactory',
     function( CnBaseModelFactory, CnOutputTypeAddFactory, CnOutputTypeListFactory, CnOutputTypeViewFactory ) {
       var object = function( root ) {
-        var self = this;
         CnBaseModelFactory.construct( this, module );
         this.addModel = CnOutputTypeAddFactory.instance( this );
         this.listModel = CnOutputTypeListFactory.instance( this );

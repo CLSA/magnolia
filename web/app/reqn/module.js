@@ -437,16 +437,16 @@ define( [ 'output' ].reduce( function( list, name ) {
 
   module.addExtraOperation( 'view', {
     title: 'View Form',
-    operation: function( $state, model ) {
-      $state.go( 'reqn_version.view', { identifier: model.viewModel.record.current_reqn_version_id } );
+    operation: async function( $state, model ) {
+      await $state.go( 'reqn_version.view', { identifier: model.viewModel.record.current_reqn_version_id } );
     }
   } );
 
   module.addExtraOperation( 'view', {
     title: 'View Report',
     isIncluded: function( $state, model ) { return model.viewModel.record.current_final_report_id; },
-    operation: function( $state, model ) {
-      $state.go( 'final_report.view', { identifier: model.viewModel.record.current_final_report_id } );
+    operation: async function( $state, model ) {
+      await $state.go( 'final_report.view', { identifier: model.viewModel.record.current_final_report_id } );
     }
   } );
 
@@ -564,41 +564,41 @@ define( [ 'output' ].reduce( function( list, name ) {
     title: 'Download',
     operations: [ {
       title: 'Application',
-      operation: function( $state, model ) { model.viewModel.downloadApplication(); }
+      operation: async function( $state, model ) { await model.viewModel.downloadApplication(); }
     }, {
       title: 'Data Checklist',
-      operation: function( $state, model ) { model.viewModel.downloadChecklist(); }
+      operation: async function( $state, model ) { await model.viewModel.downloadChecklist(); }
     }, {
       title: 'Application + Data Checklist',
-      operation: function( $state, model ) { model.viewModel.downloadApplicationAndChecklist(); }
+      operation: async function( $state, model ) { await model.viewModel.downloadApplicationAndChecklist(); }
     }, {
       title: 'Selected Data Options',
-      operation: function( $state, model ) { model.viewModel.downloadDataOptions(); }
+      operation: async function( $state, model ) { await model.viewModel.downloadDataOptions(); }
     }, {
       title: 'Proof of Peer Review',
-      operation: function( $state, model ) { model.viewModel.downloadPeerReview(); },
+      operation: async function( $state, model ) { await model.viewModel.downloadPeerReview(); },
       isDisabled: function( $state, model ) { return !model.viewModel.record.peer_review_filename; }
     }, {
       title: 'Funding Letter',
-      operation: function( $state, model ) { model.viewModel.downloadFundingLetter(); },
+      operation: async function( $state, model ) { await model.viewModel.downloadFundingLetter(); },
       isDisabled: function( $state, model ) { return !model.viewModel.record.funding_filename; }
     }, {
       title: 'Ethics Letter/Exemption',
-      operation: function( $state, model ) { model.viewModel.downloadEthicsLetter(); },
+      operation: async function( $state, model ) { await model.viewModel.downloadEthicsLetter(); },
       isDisabled: function( $state, model ) { return !model.viewModel.record.ethics_filename; }
     }, {
       title: 'Agreement Letters',
-      operation: function( $state, model ) { model.viewModel.downloadAgreementLetters(); },
+      operation: async function( $state, model ) { await model.viewModel.downloadAgreementLetters(); },
       isDisabled: function( $state, model ) { return !model.viewModel.record.has_agreements; }
     }, {
       title: 'Notices',
-      operation: function( $state, model ) { model.viewModel.displayNotices(); }
+      operation: async function( $state, model ) { await model.viewModel.displayNotices(); }
     }, {
       title: 'Reviews',
-      operation: function( $state, model ) { model.viewModel.downloadReviews(); }
+      operation: async function( $state, model ) { await model.viewModel.downloadReviews(); }
     }, {
       title: 'Final Report',
-      operation: function( $state, model ) { model.viewModel.downloadFinalReport(); },
+      operation: async function( $state, model ) { await model.viewModel.downloadFinalReport(); },
       isIncluded: function( $state, model ) {
         return ['Report Required', 'Complete'].includes( model.viewModel.record.stage_type );
       }
@@ -652,7 +652,7 @@ define( [ 'output' ].reduce( function( list, name ) {
 
           CnSession.setBreadcrumbTrail( [ {
               title: $scope.model.module.name.plural.ucWords(),
-              go: function() { $state.go( 'reqn.list' ); }
+              go: async function() { await $state.go( 'reqn.list' ); }
             }, {
               title: 'CANUE Approvals'
             } ]
@@ -696,8 +696,8 @@ define( [ 'output' ].reduce( function( list, name ) {
 
         // immediately view the user record after it has been created
         this.transitionOnSave = function( record ) {
-          CnSession.workingTransition( function() {
-            $state.go( 'reqn_version.view', { identifier: 'identifier=' + record.identifier } );
+          CnSession.workingTransition( async function() {
+            await $state.go( 'reqn_version.view', { identifier: 'identifier=' + record.identifier } );
           } );
         };
       };
@@ -728,84 +728,85 @@ define( [ 'output' ].reduce( function( list, name ) {
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnReqnViewFactory', [
     'CnBaseViewFactory', 'CnReqnHelper', 'CnSession', 'CnHttpFactory',
-    'CnModalMessageFactory', 'CnModalConfirmFactory', 'CnModalNoticeListFactory', '$window', '$state', '$q',
+    'CnModalMessageFactory', 'CnModalConfirmFactory', 'CnModalNoticeListFactory', '$window', '$state',
     function( CnBaseViewFactory, CnReqnHelper, CnSession, CnHttpFactory,
-              CnModalMessageFactory, CnModalConfirmFactory, CnModalNoticeListFactory, $window, $state, $q ) {
+              CnModalMessageFactory, CnModalConfirmFactory, CnModalNoticeListFactory, $window, $state ) {
       var object = function( parentModel, root ) {
-        var self = this;
         CnBaseViewFactory.construct( this, parentModel, root, 'stage' );
-
-        this.deferred.promise.then( function() {
-          if( angular.isDefined( self.stageModel ) ) self.stageModel.listModel.heading = 'Stage History';
-        } );
-
-        this.configureFileInput( 'instruction_filename' );
 
         angular.extend( this, {
           show: function( subject ) { return CnReqnHelper.showAction( subject, this.record ); },
-          abandon: function() {
-            return CnReqnHelper.abandon(
+          abandon: async function() {
+            var response = await CnReqnHelper.abandon(
               this.record.getIdentifier(),
               '.' != this.record.amendment,
               this.record.lang
-            ).then( function( response ) {
-              if( response ) {
-                self.record.state = 'abandoned';
-                self.record.state_date = moment().format( 'YYYY-MM-DD' );
-                self.updateFormattedRecord( 'state_date', 'date' );
-                if( angular.isDefined( self.notificationModel ) ) self.notificationModel.listModel.onList( true );
-              }
-            } );
+            );
+
+            if( response ) {
+              this.record.state = 'abandoned';
+              this.record.state_date = moment().format( 'YYYY-MM-DD' );
+              this.updateFormattedRecord( 'state_date', 'date' );
+              if( angular.isDefined( this.notificationModel ) ) await this.notificationModel.listModel.onList( true );
+            }
           },
-          delete: function() { return CnReqnHelper.delete( this.record.getIdentifier(), this.record.lang ); },
-          translate: function( value ) {
-            return this.record.lang ? CnReqnHelper.translate( 'reqn', value, this.record.lang ) : '';
+          delete: async function() { await CnReqnHelper.delete( this.record.getIdentifier(), this.record.lang ); },
+          translate: async function( value ) {
+            await this.record.lang ? CnReqnHelper.translate( 'reqn', value, this.record.lang ) : '';
           },
-          viewReport: function() { return CnReqnHelper.viewReport( this.record.getIdentifier() ); },
-          downloadApplication: function() { return CnReqnHelper.download( 'application', this.record.current_reqn_version_id ); },
-          downloadChecklist: function() { return CnReqnHelper.download( 'checklist', this.record.current_reqn_version_id ); },
-          downloadApplicationAndChecklist: function() {
-            return CnReqnHelper.download( 'application_and_checklist', this.record.current_reqn_version_id );
+          downloadApplication: async function() {
+            await CnReqnHelper.download( 'application', this.record.current_reqn_version_id );
           },
-          downloadDataOptions: function() { return CnReqnHelper.download( 'data_options', this.record.current_reqn_version_id ); },
-          downloadPeerReview: function() {
-            return CnReqnHelper.download( 'peer_review_filename', this.record.current_reqn_version_id );
+          downloadChecklist: async function() {
+            await CnReqnHelper.download( 'checklist', this.record.current_reqn_version_id );
           },
-          downloadFundingLetter: function() {
-            return CnReqnHelper.download( 'funding_filename', this.record.current_reqn_version_id );
+          downloadApplicationAndChecklist: async function() {
+            await CnReqnHelper.download( 'application_and_checklist', this.record.current_reqn_version_id );
           },
-          downloadEthicsLetter: function() {
-            return CnReqnHelper.download( 'ethics_filename', this.record.current_reqn_version_id );
+          downloadDataOptions: async function() {
+            await CnReqnHelper.download( 'data_options', this.record.current_reqn_version_id );
           },
-          downloadAgreementLetters: function() {
-            return CnHttpFactory.instance( {
+          downloadPeerReview: async function() {
+            await CnReqnHelper.download( 'peer_review_filename', this.record.current_reqn_version_id );
+          },
+          downloadFundingLetter: async function() {
+            await CnReqnHelper.download( 'funding_filename', this.record.current_reqn_version_id );
+          },
+          downloadEthicsLetter: async function() {
+            await CnReqnHelper.download( 'ethics_filename', this.record.current_reqn_version_id );
+          },
+          downloadAgreementLetters: async function() {
+            await CnHttpFactory.instance( {
               path: this.parentModel.getServiceResourcePath() + '?file=agreements',
               format: 'zip'
             } ).file();
           },
-          downloadReviews: function() {
-            return CnHttpFactory.instance( {
+          downloadReviews: async function() {
+            await CnHttpFactory.instance( {
               path: this.parentModel.getServiceResourcePath() + '?file=reviews',
               format: 'txt'
             } ).file();
           },
-          downloadFinalReport: function() { return CnReqnHelper.download( 'final_report', this.record.current_final_report_id ); },
+          downloadFinalReport: async function() {
+            await CnReqnHelper.download( 'final_report', this.record.current_final_report_id );
+          },
 
-          resetData: function() {
-            CnHttpFactory.instance( {
-              path: self.parentModel.getServiceResourcePath() + '?action=reset_data'
-            } ).patch().then( function( response ) {
-              self.onView();
-              CnModalMessageFactory.instance( {
-                title: 'Study Data Reset',
-                message: response.data ?
-                  'This ' + self.parentModel.module.name.possessive +
-                  ' study data has been made available and will automatically expire in ' +
-                  CnSession.application.studyDataExpiry + ' days.' :
-                  'Warning: The ' + self.parentModel.module.name.singular + ' has no data to make available.',
-                error: !response.data
-              } ).show();
-            } );
+          resetData: async function() {
+            var response = await CnHttpFactory.instance( {
+              path: this.parentModel.getServiceResourcePath() + '?action=reset_data'
+            } ).patch();
+
+            CnModalMessageFactory.instance( {
+              title: 'Study Data Reset',
+              message: response.data ?
+                'This ' + this.parentModel.module.name.possessive +
+                ' study data has been made available and will automatically expire in ' +
+                CnSession.application.studyDataExpiry + ' days.' :
+                'Warning: The ' + this.parentModel.module.name.singular + ' has no data to make available.',
+              error: !response.data
+            } ).show();
+
+            await this.onView();
           },
           canResetData: function() {
             // administrators and applicants can view data when in the active stage
@@ -813,7 +814,7 @@ define( [ 'output' ].reduce( function( list, name ) {
             return 'administrator' == CnSession.role.name && ( 'Data Release' == stage_type || 'Active' == stage_type );
           },
           viewData: function() {
-            $window.open( CnSession.application.studyDataUrl + '/' + self.record.data_directory, 'studyData' + self.record.id );
+            $window.open( CnSession.application.studyDataUrl + '/' + this.record.data_directory, 'studyData' + this.record.id );
           },
           canViewData: function() {
             // administrators and applicants can view data when in the active stage
@@ -821,35 +822,33 @@ define( [ 'output' ].reduce( function( list, name ) {
             return ( 'administrator' == CnSession.role.name && ['Data Release','Active'].includes( stage_type ) ) ||
                    ( 'applicant' == CnSession.role.name && 'Active' == stage_type );
           },
-          onView: function( force ) {
+          onView: async function( force ) {
             // update the output list language
-            self.updateOutputListLanguage();
+            this.updateOutputListLanguage();
 
             if( 'reviewer' == CnSession.role.name ) {
               // If we are a reviewer assigned to this reqn and haven't completed our review then show a reminder
-              CnHttpFactory.instance( {
+              var response = await CnHttpFactory.instance( {
                 path: this.parentModel.getServiceResourcePath() + '/review',
                 data: { modifier: { where: { column: 'recommendation_type_id', operator: '=', value: null } } }
-              } ).count().then( function( response ) {
-                if( 0 < parseInt( response.headers( 'Total' ) ) ) {
-                  CnModalMessageFactory.instance( {
-                    title: 'Outstanding Review',
-                    message: 'Please note: this ' + self.parentModel.module.name.singular +
-                      ' has an outstanding review which you must complete before it can proceed with the review process.'
-                  } ).show();
-                }
-              } );
+              } ).count();
+
+              if( 0 < parseInt( response.headers( 'Total' ) ) ) {
+                CnModalMessageFactory.instance( {
+                  title: 'Outstanding Review',
+                  message: 'Please note: this ' + this.parentModel.module.name.singular +
+                    ' has an outstanding review which you must complete before it can proceed with the review process.'
+                } ).show();
+              }
             }
 
             // update the column languages in case they were changed while viewing a final report
+            await this.$$onView( force );
 
-            return this.$$onView( force ).then( function() {
-              if( angular.isDefined( self.noticeModel ) ) {
-                self.noticeModel.columnList.viewed_by_trainee_user.isIncluded = null == self.record.trainee_user_id
-                                                                              ? function() { return false; }
-                                                                              : function() { return true; };
-              }
-            } );
+            if( angular.isDefined( this.noticeModel ) ) {
+              this.noticeModel.columnList.viewed_by_trainee_user.isIncluded =
+                null == this.record.trainee_user_id ? function() { return false; } : function() { return true; };
+            }
           },
 
           updateOutputListLanguage: function() {
@@ -862,59 +861,58 @@ define( [ 'output' ].reduce( function( list, name ) {
             columnList.output_source_count.title = CnReqnHelper.translate( 'output', 'output_source_count', 'en' );
           },
 
-          onPatch: function( data ) {
+          onPatch: async function( data ) {
             var changingUser = angular.isDefined( data.user_id );
             var changingTrainee = angular.isDefined( data.trainee_user_id );
-            var promiseList = [];
 
             // don't allow the user and trainee to be the same person
-            if( ( changingUser && self.record.trainee_user_id == data.user_id ) ||
-                ( changingTrainee && self.record.user_id == data.trainee_user_id ) ) {
-              return CnModalMessageFactory.instance( {
+            if( ( changingUser && this.record.trainee_user_id == data.user_id ) ||
+                ( changingTrainee && this.record.user_id == data.trainee_user_id ) ) {
+              await CnModalMessageFactory.instance( {
                 title: 'Invalid User Selection',
                 message: 'You cannot set the owner and trainee to be the same person.',
                 error: true
-              } ).show().then( function() {
-                // we're not making the change so put back the old user
-                if( changingUser ) {
-                  self.record.user_id = self.backupRecord.user_id;
-                  self.formattedRecord.user_id = self.backupRecord.formatted_user_id;
-                } else {
-                  self.record.trainee_user_id = self.backupRecord.trainee_user_id;
-                  self.formattedRecord.trainee_user_id = self.backupRecord.formatted_trainee_user_id;
-                }
-              } );
+              } ).show();
+
+              // we're not making the change so put back the old user
+              if( changingUser ) {
+                this.record.user_id = this.backupRecord.user_id;
+                this.formattedRecord.user_id = this.backupRecord.formatted_user_id;
+              } else {
+                this.record.trainee_user_id = this.backupRecord.trainee_user_id;
+                this.formattedRecord.trainee_user_id = this.backupRecord.formatted_trainee_user_id;
+              }
             } else {
+              var proceed = true;
+
               // show a warning when changing the primary applicant
               if( changingUser ) {
-                promiseList.push(
-                  CnModalConfirmFactory.instance( {
-                    title: 'Change Owner',
-                    message:
-                      'Changing the ' + this.parentModel.module.name.possessive + ' primary applicant will immediately remove ' +
-                      'it from the old owner\'s ' + this.parentModel.module.name.singular + ' list and add it to the new ' +
-                      'owner\'s list.  Also, a notification will be sent to both the old and new applicants explaining the ' +
-                      'transfer of ownership.\n\nAre you sure you wish to proceed?'
-                  } ).show().then( response => response )
-                );
+                var response = await CnModalConfirmFactory.instance( {
+                  title: 'Change Owner',
+                  message:
+                    'Changing the ' + this.parentModel.module.name.possessive + ' primary applicant will immediately remove ' +
+                    'it from the old owner\'s ' + this.parentModel.module.name.singular + ' list and add it to the new ' +
+                    'owner\'s list.  Also, a notification will be sent to both the old and new applicants explaining the ' +
+                    'transfer of ownership.\n\nAre you sure you wish to proceed?'
+                } ).show();
+                proceed = response;
               }
 
-              return $q.all( promiseList ).then( function( response ) {
-                if( 0 == response.length || response[0] ) {
-                  return self.$$onPatch( data ).then( function() {
-                    // Reload the view if we're changing the suggested revisions (the next stage will change)
-                    // or reqn type (the deadline might change)
-                    if( angular.isDefined( data.suggested_revisions ) || angular.isDefined( data.reqn_type_id ) ) return self.onView();
+              if( proceed ) {
+                await this.$$onPatch( data );
 
-                    // Reload the notification list if we're changing the user
-                    if( changingUser && angular.isDefined( self.notificationModel ) ) self.notificationModel.listModel.onList( true );
-                  } );
-                } else if( changingUser ) {
-                  // we're not making the change so put back the old user
-                  self.record.user_id = self.backupRecord.user_id;
-                  self.formattedRecord.user_id = self.backupRecord.formatted_user_id;
-                }
-              } );
+                // Reload the view if we're changing the suggested revisions (the next stage will change)
+                // or reqn type (the deadline might change)
+                if( angular.isDefined( data.suggested_revisions ) || angular.isDefined( data.reqn_type_id ) ) await this.onView();
+
+                // Reload the notification list if we're changing the user
+                if( changingUser && angular.isDefined( this.notificationModel ) )
+                  await this.notificationModel.listModel.onList( true );
+              } else if( changingUser ) {
+                // we're not making the change so put back the old user
+                this.record.user_id = this.backupRecord.user_id;
+                this.formattedRecord.user_id = this.backupRecord.formatted_user_id;
+              }
             }
           },
 
@@ -951,7 +949,21 @@ define( [ 'output' ].reduce( function( list, name ) {
             } else return false;
           },
 
-          proceed: function( stageType ) {
+          reloadAll: async function( modelList ) {
+            var self = this;
+            await Promise.all(
+              modelList.reduce(
+                function( promiseList, modelName ) {
+                  if( angular.isDefined( self[ modelName + 'Model' ] ) )
+                    promiseList.push( self[ modelName + 'Model' ].listModel.onList( true ) );
+                  return promiseList;
+                },
+                [ this.onView() ]
+              )
+            );
+          },
+
+          proceed: async function( stageType ) {
             var message = 'Are you sure you wish to move this ' + this.parentModel.module.name.singular + ' to the "' +
               ( angular.isDefined( stageType ) ? stageType : this.record.next_stage_type ) + '" stage?';
             if( 'administrator' == CnSession.role.name && ( this.reqnDeferralNotesExist() || this.reportDeferralNotesExist() ) ) {
@@ -960,177 +972,135 @@ define( [ 'output' ].reduce( function( list, name ) {
 
             if( 'Data Release' == this.record.next_stage_type ) {
               if( null == this.record.ethics_date ) {
-                message += '\n\nWARNING: This ' + self.parentModel.module.name.singular + ' has no ethics agreement, ' +
+                message += '\n\nWARNING: This ' + this.parentModel.module.name.singular + ' has no ethics agreement, ' +
                   'you may not wish to proceed until one has been uploaded.';
               } else if( moment().isAfter( this.record.ethics_date, 'day' ) ) {
-                message += '\n\nWARNING: This ' + self.parentModel.module.name.possessive + ' ethics expired on ' +
+                message += '\n\nWARNING: This ' + this.parentModel.module.name.possessive + ' ethics expired on ' +
                   moment( this.record.ethics_date ).format( 'MMMM D, YYYY' ) + ', ' +
                   'you may not wish to proceed until a new ethics agreement has been uploaded.';
               }
             }
 
-            return CnModalConfirmFactory.instance( {
+            var response = await CnModalConfirmFactory.instance( {
               message: message
-            } ).show().then( function( response ) {
-              if( response ) {
-                var queryString = '?action=next_stage';
-                if( angular.isDefined( stageType ) ) queryString += '&stage_type=' + stageType;
-                return CnHttpFactory.instance( {
-                  path: self.parentModel.getServiceResourcePath() + queryString,
-                } ).patch().then( function() {
-                  self.onView();
-                  if( angular.isDefined( self.reviewModel ) ) self.reviewModel.listModel.onList( true );
-                  if( angular.isDefined( self.stageModel ) ) self.stageModel.listModel.onList( true );
-                  if( angular.isDefined( self.notificationModel ) ) self.notificationModel.listModel.onList( true );
-                } );
-              }
-            } );
+            } ).show();
+
+            if( response ) {
+              var queryString = '?action=next_stage';
+              if( angular.isDefined( stageType ) ) queryString += '&stage_type=' + stageType;
+              await CnHttpFactory.instance( { path: this.parentModel.getServiceResourcePath() + queryString, } ).patch();
+              await this.reloadAll( [ 'review', 'stage', 'notification' ] );
+            }
           },
 
-          reject: function() {
+          reject: async function() {
             var message = 'Are you sure you wish to reject the ' + this.parentModel.module.name.singular + '?';
-            return CnModalConfirmFactory.instance( {
-              message: message
-            } ).show().then( function( response ) {
-              if( response ) {
-                return CnHttpFactory.instance( {
-                  path: self.parentModel.getServiceResourcePath() + "?action=reject",
-                } ).patch().then( function() {
-                  self.onView();
-                  if( angular.isDefined( self.reviewModel ) ) self.reviewModel.listModel.onList( true );
-                  if( angular.isDefined( self.stageModel ) ) self.stageModel.listModel.onList( true );
-                  if( angular.isDefined( self.notificationModel ) ) self.notificationModel.listModel.onList( true );
-                } );
-              }
-            } );
+            var response = await CnModalConfirmFactory.instance( { message: message } ).show();
+
+            if( response ) {
+              await CnHttpFactory.instance( { path: this.parentModel.getServiceResourcePath() + "?action=reject", } ).patch();
+              await this.reloadAll( [ 'review', 'stage', 'notification' ] );
+            }
           },
 
-          defer: function() {
+          defer: async function() {
             var message = 'Are you sure you wish to defer to the applicant?  ' +
               'A notification will be sent indicating that an action is required by the applicant.'
             if( !this.reqnDeferralNotesExist() && !this.reportDeferralNotesExist() ) {
               message += '\n\nWARNING: there are currently no deferral notes to instruct the applicant why ' +
                          'their attention is required.';
             }
-            return CnModalConfirmFactory.instance( {
-              message: message
-            } ).show().then( function( response ) {
-              if( response ) {
-                return CnHttpFactory.instance( {
-                  path: self.parentModel.getServiceResourcePath() + "?action=defer"
-                } ).patch().then( function() {
-                  self.record.state = 'deferred';
-                  self.record.state_date = moment().format( 'YYYY-MM-DD' );
-                  self.updateFormattedRecord( 'state_date', 'date' );
-                  self.onView();
-                  if( angular.isDefined( self.reqnVersionModel ) ) self.reqnVersionModel.listModel.onList( true );
-                  if( angular.isDefined( self.notificationModel ) ) self.notificationModel.listModel.onList( true );
-                } );
-              }
-            } );
+
+            var response = await CnModalConfirmFactory.instance( { message: message } ).show();
+            if( response ) {
+              await CnHttpFactory.instance( { path: this.parentModel.getServiceResourcePath() + "?action=defer" } ).patch();
+              this.record.state = 'deferred';
+              this.record.state_date = moment().format( 'YYYY-MM-DD' );
+              this.updateFormattedRecord( 'state_date', 'date' );
+              await this.reloadAll( [ 'reqnVersion', 'notification' ] );
+            }
           },
 
-          deactivate: function() {
-            return CnModalConfirmFactory.instance( {
+          deactivate: async function() {
+            var response = await CnModalConfirmFactory.instance( {
               message: 'Are you sure you wish to de-activate the ' + this.parentModel.module.name.singular + '?' +
                 '\n\nThe applicant will no longer be able to edit or submit the ' + this.parentModel.module.name.singular + '.'
-            } ).show().then( function( response ) {
-              if( response ) {
-                return CnHttpFactory.instance( {
-                  path: self.parentModel.getServiceResourcePath() + "?action=deactivate"
-                } ).patch().then( function() {
-                  self.record.state = 'inactive';
-                  self.record.state_date = moment().format( 'YYYY-MM-DD' );
-                  self.updateFormattedRecord( 'state_date', 'date' );
-                  if( angular.isDefined( self.notificationModel ) ) self.notificationModel.listModel.onList( true );
-                } );
-              }
-            } );
+            } ).show();
+            if( response ) {
+              await CnHttpFactory.instance( { path: this.parentModel.getServiceResourcePath() + "?action=deactivate" } ).patch();
+              this.record.state = 'inactive';
+              this.record.state_date = moment().format( 'YYYY-MM-DD' );
+              this.updateFormattedRecord( 'state_date', 'date' );
+              if( angular.isDefined( this.notificationModel ) ) this.notificationModel.listModel.onList( true );
+            }
           },
 
-          incomplete: function() {
-            return CnModalConfirmFactory.instance( {
+          incomplete: async function() {
+            var response = await CnModalConfirmFactory.instance( {
               message: 'Are you sure you wish to mark this ' + this.parentModel.module.name.singular + ' as permanently incomplete?' +
                 '\n\nThere is no undoing this action. However, once moved to the incomplete stage the ' +
                 this.parentModel.module.name.singular + ' can be recreated as a new application.'
-            } ).show().then( function( response ) {
-              if( response ) {
-                return CnHttpFactory.instance( {
-                  path: self.parentModel.getServiceResourcePath() + "?action=incomplete"
-                } ).patch().then( function() {
-                  self.onView();
-                  if( angular.isDefined( self.stageModel ) ) self.stageModel.listModel.onList( true );
-                  if( angular.isDefined( self.notificationModel ) ) self.notificationModel.listModel.onList( true );
-                } );
-              }
-            } );
+            } ).show();
+            if( response ) {
+              await CnHttpFactory.instance( { path: this.parentModel.getServiceResourcePath() + "?action=incomplete" } ).patch();
+              await this.reloadAll( [ 'stage', 'notification' ] );
+            }
           },
 
-          withdraw: function() {
-            return CnModalConfirmFactory.instance( {
+          withdraw: async function() {
+            var response = await CnModalConfirmFactory.instance( {
               message: 'Are you sure you wish to mark this ' + this.parentModel.module.name.singular + ' as permanently withdrawn?' +
                 '\n\nThere is no undoing this action. However, once moved to the withdrawn stage the ' +
                 this.parentModel.module.name.singular + ' can be recreated as a new application.'
-            } ).show().then( function( response ) {
-              if( response ) {
-                return CnHttpFactory.instance( {
-                  path: self.parentModel.getServiceResourcePath() + "?action=withdraw"
-                } ).patch().then( function() {
-                  self.onView();
-                  if( angular.isDefined( self.stageModel ) ) self.stageModel.listModel.onList( true );
-                  if( angular.isDefined( self.notificationModel ) ) self.notificationModel.listModel.onList( true );
-                } );
-              }
-            } );
+            } ).show();
+            if( response ) {
+              await CnHttpFactory.instance( { path: this.parentModel.getServiceResourcePath() + "?action=withdraw" } ).patch();
+              await this.reloadAll( [ 'stage', 'notification' ] );
+            }
           },
 
-          reactivate: function() {
-            return CnModalConfirmFactory.instance( {
+          reactivate: async function() {
+            var response = await CnModalConfirmFactory.instance( {
               message: 'Are you sure you wish to re-activate the ' + this.parentModel.module.name.singular + '?' +
                 '\n\nThe applicant will be notified that it has been re-activated and they will be able to re-submit for review.'
-            } ).show().then( function( response ) {
-              if( response ) {
-                return CnHttpFactory.instance( {
-                  path: self.parentModel.getServiceResourcePath() + "?action=reactivate"
-                } ).patch().then( function() {
-                  self.record.state = 'abandoned' == self.record.state ? 'deferred' : '';
-                  self.record.state_date = 'abandoned' == self.record.state ? moment().format( 'YYYY-MM-DD' ) : null;
-                  self.updateFormattedRecord( 'state_date', 'date' );
-                  if( angular.isDefined( self.notificationModel ) ) self.notificationModel.listModel.onList( true );
-                } );
-              }
-            } );
+            } ).show();
+            if( response ) {
+              await CnHttpFactory.instance( { path: this.parentModel.getServiceResourcePath() + "?action=reactivate" } ).patch();
+              this.record.state = 'abandoned' == this.record.state ? 'deferred' : '';
+              this.record.state_date = 'abandoned' == this.record.state ? moment().format( 'YYYY-MM-DD' ) : null;
+              this.updateFormattedRecord( 'state_date', 'date' );
+              if( angular.isDefined( this.notificationModel ) ) await this.notificationModel.listModel.onList( true );
+            }
           },
 
-          recreate: function() {
-            return CnModalConfirmFactory.instance( {
+          recreate: async function() {
+            var response = await CnModalConfirmFactory.instance( {
               message: 'Are you sure you wish to recreate the ' + this.parentModel.module.name.singular + '?' +
                 '\n\nA new ' + this.parentModel.module.name.singular + ' will be created using all of the details ' +
                 'provided in this ' + this.parentModel.module.name.singular + '.'
-            } ).show().then( function( response ) {
-              if( response ) {
-                return CnHttpFactory.instance( {
-                  path: self.parentModel.getServiceCollectionPath() + "?clone=" + self.record.identifier
-                } ).post().then( function( response ) {
-                  // redirect to the new requestion
-                  return $state.go( 'reqn.view', { identifier: response.data } );
-                } );
-              }
-            } );
+            } ).show();
+            if( response ) {
+              var response = await CnHttpFactory.instance( {
+                path: this.parentModel.getServiceCollectionPath() + "?clone=" + this.record.identifier
+              } ).post();
+
+              // redirect to the new requestion
+              await $state.go( 'reqn.view', { identifier: response.data } );
+            }
           },
 
-          displayNotices: function() {
+          displayNotices: async function() {
             var noticeList = [];
-            return CnHttpFactory.instance( {
+            var response = await CnHttpFactory.instance( {
               path: this.parentModel.getServiceResourcePath() + '/notice',
               data: { modifier: { order: { datetime: true } } }
-            } ).query().then( function( response ) {
-              CnModalNoticeListFactory.instance( {
-                title: 'Notice List',
-                closeText: self.translate( 'misc.close' ),
-                noticeList: response.data
-              } ).printMessage();
-            } );
+            } ).query();
+
+            CnModalNoticeListFactory.instance( {
+              title: 'Notice List',
+              closeText: this.translate( 'misc.close' ),
+              noticeList: response.data
+            } ).printMessage();
           },
 
           getChildTitle: function( child ) {
@@ -1154,6 +1124,16 @@ define( [ 'output' ].reduce( function( list, name ) {
           }
 
         } );
+
+        this.configureFileInput( 'instruction_filename' );
+
+        var self = this;
+        async function init() {
+          await self.deferred.promise;
+          if( angular.isDefined( self.stageModel ) ) self.stageModel.listModel.heading = 'Stage History';
+        }
+
+        init();
       };
       return { instance: function( parentModel, root ) { return new object( parentModel, root ); } };
     }
@@ -1162,32 +1142,14 @@ define( [ 'output' ].reduce( function( list, name ) {
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnReqnModelFactory', [
     'CnReqnHelper', 'CnBaseModelFactory', 'CnReqnAddFactory', 'CnReqnListFactory', 'CnReqnViewFactory',
-    'CnHttpFactory', 'CnSession', '$state', '$q',
+    'CnHttpFactory', 'CnSession', '$state',
     function( CnReqnHelper, CnBaseModelFactory, CnReqnAddFactory, CnReqnListFactory, CnReqnViewFactory,
-              CnHttpFactory, CnSession, $state, $q ) {
+              CnHttpFactory, CnSession, $state ) {
       var object = function( root ) {
-        var self = this;
-
         CnBaseModelFactory.construct( this, module );
         this.addModel = CnReqnAddFactory.instance( this );
         this.listModel = CnReqnListFactory.instance( this );
         this.viewModel = CnReqnViewFactory.instance( this, root );
-
-        CnReqnHelper.promise.then( function() {
-          module.inputGroupList.forEach( function( group ) {
-            if( 'Requisition Deferral Notes' == group.title ) {
-              for( var property in group.inputList ) {
-                if( group.inputList.hasOwnProperty( property ) ) {
-                  var parts = property.match( /deferral_note_([0-9]+)([a-z]+)/ );
-                  if( angular.isArray( parts ) ) {
-                    group.inputList[property].title =
-                      'Part ' + parts[1] + ': ' + CnReqnHelper.translate( 'reqn', 'part' + parts[1] + '.' + parts[2] + '.tab', 'en' );
-                  }
-                }
-              }
-            }
-          } )
-        } );
 
         angular.extend( this, {
 
@@ -1223,27 +1185,29 @@ define( [ 'output' ].reduce( function( list, name ) {
           },
 
           // override transitionToAddState (used when applicant creates a new reqn)
-          transitionToAddState: function() {
+          transitionToAddState: async function() {
             // for applicants immediately get a new reqn and view it (no add state required)
-            return 'applicant' != CnSession.role.name ? this.$$transitionToAddState() : CnHttpFactory.instance( {
+            var response = await 'applicant' != CnSession.role.name ? this.$$transitionToAddState() : CnHttpFactory.instance( {
               path: 'reqn',
               data: { user_id: CnSession.user.id }
-            } ).post().then( function ( response ) {
-              // get the new reqn version id
-              return CnHttpFactory.instance( {
-                path: 'reqn/' + response.data,
-                data: { select: { column: { table: 'reqn_version', column: 'id', alias: 'reqn_version_id' } } }
-              } ).get().then( function( response ) {
-                return $state.go( 'reqn_version.view', { identifier: response.data.reqn_version_id } );
-              } );
-            } )
+            } ).post();
+
+            // get the new reqn version id
+            var response = await CnHttpFactory.instance( {
+              path: 'reqn/' + response.data,
+              data: { select: { column: { table: 'reqn_version', column: 'id', alias: 'reqn_version_id' } } }
+            } ).get();
+
+            await $state.go( 'reqn_version.view', { identifier: response.data.reqn_version_id } );
           },
 
           // override transitionToViewState (used when application views a reqn)
-          transitionToViewState: function( record ) {
-            if( this.isRole( 'applicant' ) || this.isRole( 'typist' ) )
-              $state.go( 'reqn_version.view', { identifier: record.reqn_version_id } );
-            else this.$$transitionToViewState( record );
+          transitionToViewState: async function( record ) {
+            if( this.isRole( 'applicant' ) || this.isRole( 'typist' ) ) {
+              await $state.go( 'reqn_version.view', { identifier: record.reqn_version_id } );
+            } else {
+              await this.$$transitionToViewState( record );
+            }
           },
 
           // override the service collection
@@ -1271,64 +1235,79 @@ define( [ 'output' ].reduce( function( list, name ) {
             return data;
           },
 
-          getMetadata: function() {
-            return self.$$getMetadata().then( function() {
-              return $q.all( [
-                CnHttpFactory.instance( {
-                  path: 'reqn_type',
-                  data: {
-                    select: { column: [ 'id', 'name' ] },
-                    modifier: { order: 'name', limit: 1000 }
-                  }
-                } ).query().then( function success( response ) {
-                  self.metadata.columnList.reqn_type_id.enumList = [];
-                  response.data.forEach( function( item ) {
-                    self.metadata.columnList.reqn_type_id.enumList.push( {
-                      value: item.id,
-                      name: item.name
-                    } );
-                  } );
-                } ),
+          getMetadata: async function() {
+            var self = this;
+            await this.$$getMetadata();
 
-                CnHttpFactory.instance( {
-                  path: 'deadline',
-                  data: {
-                    select: { column: [ 'id', 'name' ] },
-                    modifier: { order: 'date', desc: true, limit: 1000 }
-                  }
-                } ).query().then( function success( response ) {
-                  self.metadata.columnList.deadline_id.enumList = [];
-                  response.data.forEach( function( item ) {
-                    self.metadata.columnList.deadline_id.enumList.push( {
-                      value: item.id,
-                      name: item.name
-                    } );
-                  } );
-                } ),
+            var response = await CnHttpFactory.instance( {
+              path: 'reqn_type',
+              data: {
+                select: { column: [ 'id', 'name' ] },
+                modifier: { order: 'name', limit: 1000 }
+              }
+            } ).query();
+            this.metadata.columnList.reqn_type_id.enumList = [];
+            response.data.forEach( function( item ) {
+              self.metadata.columnList.reqn_type_id.enumList.push( {
+                value: item.id,
+                name: item.name
+              } );
+            } );
 
-                CnHttpFactory.instance( {
-                  path: 'language',
-                  data: {
-                    select: { column: [ 'id', 'name' ] },
-                    modifier: {
-                      where: { column: 'active', operator: '=', value: true },
-                      order: 'name',
-                      limit: 1000
-                    }
-                  }
-                } ).query().then( function success( response ) {
-                  self.metadata.columnList.language_id.enumList = [];
-                  response.data.forEach( function( item ) {
-                    self.metadata.columnList.language_id.enumList.push( {
-                      value: item.id,
-                      name: item.name
-                    } );
-                  } );
-                } )
-              ] );
+            var response = await CnHttpFactory.instance( {
+              path: 'deadline',
+              data: {
+                select: { column: [ 'id', 'name' ] },
+                modifier: { order: 'date', desc: true, limit: 1000 }
+              }
+            } ).query();
+            this.metadata.columnList.deadline_id.enumList = [];
+            response.data.forEach( function( item ) {
+              self.metadata.columnList.deadline_id.enumList.push( {
+                value: item.id,
+                name: item.name
+              } );
+            } );
+
+            var response = await CnHttpFactory.instance( {
+              path: 'language',
+              data: {
+                select: { column: [ 'id', 'name' ] },
+                modifier: {
+                  where: { column: 'active', operator: '=', value: true },
+                  order: 'name',
+                  limit: 1000
+                }
+              }
+            } ).query();
+            this.metadata.columnList.language_id.enumList = [];
+            response.data.forEach( function( item ) {
+              self.metadata.columnList.language_id.enumList.push( {
+                value: item.id,
+                name: item.name
+              } );
             } );
           }
         } );
+
+        async function init() {
+          await CnReqnHelper.promise;
+          module.inputGroupList.forEach( function( group ) {
+            if( 'Requisition Deferral Notes' == group.title ) {
+              for( var property in group.inputList ) {
+                if( group.inputList.hasOwnProperty( property ) ) {
+                  var parts = property.match( /deferral_note_([0-9]+)([a-z]+)/ );
+                  if( angular.isArray( parts ) ) {
+                    group.inputList[property].title =
+                      'Part '+parts[1]+': ' + CnReqnHelper.translate( 'reqn', 'part'+parts[1]+'.'+parts[2] + '.tab', 'en' );
+                  }
+                }
+              }
+            }
+          } )
+        }
+
+        init();
       };
 
       return {

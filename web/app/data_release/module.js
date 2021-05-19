@@ -130,33 +130,33 @@ define( function() {
     function( CnBaseModelFactory, CnDataReleaseAddFactory, CnDataReleaseListFactory, CnDataReleaseViewFactory,
               CnHttpFactory ) {
       var object = function( root ) {
-        var self = this;
         CnBaseModelFactory.construct( this, module );
         this.addModel = CnDataReleaseAddFactory.instance( this );
         this.listModel = CnDataReleaseListFactory.instance( this );
         this.viewModel = CnDataReleaseViewFactory.instance( this, root );
 
         // allow adding and deleting even if parent is read-only
-        this.getAddEnabled = function() { return angular.isDefined( self.module.actions.add ); };
-        this.getDeleteEnabled = function() { return angular.isDefined( self.module.actions.delete ); };
+        this.getAddEnabled = function() { return angular.isDefined( this.module.actions.add ); };
+        this.getDeleteEnabled = function() { return angular.isDefined( this.module.actions.delete ); };
 
-        this.getMetadata = function() {
-          return self.$$getMetadata().then( function() {
-            return CnHttpFactory.instance( {
-              path: 'data_version',
-              data: {
-                select: { column: [ 'id', 'name' ] },
-                modifier: { order: 'name', limit: 1000 }
-              }
-            } ).query().then( function success( response ) {
-              self.metadata.columnList.data_version_id.enumList = [];
-              response.data.forEach( function( item ) {
-                self.metadata.columnList.data_version_id.enumList.push( {
-                  value: item.id,
-                  name: item.name
-                } );
-              } );
-            } )
+        this.getMetadata = async function() {
+          var self = this;
+          await this.$$getMetadata();
+
+          var response = await CnHttpFactory.instance( {
+            path: 'data_version',
+            data: {
+              select: { column: [ 'id', 'name' ] },
+              modifier: { order: 'name', limit: 1000 }
+            }
+          } ).query();
+
+          this.metadata.columnList.data_version_id.enumList = [];
+          response.data.forEach( function( item ) {
+            self.metadata.columnList.data_version_id.enumList.push( {
+              value: item.id,
+              name: item.name
+            } );
           } );
         };
       };

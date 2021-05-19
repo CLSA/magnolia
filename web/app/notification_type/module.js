@@ -96,12 +96,15 @@ define( function() {
     'CnBaseViewFactory',
     function( CnBaseViewFactory ) {
       var object = function( parentModel, root ) {
-        var self = this;
         CnBaseViewFactory.construct( this, parentModel, root );
 
-        this.deferred.promise.then( function() {
+        var self = this;
+        async function init() {
+          await self.deferred.promise;
           if( angular.isDefined( self.stageTypeModel ) ) self.stageTypeModel.listModel.heading = 'Notified Stage Type List';
-        } );
+        }
+
+        init();
       }
       return { instance: function( parentModel, root ) { return new object( parentModel, root ); } };
     }
@@ -112,7 +115,6 @@ define( function() {
     'CnBaseModelFactory', 'CnNotificationTypeListFactory', 'CnNotificationTypeViewFactory',
     function( CnBaseModelFactory, CnNotificationTypeListFactory, CnNotificationTypeViewFactory ) {
       var object = function( root ) {
-        var self = this;
         CnBaseModelFactory.construct( this, module );
         this.listModel = CnNotificationTypeListFactory.instance( this );
         this.viewModel = CnNotificationTypeViewFactory.instance( this, root );
