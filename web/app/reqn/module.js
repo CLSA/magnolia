@@ -1201,18 +1201,20 @@ define( [ 'output' ].reduce( function( list, name ) {
           // override transitionToAddState (used when applicant creates a new reqn)
           transitionToAddState: async function() {
             // for applicants immediately get a new reqn and view it (no add state required)
-            var response = await 'applicant' != CnSession.role.name ? this.$$transitionToAddState() : CnHttpFactory.instance( {
-              path: 'reqn',
-              data: { user_id: CnSession.user.id }
-            } ).post();
+            if( 'applicant' != CnSession.role.name ) {
+              this.$$transitionToAddState();
+            } else {
+              var response = await CnHttpFactory.instance( { path: 'reqn', data: { user_id: CnSession.user.id } } ).post();
+              var newId = response.data;
 
-            // get the new reqn version id
-            var response = await CnHttpFactory.instance( {
-              path: 'reqn/' + response.data,
-              data: { select: { column: { table: 'reqn_version', column: 'id', alias: 'reqn_version_id' } } }
-            } ).get();
+              // get the new reqn version id
+              var response = await CnHttpFactory.instance( {
+                path: 'reqn/' + newId,
+                data: { select: { column: { table: 'reqn_version', column: 'id', alias: 'reqn_version_id' } } }
+              } ).get();
 
-            await $state.go( 'reqn_version.view', { identifier: response.data.reqn_version_id } );
+              await $state.go( 'reqn_version.view', { identifier: response.data.reqn_version_id } );
+            }
           },
 
           // override transitionToViewState (used when application views a reqn)
