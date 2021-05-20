@@ -157,11 +157,12 @@ define( [ 'reqn' ].reduce( function( list, name ) {
           $scope.$on( 'cnRecordView ready', function( event, data ) {
             var cnRecordViewScope = data;
             var origin = $scope.model.getQueryParameter( 'origin', true );
-            var parentExistsFn = cnRecordViewScope.parentExists;
+            cnRecordViewScope.baseParentExistsFn = cnRecordViewScope.parentExists;
             angular.extend( cnRecordViewScope, {
               // don't show the option to view the parent reqn to the applicant
               parentExists: function( subject ) {
-                return $scope.model.isRole( 'applicant' ) && 'reqn' == subject ? false : parentExistsFn( subject );
+                return $scope.model.isRole( 'applicant' ) && 'reqn' == subject ?
+                  false : cnRecordViewScope.baseParentExistsFn( subject );
               },
               getDeleteText: function() {
                 return 'final_report' == origin ?

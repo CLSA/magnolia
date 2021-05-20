@@ -66,7 +66,7 @@ define( function() {
               lang = response.data.lang;
             }
 
-            var saveFn = cnRecordAddScope.save;
+            cnRecordAddScope.baseSaveFn = cnRecordAddScope.save;
             angular.extend( cnRecordAddScope, {
               getCancelText: function() { return CnReqnHelper.translate( 'output', 'cancel', lang ); },
               getSaveText: function() { return CnReqnHelper.translate( 'output', 'save', lang ); },
@@ -77,7 +77,7 @@ define( function() {
                     message: CnReqnHelper.translate( 'output', 'newOutputSourceMessage', lang ),
                     error: true
                   } ).show();
-                } else saveFn();
+                } else cnRecordAddScope.baseSaveFn();
               }
             } );
           } );
@@ -116,7 +116,7 @@ define( function() {
           $scope.$on( 'cnRecordView ready', function( event, data ) {
             var cnRecordViewScope = data;
             var origin = $scope.model.getQueryParameter( 'origin', true );
-            var patchFn = cnRecordViewScope.patch;
+            cnRecordViewScope.basePatchFn = cnRecordViewScope.patch;
             angular.extend( cnRecordViewScope, {
               getDeleteText: function() {
                 return 'final_report' == origin ?
@@ -143,7 +143,7 @@ define( function() {
                   }
                   if( $scope.model.viewModel.record.url != $scope.model.viewModel.backupRecord.url )
                     $scope.model.viewModel.record.url = $scope.model.viewModel.backupRecord.url;
-                } else patchFn();
+                } else cnRecordViewScope.basePatchFn();
               }
             } );
           } );
