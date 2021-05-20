@@ -782,11 +782,11 @@ cenozo.service( 'CnReqnHelper', [
             },
             designateSubmitTitle: {
               en: 'Application Submitted for Primary Applicant Approval',
-              fr: 'TODO: TRANSLATE'
+              fr: 'Soumission de la demande pour approbation par le demandeur principal'
             },
             designateSubmitMessage: {
               en: 'You have successfully submitted the CLSA Data and Biospecimen Request Application on behalf of the primary applicant and they will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your application. For timelines of the anticipated notice of decision, please check the Data Access Application Process page of our website.',
-              fr: 'TODO: TRANSLATE'
+              fr: 'Votre demande d’accès aux données et aux échantillons biologiques de l’ÉLCV a été soumise avec succès au nom du demandeur principal. Celui-ci recevra une demande d’approbation par courriel. Vous recevrez un courriel avec des instructions supplémentaires en cas de besoin, puis lorsque le processus d’examen sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour voir l’état de votre demande. Pour connaître les délais prévus pour la réception de l’avis de décision, veuillez consulter la page Processus de demande d’accès aux données de notre site Web.'
             },
             resubmitTitle: {
               en: 'Application Resubmitted',
@@ -806,11 +806,11 @@ cenozo.service( 'CnReqnHelper', [
             },
             designateResubmitTitle: {
               en: 'Application Resubmitted for Primary Applicant Approval',
-              fr: 'TODO: TRANSLATE'
+              fr: 'Nouvelle soumission de la demande pour approbation par le demandeur principal'
             },
             designateResubmitMessage: {
               en: 'You have successfully resubmitted the CLSA Data and Biospecimen Request Application on behalf of the primary applicant and they will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your application. For timelines of the anticipated notice of decision, please check the Data Access Application Process page of our website.',
-              fr: 'TODO: TRANSLATE'
+              fr: 'Votre demande d’accès aux données et aux échantillons biologiques de l’ÉLCV a été resoumise avec succès au nom du demandeur principal. Celui-ci recevra une demande d’approbation par courriel. Vous recevrez un courriel avec des instructions supplémentaires en cas de besoin, puis lorsque le processus d’examen sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour voir l’état de votre demande. Pour connaître les délais prévus pour la réception de l’avis de décision, veuillez consulter la page Processus de demande d’accès aux données de notre site Web.'
             },
             submitWarning: {
               en: 'Are you sure that all changes are complete and the application is ready to be submitted?',
@@ -1038,11 +1038,11 @@ cenozo.service( 'CnReqnHelper', [
             },
             designateSubmitTitle: {
               en: 'Final Report Submitted for Primary Applicant Approval',
-              fr: 'TODO: TRANSLATE'
+              fr: 'Soumission du rapport final pour approbation par le demandeur principal'
             },
             designateSubmitMessage: {
               en: 'You have successfully submitted the Final Report on behalf of the primary applicant and they will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.',
-              fr: 'TODO: TRANSLATE'
+              fr: 'Votre rapport final a été soumis avec succès au nom du demandeur principal. Celui-ci recevra une demande d’approbation par courriel. Vous recevrez un courriel avec des instructions supplémentaires en cas de besoin, puis lorsque le processus d’examen sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour consulter l’état de votre rapport.'
             },
             resubmitTitle: {
               en: 'Final Report Resubmitted',
@@ -1062,11 +1062,11 @@ cenozo.service( 'CnReqnHelper', [
             },
             designateResubmitTitle: {
               en: 'Final Report Resubmitted for Primary Applicant Approval',
-              fr: 'TODO: TRANSLATE'
+              fr: 'Nouvelle soumission du rapport final pour approbation par le demandeur principal'
             },
             designateResubmitMessage: {
               en: 'You have successfully resubmitted the Final Report on behalf of the primary applicant and they will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.',
-              fr: 'TODO: TRANSLATE'
+              fr: 'Votre rapport final a été resoumis avec succès au nom du demandeur principal. Celui-ci recevra une demande d’approbation par courriel. Vous recevrez un courriel avec des instructions supplémentaires en cas de besoin, puis lorsque le processus d’examen sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour consulter l’état de votre rapport.'
             },
             submitWarning: {
               en: 'Are you sure that all changes are complete and the report is ready to be submitted?',
