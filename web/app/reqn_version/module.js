@@ -2031,12 +2031,12 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
         this.configureFileInput( 'ethics_filename' );
         this.configureFileInput( 'data_sharing_filename' );
         this.configureFileInput( 'agreement_filename' );
-        this.coapplicantModel.metadata.getPromise(); // needed to get the coapplicant's metadata
-        this.referenceModel.metadata.getPromise(); // needed to get the reference's metadata
 
         var self = this;
         async function init() {
           await self.deferred.promise;
+          await self.coapplicantModel.metadata.getPromise(); // needed to get the coapplicant's metadata
+          await self.referenceModel.metadata.getPromise(); // needed to get the reference's metadata
           if( angular.isDefined( self.stageModel ) ) self.stageModel.listModel.heading = 'Stage History';
         }
 
