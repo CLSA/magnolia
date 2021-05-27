@@ -302,7 +302,7 @@ define( [ 'output' ].reduce( function( list, name ) {
     amendment: { column: 'reqn_version.amendment', type: 'string', isExcluded: true },
     peer_review_filename: { column: 'reqn_version.peer_review_filename', type: 'string', isExcluded: true },
     funding_filename: { column: 'reqn_version.funding_filename', type: 'string', isExcluded: true },
-    ethics_date: { column: 'reqn_version.ethics_date', type: 'date', isExcluded: true },
+    ethics_date: { column: 'ethics_approval.date', type: 'date', isExcluded: true },
     ethics_filename: { column: 'reqn_version.ethics_filename', type: 'string', isExcluded: true },
     has_agreements: { type: 'boolean', isExcluded: true },
     has_ethics_approval_list: { type: 'boolean', isExcluded: true },
