@@ -985,13 +985,20 @@ define( [ 'output' ].reduce( function( list, name ) {
             }
 
             if( 'Data Release' == this.record.next_stage_type ) {
-              if( null == this.record.ethics_date ) {
-                message += '\n\nWARNING: This ' + this.parentModel.module.name.singular + ' has no ethics agreement, ' +
-                  'you may not wish to proceed until one has been uploaded.';
-              } else if( moment().isAfter( this.record.ethics_date, 'day' ) ) {
-                message += '\n\nWARNING: This ' + this.parentModel.module.name.possessive + ' ethics expired on ' +
-                  moment( this.record.ethics_date ).format( 'MMMM D, YYYY' ) + ', ' +
-                  'you may not wish to proceed until a new ethics agreement has been uploaded.';
+              if( this.record.has_ethics_approval_list ) {
+                if( null == this.record.ethics_date ) {
+                  message += '\n\nWARNING: This ' + self.parentModel.module.name.singular + ' has no ethics agreement, ' +
+                    'you may not wish to proceed until one has been uploaded.';
+                } else if( moment().isAfter( this.record.ethics_date, 'day' ) ) {
+                  message += '\n\nWARNING: This ' + self.parentModel.module.name.possessive + ' ethics expired on ' +
+                    moment( this.record.ethics_date ).format( 'MMMM D, YYYY' ) + ', ' +
+                    'you may not wish to proceed until a new ethics agreement has been uploaded.';
+                }
+              } else {
+                if( !this.record.ethics_filename ) {
+                  message += '\n\nWARNING: This ' + self.parentModel.module.name.singular + ' has no ethics agreement, ' +
+                    'you may not wish to proceed until one has been uploaded.';
+                }
               }
             }
 
