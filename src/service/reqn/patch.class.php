@@ -206,7 +206,10 @@ class patch extends \cenozo\service\patch
     $db_user = $session->get_user();
 
     $db_reqn = $this->get_leaf_record();
-    $trainee = 'applicant' == $db_role->name && $db_reqn->trainee_user_id == $db_user->id;
+    $approval_required = 'applicant' == $db_role->name && (
+      $db_reqn->trainee_user_id == $db_user->id ||
+      $db_reqn->designate_user_id == $db_user->id
+    );
     $db_reqn_version = $db_reqn->get_current_reqn_version();
     $file = $this->get_argument( 'file', NULL );
     $headers = apache_request_headers();
@@ -358,8 +361,8 @@ class patch extends \cenozo\service\patch
           }
           else if( !$db_reqn->legacy || '.' != $db_reqn_version->amendment )
           {
-            // trainees must be get approval from their supervisor
-            if( $trainee )
+            // trainees and proxies must be get approval from their supervisor
+            if( $approval_required )
             {
               // send a notification to the supervisor
               $db_notification = lib::create( 'database\notification' );

@@ -4,9 +4,9 @@ var cenozo = angular.module( 'cenozo' );
 
 cenozo.controller( 'HeaderCtrl', [
   '$scope', 'CnBaseHeader',
-  function( $scope, CnBaseHeader ) {
+  async function( $scope, CnBaseHeader ) {
     // copy all properties from the base header
-    CnBaseHeader.construct( $scope );
+    await CnBaseHeader.construct( $scope );
   }
 ] );
 
@@ -46,10 +46,9 @@ cenozo.directive( 'cnDeferralNote',
 
 /* ######################################################################################################## */
 cenozo.service( 'CnModalNoticeListFactory', [
-  'CnModalMessageFactory', '$uibModal', '$state', '$window', '$filter',
-  function( CnModalMessageFactory, $uibModal, $state, $window, $filter ) {
+  'CnModalMessageFactory', '$uibModal', '$window', '$filter',
+  function( CnModalMessageFactory, $uibModal, $window, $filter ) {
     var object = function( params ) {
-      var self = this;
       angular.extend( this, {
         title: 'Title',
         closeText: 'Close',
@@ -86,9 +85,10 @@ cenozo.service( 'CnModalNoticeListFactory', [
         },
 
         show: function() {
-          self.modal = $uibModal.open( {
+          var self = this;
+          this.modal = $uibModal.open( {
             backdrop: 'static',
-            keyboard: !self.block,
+            keyboard: !this.block,
             modalFade: true,
             templateUrl: cenozoApp.getFileUrl( 'magnolia', 'modal-notice-list.tpl.html' ),
             controller: [ '$scope', '$uibModalInstance', function( $scope, $uibModalInstance ) {
@@ -97,7 +97,7 @@ cenozo.service( 'CnModalNoticeListFactory', [
             } ]
           } );
 
-          return self.modal.result;
+          return this.modal.result;
         },
 
         close: function() { if( angular.isDefined( this.modal ) ) this.modal.close( false ); }
@@ -113,11 +113,11 @@ cenozo.service( 'CnModalSubmitLegacyFactory', [
   '$uibModal',
   function( $uibModal ) {
     var object = function( params ) {
-      var self = this;
       angular.extend( this, params );
 
       angular.extend( this, {
         show: function() {
+          var self = this;
           return $uibModal.open( {
             backdrop: 'static',
             keyboard: true,
@@ -143,7 +143,6 @@ cenozo.service( 'CnModalUploadAgreementFactory', [
   'CnHttpFactory', '$uibModal',
   function( CnHttpFactory, $uibModal ) {
     var object = function( params ) {
-      var self = this;
       angular.extend( this, params );
 
       this.show = function() {
@@ -165,16 +164,20 @@ cenozo.service( 'CnModalUploadAgreementFactory', [
                   var fileDetails = data.get( 'file' );
                   return fileDetails.name;
                 },
-                upload: function( path ) {
+                upload: async function( path ) {
                   var obj = this;
-                  obj.uploading = true;
 
                   // upload the file
-                  return CnHttpFactory.instance( {
-                    path: path + '?file=agreement_filename',
-                    data: obj.file,
-                    format: 'unknown'
-                  } ).patch().finally( function() { obj.uploading = false; } );
+                  try {
+                    obj.uploading = true;
+                    await CnHttpFactory.instance( {
+                      path: path + '?file=agreement_filename',
+                      data: obj.file,
+                      format: 'unknown'
+                    } ).patch()
+                  } finally {
+                    obj.uploading = false;
+                  }
                 }
               },
               filename: null,
@@ -197,6 +200,8 @@ cenozo.service( 'CnReqnHelper', [
   'CnSession', 'CnHttpFactory', 'CnModalConfirmFactory', '$state',
   function( CnSession, CnHttpFactory, CnModalConfirmFactory, $state ) {
     var object = {
+      promise: null,
+
       showAction: function( subject, record ) {
         var role = CnSession.role.name;
         var phase = record.phase ? record.phase : '';
@@ -274,7 +279,7 @@ cenozo.service( 'CnReqnHelper', [
         } else return false;
       },
 
-      abandon: function( reqnIdentifier, amendment, language ) {
+      abandon: async function( reqnIdentifier, amendment, language ) {
         var message = '';
         if( amendment ) {
           if( 'applicant' == CnSession.role.name ) {
@@ -292,41 +297,41 @@ cenozo.service( 'CnReqnHelper', [
               'be discontinued. It is possible to re-activate the requisition at a later time.';
           }
         }
-        return CnModalConfirmFactory.instance( {
+        var response = await CnModalConfirmFactory.instance( {
           title: 'applicant' == CnSession.role.name ? this.translate( 'reqn', 'misc.pleaseConfirm', language ) : 'Please Confirm',
           noText: 'applicant' == CnSession.role.name ? this.translate( 'reqn', 'misc.no', language ) : 'No',
           yesText: 'applicant' == CnSession.role.name ? this.translate( 'reqn', 'misc.yes', language ) : 'Yes',
           message: message
-        } ).show().then( function( response ) {
-          if( response ) {
-            return CnHttpFactory.instance( { path: 'reqn/' + reqnIdentifier + "?action=abandon" } ).patch().then( function() {
-              return true;
-            } );
-          } else return false;
-        } );
+        } ).show();
+
+        if( response ) {
+          await CnHttpFactory.instance( { path: 'reqn/' + reqnIdentifier + "?action=abandon" } ).patch();
+          return true;
+        }
+
+        return false;
       },
 
-      delete: function( reqnIdentifier, language ) {
-        return CnModalConfirmFactory.instance( {
+      delete: async function( reqnIdentifier, language ) {
+        var response = await CnModalConfirmFactory.instance( {
           title: 'applicant' == CnSession.role.name ? this.translate( 'reqn', 'misc.pleaseConfirm', language ) : 'Please Confirm',
           noText: 'applicant' == CnSession.role.name ? this.translate( 'reqn', 'misc.no', language ) : 'No',
           yesText: 'applicant' == CnSession.role.name ? this.translate( 'reqn', 'misc.yes', language ) : 'Yes',
           message: this.translate( 'reqn', 'misc.deleteWarning', language )
-        } ).show().then( function( response ) {
-          if( response ) {
-            return CnHttpFactory.instance( { path: 'reqn/' + reqnIdentifier } ).delete().then( function() {
-              $state.go( 'applicant' == CnSession.role.name ? 'root.home' : 'reqn.list' );
-            } );
-          }
-        } );
+        } ).show();
+
+        if( response ) {
+          await CnHttpFactory.instance( { path: 'reqn/' + reqnIdentifier } ).delete();
+          await $state.go( 'applicant' == CnSession.role.name ? 'root.home' : 'reqn.list' );
+        }
       },
 
-      download: function( subject, id ) {
+      download: async function( subject, id ) {
         var http = {
           path: 'final_report' == subject ? 'final_report/' + id : 'reqn_version/' + id + '?file=' + subject,
           format: 'final_report' == subject ? 'pdf' : 'data_options' == subject ? 'csv' : 'unknown'
         };
-        return CnHttpFactory.instance( http ).file();
+        await CnHttpFactory.instance( http ).file();
       },
 
       translate: function( subject, address, language ) {
@@ -775,6 +780,14 @@ cenozo.service( 'CnReqnHelper', [
               en: 'You have successfully submitted your CLSA Data and Biospecimen Request Application and your supervisor will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your application. For timelines of the anticipated notice of decision, please check the Data Access Application Process page of our website.',
               fr: 'Votre demande d’accès aux données et aux échantillons de l’ÉLCV a été soumise avec succès. Votre superviseur recevra une demande d’approbation par courriel. Elle sera maintenant évaluée. Vous recevrez un courriel avec des instructions supplémentaires si nous avons besoin d’autre information et lorsque le processus d’évaluation sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour consulter le statut de votre demande. Pour connaître les dates approximatives d’envoi de l’avis de décision, veuillez consulter la page Processus de demande d’accès aux données de notre site Web.'
             },
+            designateSubmitTitle: {
+              en: 'Application Submitted for Primary Applicant Approval',
+              fr: 'Soumission de la demande pour approbation par le demandeur principal'
+            },
+            designateSubmitMessage: {
+              en: 'You have successfully submitted the CLSA Data and Biospecimen Request Application on behalf of the primary applicant and they will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your application. For timelines of the anticipated notice of decision, please check the Data Access Application Process page of our website.',
+              fr: 'Votre demande d’accès aux données et aux échantillons biologiques de l’ÉLCV a été soumise avec succès au nom du demandeur principal. Celui-ci recevra une demande d’approbation par courriel. Vous recevrez un courriel avec des instructions supplémentaires en cas de besoin, puis lorsque le processus d’examen sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour voir l’état de votre demande. Pour connaître les délais prévus pour la réception de l’avis de décision, veuillez consulter la page Processus de demande d’accès aux données de notre site Web.'
+            },
             resubmitTitle: {
               en: 'Application Resubmitted',
               fr: 'Demande resoumise',
@@ -790,6 +803,14 @@ cenozo.service( 'CnReqnHelper', [
             traineeResubmitMessage: {
               en: 'You have successfully resubmitted your CLSA Data and Biospecimen Request Application and your supervisor will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your application. For timelines of the anticipated notice of decision, please check the Data Access Application Process page of our website.',
               fr: 'Votre demande d’accès aux données et aux échantillons de l’ÉLCV a été resoumise avec succès. Votre superviseur recevra une demande d’approbation par courriel. Vous recevrez un courriel avec des instructions supplémentaires si nous avons besoin d’autre information et lorsque le processus d’évaluation sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour consulter le statut de votre demande. Pour connaître les dates approximatives d’envoi de l’avis de décision, veuillez consulter la page Processus de demande d’accès aux données de notre site Web.'
+            },
+            designateResubmitTitle: {
+              en: 'Application Resubmitted for Primary Applicant Approval',
+              fr: 'Nouvelle soumission de la demande pour approbation par le demandeur principal'
+            },
+            designateResubmitMessage: {
+              en: 'You have successfully resubmitted the CLSA Data and Biospecimen Request Application on behalf of the primary applicant and they will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your application. For timelines of the anticipated notice of decision, please check the Data Access Application Process page of our website.',
+              fr: 'Votre demande d’accès aux données et aux échantillons biologiques de l’ÉLCV a été resoumise avec succès au nom du demandeur principal. Celui-ci recevra une demande d’approbation par courriel. Vous recevrez un courriel avec des instructions supplémentaires en cas de besoin, puis lorsque le processus d’examen sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour voir l’état de votre demande. Pour connaître les délais prévus pour la réception de l’avis de décision, veuillez consulter la page Processus de demande d’accès aux données de notre site Web.'
             },
             submitWarning: {
               en: 'Are you sure that all changes are complete and the application is ready to be submitted?',
@@ -1015,6 +1036,14 @@ cenozo.service( 'CnReqnHelper', [
               en: 'You have successfully submitted your Final Report and your supervisor will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.',
               fr: 'Votre rapport final a été soumis avec succès. Votre superviseur recevra un courriel lui demandant son approbation. Vous recevrez un courriel avec des instructions supplémentaires en cas de besoin et lorsque le processus d’examen sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour consulter l’état de votre rapport.'
             },
+            designateSubmitTitle: {
+              en: 'Final Report Submitted for Primary Applicant Approval',
+              fr: 'Soumission du rapport final pour approbation par le demandeur principal'
+            },
+            designateSubmitMessage: {
+              en: 'You have successfully submitted the Final Report on behalf of the primary applicant and they will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.',
+              fr: 'Votre rapport final a été soumis avec succès au nom du demandeur principal. Celui-ci recevra une demande d’approbation par courriel. Vous recevrez un courriel avec des instructions supplémentaires en cas de besoin, puis lorsque le processus d’examen sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour consulter l’état de votre rapport.'
+            },
             resubmitTitle: {
               en: 'Final Report Resubmitted',
               fr: 'Rapport final resoumise',
@@ -1030,6 +1059,14 @@ cenozo.service( 'CnReqnHelper', [
             traineeResubmitMessage: {
               en: 'You have successfully resubmitted your Final Report and your supervisor will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.',
               fr: 'Votre rapport final a été resoumis avec succès. Votre superviseur recevra un courriel lui demandant son approbation. Vous recevrez un courriel avec des instructions supplémentaires en cas de besoin et lorsque le processus d’examen sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour consulter l’état de votre rapport.'
+            },
+            designateResubmitTitle: {
+              en: 'Final Report Resubmitted for Primary Applicant Approval',
+              fr: 'Nouvelle soumission du rapport final pour approbation par le demandeur principal'
+            },
+            designateResubmitMessage: {
+              en: 'You have successfully resubmitted the Final Report on behalf of the primary applicant and they will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.',
+              fr: 'Votre rapport final a été resoumis avec succès au nom du demandeur principal. Celui-ci recevra une demande d’approbation par courriel. Vous recevrez un courriel avec des instructions supplémentaires en cas de besoin, puis lorsque le processus d’examen sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour consulter l’état de votre rapport.'
             },
             submitWarning: {
               en: 'Are you sure that all changes are complete and the report is ready to be submitted?',
@@ -1071,20 +1108,24 @@ cenozo.service( 'CnReqnHelper', [
       }
     };
 
-    // fill in dynamic content
-    object.promise = CnHttpFactory.instance( {
-      path: 'data_option_category',
-      data: {
-        select: { column: [ 'name_en', 'name_fr' ] },
-        modifier: { order: 'rank', limit: 1000 }
-      }
-    } ).query().then( function( response ) {
+    async function init() {
+      // fill in dynamic content
+      object.promise = await CnHttpFactory.instance( {
+        path: 'data_option_category',
+        data: {
+          select: { column: [ 'name_en', 'name_fr' ] },
+          modifier: { order: 'rank', limit: 1000 }
+        }
+      } ).query();
+
       var letter = 'a';
-      response.data.forEach( function( cat ) {
+      object.promise.data.forEach( function( cat ) {
         object.lookupData.reqn.part2[letter].tab = { en: cat.name_en, fr: cat.name_fr };
         letter = String.fromCharCode( letter.charCodeAt(0) + 1 );
       } );
-    } );
+    }
+
+    init();
 
     return object;
   }

@@ -1034,13 +1034,23 @@ class reqn extends \cenozo\database\record
   }
 
   /**
-   * Returns the number of days left before the reqn's study-data will expire
+   * Get the trainee user
    * 
-   * @return integer
+   * @return database\user
    */
   public function get_trainee_user()
   {
     return is_null( $this->trainee_user_id ) ? NULL : lib::create( 'database\user', $this->trainee_user_id );
+  }
+
+  /**
+   * Get the designate user
+   * 
+   * @return database\user
+   */
+  public function get_designate_user()
+  {
+    return is_null( $this->designate_user_id ) ? NULL : lib::create( 'database\user', $this->designate_user_id );
   }
 
   /**
@@ -1234,8 +1244,9 @@ class reqn extends \cenozo\database\record
 
   /**
    * Marks all notices viewed by the given user
+   * @param string $type One of primary, trainee or designate
    */
-  public function mark_notices_read_by_user( $type = 'primary' )
+  public function mark_notices_as_read( $type = 'primary' )
   {
     // get the notice list
     $notice_sel = lib::create( 'database\select' );
@@ -1243,16 +1254,15 @@ class reqn extends \cenozo\database\record
     $notice_id_list = array();
     foreach( $this->get_notice_list( $notice_sel ) as $notice ) $notice_id_list[] = $notice['id'];
 
-    $db_user = 'primary' == $type ? $this->get_user() : $this->get_trainee_user();
-    if( !is_null( $db_user ) && 0 < count( $notice_id_list ) ) $db_user->add_notice( $notice_id_list );
-  }
+    if( 0 < count( $notice_id_list ) )
+    {
+      $db_user = NULL;
+      if( 'primary' == $type ) $db_user = $this->get_user();
+      else if( 'trainee' == $type ) $db_user = $this->get_trainee_user();
+      else if( 'designate' == $type ) $db_user = $this->get_designate_user();
 
-  /**
-   * Convenience method
-   */
-  public function mark_notices_read_by_trainee()
-  {
-    $this->mark_notices_read_by_user( 'trainee' );
+      if( !is_null( $db_user ) ) $db_user->add_notice( $notice_id_list );
+    }
   }
 
   /**

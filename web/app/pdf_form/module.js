@@ -119,14 +119,14 @@ define( function() {
     'CnBaseViewFactory', 'CnHttpFactory',
     function( CnBaseViewFactory, CnHttpFactory ) {
       var object = function( parentModel, root ) {
-        var self = this;
         CnBaseViewFactory.construct( this, parentModel, root );
         this.configureFileInput( 'filename', 'pdf' );
 
+        var self = this;
         this.afterView( function() {
           if( angular.isUndefined( self.downloadFile ) ) {
-            self.downloadFile = function() {
-              return CnHttpFactory.instance( {
+            self.downloadFile = async function() {
+              await CnHttpFactory.instance( {
                 path: self.parentModel.getServiceResourcePath(),
                 format: 'pdf'
               } ).file();
@@ -140,8 +140,8 @@ define( function() {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnPdfFormModelFactory', [
-    'CnBaseModelFactory', 'CnPdfFormAddFactory', 'CnPdfFormListFactory', 'CnPdfFormViewFactory', '$state',
-    function( CnBaseModelFactory, CnPdfFormAddFactory, CnPdfFormListFactory, CnPdfFormViewFactory, $state ) {
+    'CnBaseModelFactory', 'CnPdfFormAddFactory', 'CnPdfFormListFactory', 'CnPdfFormViewFactory',
+    function( CnBaseModelFactory, CnPdfFormAddFactory, CnPdfFormListFactory, CnPdfFormViewFactory ) {
       var object = function( root ) {
         CnBaseModelFactory.construct( this, module );
         this.addModel = CnPdfFormAddFactory.instance( this );

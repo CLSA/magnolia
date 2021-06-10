@@ -33,8 +33,12 @@ class module extends \cenozo\service\module
     {
       $db_user = lib::create( 'business\session' )->get_user();
       $db_reqn = $this->get_parent_resource();
-      if( $db_user->id == $db_reqn->user_id ) $db_reqn->mark_notices_read_by_user();
-      else if( $db_user->id == $db_reqn->trainee_user_id ) $db_reqn->mark_notices_read_by_trainee();
+      $user_type = NULL;
+      if( $db_user->id == $db_reqn->user_id ) $user_type = 'primary';
+      else if( $db_user->id == $db_reqn->trainee_user_id ) $user_type = 'trainee';
+      else if( $db_user->id == $db_reqn->designate_user_id )$user_type = 'designate';
+
+      if( !is_null( $user_type ) ) $db_reqn->mark_notices_as_read( 'primary' );
     }
 
     if( $select->has_column( 'viewed_by_user' ) )
@@ -81,6 +85,29 @@ class module extends \cenozo\service\module
         'notice.id',
         'notice_join_trainee_user.notice_id' );
       $select->add_column( 'has_trainee_user', 'viewed_by_trainee_user', false, 'boolean' );
+    }
+
+    if( $select->has_column( 'viewed_by_designate_user' ) )
+    {
+      // we can't use parent::add_count_column() since it doesn't quite match our use case
+      $join_sel = lib::create( 'database\select' );
+      $join_sel->from( 'notice' );
+      $join_sel->add_column( 'id', 'notice_id' );
+      $join_sel->add_column( 'notice_has_user.user_id IS NOT NULL', 'has_designate_user', false );
+
+      $join_mod = lib::create( 'database\modifier' );
+      $join_mod->join( 'reqn', 'notice.reqn_id', 'reqn.id' );
+      $sub_mod = lib::create( 'database\modifier' );
+      $sub_mod->where( 'notice.id', '=', 'notice_has_user.notice_id', false );
+      $sub_mod->where( 'reqn.designate_user_id', '=', 'notice_has_user.user_id', false );
+      $join_mod->join_modifier( 'notice_has_user', $sub_mod, 'left' );
+      $join_mod->group( 'notice.id' );
+
+      $modifier->left_join(
+        sprintf( '( %s %s ) AS notice_join_designate_user', $join_sel->get_sql(), $join_mod->get_sql() ),
+        'notice.id',
+        'notice_join_designate_user.notice_id' );
+      $select->add_column( 'has_designate_user', 'viewed_by_designate_user', false, 'boolean' );
     }
   }
 }

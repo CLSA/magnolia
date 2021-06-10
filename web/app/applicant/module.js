@@ -96,10 +96,9 @@ define( function() {
     'CnBaseListFactory', '$state',
     function( CnBaseListFactory, $state ) {
       var object = function( parentModel ) {
-        var self = this;
         CnBaseListFactory.construct( this, parentModel );
-        this.onSelect = function( record ) {
-          $state.go( 'user.view', { identifier: 'name=' + record.user_name } );
+        this.onSelect = async function( record ) {
+          await $state.go( 'user.view', { identifier: 'name=' + record.user_name } );
         };
       };
       return { instance: function( parentModel ) { return new object( parentModel ); } };
@@ -111,7 +110,6 @@ define( function() {
     'CnBaseModelFactory', 'CnApplicantAddFactory', 'CnApplicantListFactory',
     function( CnBaseModelFactory, CnApplicantAddFactory, CnApplicantListFactory ) {
       var object = function( root ) {
-        var self = this;
         CnBaseModelFactory.construct( this, module );
         this.addModel = CnApplicantAddFactory.instance( this );
         this.listModel = CnApplicantListFactory.instance( this );

@@ -42,14 +42,6 @@ class user extends \cenozo\database\user
   }
 
   /**
-   * Determines whether the user is a trainee (has a supervisor)
-   */
-  public function is_trainee()
-  {
-    return !is_null( $this->get_applicant()->supervisor_user_id );
-  }
-
-  /**
    * Returns this user's applicant record (if it exists)
    * @return database\applicant
    */

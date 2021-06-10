@@ -1,0 +1,42 @@
+DROP PROCEDURE IF EXISTS patch_reqn;
+DELIMITER //
+CREATE PROCEDURE patch_reqn()
+  BEGIN
+
+    -- determine the @cenozo database name
+    SET @cenozo = (
+      SELECT unique_constraint_schema
+      FROM information_schema.referential_constraints
+      WHERE constraint_schema = DATABASE()
+      AND constraint_name = "fk_access_site_id"
+    );
+
+    SELECT "Adding designate_user_id column to reqn table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "designate_user_id";
+
+    IF @test = 0 THEN
+      ALTER TABLE reqn ADD COLUMN designate_user_id INT UNSIGNED NULL DEFAULT NULL AFTER trainee_user_id;
+      ALTER TABLE reqn ADD INDEX fk_designate_user_id (designate_user_id ASC);
+
+      SET @sql = CONCAT(
+        "ALTER TABLE reqn ADD CONSTRAINT fk_reqn_designate_user_id ",
+        "FOREIGN KEY (designate_user_id) ",
+        "REFERENCES ", @cenozo, ".user (id) ",
+        "ON DELETE NO ACTION ",
+        "ON UPDATE NO ACTION"
+      );
+      PREPARE statement FROM @sql;
+      EXECUTE statement;
+      DEALLOCATE PREPARE statement;
+    END IF;
+
+  END //
+DELIMITER ;
+
+CALL patch_reqn();
+DROP PROCEDURE IF EXISTS patch_reqn;

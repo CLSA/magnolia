@@ -86,8 +86,8 @@ define( [ 'reqn' ].reduce( function( list, name ) {
 
   /* ######################################################################################################## */
   cenozo.providers.directive( 'cnOutputAdd', [
-    'CnOutputModelFactory', 'CnHttpFactory', 'CnReqnHelper', '$q', '$timeout',
-    function( CnOutputModelFactory, CnHttpFactory, CnReqnHelper, $q, $timeout ) {
+    'CnOutputModelFactory', 'CnHttpFactory', 'CnReqnHelper', '$timeout',
+    function( CnOutputModelFactory, CnHttpFactory, CnReqnHelper, $timeout ) {
       return {
         templateUrl: module.getFileUrl( 'add.tpl.html' ),
         restrict: 'E',
@@ -95,30 +95,27 @@ define( [ 'reqn' ].reduce( function( list, name ) {
         controller: function( $scope ) {
           if( angular.isUndefined( $scope.model ) ) $scope.model = CnOutputModelFactory.root;
 
-          $scope.$on( 'cnRecordAdd ready', function( event, data ) {
+          $scope.$on( 'cnRecordAdd ready', async function( event, data ) {
             var cnRecordAddView = data;
             var parent = $scope.model.getParentIdentifier();
-            var promiseList = [];
-            var len = promiseList.length;
+            var lang = 'en';
             if( 'final_report' == parent.subject ) {
-              promiseList.push( CnHttpFactory.instance( {
+              var response = await CnHttpFactory.instance( {
                 path: 'final_report/' + parent.identifier,
                 data: { select: { column: { table: 'language', column: 'code', alias: 'lang' } } }
-              } ).get().then( response => response.data.lang ) );
+              } ).get();
+              lang = response.data.lang;
             }
 
-            $q.all( promiseList ).then( function( response ) {
-              var lang = len == response.length ? 'en' : response[len];
-              $scope.model.updateLanguage( lang ).then( function() {
-                // we need to wait for the next event cycle for some reason, so use timeout with a 0ms delay
-                $timeout( function() {
-                  var enumListItem = cnRecordAddView.dataArray[0].inputArray.findByProperty( 'key', 'output_type_id' ).enumList[0];
-                  enumListItem.name = CnReqnHelper.translate( 'output', 'choose', lang );
-                  angular.extend( cnRecordAddView, {
-                    getCancelText: function() { return CnReqnHelper.translate( 'output', 'cancel', lang ); },
-                    getSaveText: function() { return CnReqnHelper.translate( 'output', 'save', lang ); }
-                  } );
-                } );
+            await $scope.model.updateLanguage( lang );
+
+            // we need to wait for the next event cycle for some reason, so use timeout with a 0ms delay
+            $timeout( function() {
+              var enumListItem = cnRecordAddView.dataArray[0].inputArray.findByProperty( 'key', 'output_type_id' ).enumList[0];
+              enumListItem.name = CnReqnHelper.translate( 'output', 'choose', lang );
+              angular.extend( cnRecordAddView, {
+                getCancelText: function() { return CnReqnHelper.translate( 'output', 'cancel', lang ); },
+                getSaveText: function() { return CnReqnHelper.translate( 'output', 'save', lang ); }
               } );
             } );
           } );
@@ -160,11 +157,12 @@ define( [ 'reqn' ].reduce( function( list, name ) {
           $scope.$on( 'cnRecordView ready', function( event, data ) {
             var cnRecordViewScope = data;
             var origin = $scope.model.getQueryParameter( 'origin', true );
-            var parentExistsFn = cnRecordViewScope.parentExists;
+            cnRecordViewScope.baseParentExistsFn = cnRecordViewScope.parentExists;
             angular.extend( cnRecordViewScope, {
               // don't show the option to view the parent reqn to the applicant
               parentExists: function( subject ) {
-                return $scope.model.isRole( 'applicant' ) && 'reqn' == subject ? false : parentExistsFn( subject );
+                return $scope.model.isRole( 'applicant' ) && 'reqn' == subject ?
+                  false : cnRecordViewScope.baseParentExistsFn( subject );
               },
               getDeleteText: function() {
                 return 'final_report' == origin ?
@@ -196,29 +194,27 @@ define( [ 'reqn' ].reduce( function( list, name ) {
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnOutputAddFactory', [
-    'CnBaseAddFactory', 'CnHttpFactory', 'CnReqnHelper', '$q',
-    function( CnBaseAddFactory, CnHttpFactory, CnReqnHelper, $q ) {
+    'CnBaseAddFactory', 'CnHttpFactory', 'CnReqnHelper',
+    function( CnBaseAddFactory, CnHttpFactory, CnReqnHelper ) {
       var object = function( parentModel ) {
-        var self = this;
         CnBaseAddFactory.construct( this, parentModel );
 
-        this.onNew = function( record ) {
-          var parent = self.parentModel.getParentIdentifier();
-          var promiseList = [ self.$$onNew( record ) ];
-          var len = promiseList.length;
+        this.onNew = async function( record ) {
+          var parent = this.parentModel.getParentIdentifier();
+          var lang = 'en';
+
+          await this.$$onNew( record );
 
           if( 'final_report' == parent.subject ) {
-            promiseList.push( CnHttpFactory.instance( {
+            var response = await CnHttpFactory.instance( {
               path: 'final_report/' + parent.identifier,
               data: { select: { column: { table: 'language', column: 'code', alias: 'lang' } } }
-            } ).get().then( response => response.data.lang ) );
+            } ).get();
+            lang = response.data.lang;
           }
 
-          return $q.all( promiseList ).then( function( response ) {
-            var lang = len == response.length ? 'en' : response[len];
-            self.parentModel.updateLanguage( lang );
-            self.heading = CnReqnHelper.translate( 'output', 'createOutput', lang );
-          } );
+          await this.parentModel.updateLanguage( lang );
+          this.heading = CnReqnHelper.translate( 'output', 'createOutput', lang );
         };
       };
       return { instance: function( parentModel ) { return new object( parentModel ); } };
@@ -230,15 +226,14 @@ define( [ 'reqn' ].reduce( function( list, name ) {
     'CnBaseListFactory',
     function( CnBaseListFactory ) {
       var object = function( parentModel ) {
-        var self = this;
         CnBaseListFactory.construct( this, parentModel );
 
         // The final report's output list is in "simple" mode which means the pagination widget isn't visible,
         // so to make sure that all records show changethe itemsPerPage value to 100 (it is assumed that no
         // reqn will have more than 100 outputs)
-        this.onList = function( replace ) {
-          self.paginationModel.itemsPerPage = 'final_report' == this.parentModel.getSubjectFromState() ? 100 : 20;
-          return self.$$onList( replace );
+        this.onList = async function( replace ) {
+          this.paginationModel.itemsPerPage = 'final_report' == this.parentModel.getSubjectFromState() ? 100 : 20;
+          await this.$$onList( replace );
         }
       };
       return { instance: function( parentModel ) { return new object( parentModel ); } };
@@ -250,7 +245,6 @@ define( [ 'reqn' ].reduce( function( list, name ) {
     'CnBaseViewFactory', 'CnReqnModelFactory', 'CnReqnHelper',
     function( CnBaseViewFactory, CnReqnModelFactory, CnReqnHelper ) {
       var object = function( parentModel, root ) {
-        var self = this;
         CnBaseViewFactory.construct( this, parentModel, root );
 
         angular.extend( this, {
@@ -262,15 +256,14 @@ define( [ 'reqn' ].reduce( function( list, name ) {
             columnList.url.title = CnReqnHelper.translate( 'output', 'url', lang );
           },
 
-          onView: function( force ) {
-            return self.$$onView( force ).then( function() {
-              var origin = self.parentModel.getQueryParameter( 'origin', true );
-              var lang = 'final_report' == origin ? self.record.lang : 'en';
-              self.parentModel.updateLanguage( lang );
-              self.updateOutputSourceListLanguage( lang );
-              self.outputSourceModel.listModel.heading = CnReqnHelper.translate( 'output', 'outputSourceListHeading', lang );
-              self.heading = CnReqnHelper.translate( 'output', 'outputDetails', lang );
-            } );
+          onView: async function( force ) {
+            await this.$$onView( force );
+            var origin = this.parentModel.getQueryParameter( 'origin', true );
+            var lang = 'final_report' == origin ? this.record.lang : 'en';
+            await this.parentModel.updateLanguage( lang );
+            this.updateOutputSourceListLanguage( lang );
+            this.outputSourceModel.listModel.heading = CnReqnHelper.translate( 'output', 'outputSourceListHeading', lang );
+            this.heading = CnReqnHelper.translate( 'output', 'outputDetails', lang );
           }
         } );
       }
@@ -285,116 +278,121 @@ define( [ 'reqn' ].reduce( function( list, name ) {
     function( CnBaseModelFactory, CnOutputAddFactory, CnOutputListFactory, CnOutputViewFactory,
               CnSession, CnHttpFactory, CnReqnHelper, $state ) {
       var object = function( root ) {
-        var self = this;
         CnBaseModelFactory.construct( this, module );
         this.addModel = CnOutputAddFactory.instance( this );
         this.listModel = CnOutputListFactory.instance( this );
         this.viewModel = CnOutputViewFactory.instance( this, root );
 
         angular.extend( this, {
-          updateLanguage: function( lang ) {
-            var group = self.module.inputGroupList.findByProperty( 'title', '' );
+          updateLanguage: async function( lang ) {
+            var group = this.module.inputGroupList.findByProperty( 'title', '' );
             group.inputList.output_type_id.title = CnReqnHelper.translate( 'output', 'output_type', lang );
             group.inputList.detail.title = CnReqnHelper.translate( 'output', 'detail', lang );
-            return self.metadata.getPromise().then( function() {
-              self.metadata.columnList.output_type_id.enumList = self.metadata.columnList.output_type_id.enumLists[lang];
-            } );
+            await this.metadata.getPromise();
+            this.metadata.columnList.output_type_id.enumList = this.metadata.columnList.output_type_id.enumLists[lang];
           },
 
           setupBreadcrumbTrail: function() {
             // change the breadcrumb trail based on the origin parameter
-            self.$$setupBreadcrumbTrail();
-            var origin = self.getQueryParameter( 'origin', true );
+            this.$$setupBreadcrumbTrail();
+            var origin = this.getQueryParameter( 'origin', true );
             if( 'final_report' == origin ) {
-              var parent = self.getParentIdentifier();
+              var parent = this.getParentIdentifier();
               var index = CnSession.breadcrumbTrail.findIndexByProperty( 'title', 'Final Report' );
-              CnSession.breadcrumbTrail[index+1].go = function() {
-                $state.go( 'final_report.view', { identifier: parent.identifier, t: 'part2' } );
+              CnSession.breadcrumbTrail[index+1].go = async function() {
+                await $state.go( 'final_report.view', { identifier: parent.identifier, t: 'part2' } );
               };
               delete CnSession.breadcrumbTrail[index].go;
             }
-          },
+         },
 
           getParentIdentifier: function() {
-            var response = {};
+            var parentIdentifier = {};
 
             // make sure to use the appropriate parent based on the origin parameter
-            var origin = self.getQueryParameter( 'origin' );
+            var origin = this.getQueryParameter( 'origin' );
             if( 'final_report' == origin ) {
-              var parent = self.module.identifier.parent.findByProperty( 'subject', 'final_report' );
-              response = {
+              var parent = this.module.identifier.parent.findByProperty( 'subject', 'final_report' );
+              parentIdentifier = {
                 subject: parent.subject,
-                identifier: parent.getIdentifier( self.viewModel.record )
+                identifier: parent.getIdentifier( this.viewModel.record )
               };
-              if( angular.isDefined( parent.friendly ) ) response.friendly = parent.friendly;
-            } else response = self.$$getParentIdentifier();
+              if( angular.isDefined( parent.friendly ) ) parentIdentifier.friendly = parent.friendly;
+            } else {
+              parentIdentifier = this.$$getParentIdentifier();
+            }
 
-            return response;
+            return parentIdentifier;
           },
 
-          transitionToAddState: function() {
-            if( 'final_report' == self.getSubjectFromState() ) {
-              $state.go(
-                '^.add_' + self.module.subject.snake,
+          transitionToAddState: async function() {
+            if( 'final_report' == this.getSubjectFromState() ) {
+              await $state.go(
+                '^.add_' + this.module.subject.snake,
                 { parentIdentifier: $state.params.identifier, origin: 'final_report' }
               );
-            } else self.$$transitionToAddState();
+            } else {
+              await self.$$transitionToAddState();
+            }
           },
 
-          transitionToViewState: function( record ) {
+          transitionToViewState: async function( record ) {
             // add the origin when transitioning to the view state
             var stateName = $state.current.name;
             var stateParams = {
               identifier: record.getIdentifier(),
-              origin: self.getSubjectFromState()
+              origin: this.getSubjectFromState()
             };
             if( 'view' == stateName.substring( stateName.lastIndexOf( '.' ) + 1 ) )
               stateParams.parentIdentifier = $state.params.identifier;
-            return $state.go( self.module.subject.snake + '.view', stateParams );
+            await $state.go( this.module.subject.snake + '.view', stateParams );
           },
 
-          transitionToLastState: function() {
+          transitionToLastState: async function() {
             // if we're transitioning back to the final report then load the output list in part2
-            if( 'final_report' == self.getSubjectFromState() ) {
-              $state.go( 'final_report.view', { identifier: self.getParentIdentifier().identifier, t: 'part2' } );
-            } else return self.$$transitionToLastState();
+            if( 'final_report' == this.getSubjectFromState() ) {
+              await $state.go( 'final_report.view', { identifier: this.getParentIdentifier().identifier, t: 'part2' } );
+            } else {
+              await this.$$transitionToLastState();
+            }
           },
 
-          transitionToParentViewState: function( subject, identifier ) {
+          transitionToParentViewState: async function( subject, identifier ) {
             // if we're transitioning back to the final report then load the output list in part2
             return 'final_report' == subject ?
-              $state.go( 'final_report.view', { identifier: self.viewModel.record.final_report_id, t: 'part2' } ) :
-              self.$$transitionToParentViewState( subject, identifier );
+              await $state.go( 'final_report.view', { identifier: this.viewModel.record.final_report_id, t: 'part2' } ) :
+              await this.$$transitionToParentViewState( subject, identifier );
           },
 
-          getMetadata: function() {
-            return self.$$getMetadata().then( function() {
-              return CnHttpFactory.instance( {
-                path: 'output_type',
-                data: {
-                  select: { column: [ 'id', 'name_en', 'name_fr' ] },
-                  modifier: { order: 'name_en', limit: 1000 }
-                }
-              } ).query().then( function success( response ) {
-                // we need both languages, we'll dynamically choose which one to use
-                self.metadata.columnList.output_type_id.enumLists = { en: [], fr: [] };
-                response.data.forEach( function( item ) {
-                  self.metadata.columnList.output_type_id.enumLists.en.push( {
-                    value: item.id,
-                    name: item.name_en
-                  } );
-                  self.metadata.columnList.output_type_id.enumLists.fr.push( {
-                    value: item.id,
-                    name: item.name_fr
-                  } );
-                } );
+          getMetadata: async function() {
+            await this.$$getMetadata();
 
-                // sort the french enum list
-                self.metadata.columnList.output_type_id.enumLists.fr.sort(
-                  (a, b) => (a.name < b.name ? -1 : a.name == b.name ? 0 : 1)
-                );
+            var response = await CnHttpFactory.instance( {
+              path: 'output_type',
+              data: {
+                select: { column: [ 'id', 'name_en', 'name_fr' ] },
+                modifier: { order: 'name_en', limit: 1000 }
+              }
+            } ).query();
+
+            // we need both languages, we'll dynamically choose which one to use
+            this.metadata.columnList.output_type_id.enumLists = { en: [], fr: [] };
+            var self = this;
+            response.data.forEach( function( item ) {
+              self.metadata.columnList.output_type_id.enumLists.en.push( {
+                value: item.id,
+                name: item.name_en
+              } );
+              self.metadata.columnList.output_type_id.enumLists.fr.push( {
+                value: item.id,
+                name: item.name_fr
               } );
             } );
+
+            // sort the french enum list
+            this.metadata.columnList.output_type_id.enumLists.fr.sort(
+              (a, b) => (a.name < b.name ? -1 : a.name == b.name ? 0 : 1)
+            );
           }
         } );
       };

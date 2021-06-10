@@ -44,6 +44,7 @@ define( [ 'output' ].reduce( function( list, name ) {
     version: { type: 'string' },
     current_reqn_version_id: { column: 'reqn_version.id', type: 'string' },
     trainee_user_id: { column: 'reqn.trainee_user_id', type: 'string' },
+    designate_user_id: { column: 'reqn.designate_user_id', type: 'string' },
     state: { column: 'reqn.state', type: 'string' },
     stage_type: { column: 'stage_type.name', type: 'string' },
     phase: { column: 'stage_type.phase', type: 'string' },
@@ -99,17 +100,17 @@ define( [ 'output' ].reduce( function( list, name ) {
             CnSession.setBreadcrumbTrail(
               [ {
                 title: reqnModel.module.name.plural.ucWords(),
-                go: function() { reqnModel.transitionToListState(); }
+                go: async function() { await reqnModel.transitionToListState(); }
               }, {
                 title: scope.model.viewModel.record.identifier,
-                go: function() {
-                  reqnModel.transitionToViewState( {
+                go: async function() {
+                  await reqnModel.transitionToViewState( {
                     getIdentifier: function() { return 'identifier=' + scope.model.viewModel.record.identifier; }
                   } );
                 }
               }, {
                 title: scope.model.module.name.singular.ucWords(),
-                go: function() { scope.model.transitionToViewState( scope.model.viewModel.record ); }
+                go: async function() { await scope.model.transitionToViewState( scope.model.viewModel.record ); }
               } ]
             );
           } );
@@ -141,11 +142,11 @@ define( [ 'output' ].reduce( function( list, name ) {
             ].join( ' ' );
           };
 
-          $scope.compareTo = function( version ) {
+          $scope.compareTo = async function( version ) {
             $scope.model.viewModel.compareRecord = version;
             $scope.liteModel.viewModel.compareRecord = version;
             $scope.model.setQueryParameter( 'c', null == version ? undefined : version.version );
-            $scope.model.reloadState( false, false, 'replace' );
+            await $scope.model.reloadState( false, false, 'replace' );
           };
         }
       };
@@ -168,7 +169,6 @@ define( [ 'output' ].reduce( function( list, name ) {
     function( CnBaseViewFactory, CnOutputModelFactory, CnReqnHelper, CnHttpFactory,
               CnModalMessageFactory, CnModalConfirmFactory, CnSession, $state ) {
       var object = function( parentModel, root ) {
-        var self = this;
         CnBaseViewFactory.construct( this, parentModel, root );
 
         angular.extend( this, {
@@ -185,38 +185,42 @@ define( [ 'output' ].reduce( function( list, name ) {
             return this.parentModel.transitionToParentViewState( 'reqn_version', this.record.current_reqn_version_id );
           },
 
-          onView: function( force ) {
+          onView: async function( force ) {
             // reset tab value
             this.setFormTab( this.parentModel.getQueryParameter( 't' ), false );
 
             // reset compare version and differences
             this.compareRecord = null;
 
-            return this.$$onView( force ).then( function() {
-              if( 'lite' != self.parentModel.type ) {
-                cenozoApp.setLang( self.record.lang );
-                self.updateOutputListLanguage( self.record.lang );
-                return self.getVersionList();
-              }
-            } );
+            await this.$$onView( force );
+
+            if( 'lite' != this.parentModel.type ) {
+              cenozoApp.setLang( this.record.lang );
+              this.updateOutputListLanguage( this.record.lang );
+              await this.getVersionList();
+            }
           },
 
-          onPatch: function( data ) {
+          onPatch: async function( data ) {
             var property = Object.keys( data )[0];
             if( !this.parentModel.getEditEnabled() ) throw new Error( 'Calling onPatch() but edit is not enabled.' );
 
             if( null == property.match( /^deferral_note/ ) ) {
-              return self.$$onPatch( data );
+              await this.$$onPatch( data );
             } else { // make sure to send patches to deferral notes to the parent reqn
               var parent = this.parentModel.getParentIdentifier();
               var httpObj = {
                 path: parent.subject + '/' + parent.identifier,
                 data: data
               };
+              var self = this;
               httpObj.onError = function( response ) { self.onPatchError( response ); };
-              return CnHttpFactory.instance( httpObj ).patch().then( function() {
-                self.afterPatchFunctions.forEach( function( fn ) { fn(); } );
-              } );
+              try {
+                await CnHttpFactory.instance( httpObj ).patch();
+                this.afterPatchFunctions.forEach( function( fn ) { fn(); } );
+              } catch( error ) {
+                // handled by onError above
+              }
             }
           },
 
@@ -243,7 +247,7 @@ define( [ 'output' ].reduce( function( list, name ) {
 
           formTab: '',
           tabSectionList: ['instructions','part1','part2','part3'],
-          setFormTab: function( tab, transition ) {
+          setFormTab: async function( tab, transition ) {
             if( angular.isUndefined( transition ) ) transition = true;
 
             // find the tab section
@@ -261,19 +265,19 @@ define( [ 'output' ].reduce( function( list, name ) {
             this.formTab = tab;
             this.parentModel.setQueryParameter( 't', tab );
 
-            if( transition ) this.parentModel.reloadState( false, false, 'replace' );
+            if( transition ) await this.parentModel.reloadState( false, false, 'replace' );
 
             // update all textarea sizes
             angular.element( 'textarea[cn-elastic]' ).trigger( 'elastic' );
           },
 
-          nextSection: function( reverse ) {
+          nextSection: async function( reverse ) {
             if( angular.isUndefined( reverse ) ) reverse = false;
 
             var currentTabSectionIndex = this.tabSectionList.indexOf( this.formTab );
             if( null != currentTabSectionIndex ) {
               var tabSection = this.tabSectionList[currentTabSectionIndex + (reverse?-1:1)];
-              if( angular.isDefined( tabSection ) ) this.setFormTab( tabSection );
+              if( angular.isDefined( tabSection ) ) await this.setFormTab( tabSection );
             }
           },
 
@@ -325,132 +329,132 @@ define( [ 'output' ].reduce( function( list, name ) {
             return differences;
           },
 
-          getVersionList: function() {
-            var parent = self.parentModel.getParentIdentifier();
+          getVersionList: async function() {
+            var parent = this.parentModel.getParentIdentifier();
             this.versionList = [];
-            return CnHttpFactory.instance( {
+            var response = await CnHttpFactory.instance( {
               path: parent.subject + '/' + parent.identifier + '/final_report'
-            } ).query().then( function( response ) {
-              self.versionList = response.data;
+            } ).query();
 
-              var compareVersion = self.parentModel.getQueryParameter( 'c' );
-              if( angular.isDefined( compareVersion ) )
-                self.compareRecord = self.versionList.findByProperty( 'version', compareVersion );
+            this.versionList = response.data;
 
-              if( 1 < self.versionList.length ) {
-                // add a null object to the version list so we can turn off comparisons
-                self.versionList.unshift( null );
-              }
+            var compareVersion = this.parentModel.getQueryParameter( 'c' );
+            if( angular.isDefined( compareVersion ) )
+              this.compareRecord = this.versionList.findByProperty( 'version', compareVersion );
 
-              // Calculate all differences for all versions (in reverse order so we can find the last agreement version)
-              self.versionList.reverse();
+            // add a null object to the version list so we can turn off comparisons
+            if( 1 < this.versionList.length ) this.versionList.unshift( null );
 
-              self.lastAgreementVersion = null;
-              self.versionList.forEach( function( version ) {
-                if( null != version ) version.differences = self.getDifferences( version );
-              } );
+            // Calculate all differences for all versions (in reverse order so we can find the last agreement version)
+            this.versionList.reverse();
 
-              // if no different list was defined then make it an empty list
-              if( null == self.agreementDifferenceList ) self.agreementDifferenceList = [];
-
-              // put the order of the version list back to normal
-              self.versionList.reverse();
+            this.lastAgreementVersion = null;
+            var self = this;
+            this.versionList.forEach( function( version ) {
+              if( null != version ) version.differences = self.getDifferences( version );
             } );
+
+            // if no different list was defined then make it an empty list
+            if( null == this.agreementDifferenceList ) this.agreementDifferenceList = [];
+
+            // put the order of the version list back to normal
+            this.versionList.reverse();
           },
 
-          submit: function() {
-            // used below
-            function submitFinalReport() {
-              var parent = self.parentModel.getParentIdentifier();
-              return CnHttpFactory.instance( {
-                path: parent.subject + '/' + parent.identifier + "?action=submit"
-              } ).patch().then( function() {
-                var code = CnSession.user.id == self.record.trainee_user_id ?
-                  ( 'deferred' == self.record.state ? 'traineeResubmit' : 'traineeSubmit' ) :
-                  ( 'deferred' == self.record.state ? 'resubmit' : 'submit' );
-                return CnModalMessageFactory.instance( {
-                  title: self.translate( 'misc.' + code + 'Title' ),
-                  message: self.translate( 'misc.' + code + 'Message' ),
-                  closeText: self.translate( 'misc.close' )
-                } ).show().then( function() {
-                  return self.parentModel.isRole( 'applicant' ) ?
-                    $state.go( 'root.home' ) :
-                    self.onView( true ); // refresh
-                } );
-              } );
-            }
-
+          submit: async function() {
             var record = this.record;
-
-            return CnModalConfirmFactory.instance( {
+            var response = await CnModalConfirmFactory.instance( {
               title: this.translate( 'misc.pleaseConfirm' ),
               noText: 'applicant' == CnSession.role.name ? this.translate( 'misc.no' ) : 'No',
               yesText: 'applicant' == CnSession.role.name ? this.translate( 'misc.yes' ) : 'Yes',
               message: this.translate( 'misc.submitWarning' )
-            } ).show().then( function( response ) {
-              if( response ) {
-                // make sure that certain properties have been defined, one tab at a time
-                var requiredTabList = {
-                  'part1': [ 'activities', 'findings', 'outcomes', 'thesis_title', 'thesis_status' ],
-                  'part3': [ 'impact', 'opportunities', 'dissemination' ]
-                };
+            } ).show();
 
-                var error = null;
-                var errorTab = null;
-                for( var tab in requiredTabList ) {
-                  var firstProperty = null;
-                  requiredTabList[tab].filter( function( property ) {
-                    if( 'part1' == tab ) {
-                      // only check thesis properties if the reqn has a trainee
-                      return null == property.match( /thesis/ ) || self.record.trainee_user_id;
-                    }
+            if( response ) {
+              // make sure that certain properties have been defined, one tab at a time
+              var requiredTabList = {
+                'part1': [ 'activities', 'findings', 'outcomes', 'thesis_title', 'thesis_status' ],
+                'part3': [ 'impact', 'opportunities', 'dissemination' ]
+              };
 
-                    // check everything else
-                    return true;
-                  } ).forEach( function( property ) {
-                    // check for the property's value
-                    if( null === record[property] || '' === record[property] ) {
-                      var element = cenozo.getFormElement( property );
-                      element.$error.required = true;
-                      cenozo.updateFormElement( element, true );
-                      if( null == errorTab ) errorTab = tab;
-                      if( null == error ) error = {
-                        title: self.translate( 'misc.missingFieldTitle' ),
-                        message: self.translate( 'misc.missingFieldMessage' ),
-                        error: true
-                      };
-                    }
-                  } );
+              var error = null;
+              var errorTab = null;
+              for( var tab in requiredTabList ) {
+                var firstProperty = null;
+                var self = this;
+                requiredTabList[tab].filter( function( property ) {
+                  if( 'part1' == tab ) {
+                    // only check thesis properties if the reqn has a trainee
+                    return null == property.match( /thesis/ ) || self.record.trainee_user_id;
+                  }
+
+                  // check everything else
+                  return true;
+                } ).forEach( function( property ) {
+                  // check for the property's value
+                  if( null === record[property] || '' === record[property] ) {
+                    var element = cenozo.getFormElement( property );
+                    element.$error.required = true;
+                    cenozo.updateFormElement( element, true );
+                    if( null == errorTab ) errorTab = tab;
+                    if( null == error ) error = {
+                      title: self.translate( 'misc.missingFieldTitle' ),
+                      message: self.translate( 'misc.missingFieldMessage' ),
+                      error: true
+                    };
+                  }
+                } );
+              }
+
+              if( null != error ) {
+                // if there was an error then display it now
+                if( 'applicant' == CnSession.role.name ) error.closeText = this.translate( 'misc.close' );
+                await CnModalMessageFactory.instance( error ).show();
+                await this.setFormTab( errorTab );
+              } else {
+                // now check to make sure this version is different from the last (the first is always different)
+                var response = await CnHttpFactory.instance( {
+                  path: this.parentModel.getServiceResourcePath(),
+                  data: { select: { column: 'has_changed' } }
+                } ).get();
+
+                var proceed = false;
+                if( response.data.has_changed ) {
+                  proceed = true;
+                } else {
+                  // no changes made so warn the user before proceeding
+                  proceed = await CnModalConfirmFactory.instance( {
+                    title: this.translate( 'misc.pleaseConfirm' ),
+                    noText: this.translate( 'misc.no' ),
+                    yesText: this.translate( 'misc.yes' ),
+                    message: this.translate( 'misc.noChangesMessage' )
+                  } ).show();
                 }
 
-                if( null != error ) {
-                  // if there was an error then display it now
-                  if( 'applicant' == CnSession.role.name ) error.closeText = self.translate( 'misc.close' );
-                  CnModalMessageFactory.instance( error ).show().then( function() {
-                    self.setFormTab( errorTab );
-                  } );
-                } else {
-                  // now check to make sure this version is different from the last (the first is always different)
-                  return CnHttpFactory.instance( {
-                    path: self.parentModel.getServiceResourcePath(),
-                    data: { select: { column: 'has_changed' } }
-                  } ).get().then( function( response ) {
-                    return response.data.has_changed ?
-                      // changes have been made, so submit now
-                      submitFinalReport() :
-                      // no changes made so warn the user before proceeding
-                      CnModalConfirmFactory.instance( {
-                        title: self.translate( 'misc.pleaseConfirm' ),
-                        noText: self.translate( 'misc.no' ),
-                        yesText: self.translate( 'misc.yes' ),
-                        message: self.translate( 'misc.noChangesMessage' )
-                      } ).show().then( function( response ) {
-                        if( response ) return submitFinalReport();
-                      } );
-                  } );
+                // changes have been made, so submit now
+                if( proceed ) {
+                  var parent = this.parentModel.getParentIdentifier();
+                  await CnHttpFactory.instance( {
+                    path: parent.subject + '/' + parent.identifier + "?action=submit"
+                  } ).patch();
+
+                  var code = CnSession.user.id == this.record.trainee_user_id ?
+                    ( 'deferred' == this.record.state ? 'traineeResubmit' : 'traineeSubmit' ) :
+                    ( 'deferred' == this.record.state ? 'resubmit' : 'submit' );
+                  await CnModalMessageFactory.instance( {
+                    title: this.translate( 'misc.' + code + 'Title' ),
+                    message: this.translate( 'misc.' + code + 'Message' ),
+                    closeText: this.translate( 'misc.close' )
+                  } ).show();
+
+                  if( this.parentModel.isRole( 'applicant' ) ) {
+                    await $state.go( 'root.home' );
+                  } else {
+                    await this.onView( true ); // refresh
+                  }
                 }
               }
-            } );
+            }
           }
         } );
       };
@@ -463,7 +467,6 @@ define( [ 'output' ].reduce( function( list, name ) {
     'CnBaseModelFactory', 'CnFinalReportListFactory', 'CnFinalReportViewFactory', 'CnSession', '$state',
     function( CnBaseModelFactory, CnFinalReportListFactory, CnFinalReportViewFactory, CnSession, $state ) {
       var object = function( type ) {
-        var self = this;
         CnBaseModelFactory.construct( this, module );
         this.type = type;
         if( 'lite' != this.type ) this.listModel = CnFinalReportListFactory.instance( this );
@@ -483,10 +486,12 @@ define( [ 'output' ].reduce( function( list, name ) {
             } else {
               trail = [ {
                 title: 'Requisitions',
-                go: function() { return $state.go( 'reqn.list' ); }
+                go: async function() { await $state.go( 'reqn.list' ); }
               }, {
                 title: this.viewModel.record.identifier,
-                go: function() { return $state.go( 'reqn.view', { identifier: 'identifier=' + self.viewModel.record.identifier } ); }
+                go: async function() {
+                  await $state.go( 'reqn.view', { identifier: 'identifier=' + this.viewModel.record.identifier } );
+                }
               }, {
                 title: 'Final Report version ' + this.viewModel.record.version
               } ];
@@ -496,8 +501,8 @@ define( [ 'output' ].reduce( function( list, name ) {
           }
         } );
 
-
         // make the input lists from all groups more accessible
+        var self = this;
         module.inputGroupList.forEach( group => Object.assign( self.inputList, group.inputList ) );
       };
 
