@@ -123,6 +123,7 @@ define( function() {
         angular.extend( this, params );
 
         this.show = function() {
+          var self = this;
           return $uibModal.open( {
             backdrop: 'static',
             keyboard: true,
@@ -166,12 +167,15 @@ define( function() {
                     date: this.date,
                     pickerType: 'date',
                     emptyAllowed: false,
-                    locale: this.language
+                    locale: self.language
                   } ).show();
 
                   if( response ) $scope.date = response.replace( /T.*/, '' );
                 },
-                t: function( value ) { return CnReqnHelper.translate( 'reqn', value, this.language ); },
+                t: function( value ) {
+                  console.log( $scope );
+                  return CnReqnHelper.translate( 'reqn', value, self.language );
+                },
                 ok: function() {
                   $uibModalInstance.close( { file: $scope.file, date: $scope.date } );
                 },
