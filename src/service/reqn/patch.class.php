@@ -242,10 +242,17 @@ class patch extends \cenozo\service\patch
           }
           else
           {
-            // remove the amendment's review
-            $report_mod = lib::create( 'database\modifier' );
-            $report_mod->where( 'amendment', '=', $db_reqn_version->amendment );
-            foreach( $db_reqn->get_review_object_list( $report_mod ) as $db_review ) $db_review->delete();
+            // remove all of the amendment's versions and reviews
+            $reqn_version_mod = lib::create( 'database\modifier' );
+            $reqn_version_mod->where( 'amendment', '=', $db_reqn_version->amendment );
+            $reqn_version_mod->order_desc( 'version' );
+            foreach( $db_reqn->get_reqn_version_object_list( $reqn_version_mod ) as $db_amendment_reqn_version )
+            {
+              $report_mod = lib::create( 'database\modifier' );
+              $report_mod->where( 'amendment', '=', $db_amendment_reqn_version->amendment );
+              foreach( $db_reqn->get_review_object_list( $report_mod ) as $db_review ) $db_review->delete();
+              $db_amendment_reqn_version->delete();
+            }
 
             // remove the current stage and re-activate the previous one
             $db_current_stage = $db_reqn->get_current_stage();
@@ -256,9 +263,6 @@ class patch extends \cenozo\service\patch
             $db_last_stage = current( $db_reqn->get_stage_object_list( $stage_mod ) );
             $db_last_stage->datetime = NULL;
             $db_last_stage->save();
-
-            // delete the current (amendment) version
-            $db_reqn_version->delete();
 
             // and finally, make sure the reqn is no longer deferred
             if( 'deferred' == $db_reqn->state )
