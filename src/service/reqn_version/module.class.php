@@ -32,10 +32,10 @@ class module extends \cenozo\service\module
       if( !is_null( $db_reqn_version ) )
       {
         $db_reqn = $db_reqn_version->get_reqn();
-        if( 'applicant' == $db_role->name && !is_null( $db_reqn ) )
+        if( in_array( $db_role->name, ['applicant', 'designate'] ) && !is_null( $db_reqn ) )
         {
           $trainee = 'applicant' == $db_role->name && $db_reqn->trainee_user_id == $db_user->id;
-          $designate = 'applicant' == $db_role->name && $db_reqn->designate_user_id == $db_user->id;
+          $designate = 'designate' == $db_role->name && $db_reqn->designate_user_id == $db_user->id;
           if( ( $db_reqn->user_id != $db_user->id && !$trainee && !$designate ) || 'abandoned' == $db_reqn->state )
           {
             $this->get_status()->set_code( 404 );

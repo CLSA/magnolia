@@ -20,7 +20,7 @@ class access extends \cenozo\database\access
   {
     parent::save();
 
-    // make sure the user has an applicant record if they have been granted applicant access
-    if( 'applicant' == $this->get_role()->name ) $this->get_user()->assert_applicant();
+    // make sure the user has an applicant record if they have been granted applicant or designate access
+    if( in_array( $this->get_role()->name, ['applicant', 'designate'] ) ) $this->get_user()->assert_applicant();
   }
 }

@@ -21,7 +21,7 @@ class delete extends \cenozo\service\delete
     $db_ethics_approval = $this->get_leaf_record();
     $db_language = $db_ethics_approval->get_reqn()->get_language();
 
-    if( 'applicant' == $db_role->name )
+    if( in_array( $db_role->name, ['applicant', 'designate'] ) )
     {
       throw lib::create( 'exception\notice',
         'fr' == $db_language->code ?

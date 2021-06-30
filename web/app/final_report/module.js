@@ -127,7 +127,7 @@ define( [ 'output' ].reduce( function( list, name ) {
           $scope.getHeading = function() {
             var status = null;
             if( 'deferred' == $scope.model.viewModel.record.state ) {
-              status = $scope.model.isRole( 'applicant' ) ? 'Action Required' : 'Deferred to Applicant';
+              status = $scope.model.isRole( 'applicant', 'designate' ) ? 'Action Required' : 'Deferred to Applicant';
             } else if( $scope.model.viewModel.record.state ) {
               status = $scope.model.viewModel.record.state.ucWords();
             }
@@ -365,8 +365,8 @@ define( [ 'output' ].reduce( function( list, name ) {
             var record = this.record;
             var response = await CnModalConfirmFactory.instance( {
               title: this.translate( 'misc.pleaseConfirm' ),
-              noText: 'applicant' == CnSession.role.name ? this.translate( 'misc.no' ) : 'No',
-              yesText: 'applicant' == CnSession.role.name ? this.translate( 'misc.yes' ) : 'Yes',
+              noText: this.isRole( 'applicant', 'designate' ) ? this.translate( 'misc.no' ) : 'No',
+              yesText: this.isRole( 'applicant', 'designate' ) ? this.translate( 'misc.yes' ) : 'Yes',
               message: this.translate( 'misc.submitWarning' )
             } ).show();
 
@@ -408,7 +408,7 @@ define( [ 'output' ].reduce( function( list, name ) {
 
               if( null != error ) {
                 // if there was an error then display it now
-                if( 'applicant' == CnSession.role.name ) error.closeText = this.translate( 'misc.close' );
+                if( this.isRole( 'applicant', 'designate' ) ) error.closeText = this.translate( 'misc.close' );
                 await CnModalMessageFactory.instance( error ).show();
                 await this.setFormTab( errorTab );
               } else {
@@ -447,7 +447,7 @@ define( [ 'output' ].reduce( function( list, name ) {
                     closeText: this.translate( 'misc.close' )
                   } ).show();
 
-                  if( this.parentModel.isRole( 'applicant' ) ) {
+                  if( this.parentModel.isRole( 'applicant', 'designate' ) ) {
                     await $state.go( 'root.home' );
                   } else {
                     await this.onView( true ); // refresh
@@ -478,7 +478,7 @@ define( [ 'output' ].reduce( function( list, name ) {
           setupBreadcrumbTrail: function() {
             var trail = [];
 
-            if( this.isRole( 'applicant' ) ) {
+            if( this.isRole( 'applicant', 'designate' ) ) {
               trail = [
                 { title: 'Final Report' },
                 { title: this.viewModel.record.identifier }

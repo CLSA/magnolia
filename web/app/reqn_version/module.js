@@ -178,7 +178,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
 
             // display final report message if appropriate
             var stage_type = record.stage_type ? record.stage_type : '';
-            if( scope.model.isRole( 'applicant' ) &&
+            if( scope.model.isRole( 'applicant', 'designate' ) &&
                 'Report Required' == stage_type &&
                 'deferred' == scope.model.viewModel.record.state &&
                 !scope.reportRequiredWarningShown ) {
@@ -187,7 +187,8 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
             }
 
             // display notices to the applicant if they've never seen it
-            if( scope.model.isRole( 'applicant' ) && record.has_unread_notice ) await scope.model.viewModel.displayNotices();
+            if( scope.model.isRole( 'applicant', 'designate' ) && record.has_unread_notice )
+              await scope.model.viewModel.displayNotices();
           } );
 
           scope.$watch( 'model.viewModel.record.start_date', function( date ) {
@@ -231,9 +232,9 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
           coapplicantAddModel.onNew( $scope.coapplicantRecord );
 
           $scope.getHeading = function() {
-            var status = $scope.model.viewModel.record[$scope.model.isRole( 'applicant' ) ? 'status' : 'stage_type'];
+            var status = $scope.model.viewModel.record[$scope.model.isRole( 'applicant', 'designate' ) ? 'status' : 'stage_type'];
             if( 'deferred' == $scope.model.viewModel.record.state ) {
-              status = $scope.model.isRole( 'applicant' ) ? 'Action Required' : 'Deferred to Applicant';
+              status = $scope.model.isRole( 'applicant', 'designate' ) ? 'Action Required' : 'Deferred to Applicant';
             } else if( $scope.model.viewModel.record.state ) {
               status = $scope.model.viewModel.record.state.ucWords();
             }
@@ -366,7 +367,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
           $scope.isRemoveEthicsApprovalAllowed = function( id ) {
             if( $scope.model.viewModel.ethicsApprovalModel.getDeleteEnabled() ) {
               if( $scope.model.isRole( 'administrator' ) ) return true;
-              else if( $scope.model.isRole( 'applicant' ) ) {
+              else if( $scope.model.isRole( 'applicant', 'designate' ) ) {
                 var ethicsApproval = $scope.model.viewModel.record.ethicsApprovalList.findByProperty( 'id', id );
                 return null != ethicsApproval && ethicsApproval.one_day_old;
               }
@@ -465,7 +466,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
               '.' != this.record.amendment,
               this.record.lang
             )
-            if( response ) await $state.go( this.parentModel.isRole( 'applicant' ) ? 'root.home' : 'reqn.list' );
+            if( response ) await $state.go( this.parentModel.isRole( 'applicant', 'designate' ) ? 'root.home' : 'reqn.list' );
           },
           delete: async function() { await CnReqnHelper.delete( 'identifier=' + this.record.identifier, this.record.lang ); },
           translate: function( value ) {
@@ -1587,7 +1588,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
           canViewData: function() {
             // administrators and applicants can view data when in the active stage
             var stage_type = this.record.stage_type ? this.record.stage_type : '';
-            return this.parentModel.isRole( 'administrator', 'applicant' ) && 'Active' == stage_type;
+            return this.parentModel.isRole( 'administrator', 'applicant', 'designate' ) && 'Active' == stage_type;
           },
 
           getDifferenceList: function( version ) {
@@ -1656,8 +1657,8 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
           submit: async function( data ) {
             var response = await CnModalConfirmFactory.instance( {
               title: this.translate( 'misc.pleaseConfirm' ),
-              noText: this.parentModel.isRole( 'applicant' ) ? this.translate( 'misc.no' ) : 'No',
-              yesText: this.parentModel.isRole( 'applicant' ) ? this.translate( 'misc.yes' ) : 'Yes',
+              noText: this.parentModel.isRole( 'applicant', 'designate' ) ? this.translate( 'misc.no' ) : 'No',
+              yesText: this.parentModel.isRole( 'applicant', 'designate' ) ? this.translate( 'misc.yes' ) : 'Yes',
               message: this.translate( 'misc.submitWarning' )
             } ).show();
 
@@ -1789,7 +1790,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
 
               if( null != error ) {
                 // if there was an error then display it now
-                if( this.parentModel.isRole( 'applicant' ) ) error.closeText = this.translate( 'misc.close' );
+                if( this.parentModel.isRole( 'applicant', 'designate' ) ) error.closeText = this.translate( 'misc.close' );
                 await CnModalMessageFactory.instance( error ).show();
 
                 if( 'amendment' == errorTab ) {
@@ -1947,7 +1948,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                           closeText: this.translate( 'misc.close' )
                         } ).show();
 
-                        if( this.parentModel.isRole( 'applicant' ) ) {
+                        if( this.parentModel.isRole( 'applicant', 'designate' ) ) {
                           await $state.go( 'root.home' );
                         } else {
                           await this.onView( true ); // refresh
@@ -2111,7 +2112,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
             var stage_type = this.viewModel.record.stage_type ? this.viewModel.record.stage_type : '';
 
             var check = false;
-            if( this.isRole( 'applicant' ) ) {
+            if( this.isRole( 'applicant', 'designate' ) ) {
               check = 'new' == phase || (
                 'deferred' == state && ( 'review' == phase || ( 'lite' == this.type && 'Agreement' == stage_type ) )
               );
@@ -2134,7 +2135,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
             var self = this;
             var trail = [];
 
-            if( this.isRole( 'applicant' ) ) {
+            if( this.isRole( 'applicant', 'designate' ) ) {
               trail = [
                 { title: 'Requisition' },
                 { title: this.viewModel.record.identifier }

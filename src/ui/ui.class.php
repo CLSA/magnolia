@@ -149,14 +149,19 @@ class ui extends \cenozo\ui\ui
     $this->remove_listitem( 'Settings' );
     $this->remove_listitem( 'Sites' );
 
-    if( 'applicant' == $db_role->name ) $this->remove_listitem( 'Requisitions' );
+    if( in_array( $db_role->name, ['applicant', 'designate'] ) )
+    {
+      $this->remove_listitem( 'Amendment Types' );
+      $this->remove_listitem( 'Requisitions' );
+    }
+
     if( 'administrator' != $db_role->name ) $this->remove_listitem( 'Users' );
     if( 'administrator' == $db_role->name )
     {
       $this->add_listitem( 'Data Option Categories', 'data_option_category' );
       $this->add_listitem( 'Output Types', 'output_type' );
     }
-    if( in_array( $db_role->name, [ 'administrator', 'readonly' ] ) ) $this->add_listitem( 'Requisition Types', 'reqn_type' );
+    if( in_array( $db_role->name, ['administrator', 'readonly'] ) ) $this->add_listitem( 'Requisition Types', 'reqn_type' );
   }
 
   /**
@@ -177,8 +182,9 @@ class ui extends \cenozo\ui\ui
       'subject' => 'reqn',
       'action' => 'data_sharing'
     );
+
     if( array_key_exists( 'User Overview', $list ) )
-      if( 'applicant' == $db_role->name || 'reviewer' == $db_role->name )
+      if( in_array( $db_role->name, ['applicant', 'designate', 'reviewer'] ) )
         unset( $list['User Overview'] );
 
     return $list;

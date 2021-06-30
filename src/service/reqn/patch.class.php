@@ -65,7 +65,7 @@ class patch extends \cenozo\service\patch
       }
       else if( 'abandon' == $action )
       {
-        if( !in_array( $db_role->name, array( 'applicant', 'administrator' ) ) ) $code = 403;
+        if( !in_array( $db_role->name, array( 'applicant', 'designate', 'administrator' ) ) ) $code = 403;
         else if( '.' != $db_reqn_version->amendment )
         {
           // do not allow an amendment to be abandoned once it has gone past the admin review
@@ -82,7 +82,7 @@ class patch extends \cenozo\service\patch
       }
       else if( 'amend' == $action )
       {
-        if( !in_array( $db_role->name, array( 'applicant', 'administrator', 'typist' ) ) ||
+        if( !in_array( $db_role->name, array( 'applicant', 'designate', 'administrator', 'typist' ) ) ||
             'active' != $phase ||
             'Report Required' == $db_current_stage_type->name ) $code = 403;
       }
@@ -98,11 +98,11 @@ class patch extends \cenozo\service\patch
       }
       else if( 'reactivate' == $action )
       {
-        if( 'administrator' != $db_role->name || !in_array( $state, [ 'abandoned', 'inactive' ] ) ) $code = 403;
+        if( 'administrator' != $db_role->name || !in_array( $state, ['abandoned', 'inactive'] ) ) $code = 403;
       }
       else if( 'submit' == $action )
       {
-        if( in_array( $db_role->name, array( 'applicant', 'administrator', 'typist' ) ) )
+        if( in_array( $db_role->name, array( 'applicant', 'designate', 'administrator', 'typist' ) ) )
         {
           if( 'new' != $phase && 'deferred' != $state ) $code = 403;
           else if( !$db_reqn->legacy && 'new' == $phase )
@@ -206,10 +206,12 @@ class patch extends \cenozo\service\patch
     $db_user = $session->get_user();
 
     $db_reqn = $this->get_leaf_record();
-    $approval_required = 'applicant' == $db_role->name && (
-      $db_reqn->trainee_user_id == $db_user->id ||
-      $db_reqn->designate_user_id == $db_user->id
-    );
+    $approval_required =
+      'designate' == $db_role->name || (
+        'applicant' == $db_role->name && (
+          $db_reqn->trainee_user_id == $db_user->id || $db_reqn->designate_user_id == $db_user->id
+        )
+      );
     $db_reqn_version = $db_reqn->get_current_reqn_version();
     $file = $this->get_argument( 'file', NULL );
     $headers = apache_request_headers();

@@ -20,7 +20,7 @@ class patch extends \cenozo\service\user\patch
     // remove supervisor_user_id from the patch array
     if( array_key_exists( 'supervisor_user_id', $patch_array ) )
     {
-      $this->supervisor_user_id = $patch_array[ 'supervisor_user_id'];
+      $this->supervisor_user_id = $patch_array['supervisor_user_id'];
       $this->update_supervisor = true;
       unset( $patch_array['supervisor_user_id'] );
     }

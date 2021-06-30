@@ -173,7 +173,6 @@ define( function() {
                   if( response ) $scope.date = response.replace( /T.*/, '' );
                 },
                 t: function( value ) {
-                  console.log( $scope );
                   return CnReqnHelper.translate( 'reqn', value, self.language );
                 },
                 ok: function() {

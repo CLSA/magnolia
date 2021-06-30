@@ -31,10 +31,10 @@ class module extends \cenozo\service\module
       if( !is_null( $db_reqn ) )
       {
         // make sure to restrict applicants to their own reqns which are not abandoned
-        if( 'applicant' == $db_role->name )
+        if( in_array( $db_role->name, ['applicant', 'designate'] ) )
         {
           $trainee = 'applicant' == $db_role->name && $db_reqn->trainee_user_id == $db_user->id;
-          $designate = 'applicant' == $db_role->name && $db_reqn->designate_user_id == $db_user->id;
+          $designate = 'designate' == $db_role->name && $db_reqn->designate_user_id == $db_user->id;
           if( ( $db_reqn->user_id != $db_user->id && !$trainee && !$designate ) || 'abandoned' == $db_reqn->state )
           {
             $this->get_status()->set_code( 404 );
@@ -194,14 +194,21 @@ class module extends \cenozo\service\module
       $select->add_column( 'reviewers_completed.total', 'reviewers_completed', false );
     }
 
-    if( 'applicant' == $db_role->name )
+    if( in_array( $db_role->name, ['applicant', 'designate'] ) )
     {
       // only show applicants their own reqns which aren't abandoned
-      $modifier->where_bracket( true );
-      $modifier->where( 'reqn.user_id', '=', $db_user->id );
-      $modifier->or_where( 'reqn.trainee_user_id', '=', $db_user->id );
-      $modifier->or_where( 'reqn.designate_user_id', '=', $db_user->id );
-      $modifier->where_bracket( false );
+      if( 'designate' == $db_role->name )
+      {
+        $modifier->where( 'reqn.designate_user_id', '=', $db_user->id );
+      }
+      else
+      {
+        $modifier->where_bracket( true );
+        $modifier->where( 'reqn.user_id', '=', $db_user->id );
+        $modifier->or_where( 'reqn.trainee_user_id', '=', $db_user->id );
+        $modifier->where_bracket( false );
+      }
+
       $modifier->where( 'IFNULL( reqn.state, "" )', '!=', 'abandoned' );
 
       // do not show legacy reqns which are still in the new phase

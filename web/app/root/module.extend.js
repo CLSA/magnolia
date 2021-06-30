@@ -15,7 +15,7 @@ define( [ 'reqn', 'review', 'root' ].reduce( function( list, name ) {
       var oldController = $delegate[0].controller;
       var oldLink = $delegate[0].link;
 
-      if( 'applicant' == CnSession.role.name ) {
+      if( [ 'applicant', 'designate' ].includes( CnSession.role.name ) ) {
         angular.extend( $delegate[0], {
           // override the template for applicants
           templateUrl: cenozoApp.getFileUrl( 'root', 'applicant_home.tpl.html' ),

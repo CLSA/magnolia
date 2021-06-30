@@ -20,14 +20,14 @@ define( [ 'output' ].reduce( function( list, name ) {
         title: 'Language',
         column: 'language.code',
         isIncluded: function( $state, model ) {
-          return !model.isRole( 'applicant' ) && 'data_sharing' != model.getActionFromState();
+          return !model.isRole( 'applicant', 'designate' ) && 'data_sharing' != model.getActionFromState();
         }
       },
       legacy: {
         title: 'Legacy',
         type: 'boolean',
         isIncluded: function( $state, model ) {
-          return !model.isRole( 'applicant', 'typist' ) && 'data_sharing' != model.getActionFromState();
+          return !model.isRole( 'applicant', 'designate', 'typist' ) && 'data_sharing' != model.getActionFromState();
         }
       },
       reqn_type: {
@@ -36,7 +36,7 @@ define( [ 'output' ].reduce( function( list, name ) {
       },
       user_full_name: {
         title: 'Owner',
-        isIncluded: function( $state, model ) { return !model.isRole( 'applicant' ); }
+        isIncluded: function( $state, model ) { return !model.isRole( 'applicant', 'designate' ); }
       },
       trainee_full_name: {
         title: 'Trainee'
@@ -67,14 +67,14 @@ define( [ 'output' ].reduce( function( list, name ) {
         column: 'stage_type.status',
         title: 'Status',
         isIncluded: function( $state, model ) {
-          return model.isRole( 'applicant' ) && 'data_sharing' != model.getActionFromState();
+          return model.isRole( 'applicant', 'designate' ) && 'data_sharing' != model.getActionFromState();
         }
       },
       state: {
         title: 'On Hold',
         type: 'string',
         isIncluded: function( $state, model ) {
-          return !model.isRole( 'applicant', 'typist' ) && 'data_sharing' != model.getActionFromState();
+          return !model.isRole( 'applicant', 'designate', 'typist' ) && 'data_sharing' != model.getActionFromState();
         },
         help: 'The reason the requisition is on hold (empty if the requisition hasn\'t been held up)'
       },
@@ -82,7 +82,7 @@ define( [ 'output' ].reduce( function( list, name ) {
         title: 'Days On Hold',
         type: 'number',
         isIncluded: function( $state, model ) {
-          return !model.isRole( 'applicant', 'typist' ) && 'data_sharing' != model.getActionFromState();
+          return !model.isRole( 'applicant', 'designate', 'typist' ) && 'data_sharing' != model.getActionFromState();
         },
         help: 'The number of days since the requisition was put on hold (empty if the requisition hasn\'t been held up)'
       },
@@ -95,7 +95,7 @@ define( [ 'output' ].reduce( function( list, name ) {
         column: 'stage_type.name',
         title: 'Stage',
         type: 'string',
-        isIncluded: function( $state, model ) { return !model.isRole( 'applicant', 'reviewer' ); }
+        isIncluded: function( $state, model ) { return !model.isRole( 'applicant', 'designate', 'reviewer' ); }
       },
       has_data_sharing_filename: {
         title: 'Has Agreement',
@@ -186,7 +186,8 @@ define( [ 'output' ].reduce( function( list, name ) {
         // if the reqn has an agreement then we can't directly change the primary applicant
         return !model.isRole( 'administrator' ) || 0 < model.viewModel.record.has_agreements;
       },
-      isExcluded: 'add'
+      isExcluded: 'add',
+      help: 'Only users who have the applicant role and a supervisor can be selected.'
     },
     designate_user_id: {
       title: 'Designate',
@@ -195,7 +196,8 @@ define( [ 'output' ].reduce( function( list, name ) {
         table: 'user',
         select: 'CONCAT( user.first_name, " ", user.last_name, " (", user.name, ")" )',
         where: [ 'user.first_name', 'user.last_name', 'user.name' ]
-      }
+      },
+      help: 'Only users who have the designate role can be selected.'
     },
     language_id: {
       title: 'Language',
@@ -823,7 +825,7 @@ define( [ 'output' ].reduce( function( list, name ) {
           canResetData: function() {
             // administrators and applicants can view data when in the active stage
             var stage_type = this.record.stage_type ? this.record.stage_type : '';
-            return 'administrator' == CnSession.role.name && ( 'Data Release' == stage_type || 'Active' == stage_type );
+            return this.parentModel.isRole( 'administrator' ) && ( 'Data Release' == stage_type || 'Active' == stage_type );
           },
           viewData: function() {
             $window.open( CnSession.application.studyDataUrl + '/' + this.record.data_directory, 'studyData' + this.record.id );
@@ -831,14 +833,14 @@ define( [ 'output' ].reduce( function( list, name ) {
           canViewData: function() {
             // administrators and applicants can view data when in the active stage
             var stage_type = this.record.stage_type ? this.record.stage_type : '';
-            return ( 'administrator' == CnSession.role.name && ['Data Release','Active'].includes( stage_type ) ) ||
-                   ( 'applicant' == CnSession.role.name && 'Active' == stage_type );
+            return ( this.parentModel.isRole( 'administrator' ) && ['Data Release','Active'].includes( stage_type ) ) ||
+                   ( this.parentModel.isRole( 'applicant', 'designate' ) && 'Active' == stage_type );
           },
           onView: async function( force ) {
             // update the output list language
             this.updateOutputListLanguage();
 
-            if( 'reviewer' == CnSession.role.name ) {
+            if( this.parentModel.isRole( 'reviewer' ) ) {
               // If we are a reviewer assigned to this reqn and haven't completed our review then show a reminder
               var response = await CnHttpFactory.instance( {
                 path: this.parentModel.getServiceResourcePath() + '/review',
@@ -980,7 +982,7 @@ define( [ 'output' ].reduce( function( list, name ) {
           proceed: async function( stageType ) {
             var message = 'Are you sure you wish to move this ' + this.parentModel.module.name.singular + ' to the "' +
               ( angular.isDefined( stageType ) ? stageType : this.record.next_stage_type ) + '" stage?';
-            if( 'administrator' == CnSession.role.name && ( this.reqnDeferralNotesExist() || this.reportDeferralNotesExist() ) ) {
+            if( this.parentModel.isRole( 'administrator' ) && ( this.reqnDeferralNotesExist() || this.reportDeferralNotesExist() ) ) {
               message += '\n\nWARNING: There are deferral notes present, you may wish to remove them before proceeding.';
             }
 
@@ -1185,7 +1187,7 @@ define( [ 'output' ].reduce( function( list, name ) {
           getAddEnabled: function() {
             return this.$$getAddEnabled() && (
               'reqn' == this.getSubjectFromState() ||
-              'root' == this.getSubjectFromState() && 'applicant' == CnSession.role.name
+              ( 'root' == this.getSubjectFromState() && this.isRole( 'applicant' ) )
             );
           },
 
@@ -1193,7 +1195,7 @@ define( [ 'output' ].reduce( function( list, name ) {
             var phase = this.viewModel.record.phase ? this.viewModel.record.phase : '';
             var state = this.viewModel.record.state ? this.viewModel.record.state : '';
             return this.$$getEditEnabled() && (
-              'applicant' == CnSession.role.name ?
+              this.isRole( 'applicant', 'designate' ) ?
               'new' == phase || ( 'deferred' == state && 'review' == phase ) :
               ['administrator','communication','typist'].includes( CnSession.role.name )
             );
@@ -1226,7 +1228,7 @@ define( [ 'output' ].reduce( function( list, name ) {
 
           // override transitionToViewState (used when application views a reqn)
           transitionToViewState: async function( record ) {
-            if( this.isRole( 'applicant' ) || this.isRole( 'typist' ) ) {
+            if( this.isRole( 'applicant', 'designate', 'typist' ) ) {
               await $state.go( 'reqn_version.view', { identifier: record.reqn_version_id } );
             } else {
               await this.$$transitionToViewState( record );
@@ -1240,19 +1242,36 @@ define( [ 'output' ].reduce( function( list, name ) {
             // chairs only see DSAC reqns from the home screen
             if( 'root' == this.getSubjectFromState() ) {
               if( angular.isUndefined( data.modifier.where ) ) data.modifier.where = [];
-              if( 'chair' == CnSession.role.name ) {
+              if( this.isRole( 'chair' ) ) {
                 data.modifier.where.push( {
                   column: 'stage_type.name',
                   operator: 'LIKE',
                   value: '%DSAC%'
                 } );
-              } else if( 'smt' == CnSession.role.name ) {
+              } else if( this.isRole( 'smt' ) ) {
                 data.modifier.where.push( {
                   column: 'stage_type.name',
                   operator: 'LIKE',
                   value: '%SMT%'
                 } );
               }
+            }
+
+            return data;
+          },
+
+          getTypeaheadData: function( input, viewValue ) {
+            var data = this.$$getTypeaheadData( input, viewValue );
+
+            if( 'trainee_user_id' == input.key ) {
+              data.modifier.join = { table: 'applicant', onleft: 'user.id', onright: 'applicant.user_id' };
+              data.modifier.where.push( { column: 'applicant.supervisor_user_id', operator: '!=', value: null } );
+            } else if( 'designate_user_id' == input.key ) {
+              data.modifier.join = [
+                { table: 'access', onleft: 'user.id', onright: 'access.user_id' },
+                { table: 'role', onleft: 'access.role_id', onright: 'role.id' }
+              ];
+              data.modifier.where.push( { column: 'role.name', operator: '=', value: 'designate' } );
             }
 
             return data;

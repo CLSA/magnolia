@@ -161,7 +161,7 @@ define( [ 'reqn' ].reduce( function( list, name ) {
             angular.extend( cnRecordViewScope, {
               // don't show the option to view the parent reqn to the applicant
               parentExists: function( subject ) {
-                return $scope.model.isRole( 'applicant' ) && 'reqn' == subject ?
+                return $scope.model.isRole( 'applicant', 'designate' ) && 'reqn' == subject ?
                   false : cnRecordViewScope.baseParentExistsFn( subject );
               },
               getDeleteText: function() {

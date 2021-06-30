@@ -209,33 +209,33 @@ cenozo.service( 'CnReqnHelper', [
         var stage_type = record.stage_type ? record.stage_type : '';
 
         if( 'submit' == subject ) {
-          return ( ['applicant', 'administrator', 'typist'].includes( role ) ) &&
+          return ( ['applicant', 'designate', 'administrator', 'typist'].includes( role ) ) &&
                  ( 'new' == phase || 'deferred' == state );
         } else if( 'view' == subject ) {
-          return 'applicant' != role;
+          return 'applicant', 'designate' != role;
         } else if( 'abandon' == subject ) {
           return '.' == record.amendment ?
                  // non-amendment process
-                 ['administrator','applicant'].includes( role ) &&
+                 ['administrator', 'applicant', 'designate'].includes( role ) &&
                  'deferred' == state &&
                  'review' == phase :
                  // amendment process
-                 ['administrator','applicant'].includes( role ) &&
+                 ['administrator', 'applicant', 'designate'].includes( role ) &&
                  'Admin Review' == record.stage_type;
         } else if( 'delete' == subject ) {
           return 'new' == phase;
         } else if( 'defer' == subject ) {
           return 'administrator' == role &&
-                 !['abandoned','inactive','deferred'].includes( state ) &&
-                 ['review','active'].includes( phase );
+                 !['abandoned', 'inactive', 'deferred'].includes( state ) &&
+                 ['review', 'active'].includes( phase );
         } else if( 'amend' == subject ) {
-          return ['administrator','applicant','typist'].includes( role ) &&
-                 !['abandoned','deferred'].includes( state ) &&
+          return ['administrator', 'applicant', 'designate', 'typist'].includes( role ) &&
+                 !['abandoned', 'deferred'].includes( state ) &&
                  'active' == phase && 'Report Required' != stage_type;
         } else if( 'deactivate' == subject ) {
           return 'administrator' == role &&
-                 !['abandoned','inactive'].includes( state ) &&
-                 !['new','complete'].includes( phase );
+                 !['abandoned', 'inactive'].includes( state ) &&
+                 !['new', 'complete'].includes( phase );
         } else if( 'incomplete' == subject ) {
           return 'administrator' == role &&
                  '.' == record.amendment &&
@@ -244,11 +244,11 @@ cenozo.service( 'CnReqnHelper', [
           return 'administrator' == role &&
                  'active' == phase;
         } else if( 'reactivate' == subject ) {
-          return 'administrator' == role && ['abandoned','inactive'].includes( state );
+          return 'administrator' == role && ['abandoned', 'inactive'].includes( state );
         } else if( 'recreate' == subject ) {
           return 'administrator' == role && 'complete' == phase;
         } else if( 'report' == subject ) {
-          return ['Report Required','Complete'].includes( stage_type );
+          return ['Report Required', 'Complete'].includes( stage_type );
         } else if( 'proceed' == subject ) {
           return 'complete' != phase && (
                    ( 'administrator' == role && 'new' != phase ) ||
@@ -257,39 +257,39 @@ cenozo.service( 'CnReqnHelper', [
                  ) && !this.showAction( 'amendment proceed', record );
         } else if( 'reject' == subject ) {
           return 'DSAC Selection' == stage_type &&
-                 ['administrator','chair'].includes( role );
+                 ['administrator', 'chair'].includes( role );
         } else if( 'compare' == subject ) {
-          return 'applicant' != role;
+          return !['applicant', 'designate'].includes( role );
         } else if( 'amendment proceed' == subject ) {
           return '.' != record.amendment &&
-                 ['Admin Review','Feasibility Review','Decision Made','Agreement'].includes( stage_type ) &&
+                 ['Admin Review', 'Feasibility Review', 'Decision Made', 'Agreement'].includes( stage_type ) &&
                  'administrator' == role;
         } else if( 'amendment feasibility review' == subject ) {
           return 'Admin Review' == stage_type;
         } else if( 'amendment dsac review' == subject ) {
           return 'Feasibility Review' == stage_type;
         } else if( 'amendment decision made' == subject ) {
-          return ['Admin Review','Feasibility Review'].includes( stage_type );
+          return ['Admin Review', 'Feasibility Review'].includes( stage_type );
         } else if( 'amendment agreement' == subject ) {
           return 'Decision Made' == stage_type;
         } else if( 'amendment data release' == subject ) {
-          return ['Decision Made','Agreement'].includes( stage_type );
+          return ['Decision Made', 'Agreement'].includes( stage_type );
         } else if( 'amendment active' == subject ) {
-          return ['Decision Made','Agreement'].includes( stage_type );
+          return ['Decision Made', 'Agreement'].includes( stage_type );
         } else return false;
       },
 
       abandon: async function( reqnIdentifier, amendment, language ) {
         var message = '';
         if( amendment ) {
-          if( 'applicant' == CnSession.role.name ) {
+          if( ['applicant', 'designate'].includes( CnSession.role.name ) ) {
             message = this.translate( 'reqn', 'misc.abandonAmendmentWarning', language );
           } else {
             message = 'Are you sure you want to abandon the amendment?' +
               '\n\nThe amendment process will be discontinued and the requisition will be returned back to its previous status.';
           }
         } else {
-          if( 'applicant' == CnSession.role.name ) {
+          if( ['applicant', 'designate'].includes( CnSession.role.name ) ) {
             message = this.translate( 'reqn', 'misc.abandonWarning', language );
           } else {
             message = 'Are you sure you wish to abandon the requisition?' +
@@ -298,9 +298,12 @@ cenozo.service( 'CnReqnHelper', [
           }
         }
         var response = await CnModalConfirmFactory.instance( {
-          title: 'applicant' == CnSession.role.name ? this.translate( 'reqn', 'misc.pleaseConfirm', language ) : 'Please Confirm',
-          noText: 'applicant' == CnSession.role.name ? this.translate( 'reqn', 'misc.no', language ) : 'No',
-          yesText: 'applicant' == CnSession.role.name ? this.translate( 'reqn', 'misc.yes', language ) : 'Yes',
+          title: ['applicant', 'designate'].includes( CnSession.role.name ) ?
+            this.translate( 'reqn', 'misc.pleaseConfirm', language ) : 'Please Confirm',
+          noText: ['applicant', 'designate'].includes( CnSession.role.name ) ?
+            this.translate( 'reqn', 'misc.no', language ) : 'No',
+          yesText: ['applicant', 'designate'].includes( CnSession.role.name ) ?
+            this.translate( 'reqn', 'misc.yes', language ) : 'Yes',
           message: message
         } ).show();
 
@@ -314,15 +317,18 @@ cenozo.service( 'CnReqnHelper', [
 
       delete: async function( reqnIdentifier, language ) {
         var response = await CnModalConfirmFactory.instance( {
-          title: 'applicant' == CnSession.role.name ? this.translate( 'reqn', 'misc.pleaseConfirm', language ) : 'Please Confirm',
-          noText: 'applicant' == CnSession.role.name ? this.translate( 'reqn', 'misc.no', language ) : 'No',
-          yesText: 'applicant' == CnSession.role.name ? this.translate( 'reqn', 'misc.yes', language ) : 'Yes',
+          title: ['applicant', 'designate'].includes( CnSession.role.name ) ?
+            this.translate( 'reqn', 'misc.pleaseConfirm', language ) : 'Please Confirm',
+          noText: ['applicant', 'designate'].includes( CnSession.role.name ) ?
+            this.translate( 'reqn', 'misc.no', language ) : 'No',
+          yesText: ['applicant', 'designate'].includes( CnSession.role.name ) ?
+            this.translate( 'reqn', 'misc.yes', language ) : 'Yes',
           message: this.translate( 'reqn', 'misc.deleteWarning', language )
         } ).show();
 
         if( response ) {
           await CnHttpFactory.instance( { path: 'reqn/' + reqnIdentifier } ).delete();
-          await $state.go( 'applicant' == CnSession.role.name ? 'root.home' : 'reqn.list' );
+          await $state.go( ['applicant', 'designate'].includes( CnSession.role.name ) ? 'root.home' : 'reqn.list' );
         }
       },
 
