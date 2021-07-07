@@ -113,7 +113,7 @@ class reqn_version extends \cenozo\database\record
     $reference_class_name = lib::get_class_name( 'database\reference' );
     $reqn_version_data_option_class_name = lib::get_class_name( 'database\reqn_version_data_option' );
     $reqn_version_comment_class_name = lib::get_class_name( 'database\reqn_version_comment' );
-    $reqn_version_justification_class_name = lib::get_class_name( 'database\reqn_version_justification' );
+    $data_option_justification_class_name = lib::get_class_name( 'database\data_option_justification' );
 
     // get the two newest versions
     $version_mod = lib::create( 'database\modifier' );
@@ -211,13 +211,13 @@ class reqn_version extends \cenozo\database\record
     }
 
     // see if there is a different number of justifications
-    if( $this->get_reqn_version_justification_count() != $db_last_reqn_version->get_reqn_version_justification_count() )
+    if( $this->get_data_option_justification_count() != $db_last_reqn_version->get_data_option_justification_count() )
       return true;
 
-    // now check reqn_version_justification records
-    foreach( $this->get_reqn_version_justification_object_list() as $db_rvj )
+    // now check data_option_justification records
+    foreach( $this->get_data_option_justification_object_list() as $db_rvj )
     {
-      $db_last_rvj = $reqn_version_justification_class_name::get_unique_record(
+      $db_last_rvj = $data_option_justification_class_name::get_unique_record(
         array( 'reqn_version_id', 'data_option_id' ),
         array( $db_last_reqn_version->id, $db_rvj->data_option_id )
       );
@@ -228,9 +228,9 @@ class reqn_version extends \cenozo\database\record
     }
 
     // do the same check but from the last version instead
-    foreach( $db_last_reqn_version->get_reqn_version_justification_object_list() as $db_last_rvj )
+    foreach( $db_last_reqn_version->get_data_option_justification_object_list() as $db_last_rvj )
     {
-      $db_rvj = $reqn_version_justification_class_name::get_unique_record(
+      $db_rvj = $data_option_justification_class_name::get_unique_record(
         array( 'reqn_version_id', 'data_option_id' ),
         array( $this->id, $db_last_rvj->data_option_id )
       );
@@ -601,20 +601,20 @@ class reqn_version extends \cenozo\database\record
     $justification_sel->add_table_column( 'data_option', 'rank', 'data_option_rank' );
     $justification_sel->add_column( 'description' );
     $justification_mod = lib::create( 'database\modifier' );
-    $justification_mod->join( 'data_option', 'reqn_version_justification.data_option_id', 'data_option.id' );
+    $justification_mod->join( 'data_option', 'data_option_justification.data_option_id', 'data_option.id' );
     $justification_mod->join( 'data_option_category', 'data_option.data_option_category_id', 'data_option_category.id' );
     $justification_mod->where( 'description', '!=', NULL );
     $justification_mod->where( 'data_option.justification', '=', true );
     $justification_mod->order( 'data_option_category.rank' );
     $justification_mod->order( 'data_option.rank' );
 
-    foreach( $this->get_reqn_version_justification_list( $justification_sel, $justification_mod ) as $reqn_version_justification )
+    foreach( $this->get_data_option_justification_list( $justification_sel, $justification_mod ) as $data_option_justification )
     {
       $data[ sprintf(
         'c%d_o%d_justification',
-        $reqn_version_justification['data_option_category_rank'],
-        $reqn_version_justification['data_option_rank']
-      ) ] = $reqn_version_justification['description'];
+        $data_option_justification['data_option_category_rank'],
+        $data_option_justification['data_option_rank']
+      ) ] = $data_option_justification['description'];
     }
 
     if( is_null( $db_pdf_form ) )

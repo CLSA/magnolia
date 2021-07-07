@@ -59,6 +59,18 @@ CREATE PROCEDURE patch_reqn_version()
       ALTER TABLE reqn_version ADD COLUMN agreement_end_date DATE NULL DEFAULT NULL AFTER agreement_start_date;
     END IF;
 
+    SELECT "Removing amendment_justification column from reqn_version table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn_version"
+    AND column_name = "amendment_justification";
+
+    IF @test = 1 THEN
+      ALTER TABLE reqn_version DROP COLUMN amendment_justification;
+    END IF;
+
   END //
 DELIMITER ;
 

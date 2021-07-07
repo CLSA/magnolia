@@ -80,7 +80,6 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
     last_identifier: { type: 'string' },
     agreement_start_date: { type: 'date' },
     agreement_end_date: { type: 'date' },
-    amendment_justification: { type: 'text' },
 
     current_final_report_id: { column: 'final_report.id', type: 'string' },
     trainee_user_id: { column: 'reqn.trainee_user_id', type: 'string' },
@@ -532,22 +531,38 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
 
             var property = Object.keys( data )[0];
 
-            if( null != property.match( /^justification_/ ) ) {
+            if( null != property.match( /^amendment_justification_/ ) ) {
               // justifications have their own service
-              var match = property.match( /^justification_([0-9]+)$/ );
+              var match = property.match( /^amendment_justification_([0-9]+)$/ );
+              var amendmentTypeId = match[1];
+
+              await CnHttpFactory.instance( {
+                path: [
+                  'reqn_version',
+                  this.record.id,
+                  'amendment_justification',
+                  'amendment_type_id=' + amendmentTypeId
+                ].join( '/' ),
+                data: { description: data[property] }
+              } ).patch();
+
+              this.record['amendment_justification_' + amendmentTypeId] = data[property];
+            } else if( null != property.match( /^data_option_justification_/ ) ) {
+              // justifications have their own service
+              var match = property.match( /^data_option_justification_([0-9]+)$/ );
               var dataOptionId = match[1];
 
               await CnHttpFactory.instance( {
                 path: [
                   'reqn_version',
                   this.record.id,
-                  'reqn_version_justification',
+                  'data_option_justification',
                   'data_option_id=' + dataOptionId
                 ].join( '/' ),
                 data: { description: data[property] }
               } ).patch();
 
-              this.record['justification_' + dataOptionId] = data[property];
+              this.record['data_option_justification_' + dataOptionId] = data[property];
             } else if( null != property.match( /^comment_/ ) ) {
               // comments have their own service
               var match = property.match( /^comment_([0-9]+)$/ );
@@ -775,7 +790,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                 a: { // the only unnamed amendment category
                   diff: false,
                   new_user_id: false,
-                  amendment_justification: false
+                  amendmentJustificationList: []
                 }
               },
               part1: {
@@ -1008,10 +1023,13 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                           }
                         } );
                       } else if( 'dataOptionJustificationList' == property ) {
+                        // TODO: the code past "b" is probably wrong
+                        console.log( 'a', property );
                         for( var prop in reqnVersion1 ) {
-                          if( null != prop.match( /^justification_/ ) ) {
+                          if( null != prop.match( /^data_option_justification_/ ) ) {
+                            console.log( 'b', prop );
                             if( reqnVersion1[prop] != reqnVersion2[prop] ) {
-                              var match = prop.match( /^justification_([0-9]+)$/ );
+                              var match = prop.match( /^data_option_justification_([0-9]+)$/ );
                               var dataOption = this.parentModel.getCategoryAndDataOption( match[1] ).dataOption;
                               differences.diff = true;
                               differences[part].diff = true;
@@ -1022,6 +1040,14 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                                 diff: reqnVersion1.dataOptionValueList.f1[dataOption.id] ? 'added' : 'removed'
                               } );
                             }
+                          }
+                        }
+                      } else if( 'amendmentJustificationList' == property ) {
+                        // TODO: implement this like dataOptionJustificationList above, once it's fixed
+                        console.log( 'c', property );
+                        for( var prop in reqnVersion1 ) {
+                          if( null != prop.match( /^amendment_justification_/ ) ) {
+                            console.log( 'd', property );
                           }
                         }
                       }
@@ -1266,11 +1292,14 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
             var self = this;
             var onErrorFn = function( error ) { self.record[property] = !self.record[property]; };
             var path = this.parentModel.getServiceResourcePath() + '/amendment_type';
+            var amendmentType = this.parentModel.amendmentTypeList.en.findByProperty( 'id', amendmentTypeId );
+            var justificationColumn = 'amendment_justification_' + amendmentTypeId;
 
             var property = 'amendmentType' + amendmentTypeId;
             if( this.record[property] ) {
-            var self = this;
+              var self = this;
               var proceed = true;
+
               if( amendmentTypeId == this.parentModel.newUserAmendmentTypeId ) {
                 proceed = false;
 
@@ -1288,6 +1317,11 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
               if( proceed ) {
                 try {
                   await CnHttpFactory.instance( { path: path, data: amendmentTypeId, onError: onErrorFn } ).post();
+
+                  // add the local copy of the justification if it doesn't already exist
+                  if( amendmentType.justificationPrompt && angular.isUndefined( this.record[justificationColumn] ) ) {
+                    this.record[justificationColumn] = '';
+                  }
                 } catch( error ) {
                   // handled by onError above
                 }
@@ -1299,6 +1333,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
               // delete the amendment type
               try {
                 await CnHttpFactory.instance( { path: path + '/' + amendmentTypeId, onError: onErrorFn } ).delete();
+                delete this.record[justificationColumn];
               } catch( error ) {
                 // handled by onError above
               }
@@ -1453,11 +1488,22 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
               } ),
 
               CnHttpFactory.instance( {
-                path: basePath + '/reqn_version_justification',
+                path: basePath + '/data_option_justification',
                 data: { select: { column: [ 'data_option_id', 'description' ] } }
               } ).query().then( function( response ) {
                 response.data.forEach( function( justification ) {
-                  var column = 'justification_' + justification.data_option_id;
+                  var column = 'data_option_justification_' + justification.data_option_id;
+                  object[column] = justification.description;
+                  self.backupRecord[column] = object[column];
+                } );
+              } ),
+
+              CnHttpFactory.instance( {
+                path: basePath + '/amendment_justification',
+                data: { select: { column: [ 'amendment_type_id', 'description' ] } }
+              } ).query().then( function( response ) {
+                response.data.forEach( function( justification ) {
+                  var column = 'amendment_justification_' + justification.amendment_type_id;
                   object[column] = justification.description;
                   self.backupRecord[column] = object[column];
                 } );
@@ -1529,7 +1575,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
 
             // don't proceed if the confirm factory says no
             if( proceed ) {
-              var justificationColumn = 'justification_' + dataOptionId;
+              var justificationColumn = 'data_option_justification_' + dataOptionId;
 
               // toggle the option
               this.record.dataOptionValueList[studyPhaseCode][dataOptionId] =
@@ -1676,11 +1722,11 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
 
               // Now add the data option justifications
               // We have to do this dynamically because they only exist if their parent data option is selected and
-              // have the "jurisdiction" property
+              // have the "justification" property
               for( var property in this.record ) {
-                if( null != property.match( /^justification_/ ) ) {
+                if( null != property.match( /^data_option_justification_/ ) ) {
                   // find which tab the justification belongs to
-                  var match = property.match( /^justification_([0-9]+)$/ );
+                  var match = property.match( /^data_option_justification_([0-9]+)$/ );
                   var obj = this.parentModel.getCategoryAndDataOption( match[1] );
                   if( obj.dataOption.justification ) {
                     var tab = '2' + obj.category.charCode;
@@ -1692,6 +1738,17 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                 }
               }
 
+              // Now add the amendment justifications
+              // We have to do this dynamically because they only exist if their parent amendment type is selected and
+              // have the "justification_prompt_*" properties
+              for( var property in this.record ) {
+                if( null != property.match( /^amendment_justification_/ ) ) {
+                  // add it to the required tab list
+                  var tab = '1a';
+                  if( angular.isUndefined( requiredTabList[tab] ) ) requiredTabList[tab] = [];
+                  requiredTabList[tab].push( property );
+                }
+              }
 
               var self = this;
               var error = null;
@@ -1775,6 +1832,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                 }
 
                 // make sure the justification is filled out if necessary
+                // TODO: check ALL selected amendment types, not just if any are selected
                 if( this.amendmentTypeWithJustificationSelected() && null == this.record.amendment_justification ) {
                   var element = cenozo.getFormElement( 'amendment_justification' );
                   element.$error.required = true;

@@ -146,7 +146,7 @@ class reqn extends \cenozo\database\record
   public function create_version( $new_amendment = false, $db_clone_reqn_version = NULL )
   {
     $reqn_version_comment_class_name = lib::get_class_name( 'database\reqn_version_comment' );
-    $reqn_version_justification_class_name = lib::get_class_name( 'database\reqn_version_justification' );
+    $data_option_justification_class_name = lib::get_class_name( 'database\data_option_justification' );
 
     // first get the current reqn version to determine the next version number
     $db_current_reqn_version = $this->get_current_reqn_version();
@@ -166,7 +166,6 @@ class reqn extends \cenozo\database\record
     $db_reqn_version->agreement_filename = NULL;
     $db_reqn_version->agreement_start_date = NULL;
     $db_reqn_version->agreement_end_date = NULL;
-    if( $new_amendment ) $db_reqn_version->amendment_justification = NULL;
 
     // determine the amendment
     if( $new_amendment )
@@ -243,14 +242,14 @@ class reqn extends \cenozo\database\record
       }
 
       // copy all justifications
-      foreach( $db_clone_reqn_version->get_reqn_version_justification_object_list() as $db_reqn_version_justification_clone )
+      foreach( $db_clone_reqn_version->get_data_option_justification_object_list() as $db_data_option_justification_clone )
       {
-        $db_reqn_version_justification = $reqn_version_justification_class_name::get_unique_record(
+        $db_data_option_justification = $data_option_justification_class_name::get_unique_record(
           array( 'reqn_version_id', 'data_option_id' ),
-          array( $db_reqn_version->id, $db_reqn_version_justification_clone->data_option_id )
+          array( $db_reqn_version->id, $db_data_option_justification_clone->data_option_id )
         );
-        $db_reqn_version_justification->description = $db_reqn_version_justification_clone->description;
-        $db_reqn_version_justification->save();
+        $db_data_option_justification->description = $db_data_option_justification_clone->description;
+        $db_data_option_justification->save();
       }
     }
   }
@@ -464,7 +463,6 @@ class reqn extends \cenozo\database\record
         else if( 'Decision Made' == $db_current_stage_type->name )
         {
           $recommendation = $this->get_recommendation();
-          log::debug( $recommendation );
           if( !is_null( $recommendation ) )
           {
             // NOTE: when approved check if this is not an amendment and revisions have been suggested
