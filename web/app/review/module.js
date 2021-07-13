@@ -1,4 +1,6 @@
-define( function() {
+define( [ 'review_answer' ].reduce( function( list, name ) {
+  return list.concat( cenozoApp.module( name ).getRequiredFiles() );
+}, [] ), function() {
   'use strict';
 
   try { var module = cenozoApp.module( 'review', true ); } catch( err ) { console.warn( err ); return; }
@@ -27,6 +29,7 @@ define( function() {
         isIncluded: function( $state, model ) { return !model.isRole( 'reviewer' ); }
       },
       datetime: { title: 'Created On', type: 'date' },
+      answered_questions: { title: 'Questions' },
       recommendation: {
         column: 'recommendation_type.name',
         title: 'Recommendation'

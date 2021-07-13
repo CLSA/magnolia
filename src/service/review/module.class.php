@@ -111,5 +111,57 @@ class module extends \cenozo\service\module
       }
       $select->add_column( $column, 'editable', false, 'boolean' );
     }
+
+    if( $select->has_column( 'questions' ) || $select->has_column( 'answered_questions' ) )
+    {
+      $join_sel = lib::create( 'database\select' );
+      $join_sel->from( 'review' );
+      $join_sel->add_column( 'id', 'review_id' );
+      $join_sel->add_column( 'COUNT(*)', 'total', false );
+      $join_mod = lib::create( 'database\modifier' );
+      $join_mod->join( 'review_type', 'review.review_type_id', 'review_type.id' );
+      $join_mod->join( 'review_type_question', 'review_type.id', 'review_type_question.review_type_id' );
+      $join_mod->group( 'review.id' );
+
+      $modifier->left_join(
+        sprintf( '( %s %s ) AS %s', $join_sel->get_sql(), $join_mod->get_sql(), 'num_questions' ),
+        'review.id',
+        'num_questions.review_id'
+      );
+
+      if( $select->has_column( 'questions' ) )
+        $select->add_column( 'IFNULL( num_questions.total, 0 )', 'questions', false );
+    }
+
+    if( $select->has_column( 'answers' ) || $select->has_column( 'answered_questions' ) )
+    {
+      $join_sel = lib::create( 'database\select' );
+      $join_sel->from( 'review' );
+      $join_sel->add_column( 'id', 'review_id' );
+      $join_sel->add_column( 'COUNT(*)', 'total', false );
+      $join_mod = lib::create( 'database\modifier' );
+      $join_mod->join( 'review_type', 'review.review_type_id', 'review_type.id' );
+      $join_mod->join( 'review_answer', 'review.id', 'review_answer.review_id' );
+      $join_mod->where( 'review_answer.answer', '!=', NULL );
+      $join_mod->group( 'review.id' );
+
+      $modifier->left_join(
+        sprintf( '( %s %s ) AS %s', $join_sel->get_sql(), $join_mod->get_sql(), 'num_answers' ),
+        'review.id',
+        'num_answers.review_id'
+      );
+
+      if( $select->has_column( 'answers' ) )
+        $select->add_column( 'IFNULL( num_answers.total, 0 )', 'answers', false );
+    }
+
+    if( $select->has_column( 'answered_questions' ) )
+    {
+      $select->add_column(
+        'IF( num_questions.total = 0, "N/A", CONCAT( IFNULL( num_answers.total, 0 ), " of ", num_questions.total ) )',
+        'answered_questions',
+        false
+      );
+    }
   }
 }

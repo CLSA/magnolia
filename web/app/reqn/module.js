@@ -844,15 +844,42 @@ define( [ 'output' ].reduce( function( list, name ) {
               // If we are a reviewer assigned to this reqn and haven't completed our review then show a reminder
               var response = await CnHttpFactory.instance( {
                 path: this.parentModel.getServiceResourcePath() + '/review',
-                data: { modifier: { where: { column: 'recommendation_type_id', operator: '=', value: null } } }
-              } ).count();
+                data: {
+                  select: { column: [ 'recommendation_type_id', 'answers', 'questions', { table: 'review_type', column: 'name' } ] },
+                  modifier: { where: [
+                    { column: 'review.user_id', operator: '=', value: CnSession.user.id },
+                    { column: 'review_type.name', operator: 'LIKE', value: 'Reviewer %' }
+                  ] }
+                }
+              } ).query();
 
-              if( 0 < parseInt( response.headers( 'Total' ) ) ) {
-                CnModalMessageFactory.instance( {
-                  title: 'Outstanding Review',
-                  message: 'Please note: this ' + this.parentModel.module.name.singular +
-                    ' has an outstanding review which you must complete before it can proceed with the review process.'
-                } ).show();
+              var outstandingReview = null
+              response.data.some( function( review ) {
+                if( null == review.recommendation_type_id || review.answers < review.questions ) {
+                  outstandingReview = review;
+                  return true;
+                }
+              } );
+              if( null != outstandingReview ) {
+                var message = 'Please note: you are responsible for the "' + outstandingReview.name + '" review belonging to this ' +
+                              this.parentModel.module.name.singular + ' which has not been completed.\n\n' +
+                              'In order for the review process to proceed you must ';
+
+                // warn if the recommendation hasn't been completed
+                if( null == outstandingReview.recommendation_type_id ) {
+                  message += 'provide a recommendation';
+                  if( outstandingReview.answers < outstandingReview.questions ) message += ' and ';
+                }
+
+                // warn if a question is unanswered
+                if( outstandingReview.answers < outstandingReview.questions ) {
+                  message += 'answer all review questions (' + outstandingReview.answers + ' of ' + outstandingReview.questions +
+                             ' have been answered)';
+                }
+
+                message += '.';
+
+                CnModalMessageFactory.instance( { title: 'Outstanding Review', message: message } ).show();
               }
             }
 

@@ -55,6 +55,5 @@ class module extends \cenozo\service\user\module
         'user_join_reviewer.user_id'
       );
     }
-    \cenozo\database\database::$debug = true;
   }
 }

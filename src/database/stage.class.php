@@ -92,6 +92,19 @@ class stage extends \cenozo\database\record
             '.' == $db_review->amendment ? '' : sprintf( ' (Amendment %s)', $db_review->amendment )
           );
         }
+
+        $answer_mod = lib::create( 'database\modifier' );
+        $answer_mod->where( 'answer', '=', NULL );
+        $missing = $db_review->get_review_answer_count( $answer_mod );
+        if( 0 < $missing )
+        {
+          return sprintf(
+            'There %s questions for the %s review%s which must be answered before proceeding to the next stage.',
+            1 == $missing ? 'is one' : 'are '.$missing,
+            $db_review->get_review_type()->name,
+            '.' == $db_review->amendment ? '' : sprintf( ' (Amendment %s)', $db_review->amendment )
+          );
+        }
       }
     }
 

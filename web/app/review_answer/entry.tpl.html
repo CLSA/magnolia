@@ -1,0 +1,44 @@
+<div class="record-view rounded" ng-if="0 < reviewAnswerModel.entryModel.answerList.length">
+  <div class="container-fluid bg-primary rounded-top"
+           data-toggle="collapse"
+           data-target="#ReviewAnswerEntry"
+           ng-click="collapsed = !collapsed"
+           style="cursor:pointer;">
+    <h4>
+      <div class="pull-right">
+        <i class="glyphicon glyphicon-refresh glyph-hover btn-primary btn-header"
+           ng-if="reviewAnswerModel.entryModel.isReady"
+           ng-click="refresh(); $event.stopPropagation()"
+           uib-tooltip="Click to refresh data"
+           tooltip-placement="left"></i>
+        <i class="glyphicon glyph-hover btn-primary btn-header"
+           ng-class="collapsed ? 'glyphicon-collapse-down' : 'glyphicon-collapse-up'"
+           uib-tooltip="Click to expand review question list"
+           tooltip-placement="left"></i>
+      </div>
+      Review Questions
+      <span ng-if="!model.getEditEnabled()">(read only)</span>
+      <span ng-if="!reviewAnswerModel.entryModel.isReady">(Loading&hellip;)</span>
+    </h4>
+  </div>
+  <form name="form" class="form-horizontal" novalidate><fieldset ng-disabled="!reviewAnswerModel.entryModel.isReady">
+    <div class="form-body collapse" ng-class="{'in':!initCollapsed}" id="ReviewAnswerEntry">
+      <div class="collapse" ng-class="{'in':!group.initCollapsed}">
+        <div ng-repeat="answer in reviewAnswerModel.entryModel.answerList" class="form-group">
+          <label for="Answer{{ answer.id }}" class="control-label col-sm-10" ng-bind-html="answer.question"></label>
+          <div class="row col-sm-2">
+            <div class="input-group">
+              <select ng-attr-id="Answer{{ answer.id }}"
+                      class="form-control"
+                      ng-model="answer.answer"
+                      ng-change="model.getEditEnabled() && reviewAnswerModel.entryModel.patch( answer.id )"
+                      ng-disabled="!model.getEditEnabled()"
+                      ng-options="item.value as item.name for item in reviewAnswerModel.entryModel.answerOptionList">
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </fieldset></form>
+</div>
