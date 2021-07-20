@@ -1,6 +1,4 @@
-define( [ 'review_answer' ].reduce( function( list, name ) {
-  return list.concat( cenozoApp.module( name ).getRequiredFiles() );
-}, [] ), function() {
+define( function() {
   'use strict';
 
   try { var module = cenozoApp.module( 'review', true ); } catch( err ) { console.warn( err ); return; }
