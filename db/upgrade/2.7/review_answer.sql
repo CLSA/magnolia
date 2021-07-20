@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS review_answer (
   review_id INT(10) UNSIGNED NOT NULL,
   review_type_question_id INT(10) UNSIGNED NOT NULL,
   answer TINYINT(1) NULL DEFAULT NULL,
+  comment TEXT NULL DEFAULT NULL,
   PRIMARY KEY (id),
   INDEX fk_review_id (review_id ASC),
   INDEX fk_review_type_question_id (review_type_question_id ASC),

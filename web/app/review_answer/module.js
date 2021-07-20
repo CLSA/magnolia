@@ -102,7 +102,7 @@ define( function() {
               var response = await CnHttpFactory.instance( {
                 path: ['review', this.parentModel.getQueryParameter( 'identifier', true ), 'review_answer' ].join( '/' ),
                 data: {
-                  select: { column: [ 'id', 'answer', { table: 'review_type_question', column: 'question' } ] },
+                  select: { column: [ 'id', 'answer', 'comment', { table: 'review_type_question', column: 'question' } ] },
                   modifier: { order: 'review_type_question.rank' }
                 }
               } ).query();
@@ -111,14 +111,13 @@ define( function() {
               this.isReady = true;
             }
           },
-          patch: async function( id ) {
+          patch: async function( property, id ) {
             this.isReady = false;
 
             try {
-              await CnHttpFactory.instance( {
-                path: ['review_answer', id].join( '/' ),
-                data: { answer: this.answerList.findByProperty( 'id', id ).answer }
-              } ).patch();
+              var data = {};
+              data[property] = this.answerList.findByProperty( 'id', id )[property];
+              await CnHttpFactory.instance( { path: ['review_answer', id].join( '/' ), data: data } ).patch();
             } finally {
               this.isReady = true;
             }

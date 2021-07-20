@@ -31,11 +31,19 @@
               <select ng-attr-id="Answer{{ answer.id }}"
                       class="form-control"
                       ng-model="answer.answer"
-                      ng-change="model.getEditEnabled() && reviewAnswerModel.entryModel.patch( answer.id )"
+                      ng-change="model.getEditEnabled() && reviewAnswerModel.entryModel.patch( 'answer', answer.id )"
                       ng-disabled="!model.getEditEnabled()"
                       ng-options="item.value as item.name for item in reviewAnswerModel.entryModel.answerOptionList">
               </select>
             </div>
+          </div>
+          <div class="container-fluid horizontal-spacer-wide">
+            <textarea ng-attr-id="Comment{{ answer.id }}"
+                      cn-elastic
+                      class="form-control"
+                      ng-model="answer.comment"
+                      cn-change="model.getEditEnabled() && reviewAnswerModel.entryModel.patch( 'comment', answer.id )"
+                      ng-disabled="!model.getEditEnabled()"></textarea>
           </div>
         </div>
       </div>
