@@ -987,6 +987,13 @@ define( [ 'output' ].reduce( function( list, name ) {
 
             if( ['abandon', 'deactivate', 'defer', 'incomplete', 'withdraw', 'reactivate', 'recreate'].includes( subject ) ) {
               return true;
+            } else if(
+              'proceed' == subject && 
+              '.' != this.record.amendment &&
+              ['Admin Review', 'Feasibility Review', 'Decision Made', 'Agreement'].includes( this.record.stage_type )
+            ) {
+              // the next stage isn't always set when in an amendment, so only check for state
+              return !state;
             } else if( ['proceed','reject'].includes( subject ) ) {
               return !state && null != this.record.next_stage_type;
             } else return false;
