@@ -185,6 +185,9 @@
                 </cn-view-input-with-differences>
               </div>
               <div style="padding: 0 2em;"
+                   ng-class="{
+                     'bg-warning': model.viewModel.compareRecord.differences.amendment.a['amendmentType'+amendmentType.id]
+                   }"
                    ng-if="amendmentType.justificationPrompt && model.viewModel.record['amendmentType'+amendmentType.id]">
                 <span class="text-info" ng-bind-html="amendmentType.justificationPrompt"></span>
                 <cn-view-input-with-differences

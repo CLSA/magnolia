@@ -681,15 +681,6 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
           minStartDate: null,
           noAmendmentTypes: false,
 
-          amendmentTypeWithJustificationSelected: function() {
-            var self = this;
-            return angular.isDefined( this.parentModel.amendmentTypeList ) ?
-              this.parentModel.amendmentTypeList.en.some( function( amendmentType ) {
-                return null != amendmentType.justificationPrompt && self.record['amendmentType' + amendmentType.id];
-              } ) :
-              false;
-          },
-
           // setup language and tab state parameters
           toggleLanguage: async function() {
             var parent = this.parentModel.getParentIdentifier();
@@ -1023,31 +1014,28 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                           }
                         } );
                       } else if( 'dataOptionJustificationList' == property ) {
-                        // TODO: the code past "b" is probably wrong
-                        console.log( 'a', property );
                         for( var prop in reqnVersion1 ) {
                           if( null != prop.match( /^data_option_justification_/ ) ) {
-                            console.log( 'b', prop );
                             if( reqnVersion1[prop] != reqnVersion2[prop] ) {
                               var match = prop.match( /^data_option_justification_([0-9]+)$/ );
                               var dataOption = this.parentModel.getCategoryAndDataOption( match[1] ).dataOption;
                               differences.diff = true;
                               differences[part].diff = true;
                               differences[part][section].diff = true;
-                              differences[part][section][property].push( {
-                                id: dataOption.id,
-                                name: dataOption.name.en,
-                                diff: reqnVersion1.dataOptionValueList.f1[dataOption.id] ? 'added' : 'removed'
-                              } );
+                              differences[part][section][property].push( { id: dataOption.id, diff: true } );
                             }
                           }
                         }
                       } else if( 'amendmentJustificationList' == property ) {
-                        // TODO: implement this like dataOptionJustificationList above, once it's fixed
-                        console.log( 'c', property );
                         for( var prop in reqnVersion1 ) {
                           if( null != prop.match( /^amendment_justification_/ ) ) {
-                            console.log( 'd', property );
+                            if( reqnVersion1[prop] != reqnVersion2[prop] ) {
+                              var match = prop.match( /^amendment_justification_([0-9]+)$/ );
+                              differences.diff = true;
+                              differences[part].diff = true;
+                              differences[part][section].diff = true;
+                              differences[part][section][property].push( { id: match[1], diff: true } );
+                            }
                           }
                         }
                       }
@@ -1831,19 +1819,24 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                   };
                 }
 
-                // make sure the justification is filled out if necessary
-                // TODO: check ALL selected amendment types, not just if any are selected
-                if( this.amendmentTypeWithJustificationSelected() && null == this.record.amendment_justification ) {
-                  var element = cenozo.getFormElement( 'amendment_justification' );
-                  element.$error.required = true;
-                  cenozo.updateFormElement( element, true );
-                  if( null == errorTab ) errorTab = 'amendment';
-                  if( null == error ) error = {
-                    title: this.translate( 'misc.missingFieldTitle' ),
-                    message: this.translate( 'misc.missingFieldMessage' ),
-                    error: true
-                  };
-                }
+                // make sure that all selected amendment types have a justification
+                this.parentModel.amendmentTypeList.en
+                  .filter( amendmentType => amendmentType.justificationPrompt )
+                  .forEach( function( amendmentType ) {
+                    // search for checked amendments with no justification
+                    var columnName = 'amendment_justification_' + amendmentType.id;
+                    if( self.record['amendmentType' + amendmentType.id] &&
+                        !self.record[columnName] ) {
+                      var element = cenozo.getFormElement( columnName );
+                      element.$error.required = true;
+                      if( null == errorTab ) errorTab = 'amendment';
+                      if( null == error ) error = {
+                        title: this.translate( 'misc.missingFieldTitle' ),
+                        message: this.translate( 'misc.missingFieldMessage' ),
+                        error: true
+                      };
+                    }
+                } );
               }
 
               if( null != error ) {
