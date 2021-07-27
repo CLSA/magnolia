@@ -27,7 +27,10 @@ define( function() {
         isIncluded: function( $state, model ) { return !model.isRole( 'reviewer' ); }
       },
       datetime: { title: 'Created On', type: 'date' },
-      answered_questions: { title: 'Questions' },
+      answered_questions: {
+        title: 'Questions (Yes/Answered)',
+        help: 'Displays the number of "Yes" Answers out of the number of Answered Questions.'
+      },
       recommendation: {
         column: 'recommendation_type.name',
         title: 'Recommendation'
