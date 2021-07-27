@@ -118,6 +118,9 @@ define( function() {
               var data = {};
               data[property] = this.answerList.findByProperty( 'id', id )[property];
               await CnHttpFactory.instance( { path: ['review_answer', id].join( '/' ), data: data } ).patch();
+
+              // if we set the answer to NULL then reload the page as the recommendation might get reset
+              if( 'answer' == property && null == data.answer ) await this.parentModel.reloadState( true );
             } finally {
               this.isReady = true;
             }
