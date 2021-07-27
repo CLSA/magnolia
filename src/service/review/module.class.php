@@ -47,6 +47,15 @@ class module extends \cenozo\service\module
               if( 'smt' != $db_role->name ) $this->get_status()->set_code( 403 );
             }
           }
+
+          // recommendations can only be provided once all questions have been answered
+          $modifier = lib::create( 'database\modifier' );
+          $modifier->where( 'answer', '=', NULL );
+          if( 0 < $db_review->get_review_answer_count( $modifier ) )
+          {
+            $this->get_status()->set_code( 306 );
+            $this->set_data( 'A recommendation can only be provided after all review questions have been answered.' );
+          }
         }
       }
     }
