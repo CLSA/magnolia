@@ -80,7 +80,7 @@ define( function() {
     function( CnBaseViewFactory ) {
       var object = function( parentModel, root ) {
         var self = this;
-        CnBaseViewFactory.construct( this, parentModel, root );
+        CnBaseViewFactory.construct( this, parentModel, root, 'review_type_question' );
       }
       return { instance: function( parentModel, root ) { return new object( parentModel, root ); } };
     }

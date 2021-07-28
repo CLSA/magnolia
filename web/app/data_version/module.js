@@ -99,7 +99,7 @@ define( function() {
         var self = this;
         async function init() {
           // Have the data release model point to the requisition instead
-          await deferred.promise;
+          await self.deferred.promise;
 
           if( angular.isDefined( self.dataReleaseModel ) ) {
             self.dataReleaseModel.listModel.heading = 'Requisition List';
