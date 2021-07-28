@@ -96,7 +96,7 @@ define( function() {
     'CnBaseViewFactory',
     function( CnBaseViewFactory ) {
       var object = function( parentModel, root ) {
-        CnBaseViewFactory.construct( this, parentModel, root );
+        CnBaseViewFactory.construct( this, parentModel, root, 'notification' );
 
         var self = this;
         async function init() {

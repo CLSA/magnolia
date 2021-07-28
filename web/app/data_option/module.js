@@ -114,7 +114,7 @@ define( function() {
   cenozo.providers.factory( 'CnDataOptionViewFactory', [
     'CnBaseViewFactory',
     function( CnBaseViewFactory ) {
-      var object = function( parentModel, root ) { CnBaseViewFactory.construct( this, parentModel, root ); }
+      var object = function( parentModel, root ) { CnBaseViewFactory.construct( this, parentModel, root, 'data_option_detail' ); }
       return { instance: function( parentModel, root ) { return new object( parentModel, root ); } };
     }
   ] );
