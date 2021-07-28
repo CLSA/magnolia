@@ -32,7 +32,7 @@ class review_summary extends \cenozo\business\report\base_report
         'CONCAT( '.
           'review_type_question.rank, ") ", '.
           'review_type_question.question, " ", '.
-          'IFNULL( IF( review_answer.answer, "Yes", "No" ), "(no answer)" ), "\\n", '.
+          'IF( review_answer.answer IS NULL, "(no answer)", IF( review_answer.answer, "Yes", "No" ) ), "\\n", '.
           'IFNULL( review_answer.comment, "(no comment)" ) '.
         ') '.
         'ORDER BY review_type_question.rank '.
@@ -75,7 +75,8 @@ class review_summary extends \cenozo\business\report\base_report
           "review_details.recommendation_type_name, ".
           "'\\n', ".
           "IFNULL( CONCAT( review_details.questions, '\\n' ), '' ), ".
-          "IFNULL( review.note, '(no note)' ) ".
+          "'General Notes: ', ".
+          "IFNULL( review.note, '(none)' ) ".
         ") ".
         "SEPARATOR '\\n\\n' ".
       ")",
