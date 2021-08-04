@@ -143,7 +143,7 @@ class notification extends \cenozo\database\record
       // remove all trainee text if no trainee, otherwise just remove the if/endif syntax
       is_null( $db_reqn->trainee_user_id ) ?
         '/{{if_trainee}}.*?{{endif_trainee}}/' :
-        array( '{{if_trainee}}', '{{endif_trainee}}' ),
+        array( '/{{if_trainee}}/', '/{{endif_trainee}}/' ),
       '',
       // search/replace dynamic text
       str_replace(
