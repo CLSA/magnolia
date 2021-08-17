@@ -42,6 +42,7 @@
                       cn-elastic
                       class="form-control"
                       ng-model="answer.comment"
+                      placeholder="Comments:"
                       cn-change="model.getEditEnabled() && reviewAnswerModel.entryModel.patch( 'comment', answer.id )"
                       ng-disabled="!model.getEditEnabled()"></textarea>
           </div>
