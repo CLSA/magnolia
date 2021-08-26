@@ -49,12 +49,16 @@ class module extends \cenozo\service\module
           }
 
           // recommendations can only be provided once all questions have been answered
-          $modifier = lib::create( 'database\modifier' );
-          $modifier->where( 'answer', '=', NULL );
-          if( 0 < $db_review->get_review_answer_count( $modifier ) )
+          $data = $this->get_file_as_array();
+          if( array_key_exists( 'recommendation_type_id', $data ) && !is_null( $data['recommendation_type_id'] ) )
           {
-            $this->get_status()->set_code( 306 );
-            $this->set_data( 'A recommendation can only be provided after all review questions have been answered.' );
+            $modifier = lib::create( 'database\modifier' );
+            $modifier->where( 'answer', '=', NULL );
+            if( 0 < $db_review->get_review_answer_count( $modifier ) )
+            {
+              $this->get_status()->set_code( 306 );
+              $this->set_data( 'A recommendation can only be provided after all review questions have been answered.' );
+            }
           }
         }
       }
