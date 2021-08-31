@@ -771,6 +771,9 @@ class reqn extends \cenozo\database\record
     }
     else if( 'Active' == $db_next_stage_type->name )
     {
+      // create the data directories now in case the data-release stage was never passed through (legacy reqns)
+      $this->generate_data_directory();
+
       // if we have just entered the active stage then create symbolic links to all data files and update file timestamps
       $this->refresh_study_data_files();
 
