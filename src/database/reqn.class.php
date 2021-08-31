@@ -1292,44 +1292,47 @@ class reqn extends \cenozo\database\record
    */
   private function generate_data_directory()
   {
-    $created = false;
-    $count = 0;
-    while( 100 > $count++ )
+    if( is_null( $this->data_directory ) )
     {
-      $name = sprintf(
-        '%s-%s-%s-%s',
-        bin2hex( openssl_random_pseudo_bytes( 2 ) ),
-        bin2hex( openssl_random_pseudo_bytes( 2 ) ),
-        bin2hex( openssl_random_pseudo_bytes( 2 ) ),
-        bin2hex( openssl_random_pseudo_bytes( 2 ) )
-      );
-
-      // create the web directory based on the random name
-      $path = sprintf( '%s/web/%s', STUDY_DATA_PATH, $name );
-      if( !file_exists( $path ) )
+      $created = false;
+      $count = 0;
+      while( 100 > $count++ )
       {
-        if( !mkdir( $path ) )
-          throw lib::create( 'exception\runtime', sprintf( 'Unable to create data directory "%s"', $path ), __METHOD__ );
+        $name = sprintf(
+          '%s-%s-%s-%s',
+          bin2hex( openssl_random_pseudo_bytes( 2 ) ),
+          bin2hex( openssl_random_pseudo_bytes( 2 ) ),
+          bin2hex( openssl_random_pseudo_bytes( 2 ) ),
+          bin2hex( openssl_random_pseudo_bytes( 2 ) )
+        );
 
-        // now create the data directory based on the identifier
-        $path = sprintf( '%s/data/%s', STUDY_DATA_PATH, $this->identifier );
+        // create the web directory based on the random name
+        $path = sprintf( '%s/web/%s', STUDY_DATA_PATH, $name );
         if( !file_exists( $path ) )
         {
           if( !mkdir( $path ) )
             throw lib::create( 'exception\runtime', sprintf( 'Unable to create data directory "%s"', $path ), __METHOD__ );
-          chmod( $path, 0777 );
+
+          // now create the data directory based on the identifier
+          $path = sprintf( '%s/data/%s', STUDY_DATA_PATH, $this->identifier );
+          if( !file_exists( $path ) )
+          {
+            if( !mkdir( $path ) )
+              throw lib::create( 'exception\runtime', sprintf( 'Unable to create data directory "%s"', $path ), __METHOD__ );
+            chmod( $path, 0777 );
+          }
+
+          $this->data_directory = $name;
+          $this->save();
+
+          $created = true;
+          break;
         }
-
-        $this->data_directory = $name;
-        $this->save();
-
-        $created = true;
-        break;
       }
-    }
 
-    // if we get here then something is wrong
-    if( !$created ) throw lib::create( 'exception\runtime', 'Unable to create unique data directory.', __METHOD__ );
+      // if we get here then something is wrong
+      if( !$created ) throw lib::create( 'exception\runtime', 'Unable to create unique data directory.', __METHOD__ );
+    }
   }
 
   /**
