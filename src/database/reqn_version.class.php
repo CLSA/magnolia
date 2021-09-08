@@ -372,14 +372,17 @@ class reqn_version extends \cenozo\database\record
     $reqn_version_mod->order_desc( 'version' );
     $reqn_version_mod->limit( 1 );
     $reqn_version_list = $db_reqn->get_reqn_version_object_list( $reqn_version_mod );
-    $db_last_reqn_version = current( $reqn_version_list );
 
-    $coapplicant_sel = lib::create( 'database\select' );
-    $coapplicant_sel->add_column( 'name' );
-    $coapplicant_sel->add_column( 'access' );
     $last_coapplicant_list = array();
-    foreach( $db_last_reqn_version->get_coapplicant_list( $coapplicant_sel ) as $coapplicant )
-      $last_coapplicant_list[$coapplicant['name']] = $coapplicant['access'];
+    if( 0 < count( $reqn_version_list ) )
+    {
+      $db_last_reqn_version = current( $reqn_version_list );
+      $coapplicant_sel = lib::create( 'database\select' );
+      $coapplicant_sel->add_column( 'name' );
+      $coapplicant_sel->add_column( 'access' );
+      foreach( $db_last_reqn_version->get_coapplicant_list( $coapplicant_sel ) as $coapplicant )
+        $last_coapplicant_list[$coapplicant['name']] = $coapplicant['access'];
+    }
 
     $coapplicant_number = 1;
     $coapplicant_sel = lib::create( 'database\select' );
