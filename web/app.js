@@ -38,7 +38,14 @@ cenozo.directive( 'cnDeferralNote',
       restrict: 'E',
       scope: { note: '@' },
       controller: [ '$scope', function( $scope ) {
-        $scope.directive = 'cnDeferralNote';
+        angular.extend( $scope, {
+          directive: 'cnDeferralNote',
+          input: {
+            key: $scope.note,
+            title: 'Note to Applicant',
+            type: $scope.$parent.model.inputList[$scope.note].type
+          }
+        } );
       } ]
     };
   }
