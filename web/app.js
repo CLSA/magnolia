@@ -392,8 +392,8 @@ cenozo.service( 'CnReqnHelper', [
               fr: 'La demande est séparée en trois parties :<ul><li>1<sup>re</sup> partie : Renseignements généraux</li><li>2<sup>e</sup> partie : Sélection des données</li><li>3<sup>e</sup> partie : Sélection des échantillons biologiques (à venir)</li></ul>'
             },
             text5: {
-              en: 'Additional information or instructions are available anywhere that the ⓘ symbol appears. Hover your mouse cursor over the text to see the additional details.',
-              fr: 'Des informations ou des instructions supplémentaires sont disponibles partout où le symbole ⓘ apparaît. Passez le curseur sur le texte pour voir les informations supplémentaires.'
+              en: 'Additional information or instructions are available anywhere that the <b class="invert">ⓘ</b> symbol appears. Hover your mouse cursor over the text to see the additional details.',
+              fr: 'Des informations ou des instructions supplémentaires sont disponibles partout où le symbole <b class="invert">ⓘ</b> apparaît. Passez le curseur sur le texte pour voir les informations supplémentaires.'
             },
             text6: {
               en: 'Please ensure that you have completed <strong>all of the sections of the application</strong> form that are relevant to your application. Incomplete applications may result in processing delays or refusal of your application.',

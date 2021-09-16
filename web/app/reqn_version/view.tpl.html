@@ -597,7 +597,7 @@
                 <cn-view-input-with-differences
                   input="{
                     key: 'lay_summary',
-                    title: t( 'part1.d.lay_summary' ) + '<sup>ⓘ</sup><br><span class=text-info>(' +
+                    title: '<b class=\'invert\'>ⓘ</b> ' + t( 'part1.d.lay_summary' ) + '<br><span class=text-info>(' +
                            model.viewModel.charCount.lay_summary + ' ' + t( 'misc.chars' ) + ')</span>',
                     type: model.inputList.lay_summary.type,
                     isConstant: isDescriptionConstant,
@@ -637,7 +637,7 @@
                 <cn-view-input-with-differences
                   input="{
                     key: 'methodology',
-                    title: t( 'part1.d.methodology' )+'<sup>ⓘ</sup>' + '<br><span class=text-info>(' +
+                    title: '<b class=\'invert\'>ⓘ</b> ' + t( 'part1.d.methodology' ) + '<br><span class=text-info>(' +
                            model.viewModel.charCount.methodology + ' ' + t( 'misc.chars' ) + ')</span>',
                     type: 'text',
                     isConstant: isDescriptionConstant,
@@ -651,7 +651,7 @@
                 <cn-view-input-with-differences
                   input="{
                     key: 'analysis',
-                    title: t( 'part1.d.analysis' )+'<sup>ⓘ</sup>' + '<br><span class=text-info>(' +
+                    title: '<b class=\'invert\'>ⓘ</b> ' + t( 'part1.d.analysis' ) + '<br><span class=text-info>(' +
                            model.viewModel.charCount.analysis + ' ' + t( 'misc.chars' ) + ')</span>',
                     type: 'text',
                     isConstant: isDescriptionConstant,
@@ -1028,7 +1028,7 @@
                           style="vertical-align: middle;"
                           uib-tooltip-html="model.dataOptionCategoryList[partIndex].note[model.viewModel.record.lang] | cnNewlines"
                           tooltip-popup-delay="100">
-                        {{ t( 'part2.' + part + '.module' ) }}<sup ng-if="model.dataOptionCategoryList[partIndex].note[model.viewModel.record.lang]">ⓘ</sup>
+                        <b class="invert" ng-if="model.dataOptionCategoryList[partIndex].note[model.viewModel.record.lang]">ⓘ</b> {{ t( 'part2.' + part + '.module' ) }}
                       </td>
                       <td width="25%" style="vertical-align: middle;" ng-bind-html="t( 'misc.baseline' )"></td>
                       <td width="25%" style="vertical-align: middle;" ng-bind-html="t( 'misc.followup1' )"></td>
@@ -1039,9 +1039,10 @@
                       <td width="50%" data-toggle="collapse" data-target="#accordion{{ dataOption.id }}" style="vertical-align: middle">
                         <a uib-tooltip-html="dataOption.note[model.viewModel.record.lang] | cnNewlines"
                            tooltip-popup-delay="100">
+                          <b class="invert" ng-if="dataOption.note[model.viewModel.record.lang]">ⓘ</b>
                           <span style="text-decoration: underline">
                             {{ dataOption.name[model.viewModel.record.lang] }}
-                          </span><sup ng-if="dataOption.note[model.viewModel.record.lang]">ⓘ</sup>
+                          </span>
                         </a>
                       </td>
                       <td ng-style="{ 'width': 'g' == part ? '50%' : '25%' }" ng-if="dataOption.bl" ng-class="{ 'bg-warning': model.viewModel.compareRecord.differences.part2[part].baselineDataOptionList.findByProperty( 'id', dataOption.id ) }">
@@ -1084,7 +1085,8 @@
                               <span ng-repeat="detail in detailCat.detailList"
                                     uib-tooltip-html="detail.note[model.viewModel.record.lang] | cnNewlines"
                                     tooltip-popup-delay="100">
-                                {{ detail.name[model.viewModel.record.lang] }}<sup ng-if="detail.note[model.viewModel.record.lang]">ⓘ</sup>{{ $last ? '' : ';' }}
+                                <b class="invert" ng-if="detail.note[model.viewModel.record.lang]">ⓘ</b>
+                                {{ detail.name[model.viewModel.record.lang] }}{{ $last ? '' : ';' }}
                               </span>
                             </div>
                           </div>
