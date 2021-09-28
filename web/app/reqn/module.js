@@ -1315,49 +1315,52 @@ define( [ 'output' ].reduce( function( list, name ) {
             var self = this;
             await this.$$getMetadata();
 
-            var response = await CnHttpFactory.instance( {
-              path: 'reqn_type',
-              data: {
-                select: { column: [ 'id', 'name' ] },
-                modifier: { order: 'name', limit: 1000 }
-              }
-            } ).query();
+            var [reqnTypeResponse, deadlineResponse, languageResponse] = await Promise.all( [
+              CnHttpFactory.instance( {
+                path: 'reqn_type',
+                data: {
+                  select: { column: [ 'id', 'name' ] },
+                  modifier: { order: 'name', limit: 1000 }
+                }
+              } ).query(),
+
+              CnHttpFactory.instance( {
+                path: 'deadline',
+                data: {
+                  select: { column: [ 'id', 'name' ] },
+                  modifier: { order: 'date', desc: true, limit: 1000 }
+                }
+              } ).query(),
+
+              CnHttpFactory.instance( {
+                path: 'language',
+                data: {
+                  select: { column: [ 'id', 'name' ] },
+                  modifier: {
+                    where: { column: 'active', operator: '=', value: true },
+                    order: 'name',
+                    limit: 1000
+                  }
+                }
+              } ).query()
+            ] );
+
             this.metadata.columnList.reqn_type_id.enumList = [];
-            response.data.forEach( function( item ) {
+            reqnTypeResponse.data.forEach( function( item ) {
               self.metadata.columnList.reqn_type_id.enumList.push( {
                 value: item.id,
                 name: item.name
               } );
             } );
-
-            var response = await CnHttpFactory.instance( {
-              path: 'deadline',
-              data: {
-                select: { column: [ 'id', 'name' ] },
-                modifier: { order: 'date', desc: true, limit: 1000 }
-              }
-            } ).query();
             this.metadata.columnList.deadline_id.enumList = [];
-            response.data.forEach( function( item ) {
+            deadlineResponse.data.forEach( function( item ) {
               self.metadata.columnList.deadline_id.enumList.push( {
                 value: item.id,
                 name: item.name
               } );
             } );
-
-            var response = await CnHttpFactory.instance( {
-              path: 'language',
-              data: {
-                select: { column: [ 'id', 'name' ] },
-                modifier: {
-                  where: { column: 'active', operator: '=', value: true },
-                  order: 'name',
-                  limit: 1000
-                }
-              }
-            } ).query();
             this.metadata.columnList.language_id.enumList = [];
-            response.data.forEach( function( item ) {
+            languageResponse.data.forEach( function( item ) {
               self.metadata.columnList.language_id.enumList.push( {
                 value: item.id,
                 name: item.name

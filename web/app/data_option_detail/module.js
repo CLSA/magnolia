@@ -144,35 +144,37 @@ define( [ 'data_option' ].reduce( function( list, name ) {
           var self = this;
           await this.$$getMetadata();
 
-          var response = await CnHttpFactory.instance( {
-            path: 'data_option',
-            data: {
-              select: { column: [ 'id', 'name_en' ] },
-              modifier: { order: 'data_option.rank', limit: 1000 }
-            }
-          } ).query();
+          var [dataOptionResponse, studyPhaseResponse] = await Promise.all( [
+            CnHttpFactory.instance( {
+              path: 'data_option',
+              data: {
+                select: { column: [ 'id', 'name_en' ] },
+                modifier: { order: 'data_option.rank', limit: 1000 }
+              }
+            } ).query(),
+
+            CnHttpFactory.instance( {
+              path: 'study_phase',
+              data: {
+                select: { column: [ 'id', 'name' ] },
+                modifier: {
+                  where: { column: 'study.name', operator: '=', value: 'CLSA' },
+                  order: 'name',
+                  limit: 1000
+                }
+              }
+            } ).query()
+          ] );
 
           this.metadata.columnList.data_option_id.enumList = [];
-          response.data.forEach( function( item ) {
+          dataOptionResponse.data.forEach( function( item ) {
             self.metadata.columnList.data_option_id.enumList.push( {
               value: item.id, name: item.name_en
             } );
           } );
 
-          var response = await CnHttpFactory.instance( {
-            path: 'study_phase',
-            data: {
-              select: { column: [ 'id', 'name' ] },
-              modifier: {
-                where: { column: 'study.name', operator: '=', value: 'CLSA' },
-                order: 'name',
-                limit: 1000
-              }
-            }
-          } ).query();
-
           this.metadata.columnList.study_phase_id.enumList = [];
-          response.data.forEach( function( item ) {
+          studyPhaseResponse.data.forEach( function( item ) {
             self.metadata.columnList.study_phase_id.enumList.push( {
               value: item.id, name: item.name
             } );

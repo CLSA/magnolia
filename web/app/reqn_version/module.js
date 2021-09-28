@@ -2212,11 +2212,72 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
             var self = this;
             await this.$$getMetadata();
 
-            var response = await CnHttpFactory.instance( {
-              path: 'reqn_version'
-            } ).head();
+            var promiseList = [
+              CnHttpFactory.instance( { path: 'reqn_version' } ).head(),
+              CnHttpFactory.instance( { path: 'amendment_type', data: { modifier: { order: 'rank' } } } ).query()
+            ];
 
-            var columnList = angular.fromJson( response.headers( 'Columns' ) );
+            if( 'root' == this.type ) {
+              promiseList = promiseList.concat( [
+                CnHttpFactory.instance( {
+                  path: 'data_option_category',
+                  data: {
+                    select: { column: [
+                      'id',
+                      'rank',
+                      'comment',
+                      'name_en', 'name_fr',
+                      'condition_en', 'condition_fr',
+                      'note_en', 'note_fr'
+                    ] },
+                    modifier: { order: 'rank', limit: 1000 }
+                  }
+                } ).query(),
+
+                CnHttpFactory.instance( {
+                  path: 'data_option',
+                  data: {
+                    select: { column: [
+                      'id',
+                      'data_option_category_id',
+                      'justification',
+                      'name_en', 'name_fr',
+                      'condition_en', 'condition_fr',
+                      'note_en', 'note_fr',
+                      'bl',
+                      'f1'
+                    ] },
+                    modifier: {
+                      order: [ 'data_option_category_id', 'data_option.rank' ],
+                      limit: 1000
+                    }
+                  }
+                } ).query(),
+
+                CnHttpFactory.instance( {
+                  path: 'data_option_detail',
+                  data: {
+                    select: { column: [ 'id', 'data_option_id', 'name_en', 'name_fr', 'note_en', 'note_fr', 'study_phase_id', {
+                      table: 'study_phase',
+                      column: 'name',
+                      alias: 'study_phase'
+                    }, {
+                      table: 'data_option',
+                      column: 'data_option_category_id'
+                    } ] },
+                    modifier: {
+                      order: [ 'data_option_id', 'study_phase_id', 'data_option_detail.rank' ],
+                      limit: 1000
+                    }
+                  }
+                } ).query()
+              ] );
+            }
+
+            var [reqnVersionResponse, amendmentTypeResponse,
+                 dataOptionCategoryResponse, dataOptionResponse, dataOptionDetailResponse] = await Promise.all( promiseList );
+
+            var columnList = angular.fromJson( reqnVersionResponse.headers( 'Columns' ) );
             for( var column in columnList ) {
               columnList[column].required = '1' == columnList[column].required;
               if( 'enum' == columnList[column].data_type ) { // parse out the enum values
@@ -2229,13 +2290,8 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
               angular.extend( this.metadata.columnList[column], columnList[column] );
             }
 
-            var response = await CnHttpFactory.instance( {
-              path: 'amendment_type',
-              data: { modifier: { order: 'rank' } }
-            } ).query();
-
             this.amendmentTypeList = { en: [], fr: [] };
-            response.data.forEach( function( item ) {
+            amendmentTypeResponse.data.forEach( function( item ) {
               if( item.new_user ) self.newUserAmendmentTypeId = item.id;
 
               self.amendmentTypeList.en.push( {
@@ -2349,22 +2405,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
 
             // only do the following for the root instance
             if( 'root' == this.type ) {
-              var response = await CnHttpFactory.instance( {
-                path: 'data_option_category',
-                data: {
-                  select: { column: [
-                    'id',
-                    'rank',
-                    'comment',
-                    'name_en', 'name_fr',
-                    'condition_en', 'condition_fr',
-                    'note_en', 'note_fr'
-                  ] },
-                  modifier: { order: 'rank', limit: 1000 }
-                }
-              } ).query();
-
-              this.dataOptionCategoryList = response.data;
+              this.dataOptionCategoryList = dataOptionCategoryResponse.data;
               this.dataOptionCategoryList.forEach( function( dataOptionCategory ) {
                 // determine the character code based on the rank
                 dataOptionCategory.charCode = String.fromCharCode( 'a'.charCodeAt(0) + dataOptionCategory.rank - 1 );
@@ -2377,28 +2418,8 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                 dataOptionCategory.optionList = [];
               } );
 
-              var response = await CnHttpFactory.instance( {
-                path: 'data_option',
-                data: {
-                  select: { column: [
-                    'id',
-                    'data_option_category_id',
-                    'justification',
-                    'name_en', 'name_fr',
-                    'condition_en', 'condition_fr',
-                    'note_en', 'note_fr',
-                    'bl',
-                    'f1'
-                  ] },
-                  modifier: {
-                    order: [ 'data_option_category_id', 'data_option.rank' ],
-                    limit: 1000
-                  }
-                }
-              } ).query();
-
               var category = null;
-              response.data.forEach( function( option ) {
+              dataOptionResponse.data.forEach( function( option ) {
                 if( null == category || option.data_option_category_id != category.id )
                   category = self.dataOptionCategoryList.findByProperty( 'id', option.data_option_category_id );
 
@@ -2412,27 +2433,9 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                 category.optionList.push( option );
               } );
 
-              var response = await CnHttpFactory.instance( {
-                path: 'data_option_detail',
-                data: {
-                  select: { column: [ 'id', 'data_option_id', 'name_en', 'name_fr', 'note_en', 'note_fr', 'study_phase_id', {
-                    table: 'study_phase',
-                    column: 'name',
-                    alias: 'study_phase'
-                  }, {
-                    table: 'data_option',
-                    column: 'data_option_category_id'
-                  } ] },
-                  modifier: {
-                    order: [ 'data_option_id', 'study_phase_id', 'data_option_detail.rank' ],
-                    limit: 1000
-                  }
-                }
-              } ).query();
-
               var category = null;
               var option = null;
-              response.data.forEach( function( detail ) {
+              dataOptionDetailResponse.data.forEach( function( detail ) {
                 var detailList = {};
                 if( null == category || detail.data_option_category_id != category.id )
                   category = self.dataOptionCategoryList.findByProperty( 'id', detail.data_option_category_id );
