@@ -487,7 +487,7 @@ cenozo.service( 'CnReqnHelper', [
               },
               name: { en: 'Name', fr: 'Nom' },
               position: { en: 'Position', fr: 'Poste' },
-              affiliation: { en: 'Affiliation', fr: 'Organisme d’appartenance' },
+              affiliation: { en: 'Institution', fr: 'Établissement' },
               email: { en: 'E-mail', fr: 'Courriel' },
               role: { en: 'Role', fr: 'Rôle' },
               access: { en: 'Requires Access to Data', fr: 'Doit avoir accès aux données' },
