@@ -21,6 +21,8 @@ define( function() {
       justification: { title: 'Justification', type: 'boolean' },
       name_en: { title: 'Name' },
       has_condition: { title: 'Has Condition', type: 'boolean' },
+      cost: { title: 'Cost', type: 'currency:$:0' },
+      combined_cost: { title: 'Combined Cost', type: 'boolean' },
       note_en: { title: 'Note', type: 'text', limit: 20 }
     },
     defaultOrder: { column: 'rank', reverse: false }
@@ -42,6 +44,16 @@ define( function() {
       title: 'Justification',
       type: 'boolean',
       help: 'Whether the applicant must provide a justification when selecting this data-option.'
+    },
+    cost: {
+      title: 'Cost ($)',
+      type: 'string',
+      format: 'integer'
+    },
+    combined_cost: {
+      title: 'Combined Cost',
+      type: 'boolean',
+      help: 'Determines whether selecting multiple study phases are costs the same as selecting a single study phase.'
     },
     name_en: {
       title: 'Name (English)',

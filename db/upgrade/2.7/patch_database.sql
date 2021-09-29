@@ -19,7 +19,6 @@ SOURCE review_type_question.sql
 SOURCE review_answer.sql
 SOURCE review.sql
 SOURCE data_option.sql
-SOURCE data_option_has_study_phase.sql
 SOURCE applicant.sql
 
 SOURCE report_type.sql

@@ -94,6 +94,7 @@
     </div>
   </div>
   <div class="container-fluid" style="padding-top: 1em;">
+    <div class="spacer pull-right text-info">Total Cost: ${{ model.viewModel.calculateCost() }}</div>
     <ul class="nav nav-tabs">
       <li ng-class="{'active':'instructions'==model.viewModel.formTab[0]}">
         <a ng-click="model.viewModel.setFormTab(0,'instructions')"
@@ -1081,7 +1082,8 @@
                         <div id="accordion{{ dataOption.id }}" class="collapse text-primary text-left">
                           <div ng-repeat="detailCat in dataOption.detailCategoryList track by $index">
                             <div class="col-sm-2 vertical-spacer">{{ detailCat.name[model.viewModel.record.lang] }}</div>
-                            <div class="col-sm-10 vertical-spacer">
+                            <div class="col-sm-1 vertical-spacer">{{ detailCat.cost[model.viewModel.record.lang] }}</div>
+                            <div class="col-sm-9 vertical-spacer">
                               <span ng-repeat="detail in detailCat.detailList"
                                     uib-tooltip-html="detail.note[model.viewModel.record.lang] | cnNewlines"
                                     tooltip-popup-delay="100">
