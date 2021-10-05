@@ -6,7 +6,7 @@
  * @filesource
  */
 
-namespace magnolia\service\data_option_detail;
+namespace magnolia\service\data_selection_detail;
 use cenozo\lib, cenozo\log, magnolia\util;
 
 /**
@@ -21,8 +21,9 @@ class module extends \cenozo\service\module
   {
     parent::prepare_read( $select, $modifier );
 
-    $modifier->join( 'data_option', 'data_option_detail.data_option_id', 'data_option.id' );
+    $modifier->join( 'data_selection', 'data_selection_detail.data_selection_id', 'data_selection.id' );
+    $modifier->join( 'study_phase', 'data_selection.study_phase_id', 'study_phase.id' );
+    $modifier->join( 'data_option', 'data_selection.data_option_id', 'data_option.id' );
     $modifier->join( 'data_option_category', 'data_option.data_option_category_id', 'data_option_category.id' );
-    $modifier->join( 'study_phase', 'data_option_detail.study_phase_id', 'study_phase.id' );
   }
 }

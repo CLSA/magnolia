@@ -8,9 +8,6 @@
 namespace magnolia\business\report;
 use cenozo\lib, cenozo\log, magnolia\util;
 
-/**
- * Call history report
- */
 class deadline_data_option extends \cenozo\business\report\base_report
 {
   /**
@@ -21,20 +18,48 @@ class deadline_data_option extends \cenozo\business\report\base_report
   {
     $reqn_class_name = lib::get_class_name( 'database\reqn' );
     $study_class_name = lib::get_class_name( 'database\study' );
-    $study_phase_class_name = lib::get_class_name( 'database\study_phase' );
+    $data_option_category_class_name = lib::get_class_name( 'database\data_option_category' );
 
-    $study_id = $study_class_name::get_unique_record( 'name', 'CLSA' )->id;
-    $bl_id = $study_phase_class_name::get_unique_record( array( 'study_id', 'code' ), array( $study_id, 'bl' ) )->id;
-    $f1_id = $study_phase_class_name::get_unique_record( array( 'study_id', 'code' ), array( $study_id, 'f1' ) )->id;
+    $study_phase_id_list = array();
+    foreach( $data_option_category_class_name::get_all_study_phase_list() as $db_study_phase )
+      $study_phase_id_list[] = $db_study_phase->id;
 
     $select = lib::create( 'database\select' );
+    $select->from( 'reqn' );
+    $select->add_column( 'identifier' );
+    $select->add_table_column( 'data_option', 'name_en' );
+    $select->add_table_column( 'reqn_version_has_data_selection', 'reqn_version_id IS NOT NULL', 'selected' );
+    $select->add_table_column( 'study', 'name', 'study' );
+    $select->add_table_column( 'study_phase', 'code' );
+
     $modifier = lib::create( 'database\modifier' );
 
-    // join to all data options and the current reqn version
-    $modifier->inner_join( 'data_option_category' );
+    // join to all study phases in use
+    $modifier->inner_join( 'study_phase' );
+    $modifier->join( 'study', 'study_phase.study_id', 'study.id' );
+    $modifier->where( 'study_phase.id', 'IN', $study_phase_id_list );
+
+    $modifier->join(
+      'data_option_category_has_study_phase',
+      'study_phase.id',
+      'data_option_category_has_study_phase.study_phase_id'
+    );
+    $modifier->join(
+      'data_option_category',
+      'data_option_category_has_study_phase.data_option_category_id',
+      'data_option_category.id'
+    );
     $modifier->join( 'data_option', 'data_option_category.id', 'data_option.data_option_category_id' );
+    $join_mod = lib::create( 'database\modifier' );
+    $join_mod->where( 'data_option.id', '=', 'data_selection.data_option_id', false );
+    $join_mod->where( 'study_phase.id', '=', 'data_selection.study_phase_id', false );
+    $modifier->join_modifier( 'data_selection', $join_mod );
     $modifier->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
     $modifier->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
+    $join_mod = lib::create( 'database\modifier' );
+    $join_mod->where( 'reqn_version.id', '=', 'reqn_version_has_data_selection.reqn_version_id', false );
+    $join_mod->where( 'data_selection.id', '=', 'reqn_version_has_data_selection.data_selection_id', false );
+    $modifier->join_modifier( 'reqn_version_has_data_selection', $join_mod, 'left' );
 
     // only include reqns which aren't in certain stages
     $join_mod = lib::create( 'database\modifier' );
@@ -49,29 +74,9 @@ class deadline_data_option extends \cenozo\business\report\base_report
     $modifier->order( 'data_option_category.rank' );
     $modifier->order( 'data_option.rank' );
 
-    // join to whether the reqn selected each data option for baseline
-    $join_mod = lib::create( 'database\modifier' );
-    $join_mod->where( 'data_option.id', '=', 'bl_reqn_version_data_option.data_option_id', false );
-    $join_mod->where( 'bl_reqn_version_data_option.study_phase_id', '=', $bl_id );
-    $join_mod->where( 'bl_reqn_version_data_option.reqn_version_id', '=', 'reqn_version.id', false );
-    $modifier->join_modifier( 'reqn_version_data_option', $join_mod, 'left', 'bl_reqn_version_data_option' );
-
-    // join to whether the reqn selected each data option for follow-up 1
-    $join_mod = lib::create( 'database\modifier' );
-    $join_mod->where( 'data_option.id', '=', 'f1_reqn_version_data_option.data_option_id', false );
-    $join_mod->where( 'f1_reqn_version_data_option.study_phase_id', '=', $f1_id );
-    $join_mod->where( 'f1_reqn_version_data_option.reqn_version_id', '=', 'reqn_version.id', false );
-    $modifier->join_modifier( 'reqn_version_data_option', $join_mod, 'left', 'f1_reqn_version_data_option' );
-
     $this->apply_restrictions( $modifier );
 
-    $select->from( 'reqn' );
-    $select->add_column( 'identifier' );
-    $select->add_table_column( 'data_option', 'name_en' );
-    $select->add_table_column( 'bl_reqn_version_data_option', 'reqn_version_id IS NOT NULL', 'bl' );
-    $select->add_table_column( 'f1_reqn_version_data_option', 'reqn_version_id IS NOT NULL', 'f1' );
-
-    $header = array();
+    $header = array( 'Identifier' );
     $contents = array();
     $row = NULL;
     $first_identifier = NULL;
@@ -80,28 +85,21 @@ class deadline_data_option extends \cenozo\business\report\base_report
     {
       if( $working_identifier == $data['identifier'] )
       { // if we're still on the same identifier then keep adding to the current row
-        $row[] = $data['bl'] ? 'yes' : 'no';
-        $row[] = $data['f1'] ? 'yes' : 'no';
+        $row[] = $data['selected'] ? 'yes' : 'no';
 
-        if( $first_identifier == $data['identifier'] )
-        {
-          $header[] = sprintf( '%s (bl)', $data['name_en'] );
-          $header[] = sprintf( '%s (f1)', $data['name_en'] );
-        }
+        // build the header during the first identifier
+        if( $first_identifier ) $header[] = sprintf( '%s (%s %s)', $data['name_en'], $data['study'], $data['code'] );
       }
       else
       { // we're on a new identifier then add the existing row to the contents
+        $first_identifier = is_null( $first_identifier );
         if( !is_null( $row ) ) $contents[] = $row;
-        $row = array( $data['identifier'], $data['bl'] ? 'yes' : 'no', $data['f1'] ? 'yes' : 'no' );
 
         // build the header during the first identifier
-        if( is_null( $first_identifier ) )
-        {
-          $header[] = 'Identifier';
-          $header[] = sprintf( '%s (bl)', $data['name_en'] );
-          $header[] = sprintf( '%s (f1)', $data['name_en'] );
-          $first_identifier = $data['identifier'];
-        }
+        if( $first_identifier ) $header[] = sprintf( '%s (%s %s)', $data['name_en'], $data['study'], $data['code'] );
+
+        // now start a new row with the identifier and first data-selection's selected value
+        $row = array( $data['identifier'], $data['selected'] ? 'yes' : 'no' );
 
         $working_identifier = $data['identifier'];
       }

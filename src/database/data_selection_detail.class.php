@@ -1,6 +1,6 @@
 <?php
 /**
- * data_option_detail.class.php
+ * data_selection_detail.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
  * @filesource
@@ -10,9 +10,9 @@ namespace magnolia\database;
 use cenozo\lib, cenozo\log, magnolia\util;
 
 /**
- * data_option_detail: record
+ * data_selection_detail: record
  */
-class data_option_detail extends \cenozo\database\has_rank
+class data_selection_detail extends \cenozo\database\has_rank
 {
   /**
    * The type of record which the record has a rank for.

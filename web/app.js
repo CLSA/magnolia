@@ -748,6 +748,7 @@ cenozo.service( 'CnReqnHelper', [
             prevButton: { en: 'Return to the previous section', fr: 'Retourner à la section précédente' },
             nextButton: { en: 'Proceed to the next section', fr: 'Passez à la section suivante' },
             pleaseConfirm: { en: 'Please confirm', fr: 'Veuillez confirmer' },
+            totalCost: { en: 'Total cost', fr: 'TODO: TRANSLATION REQUIRED' },
             remove: { en: 'Remove', fr: 'Supprimer' },
             chars: { en: 'characters', fr: 'caractères' },
             comments: { en: 'Comments', fr: 'Commentaires' },
@@ -760,16 +761,20 @@ cenozo.service( 'CnReqnHelper', [
             notices: { en: 'Notices', fr: 'Notifications' },
             studyData: { en: 'Study Data', fr: 'Données d’étude' },
             finalReport: { en: 'Final Report', fr: 'Rapport final' },
-            notAvailable: { en: 'not yet available', fr: 'pas encore disponible' },
-            notApplicable: { en: 'not applicable', fr: 'sans objet' },
-            baseline: { en: 'Baseline', fr: 'Départ' },
-            followup1: { en: 'Follow-up 1', fr: '1er suivi' },
+            studyPhase: {
+              bl: { en: 'Baseline', fr: 'Départ' },
+              f1: { en: 'Follow-up 1', fr: '1er suivi' }
+            },
             file: { en: 'File', fr: 'Fichier' },
             expirationDate: { en: 'Expiration Date', fr: 'Date limite' },
             addEthicsApproval: { en: 'Add Ethics Approval', fr: 'Ajouter une lettre d’approbation éthique' },
             reportRequiredWarning: {
               en: 'This application\'s final report is required, would you like to view it now?',
               fr: 'Il faut fournir un rapport final pour cette demande, souhaitez-vous l’afficher maintenant?'
+            },
+            combinedCost: {
+              en: 'Fee payable for any/all study-phases when requested at the same time.',
+              fr: 'TODO: TRANSLATION REQUIRED'
             },
             amend: { en: 'Create Amendment', fr: 'Effectuer une modification' },
             amendWarning: {

@@ -1,28 +1,25 @@
-define( [ 'data_option' ].reduce( function( list, name ) {
+define( [ 'data_selection' ].reduce( function( list, name ) {
   return list.concat( cenozoApp.module( name ).getRequiredFiles() );
 }, [] ), function() {
   'use strict';
 
-  try { var module = cenozoApp.module( 'data_option_detail', true ); } catch( err ) { console.warn( err ); return; }
+  try { var module = cenozoApp.module( 'data_selection_detail', true ); } catch( err ) { console.warn( err ); return; }
   angular.extend( module, {
     identifier: {
       parent: {
-        subject: 'data_option',
-        column: 'data_option.id'
+        subject: 'data_selection',
+        column: 'data_selection.id'
       }
     },
     name: {
-      singular: 'data-option detail',
-      plural: 'data-option details',
-      possessive: 'data-option detail\'s'
+      singular: 'data-selection detail',
+      plural: 'data-selection details',
+      possessive: 'data-selection detail\'s'
     },
     columnList: {
-      parent_rank: { column: 'data_option.rank', title: 'Data Option Rank', type: 'rank' },
-      parent_name_en: { column: 'data_option.name_en', title: 'Data Option Name' },
-      study_phase: { column: 'study_phase.name', title: 'Study Phase' },
       rank: { title: 'Rank', type: 'rank' },
       name_en: { title: 'Name' },
-      note_en: { title: 'Note', type: 'text', limit: 20 }
+      note_en: { title: 'Note', type: 'text', limit: 200 }
     },
     defaultOrder: { column: 'rank', reverse: false }
   } );
@@ -35,13 +32,8 @@ define( [ 'data_option' ].reduce( function( list, name ) {
       isExcluded: 'add',
       isConstant: true
     },
-    data_option_id: {
-      title: 'Data Option',
-      type: 'enum',
-      isConstant: 'view'
-    },
-    study_phase_id: {
-      title: 'Study Phase',
+    data_selection_id: {
+      title: 'Data Selection',
       type: 'enum',
       isConstant: 'view'
     },
@@ -54,52 +46,52 @@ define( [ 'data_option' ].reduce( function( list, name ) {
   } );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnDataOptionDetailAdd', [
-    'CnDataOptionDetailModelFactory',
-    function( CnDataOptionDetailModelFactory ) {
+  cenozo.providers.directive( 'cnDataSelectionDetailAdd', [
+    'CnDataSelectionDetailModelFactory',
+    function( CnDataSelectionDetailModelFactory ) {
       return {
         templateUrl: module.getFileUrl( 'add.tpl.html' ),
         restrict: 'E',
         scope: { model: '=?' },
         controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnDataOptionDetailModelFactory.root;
+          if( angular.isUndefined( $scope.model ) ) $scope.model = CnDataSelectionDetailModelFactory.root;
         }
       };
     }
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnDataOptionDetailList', [
-    'CnDataOptionDetailModelFactory',
-    function( CnDataOptionDetailModelFactory ) {
+  cenozo.providers.directive( 'cnDataSelectionDetailList', [
+    'CnDataSelectionDetailModelFactory',
+    function( CnDataSelectionDetailModelFactory ) {
       return {
         templateUrl: module.getFileUrl( 'list.tpl.html' ),
         restrict: 'E',
         scope: { model: '=?' },
         controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnDataOptionDetailModelFactory.root;
+          if( angular.isUndefined( $scope.model ) ) $scope.model = CnDataSelectionDetailModelFactory.root;
         }
       };
     }
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnDataOptionDetailView', [
-    'CnDataOptionDetailModelFactory',
-    function( CnDataOptionDetailModelFactory ) {
+  cenozo.providers.directive( 'cnDataSelectionDetailView', [
+    'CnDataSelectionDetailModelFactory',
+    function( CnDataSelectionDetailModelFactory ) {
       return {
         templateUrl: module.getFileUrl( 'view.tpl.html' ),
         restrict: 'E',
         scope: { model: '=?' },
         controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnDataOptionDetailModelFactory.root;
+          if( angular.isUndefined( $scope.model ) ) $scope.model = CnDataSelectionDetailModelFactory.root;
         }
       };
     }
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnDataOptionDetailAddFactory', [
+  cenozo.providers.factory( 'CnDataSelectionDetailAddFactory', [
     'CnBaseAddFactory',
     function( CnBaseAddFactory ) {
       var object = function( parentModel ) { CnBaseAddFactory.construct( this, parentModel ); };
@@ -108,7 +100,7 @@ define( [ 'data_option' ].reduce( function( list, name ) {
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnDataOptionDetailListFactory', [
+  cenozo.providers.factory( 'CnDataSelectionDetailListFactory', [
     'CnBaseListFactory',
     function( CnBaseListFactory ) {
       var object = function( parentModel ) { CnBaseListFactory.construct( this, parentModel ); };
@@ -117,7 +109,7 @@ define( [ 'data_option' ].reduce( function( list, name ) {
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnDataOptionDetailViewFactory', [
+  cenozo.providers.factory( 'CnDataSelectionDetailViewFactory', [
     'CnBaseViewFactory',
     function( CnBaseViewFactory ) {
       var object = function( parentModel, root ) { CnBaseViewFactory.construct( this, parentModel, root ); }
@@ -126,57 +118,34 @@ define( [ 'data_option' ].reduce( function( list, name ) {
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnDataOptionDetailModelFactory', [
-    'CnBaseModelFactory', 'CnDataOptionDetailAddFactory', 'CnDataOptionDetailListFactory', 'CnDataOptionDetailViewFactory',
+  cenozo.providers.factory( 'CnDataSelectionDetailModelFactory', [
+    'CnBaseModelFactory', 'CnDataSelectionDetailAddFactory', 'CnDataSelectionDetailListFactory', 'CnDataSelectionDetailViewFactory',
     'CnHttpFactory',
-    function( CnBaseModelFactory, CnDataOptionDetailAddFactory, CnDataOptionDetailListFactory, CnDataOptionDetailViewFactory,
+    function( CnBaseModelFactory, CnDataSelectionDetailAddFactory, CnDataSelectionDetailListFactory, CnDataSelectionDetailViewFactory,
               CnHttpFactory ) {
       var object = function( root ) {
         CnBaseModelFactory.construct( this, module );
-        this.addModel = CnDataOptionDetailAddFactory.instance( this );
-        this.listModel = CnDataOptionDetailListFactory.instance( this );
-        this.viewModel = CnDataOptionDetailViewFactory.instance( this, root );
-
-        var studyDataModule = cenozoApp.module( 'data_option' );
+        this.addModel = CnDataSelectionDetailAddFactory.instance( this );
+        this.listModel = CnDataSelectionDetailListFactory.instance( this );
+        this.viewModel = CnDataSelectionDetailViewFactory.instance( this, root );
 
         // extend getMetadata
         this.getMetadata = async function() {
           var self = this;
           await this.$$getMetadata();
 
-          var [dataOptionResponse, studyPhaseResponse] = await Promise.all( [
-            CnHttpFactory.instance( {
-              path: 'data_option',
-              data: {
-                select: { column: [ 'id', 'name_en' ] },
-                modifier: { order: 'data_option.rank', limit: 1000 }
-              }
-            } ).query(),
+          var dataSelectionResponse = await CnHttpFactory.instance( {
+            path: 'data_selection',
+            data: {
+              select: { column: [ 'id', { table: 'data_option', column: 'name_en' }, { table: 'study_phase', column: 'code' } ] },
+              modifier: { order: 'data_option.rank', limit: 1000 }
+            }
+          } ).query();
 
-            CnHttpFactory.instance( {
-              path: 'study_phase',
-              data: {
-                select: { column: [ 'id', 'name' ] },
-                modifier: {
-                  where: { column: 'study.name', operator: '=', value: 'CLSA' },
-                  order: 'name',
-                  limit: 1000
-                }
-              }
-            } ).query()
-          ] );
-
-          this.metadata.columnList.data_option_id.enumList = [];
-          dataOptionResponse.data.forEach( function( item ) {
-            self.metadata.columnList.data_option_id.enumList.push( {
-              value: item.id, name: item.name_en
-            } );
-          } );
-
-          this.metadata.columnList.study_phase_id.enumList = [];
-          studyPhaseResponse.data.forEach( function( item ) {
-            self.metadata.columnList.study_phase_id.enumList.push( {
-              value: item.id, name: item.name
+          this.metadata.columnList.data_selection_id.enumList = [];
+          dataSelectionResponse.data.forEach( function( item ) {
+            self.metadata.columnList.data_selection_id.enumList.push( {
+              value: item.id, name: item.name_en + ' (' + item.code + ')'
             } );
           } );
         };

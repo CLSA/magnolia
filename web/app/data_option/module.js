@@ -21,7 +21,6 @@ define( function() {
       justification: { title: 'Justification', type: 'boolean' },
       name_en: { title: 'Name' },
       has_condition: { title: 'Has Condition', type: 'boolean' },
-      cost: { title: 'Cost', type: 'currency:$:0' },
       combined_cost: { title: 'Combined Cost', type: 'boolean' },
       note_en: { title: 'Note', type: 'text', limit: 20 }
     },
@@ -44,11 +43,6 @@ define( function() {
       title: 'Justification',
       type: 'boolean',
       help: 'Whether the applicant must provide a justification when selecting this data-option.'
-    },
-    cost: {
-      title: 'Cost ($)',
-      type: 'string',
-      format: 'integer'
     },
     combined_cost: {
       title: 'Combined Cost',
@@ -126,7 +120,7 @@ define( function() {
   cenozo.providers.factory( 'CnDataOptionViewFactory', [
     'CnBaseViewFactory',
     function( CnBaseViewFactory ) {
-      var object = function( parentModel, root ) { CnBaseViewFactory.construct( this, parentModel, root, 'data_option_detail' ); }
+      var object = function( parentModel, root ) { CnBaseViewFactory.construct( this, parentModel, root, 'data_selection' ); }
       return { instance: function( parentModel, root ) { return new object( parentModel, root ); } };
     }
   ] );

@@ -332,24 +332,6 @@ CREATE PROCEDURE patch_data_option()
       "Spirometry (RAW+ / Images)"
     );
 
-    SELECT "Adding new cost column to data_option table" AS "";
-
-    SELECT COUNT(*) INTO @test
-    FROM information_schema.COLUMNS
-    WHERE table_schema = DATABASE()
-    AND table_name = "data_option"
-    AND column_name = "cost";
-
-    IF @test = 0 THEN
-      ALTER TABLE data_option ADD COLUMN cost INT(10) UNSIGNED NOT NULL DEFAULT 0 AFTER justification;
-
-      UPDATE data_option SET cost = 500 WHERE name_en IN(
-        "cIMT Still image", "DXA Forearm", "DXA Hip", "DXA Whole Body", "DXA IVA Lateral Spine",
-        "ECG RAW+", "ECG Images", "Retinal Scan (Image)", "Spirometry RAW+", "Spirometry Images" 
-      );
-      UPDATE data_option SET cost = 3000 WHERE name_en = "cIMT Cineloops";
-    END IF;
-
     SELECT "Adding new combined_cost column to data_option table" AS "";
 
     SELECT COUNT(*) INTO @test
@@ -359,7 +341,7 @@ CREATE PROCEDURE patch_data_option()
     AND column_name = "combined_cost";
 
     IF @test = 0 THEN
-      ALTER TABLE data_option ADD COLUMN combined_cost TINYINT(1) NOT NULL DEFAULT 0 AFTER cost;
+      ALTER TABLE data_option ADD COLUMN combined_cost TINYINT(1) NOT NULL DEFAULT 0 AFTER justification;
 
       UPDATE data_option SET combined_cost = 1 WHERE name_en = "cIMT Cineloops";
     END IF;

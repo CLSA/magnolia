@@ -21,6 +21,23 @@ class module extends \cenozo\service\module
   {
     parent::prepare_read( $select, $modifier );
 
+    if( $select->has_column( 'study_phase_code_list' ) )
+    {
+      $modifier->join(
+        'data_option_category_has_study_phase',
+        'data_option_category.id',
+        'data_option_category_has_study_phase.data_option_category_id'
+      );
+      $modifier->join(
+        'study_phase',
+        'data_option_category_has_study_phase.study_phase_id',
+        'study_phase.id'
+      );
+      $modifier->group( 'data_option_category.id' );
+
+      $select->add_column( 'GROUP_CONCAT( study_phase.code )', 'study_phase_code_list', false );
+    }
+
     if( $select->has_column( 'has_condition' ) )
     {
       $select->add_column(

@@ -12,6 +12,7 @@ define( function() {
     columnList: {
       rank: { title: 'Rank', type: 'rank' },
       name_en: { title: 'Name' },
+      comment: { title: 'Allow Comments', type: 'boolean' },
       has_condition: { title: 'Has Condition', type: 'boolean' },
       note_en: { title: 'Note', type: 'text', limit: 20 }
     },
@@ -23,6 +24,10 @@ define( function() {
       title: 'Rank',
       type: 'rank',
       isConstant: true
+    },
+    comment: {
+      title: 'Allow Comments',
+      type: 'boolean'
     },
     name_en: {
       title: 'Name (English)',

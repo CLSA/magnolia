@@ -22,14 +22,23 @@ class ui extends \cenozo\ui\ui
     parent::build_module_list();
 
     $module = $this->get_module( 'data_option_category' );
-    if( !is_null( $module ) ) $module->add_child( 'data_option' );
+    if( !is_null( $module ) )
+    {
+      $module->add_choose( 'study_phase' );
+      $module->add_child( 'data_option' );
+    }
 
     $module = $this->get_module( 'data_option' );
     if( !is_null( $module ) )
     {
-      $module->add_choose( 'study_phase' );
-      $module->add_child( 'data_option_detail' );
+      $module->add_child( 'data_selection' );
       $module->add_child( 'reqn' );
+    }
+
+    $module = $this->get_module( 'data_selection' );
+    if( !is_null( $module ) )
+    {
+      $module->add_child( 'data_selection_detail' );
     }
 
     $module = $this->get_module( 'data_version' );

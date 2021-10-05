@@ -21,6 +21,11 @@ SOURCE review.sql
 SOURCE data_option.sql
 SOURCE applicant.sql
 
+SOURCE data_option_category_has_study_phase.sql
+SOURCE data_selection.sql
+SOURCE data_selection_detail.sql
+SOURCE reqn_version_has_data_selection.sql
+
 SOURCE report_type.sql
 SOURCE report_restriction.sql
 SOURCE application_type_has_report_type.sql
