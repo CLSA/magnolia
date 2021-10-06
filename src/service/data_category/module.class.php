@@ -6,7 +6,7 @@
  * @filesource
  */
 
-namespace magnolia\service\data_option_category;
+namespace magnolia\service\data_category;
 use cenozo\lib, cenozo\log, magnolia\util;
 
 /**
@@ -24,16 +24,16 @@ class module extends \cenozo\service\module
     if( $select->has_column( 'study_phase_code_list' ) )
     {
       $modifier->join(
-        'data_option_category_has_study_phase',
-        'data_option_category.id',
-        'data_option_category_has_study_phase.data_option_category_id'
+        'data_category_has_study_phase',
+        'data_category.id',
+        'data_category_has_study_phase.data_category_id'
       );
       $modifier->join(
         'study_phase',
-        'data_option_category_has_study_phase.study_phase_id',
+        'data_category_has_study_phase.study_phase_id',
         'study_phase.id'
       );
-      $modifier->group( 'data_option_category.id' );
+      $modifier->group( 'data_category.id' );
 
       $select->add_column( 'GROUP_CONCAT( study_phase.code )', 'study_phase_code_list', false );
     }
@@ -41,7 +41,7 @@ class module extends \cenozo\service\module
     if( $select->has_column( 'has_condition' ) )
     {
       $select->add_column(
-        'data_option_category.condition_en IS NOT NULL OR data_option_category.condition_fr IS NOT NULL',
+        'data_category.condition_en IS NOT NULL OR data_category.condition_fr IS NOT NULL',
         'has_condition',
         false
       );

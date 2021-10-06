@@ -21,7 +21,7 @@ class module extends \cenozo\service\module
   {
     parent::prepare_read( $select, $modifier );
 
-    $modifier->join( 'data_option_category', 'data_option.data_option_category_id', 'data_option_category.id' );
+    $modifier->join( 'data_category', 'data_option.data_category_id', 'data_category.id' );
 
     if( $select->has_column( 'has_condition' ) )
     {

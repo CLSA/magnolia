@@ -547,22 +547,22 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
               } ).patch();
 
               this.record['amendment_justification_' + amendmentTypeId] = data[property];
-            } else if( null != property.match( /^data_option_justification_/ ) ) {
+            } else if( null != property.match( /^data_justification_/ ) ) {
               // justifications have their own service
-              var match = property.match( /^data_option_justification_([0-9]+)$/ );
+              var match = property.match( /^data_justification_([0-9]+)$/ );
               var optionId = match[1];
 
               await CnHttpFactory.instance( {
                 path: [
                   'reqn_version',
                   this.record.id,
-                  'data_option_justification',
+                  'data_justification',
                   'data_option_id=' + optionId
                 ].join( '/' ),
                 data: { description: data[property] }
               } ).patch();
 
-              this.record['data_option_justification_' + optionId] = data[property];
+              this.record['data_justification_' + optionId] = data[property];
             } else if( null != property.match( /^comment_/ ) ) {
               // comments have their own service
               var match = property.match( /^comment_([0-9]+)$/ );
@@ -573,7 +573,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                   'reqn_version',
                   this.record.id,
                   'reqn_version_comment',
-                  'data_option_category_id=' + categoryId
+                  'data_category_id=' + categoryId
                 ].join( '/' ),
                 data: { description: data[property] }
               } ).patch();
@@ -1014,9 +1014,9 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                         } );
                       } else if( 'optionJustificationList' == property ) {
                         for( var prop in reqnVersion1 ) {
-                          if( null != prop.match( /^data_option_justification_/ ) ) {
+                          if( null != prop.match( /^data_justification_/ ) ) {
                             if( reqnVersion1[prop] != reqnVersion2[prop] ) {
-                              var match = prop.match( /^data_option_justification_([0-9]+)$/ );
+                              var match = prop.match( /^data_justification_([0-9]+)$/ );
                               var option = this.parentModel.getCategoryAndOption( match[1] ).option;
                               differences.diff = true;
                               differences[part].diff = true;
@@ -1459,11 +1459,11 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
 
               CnHttpFactory.instance( {
                 path: basePath + '/reqn_version_comment',
-                data: { select: { column: [ 'data_option_category_id', 'description' ] } }
+                data: { select: { column: [ 'data_category_id', 'description' ] } }
               } ).query(),
 
               CnHttpFactory.instance( {
-                path: basePath + '/data_option_justification',
+                path: basePath + '/data_justification',
                 data: { select: { column: [ 'data_option_id', 'description' ] } }
               } ).query(),
 
@@ -1478,14 +1478,14 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
 
             // define all reqn-version comments
             commentResponse.data.forEach( function( comment ) {
-              var column = 'comment_' + comment.data_option_category_id;
+              var column = 'comment_' + comment.data_category_id;
               object[column] = comment.description;
               self.backupRecord[column] = object[column];
             } );
 
             // define all reqn-version data-option justifications
             optionJustificationResponse.data.forEach( function( justification ) {
-              var column = 'data_option_justification_' + justification.data_option_id;
+              var column = 'data_justification_' + justification.data_option_id;
               object[column] = justification.description;
               self.backupRecord[column] = object[column];
             } );
@@ -1551,7 +1551,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
 
             // don't proceed if the confirm factory says no
             if( proceed ) {
-              var justificationColumn = 'data_option_justification_' + option.id;
+              var justificationColumn = 'data_justification_' + option.id;
 
               // toggle the option
               this.record.selectionList[selection.id] = !this.record.selectionList[selection.id];
@@ -1686,9 +1686,9 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
               // We have to do this dynamically because they only exist if their parent data option is selected and
               // have the "justification" property
               for( var property in this.record ) {
-                if( null != property.match( /^data_option_justification_/ ) ) {
+                if( null != property.match( /^data_justification_/ ) ) {
                   // find which tab the justification belongs to
-                  var match = property.match( /^data_option_justification_([0-9]+)$/ );
+                  var match = property.match( /^data_justification_([0-9]+)$/ );
                   var obj = this.parentModel.getCategoryAndOption( match[1] );
                   if( obj.option.justification ) {
                     var tab = '2' + obj.category.charCode;
@@ -2194,7 +2194,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
             if( 'root' == this.type ) {
               promiseList = promiseList.concat( [
                 CnHttpFactory.instance( {
-                  path: 'data_option_category',
+                  path: 'data_category',
                   data: {
                     select: { column: [
                       'id',
@@ -2216,7 +2216,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                   data: {
                     select: { column: [
                       'id',
-                      'data_option_category_id',
+                      'data_category_id',
                       'justification',
                       'combined_cost',
                       'name_en', 'name_fr',
@@ -2224,7 +2224,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                       'note_en', 'note_fr'
                     ] },
                     modifier: {
-                      order: [ 'data_option_category.rank', 'data_option.rank' ],
+                      order: [ 'data_category.rank', 'data_option.rank' ],
                       limit: 1000
                     }
                   }
@@ -2239,28 +2239,28 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                       'cost',
                       'unavailable_en', 'unavailable_fr',
                       { table: 'study_phase', column: 'code', alias: 'study_phase_code' },
-                      { table: 'data_option_category', column: 'id', alias: 'data_option_category_id' }
+                      { table: 'data_category', column: 'id', alias: 'data_category_id' }
                     ] },
                     modifier: {
-                      order: [ 'data_option_category.rank', 'data_option.rank', 'study_phase.rank' ],
+                      order: [ 'data_category.rank', 'data_option.rank', 'study_phase.rank' ],
                       limit: 1000
                     }
                   }
                 } ).query(),
 
                 CnHttpFactory.instance( {
-                  path: 'data_selection_detail',
+                  path: 'data_detail',
                   data: {
                     select: { column: [
                       'id',
                       'data_selection_id',
                       'name_en', 'name_fr',
                       'note_en', 'note_fr',
-                      { table: 'data_option_category', column: 'id', alias: 'data_option_category_id' },
+                      { table: 'data_category', column: 'id', alias: 'data_category_id' },
                       { table: 'data_option', column: 'id', alias: 'data_option_id' }
                     ] },
                     modifier: {
-                      order: [ 'data_option.id', 'study_phase.rank', 'data_selection_detail.rank' ],
+                      order: [ 'data_option.id', 'study_phase.rank', 'data_detail.rank' ],
                       limit: 1000
                     }
                   }
@@ -2422,8 +2422,8 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
               // add options to all categories
               var category = null;
               optionResponse.data.forEach( function( option ) {
-                if( null == category || option.data_option_category_id != category.id )
-                  category = self.categoryList.findByProperty( 'id', option.data_option_category_id );
+                if( null == category || option.data_category_id != category.id )
+                  category = self.categoryList.findByProperty( 'id', option.data_category_id );
 
                 angular.extend( option, {
                   name: { en: option.name_en, fr: option.name_fr },
@@ -2435,7 +2435,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                 category.optionList.push( option );
 
                 // remove stuff we no longer need
-                delete option.data_option_category_id;
+                delete option.data_category_id;
                 delete option.combined_cost;
                 delete option.name_en;
                 delete option.name_fr;
@@ -2447,8 +2447,8 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
               var category = null;
               var option = null;
               selectionResponse.data.forEach( function( selection ) {
-                if( null == category || selection.data_option_category_id != category.id )
-                  category = self.categoryList.findByProperty( 'id', selection.data_option_category_id );
+                if( null == category || selection.data_category_id != category.id )
+                  category = self.categoryList.findByProperty( 'id', selection.data_category_id );
                 if( null == option || selection.data_option_id != option.id )
                   option = category.optionList.findByProperty( 'id', selection.data_option_id );
 
@@ -2470,7 +2470,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
 
                 // remove stuff we no longer need
                 delete selection.study_phase_code;
-                delete selection.data_option_category_id;
+                delete selection.data_category_id;
                 delete selection.data_option_id;
                 delete selection.unavailable_en;
                 delete selection.unavailable_fr;
@@ -2481,8 +2481,8 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
               var option = null;
               var selection = null;
               detailResponse.data.forEach( function( detail ) {
-                if( null == category || detail.data_option_category_id != category.id )
-                  category = self.categoryList.findByProperty( 'id', detail.data_option_category_id );
+                if( null == category || detail.data_category_id != category.id )
+                  category = self.categoryList.findByProperty( 'id', detail.data_category_id );
                 if( null == option || detail.data_option_id != option.id )
                   option = category.optionList.findByProperty( 'id', detail.data_option_id );
                 if( null == selection || detail.data_selection_id != selection.id )
@@ -2496,7 +2496,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                 selection.detailList.push( detail );
 
                 // remove stuff we no longer need
-                delete detail.data_option_category_id;
+                delete detail.data_category_id;
                 delete detail.data_option_id;
                 delete detail.name_en;
                 delete detail.name_fr;

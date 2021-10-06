@@ -87,9 +87,9 @@ BEGIN
   CALL update_reqn_last_reqn_version_with_agreement( NEW.reqn_id );
 
   -- create reqn_version_comment
-  INSERT INTO reqn_version_comment( create_timestamp, reqn_version_id, data_option_category_id )
-  SELECT NEW.create_timestamp, NEW.id, data_option_category.id
-  FROM data_option_category
+  INSERT INTO reqn_version_comment( create_timestamp, reqn_version_id, data_category_id )
+  SELECT NEW.create_timestamp, NEW.id, data_category.id
+  FROM data_category
   WHERE comment = true;
 END$$
 

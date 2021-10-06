@@ -5,8 +5,8 @@ define( function() {
   angular.extend( module, {
     identifier: {
       parent: {
-        subject: 'data_option_category',
-        column: 'data_option_category.name_en'
+        subject: 'data_category',
+        column: 'data_category.name_en'
       }
     },
     name: {
@@ -15,8 +15,8 @@ define( function() {
       possessive: 'data-option\'s'
     },
     columnList: {
-      category_rank: { column: 'data_option_category.rank', title: 'Category Rank', type: 'rank' },
-      category_name_en: { column: 'data_option_category.name_en', title: 'Category Name' },
+      category_rank: { column: 'data_category.rank', title: 'Category Rank', type: 'rank' },
+      category_name_en: { column: 'data_category.name_en', title: 'Category Name' },
       rank: { title: 'Rank', type: 'rank' },
       justification: { title: 'Justification', type: 'boolean' },
       name_en: { title: 'Name' },
@@ -28,8 +28,8 @@ define( function() {
   } );
 
   module.addInputGroup( '', {
-    data_option_category_name_en: {
-      column: 'data_option_category.name_en',
+    data_category_name_en: {
+      column: 'data_category.name_en',
       title: 'Category',
       type: 'string',
       isConstant: true

@@ -6,7 +6,7 @@
  * @filesource
  */
 
-namespace magnolia\service\reqn_version_comment;
+namespace magnolia\service\data_justification;
 use cenozo\lib, cenozo\log, magnolia\util;
 
 /**
@@ -21,7 +21,7 @@ class module extends \cenozo\service\module
   {
     parent::prepare_read( $select, $modifier );
 
-    $modifier->join( 'reqn_version', 'reqn_version_comment.reqn_version_id', 'reqn_version.id' );
-    $modifier->join( 'data_category', 'reqn_version_comment.data_category_id', 'data_category.id' );
+    $modifier->join( 'reqn_version', 'data_justification.reqn_version_id', 'reqn_version.id' );
+    $modifier->join( 'data_option', 'data_justification.data_option_id', 'data_option.id' );
   }
 }

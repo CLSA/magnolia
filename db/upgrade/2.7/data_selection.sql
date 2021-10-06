@@ -57,10 +57,10 @@ CREATE PROCEDURE patch_data_selection()
                "IF( data_option_has_study_phase.study_phase_id IS NOT NULL, NULL, ",
                "IF( data_option.name_en RLIKE 'Genomics\|Epigenetics\|Metabolomics', '(sans objet)', '(pas encore disponible)' ) ) ",
         "FROM data_option ",
-        "JOIN data_option_category ON data_option.data_option_category_id = data_option_category.id ",
-        "JOIN data_option_category_has_study_phase ",
-          "ON data_option_category.id = data_option_category_has_study_phase.data_option_category_id ",
-        "JOIN ", @cenozo, ".study_phase ON data_option_category_has_study_phase.study_phase_id = study_phase.id ",
+        "JOIN data_category ON data_option.data_option_category_id = data_category.id ",
+        "JOIN data_category_has_study_phase ",
+          "ON data_category.id = data_category_has_study_phase.data_category_id ",
+        "JOIN ", @cenozo, ".study_phase ON data_category_has_study_phase.study_phase_id = study_phase.id ",
         "LEFT JOIN data_option_has_study_phase ",
                "ON data_option.id = data_option_has_study_phase.data_option_id ",
                "AND study_phase.id = data_option_has_study_phase.study_phase_id"
@@ -70,18 +70,6 @@ CREATE PROCEDURE patch_data_selection()
       DEALLOCATE PREPARE statement;
 
       DROP TABLE data_option_has_study_phase;
-
-      UPDATE data_selection
-      JOIN data_option ON data_selection.data_option_id = data_option.id
-      SET data_selection.cost = 500
-      WHERE data_option.name_en IN(
-        "cIMT Still image", "DXA Forearm", "DXA Hip", "DXA Whole Body", "DXA IVA Lateral Spine",
-        "ECG RAW+", "ECG Images", "Retinal Scan (Image)", "Spirometry RAW+", "Spirometry Images" 
-      );
-      UPDATE data_selection
-      JOIN data_option ON data_selection.data_option_id = data_option.id
-      SET cost = 3000
-      WHERE data_option.name_en = "cIMT Cineloops";
     END IF;
 
   END //

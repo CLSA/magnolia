@@ -1138,7 +1138,7 @@ cenozo.service( 'CnReqnHelper', [
     async function init() {
       // fill in dynamic content
       object.promise = await CnHttpFactory.instance( {
-        path: 'data_option_category',
+        path: 'data_category',
         data: {
           select: { column: [ 'name_en', 'name_fr' ] },
           modifier: { order: 'rank', limit: 1000 }

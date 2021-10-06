@@ -21,7 +21,7 @@ class ui extends \cenozo\ui\ui
   {
     parent::build_module_list();
 
-    $module = $this->get_module( 'data_option_category' );
+    $module = $this->get_module( 'data_category' );
     if( !is_null( $module ) )
     {
       $module->add_choose( 'study_phase' );
@@ -38,7 +38,7 @@ class ui extends \cenozo\ui\ui
     $module = $this->get_module( 'data_selection' );
     if( !is_null( $module ) )
     {
-      $module->add_child( 'data_selection_detail' );
+      $module->add_child( 'data_selection' );
     }
 
     $module = $this->get_module( 'data_version' );
@@ -172,7 +172,7 @@ class ui extends \cenozo\ui\ui
     if( 'administrator' != $db_role->name ) $this->remove_listitem( 'Users' );
     if( 'administrator' == $db_role->name )
     {
-      $this->add_listitem( 'Data Option Categories', 'data_option_category' );
+      $this->add_listitem( 'Data Option Categories', 'data_category' );
       $this->add_listitem( 'Output Types', 'output_type' );
     }
     if( in_array( $db_role->name, ['administrator', 'readonly'] ) ) $this->add_listitem( 'Requisition Types', 'reqn_type' );

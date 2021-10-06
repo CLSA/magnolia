@@ -112,7 +112,7 @@ class reqn_version extends \cenozo\database\record
     $coapplicant_class_name = lib::get_class_name( 'database\coapplicant' );
     $reference_class_name = lib::get_class_name( 'database\reference' );
     $reqn_version_comment_class_name = lib::get_class_name( 'database\reqn_version_comment' );
-    $data_option_justification_class_name = lib::get_class_name( 'database\data_option_justification' );
+    $data_justification_class_name = lib::get_class_name( 'database\data_justification' );
 
     // get the two newest versions
     $version_mod = lib::create( 'database\modifier' );
@@ -187,20 +187,20 @@ class reqn_version extends \cenozo\database\record
     foreach( $this->get_reqn_version_comment_object_list() as $db_reqn_version_comment )
     {
       $db_last_reqn_version_comment = $reqn_version_comment_class_name::get_unique_record(
-        array( 'reqn_version_id', 'data_option_category_id' ),
-        array( $db_last_reqn_version->id, $db_reqn_version_comment->data_option_category_id )
+        array( 'reqn_version_id', 'data_category_id' ),
+        array( $db_last_reqn_version->id, $db_reqn_version_comment->data_category_id )
       );
       if( $db_reqn_version_comment->description != $db_last_reqn_version_comment->description ) return true;
     }
 
     // see if there is a different number of justifications
-    if( $this->get_data_option_justification_count() != $db_last_reqn_version->get_data_option_justification_count() )
+    if( $this->get_data_justification_count() != $db_last_reqn_version->get_data_justification_count() )
       return true;
 
-    // now check data_option_justification records
-    foreach( $this->get_data_option_justification_object_list() as $db_rvj )
+    // now check data_justification records
+    foreach( $this->get_data_justification_object_list() as $db_rvj )
     {
-      $db_last_rvj = $data_option_justification_class_name::get_unique_record(
+      $db_last_rvj = $data_justification_class_name::get_unique_record(
         array( 'reqn_version_id', 'data_option_id' ),
         array( $db_last_reqn_version->id, $db_rvj->data_option_id )
       );
@@ -211,9 +211,9 @@ class reqn_version extends \cenozo\database\record
     }
 
     // do the same check but from the last version instead
-    foreach( $db_last_reqn_version->get_data_option_justification_object_list() as $db_last_rvj )
+    foreach( $db_last_reqn_version->get_data_justification_object_list() as $db_last_rvj )
     {
-      $db_rvj = $data_option_justification_class_name::get_unique_record(
+      $db_rvj = $data_justification_class_name::get_unique_record(
         array( 'reqn_version_id', 'data_option_id' ),
         array( $this->id, $db_last_rvj->data_option_id )
       );
@@ -284,9 +284,9 @@ class reqn_version extends \cenozo\database\record
     $modifier->join( 'reqn_version_has_data_selection', 'reqn_version.id', 'reqn_version_has_data_selection.reqn_version_id' );
     $modifier->join( 'data_selection', 'reqn_version_has_data_selection.data_selection_id', 'data_select.id' );
     $modifier->join( 'data_option', 'data_selection.data_option_id', 'data_option.id' );
-    $modifier->join( 'data_option_category', 'data_option.data_option_category_id', 'data_option_category.id' );
+    $modifier->join( 'data_category', 'data_option.data_category_id', 'data_category.id' );
     $modifier->where( 'reqn_version.id', '=', $this->id );
-    $modifier->where( 'data_option_category.name_en', '=', 'Linked Data' );
+    $modifier->where( 'data_category.name_en', '=', 'Linked Data' );
 
     return static::db()->get_one( sprintf( '%s %s', $select->get_sql(), $modifier->get_sql() ) );
   }
@@ -551,12 +551,12 @@ class reqn_version extends \cenozo\database\record
                              : $this->last_identifier;
 
     $data_selection_sel = lib::create( 'database\select' );
-    $data_selection_sel->add_table_column( 'data_option_category', 'rank', 'category_rank' );
+    $data_selection_sel->add_table_column( 'data_category', 'rank', 'category_rank' );
     $data_selection_sel->add_table_column( 'data_option', 'rank', 'option_rank' );
     $data_selection_sel->add_table_column( 'study_phase', 'code' );
     $data_selection_mod = lib::create( 'database\modifier' );
     $data_selection_mod->join( 'data_option', 'data_selection.data_option_id', 'data_option.id' );
-    $data_selection_mod->join( 'data_option_category', 'data_option.data_option_category_id', 'data_option_category.id' );
+    $data_selection_mod->join( 'data_category', 'data_option.data_category_id', 'data_category.id' );
     $data_selection_mod->join( 'study_phase', 'data_selection.study_phase_id', 'study_phase.id' );
     foreach( $this->get_data_selection_list( $data_selection_sel, $data_selection_mod ) as $data_selection )
     {
@@ -569,35 +569,35 @@ class reqn_version extends \cenozo\database\record
     }
 
     $comment_sel = lib::create( 'database\select' );
-    $comment_sel->add_table_column( 'data_option_category', 'rank' );
+    $comment_sel->add_table_column( 'data_category', 'rank' );
     $comment_sel->add_column( 'description' );
     $comment_mod = lib::create( 'database\modifier' );
-    $comment_mod->join( 'data_option_category', 'reqn_version_comment.data_option_category_id', 'data_option_category.id' );
+    $comment_mod->join( 'data_category', 'reqn_version_comment.data_category_id', 'data_category.id' );
     $comment_mod->where( 'description', '!=', NULL );
-    $comment_mod->order( 'data_option_category.rank' );
+    $comment_mod->order( 'data_category.rank' );
 
     foreach( $this->get_reqn_version_comment_list( $comment_sel, $comment_mod ) as $reqn_version_comment )
       $data[ sprintf( 'c%d_comment', $reqn_version_comment['rank'] ) ] = $reqn_version_comment['description'];
 
     $justification_sel = lib::create( 'database\select' );
-    $justification_sel->add_table_column( 'data_option_category', 'rank', 'data_option_category_rank' );
+    $justification_sel->add_table_column( 'data_category', 'rank', 'data_category_rank' );
     $justification_sel->add_table_column( 'data_option', 'rank', 'data_option_rank' );
     $justification_sel->add_column( 'description' );
     $justification_mod = lib::create( 'database\modifier' );
-    $justification_mod->join( 'data_option', 'data_option_justification.data_option_id', 'data_option.id' );
-    $justification_mod->join( 'data_option_category', 'data_option.data_option_category_id', 'data_option_category.id' );
+    $justification_mod->join( 'data_option', 'data_justification.data_option_id', 'data_option.id' );
+    $justification_mod->join( 'data_category', 'data_option.data_category_id', 'data_category.id' );
     $justification_mod->where( 'description', '!=', NULL );
     $justification_mod->where( 'data_option.justification', '=', true );
-    $justification_mod->order( 'data_option_category.rank' );
+    $justification_mod->order( 'data_category.rank' );
     $justification_mod->order( 'data_option.rank' );
 
-    foreach( $this->get_data_option_justification_list( $justification_sel, $justification_mod ) as $data_option_justification )
+    foreach( $this->get_data_justification_list( $justification_sel, $justification_mod ) as $data_justification )
     {
       $data[ sprintf(
         'c%d_o%d_justification',
-        $data_option_justification['data_option_category_rank'],
-        $data_option_justification['data_option_rank']
-      ) ] = $data_option_justification['description'];
+        $data_justification['data_category_rank'],
+        $data_justification['data_option_rank']
+      ) ] = $data_justification['description'];
     }
 
     if( is_null( $db_pdf_form ) )
@@ -644,7 +644,7 @@ class reqn_version extends \cenozo\database\record
   public function generate_data_option_list_csv()
   {
     $study_class_name = lib::get_class_name( 'database\study' );
-    $data_option_category_class_name = lib::get_class_name( 'database\data_option_category' );
+    $data_category_class_name = lib::get_class_name( 'database\data_category' );
 
     $study_id = $study_class_name::get_unique_record( 'name', 'CLSA' )->id;
     $db_user = lib::create( 'business\session' )->get_user();
@@ -679,13 +679,13 @@ class reqn_version extends \cenozo\database\record
     );
 
     // get a list of all study_phases that all categories are linked to
-    $study_phase_list = $data_option_category_class_name::get_all_study_phase_list();
+    $study_phase_list = $data_category_class_name::get_all_study_phase_list();
 
     $modifier = lib::create( 'database\modifier' );
-    $modifier->join( 'data_option', 'data_option_category.id', 'data_option.data_option_category_id' );
+    $modifier->join( 'data_option', 'data_category.id', 'data_option.data_category_id' );
 
     $select = lib::create( 'database\select' );
-    $select->from( 'data_option_category' );
+    $select->from( 'data_category' );
     $select->add_column( 'name_en', 'Category' );
     $select->add_table_column( 'data_option', 'name_en', 'Data Option' );
     foreach( $study_phase_list as $db_study_phase )
@@ -701,7 +701,7 @@ class reqn_version extends \cenozo\database\record
       $modifier->join_modifier( 'reqn_version_has_data_selection', $join_mod, 'left', $table_name );
     }
 
-    $modifier->order( 'data_option_category.rank' );
+    $modifier->order( 'data_category.rank' );
     $modifier->order( 'data_option.rank' );
 
     $output .= "\n".util::get_data_as_csv(

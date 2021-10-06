@@ -92,8 +92,8 @@ class module extends \cenozo\service\module
       $category_sel->add_column( 'id' );
       $category_mod = lib::create( 'database\modifier' );
       $category_mod->join( 'data_option', 'data_selection.data_option_id', 'data_option.id' );
-      $category_mod->join( 'data_option_category', 'data_option.data_option_category_id', 'data_option_category.id' );
-      $category_mod->where( 'data_option_category.name_en', '=', 'Linked Data' );
+      $category_mod->join( 'data_category', 'data_option.data_category_id', 'data_category.id' );
+      $category_mod->where( 'data_category.name_en', '=', 'Linked Data' );
       $linked_data_sql = sprintf( '( %s %s )', $category_sel->get_sql(), $category_mod->get_sql() );
 
       $join_sel = lib::create( 'database\select' );

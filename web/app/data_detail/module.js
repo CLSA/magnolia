@@ -3,7 +3,7 @@ define( [ 'data_selection' ].reduce( function( list, name ) {
 }, [] ), function() {
   'use strict';
 
-  try { var module = cenozoApp.module( 'data_selection_detail', true ); } catch( err ) { console.warn( err ); return; }
+  try { var module = cenozoApp.module( 'data_detail', true ); } catch( err ) { console.warn( err ); return; }
   angular.extend( module, {
     identifier: {
       parent: {
@@ -12,9 +12,9 @@ define( [ 'data_selection' ].reduce( function( list, name ) {
       }
     },
     name: {
-      singular: 'data-selection detail',
-      plural: 'data-selection details',
-      possessive: 'data-selection detail\'s'
+      singular: 'data-detail',
+      plural: 'data-details',
+      possessive: 'data-detail\'s'
     },
     columnList: {
       rank: { title: 'Rank', type: 'rank' },
@@ -25,8 +25,8 @@ define( [ 'data_selection' ].reduce( function( list, name ) {
   } );
 
   module.addInputGroup( '', {
-    data_option_category_name_en: {
-      column: 'data_option_category.name_en',
+    data_category_name_en: {
+      column: 'data_category.name_en',
       title: 'Category',
       type: 'string',
       isExcluded: 'add',
@@ -42,56 +42,56 @@ define( [ 'data_selection' ].reduce( function( list, name ) {
     name_fr: { title: 'Name (French)', type: 'string' },
     note_en: { title: 'Note (English)', type: 'text' },
     note_fr: { title: 'Note (French)', type: 'text' },
-    data_option_category_rank: { column: 'data_option_category.rank', type: 'hidden' }
+    data_category_rank: { column: 'data_category.rank', type: 'hidden' }
   } );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnDataSelectionDetailAdd', [
-    'CnDataSelectionDetailModelFactory',
-    function( CnDataSelectionDetailModelFactory ) {
+  cenozo.providers.directive( 'cnDataDetailAdd', [
+    'CnDataDetailModelFactory',
+    function( CnDataDetailModelFactory ) {
       return {
         templateUrl: module.getFileUrl( 'add.tpl.html' ),
         restrict: 'E',
         scope: { model: '=?' },
         controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnDataSelectionDetailModelFactory.root;
+          if( angular.isUndefined( $scope.model ) ) $scope.model = CnDataDetailModelFactory.root;
         }
       };
     }
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnDataSelectionDetailList', [
-    'CnDataSelectionDetailModelFactory',
-    function( CnDataSelectionDetailModelFactory ) {
+  cenozo.providers.directive( 'cnDataDetailList', [
+    'CnDataDetailModelFactory',
+    function( CnDataDetailModelFactory ) {
       return {
         templateUrl: module.getFileUrl( 'list.tpl.html' ),
         restrict: 'E',
         scope: { model: '=?' },
         controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnDataSelectionDetailModelFactory.root;
+          if( angular.isUndefined( $scope.model ) ) $scope.model = CnDataDetailModelFactory.root;
         }
       };
     }
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnDataSelectionDetailView', [
-    'CnDataSelectionDetailModelFactory',
-    function( CnDataSelectionDetailModelFactory ) {
+  cenozo.providers.directive( 'cnDataDetailView', [
+    'CnDataDetailModelFactory',
+    function( CnDataDetailModelFactory ) {
       return {
         templateUrl: module.getFileUrl( 'view.tpl.html' ),
         restrict: 'E',
         scope: { model: '=?' },
         controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnDataSelectionDetailModelFactory.root;
+          if( angular.isUndefined( $scope.model ) ) $scope.model = CnDataDetailModelFactory.root;
         }
       };
     }
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnDataSelectionDetailAddFactory', [
+  cenozo.providers.factory( 'CnDataDetailAddFactory', [
     'CnBaseAddFactory',
     function( CnBaseAddFactory ) {
       var object = function( parentModel ) { CnBaseAddFactory.construct( this, parentModel ); };
@@ -100,7 +100,7 @@ define( [ 'data_selection' ].reduce( function( list, name ) {
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnDataSelectionDetailListFactory', [
+  cenozo.providers.factory( 'CnDataDetailListFactory', [
     'CnBaseListFactory',
     function( CnBaseListFactory ) {
       var object = function( parentModel ) { CnBaseListFactory.construct( this, parentModel ); };
@@ -109,7 +109,7 @@ define( [ 'data_selection' ].reduce( function( list, name ) {
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnDataSelectionDetailViewFactory', [
+  cenozo.providers.factory( 'CnDataDetailViewFactory', [
     'CnBaseViewFactory',
     function( CnBaseViewFactory ) {
       var object = function( parentModel, root ) { CnBaseViewFactory.construct( this, parentModel, root ); }
@@ -118,16 +118,16 @@ define( [ 'data_selection' ].reduce( function( list, name ) {
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnDataSelectionDetailModelFactory', [
-    'CnBaseModelFactory', 'CnDataSelectionDetailAddFactory', 'CnDataSelectionDetailListFactory', 'CnDataSelectionDetailViewFactory',
+  cenozo.providers.factory( 'CnDataDetailModelFactory', [
+    'CnBaseModelFactory', 'CnDataDetailAddFactory', 'CnDataDetailListFactory', 'CnDataDetailViewFactory',
     'CnHttpFactory',
-    function( CnBaseModelFactory, CnDataSelectionDetailAddFactory, CnDataSelectionDetailListFactory, CnDataSelectionDetailViewFactory,
+    function( CnBaseModelFactory, CnDataDetailAddFactory, CnDataDetailListFactory, CnDataDetailViewFactory,
               CnHttpFactory ) {
       var object = function( root ) {
         CnBaseModelFactory.construct( this, module );
-        this.addModel = CnDataSelectionDetailAddFactory.instance( this );
-        this.listModel = CnDataSelectionDetailListFactory.instance( this );
-        this.viewModel = CnDataSelectionDetailViewFactory.instance( this, root );
+        this.addModel = CnDataDetailAddFactory.instance( this );
+        this.listModel = CnDataDetailListFactory.instance( this );
+        this.viewModel = CnDataDetailViewFactory.instance( this, root );
 
         // extend getMetadata
         this.getMetadata = async function() {

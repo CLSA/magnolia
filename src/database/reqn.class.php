@@ -146,7 +146,7 @@ class reqn extends \cenozo\database\record
   public function create_version( $new_amendment = false, $db_clone_reqn_version = NULL )
   {
     $reqn_version_comment_class_name = lib::get_class_name( 'database\reqn_version_comment' );
-    $data_option_justification_class_name = lib::get_class_name( 'database\data_option_justification' );
+    $data_justification_class_name = lib::get_class_name( 'database\data_justification' );
 
     // first get the current reqn version to determine the next version number
     $db_current_reqn_version = $this->get_current_reqn_version();
@@ -234,22 +234,22 @@ class reqn extends \cenozo\database\record
       foreach( $db_clone_reqn_version->get_reqn_version_comment_object_list() as $db_reqn_version_comment_clone )
       {
         $db_reqn_version_comment = $reqn_version_comment_class_name::get_unique_record(
-          array( 'reqn_version_id', 'data_option_category_id' ),
-          array( $db_reqn_version->id, $db_reqn_version_comment_clone->data_option_category_id )
+          array( 'reqn_version_id', 'data_category_id' ),
+          array( $db_reqn_version->id, $db_reqn_version_comment_clone->data_category_id )
         );
         $db_reqn_version_comment->description = $db_reqn_version_comment_clone->description;
         $db_reqn_version_comment->save();
       }
 
       // copy all justifications
-      foreach( $db_clone_reqn_version->get_data_option_justification_object_list() as $db_data_option_justification_clone )
+      foreach( $db_clone_reqn_version->get_data_justification_object_list() as $db_data_justification_clone )
       {
-        $db_data_option_justification = $data_option_justification_class_name::get_unique_record(
+        $db_data_justification = $data_justification_class_name::get_unique_record(
           array( 'reqn_version_id', 'data_option_id' ),
-          array( $db_reqn_version->id, $db_data_option_justification_clone->data_option_id )
+          array( $db_reqn_version->id, $db_data_justification_clone->data_option_id )
         );
-        $db_data_option_justification->description = $db_data_option_justification_clone->description;
-        $db_data_option_justification->save();
+        $db_data_justification->description = $db_data_justification_clone->description;
+        $db_data_justification->save();
       }
     }
   }

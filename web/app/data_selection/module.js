@@ -98,7 +98,7 @@ define( function() {
   cenozo.providers.factory( 'CnDataSelectionViewFactory', [
     'CnBaseViewFactory',
     function( CnBaseViewFactory ) {
-      var object = function( parentModel, root ) { CnBaseViewFactory.construct( this, parentModel, root, 'data_selection_detail' ); }
+      var object = function( parentModel, root ) { CnBaseViewFactory.construct( this, parentModel, root, 'data_detail' ); }
       return { instance: function( parentModel, root ) { return new object( parentModel, root ); } };
     }
   ] );
@@ -122,8 +122,8 @@ define( function() {
             CnHttpFactory.instance( {
               path: 'data_option',
               data: {
-                select: { column: [ 'id', 'name_en', { table: 'data_option_category', column: 'name_en', alias: 'category' } ] },
-                modifier: { order: [ 'data_option_category.rank', 'data_option.rank' ], limit: 1000 }
+                select: { column: [ 'id', 'name_en', { table: 'data_category', column: 'name_en', alias: 'category' } ] },
+                modifier: { order: [ 'data_category.rank', 'data_option.rank' ], limit: 1000 }
               }
             } ).query(),
 

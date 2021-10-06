@@ -21,8 +21,11 @@ INSERT IGNORE INTO service ( subject, method, resource, restricted ) VALUES
 ( 'review_answer', 'GET', 1, 1 ),
 ( 'review_answer', 'PATCH', 1, 1 );
 
-SELECT "Renaming reqn_version_justification services to data_option_justification" AS "";
-UPDATE service SET subject = "data_option_justification" WHERE subject = "reqn_version_justification";
+SELECT "Renaming data_option_category services to data_category" AS "";
+UPDATE service SET subject = "data_category" WHERE subject = "data_option_category";
 
-SELECT "Renaming data_option_detail services to data_selection_detail" AS "";
-UPDATE service SET subject = "data_selection_detail" WHERE subject = "data_option_detail";
+SELECT "Renaming reqn_version_justification services to data_justification" AS "";
+UPDATE service SET subject = "data_justification" WHERE subject IN( "reqn_version_justification", "data_option_justification" );
+
+SELECT "Renaming data_option_detail services to data_detail" AS "";
+UPDATE service SET subject = "data_detail" WHERE subject IN( "data_option_detail", "data_selection_detail" );

@@ -18,10 +18,10 @@ class deadline_data_option extends \cenozo\business\report\base_report
   {
     $reqn_class_name = lib::get_class_name( 'database\reqn' );
     $study_class_name = lib::get_class_name( 'database\study' );
-    $data_option_category_class_name = lib::get_class_name( 'database\data_option_category' );
+    $data_category_class_name = lib::get_class_name( 'database\data_category' );
 
     $study_phase_id_list = array();
-    foreach( $data_option_category_class_name::get_all_study_phase_list() as $db_study_phase )
+    foreach( $data_category_class_name::get_all_study_phase_list() as $db_study_phase )
       $study_phase_id_list[] = $db_study_phase->id;
 
     $select = lib::create( 'database\select' );
@@ -40,16 +40,16 @@ class deadline_data_option extends \cenozo\business\report\base_report
     $modifier->where( 'study_phase.id', 'IN', $study_phase_id_list );
 
     $modifier->join(
-      'data_option_category_has_study_phase',
+      'data_category_has_study_phase',
       'study_phase.id',
-      'data_option_category_has_study_phase.study_phase_id'
+      'data_category_has_study_phase.study_phase_id'
     );
     $modifier->join(
-      'data_option_category',
-      'data_option_category_has_study_phase.data_option_category_id',
-      'data_option_category.id'
+      'data_category',
+      'data_category_has_study_phase.data_category_id',
+      'data_category.id'
     );
-    $modifier->join( 'data_option', 'data_option_category.id', 'data_option.data_option_category_id' );
+    $modifier->join( 'data_option', 'data_category.id', 'data_option.data_category_id' );
     $join_mod = lib::create( 'database\modifier' );
     $join_mod->where( 'data_option.id', '=', 'data_selection.data_option_id', false );
     $join_mod->where( 'study_phase.id', '=', 'data_selection.study_phase_id', false );
@@ -71,7 +71,7 @@ class deadline_data_option extends \cenozo\business\report\base_report
 
     // order by reqn, then data option
     $modifier->order( 'reqn.identifier' );
-    $modifier->order( 'data_option_category.rank' );
+    $modifier->order( 'data_category.rank' );
     $modifier->order( 'data_option.rank' );
 
     $this->apply_restrictions( $modifier );

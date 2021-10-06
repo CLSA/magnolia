@@ -23,8 +23,8 @@ class module extends \cenozo\service\module
 
     $modifier->join( 'data_option', 'data_selection.data_option_id', 'data_option.id' );
     $modifier->join( 'study_phase', 'data_selection.study_phase_id', 'study_phase.id' );
-    if( $select->has_table_columns( 'data_option_category' ) )
-      $modifier->join( 'data_option_category', 'data_option.data_option_category_id', 'data_option_category.id' );
+    if( $select->has_table_columns( 'data_category' ) )
+      $modifier->join( 'data_category', 'data_option.data_category_id', 'data_category.id' );
 
     if( $select->has_column( 'is_unavailable' ) )
       $select->add_column( 'unavailable_en IS NOT NULL AND unavailable_fr IS NOT NULL', 'is_unavailable', false );
