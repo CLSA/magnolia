@@ -748,7 +748,7 @@ cenozo.service( 'CnReqnHelper', [
             prevButton: { en: 'Return to the previous section', fr: 'Retourner à la section précédente' },
             nextButton: { en: 'Proceed to the next section', fr: 'Passez à la section suivante' },
             pleaseConfirm: { en: 'Please confirm', fr: 'Veuillez confirmer' },
-            totalCost: { en: 'Total cost', fr: 'TODO: TRANSLATION REQUIRED' },
+            totalCost: { en: 'Total cost', fr: 'Coût total' },
             remove: { en: 'Remove', fr: 'Supprimer' },
             chars: { en: 'characters', fr: 'caractères' },
             comments: { en: 'Comments', fr: 'Commentaires' },
@@ -761,8 +761,17 @@ cenozo.service( 'CnReqnHelper', [
             notices: { en: 'Notices', fr: 'Notifications' },
             studyData: { en: 'Study Data', fr: 'Données d’étude' },
             finalReport: { en: 'Final Report', fr: 'Rapport final' },
+            study: {
+              clsa: { en: 'CLSA', fr: 'ÉLCV' },
+              covid19: {
+                questionnaire: { en: 'COVID-19, Questionnaire', fr: 'COVID-19, questionnaire' },
+                antibody: { en: 'COVID-19, Antibody', fr: 'COVID-19, anticorps' },
+                dbs: { en: 'COVID-19, DBS', fr: 'COVID-19, DBS' },
+                brain: { en: 'COVID-19, Brain', fr: 'COVID-19, cerveau' },
+              }
+            },
             studyPhase: {
-              bl: { en: 'Baseline', fr: 'Départ' },
+              bl: { en: 'Baseline', fr: 'départ' },
               f1: { en: 'Follow-up 1', fr: '1er suivi' }
             },
             file: { en: 'File', fr: 'Fichier' },
@@ -774,7 +783,7 @@ cenozo.service( 'CnReqnHelper', [
             },
             combinedCost: {
               en: 'Fee payable for any/all study-phases when requested at the same time.',
-              fr: 'TODO: TRANSLATION REQUIRED'
+              fr: 'Frais à payer pour toutes les phases d’étude lorsqu’elles sont demandées en même temps.'
             },
             amend: { en: 'Create Amendment', fr: 'Effectuer une modification' },
             amendWarning: {
