@@ -647,7 +647,10 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
               if( proceed ) {
                 await this.$$onPatch( data );
 
-                if( angular.isDefined( data.comprehensive ) || angular.isDefined( data.tracking ) ) {
+                if( angular.isDefined( data.applicant_country_id ) || angular.isDefined( data.trainee_country_id ) ) {
+                  // we may have to set the fee waiver type to none if either the applicant or trainee is not Canadian
+                  if( this.record.waiver && !this.isWaiverAllowed() ) this.record.waiver = '';
+                } else if( angular.isDefined( data.comprehensive ) || angular.isDefined( data.tracking ) ) {
                   if( this.record.comprehensive && this.record.tracking ) {
                     // show the cohort warning to the applicant
                     CnModalMessageFactory.instance( {
@@ -827,6 +830,13 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
             );
 
             return 'en' == this.record.lang ? '$' + cost : cost + ' $';
+          },
+
+          isWaiverAllowed: function() {
+            var baseCountryId = CnSession.application.baseCountryId;
+            return this.record.trainee_name &&
+              ( null == this.record.applicant_country_id || baseCountryId == this.record.applicant_country_id ) &&
+              ( null == this.record.trainee_country_id || baseCountryId == this.record.trainee_country_id );
           },
 
           getDifferences: function( reqnVersion2 ) {

@@ -377,71 +377,6 @@
                 </cn-view-input-with-differences>
               </div>
               <hr />
-              <p class="text-primary" ng-bind-html="t( 'part1.a.text3' )"></p>
-              <div class="form-horizontal">
-                <cn-view-input-with-differences
-                  input="{
-                    key: 'trainee_name',
-                    title: t( 'part1.a.trainee_name' ),
-                    type: model.inputList.trainee_name.type,
-                    constant: true
-                  }"
-                  difference="model.viewModel.compareRecord.differences.part1.a.trainee_name"
-                  model="model">
-                </cn-view-input-with-differences>
-                <cn-view-input-with-differences
-                  input="{
-                    key: 'trainee_program',
-                    title: t( 'part1.a.trainee_program' ),
-                    type: model.inputList.trainee_program.type,
-                    constant: !model.viewModel.record.trainee_name
-                  }"
-                  difference="model.viewModel.compareRecord.differences.part1.a.trainee_program"
-                  model="model">
-                </cn-view-input-with-differences>
-                <cn-view-input-with-differences
-                  input="{
-                    key: 'trainee_institution',
-                    title: t( 'part1.a.trainee_institution' ),
-                    type: 'string',
-                    constant: !model.viewModel.record.trainee_name
-                  }"
-                  difference="model.viewModel.compareRecord.differences.part1.a.trainee_institution"
-                  model="model">
-                </cn-view-input-with-differences>
-                <cn-view-input-with-differences
-                  input="{
-                    key: 'trainee_address',
-                    title: t( 'part1.a.trainee_address' ),
-                    type: model.inputList.trainee_address.type,
-                    constant: !model.viewModel.record.trainee_name
-                  }"
-                  difference="model.viewModel.compareRecord.differences.part1.a.trainee_address"
-                  model="model">
-                </cn-view-input-with-differences>
-                <cn-view-input-with-differences
-                  input="{
-                    key: 'trainee_phone',
-                    title: t( 'part1.a.trainee_phone' ),
-                    type: model.inputList.trainee_phone.type,
-                    constant: !model.viewModel.record.trainee_name
-                  }"
-                  difference="model.viewModel.compareRecord.differences.part1.a.trainee_phone"
-                  model="model">
-                </cn-view-input-with-differences>
-                <cn-view-input-with-differences
-                  input="{
-                    key: 'trainee_email',
-                    title: t( 'part1.a.trainee_email' ),
-                    type: model.inputList.trainee_email.type,
-                    constant: true,
-                    help: t( 'misc.emailText' )
-                  }"
-                  difference="model.viewModel.compareRecord.differences.part1.a.trainee_email"
-                  model="model">
-                </cn-view-input-with-differences>
-              </div>
-              <hr />
               <p class="text-primary" ng-bind-html="t( 'part1.a.text4' )"></p>
               <div class="form-horizontal">
                 <cn-view-input-with-differences
@@ -450,7 +385,7 @@
                     title: t( 'part1.a.waiver' ),
                     type: 'enum',
                     enumList: model.metadata.columnList.waiver.enumList[model.viewModel.record.lang],
-                    constant: !model.viewModel.record.trainee_name
+                    constant: !model.viewModel.isWaiverAllowed()
                   }"
                   difference="model.viewModel.compareRecord.differences.part1.a.waiver"
                   model="model">
