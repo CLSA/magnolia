@@ -50,12 +50,20 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
     applicant_position: { type: 'string' },
     applicant_affiliation: { type: 'string' },
     applicant_address: { type: 'string' },
+    applicant_country_id: {
+      type: 'lookup-typeahead',
+      typeahead: { table: 'country' }
+    },
     applicant_phone: { type: 'string' },
     applicant_email: { type: 'string' },
     trainee_name: { type: 'string' },
     trainee_program: { type: 'string' },
     trainee_institution: { type: 'string' },
     trainee_address: { type: 'string' },
+    trainee_country_id: {
+      type: 'lookup-typeahead',
+      typeahead: { table: 'country' }
+    },
     trainee_phone: { type: 'string' },
     trainee_email: { type: 'string' },
     start_date: { type: 'date' },
@@ -86,6 +94,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
     designate_user_id: { column: 'reqn.designate_user_id', type: 'string' },
     identifier: { column: 'reqn.identifier', type: 'string' },
     legacy: { column: 'reqn.legacy', type: 'string' },
+    show_prices: { column: 'reqn.show_prices', type: 'string' },
     state: { column: 'reqn.state', type: 'string' },
     data_directory: { column: 'reqn.data_directory', type: 'string' },
     status: { column: 'stage_type.status', type: 'string' },
@@ -773,14 +782,35 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
           },
 
           calculateCost: function() {
-            // TODO: determine base cost from reqn country
-            var cost = 0;
+            // only calculate the cost if we have to
+            if( !this.record.show_prices ) return null;
+
+            // determine the base cost based on country (assume the base country if none is provided)
+            var baseCountryId = CnSession.application.baseCountryId;
+            var applicantCountryId = null == this.record.applicant_country_id ? baseCountryId : this.record.applicant_country_id;
+            var traineeCountryId = null == this.record.trainee_country_id ? baseCountryId : this.record.trainee_country_id;
+            var cost = 3000;
+            
+            // cost for trainees is different to applicants
+            if( this.record.trainee_user_id ) {
+              if( baseCountryId != traineeCountryId || baseCountryId != applicantCountryId ) {
+                // if either the trainee or applicant isn't Canadian then the base fee is 5000
+                cost = 5000;
+              } else if( baseCountryId == traineeCountryId && baseCountryId == applicantCountryId && this.record.waiver ) {
+                // if both are canadian and there is a fee waiver means the base cost is 0
+                cost = 0;
+              }
+            } else {
+              // if the applicant is not Canadian then the base fee is 5000
+              if( CnSession.application.baseCountryId != applicantCountryId ) cost = 5000;
+            }
+
             var self = this;
             this.parentModel.categoryList.forEach(
               category => category.optionList.forEach( function( option ) {
                 var maxCombinedCost = 0;
                 option.selectionList.filter( selection => 0 < selection.cost.value ).forEach( function( selection ) {
-                  if( self.record.selectionList[selection.id] ) {
+                  if( angular.isArray( self.record.selectionList ) && self.record.selectionList[selection.id] ) {
                     if( option.combinedCost ) {
                       // track the most expensive selection
                       if( selection.cost.value > maxCombinedCost ) maxCombinedCost = selection.cost.value;
@@ -818,10 +848,12 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                   applicant_position: false,
                   applicant_affiliation: false,
                   applicant_address: false,
+                  applicant_country_id: false,
                   applicant_phone: false,
                   trainee_program: false,
                   trainee_institution: false,
                   trainee_address: false,
+                  trainee_country_id: false,
                   trainee_phone: false,
                   waiver: false
                 },
@@ -1499,7 +1531,8 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
           },
 
           isOptionSelected: function( option ) {
-            return option.selectionList.some( selection => this.record.selectionList[selection.id] );
+            return angular.isArray( this.record.selectionList ) &&
+                   option.selectionList.some( selection => this.record.selectionList[selection.id] );
           },
 
           isCategorySelected: function( category ) {
@@ -1673,7 +1706,10 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
             if( response ) {
               // make sure that certain properties have been defined, one tab at a time
               var requiredTabList = {
-                '1a': [ 'applicant_position', 'applicant_affiliation', 'applicant_address', 'applicant_phone' ],
+                '1a': [
+                  'applicant_position', 'applicant_affiliation', 'applicant_address',
+                  'applicant_country_id', 'applicant_phone'
+                ],
                 '1b': [ 'coapplicant_agreement_filename' ],
                 '1c': [ 'start_date', 'duration' ],
                 '1d': [ 'title', 'keywords', 'lay_summary', 'background', 'objectives', 'methodology', 'analysis' ],
@@ -1721,7 +1757,10 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
               for( var tab in requiredTabList ) {
                 var firstProperty = null;
                 requiredTabList[tab].filter( function( property ) {
-                  if( '1b' == tab ) {
+                  if( '1a' == tab ) {
+                    // only check the country if show_prices is on
+                    return 'applicant_country_id' != property || self.record.show_prices;
+                  } else if( '1b' == tab ) {
                     // only check 1b properties if there is a new coapplication with access to data
                     return self.addingCoapplicantWithData;
                   } else if( '1e' == tab ) {

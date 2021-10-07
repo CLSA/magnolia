@@ -6,6 +6,8 @@ INSERT IGNORE INTO service ( subject, method, resource, restricted ) VALUES
 ( 'amendment_justification', 'GET', 1, 0 ),
 ( 'amendment_justification', 'PATCH', 1, 0 ),
 ( 'amendment_justification', 'POST', 0, 0 ),
+( 'country', 'GET', 0, 0 ),
+( 'country', 'GET', 1, 0 ),
 ( 'data_selection', 'DELETE', 1, 1 ),
 ( 'data_selection', 'GET', 0, 0 ),
 ( 'data_selection', 'GET', 1, 0 ),

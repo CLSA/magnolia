@@ -678,36 +678,77 @@ class reqn_version extends \cenozo\database\record
       true
     );
 
-    // get a list of all study_phases that all categories are linked to
-    $study_phase_list = $data_category_class_name::get_all_study_phase_list();
+    // get all selections to fill in below
+    $selection_sel = lib::create( 'database\select' );
+    $selection_sel->add_column( 'CONCAT( "c", data_category.id )', 'c', false );
+    $selection_sel->add_column( 'CONCAT( "o", data_option.id )', 'o', false );
+    $selection_sel->add_table_column( 'study_phase', 'id', 'study_phase_id' );
 
-    $modifier = lib::create( 'database\modifier' );
-    $modifier->join( 'data_option', 'data_category.id', 'data_option.data_category_id' );
-
-    $select = lib::create( 'database\select' );
-    $select->from( 'data_category' );
-    $select->add_column( 'name_en', 'Category' );
-    $select->add_table_column( 'data_option', 'name_en', 'Data Option' );
-    foreach( $study_phase_list as $db_study_phase )
+    $selection_mod = lib::create( 'database\modifier' );
+    $selection_mod->join( 'study_phase', 'data_selection.study_phase_id', 'study_phase.id' );
+    $selection_mod->join( 'data_option', 'data_selection.data_option_id', 'data_option.id' );
+    $selection_mod->join( 'data_category', 'data_option.data_category_id', 'data_category.id' );
+    $selection_mod->order( 'data_category.rank' );
+    $selection_mod->order( 'data_option.rank' );
+    $selection_mod->order( 'study_phase.rank' );
+    $selection_list = array();
+    foreach( $this->get_data_selection_list( $selection_sel, $selection_mod ) as $selection )
     {
-      $table_name = sprintf( 'reqn_version_has_data_selection_%d', $db_study_phase->id );
-      $select->add_table_column( $table_name, 'reqn_version_id IS NOT NULL', $db_study_phase->name );
+      $c = $selection['c'];
+      $o = $selection['o'];
 
-      $join_mod = lib::create( 'database\modifier' );
-      $join_mod->where( 'data_option.id', '=', sprintf( '%s.data_option_id', $table_name ), false );
-      $join_mod->where( 'data_option.id', '=', sprintf( '%s.data_option_id', $table_name ), false );
-      $join_mod->where( sprintf( '%s.study_phase_id', $table_name ), '=', $db_study_phase->id );
-      $join_mod->where( sprintf( '%s.reqn_version_id', $table_name ), '=', $this->id );
-      $modifier->join_modifier( 'reqn_version_has_data_selection', $join_mod, 'left', $table_name );
+      if( !array_key_exists( $c, $selection_list ) ) $selection_list[$c] = array();
+      if( !array_key_exists( $o, $selection_list[$c] ) ) $selection_list[$o] = array();
+
+      $selection_list[$c][$o][] = $selection['study_phase_id'];
     }
 
-    $modifier->order( 'data_category.rank' );
-    $modifier->order( 'data_option.rank' );
+    // build each category's data options one table at a time
+    $data_category_mod = lib::create( 'database\modifier' );
+    $data_category_mod->order( 'rank' );
+    foreach( $data_category_class_name::select_objects( $data_category_mod ) as $db_data_category )
+    {
+      // use this as an array key
+      $c = sprintf( 'c%d', $db_data_category->id );
 
-    $output .= "\n".util::get_data_as_csv(
-      static::db()->get_all( sprintf( '%s %s', $select->get_sql(), $modifier->get_sql() ) ),
-      $db_user
-    );
+      // build this category's header
+      $output .= sprintf( '%s"%s"%s"Data Option"', "\n", strtoupper( $db_data_category->name_en ), "\n" );
+
+      $study_phase_sel = lib::create( 'database\select' );
+      $study_phase_sel->add_column( 'id' );
+      $study_phase_sel->add_table_column( 'study', 'name', 'study_name' );
+      $study_phase_sel->add_column( 'name', 'study_phase_name' );
+
+      $study_phase_mod = lib::create( 'database\modifier' );
+      $study_phase_mod->join( 'study', 'study_phase.study_id', 'study.id' );
+      $study_phase_mod->order( 'study.name' );
+      $study_phase_mod->order( 'study_phase.rank' );
+      $study_phase_list = $db_data_category->get_study_phase_list( $study_phase_sel, $study_phase_mod );
+      foreach( $study_phase_list as $study_phase )
+        $output .= sprintf( ',"%s - %s"', $study_phase['study_name'], $study_phase['study_phase_name'] );
+
+      // now fill in all data options for this category, one option per row with one column for each study phase
+      $data_option_mod = lib::create( 'database\modifier' );
+      $data_option_mod->order( 'data_option.rank' );
+      foreach( $db_data_category->get_data_option_object_list( $data_option_mod ) as $db_data_option )
+      {
+        // use this as an array key
+        $o = sprintf( 'o%d', $db_data_option->id );
+
+        $output .= sprintf( '%s"%s"', "\n", $db_data_option->name_en );
+        foreach( $study_phase_list as $study_phase )
+        {
+          $output .= sprintf(
+            ',"%s"',
+            array_key_exists( $c, $selection_list ) &&
+            array_key_exists( $o, $selection_list[$c] ) &&
+            in_array( $study_phase['id'], $selection_list[$c][$o] ) ? 'yes' : 'no'
+          );
+        }
+      }
+
+      $output .= "\n";
+    }
 
     $filename = sprintf( '%s/%s.csv', DATA_OPTION_LIST_PATH, $this->id );
     $result = file_put_contents( $filename, $output );

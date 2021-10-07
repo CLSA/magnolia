@@ -94,7 +94,10 @@
     </div>
   </div>
   <div class="container-fluid" style="padding-top: 1em;">
-    <div class="spacer pull-right text-info">{{ t( 'misc.totalCost' ) }}: {{ model.viewModel.calculateCost() }}</div>
+    <div ng-if="model.viewModel.record.show_prices"
+         class="spacer pull-right text-info"
+         ng-bind-html="t( 'misc.totalCost' ) + ': ' + model.viewModel.calculateCost()">
+    </div>
     <ul class="nav nav-tabs">
       <li ng-class="{'active':'instructions'==model.viewModel.formTab[0]}">
         <a ng-click="model.viewModel.setFormTab(0,'instructions')"
@@ -261,6 +264,16 @@
                 </cn-view-input-with-differences>
                 <cn-view-input-with-differences
                   input="{
+                    key: 'applicant_country_id',
+                    title: t( 'part1.a.applicant_country_id' ),
+                    type: model.inputList.applicant_country_id.type,
+                    typeahead: model.inputList.applicant_country_id.typeahead
+                  }"
+                  difference="model.viewModel.compareRecord.differences.part1.a.applicant_country_id"
+                  model="model">
+                </cn-view-input-with-differences>
+                <cn-view-input-with-differences
+                  input="{
                     key: 'applicant_address',
                     title: t( 'part1.a.applicant_address' ),
                     type: model.inputList.applicant_address.type
@@ -286,6 +299,80 @@
                     help: t( 'misc.emailText' )
                   }"
                   difference="model.viewModel.compareRecord.differences.part1.a.applicant_email"
+                  model="model">
+                </cn-view-input-with-differences>
+              </div>
+              <hr />
+              <p class="text-primary" ng-bind-html="t( 'part1.a.text3' )"></p>
+              <div class="form-horizontal">
+                <cn-view-input-with-differences
+                  input="{
+                    key: 'trainee_name',
+                    title: t( 'part1.a.trainee_name' ),
+                    type: model.inputList.trainee_name.type,
+                    constant: true
+                  }"
+                  difference="model.viewModel.compareRecord.differences.part1.a.trainee_name"
+                  model="model">
+                </cn-view-input-with-differences>
+                <cn-view-input-with-differences
+                  input="{
+                    key: 'trainee_program',
+                    title: t( 'part1.a.trainee_program' ),
+                    type: model.inputList.trainee_program.type,
+                    constant: !model.viewModel.record.trainee_name
+                  }"
+                  difference="model.viewModel.compareRecord.differences.part1.a.trainee_program"
+                  model="model">
+                </cn-view-input-with-differences>
+                <cn-view-input-with-differences
+                  input="{
+                    key: 'trainee_institution',
+                    title: t( 'part1.a.trainee_institution' ),
+                    type: 'string',
+                    constant: !model.viewModel.record.trainee_name
+                  }"
+                  difference="model.viewModel.compareRecord.differences.part1.a.trainee_institution"
+                  model="model">
+                </cn-view-input-with-differences>
+                <cn-view-input-with-differences
+                  input="{
+                    key: 'trainee_country_id',
+                    title: t( 'part1.a.trainee_country_id' ),
+                    type: model.inputList.trainee_country_id.type,
+                    typeahead: model.inputList.trainee_country_id.typeahead
+                  }"
+                  difference="model.viewModel.compareRecord.differences.part1.a.trainee_country_id"
+                  model="model">
+                </cn-view-input-with-differences>
+                <cn-view-input-with-differences
+                  input="{
+                    key: 'trainee_address',
+                    title: t( 'part1.a.trainee_address' ),
+                    type: model.inputList.trainee_address.type,
+                    constant: !model.viewModel.record.trainee_name
+                  }"
+                  difference="model.viewModel.compareRecord.differences.part1.a.trainee_address"
+                  model="model">
+                </cn-view-input-with-differences>
+                <cn-view-input-with-differences
+                  input="{
+                    key: 'trainee_phone',
+                    title: t( 'part1.a.trainee_phone' ),
+                    type: model.inputList.trainee_phone.type
+                  }"
+                  difference="model.viewModel.compareRecord.differences.part1.a.trainee_phone"
+                  model="model">
+                </cn-view-input-with-differences>
+                <cn-view-input-with-differences
+                  input="{
+                    key: 'trainee_email',
+                    title: t( 'part1.a.trainee_email' ),
+                    type: model.inputList.trainee_email.type,
+                    constant: true,
+                    help: t( 'misc.emailText' )
+                  }"
+                  difference="model.viewModel.compareRecord.differences.part1.a.trainee_email"
                   model="model">
                 </cn-view-input-with-differences>
               </div>

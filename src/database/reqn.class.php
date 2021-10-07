@@ -221,14 +221,13 @@ class reqn extends \cenozo\database\record
         $db_new_reference->save();
       }
 
-      // copy reqn_version_has_data_selection records
-      foreach( $db_clone_reqn_version->get_reqn_version_has_data_selection_object_list() as $db_reqn_version_has_data_selection )
-      {
-        $db_new_reqn_version_has_data_selection = lib::create( 'database\reqn_version_has_data_selection' );
-        $db_new_reqn_version_has_data_selection->reqn_version_id = $db_reqn_version->id;
-        $db_new_reqn_version_has_data_selection->data_selection_id = $db_reqn_version_has_data_selection->data_selection_id;
-        $db_new_reqn_version_has_data_selection->save();
-      }
+      // copy data_selection records
+      $data_selection_id_list = array();
+      $data_selection_sel = lib::create( 'database\select' );
+      $data_selection_sel->add_column( 'id' );
+      foreach( $db_clone_reqn_version->get_data_selection_list( $data_selection_sel ) as $data_selection )
+        $data_selection_id_list[] = $data_selection['id'];
+      $db_reqn_version->add_data_selection( $data_selection_id_list );
 
       // copy all comments
       foreach( $db_clone_reqn_version->get_reqn_version_comment_object_list() as $db_reqn_version_comment_clone )

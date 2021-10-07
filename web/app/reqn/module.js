@@ -133,6 +133,13 @@ define( [ 'output' ].reduce( function( list, name ) {
       help: 'Legacy requisitions are those which were created outside of Magnolia. ' +
             'Use this option when uploading pre-existing requisitions into the software.'
     },
+    show_prices: {
+      title: 'Show Prices',
+      type: 'boolean',
+      isExcluded: function( $state, model ) { return 'view' != model.getActionFromState(); },
+      help: 'Determines whether the price of the application is calculated. ' +
+        'This also makes the applicant and trainee country a mandatory field.'
+    },
     reqn_type_id: {
       title: 'Requisition Type',
       type: 'enum',
