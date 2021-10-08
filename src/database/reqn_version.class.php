@@ -19,8 +19,6 @@ class reqn_version extends \cenozo\database\record
    */
   public function save()
   {
-    $country_class_name = lib::get_class_name( 'database\country' );
-
     // delete files if peer-review or funding are not selected
     if( !$this->peer_review ) $this->peer_review_filename = NULL;
 
@@ -38,9 +36,11 @@ class reqn_version extends \cenozo\database\record
     if( !is_null( $this->waiver ) )
     {
       $db_application = lib::create( 'business\session' )->get_application();
-      $db_country = $country_class_name::get_unique_record( 'name', $db_application->country );
-      if( ( !is_null( $this->applicant_country_id ) && $db_country->id != $this->applicant_country_id ) ||
-          ( !is_null( $this->trainee_country_id ) && $db_country->id != $this->trainee_country_id ) ) $this->waiver = NULL;
+      if( ( !is_null( $this->applicant_country_id ) && $db_application->country_id != $this->applicant_country_id ) ||
+          ( !is_null( $this->trainee_country_id ) && $db_application->country_id != $this->trainee_country_id ) )
+      {
+        $this->waiver = NULL;
+      }
     }
 
     parent::save();
