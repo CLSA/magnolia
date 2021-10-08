@@ -344,6 +344,72 @@ class reqn_version extends \cenozo\database\record
   }
 
   /**
+   * Calculate the cost of the reqn (NULL if show_prices is false)
+   * 
+   * Note: this process mirrors CnReqnVersionViewFactory::calculateCost() on the client-side
+   * @return int
+   */
+  public function calculate_cost()
+  {
+    $db_reqn = $this->get_reqn();
+    $base_country_id = lib::create( 'business\session' )->get_application()->country_id;
+    $applicant_country_id = is_null( $this->applicant_country_id ) ? $base_country_id : $this->applicant_country_id;
+    $trainee_country_id = is_null( $this->trainee_country_id ) ? $base_country_id : $this->trainee_country_id;
+    $cost = 3000;
+
+    // only calculate the cost if we have to
+    if( !$db_reqn->show_prices ) return NULL;
+
+    // cost for trainees is different to applicants
+    if( $db_reqn->trainee_user_id ) {
+      if( $base_country_id != $trainee_country_id || $base_country_id != $applicant_country_id ) {
+        // if either the trainee or applicant isn't Canadian then the base fee is 5000
+        $cost = 5000;
+      } else if( $base_country_id == $trainee_country_id && $base_country_id == $applicant_country_id && !is_null( $this->waiver ) ) {
+        // if both are canadian and there is a fee waiver means the base cost is 0
+        $cost = 0;
+      }
+    } else {
+      // if the applicant is not Canadian then the base fee is 5000
+      if( $base_country_id != $applicant_country_id ) $cost = 5000;
+    }
+
+    $selection_sel = lib::create( 'database\select' );
+    $selection_sel->add_column( 'data_option_id' );
+    $selection_sel->add_column( 'cost' );
+    $selection_sel->add_table_column( 'data_option', 'combined_cost' );
+    $selection_mod = lib::create( 'database\modifier' );
+    $selection_mod->join( 'data_option', 'data_selection.data_option_id', 'data_option.id' );
+    $selection_mod->join( 'data_category', 'data_option.data_category_id', 'data_category.id' );
+    $selection_mod->order( 'data_category.rank' );
+    $selection_mod->order( 'data_option.rank' );
+    $current_data_option_id = NULL;
+    $max_combined_cost = 0;
+    foreach( $this->get_data_selection_list( $selection_sel, $selection_mod ) as $selection )
+    {
+      if( $selection['data_option_id'] != $current_data_option_id )
+      {
+        if( $selection['combined_cost'] ) $cost += $max_combined_cost;
+        $max_combined_cost = 0;
+      }
+
+      if( $selection['combined_cost'] )
+      {
+        // track the most expensive selection
+        if( $max_combined_cost < $selection['cost'] ) $max_combined_cost = $selection['cost'];
+      }
+      else
+      {
+        $cost += $selection['cost'];
+      }
+
+      $current_data_option_id = $selection['data_option_id'];
+    }
+
+    return $cost;
+  }
+
+  /**
    * Generates the coapplicant agreement PDF form template
    */
   public function generate_coapplicant_agreement_template_form()
@@ -360,7 +426,7 @@ class reqn_version extends \cenozo\database\record
       'version' => $this->get_amendment_version(),
       'date_of_download' => util::get_datetime_object()->format( 'Y-m-d' )
     );
-    
+
     // get a list of all new coapplicants who have access to the data by first finding the last amendment-version
     $reqn_version_mod = lib::create( 'database\modifier' );
     $reqn_version_mod->where( 'amendment', '<', $this->amendment );
@@ -443,12 +509,16 @@ class reqn_version extends \cenozo\database\record
     $db_user = $db_reqn->get_user();
     $db_trainee_user = $db_reqn->get_trainee_user();
     $date_of_approval = $this->get_date_of_approval();
+    $cost = $this->calculate_cost();
 
     // generate the application form
     $data = array(
       'identifier' => $db_reqn->identifier,
       'version' => $this->get_amendment_version(),
-      'dateofapproval' => is_null( $date_of_approval ) ? 'None' : $date_of_approval->format( 'Y-m-d' )
+      'dateofapproval' => is_null( $date_of_approval ) ? 'None' : $date_of_approval->format( 'Y-m-d' ),
+      'cost' => is_null( $cost )
+        ? ( 'fr' == $db_language->code ? 'TODO: TRANSLATION' : '(not calculated)' )
+        : sprintf( 'fr' == $db_language->code ? '%s $' : '$%s', $cost )
     );
     $data['applicant_name'] = sprintf( '%s %s', $db_user->first_name, $db_user->last_name );
     if( !is_null( $this->title ) ) $data['title'] = $this->title;
@@ -546,7 +616,10 @@ class reqn_version extends \cenozo\database\record
     $data = array(
       'identifier' => $db_reqn->identifier,
       'version' => $this->get_amendment_version(),
-      'dateofapproval' => is_null( $date_of_approval ) ? 'None' : $date_of_approval->format( 'Y-m-d' )
+      'dateofapproval' => is_null( $date_of_approval ) ? 'None' : $date_of_approval->format( 'Y-m-d' ),
+      'cost' => is_null( $cost )
+        ? ( 'fr' == $db_language->code ? 'TODO: TRANSLATION' : '(not calculated)' )
+        : sprintf( 'fr' == $db_language->code ? '%s $' : '$%s', $cost )
     );
     $data['applicant_name'] = sprintf( '%s %s', $db_user->first_name, $db_user->last_name );
     if( !is_null( $this->title ) ) $data['title'] = $this->title;

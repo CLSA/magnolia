@@ -784,6 +784,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
             }
           },
 
+          // NOTE: This process mirrors database\reqn_version::calculate_cost() on the server side
           calculateCost: function() {
             // only calculate the cost if we have to
             if( !this.record.show_prices ) return null;
@@ -805,7 +806,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
               }
             } else {
               // if the applicant is not Canadian then the base fee is 5000
-              if( CnSession.application.baseCountryId != applicantCountryId ) cost = 5000;
+              if( baseCountryId != applicantCountryId ) cost = 5000;
             }
 
             var self = this;
