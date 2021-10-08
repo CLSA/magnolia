@@ -20,17 +20,26 @@ class module extends \cenozo\service\module
   public function validate()
   {
     parent::validate();
-    $db_role = lib::create( 'business\session' )->get_role();
+
+    $session = lib::create( 'business\session' );
+    $db_user = $session->get_user();
+    $db_role = $session->get_role();
 
     // restrict some review-types to certain roles
     if( 300 > $this->get_status()->get_code() )
     {
-      if( 'PATCH' == $this->get_method() )
+      $db_review = $this->get_resource();
+      if( !is_null( $db_review ) )
       {
-        $db_review = $this->get_resource();
-        if( !is_null( $db_review ) )
+        $review_type = $this->get_resource()->get_review_type()->name;
+
+        // do not allow reviewers to see other reviewer's reviews
+        if( 'reviewer' == $db_role->name && false !== strpos( $review_type, 'Reviewer' ) && $db_review->user_id != $db_user->id )
         {
-          $review_type = $this->get_resource()->get_review_type()->name;
+          $this->get_status()->set_code( 403 );
+        }
+        else if( 'PATCH' == $this->get_method() )
+        {
           if( 'administrator' != $db_role->name )
           {
             if( 'Admin' == $review_type || 'Feasibility' == $review_type ) $this->get_status()->set_code( 403 );
@@ -88,6 +97,15 @@ class module extends \cenozo\service\module
     $join_mod->where( 'stage.datetime', '=', NULL );
     $modifier->join_modifier( 'stage', $join_mod );
     $modifier->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
+
+    // do not allow reviewers to see other reviewer's reviews
+    if( 'reviewer' == $db_role->name )
+    {
+      $modifier->where_bracket( true );
+      $modifier->where( 'review.user_id', '=', $db_user->id );
+      $modifier->or_where( 'review_type.name', 'NOT LIKE', 'Reviewer %' );
+      $modifier->where_bracket( false );
+    }
 
     if( !is_null( $this->get_resource() ) )
     {
