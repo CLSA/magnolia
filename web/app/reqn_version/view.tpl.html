@@ -1080,7 +1080,7 @@
                         <button ng-if="null == selection.unavailable[model.viewModel.record.lang]"
                                 class="btn full-width"
                                 ng-class="model.viewModel.record.selectionList[selection.id] ? 'btn-success' : 'btn-default'"
-                                ng-disabled="!model.getEditEnabled()"
+                                ng-disabled="!model.getEditEnabled() && !model.isRole( 'administrator' )"
                                 ng-click="model.viewModel.toggleSelection( model.categoryList[partIndex], option, selection )">
                           <i class="glyphicon glyphicon-ok" ng-if="model.viewModel.record.selectionList[selection.id]"></i>
                           <span style="font-weight: normal"
