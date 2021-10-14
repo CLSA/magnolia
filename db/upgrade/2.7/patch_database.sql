@@ -19,12 +19,12 @@ SOURCE reqn_version_has_amendment_type.sql
 SOURCE review_type_question.sql
 SOURCE review_answer.sql
 SOURCE review.sql
+SOURCE data_category_has_study_phase.sql
 SOURCE data_selection.sql
 SOURCE data_detail.sql
 SOURCE data_option.sql
 SOURCE applicant.sql
 
-SOURCE data_category_has_study_phase.sql
 SOURCE reqn_version_has_data_selection.sql
 
 SOURCE new_data_options.sql

@@ -44,10 +44,10 @@ CREATE PROCEDURE patch_data_category_has_study_phase()
       SELECT "Populating new data_category_has_study_phase table" AS "";
 
       INSERT INTO data_category_has_study_phase( data_category_id, study_phase_id )
-      SELECT DISTINCT data_category_id, study_phase_id
+      SELECT DISTINCT data_option_category_id, study_phase_id
       FROM data_option
       JOIN data_option_has_study_phase ON data_option.id = data_option_has_study_phase.data_option_id
-      ORDER BY data_category_id, study_phase_id;
+      ORDER BY data_option_category_id, study_phase_id;
     END IF;
 
   END //
