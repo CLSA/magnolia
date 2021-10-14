@@ -456,6 +456,7 @@ cenozo.service( 'CnReqnHelper', [
               applicant_name: { en: 'Name', fr: 'Nom' },
               applicant_position: { en: 'Position', fr: 'Poste' },
               applicant_affiliation: { en: 'Institution', fr: 'Établissement' },
+              applicant_country_id: { en: 'Institution Country', fr: 'TODO: TRANSLATE' },
               applicant_address: { en: 'Mailing Address', fr: 'Adresse de correspondance' },
               applicant_phone: { en: 'Phone', fr: 'Téléphone' },
               applicant_email: { en: 'E-mail', fr: 'Courriel' },
@@ -466,6 +467,7 @@ cenozo.service( 'CnReqnHelper', [
               trainee_name: { en: 'Name', fr: 'Nom' },
               trainee_program: { en: 'Degree and Program of Study', fr: 'Grade et programme d’étude' },
               trainee_institution: { en: 'Institution of Enrollment', fr: 'Établissement d’étude' },
+              trainee_country_id: { en: 'Institution Country', fr: 'TODO: TRANSLATE' },
               trainee_address: { en: 'Current Mailing Address', fr: 'Adresse de correspondance actuelle' },
               trainee_phone: { en: 'Phone', fr: 'Téléphone' },
               trainee_email: { en: 'E-mail', fr: 'Courriel' },
@@ -748,6 +750,7 @@ cenozo.service( 'CnReqnHelper', [
             prevButton: { en: 'Return to the previous section', fr: 'Retourner à la section précédente' },
             nextButton: { en: 'Proceed to the next section', fr: 'Passez à la section suivante' },
             pleaseConfirm: { en: 'Please confirm', fr: 'Veuillez confirmer' },
+            totalCost: { en: 'Total cost', fr: 'Coût total' },
             remove: { en: 'Remove', fr: 'Supprimer' },
             chars: { en: 'characters', fr: 'caractères' },
             comments: { en: 'Comments', fr: 'Commentaires' },
@@ -760,16 +763,29 @@ cenozo.service( 'CnReqnHelper', [
             notices: { en: 'Notices', fr: 'Notifications' },
             studyData: { en: 'Study Data', fr: 'Données d’étude' },
             finalReport: { en: 'Final Report', fr: 'Rapport final' },
-            notAvailable: { en: 'not yet available', fr: 'pas encore disponible' },
-            notApplicable: { en: 'not applicable', fr: 'sans objet' },
-            baseline: { en: 'Baseline', fr: 'Départ' },
-            followup1: { en: 'Follow-up 1', fr: '1er suivi' },
+            study: {
+              clsa: { en: 'CLSA', fr: 'ÉLCV' },
+              covid19: {
+                questionnaire: { en: 'COVID-19, Questionnaire', fr: 'COVID-19, questionnaire' },
+                antibody: { en: 'COVID-19, Antibody', fr: 'COVID-19, anticorps' },
+                dbs: { en: 'COVID-19, DBS', fr: 'COVID-19, DBS' },
+                brain: { en: 'COVID-19, Brain', fr: 'COVID-19, cerveau' },
+              }
+            },
+            studyPhase: {
+              bl: { en: 'Baseline', fr: 'départ' },
+              f1: { en: 'Follow-up 1', fr: '1er suivi' }
+            },
             file: { en: 'File', fr: 'Fichier' },
             expirationDate: { en: 'Expiration Date', fr: 'Date limite' },
             addEthicsApproval: { en: 'Add Ethics Approval', fr: 'Ajouter une lettre d’approbation éthique' },
             reportRequiredWarning: {
               en: 'This application\'s final report is required, would you like to view it now?',
               fr: 'Il faut fournir un rapport final pour cette demande, souhaitez-vous l’afficher maintenant?'
+            },
+            combinedCost: {
+              en: 'Fee payable for any/all study-phases when requested at the same time.',
+              fr: 'Frais à payer pour toutes les phases d’étude lorsqu’elles sont demandées en même temps.'
             },
             amend: { en: 'Create Amendment', fr: 'Effectuer une modification' },
             amendWarning: {
@@ -1124,7 +1140,7 @@ cenozo.service( 'CnReqnHelper', [
     async function init() {
       // fill in dynamic content
       object.promise = await CnHttpFactory.instance( {
-        path: 'data_option_category',
+        path: 'data_category',
         data: {
           select: { column: [ 'name_en', 'name_fr' ] },
           modifier: { order: 'rank', limit: 1000 }

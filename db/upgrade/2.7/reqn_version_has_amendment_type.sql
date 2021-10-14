@@ -1,4 +1,4 @@
-SELECT "Updating reqn_version_data_option triggers with new data_option_justification table" AS "";
+SELECT "Updating reqn_version_has_amendment_type triggers" AS "";
 
 DELIMITER $$
 

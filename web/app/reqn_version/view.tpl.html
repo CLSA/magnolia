@@ -94,6 +94,10 @@
     </div>
   </div>
   <div class="container-fluid" style="padding-top: 1em;">
+    <div ng-if="model.viewModel.record.show_prices"
+         class="spacer pull-right text-info"
+         ng-bind-html="t( 'misc.totalCost' ) + ': ' + model.viewModel.calculateCost()">
+    </div>
     <ul class="nav nav-tabs">
       <li ng-class="{'active':'instructions'==model.viewModel.formTab[0]}">
         <a ng-click="model.viewModel.setFormTab(0,'instructions')"
@@ -260,6 +264,16 @@
                 </cn-view-input-with-differences>
                 <cn-view-input-with-differences
                   input="{
+                    key: 'applicant_country_id',
+                    title: t( 'part1.a.applicant_country_id' ),
+                    type: model.inputList.applicant_country_id.type,
+                    typeahead: model.inputList.applicant_country_id.typeahead
+                  }"
+                  difference="model.viewModel.compareRecord.differences.part1.a.applicant_country_id"
+                  model="model">
+                </cn-view-input-with-differences>
+                <cn-view-input-with-differences
+                  input="{
                     key: 'applicant_address',
                     title: t( 'part1.a.applicant_address' ),
                     type: model.inputList.applicant_address.type
@@ -323,6 +337,16 @@
                 </cn-view-input-with-differences>
                 <cn-view-input-with-differences
                   input="{
+                    key: 'trainee_country_id',
+                    title: t( 'part1.a.trainee_country_id' ),
+                    type: model.inputList.trainee_country_id.type,
+                    typeahead: model.inputList.trainee_country_id.typeahead
+                  }"
+                  difference="model.viewModel.compareRecord.differences.part1.a.trainee_country_id"
+                  model="model">
+                </cn-view-input-with-differences>
+                <cn-view-input-with-differences
+                  input="{
                     key: 'trainee_address',
                     title: t( 'part1.a.trainee_address' ),
                     type: model.inputList.trainee_address.type,
@@ -335,8 +359,7 @@
                   input="{
                     key: 'trainee_phone',
                     title: t( 'part1.a.trainee_phone' ),
-                    type: model.inputList.trainee_phone.type,
-                    constant: !model.viewModel.record.trainee_name
+                    type: model.inputList.trainee_phone.type
                   }"
                   difference="model.viewModel.compareRecord.differences.part1.a.trainee_phone"
                   model="model">
@@ -362,7 +385,7 @@
                     title: t( 'part1.a.waiver' ),
                     type: 'enum',
                     enumList: model.metadata.columnList.waiver.enumList[model.viewModel.record.lang],
-                    constant: !model.viewModel.record.trainee_name
+                    constant: !model.viewModel.isWaiverAllowed()
                   }"
                   difference="model.viewModel.compareRecord.differences.part1.a.waiver"
                   model="model">
@@ -1021,68 +1044,66 @@
                 <ul class="list-group" ng-if="t( 'part2.' + part + '.heading' )">
                   <li class="list-group-item"><div ng-bind-html="t( 'part2.' + part + '.heading' )"></div></li>
                 </ul>
-                <table class="table table-hover" ng-if="model.dataOptionCategoryList[partIndex].optionList.length">
+                <table class="table table-hover" ng-if="model.categoryList[partIndex].optionList.length">
                   <thead class="bg-info">
-                    <tr ng-if="'g' != part">
+                    <tr>
                       <td width="50%"
                           style="vertical-align: middle;"
-                          uib-tooltip-html="model.dataOptionCategoryList[partIndex].note[model.viewModel.record.lang] | cnNewlines"
+                          uib-tooltip-html="model.categoryList[partIndex].note[model.viewModel.record.lang] | cnNewlines"
                           tooltip-popup-delay="100">
-                        <b class="invert" ng-if="model.dataOptionCategoryList[partIndex].note[model.viewModel.record.lang]">ⓘ</b> {{ t( 'part2.' + part + '.module' ) }}
+                        <b class="invert" ng-if="model.categoryList[partIndex].note[model.viewModel.record.lang]">ⓘ</b>
+                        {{ t( 'part2.' + part + '.module' ) }}
                       </td>
-                      <td width="25%" style="vertical-align: middle;" ng-bind-html="t( 'misc.baseline' )"></td>
-                      <td width="25%" style="vertical-align: middle;" ng-bind-html="t( 'misc.followup1' )"></td>
+                      <td ng-repeat="studyPhaseCode in model.categoryList[partIndex].studyPhaseCodeList"
+                          width="{{ 50/model.categoryList[partIndex].studyPhaseCodeList.length + '%' }}"
+                          style="vertical-align: middle;"
+                          ng-bind-html="t( 'misc.studyPhase.' + studyPhaseCode )"></td>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr ng-repeat-start="dataOption in model.dataOptionCategoryList[partIndex].optionList">
-                      <td width="50%" data-toggle="collapse" data-target="#accordion{{ dataOption.id }}" style="vertical-align: middle">
-                        <a uib-tooltip-html="dataOption.note[model.viewModel.record.lang] | cnNewlines"
+                    <tr ng-repeat-start="option in model.categoryList[partIndex].optionList">
+                      <td width="50%" data-toggle="collapse" data-target="#accordion{{ option.id }}" style="vertical-align: middle">
+                        <a uib-tooltip-html="option.note[model.viewModel.record.lang] | cnNewlines"
                            tooltip-popup-delay="100">
-                          <b class="invert" ng-if="dataOption.note[model.viewModel.record.lang]">ⓘ</b>
+                          <b class="invert" ng-if="option.note[model.viewModel.record.lang]">ⓘ</b>
                           <span style="text-decoration: underline">
-                            {{ dataOption.name[model.viewModel.record.lang] }}
+                            {{ option.name[model.viewModel.record.lang] }}
                           </span>
                         </a>
                       </td>
-                      <td ng-style="{ 'width': 'g' == part ? '50%' : '25%' }" ng-if="dataOption.bl" ng-class="{ 'bg-warning': model.viewModel.compareRecord.differences.part2[part].baselineDataOptionList.findByProperty( 'id', dataOption.id ) }">
-                        <button class="btn full-width"
-                                ng-class="model.viewModel.record.dataOptionValueList.bl[dataOption.id] ?
-                                  'btn-success' : 'btn-default'"
-                                ng-disabled="!model.getEditEnabled()"
-                                ng-click="model.viewModel.toggleDataOptionValue( 'bl', dataOption.id )">
-                          <i class="glyphicon glyphicon-ok"
-                             ng-if="model.viewModel.record.dataOptionValueList.bl[dataOption.id]"></i>
+                      <td
+                          ng-repeat="selection in option.selectionList"
+                          ng-style="{ 'width': 50/detailSelection.length + '%' }"
+                          ng-class="{ 'bg-warning': model.viewModel.compareRecord.differences.part2[part].optionList.findByProperty( 'id', option.id ).selectionList.findByProperty( 'id', selection.id ) }">
+                        <span ng-if="null != selection.unavailable[model.viewModel.record.lang]"
+                              ng-bind-html="selection.unavailable[model.viewModel.record.lang]"></span>
+                        <button ng-if="null == selection.unavailable[model.viewModel.record.lang]"
+                                class="btn full-width"
+                                ng-class="model.viewModel.record.selectionList[selection.id] ? 'btn-success' : 'btn-default'"
+                                ng-disabled="!model.getEditEnabled() && !model.isRole( 'administrator' )"
+                                ng-click="model.viewModel.toggleSelection( model.categoryList[partIndex], option, selection )">
+                          <i class="glyphicon glyphicon-ok" ng-if="model.viewModel.record.selectionList[selection.id]"></i>
                           <span style="font-weight: normal"
-                                ng-if="!model.viewModel.record.dataOptionValueList.bl[dataOption.id]"
+                                ng-if="!model.viewModel.record.selectionList[selection.id]"
                                 ng-bind-html="t( 'misc.clickToSelect' )"></span>
                         </button>
-                      </td>
-                      <td ng-style="{ 'width': 'g' == part ? '50%' : '25%' }" ng-if="!dataOption.bl" ng-bind-html="t( 'misc.notAvailable' )"></td>
-                      <td width="25%" ng-if="'g' != part && dataOption.f1" ng-class="{ 'bg-warning': model.viewModel.compareRecord.differences.part2[part].followUp1DataOptionList.findByProperty( 'id', dataOption.id ) }">
-                        <button class="btn full-width"
-                                ng-class="model.viewModel.record.dataOptionValueList.f1[dataOption.id] ?
-                                  'btn-success' : 'btn-default'"
-                                ng-disabled="!model.getEditEnabled()"
-                                ng-click="model.viewModel.toggleDataOptionValue( 'f1', dataOption.id )">
-                          <i class="glyphicon glyphicon-ok"
-                             ng-if="model.viewModel.record.dataOptionValueList.f1[dataOption.id]"></i>
-                          <span style="font-weight: normal"
-                                ng-if="!model.viewModel.record.dataOptionValueList.f1[dataOption.id]"
-                                ng-bind-html="t( 'misc.clickToSelect' )"></span>
-                        </button>
-                      </td>
-                      <td width="25%" ng-if="'g' != part && !dataOption.f1">
-                        <span style="line-height: 28px;">({{ t( 'c' == part && !dataOption.name.en.includes( 'Report' ) ? 'misc.notApplicable' : 'misc.notAvailable' ) }})</span>
                       </td>
                     </tr>
-                    <tr ng-repeat-end style="background: white">
+                    <tr ng-repeat-end ng-repeatstyle="background: white">
                       <td colspan="3">
-                        <div id="accordion{{ dataOption.id }}" class="collapse text-primary text-left">
-                          <div ng-repeat="detailCat in dataOption.detailCategoryList track by $index">
-                            <div class="col-sm-2 vertical-spacer">{{ detailCat.name[model.viewModel.record.lang] }}</div>
-                            <div class="col-sm-10 vertical-spacer">
-                              <span ng-repeat="detail in detailCat.detailList"
+                        <div id="accordion{{ option.id }}" class="collapse text-primary text-left">
+                          <div ng-repeat="selection in option.selectionList">
+                            <div class="col-sm-2 vertical-spacer"
+                                 ng-bind-html="t( 'misc.studyPhase.' + selection.studyPhaseCode )"></div>
+                            <div class="col-sm-1 vertical-spacer">
+                              <span uib-tooltip-html="option.combinedCost ? t( 'misc.combinedCost' ) : ''"
+                                    tooltip-popup-delay="100">
+                                <b class="invert" ng-if="option.combinedCost">ⓘ</b>
+                                {{ selection.cost[model.viewModel.record.lang] }}
+                              </span>
+                            </div>
+                            <div class="col-sm-9 vertical-spacer">
+                              <span ng-repeat="detail in selection.detailList"
                                     uib-tooltip-html="detail.note[model.viewModel.record.lang] | cnNewlines"
                                     tooltip-popup-delay="100">
                                 <b class="invert" ng-if="detail.note[model.viewModel.record.lang]">ⓘ</b>
@@ -1091,17 +1112,14 @@
                             </div>
                           </div>
                         </div>
-                        <div ng-if="dataOption.justification && (
-                                      model.viewModel.record.dataOptionValueList.bl[dataOption.id] ||
-                                      model.viewModel.record.dataOptionValueList.f1[dataOption.id]
-                                    )">
+                        <div ng-if="option.justification && model.viewModel.isOptionSelected( option )">
                           <cn-view-input-with-differences
                             input="{
-                              key: 'data_option_justification_' + dataOption.id,
+                              key: 'data_justification_' + option.id,
                               title: 'Justification',
                               type: 'text'
                             }"
-                            difference="model.viewModel.compareRecord.differences.part2[part].dataOptionJustificationList.findByProperty( 'id', dataOption.id )"
+                            difference="model.viewModel.compareRecord.differences.part2[part].optionJustificationList.findByProperty( 'id', option.id )"
                             model="model">
                           </cn-view-input-with-differences>
                         </div>
@@ -1128,9 +1146,9 @@
                 <div class="container-fluid">
                   <cn-view-input-with-differences
                     no-cols=true
-                    ng-if="model.dataOptionCategoryList[partIndex].comment"
+                    ng-if="model.categoryList[partIndex].comment"
                     input="{
-                      key: 'comment_' + model.dataOptionCategoryList[partIndex].id,
+                      key: 'comment_' + model.categoryList[partIndex].id,
                       title: t( 'misc.comments' ),
                       type: 'text'
                     }"

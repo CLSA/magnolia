@@ -1,6 +1,6 @@
 <?php
 /**
- * data_option_category.class.php
+ * data_justification.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
  * @filesource
@@ -10,6 +10,6 @@ namespace magnolia\database;
 use cenozo\lib, cenozo\log, magnolia\util;
 
 /**
- * data_option_category: record
+ * data_justification: record
  */
-class data_option_category extends \cenozo\database\has_rank {}
+class data_justification extends \cenozo\database\record {}

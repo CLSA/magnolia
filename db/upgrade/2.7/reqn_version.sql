@@ -3,6 +3,14 @@ DELIMITER //
 CREATE PROCEDURE patch_reqn_version()
   BEGIN
 
+     -- determine the @cenozo database name
+     SET @cenozo = (
+       SELECT unique_constraint_schema
+       FROM information_schema.referential_constraints
+       WHERE constraint_schema = DATABASE()
+       AND constraint_name = "fk_access_site_id"
+     );
+
     SELECT "Adding new peer_review column to reqn_version table" AS "";
 
     SELECT COUNT(*) INTO @test
@@ -71,6 +79,56 @@ CREATE PROCEDURE patch_reqn_version()
       ALTER TABLE reqn_version DROP COLUMN amendment_justification;
     END IF;
 
+    SELECT "Adding applicant_country_id column to reqn_version table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn_version"
+    AND column_name = "applicant_country_id";
+
+    IF @test = 0 THEN
+      ALTER TABLE reqn_version ADD COLUMN applicant_country_id INT UNSIGNED NULL DEFAULT NULL AFTER applicant_address;
+
+      SET @sql = CONCAT(
+        "ALTER TABLE reqn_version ",
+          "ADD INDEX fk_applicant_country_id (applicant_country_id ASC), ",
+          "ADD CONSTRAINT fk_reqn_version_applicant_country_id ",
+            "FOREIGN KEY (applicant_country_id) ",
+            "REFERENCES ", @cenozo, ".country (id) ",
+            "ON DELETE NO ACTION ",
+            "ON UPDATE NO ACTION"
+      );
+      PREPARE statement FROM @sql;
+      EXECUTE statement;
+      DEALLOCATE PREPARE statement;
+    END IF;
+
+    SELECT "Adding trainee_country_id column to reqn_version table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn_version"
+    AND column_name = "trainee_country_id";
+
+    IF @test = 0 THEN
+      ALTER TABLE reqn_version ADD COLUMN trainee_country_id INT UNSIGNED NULL DEFAULT NULL AFTER trainee_address;
+
+      SET @sql = CONCAT(
+        "ALTER TABLE reqn_version ",
+          "ADD INDEX fk_trainee_country_id (trainee_country_id ASC), ",
+          "ADD CONSTRAINT fk_reqn_version_trainee_country_id ",
+            "FOREIGN KEY (trainee_country_id) ",
+            "REFERENCES ", @cenozo, ".country (id) ",
+            "ON DELETE NO ACTION ",
+            "ON UPDATE NO ACTION"
+      );
+      PREPARE statement FROM @sql;
+      EXECUTE statement;
+      DEALLOCATE PREPARE statement;
+    END IF;
+
   END //
 DELIMITER ;
 
@@ -87,9 +145,9 @@ BEGIN
   CALL update_reqn_last_reqn_version_with_agreement( NEW.reqn_id );
 
   -- create reqn_version_comment
-  INSERT INTO reqn_version_comment( create_timestamp, reqn_version_id, data_option_category_id )
-  SELECT NEW.create_timestamp, NEW.id, data_option_category.id
-  FROM data_option_category
+  INSERT INTO reqn_version_comment( create_timestamp, reqn_version_id, data_category_id )
+  SELECT NEW.create_timestamp, NEW.id, data_category.id
+  FROM data_category
   WHERE comment = true;
 END$$
 

@@ -60,6 +60,8 @@ class module extends \cenozo\service\module
     $modifier->left_join( 'user', 'reqn.designate_user_id', 'designate_user.id', 'designate_user' );
     $modifier->join( 'language', 'reqn.language_id', 'language.id' );
     $modifier->left_join( 'deadline', 'reqn.deadline_id', 'deadline.id' );
+    $modifier->left_join( 'country', 'reqn_version.applicant_country_id', 'applicant_country.id', 'applicant_country' );
+    $modifier->left_join( 'country', 'reqn_version.trainee_country_id', 'trainee_country.id', 'trainee_country' );
 
     $select->add_column(
       'CONCAT( REPLACE( reqn_version.amendment, ".", "" ), reqn_version.version )',
@@ -109,9 +111,11 @@ class module extends \cenozo\service\module
     $db_reqn_version = $this->get_resource();
     if( !is_null( $db_reqn_version ) )
     {
-      // include the user first/last/name as supplemental data
+      // include supplemental data
       $modifier->left_join( 'user', 'reqn_version.new_user_id', 'new_user.id', 'new_user' );
       $select->add_column( 'CONCAT( new_user.first_name, " ", new_user.last_name )', 'formatted_new_user_id', false );
+      $select->add_table_column( 'applicant_country', 'name', 'formatted_applicant_country_id' );
+      $select->add_table_column( 'trainee_country', 'name', 'formatted_trainee_country_id' );
 
       if( $select->has_columns( 'has_unread_notice' ) )
       {

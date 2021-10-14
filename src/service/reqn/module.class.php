@@ -88,25 +88,26 @@ class module extends \cenozo\service\module
     {
       // get a list of all linked-data data-options
       $category_sel = lib::create( 'database\select' );
-      $category_sel->from( 'data_option' );
+      $category_sel->from( 'data_selection' );
       $category_sel->add_column( 'id' );
       $category_mod = lib::create( 'database\modifier' );
-      $category_mod->join( 'data_option_category', 'data_option.data_option_category_id', 'data_option_category.id' );
-      $category_mod->where( 'data_option_category.name_en', '=', 'Linked Data' );
+      $category_mod->join( 'data_option', 'data_selection.data_option_id', 'data_option.id' );
+      $category_mod->join( 'data_category', 'data_option.data_category_id', 'data_category.id' );
+      $category_mod->where( 'data_category.name_en', '=', 'Linked Data' );
       $linked_data_sql = sprintf( '( %s %s )', $category_sel->get_sql(), $category_mod->get_sql() );
 
       $join_sel = lib::create( 'database\select' );
       $join_sel->from( 'reqn' );
       $join_sel->add_column( 'id', 'reqn_id' );
-      $join_sel->add_column( 'reqn_version_data_option.id IS NOT NULL', 'exists', false );
+      $join_sel->add_column( 'reqn_version_has_data_selection.reqn_version_id IS NOT NULL', 'selected', false );
 
       $join_mod = lib::create( 'database\modifier' );
       $join_mod->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
       
       $sub_mod = lib::create( 'database\modifier' );
-      $sub_mod->where( 'reqn_current_reqn_version.reqn_version_id', '=', 'reqn_version_data_option.reqn_version_id', false );
-      $sub_mod->where( 'reqn_version_data_option.data_option_id', 'IN', $linked_data_sql, false );
-      $join_mod->join_modifier( 'reqn_version_data_option', $sub_mod, 'left' );
+      $sub_mod->where( 'reqn_current_reqn_version.reqn_version_id', '=', 'reqn_version_has_data_selection.reqn_version_id', false );
+      $sub_mod->where( 'reqn_version_has_data_selection.data_selection_id', 'IN', $linked_data_sql, false );
+      $join_mod->join_modifier( 'reqn_version_has_data_selection', $sub_mod, 'left' );
       $join_mod->group( 'reqn.id' );
 
       $modifier->join(
@@ -114,13 +115,13 @@ class module extends \cenozo\service\module
         'reqn.id',
         'linked_data.reqn_id'
       );
-      $select->add_column( 'linked_data.exists', 'has_linked_data', false, 'boolean' );
+      $select->add_column( 'linked_data.selected', 'has_linked_data', false, 'boolean' );
 
       if( $this->get_argument( 'data_sharing', false ) )
       {
         $db_agreement_stage_type = $stage_type_class_name::get_unique_record( 'name', 'Agreement' );
         $modifier->where( 'stage_type.rank', '<=', $db_agreement_stage_type->rank );
-        $modifier->where( 'linked_data.exists', '=', true );
+        $modifier->where( 'linked_data.selected', '=', true );
       }
     }
 

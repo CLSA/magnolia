@@ -5,8 +5,8 @@ define( function() {
   angular.extend( module, {
     identifier: {
       parent: {
-        subject: 'data_option_category',
-        column: 'data_option_category.name_en'
+        subject: 'data_category',
+        column: 'data_category.name_en'
       }
     },
     name: {
@@ -15,20 +15,21 @@ define( function() {
       possessive: 'data-option\'s'
     },
     columnList: {
-      category_rank: { column: 'data_option_category.rank', title: 'Category Rank', type: 'rank' },
-      category_name_en: { column: 'data_option_category.name_en', title: 'Category Name' },
+      category_rank: { column: 'data_category.rank', title: 'Category Rank', type: 'rank' },
+      category_name_en: { column: 'data_category.name_en', title: 'Category Name' },
       rank: { title: 'Rank', type: 'rank' },
       justification: { title: 'Justification', type: 'boolean' },
       name_en: { title: 'Name' },
       has_condition: { title: 'Has Condition', type: 'boolean' },
+      combined_cost: { title: 'Combined Cost', type: 'boolean' },
       note_en: { title: 'Note', type: 'text', limit: 20 }
     },
     defaultOrder: { column: 'rank', reverse: false }
   } );
 
   module.addInputGroup( '', {
-    data_option_category_name_en: {
-      column: 'data_option_category.name_en',
+    data_category_name_en: {
+      column: 'data_category.name_en',
       title: 'Category',
       type: 'string',
       isConstant: true
@@ -42,6 +43,11 @@ define( function() {
       title: 'Justification',
       type: 'boolean',
       help: 'Whether the applicant must provide a justification when selecting this data-option.'
+    },
+    combined_cost: {
+      title: 'Combined Cost',
+      type: 'boolean',
+      help: 'Determines whether selecting multiple study phases are costs the same as selecting a single study phase.'
     },
     name_en: {
       title: 'Name (English)',
@@ -114,7 +120,7 @@ define( function() {
   cenozo.providers.factory( 'CnDataOptionViewFactory', [
     'CnBaseViewFactory',
     function( CnBaseViewFactory ) {
-      var object = function( parentModel, root ) { CnBaseViewFactory.construct( this, parentModel, root, 'data_option_detail' ); }
+      var object = function( parentModel, root ) { CnBaseViewFactory.construct( this, parentModel, root, 'data_selection' ); }
       return { instance: function( parentModel, root ) { return new object( parentModel, root ); } };
     }
   ] );
