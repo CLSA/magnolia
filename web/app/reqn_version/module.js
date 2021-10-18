@@ -721,8 +721,6 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
             [ 'part2', null, 'c' ],
             [ 'part2', null, 'd' ],
             [ 'part2', null, 'e' ],
-            [ 'part2', null, 'f' ],
-            [ 'part2', null, 'g' ],
             [ 'part3', null, null ],
             [ 'agreement', null, null ]
           ],
@@ -912,44 +910,32 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                   comprehensive: false,
                   tracking: false
                 },
-                a: { // questionnaires
+                a: { // core clsa data
                   diff: false,
                   optionList: [],
                   optionJustificationList: [],
                   comment: false
                 },
-                b: { // physical assessments
-                  diff: false,
-                  optionList: [],
-                  optionJustificationList: [],
-                  comment: false
-                },
-                c: { // biomarkers
-                  diff: false,
-                  optionList: [],
-                  optionJustificationList: [],
-                  comment: false
-                },
-                d: { // linked data
+                b: { // linked data
                   diff: false,
                   data_sharing_filename: false,
                   optionList: [],
                   optionJustificationList: [],
                   comment: false
                 },
-                e: { // additional data
+                c: { // additional data
                   diff: false,
                   optionList: [],
                   optionJustificationList: [],
                   comment: false
                 },
-                f: { // geographic indicators
+                d: { // geographic indicators
                   diff: false,
                   optionList: [],
                   optionJustificationList: [],
                   comment: false
                 },
-                g: { // covid-19
+                e: { // covid-19
                   diff: false,
                   optionList: [],
                   optionJustificationList: [],

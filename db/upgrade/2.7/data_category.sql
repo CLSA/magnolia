@@ -1,6 +1,6 @@
-DROP PROCEDURE IF EXISTS patch_data_option;
+DROP PROCEDURE IF EXISTS patch_data_category;
 DELIMITER //
-CREATE PROCEDURE patch_data_option()
+CREATE PROCEDURE patch_data_category()
   BEGIN
 
     SELECT "Renaming data_option_category table to data_category" AS "";
@@ -17,8 +17,8 @@ CREATE PROCEDURE patch_data_option()
   END //
 DELIMITER ;
 
-CALL patch_data_option();
-DROP PROCEDURE IF EXISTS patch_data_option;
+CALL patch_data_category();
+DROP PROCEDURE IF EXISTS patch_data_category;
 
 
 SELECT "Updating data_category triggers" AS "";

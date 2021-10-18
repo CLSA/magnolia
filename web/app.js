@@ -684,49 +684,17 @@ cenozo.service( 'CnReqnHelper', [
                 fr: 'Veuillez entrer le numéro de demande du projet connexe approuvé par l’ÉLCV.'
               }
             },
-            a: {
+            a: { tab: { en: '', fr: '' } },
+            b: {
               tab: { en: '', fr: '' },
-              module: { en: 'Data Module', fr: 'Module de données' },
-              heading: { en: '', fr: '' }
-            },
-            b: { tab: { en: '', fr: '' }, module: { en: '', fr: '' }, heading: { en: '', fr: '' } },
-            c: { tab: { en: '', fr: '' }, module: { en: '', fr: '' }, heading: { en: '', fr: '' } },
-            d: {
-              tab: { en: '', fr: '' },
-              module: { en: 'Linked Data', fr: 'Données liées' },
-              heading: {
-                en: 'When requesting these data, please note that if your CLSA Data and Biospecimen Request Application is approved, you will also be required to sign a <a href="https://canue.ca/wp-content/uploads/2021/07/CANUE-Data-Use-and-Sharing-via-Third-Party-Agreement_July2021-1.pdf" target="canue_agreement">Data Use and Sharing via Third Party Agreement</a> (available for consultation and <a href="http://canue.ca/data/" target="canue">download here</a>), and submit it to the CLSA.  For a detailed list of the linked variables please consult the <a href="https://www.clsa-elcv.ca/doc/2743" target="linked_data">Linked Data Summary Table</a> available in the Data and Biospecimens section of the CLSA website, <a href="https://www.clsa-elcv.ca/" target="clsa">www.clsa-elcv.ca</a>.',
-                fr: 'Lorsque vous demandez l’accès à ces données, veuillez noter que si votre demande d’accès aux données et aux échantillons biologiques de l’ÉLCV est approuvée, vous devrez également signer une Entente de partage et d’utilisation des données via une tierce partie autorisée (en anglais seulement - <a href="https://canue.ca/wp-content/uploads/2021/07/CANUE-Data-Use-and-Sharing-via-Third-Party-Agreement_July2021-1.pdf" target="canue_agreement">Data Use and Sharing via Third Party Agreement</a>) (disponible pour consultation et <a href="http://canue.ca/data/" target="canue">téléchargement ici</a>) et la soumettre à l’ÉLCV.  Pour obtenir une liste détaillée des variables liées, veuillez consulter le <a href="https://www.clsa-elcv.ca/sites/default/files/documents/clsa_linked_data_v1.0_2018jul11_fr_ims.pdf" target="donnees liees">Tableau récapitulatif des données liées</a> disponible à la section Données et échantillons biologiques du site Web de l’ÉLCV, <a href="https://www.clsa-elcv.ca/" target="clsa">www.clsa-elcv.ca</a>.'
-              },
               data_sharing: {
                 en: 'Completed copy of CANUE Data Use and Sharing via Third Party Agreement',
                 fr: 'Copie complété de l’Entente de partage et d’utilisation des données via une tierce partie autorisée de CANUE'
               }
             },
-            e: {
-              tab: { en: '', fr: '' },
-              module: { en: '', fr: '' },
-              heading: {
-                en: 'Additional data including images (e.g. DXA, Retinal scan) and raw data (e.g. Spirometry, ECG, Cognition) are available for some modules of the CLSA, as described in the CLSA Data Availability Table on our website. To request these data, please check the corresponding field below, and in the Justification box:<ol><li>specify which subtype/format of the data you are requesting where multiple types are available</li><li>provide detailed justification explaining how these data will help to achieve proposed objectives</li><li>describe how they will be analysed</li><li>provide evidence, if available, that you have the experience and resources to work with these types of data (i.e. references of publications)</li></ol>Please note that the request for Additional data incurs additional costs beyond the current data access fee, and these are outlined in the Fees section of our website. Requests for additional data may prolong the processing time of your application, and it may take longer to receive these data than the 6 months to receive alphanumeric data. For more information, please contact <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.',
-                fr: 'Des données additionnelles, y compris les images (p. ex. DEXA, imagerie rétinienne) et les données brutes (p. ex. spirométrie, ECG, cognition) sont disponibles pour certains modules de l’ÉLCV, comme indiqué dans le Tableau de disponibilité des données de l’ÉLCV publié sur notre site Web. Pour demander ces données, veuillez cocher le champ correspondant ci-dessous. Ensuite, dans la case ‘Justification’ :<ol><li>indiquez le sous-type ou le format des données que vous demandez lorsque plusieurs types sont disponibles</li><li>fournissez une justification détaillée expliquant comment ces données aideront à atteindre les objectifs proposés</li><li>décrivez comment ces données seront analysées</li><li>fournissez la preuve, le cas échéant, que vous disposez de l’expérience et des ressources nécessaires pour utiliser ce type de données (références de publications)</li></ol>Veuillez noter que les demandes de données additionnelles entraînent des frais supplémentaires en plus des frais d’accès actuels, ces derniers étant décrits dans la section « Frais » de notre site Web. Les demandes de données additionnelles peuvent prolonger le traitement de votre demande d’accès et la réception de ces données peut prendre plus de temps que les six mois prévus pour la réception des données alphanumériques. Pour plus d’information, veuillez nous contacter à l’adresse <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.'
-              }
-            },
-            f: {
-              tab: { en: '', fr: '' },
-              module: { en: '', fr: '' },
-              heading: {
-                en: '<ol><li>Forward Sortation Areas (A forward sortation area (FSA) is a geographic region in which all postal codes start with the same three characters.)</li><li>Census Subdivision Codes and Names - determined using the Postal Code Conversion File (PCCF) from Statistics Canada. (A census subdivision (CSD) is a geographic unit defined by Statistics Canada, roughly corresponding to municipalities, whose unique codes can be linked to other sociodemographic or census data)</li></ol>Due to the sensitive nature of these geographic indicators, a special request must be made to receive CSDs and FSAs as part of your dataset.  Adequate justification must be provided within the project description (Application Part 1) as well as in the Comments box below. By requesting these data, you also agree that you will not present in any form (presentation, publication, poster), an illustration of these geographic areas with fewer than 50 CLSA participants per FSA or CSD. For more information, please contact <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.',
-                fr: '<ol><li>Région de tri d’acheminement (Une région de tri d’acheminement (RTA) est une region géographique où tous les codes postaux ont les mêmes trois premiers caractères.)</li><li>Codes et noms des subdivisions de recensement déterminé à l’aide du Fichier de conversion des codes postaux (FCCP) de Statistique Canada. Une subdivision de recensement (SDR) est une unité géographique définie par Statistique Canada correspondant approximativement aux municipalités, dont les codes uniques peuvent être liés à d’autres données sociodémographiques ou de recensement.</li></ol>En raison de la nature de ces indicateurs géographiques, une demande spéciale doit être faite pour que les SDR et les RTA soient incluses dans votre ensemble de données. Une justification adéquate doit être fournie dans la description du projet (partie 1 de la demande). En demandant ces données, vous acceptez également de ne pas présenter sous quelque forme que ce soit (présentation, publication, affiche) une illustration des zones géographiques habitées par moins de 50 participants à l’ÉLCV. Pour toute information supplémentaire, veuillez écrire à <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.'
-              }
-            },
-            g: {
-              tab: { en: '', fr: '' },
-              module: { en: '', fr: '' },
-              heading: {
-                en: 'Please mark the datasets that you are requesting.',
-                fr: 'Veuillez cocher les ensembles de données que vous demandez.'
-              }
-            }
+            c: { tab: { en: '', fr: '' } },
+            d: { tab: { en: '', fr: '' } },
+            e: { tab: { en: '', fr: '' } }
           },
           part3: {
             tab: { en: 'Part 3', fr: '3<sup>e</sup> partie' },

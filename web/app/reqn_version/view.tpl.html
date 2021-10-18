@@ -1033,7 +1033,7 @@
             </form>
           </div>
         </div>
-        <div ng-repeat="part in ['a','b','c','d','e','f','g']"
+        <div ng-repeat="part in ['a','b','c','d','e']"
              ng-init="partIndex = $index"
              ng-show="part==model.viewModel.formTab[2]"
              class="panel panel-default">
@@ -1051,8 +1051,6 @@
                           style="vertical-align: middle;"
                           uib-tooltip-html="model.categoryList[partIndex].note[model.viewModel.record.lang] | cnNewlines"
                           tooltip-popup-delay="100">
-                        <b class="invert" ng-if="model.categoryList[partIndex].note[model.viewModel.record.lang]">ⓘ</b>
-                        {{ t( 'part2.' + part + '.module' ) }}
                       </td>
                       <td ng-repeat="studyPhaseCode in model.categoryList[partIndex].studyPhaseCodeList"
                           width="{{ 50/model.categoryList[partIndex].studyPhaseCodeList.length + '%' }}"
@@ -1128,16 +1126,16 @@
                   </tbody>
                 </table>
                 <hr/>
-                <div ng-if="'d'==part" class="container-fluid form-horizontal">
+                <div ng-if="'b'==part" class="container-fluid form-horizontal">
                   <fieldset ng-disabled="!model.getEditEnabled()">
                     <cn-view-input-with-differences
                       no-cols=true
                       input="{
                         key: 'data_sharing_filename',
-                        title: t( 'part2.d.data_sharing' ),
+                        title: t( 'part2.b.data_sharing' ),
                         type: 'file'
                       }"
-                      difference="model.viewModel.compareRecord.differences.part2.d.data_sharing_filename"
+                      difference="model.viewModel.compareRecord.differences.part2.b.data_sharing_filename"
                       model="liteModel">
                     </cn-view-input-with-differences>
                   </fieldset>

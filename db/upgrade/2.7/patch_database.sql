@@ -28,6 +28,7 @@ SOURCE applicant.sql
 SOURCE reqn_version_has_data_selection.sql
 
 SOURCE new_data_options.sql
+SOURCE data_category_2.sql
 
 SOURCE report_type.sql
 SOURCE report_restriction.sql
