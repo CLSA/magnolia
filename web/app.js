@@ -683,18 +683,7 @@ cenozo.service( 'CnReqnHelper', [
                 en: 'Please enter the application number of the related CLSA approved project',
                 fr: 'Veuillez entrer le numéro de demande du projet connexe approuvé par l’ÉLCV.'
               }
-            },
-            a: { tab: { en: '', fr: '' } },
-            b: {
-              tab: { en: '', fr: '' },
-              data_sharing: {
-                en: 'Completed copy of CANUE Data Use and Sharing via Third Party Agreement',
-                fr: 'Copie complété de l’Entente de partage et d’utilisation des données via une tierce partie autorisée de CANUE'
-              }
-            },
-            c: { tab: { en: '', fr: '' } },
-            d: { tab: { en: '', fr: '' } },
-            e: { tab: { en: '', fr: '' } }
+            }
           },
           part3: {
             tab: { en: 'Part 3', fr: '3<sup>e</sup> partie' },
@@ -733,16 +722,18 @@ cenozo.service( 'CnReqnHelper', [
             finalReport: { en: 'Final Report', fr: 'Rapport final' },
             study: {
               clsa: { en: 'CLSA', fr: 'ÉLCV' },
-              covid19: {
-                questionnaire: { en: 'COVID-19, Questionnaire', fr: 'COVID-19, questionnaire' },
-                antibody: { en: 'COVID-19, Antibody', fr: 'COVID-19, anticorps' },
-                dbs: { en: 'COVID-19, DBS', fr: 'COVID-19, DBS' },
-                brain: { en: 'COVID-19, Brain', fr: 'COVID-19, cerveau' },
-              }
+              covid19_questionnaire: { en: 'COVID-19, Questionnaire', fr: 'COVID-19, questionnaire' },
+              covid19_antibody: { en: 'COVID-19, Antibody', fr: 'COVID-19, anticorps' },
+              covid19_dbs: { en: 'COVID-19, DBS', fr: 'COVID-19, DBS' },
+              covid19_brain: { en: 'COVID-19, Brain', fr: 'COVID-19, cerveau' },
             },
             studyPhase: {
               bl: { en: 'Baseline', fr: 'départ' },
               f1: { en: 'Follow-up 1', fr: '1er suivi' }
+            },
+            data_sharing: {
+              en: 'Completed copy of CANUE Data Use and Sharing via Third Party Agreement',
+              fr: 'Copie complété de l’Entente de partage et d’utilisation des données via une tierce partie autorisée de CANUE'
             },
             file: { en: 'File', fr: 'Fichier' },
             expirationDate: { en: 'Expiration Date', fr: 'Date limite' },
@@ -1117,7 +1108,7 @@ cenozo.service( 'CnReqnHelper', [
 
       var letter = 'a';
       object.promise.data.forEach( function( cat ) {
-        object.lookupData.reqn.part2[letter].tab = { en: cat.name_en, fr: cat.name_fr };
+        object.lookupData.reqn.part2[letter] = { tab: { en: cat.name_en, fr: cat.name_fr } };
         letter = String.fromCharCode( letter.charCodeAt(0) + 1 );
       } );
     }

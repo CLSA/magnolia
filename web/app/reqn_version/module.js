@@ -499,11 +499,6 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
           },
 
           onView: async function( force ) {
-            // reset tab values (none transition so we don't have to await them)
-            this.setFormTab( 0, this.parentModel.getQueryParameter( 't0' ), false );
-            this.setFormTab( 1, this.parentModel.getQueryParameter( 't1' ), false );
-            this.setFormTab( 2, this.parentModel.getQueryParameter( 't2' ), false );
-
             // reset compare version and differences
             this.compareRecord = null;
             this.coapplicantAgreementList = [];
@@ -532,6 +527,11 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
 
               await Promise.all( promiseList );
               await this.getVersionList();
+
+              // the category list will have been loaded by now, so we can load the selected tabs
+              this.setFormTab( 0, this.parentModel.getQueryParameter( 't0' ), false );
+              this.setFormTab( 1, this.parentModel.getQueryParameter( 't1' ), false );
+              this.setFormTab( 2, this.parentModel.getQueryParameter( 't2' ), false );
             }
           },
 
@@ -595,11 +595,10 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                 path: parent.subject + '/' + parent.identifier,
                 data: data
               };
-              var self = this;
-              httpObj.onError = function( error ) { self.onPatchError( error ); };
+              httpObj.onError = ( error ) => { this.onPatchError( error ); };
               try {
                 await CnHttpFactory.instance( httpObj ).patch();
-                this.afterPatchFunctions.forEach( function( fn ) { fn(); } );
+                this.afterPatchFunctions.forEach( fn => fn() );
               } catch( error ) {
                 // handled by onError above
               }
@@ -608,21 +607,20 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
               if( 'new_user_id' == property ) {
                 proceed = false;
                 // make sure the new user isn't a trainee
-                var self = this;
                 var response = await CnHttpFactory.instance( {
                   path: 'applicant/user_id=' + data[property],
                   data: { select: { column: 'supervisor_user_id' } },
-                  onError: async function( error ) {
+                  onError: async ( error ) => {
                     if( 404 == error.status ) {
                       await CnModalMessageFactory.instance( {
-                        title: self.translate( 'misc.invalidNewApplicantTitle' ),
-                        message: self.translate( 'misc.invalidNewApplicantMessage' ),
-                        closeText: self.translate( 'misc.close' ),
+                        title: this.translate( 'misc.invalidNewApplicantTitle' ),
+                        message: this.translate( 'misc.invalidNewApplicantMessage' ),
+                        closeText: this.translate( 'misc.close' ),
                         error: true
                       } ).show();
 
                       // failed to set the new user so put it back
-                      self.formattedRecord.new_user_id = self.backupRecord.formatted_new_user_id;
+                      this.formattedRecord.new_user_id = this.backupRecord.formatted_new_user_id;
                     } else {
                       CnModalMessageFactory.httpError( error );
                     }
@@ -706,6 +704,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
 
           // the sequencial list of all tabs where every item has an array of the three indexed tab values
           formTab: [],
+          tabSectionListIsBuilt: false,
           tabSectionList: [
             [ 'instructions', null, null ],
             [ 'part1', 'a', null ],
@@ -716,11 +715,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
             [ 'part1', 'f', null ],
             [ 'part2', null, 'notes' ],
             [ 'part2', null, 'cohort' ],
-            [ 'part2', null, 'a' ],
-            [ 'part2', null, 'b' ],
-            [ 'part2', null, 'c' ],
-            [ 'part2', null, 'd' ],
-            [ 'part2', null, 'e' ],
+            // one tab for each data category will be added here
             [ 'part3', null, null ],
             [ 'agreement', null, null ]
           ],
@@ -731,14 +726,14 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
 
             // find the tab section
             var selectedTabSection = null;
-            this.tabSectionList.some( function( tabSection ) {
+            this.tabSectionList.some( tabSection => {
               if( tab == tabSection[index] ) {
                 selectedTabSection = tabSection;
                 return true;
               }
             } );
 
-            // get the tab (or default of none was found)
+            // get the tab (or default if none was found)
             tab = null != selectedTabSection && null != selectedTabSection[index]
                 ? selectedTabSection[index]
                 : ( 0 == index ? 'instructions' : 1 == index ? 'a' : 'notes' );
@@ -756,11 +751,10 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
             if( angular.isUndefined( reverse ) ) reverse = false;
 
             var currentTabSectionIndex = null;
-            var self = this;
-            this.tabSectionList.some( function( tabSection, index ) {
-              if( self.formTab[0] == tabSection[0] ) {
-                if( ( null == tabSection[1] || self.formTab[1] == tabSection[1] ) &&
-                    ( null == tabSection[2] || self.formTab[2] == tabSection[2] ) ) {
+            this.tabSectionList.some( ( tabSection, index ) => {
+              if( this.formTab[0] == tabSection[0] ) {
+                if( ( null == tabSection[1] || this.formTab[1] == tabSection[1] ) &&
+                    ( null == tabSection[2] || this.formTab[2] == tabSection[2] ) ) {
                   currentTabSectionIndex = index;
                   return true;
                 }
@@ -792,7 +786,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
             var applicantCountryId = null == this.record.applicant_country_id ? baseCountryId : this.record.applicant_country_id;
             var traineeCountryId = null == this.record.trainee_country_id ? baseCountryId : this.record.trainee_country_id;
             var cost = 3000;
-            
+
             // cost for trainees is different to applicants
             if( this.record.trainee_user_id ) {
               if( baseCountryId != traineeCountryId || baseCountryId != applicantCountryId ) {
@@ -807,12 +801,11 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
               if( baseCountryId != applicantCountryId ) cost = 5000;
             }
 
-            var self = this;
             this.parentModel.categoryList.forEach(
-              category => category.optionList.forEach( function( option ) {
+              category => category.optionList.forEach( option => {
                 var maxCombinedCost = 0;
-                option.selectionList.filter( selection => 0 < selection.cost.value ).forEach( function( selection ) {
-                  if( angular.isArray( self.record.selectionList ) && self.record.selectionList[selection.id] ) {
+                option.selectionList.filter( selection => 0 < selection.cost.value ).forEach( selection => {
+                  if( angular.isArray( this.record.selectionList ) && this.record.selectionList[selection.id] ) {
                     if( option.combinedCost ) {
                       // track the most expensive selection
                       if( selection.cost.value > maxCombinedCost ) maxCombinedCost = selection.cost.value;
@@ -909,43 +902,22 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                   diff: false,
                   comprehensive: false,
                   tracking: false
-                },
-                a: { // core clsa data
-                  diff: false,
-                  optionList: [],
-                  optionJustificationList: [],
-                  comment: false
-                },
-                b: { // linked data
-                  diff: false,
-                  data_sharing_filename: false,
-                  optionList: [],
-                  optionJustificationList: [],
-                  comment: false
-                },
-                c: { // additional data
-                  diff: false,
-                  optionList: [],
-                  optionJustificationList: [],
-                  comment: false
-                },
-                d: { // geographic indicators
-                  diff: false,
-                  optionList: [],
-                  optionJustificationList: [],
-                  comment: false
-                },
-                e: { // covid-19
-                  diff: false,
-                  optionList: [],
-                  optionJustificationList: [],
-                  comment: false
                 }
               }
             };
 
+            // add a section for each category
+            this.parentModel.categoryList.forEach( category => {
+              differences.part2[category.charCode] = {
+                diff: false,
+                selectionList: [],
+                optionJustificationList: [],
+                comment: false
+              }
+            } );
+
             // add all amendment types
-            this.parentModel.amendmentTypeList.en.forEach( function( amendmentType ) {
+            this.parentModel.amendmentTypeList.en.forEach( amendmentType => {
               differences.amendment.a['amendmentType'+amendmentType.id] = false;
             } );
 
@@ -964,7 +936,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                       // an array means we have a list go check through
                       if( 'coapplicantList' == property ) {
                         // loop through reqnVersion1's coapplicants to see if any were added or changed
-                        reqnVersion1.coapplicantList.forEach( function( c1 ) {
+                        reqnVersion1.coapplicantList.forEach( c1 => {
                           var c2 = reqnVersion2.coapplicantList.findByProperty( 'name', c1.name );
                           if( null == c2 ) {
                             // reqnVersion1 has coapplicant that compared reqnVersion2 doesn't
@@ -973,9 +945,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                             differences[part][section].diff = true;
                             differences[part][section][property].push( { name: c1.name, diff: 'added' } );
                           } else {
-                            if( ['position', 'affiliation', 'email', 'role', 'access'].some( function( p ) {
-                              return c1[p] != c2[p];
-                            } ) ) {
+                            if( ['position', 'affiliation', 'email', 'role', 'access'].some( p => c1[p] != c2[p] ) ) {
                               // reqnVersion1 has coapplicant which is different than compared reqnVersion2
                               differences.diff = true;
                               differences[part].diff = true;
@@ -986,7 +956,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                         } );
 
                         // loop through compared reqnVersion2's coapplicants to see if any were removed
-                        reqnVersion2.coapplicantList.forEach( function( c2 ) {
+                        reqnVersion2.coapplicantList.forEach( c2 => {
                           var c1 = reqnVersion1.coapplicantList.findByProperty( 'name', c2.name );
                           if( null == c2 ) {
                             // reqnVersion1 has coapplicant that compared reqnVersion2 doesn't
@@ -998,7 +968,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                         } );
                       } else if( 'referenceList' == property ) {
                         // loop through reqnVersion1's references to see if any were added or changed
-                        reqnVersion1.referenceList.forEach( function( r1 ) {
+                        reqnVersion1.referenceList.forEach( r1 => {
                           var r2 = reqnVersion2.referenceList.findByProperty( 'reference', r1.reference );
                           if( null == r2 ) {
                             // reqnVersion1 has reference that compared reqnVersion2 doesn't
@@ -1010,7 +980,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                         } );
 
                         // loop through compared reqnVersion2's references to see if any were removed
-                        reqnVersion2.referenceList.forEach( function( r2 ) {
+                        reqnVersion2.referenceList.forEach( r2 => {
                           var r1 = reqnVersion1.referenceList.findByProperty( 'reference', r2.reference );
                           if( null == r1 ) {
                             // reqnVersion1 has reference that compared reqnVersion2 doesn't
@@ -1020,26 +990,23 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                             differences[part][section][property].push( { name: r2.reference, diff: 'removed' } );
                           }
                         } );
-                      } else if( 'optionList' == property ) {
-                        this.parentModel.categoryList.forEach( function( category ) {
-                          // section a checks rank 1, section b checks rank 2, etc
-                          if( category.rank == section.charCodeAt() - 'a'.charCodeAt() + 1 ) {
-                            category.optionList.forEach( function( option ) {
-                              option.selectionList.forEach( function( selection ) {
-                                if( reqnVersion1.selectionList[selection.id] !=
-                                    reqnVersion2.selectionList[selection.id] ) {
-                                  differences.diff = true;
-                                  differences[part].diff = true;
-                                  differences[part][section].diff = true;
-                                  differences[part][section][property].push( {
-                                    id: option.id,
-                                    name: option.name.en,
-                                    diff: reqnVersion1.selectionList[selection.id] ? 'added' : 'removed'
-                                  } );
-                                }
-                              } );
+                      } else if( 'selectionList' == property ) {
+                        this.parentModel.categoryList.filter( category => section == category.charCode ).forEach( category => {
+                          category.optionList.forEach( option => {
+                            option.selectionList.forEach( selection => {
+                              if( reqnVersion1.selectionList[selection.id] != reqnVersion2.selectionList[selection.id] ) {
+                                differences.diff = true;
+                                differences[part].diff = true;
+                                differences[part][section].diff = true;
+                                differences[part][section][property].push( {
+                                  id: selection.id,
+                                  name: option.name.en + ' [' +
+                                    CnReqnHelper.lookupData.reqn.misc.studyPhase[selection.studyPhaseCode].en + ']',
+                                  diff: reqnVersion1.selectionList[selection.id] ? 'added' : 'removed'
+                                } );
+                              }
                             } );
-                          }
+                          } );
                         } );
                       } else if( 'optionJustificationList' == property ) {
                         for( var prop in reqnVersion1 ) {
@@ -1123,7 +1090,6 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
           },
 
           getVersionList: async function() {
-            var self = this;
             var parent = this.parentModel.getParentIdentifier();
             this.versionList = [];
             var response = await CnHttpFactory.instance( {
@@ -1132,55 +1098,24 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
 
             // we're going to use .then calls below to maximize overall asynchronous processing time
             var promiseList = [];
-            response.data.forEach( function( version ) {
+            response.data.forEach( version => {
               promiseList = promiseList.concat( [
-                self.getAmendmentTypeList( version.id, version ),
+                this.getAmendmentTypeList( version.id, version ),
 
-                self.getCoapplicantList( version.id, version ).then( function() {
-                  // see if there is a difference between this list and the view's list
-                  self.setCoapplicantDiff( version );
-                } ),
-
-                self.getReferenceList( version.id, version ).then( function() {
-                  // see if there is a difference between this list and the view's list
-                  self.setReferenceDiff( version );
-                } ),
-
-                self.getSelectionList( version.id, version ),
-
-                // add the file sizes
-                CnHttpFactory.instance( {
-                  path: 'reqn_version/' + version.id + '?file=coapplicant_agreement_filename'
-                } ).get().then( function( response ) {
-                  version.coapplicant_agreement_size = response.data;
-                } ),
-
-                CnHttpFactory.instance( {
-                  path: 'reqn_version/' + version.id + '?file=peer_review_filename'
-                } ).get().then( function( response ) {
-                  version.peer_review_size = response.data;
-                } ),
-
-                CnHttpFactory.instance( {
-                  path: 'reqn_version/' + version.id + '?file=funding_filename'
-                } ).get().then( function( response ) {
-                  version.funding_size = response.data;
-                } ),
-
-                CnHttpFactory.instance( {
-                  path: 'reqn_version/' + version.id + '?file=ethics_filename'
-                } ).get().then( function( response ) {
-                  version.ethics_size = response.data;
-                } ),
-
-                CnHttpFactory.instance( {
-                  path: 'reqn_version/' + version.id + '?file=data_sharing_filename'
-                } ).get().then( function( response ) {
-                  version.data_sharing_size = response.data;
-                } )
+                // see if there is a difference between this list and the view's list
+                this.getCoapplicantList( version.id, version ).then( () => this.setCoapplicantDiff( version ) ),
+                // see if there is a difference between this list and the view's list
+                this.getReferenceList( version.id, version ).then( () => this.setReferenceDiff( version ) ),
+                this.getSelectionList( version.id, version )
               ] );
 
-              self.versionList.push( version );
+              // add the file sizes
+              ['coapplicant_agreement', 'peer_review', 'funding', 'ethics', 'data_sharing'].forEach( file => {
+                var path = 'reqn_version/' + version.id + '?file=' + file + '_filename';
+                promiseList.push( CnHttpFactory.instance( { path: path } ).get().then( r => version[file + '_size'] = r.data ) );
+              } );
+
+              this.versionList.push( version );
             } );
 
             var compareVersion = this.parentModel.getQueryParameter( 'c' );
@@ -1194,11 +1129,11 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
 
             this.lastAmendmentVersion = null;
             if( '.' != this.record.amendment ) {
-              this.versionList.slice().reverse().some( function( version ) {
+              this.versionList.slice().reverse().some( version => {
                 // Note that the amendments we're comparing are letters, and since . is considered less than A it works
                 // whether we're comparing lettered versions or the initial "." version:
-                if( self.record.amendment > version.amendment ) {
-                  self.lastAmendmentVersion = version.amendment_version;
+                if( this.record.amendment > version.amendment ) {
+                  this.lastAmendmentVersion = version.amendment_version;
                   return true;
                 }
               } );
@@ -1210,17 +1145,17 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
             this.versionList.reverse();
 
             this.lastAgreementVersion = null;
-            this.versionList.forEach( function( version ) {
+            this.versionList.forEach( version => {
               if( null != version ) {
-                version.differences = self.getDifferences( version );
+                version.differences = this.getDifferences( version );
 
                 // while we're at it determine the list of coapplicant agreements
                 if( null != version.coapplicant_agreement_filename )
-                  self.coapplicantAgreementList.push( { version: version.amendment_version, id: version.id } );
+                  this.coapplicantAgreementList.push( { version: version.amendment_version, id: version.id } );
 
                 // ... and also determine the last agreement version and calculate its differences
-                if( null == self.agreementDifferenceList && null != version.agreement_filename )
-                  self.agreementDifferenceList = self.getDifferenceList( version );
+                if( null == this.agreementDifferenceList && null != version.agreement_filename )
+                  this.agreementDifferenceList = this.getDifferenceList( version );
               }
             } );
 
@@ -1232,18 +1167,16 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
           },
 
           determineCoapplicantDiffs: function() {
-            var self = this;
-            this.versionList.forEach( version => self.setCoapplicantDiff( version ) );
+            this.versionList.forEach( version => this.setCoapplicantDiff( version ) );
           },
 
           setCoapplicantDiff: function( version ) {
-            var self = this;
             if( null != version ) {
               // see if there is a difference between this list and the view's list
               version.coapplicantDiff =
                 version.coapplicantList.length != this.record.coapplicantList.length ||
                 version.coapplicantList.some(
-                  c1 => !self.record.coapplicantList.some(
+                  c1 => !this.record.coapplicantList.some(
                     c2 => ![ 'name', 'position', 'affiliation', 'email', 'role', 'access' ].some(
                       prop => c1[prop] != c2[prop]
                     )
@@ -1257,19 +1190,19 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                 if( version.coapplicantDiff ) {
                   // There is a difference between this and the previous amendment version, so now determine if there is now
                   // a coapplicant with access to the data which didn't exist in the previous version
-                  this.record.coapplicantList.some( function( coapplicant ) {
-                    var found = version.coapplicantList.some( function( oldCoapplicant ) {
+                  this.record.coapplicantList.some( coapplicant => {
+                    var found = version.coapplicantList.some( oldCoapplicant => {
                       if( oldCoapplicant.name == coapplicant.name ) {
                         // check if an existing coap has been given access to the data
-                        if( !oldCoapplicant.access && coapplicant.access ) self.addingCoapplicantWithData = true;
+                        if( !oldCoapplicant.access && coapplicant.access ) this.addingCoapplicantWithData = true;
                         return true;
                       }
                     } );
 
                     // check if a new coap has been given access to the data
-                    if( !found && coapplicant.access ) self.addingCoapplicantWithData = true;
+                    if( !found && coapplicant.access ) this.addingCoapplicantWithData = true;
 
-                    return self.addingCoapplicantWithData;
+                    return this.addingCoapplicantWithData;
                   } );
                 }
               }
@@ -1284,10 +1217,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
             if( angular.isUndefined( object ) ) object = this.record;
 
             // start by setting all amendment types to false
-            this.parentModel.amendmentTypeList.en.forEach( function( amendmentType ) {
-              var property = 'amendmentType' + amendmentType.id;
-              object[property] = false;
-            } );
+            this.parentModel.amendmentTypeList.en.forEach( amendmentType => { object['amendmentType' + amendmentType.id] = false; } );
 
             // now change any which the reqn has to true
             var response = await CnHttpFactory.instance( {
@@ -1298,22 +1228,17 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
               }
             } ).query();
 
-            response.data.forEach( function( row ) {
-              var property = 'amendmentType' + row.id;
-              object[property] = true;
-            } );
+            response.data.forEach( row => { object['amendmentType' + row.id] = true; } );
           },
 
           toggleAmendmentTypeValue: async function( amendmentTypeId ) {
-            var self = this;
-            var onErrorFn = function( error ) { self.record[property] = !self.record[property]; };
+            var onErrorFn = ( error ) => { this.record[property] = !this.record[property]; };
             var path = this.parentModel.getServiceResourcePath() + '/amendment_type';
             var amendmentType = this.parentModel.amendmentTypeList.en.findByProperty( 'id', amendmentTypeId );
             var justificationColumn = 'amendment_justification_' + amendmentTypeId;
 
             var property = 'amendmentType' + amendmentTypeId;
             if( this.record[property] ) {
-              var self = this;
               var proceed = true;
 
               if( amendmentTypeId == this.parentModel.newUserAmendmentTypeId ) {
@@ -1383,18 +1308,16 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
           },
 
           determineReferenceDiffs: function() {
-            var self = this;
-            this.versionList.forEach( version => self.setReferenceDiff( version ) );
+            this.versionList.forEach( version => this.setReferenceDiff( version ) );
           },
 
           setReferenceDiff: function( version ) {
             if( null != version ) {
               // see if there is a difference between this list and the view's list
-              var self = this;
               version.referenceDiff =
                 version.referenceList.length != this.record.referenceList.length ||
                 version.referenceList.some(
-                  c1 => !self.record.referenceList.some(
+                  c1 => !this.record.referenceList.some(
                     c2 => ![ 'rank', 'reference' ].some(
                       prop => c1[prop] != c2[prop]
                     )
@@ -1478,7 +1401,6 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
               )
             );
 
-            var self = this;
             var [selectionResponse, commentResponse,
                  optionJustificationResponse, amendmentJustificationResponse] = await Promise.all( [
               CnHttpFactory.instance( {
@@ -1503,27 +1425,27 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
             ] );
 
             // set all reqn-version selections
-            selectionResponse.data.forEach( function( selection ) { object.selectionList[selection.id] = true; } );
+            selectionResponse.data.forEach( selection => { object.selectionList[selection.id] = true; } );
 
             // define all reqn-version comments
-            commentResponse.data.forEach( function( comment ) {
+            commentResponse.data.forEach( comment => {
               var column = 'comment_' + comment.data_category_id;
               object[column] = comment.description;
-              self.backupRecord[column] = object[column];
+              this.backupRecord[column] = object[column];
             } );
 
             // define all reqn-version data-option justifications
-            optionJustificationResponse.data.forEach( function( justification ) {
+            optionJustificationResponse.data.forEach( justification => {
               var column = 'data_justification_' + justification.data_option_id;
               object[column] = justification.description;
-              self.backupRecord[column] = object[column];
+              this.backupRecord[column] = object[column];
             } );
 
             // define all reqn-version amendment justifications
-            amendmentJustificationResponse.data.forEach( function( justification ) {
+            amendmentJustificationResponse.data.forEach( justification => {
               var column = 'amendment_justification_' + justification.amendment_type_id;
               object[column] = justification.description;
-              self.backupRecord[column] = object[column];
+              this.backupRecord[column] = object[column];
             } );
           },
 
@@ -1587,14 +1509,13 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
               this.record.selectionList[selection.id] = !this.record.selectionList[selection.id];
 
               try {
-                var self = this;
                 var data = {};
                 if( this.record.selectionList[selection.id] ) data.add = selection.id;
                 else data.remove = selection.id;
                 await CnHttpFactory.instance( {
                   path: this.parentModel.getServiceResourcePath() + '/data_selection',
                   data: data,
-                  onError: function( error ) { self.record.selectionList[selection.id] = !self.record.selectionList[selection.id]; }
+                  onError: ( error ) => { this.record.selectionList[selection.id] = !this.record.selectionList[selection.id]; }
                 } ).post();
 
                 if( this.record.selectionList[selection.id] ) {
@@ -1656,7 +1577,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                         if( 'diff' == property ) continue; // used to track overall diff
 
                         if( angular.isArray( version.differences[part][section][property] ) ) {
-                          version.differences[part][section][property].forEach( function( change ) {
+                          version.differences[part][section][property].forEach( change => {
                             differenceList.push( {
                               type: property.replace( 'List', '' )
                                             .camelToSnake()
@@ -1745,43 +1666,42 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                 }
               }
 
-              var self = this;
               var error = null;
               var errorTab = null;
 
               await Promise.all( this.fileList.map( file => file.updateFileSize() ) );
-              
+
               for( var tab in requiredTabList ) {
                 var firstProperty = null;
-                requiredTabList[tab].filter( function( property ) {
+                requiredTabList[tab].filter( property => {
                   if( '1a' == tab ) {
                     // only check the country if show_prices is on
-                    return 'applicant_country_id' != property || self.record.show_prices;
+                    return 'applicant_country_id' != property || this.record.show_prices;
                   } else if( '1b' == tab ) {
                     // only check 1b properties if there is a new coapplication with access to data
-                    return self.addingCoapplicantWithData;
+                    return this.addingCoapplicantWithData;
                   } else if( '1e' == tab ) {
                     // only check 1e funding properties if funding=yes
-                    return !['peer_review', 'funding'].includes( property ) ? 'yes' == self.record.funding : true;
+                    return !['peer_review', 'funding'].includes( property ) ? 'yes' == this.record.funding : true;
                   } else if( 'ethics_filename' == property ) {
                     // only check the ethics filename if ethics=yes or exempt
-                    return ['yes', 'exempt'].includes( self.record.ethics );
+                    return ['yes', 'exempt'].includes( this.record.ethics );
                   } else if( 'last_identifier' == property ) {
                     // only check the last_identifier if longitidunal=yes (it's a boolean var)
-                    return self.record.longitudinal;
+                    return this.record.longitudinal;
                   }
 
                   // check everything else
                   return true;
-                } ).forEach( function( property ) {
+                } ).forEach( property => {
                   var missing = false;
                   if( property.match( '_filename' ) ) {
                     // check for the file size
-                    var fileDetails = self.fileList.findByProperty( 'key', property );
+                    var fileDetails = this.fileList.findByProperty( 'key', property );
                     missing = !angular.isObject( fileDetails ) || 0 == fileDetails.size;
                   } else {
                     // check for the property's value
-                    missing = null === self.record[property] || '' === self.record[property];
+                    missing = null === this.record[property] || '' === this.record[property];
                   }
 
                   if( missing ) {
@@ -1790,8 +1710,8 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                     cenozo.updateFormElement( element, true );
                     if( null == errorTab ) errorTab = tab;
                     if( null == error ) error = {
-                      title: self.translate( 'misc.missingFieldTitle' ),
-                      message: self.translate( 'misc.missingFieldMessage' ),
+                      title: this.translate( 'misc.missingFieldTitle' ),
+                      message: this.translate( 'misc.missingFieldMessage' ),
                       error: true
                     };
                   }
@@ -1803,10 +1723,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                 this.noAmendmentTypes = false;
 
                 // for amendments make sure that at least one amendment type has been selected
-                if( !this.parentModel.amendmentTypeList.en.some( function( amendmentType ) {
-                  var property = 'amendmentType' + amendmentType.id;
-                  return self.record[property];
-                } ) ) {
+                if( !this.parentModel.amendmentTypeList.en.some( at => this.record['amendmentType' + at.id] ) ) {
                   this.noAmendmentTypes = true;
                   if( null == errorTab ) errorTab = 'amendment';
                   if( null == error ) error = {
@@ -1832,11 +1749,11 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                 // make sure that all selected amendment types have a justification
                 this.parentModel.amendmentTypeList.en
                   .filter( amendmentType => amendmentType.justificationPrompt )
-                  .forEach( function( amendmentType ) {
+                  .forEach( amendmentType => {
                     // search for checked amendments with no justification
                     var columnName = 'amendment_justification_' + amendmentType.id;
-                    if( self.record['amendmentType' + amendmentType.id] &&
-                        !self.record[columnName] ) {
+                    if( this.record['amendmentType' + amendmentType.id] &&
+                        !this.record[columnName] ) {
                       var element = cenozo.getFormElement( columnName );
                       element.$error.required = true;
                       if( null == errorTab ) errorTab = 'amendment';
@@ -1972,33 +1889,32 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                     // Do not proceed when uploading an agreement is cancelled
                     if( proceed ) {
                       try {
-                        var self = this;
                         await CnHttpFactory.instance( {
                           path: parent.subject + '/' + parent.identifier + "?action=submit" + ( noReview ? '&review=0' : '' ),
-                          onError: async function( error ) {
+                          onError: async ( error ) => {
                             if( 409 == error.status ) {
                               await CnModalMessageFactory.instance( {
-                                title: self.translate( 'misc.invalidStartDateTitle' ),
-                                message: self.translate( 'misc.invalidStartDateMessage' ),
-                                closeText: self.translate( 'misc.close' ),
+                                title: this.translate( 'misc.invalidStartDateTitle' ),
+                                message: this.translate( 'misc.invalidStartDateMessage' ),
+                                closeText: this.translate( 'misc.close' ),
                                 error: true
                               } ).show();
 
                               var element = cenozo.getFormElement( 'start_date' );
-                              element.$error.custom = self.translate( 'misc.invalidStartDateTitle' );
+                              element.$error.custom = this.translate( 'misc.invalidStartDateTitle' );
                               cenozo.updateFormElement( element, true );
-                              self.setFormTab( 0, 'part1', false );
-                              await self.setFormTab( 1, 'c' );
+                              this.setFormTab( 0, 'part1', false );
+                              await this.setFormTab( 1, 'c' );
                             } else CnModalMessageFactory.httpError( error );
                           }
                         } ).patch();
 
-                        var code = CnSession.user.id == self.record.trainee_user_id ?
-                          ( 'deferred' == self.record.state ? 'traineeResubmit' : 'traineeSubmit' ) :
-                          CnSession.user.id == self.record.designate_user_id ?
-                          ( 'deferred' == self.record.state ? 'designateResubmit' : 'designateSubmit' ) :
-                          ( 'deferred' == self.record.state ? 'resubmit' : 'submit' );
-                        
+                        var code = CnSession.user.id == this.record.trainee_user_id ?
+                          ( 'deferred' == this.record.state ? 'traineeResubmit' : 'traineeSubmit' ) :
+                          CnSession.user.id == this.record.designate_user_id ?
+                          ( 'deferred' == this.record.state ? 'designateResubmit' : 'designateSubmit' ) :
+                          ( 'deferred' == this.record.state ? 'resubmit' : 'submit' );
+
                         await CnModalMessageFactory.instance( {
                           title: noReview
                             ? 'Amendment Complete'
@@ -2094,15 +2010,14 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
         this.configureFileInput( 'data_sharing_filename' );
         this.configureFileInput( 'agreement_filename' );
 
-        var self = this;
-        async function init() {
-          await self.deferred.promise;
-          await self.coapplicantModel.metadata.getPromise(); // needed to get the coapplicant's metadata
-          await self.referenceModel.metadata.getPromise(); // needed to get the reference's metadata
-          if( angular.isDefined( self.stageModel ) ) self.stageModel.listModel.heading = 'Stage History';
+        async function init( object ) {
+          await object.deferred.promise;
+          await object.coapplicantModel.metadata.getPromise(); // needed to get the coapplicant's metadata
+          await object.referenceModel.metadata.getPromise(); // needed to get the reference's metadata
+          if( angular.isDefined( object.stageModel ) ) object.stageModel.listModel.heading = 'Stage History';
         }
 
-        init();
+        init( this );
       };
       return { instance: function( parentModel, root ) { return new object( parentModel, root ); } };
     }
@@ -2131,7 +2046,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
           getCategoryAndOption: function( optionId ) {
             // get the category and data option objects
             var obj = { category: null, option: null };
-            this.categoryList.some( function( cat ) {
+            this.categoryList.some( cat => {
               var option = cat.optionList.findByProperty( 'id', optionId );
               if( null != option ) {
                 obj.category = cat;
@@ -2193,7 +2108,6 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
           },
 
           setupBreadcrumbTrail: function() {
-            var self = this;
             var trail = [];
 
             if( this.isRole( 'applicant', 'designate' ) ) {
@@ -2208,7 +2122,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
               }, {
                 title: this.viewModel.record.identifier,
                 go: async function() {
-                  await $state.go( 'reqn.view', { identifier: 'identifier=' + self.viewModel.record.identifier } );
+                  await $state.go( 'reqn.view', { identifier: 'identifier=' + this.viewModel.record.identifier } );
                 }
               }, {
                 title: 'version ' + this.viewModel.record.amendment_version
@@ -2219,7 +2133,6 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
           },
 
           getMetadata: async function() {
-            var self = this;
             await this.$$getMetadata();
 
             var promiseList = [
@@ -2236,7 +2149,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
                       'id',
                       'rank',
                       'comment',
-                      'study_phase_code_list',
+                      'study_phase_list',
                       'name_en', 'name_fr',
                       'condition_en', 'condition_fr',
                       'note_en', 'note_fr'
@@ -2312,7 +2225,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
               columnList[column].required = '1' == columnList[column].required;
               if( 'enum' == columnList[column].data_type ) { // parse out the enum values
                 columnList[column].enumList = [];
-                cenozo.parseEnumList( columnList[column] ).forEach( function( item ) {
+                cenozo.parseEnumList( columnList[column] ).forEach( item => {
                   columnList[column].enumList.push( { value: item, name: item } );
                 } );
               }
@@ -2321,16 +2234,16 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
             }
 
             this.amendmentTypeList = { en: [], fr: [] };
-            amendmentTypeResponse.data.forEach( function( item ) {
-              if( item.new_user ) self.newUserAmendmentTypeId = item.id;
+            amendmentTypeResponse.data.forEach( item => {
+              if( item.new_user ) this.newUserAmendmentTypeId = item.id;
 
-              self.amendmentTypeList.en.push( {
+              this.amendmentTypeList.en.push( {
                 id: item.id,
                 newUser: item.new_user,
                 name: item.reason_en,
                 justificationPrompt: item.justification_prompt_en
               } );
-              self.amendmentTypeList.fr.push( {
+              this.amendmentTypeList.fr.push( {
                 id: item.id,
                 newUser: item.new_user,
                 name: item.reason_fr,
@@ -2435,20 +2348,33 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
 
             // only do the following for the root instance
             if( 'root' == this.type ) {
+              // get the index that we'll be inserting categories in the tab section list
+              var insertIndex = null;
+              this.viewModel.tabSectionList.some( function( tabSection, index ) {
+                if( 'part2' == tabSection[0] && 'cohort' == tabSection[2] ) {
+                  insertIndex = index + 1;
+                  return true;
+                }
+              } );
+
               // build the categories
               this.categoryList = categoryResponse.data;
-              this.categoryList.forEach( function( category ) {
+              this.categoryList.forEach( category => {
                 // determine the character code based on the rank
                 angular.extend( category, {
-                  studyPhaseCodeList: category.study_phase_code_list.split( / *, */ ),
+                  // study phases are delimited by a ";", and each lists the study name then phase name, separated by a "`"
+                  studyPhaseList: category.study_phase_list.split( ';' ).map( str => str.split( '`' ) ),
                   charCode: String.fromCharCode( 'a'.charCodeAt(0) + category.rank - 1 ),
                   name: { en: category.name_en, fr: category.name_fr },
                   note: { en: category.note_en, fr: category.note_fr },
                   optionList: []
                 } );
 
+                this.viewModel.tabSectionList.splice( insertIndex, 0, ['part2', null, category.charCode] );
+                insertIndex++;
+
                 // remove stuff we no longer need
-                delete category.study_phase_code_list;
+                delete category.study_phase_list;
                 delete category.name_en;
                 delete category.name_fr;
                 delete category.note_en;
@@ -2457,9 +2383,9 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
 
               // add options to all categories
               var category = null;
-              optionResponse.data.forEach( function( option ) {
+              optionResponse.data.forEach( option => {
                 if( null == category || option.data_category_id != category.id )
-                  category = self.categoryList.findByProperty( 'id', option.data_category_id );
+                  category = this.categoryList.findByProperty( 'id', option.data_category_id );
 
                 angular.extend( option, {
                   name: { en: option.name_en, fr: option.name_fr },
@@ -2482,9 +2408,9 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
               // add selections to all options
               var category = null;
               var option = null;
-              selectionResponse.data.forEach( function( selection ) {
+              selectionResponse.data.forEach( selection => {
                 if( null == category || selection.data_category_id != category.id )
-                  category = self.categoryList.findByProperty( 'id', selection.data_category_id );
+                  category = this.categoryList.findByProperty( 'id', selection.data_category_id );
                 if( null == option || selection.data_option_id != option.id )
                   option = category.optionList.findByProperty( 'id', selection.data_option_id );
 
@@ -2516,9 +2442,9 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
               var category = null;
               var option = null;
               var selection = null;
-              detailResponse.data.forEach( function( detail ) {
+              detailResponse.data.forEach( detail => {
                 if( null == category || detail.data_category_id != category.id )
-                  category = self.categoryList.findByProperty( 'id', detail.data_category_id );
+                  category = this.categoryList.findByProperty( 'id', detail.data_category_id );
                 if( null == option || detail.data_option_id != option.id )
                   option = category.optionList.findByProperty( 'id', detail.data_option_id );
                 if( null == selection || detail.data_selection_id != selection.id )
@@ -2544,8 +2470,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
         } );
 
         // make the input lists from all groups more accessible
-        var self = this;
-        module.inputGroupList.forEach( group => Object.assign( self.inputList, group.inputList ) );
+        module.inputGroupList.forEach( group => Object.assign( this.inputList, group.inputList ) );
       };
 
       return {

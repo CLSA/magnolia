@@ -340,7 +340,8 @@
                     key: 'trainee_country_id',
                     title: t( 'part1.a.trainee_country_id' ),
                     type: model.inputList.trainee_country_id.type,
-                    typeahead: model.inputList.trainee_country_id.typeahead
+                    typeahead: model.inputList.trainee_country_id.typeahead,
+                    constant: !model.viewModel.record.trainee_name
                   }"
                   difference="model.viewModel.compareRecord.differences.part1.a.trainee_country_id"
                   model="model">
@@ -359,7 +360,8 @@
                   input="{
                     key: 'trainee_phone',
                     title: t( 'part1.a.trainee_phone' ),
-                    type: model.inputList.trainee_phone.type
+                    type: model.inputList.trainee_phone.type,
+                    constant: !model.viewModel.record.trainee_name
                   }"
                   difference="model.viewModel.compareRecord.differences.part1.a.trainee_phone"
                   model="model">
@@ -1033,33 +1035,34 @@
             </form>
           </div>
         </div>
-        <div ng-repeat="part in ['a','b','c','d','e']"
-             ng-init="partIndex = $index"
-             ng-show="part==model.viewModel.formTab[2]"
+        <div ng-repeat="category in model.categoryList"
+             ng-show="category.charCode == model.viewModel.formTab[2]"
              class="panel panel-default">
           <div class="panel-body">
-            <form ng-attr-id="part2{{ part }}Form" ng-attr-name="part2{{ part }}Form" novalidate>
-              <cn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_2{{ part }}"></cn-deferral-note>
+            <form ng-attr-id="part2{{ category.charCode }}Form" ng-attr-name="part2{{ category.charCode }}Form" novalidate>
+              <cn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_2{{ category.charCode }}"></cn-deferral-note>
               <div class="form-horizontal">
-                <ul class="list-group" ng-if="t( 'part2.' + part + '.heading' )">
-                  <li class="list-group-item"><div ng-bind-html="t( 'part2.' + part + '.heading' )"></div></li>
-                </ul>
-                <table class="table table-hover" ng-if="model.categoryList[partIndex].optionList.length">
+                <div ng-if="category.note[model.viewModel.record.lang]">
+                  <div ng-bind-html="category.note[model.viewModel.record.lang]"></div>
+                  <div class="vertical-spacer"></div>
+                </div>
+                <table class="table table-hover" ng-if="category.optionList.length">
                   <thead class="bg-info">
                     <tr>
                       <td width="50%"
                           style="vertical-align: middle;"
-                          uib-tooltip-html="model.categoryList[partIndex].note[model.viewModel.record.lang] | cnNewlines"
+                          uib-tooltip-html="category.note[model.viewModel.record.lang] | cnNewlines"
                           tooltip-popup-delay="100">
                       </td>
-                      <td ng-repeat="studyPhaseCode in model.categoryList[partIndex].studyPhaseCodeList"
-                          width="{{ 50/model.categoryList[partIndex].studyPhaseCodeList.length + '%' }}"
+                      <td ng-repeat="studyPhaseCode in category.studyPhaseList"
+                          width="{{ 50/category.studyPhaseList.length + '%' }}"
                           style="vertical-align: middle;"
-                          ng-bind-html="t( 'misc.studyPhase.' + studyPhaseCode )"></td>
+                          ng-bind-html="t( 'misc.study.' + studyPhaseCode[0] ) + ' - ' +
+                                        t( 'misc.studyPhase.' + studyPhaseCode[1] )"></td>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr ng-repeat-start="option in model.categoryList[partIndex].optionList">
+                    <tr ng-repeat-start="option in category.optionList">
                       <td width="50%" data-toggle="collapse" data-target="#accordion{{ option.id }}" style="vertical-align: middle">
                         <a uib-tooltip-html="option.note[model.viewModel.record.lang] | cnNewlines"
                            tooltip-popup-delay="100">
@@ -1072,14 +1075,14 @@
                       <td
                           ng-repeat="selection in option.selectionList"
                           ng-style="{ 'width': 50/detailSelection.length + '%' }"
-                          ng-class="{ 'bg-warning': model.viewModel.compareRecord.differences.part2[part].optionList.findByProperty( 'id', option.id ).selectionList.findByProperty( 'id', selection.id ) }">
+                          ng-class="{ 'bg-warning': model.viewModel.compareRecord.differences.part2[category.charCode].selectionList.findByProperty( 'id', selection.id ) }">
                         <span ng-if="null != selection.unavailable[model.viewModel.record.lang]"
                               ng-bind-html="selection.unavailable[model.viewModel.record.lang]"></span>
                         <button ng-if="null == selection.unavailable[model.viewModel.record.lang]"
                                 class="btn full-width"
                                 ng-class="model.viewModel.record.selectionList[selection.id] ? 'btn-success' : 'btn-default'"
                                 ng-disabled="!model.getEditEnabled() && !model.isRole( 'administrator' )"
-                                ng-click="model.viewModel.toggleSelection( model.categoryList[partIndex], option, selection )">
+                                ng-click="model.viewModel.toggleSelection( category, option, selection )">
                           <i class="glyphicon glyphicon-ok" ng-if="model.viewModel.record.selectionList[selection.id]"></i>
                           <span style="font-weight: normal"
                                 ng-if="!model.viewModel.record.selectionList[selection.id]"
@@ -1087,8 +1090,8 @@
                         </button>
                       </td>
                     </tr>
-                    <tr ng-repeat-end ng-repeatstyle="background: white">
-                      <td colspan="3">
+                    <tr ng-repeat-end style="background: white">
+                      <td colspan="3" style="padding: 0;">
                         <div id="accordion{{ option.id }}" class="collapse text-primary text-left">
                           <div ng-repeat="selection in option.selectionList">
                             <div class="col-sm-2 vertical-spacer"
@@ -1117,7 +1120,7 @@
                               title: 'Justification',
                               type: 'text'
                             }"
-                            difference="model.viewModel.compareRecord.differences.part2[part].optionJustificationList.findByProperty( 'id', option.id )"
+                            difference="model.viewModel.compareRecord.differences.part2[category.charCode].optionJustificationList.findByProperty( 'id', option.id )"
                             model="model">
                           </cn-view-input-with-differences>
                         </div>
@@ -1125,14 +1128,14 @@
                     </tr>
                   </tbody>
                 </table>
-                <hr/>
-                <div ng-if="'b'==part" class="container-fluid form-horizontal">
+                <hr ng-if="'Linked Data' == category.name.en || category.comment" />
+                <div ng-if="'Linked Data' == category.name.en" class="container-fluid form-horizontal">
                   <fieldset ng-disabled="!model.getEditEnabled()">
                     <cn-view-input-with-differences
                       no-cols=true
                       input="{
                         key: 'data_sharing_filename',
-                        title: t( 'part2.b.data_sharing' ),
+                        title: t( 'misc.data_sharing' ),
                         type: 'file'
                       }"
                       difference="model.viewModel.compareRecord.differences.part2.b.data_sharing_filename"
@@ -1144,13 +1147,13 @@
                 <div class="container-fluid">
                   <cn-view-input-with-differences
                     no-cols=true
-                    ng-if="model.categoryList[partIndex].comment"
+                    ng-if="category.comment"
                     input="{
-                      key: 'comment_' + model.categoryList[partIndex].id,
+                      key: 'comment_' + category.id,
                       title: t( 'misc.comments' ),
                       type: 'text'
                     }"
-                    difference="model.viewModel.compareRecord.differences.part2[part].comment"
+                    difference="model.viewModel.compareRecord.differences.part2[category.charCode].comment"
                     model="model">
                   </cn-view-input-with-differences>
                 </div>

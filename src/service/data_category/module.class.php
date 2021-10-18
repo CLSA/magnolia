@@ -21,7 +21,7 @@ class module extends \cenozo\service\module
   {
     parent::prepare_read( $select, $modifier );
 
-    if( $select->has_column( 'study_phase_code_list' ) )
+    if( $select->has_column( 'study_phase_list' ) )
     {
       $modifier->join(
         'data_category_has_study_phase',
@@ -33,9 +33,19 @@ class module extends \cenozo\service\module
         'data_category_has_study_phase.study_phase_id',
         'study_phase.id'
       );
+      $modifier->join( 'study', 'study_phase.study_id', 'study.id' );
       $modifier->group( 'data_category.id' );
 
-      $select->add_column( 'GROUP_CONCAT( study_phase.code )', 'study_phase_code_list', false );
+      // provide the list of all study phases delimited by a ";", with the study and study-phase names delimited by a "`"
+      $select->add_column(
+        'GROUP_CONCAT( CONCAT( '.
+          'REPLACE( REPLACE( LOWER( study.name ), " ", "_" ), "-", "_" ), '.
+          '"`", '.
+          'study_phase.code '.
+        ') SEPARATOR ";" )',
+        'study_phase_list',
+        false
+      );
     }
 
     if( $select->has_column( 'has_condition' ) )
