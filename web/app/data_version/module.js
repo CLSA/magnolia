@@ -1,7 +1,5 @@
-define( function() {
-  'use strict';
+cenozoApp.defineModule( 'data_version', null, ( module ) => {
 
-  try { var module = cenozoApp.module( 'data_version', true ); } catch( err ) { console.warn( err ); return; }
   angular.extend( module, {
     identifier: {},
     name: {
@@ -25,69 +23,6 @@ define( function() {
       type: 'string'
     }
   } );
-
-  /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnDataVersionAdd', [
-    'CnDataVersionModelFactory',
-    function( CnDataVersionModelFactory ) {
-      return {
-        templateUrl: module.getFileUrl( 'add.tpl.html' ),
-        restrict: 'E',
-        scope: { model: '=?' },
-        controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnDataVersionModelFactory.root;
-        }
-      };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnDataVersionList', [
-    'CnDataVersionModelFactory',
-    function( CnDataVersionModelFactory ) {
-      return {
-        templateUrl: module.getFileUrl( 'list.tpl.html' ),
-        restrict: 'E',
-        scope: { model: '=?' },
-        controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnDataVersionModelFactory.root;
-        }
-      };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnDataVersionView', [
-    'CnDataVersionModelFactory',
-    function( CnDataVersionModelFactory ) {
-      return {
-        templateUrl: module.getFileUrl( 'view.tpl.html' ),
-        restrict: 'E',
-        scope: { model: '=?' },
-        controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnDataVersionModelFactory.root;
-        }
-      };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnDataVersionAddFactory', [
-    'CnBaseAddFactory',
-    function( CnBaseAddFactory ) {
-      var object = function( parentModel ) { CnBaseAddFactory.construct( this, parentModel ); };
-      return { instance: function( parentModel ) { return new object( parentModel ); } };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnDataVersionListFactory', [
-    'CnBaseListFactory',
-    function( CnBaseListFactory ) {
-      var object = function( parentModel ) { CnBaseListFactory.construct( this, parentModel ); };
-      return { instance: function( parentModel ) { return new object( parentModel ); } };
-    }
-  ] );
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnDataVersionViewFactory', [
@@ -116,21 +51,6 @@ define( function() {
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnDataVersionModelFactory', [
-    'CnBaseModelFactory', 'CnDataVersionAddFactory', 'CnDataVersionListFactory', 'CnDataVersionViewFactory',
-    function( CnBaseModelFactory, CnDataVersionAddFactory, CnDataVersionListFactory, CnDataVersionViewFactory ) {
-      var object = function( root ) {
-        CnBaseModelFactory.construct( this, module );
-        this.addModel = CnDataVersionAddFactory.instance( this );
-        this.listModel = CnDataVersionListFactory.instance( this );
-        this.viewModel = CnDataVersionViewFactory.instance( this, root );
-      };
-
-      return {
-        root: new object( true ),
-        instance: function() { return new object( false ); }
-      };
-    }
-  ] );
+  cenozo.defineModuleModel( module, [ 'add', 'list', 'view' ] );
 
 } );

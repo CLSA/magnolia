@@ -1,9 +1,4 @@
-define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list, name ) {
-  return list.concat( cenozoApp.module( name ).getRequiredFiles() );
-}, [] ), function() {
-  'use strict';
-
-  try { var module = cenozoApp.module( 'reqn_version', true ); } catch( err ) { console.warn( err ); return; }
+cenozoApp.defineModule( 'reqn_version', [ 'coapplicant', 'ethics_approval', 'reference' ], ( module ) => {
 
   var coapplicantModule = cenozoApp.module( 'coapplicant' );
   var referenceModule = cenozoApp.module( 'reference' );
@@ -132,21 +127,6 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
       }
     }
   } );
-
-  /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnReqnVersionList', [
-    'CnReqnVersionModelFactory',
-    function( CnReqnVersionModelFactory ) {
-      return {
-        templateUrl: module.getFileUrl( 'list.tpl.html' ),
-        restrict: 'E',
-        scope: { model: '=?' },
-        controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnReqnVersionModelFactory.root;
-        }
-      };
-    }
-  ] );
 
   /* ######################################################################################################## */
   cenozo.providers.directive( 'cnReqnVersionView', [
@@ -416,15 +396,6 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
           $scope.t = function( value ) { return $scope.model.viewModel.translate( value ); };
         }
       };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnReqnVersionListFactory', [
-    'CnBaseListFactory',
-    function( CnBaseListFactory ) {
-      var object = function( parentModel ) { CnBaseListFactory.construct( this, parentModel ); };
-      return { instance: function( parentModel ) { return new object( parentModel ); } };
     }
   ] );
 
@@ -2350,7 +2321,7 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
             if( 'root' == this.type ) {
               // get the index that we'll be inserting categories in the tab section list
               var insertIndex = null;
-              this.viewModel.tabSectionList.some( function( tabSection, index ) {
+              this.viewModel.tabSectionList.some( ( tabSection, index ) => {
                 if( 'part2' == tabSection[0] && 'cohort' == tabSection[2] ) {
                   insertIndex = index + 1;
                   return true;
@@ -2480,5 +2451,8 @@ define( [ 'coapplicant', 'ethics_approval', 'reference' ].reduce( function( list
       };
     }
   ] );
+
+  /* ######################################################################################################## */
+  cenozo.defineModuleModel( module, [ 'list', 'view' ] );
 
 } );

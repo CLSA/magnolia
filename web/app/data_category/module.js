@@ -1,7 +1,5 @@
-define( function() {
-  'use strict';
+cenozoApp.defineModule( 'data_category', null, ( module ) => {
 
-  try { var module = cenozoApp.module( 'data_category', true ); } catch( err ) { console.warn( err ); return; }
   angular.extend( module, {
     identifier: { column: 'name_en' },
     name: {
@@ -60,69 +58,6 @@ define( function() {
   } );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnDataCategoryList', [
-    'CnDataCategoryModelFactory',
-    function( CnDataCategoryModelFactory ) {
-      return {
-        templateUrl: module.getFileUrl( 'list.tpl.html' ),
-        restrict: 'E',
-        scope: { model: '=?' },
-        controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnDataCategoryModelFactory.root;
-        }
-      };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnDataCategoryView', [
-    'CnDataCategoryModelFactory',
-    function( CnDataCategoryModelFactory ) {
-      return {
-        templateUrl: module.getFileUrl( 'view.tpl.html' ),
-        restrict: 'E',
-        scope: { model: '=?' },
-        controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnDataCategoryModelFactory.root;
-        }
-      };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnDataCategoryListFactory', [
-    'CnBaseListFactory',
-    function( CnBaseListFactory ) {
-      var object = function( parentModel ) { CnBaseListFactory.construct( this, parentModel ); };
-      return { instance: function( parentModel ) { return new object( parentModel ); } };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnDataCategoryViewFactory', [
-    'CnBaseViewFactory',
-    function( CnBaseViewFactory ) {
-      var object = function( parentModel, root ) { CnBaseViewFactory.construct( this, parentModel, root ); }
-      return { instance: function( parentModel, root ) { return new object( parentModel, root ); } };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnDataCategoryModelFactory', [
-    'CnBaseModelFactory', 'CnDataCategoryListFactory', 'CnDataCategoryViewFactory',
-    function( CnBaseModelFactory, CnDataCategoryListFactory, CnDataCategoryViewFactory ) {
-      var object = function( root ) {
-        var self = this;
-        CnBaseModelFactory.construct( this, module );
-        this.listModel = CnDataCategoryListFactory.instance( this );
-        this.viewModel = CnDataCategoryViewFactory.instance( this, root );
-      };
-
-      return {
-        root: new object( true ),
-        instance: function() { return new object( false ); }
-      };
-    }
-  ] );
+  cenozo.defineModuleModel( module, [ 'list', 'view' ], 'data_option' );
 
 } );

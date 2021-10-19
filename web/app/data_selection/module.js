@@ -1,7 +1,5 @@
-define( function() {
-  'use strict';
+cenozoApp.defineModule( 'data_selection', null, ( module ) => {
 
-  try { var module = cenozoApp.module( 'data_selection', true ); } catch( err ) { console.warn( err ); return; }
   angular.extend( module, {
     identifier: {
       parent: {
@@ -56,66 +54,17 @@ define( function() {
   } );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnDataSelectionList', [
-    'CnDataSelectionModelFactory',
-    function( CnDataSelectionModelFactory ) {
-      return {
-        templateUrl: module.getFileUrl( 'list.tpl.html' ),
-        restrict: 'E',
-        scope: { model: '=?' },
-        controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnDataSelectionModelFactory.root;
-        }
-      };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnDataSelectionView', [
-    'CnDataSelectionModelFactory',
-    function( CnDataSelectionModelFactory ) {
-      return {
-        templateUrl: module.getFileUrl( 'view.tpl.html' ),
-        restrict: 'E',
-        scope: { model: '=?' },
-        controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnDataSelectionModelFactory.root;
-        }
-      };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnDataSelectionListFactory', [
-    'CnBaseListFactory',
-    function( CnBaseListFactory ) {
-      var object = function( parentModel ) { CnBaseListFactory.construct( this, parentModel ); };
-      return { instance: function( parentModel ) { return new object( parentModel ); } };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnDataSelectionViewFactory', [
-    'CnBaseViewFactory',
-    function( CnBaseViewFactory ) {
-      var object = function( parentModel, root ) { CnBaseViewFactory.construct( this, parentModel, root, 'data_detail' ); }
-      return { instance: function( parentModel, root ) { return new object( parentModel, root ); } };
-    }
-  ] );
-
-  /* ######################################################################################################## */
   cenozo.providers.factory( 'CnDataSelectionModelFactory', [
-    'CnBaseModelFactory', 'CnDataSelectionListFactory', 'CnDataSelectionViewFactory', 'CnHttpFactory',
-    function( CnBaseModelFactory, CnDataSelectionListFactory, CnDataSelectionViewFactory, CnHttpFactory ) {
+    'CnBaseModelFactory', 'CnDataSelectionAddFactory', 'CnDataSelectionListFactory', 'CnDataSelectionViewFactory', 'CnHttpFactory',
+    function( CnBaseModelFactory, CnDataSelectionAddFactory, CnDataSelectionListFactory, CnDataSelectionViewFactory, CnHttpFactory ) {
       var object = function( root ) {
-        var self = this;
         CnBaseModelFactory.construct( this, module );
+        this.addModel = CnDataSelectionAddFactory.instance( this );
         this.listModel = CnDataSelectionListFactory.instance( this );
         this.viewModel = CnDataSelectionViewFactory.instance( this, root );
 
         // extend getMetadata
         this.getMetadata = async function() {
-          var self = this;
           await this.$$getMetadata();
 
           var [dataOptionResponse, studyPhaseResponse] = await Promise.all( [
@@ -136,19 +85,15 @@ define( function() {
             } ).query()
           ] );
 
-          this.metadata.columnList.data_option_id.enumList = [];
-          dataOptionResponse.data.forEach( function( item ) {
-            self.metadata.columnList.data_option_id.enumList.push( {
-              value: item.id, name: item.category + ': ' + item.name_en
-            } );
-          } );
+          this.metadata.columnList.data_option_id.enumList = dataOptionResponse.data.reduce( ( list, item ) => {
+            list.push( { value: item.id, name: item.category + ': ' + item.name_en } );
+            return list;
+          }, [] );
 
-          this.metadata.columnList.study_phase_id.enumList = [];
-          studyPhaseResponse.data.forEach( function( item ) {
-            self.metadata.columnList.study_phase_id.enumList.push( {
-              value: item.id, name: item.study + ': ' + item.name
-            } );
-          } );
+          this.metadata.columnList.study_phase_id.enumList = studyPhaseResponse.data.reduce( ( list, item ) => {
+            list.push( { value: item.id, name: item.study + ': ' + item.name } );
+            return list;
+          }, [] );
         };
       };
 
@@ -158,5 +103,7 @@ define( function() {
       };
     }
   ] );
+
+  cenozo.defineModuleModel( module, [ 'add', 'list', 'view' ] );
 
 } );

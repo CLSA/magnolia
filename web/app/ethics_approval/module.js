@@ -1,7 +1,5 @@
-define( function() {
-  'use strict';
+cenozoApp.defineModule( 'ethics_approval', null, ( module ) => {
 
-  try { var module = cenozoApp.module( 'ethics_approval', true ); } catch( err ) { console.warn( err ); return; }
   angular.extend( module, {
     identifier: {
       parent: {
@@ -35,84 +33,6 @@ define( function() {
       type: 'date'
     }
   } );
-
-  /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnEthicsApprovalAdd', [
-    'CnEthicsApprovalModelFactory',
-    function( CnEthicsApprovalModelFactory ) {
-      return {
-        templateUrl: module.getFileUrl( 'add.tpl.html' ),
-        restrict: 'E',
-        scope: { model: '=?' },
-        controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnEthicsApprovalModelFactory.root;
-        }
-      };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnEthicsApprovalList', [
-    'CnEthicsApprovalModelFactory',
-    function( CnEthicsApprovalModelFactory ) {
-      return {
-        templateUrl: module.getFileUrl( 'list.tpl.html' ),
-        restrict: 'E',
-        scope: { model: '=?' },
-        controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnEthicsApprovalModelFactory.root;
-        }
-      };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnEthicsApprovalView', [
-    'CnEthicsApprovalModelFactory',
-    function( CnEthicsApprovalModelFactory ) {
-      return {
-        templateUrl: module.getFileUrl( 'view.tpl.html' ),
-        restrict: 'E',
-        scope: { model: '=?' },
-        controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnEthicsApprovalModelFactory.root;
-        }
-      };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnEthicsApprovalAddFactory', [
-    'CnBaseAddFactory',
-    function( CnBaseAddFactory ) {
-      var object = function( parentModel ) {
-        CnBaseAddFactory.construct( this, parentModel );
-        this.configureFileInput( 'filename' );
-      };
-      return { instance: function( parentModel ) { return new object( parentModel ); } };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnEthicsApprovalListFactory', [
-    'CnBaseListFactory',
-    function( CnBaseListFactory ) {
-      var object = function( parentModel ) { CnBaseListFactory.construct( this, parentModel ); };
-      return { instance: function( parentModel ) { return new object( parentModel ); } };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnEthicsApprovalViewFactory', [
-    'CnBaseViewFactory',
-    function( CnBaseViewFactory ) {
-      var object = function( parentModel, root ) {
-        CnBaseViewFactory.construct( this, parentModel, root );
-        this.configureFileInput( 'filename' );
-      };
-      return { instance: function( parentModel, root ) { return new object( parentModel, root ); } };
-    }
-  ] );
 
   /* ######################################################################################################## */
   cenozo.providers.service( 'CnEthicsApprovalModalAddFactory', [
@@ -189,25 +109,7 @@ define( function() {
     }
   ] );
 
-
   /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnEthicsApprovalModelFactory', [
-    'CnBaseModelFactory', 'CnEthicsApprovalAddFactory', 'CnEthicsApprovalListFactory', 'CnEthicsApprovalViewFactory',
-    'CnSession', 'CnHttpFactory',
-    function( CnBaseModelFactory, CnEthicsApprovalAddFactory, CnEthicsApprovalListFactory, CnEthicsApprovalViewFactory,
-              CnSession, CnHttpFactory ) {
-      var object = function( root ) {
-        CnBaseModelFactory.construct( this, module );
-        this.addModel = CnEthicsApprovalAddFactory.instance( this );
-        this.listModel = CnEthicsApprovalListFactory.instance( this );
-        this.viewModel = CnEthicsApprovalViewFactory.instance( this, root );
-      };
-
-      return {
-        root: new object( true ),
-        instance: function() { return new object( false ); }
-      };
-    }
-  ] );
+  cenozo.defineModuleModel( module, [ 'add', 'list', 'view' ] );
 
 } );

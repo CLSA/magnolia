@@ -1,9 +1,4 @@
-define( [ 'output' ].reduce( function( list, name ) {
-  return list.concat( cenozoApp.module( name ).getRequiredFiles() );
-}, [] ), function() {
-  'use strict';
-
-  try { var module = cenozoApp.module( 'reqn', true ); } catch( err ) { console.warn( err ); return; }
+cenozoApp.defineModule( 'reqn', [ 'output' ], ( module ) => {
 
   angular.extend( module, {
     identifier: { column: 'identifier' },
@@ -631,36 +626,6 @@ define( [ 'output' ].reduce( function( list, name ) {
   } );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnReqnAdd', [
-    'CnReqnModelFactory',
-    function( CnReqnModelFactory ) {
-      return {
-        templateUrl: module.getFileUrl( 'add.tpl.html' ),
-        restrict: 'E',
-        scope: { model: '=?' },
-        controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnReqnModelFactory.root;
-        }
-      };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnReqnList', [
-    'CnReqnModelFactory',
-    function( CnReqnModelFactory ) {
-      return {
-        templateUrl: module.getFileUrl( 'list.tpl.html' ),
-        restrict: 'E',
-        scope: { model: '=?', removeColumns: '@' },
-        controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnReqnModelFactory.root;
-        }
-      };
-    }
-  ] );
-
-  /* ######################################################################################################## */
   cenozo.providers.directive( 'cnReqnDataSharing', [
     'CnReqnModelFactory', 'CnSession', '$state',
     function( CnReqnModelFactory, CnSession, $state ) {
@@ -861,7 +826,7 @@ define( [ 'output' ].reduce( function( list, name ) {
               } ).query();
 
               var outstandingReview = null
-              response.data.some( function( review ) {
+              response.data.some( review => {
                 if( null == review.recommendation_type_id || review.answers < review.questions ) {
                   outstandingReview = review;
                   return true;
@@ -1007,16 +972,12 @@ define( [ 'output' ].reduce( function( list, name ) {
           },
 
           reloadAll: async function( modelList ) {
-            var self = this;
             await Promise.all(
-              modelList.reduce(
-                function( promiseList, modelName ) {
-                  if( angular.isDefined( self[ modelName + 'Model' ] ) )
-                    promiseList.push( self[ modelName + 'Model' ].listModel.onList( true ) );
-                  return promiseList;
-                },
-                [ this.onView() ]
-              )
+              modelList.reduce( ( promiseList, modelName ) => {
+                if( angular.isDefined( this[ modelName + 'Model' ] ) )
+                  promiseList.push( this[ modelName + 'Model' ].listModel.onList( true ) );
+                return promiseList;
+              }, [ this.onView() ] )
             );
           },
 
@@ -1030,16 +991,16 @@ define( [ 'output' ].reduce( function( list, name ) {
             if( 'Data Release' == this.record.next_stage_type ) {
               if( this.record.has_ethics_approval_list ) {
                 if( null == this.record.ethics_date ) {
-                  message += '\n\nWARNING: This ' + self.parentModel.module.name.singular + ' has no ethics agreement, ' +
+                  message += '\n\nWARNING: This ' + this.parentModel.module.name.singular + ' has no ethics agreement, ' +
                     'you may not wish to proceed until one has been uploaded.';
                 } else if( moment().isAfter( this.record.ethics_date, 'day' ) ) {
-                  message += '\n\nWARNING: This ' + self.parentModel.module.name.possessive + ' ethics expired on ' +
+                  message += '\n\nWARNING: This ' + this.parentModel.module.name.possessive + ' ethics expired on ' +
                     moment( this.record.ethics_date ).format( 'MMMM D, YYYY' ) + ', ' +
                     'you may not wish to proceed until a new ethics agreement has been uploaded.';
                 }
               } else {
                 if( !this.record.ethics_filename ) {
-                  message += '\n\nWARNING: This ' + self.parentModel.module.name.singular + ' has no ethics agreement, ' +
+                  message += '\n\nWARNING: This ' + this.parentModel.module.name.singular + ' has no ethics agreement, ' +
                     'you may not wish to proceed until one has been uploaded.';
                 }
               }
@@ -1191,13 +1152,12 @@ define( [ 'output' ].reduce( function( list, name ) {
 
         this.configureFileInput( 'instruction_filename' );
 
-        var self = this;
-        async function init() {
-          await self.deferred.promise;
-          if( angular.isDefined( self.stageModel ) ) self.stageModel.listModel.heading = 'Stage History';
+        async function init( object ) {
+          await object.deferred.promise;
+          if( angular.isDefined( object.stageModel ) ) object.stageModel.listModel.heading = 'Stage History';
         }
 
-        init();
+        init( this );
       };
       return { instance: function( parentModel, root ) { return new object( parentModel, root ); } };
     }
@@ -1319,7 +1279,6 @@ define( [ 'output' ].reduce( function( list, name ) {
           },
 
           getMetadata: async function() {
-            var self = this;
             await this.$$getMetadata();
 
             var [reqnTypeResponse, deadlineResponse, languageResponse] = await Promise.all( [
@@ -1352,33 +1311,26 @@ define( [ 'output' ].reduce( function( list, name ) {
               } ).query()
             ] );
 
-            this.metadata.columnList.reqn_type_id.enumList = [];
-            reqnTypeResponse.data.forEach( function( item ) {
-              self.metadata.columnList.reqn_type_id.enumList.push( {
-                value: item.id,
-                name: item.name
-              } );
-            } );
-            this.metadata.columnList.deadline_id.enumList = [];
-            deadlineResponse.data.forEach( function( item ) {
-              self.metadata.columnList.deadline_id.enumList.push( {
-                value: item.id,
-                name: item.name
-              } );
-            } );
-            this.metadata.columnList.language_id.enumList = [];
-            languageResponse.data.forEach( function( item ) {
-              self.metadata.columnList.language_id.enumList.push( {
-                value: item.id,
-                name: item.name
-              } );
-            } );
+            this.metadata.columnList.reqn_type_id.enumList = reqnTypeResponse.data.reduce( ( list, item ) => {
+              list.push( { value: item.id, name: item.name } );
+              return list;
+            }, [] );
+
+            this.metadata.columnList.deadline_id.enumList = deadlineResponse.data.reduce( ( list, item ) => {
+              list.push( { value: item.id, name: item.name } );
+              return list;
+            }, [] );
+
+            this.metadata.columnList.language_id.enumList = languageResponse.data.reduce( ( list, item ) => {
+              list.push( { value: item.id, name: item.name } );
+              return list;
+            }, [] );
           }
         } );
 
         async function init() {
           await CnReqnHelper.promise;
-          module.inputGroupList.forEach( function( group ) {
+          module.inputGroupList.forEach( group => {
             if( 'Requisition Deferral Notes' == group.title ) {
               for( var property in group.inputList ) {
                 if( group.inputList.hasOwnProperty( property ) ) {
@@ -1402,5 +1354,8 @@ define( [ 'output' ].reduce( function( list, name ) {
       };
     }
   ] );
+
+  /* ######################################################################################################## */
+  cenozo.defineModuleModel( module, [ 'add', 'list', 'view' ] );
 
 } );

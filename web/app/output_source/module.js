@@ -1,7 +1,5 @@
-define( function() {
-  'use strict';
+cenozoApp.defineModule( 'output_source', null, ( module ) => {
 
-  try { var module = cenozoApp.module( 'output_source', true ); } catch( err ) { console.warn( err ); return; }
   angular.extend( module, {
     identifier: {
       parent: {
@@ -87,21 +85,6 @@ define( function() {
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnOutputSourceList', [
-    'CnOutputSourceModelFactory',
-    function( CnOutputSourceModelFactory ) {
-      return {
-        templateUrl: module.getFileUrl( 'list.tpl.html' ),
-        restrict: 'E',
-        scope: { model: '=?' },
-        controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnOutputSourceModelFactory.root;
-        }
-      };
-    }
-  ] );
-
-  /* ######################################################################################################## */
   cenozo.providers.directive( 'cnOutputSourceView', [
     'CnOutputSourceModelFactory', 'CnModalMessageFactory', 'CnReqnHelper',
     function( CnOutputSourceModelFactory, CnModalMessageFactory, CnReqnHelper ) {
@@ -177,15 +160,6 @@ define( function() {
           this.heading = CnReqnHelper.translate( 'output', 'createOutputSource', lang );
         };
       };
-      return { instance: function( parentModel ) { return new object( parentModel ); } };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnOutputSourceListFactory', [
-    'CnBaseListFactory',
-    function( CnBaseListFactory ) {
-      var object = function( parentModel ) { CnBaseListFactory.construct( this, parentModel ); };
       return { instance: function( parentModel ) { return new object( parentModel ); } };
     }
   ] );
@@ -292,5 +266,8 @@ define( function() {
       };
     }
   ] );
+
+  /* ######################################################################################################## */
+  cenozo.defineModuleModel( module, [ 'add', 'list', 'view' ] );
 
 } );

@@ -1,7 +1,5 @@
-define( function() {
-  'use strict';
+cenozoApp.defineModule( 'review', null, ( module ) => {
 
-  try { var module = cenozoApp.module( 'review', true ); } catch( err ) { console.warn( err ); return; }
   angular.extend( module, {
     identifier: {
       parent: {
@@ -142,45 +140,6 @@ define( function() {
   } );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnReviewList', [
-    'CnReviewModelFactory',
-    function( CnReviewModelFactory ) {
-      return {
-        templateUrl: module.getFileUrl( 'list.tpl.html' ),
-        restrict: 'E',
-        scope: { model: '=?' },
-        controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnReviewModelFactory.root;
-        }
-      };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnReviewView', [
-    'CnReviewModelFactory',
-    function( CnReviewModelFactory ) {
-      return {
-        templateUrl: module.getFileUrl( 'view.tpl.html' ),
-        restrict: 'E',
-        scope: { model: '=?' },
-        controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnReviewModelFactory.root;
-        }
-      };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnReviewListFactory', [
-    'CnBaseListFactory',
-    function( CnBaseListFactory ) {
-      var object = function( parentModel ) { CnBaseListFactory.construct( this, parentModel ); };
-      return { instance: function( parentModel ) { return new object( parentModel ); } };
-    }
-  ] );
-
-  /* ######################################################################################################## */
   cenozo.providers.factory( 'CnReviewViewFactory', [
     'CnBaseViewFactory', 'CnReqnHelper', 'CnHttpFactory', 'CnSession',
     function( CnBaseViewFactory, CnReqnHelper, CnHttpFactory, CnSession ) {
@@ -273,10 +232,9 @@ define( function() {
           }
           return data;
         };
-      
+
         // extend getMetadata
         this.getMetadata = async function() {
-          var self = this;
           await this.$$getMetadata();
 
           var response = await CnHttpFactory.instance( {
@@ -287,16 +245,14 @@ define( function() {
             }
           } ).query();
 
-          this.metadata.columnList.recommendation_type_id = { 
+          this.metadata.columnList.recommendation_type_id = {
             required: false,
             enumList: [],
           };
-          response.data.forEach( function( item ) { 
-            item.review_type_id_list.split( ',' ).forEach( function( reviewTypeId ) {
-              if( angular.isUndefined( self.recommendationList[reviewTypeId] ) ) self.recommendationList[reviewTypeId] = [];
-              self.recommendationList[reviewTypeId].push( { value: item.id, name: item.name } );
-            } );
-          } );
+          response.data.forEach( item => item.review_type_id_list.split( ',' ).forEach( reviewTypeId => {
+            if( angular.isUndefined( this.recommendationList[reviewTypeId] ) ) this.recommendationList[reviewTypeId] = [];
+            this.recommendationList[reviewTypeId].push( { value: item.id, name: item.name } );
+          } ) );
         };
 
         // extend getTypeaheadData
@@ -317,5 +273,8 @@ define( function() {
       };
     }
   ] );
+
+  /* ######################################################################################################## */
+  cenozo.defineModuleModel( module, [ 'list', 'view' ] );
 
 } );

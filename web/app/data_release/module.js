@@ -1,7 +1,5 @@
-define( function() {
-  'use strict';
+cenozoApp.defineModule( 'data_release', null, ( module ) => {
 
-  try { var module = cenozoApp.module( 'data_release', true ); } catch( err ) { console.warn( err ); return; }
   angular.extend( module, {
     identifier: {
       parent: {
@@ -52,78 +50,6 @@ define( function() {
   } );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnDataReleaseAdd', [
-    'CnDataReleaseModelFactory',
-    function( CnDataReleaseModelFactory ) {
-      return {
-        templateUrl: module.getFileUrl( 'add.tpl.html' ),
-        restrict: 'E',
-        scope: { model: '=?' },
-        controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnDataReleaseModelFactory.root;
-        }
-      };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnDataReleaseList', [
-    'CnDataReleaseModelFactory',
-    function( CnDataReleaseModelFactory ) {
-      return {
-        templateUrl: module.getFileUrl( 'list.tpl.html' ),
-        restrict: 'E',
-        scope: { model: '=?' },
-        controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnDataReleaseModelFactory.root;
-        }
-      };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnDataReleaseView', [
-    'CnDataReleaseModelFactory',
-    function( CnDataReleaseModelFactory ) {
-      return {
-        templateUrl: module.getFileUrl( 'view.tpl.html' ),
-        restrict: 'E',
-        scope: { model: '=?' },
-        controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnDataReleaseModelFactory.root;
-        }
-      };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnDataReleaseAddFactory', [
-    'CnBaseAddFactory',
-    function( CnBaseAddFactory ) {
-      var object = function( parentModel ) { CnBaseAddFactory.construct( this, parentModel ); };
-      return { instance: function( parentModel ) { return new object( parentModel ); } };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnDataReleaseListFactory', [
-    'CnBaseListFactory',
-    function( CnBaseListFactory ) {
-      var object = function( parentModel ) { CnBaseListFactory.construct( this, parentModel ); };
-      return { instance: function( parentModel ) { return new object( parentModel ); } };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnDataReleaseViewFactory', [
-    'CnBaseViewFactory',
-    function( CnBaseViewFactory ) {
-      var object = function( parentModel, root ) { CnBaseViewFactory.construct( this, parentModel, root ); }
-      return { instance: function( parentModel, root ) { return new object( parentModel, root ); } };
-    }
-  ] );
-
-  /* ######################################################################################################## */
   cenozo.providers.factory( 'CnDataReleaseModelFactory', [
     'CnBaseModelFactory', 'CnDataReleaseAddFactory', 'CnDataReleaseListFactory', 'CnDataReleaseViewFactory',
     'CnHttpFactory',
@@ -140,7 +66,6 @@ define( function() {
         this.getDeleteEnabled = function() { return angular.isDefined( this.module.actions.delete ); };
 
         this.getMetadata = async function() {
-          var self = this;
           await this.$$getMetadata();
 
           var response = await CnHttpFactory.instance( {
@@ -151,13 +76,10 @@ define( function() {
             }
           } ).query();
 
-          this.metadata.columnList.data_version_id.enumList = [];
-          response.data.forEach( function( item ) {
-            self.metadata.columnList.data_version_id.enumList.push( {
-              value: item.id,
-              name: item.name
-            } );
-          } );
+          this.metadata.columnList.data_version_id.enumList = response.data.reduce( ( list, item ) => {
+            list.push( { value: item.id, name: item.name } );
+            return list;
+          }, [] );
         };
       };
 
@@ -167,5 +89,7 @@ define( function() {
       };
     }
   ] );
+
+  cenozo.defineModuleModel( module, [ 'add', 'list', 'view' ] );
 
 } );

@@ -1,7 +1,5 @@
-define( function() {
-  'use strict';
+cenozoApp.defineModule( 'review_answer', null, ( module ) => {
 
-  try { var module = cenozoApp.module( 'review_answer', true ); } catch( err ) { console.warn( err ); return; }
   angular.extend( module, {
     identifier: {
       parent: {
@@ -46,36 +44,6 @@ define( function() {
           if( angular.isUndefined( $scope.reviewAnswerModel ) ) $scope.reviewAnswerModel = CnReviewAnswerModelFactory.root;
           $scope.refresh = function() { $scope.reviewAnswerModel.entryModel.onView(); }
           $scope.refresh();
-        }
-      };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnReviewAnswerList', [
-    'CnReviewAnswerModelFactory',
-    function( CnReviewAnswerModelFactory ) {
-      return {
-        templateUrl: module.getFileUrl( 'list.tpl.html' ),
-        restrict: 'E',
-        scope: { model: '=?' },
-        controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnReviewAnswerModelFactory.root;
-        }
-      };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnReviewAnswerView', [
-    'CnReviewAnswerModelFactory',
-    function( CnReviewAnswerModelFactory ) {
-      return {
-        templateUrl: module.getFileUrl( 'view.tpl.html' ),
-        restrict: 'E',
-        scope: { model: '=?' },
-        controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnReviewAnswerModelFactory.root;
         }
       };
     }
@@ -134,24 +102,6 @@ define( function() {
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnReviewAnswerListFactory', [
-    'CnBaseListFactory',
-    function( CnBaseListFactory ) {
-      var object = function( parentModel ) { CnBaseListFactory.construct( this, parentModel ); };
-      return { instance: function( parentModel ) { return new object( parentModel ); } };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnReviewAnswerViewFactory', [
-    'CnBaseViewFactory',
-    function( CnBaseViewFactory ) {
-      var object = function( parentModel, root ) { CnBaseViewFactory.construct( this, parentModel, root ); }
-      return { instance: function( parentModel, root ) { return new object( parentModel, root ); } };
-    }
-  ] );
-
-  /* ######################################################################################################## */
   cenozo.providers.factory( 'CnReviewAnswerModelFactory', [
     'CnBaseModelFactory', 'CnReviewAnswerEntryFactory', 'CnReviewAnswerListFactory', 'CnReviewAnswerViewFactory',
     function( CnBaseModelFactory, CnReviewAnswerEntryFactory, CnReviewAnswerListFactory, CnReviewAnswerViewFactory ) {
@@ -169,5 +119,8 @@ define( function() {
       };
     }
   ] );
+
+  /* ######################################################################################################## */
+  cenozo.defineModuleModel( module, [ 'list', 'view' ] );
 
 } );

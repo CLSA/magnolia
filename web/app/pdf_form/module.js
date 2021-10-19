@@ -1,7 +1,5 @@
-define( function() {
-  'use strict';
+cenozoApp.defineModule( 'pdf_form', null, ( module ) => {
 
-  try { var module = cenozoApp.module( 'pdf_form', true ); } catch( err ) { console.warn( err ); return; }
   angular.extend( module, {
     identifier: {
       parent: {
@@ -49,51 +47,6 @@ define( function() {
   } );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnPdfFormAdd', [
-    'CnPdfFormModelFactory',
-    function( CnPdfFormModelFactory ) {
-      return {
-        templateUrl: module.getFileUrl( 'add.tpl.html' ),
-        restrict: 'E',
-        scope: { model: '=?' },
-        controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnPdfFormModelFactory.root;
-        }
-      };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnPdfFormList', [
-    'CnPdfFormModelFactory',
-    function( CnPdfFormModelFactory ) {
-      return {
-        templateUrl: module.getFileUrl( 'list.tpl.html' ),
-        restrict: 'E',
-        scope: { model: '=?' },
-        controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnPdfFormModelFactory.root;
-        }
-      };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnPdfFormView', [
-    'CnPdfFormModelFactory',
-    function( CnPdfFormModelFactory ) {
-      return {
-        templateUrl: module.getFileUrl( 'view.tpl.html' ),
-        restrict: 'E',
-        scope: { model: '=?' },
-        controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnPdfFormModelFactory.root;
-        }
-      };
-    }
-  ] );
-
-  /* ######################################################################################################## */
   cenozo.providers.factory( 'CnPdfFormAddFactory', [
     'CnBaseAddFactory',
     function( CnBaseAddFactory ) {
@@ -101,15 +54,6 @@ define( function() {
         CnBaseAddFactory.construct( this, parentModel );
         this.configureFileInput( 'filename', 'pdf' );
       };
-      return { instance: function( parentModel ) { return new object( parentModel ); } };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnPdfFormListFactory', [
-    'CnBaseListFactory',
-    function( CnBaseListFactory ) {
-      var object = function( parentModel ) { CnBaseListFactory.construct( this, parentModel ); };
       return { instance: function( parentModel ) { return new object( parentModel ); } };
     }
   ] );
@@ -139,21 +83,6 @@ define( function() {
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnPdfFormModelFactory', [
-    'CnBaseModelFactory', 'CnPdfFormAddFactory', 'CnPdfFormListFactory', 'CnPdfFormViewFactory',
-    function( CnBaseModelFactory, CnPdfFormAddFactory, CnPdfFormListFactory, CnPdfFormViewFactory ) {
-      var object = function( root ) {
-        CnBaseModelFactory.construct( this, module );
-        this.addModel = CnPdfFormAddFactory.instance( this );
-        this.listModel = CnPdfFormListFactory.instance( this );
-        this.viewModel = CnPdfFormViewFactory.instance( this );
-      };
-
-      return {
-        root: new object( true ),
-        instance: function() { return new object( false ); }
-      };
-    }
-  ] );
+  cenozo.defineModuleModel( module, [ 'add', 'list', 'view' ] );
 
 } );
