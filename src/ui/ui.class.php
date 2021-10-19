@@ -36,10 +36,7 @@ class ui extends \cenozo\ui\ui
     }
 
     $module = $this->get_module( 'data_selection' );
-    if( !is_null( $module ) )
-    {
-      $module->add_child( 'data_selection' );
-    }
+    if( !is_null( $module ) ) $module->add_child( 'data_detail' );
 
     $module = $this->get_module( 'data_version' );
     if( !is_null( $module ) ) $module->add_child( 'data_release' );
