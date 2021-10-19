@@ -80,7 +80,7 @@ cenozo.service( 'CnModalNoticeListFactory', [
           } else {
             printWindow.document.open();
             var body = '<html><body onload="window.print()">';
-            this.noticeList.forEach( function( notice ) {
+            this.noticeList.forEach( notice => {
               body += '<h3>' + $filter( 'cnDatetime' )( notice.datetime, 'date' ) + ': ' + notice.title + '</h3>' +
                       '<div>' + $filter( 'cnNewlines' )( notice.description ) + '</div>';
             } );
@@ -640,8 +640,8 @@ cenozo.service( 'CnReqnHelper', [
                 fr: '<strong>Exclus des ensembles de données</strong><ul><li>Informations d’identification recueillies (p. ex. nom, coordonnées, date de naissance, numéro d’assurance maladie et code postal complet)</li></ul>'
               },
               text4: {
-                en: 'For more information on these data, please visit our website: <a href="https://www.clsa-elcv.ca" target="clsa">www.clsa-elcv.ca</a>.',
-                fr: 'Pour en savoir plus sur ces données, veuillez consulter notre site Web: <a href="https://www.clsa-elcv.ca" target="clsa">www.clsa-elcv.ca</a>.'
+                en: 'For more information on these data, please visit our website: <a href="https://www.clsa-elcv.ca" target="clsa">www.clsa-elcv.ca</a> and consult the <a href="https://www.clsa-elcv.ca/doc/3162" target="data_availability">CLSA Data Availability Table</a>.',
+                fr: 'TODO: TRANSLATION'
               }
             },
             cohort: {
@@ -1096,9 +1096,9 @@ cenozo.service( 'CnReqnHelper', [
       }
     };
 
-    async function init() {
+    async function init( obj ) {
       // fill in dynamic content
-      object.promise = await CnHttpFactory.instance( {
+      obj.promise = await CnHttpFactory.instance( {
         path: 'data_category',
         data: {
           select: { column: [ 'name_en', 'name_fr' ] },
@@ -1107,13 +1107,13 @@ cenozo.service( 'CnReqnHelper', [
       } ).query();
 
       var letter = 'a';
-      object.promise.data.forEach( function( cat ) {
-        object.lookupData.reqn.part2[letter] = { tab: { en: cat.name_en, fr: cat.name_fr } };
+      obj.promise.data.forEach( category => {
+        obj.lookupData.reqn.part2[letter] = { tab: { en: category.name_en, fr: category.name_fr } };
         letter = String.fromCharCode( letter.charCodeAt(0) + 1 );
       } );
     }
 
-    init();
+    init( object );
 
     return object;
   }
