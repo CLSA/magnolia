@@ -34,6 +34,6 @@ cenozoApp.defineModule( 'review_type', null, ( module ) => {
   } );
 
   /* ######################################################################################################## */
-  cenozo.defineModuleModel( module, [ 'list', 'view' ] );
+  cenozo.defineModuleModel( module, [ 'list', 'view' ], 'review_type_question' );
 
 } );

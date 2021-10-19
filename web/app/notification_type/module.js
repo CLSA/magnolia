@@ -68,6 +68,6 @@ cenozoApp.defineModule( 'notification_type', null, ( module ) => {
     }
   ] );
 
-  cenozo.defineModuleModel( module, [ 'list', 'view' ] );
+  cenozo.defineModuleModel( module, [ 'list', 'view' ], 'notification' );
 
 } );
