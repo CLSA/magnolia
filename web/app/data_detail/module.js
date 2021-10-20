@@ -31,6 +31,7 @@ cenozoApp.defineModule( 'data_detail', [ 'data_selection' ], ( module ) => {
     data_selection_id: {
       title: 'Data Selection',
       type: 'enum',
+      isExcluded: 'add',
       isConstant: 'view'
     },
     rank: { title: 'Rank', type: 'rank' },

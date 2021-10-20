@@ -15,7 +15,8 @@ cenozoApp.defineModule( 'data_selection', null, ( module ) => {
     columnList: {
       option_rank: { column: 'data_option.rank', title: 'Data-Option Rank', type: 'rank' },
       option_name_en: { column: 'data_option.name_en', title: 'Data-Option Name' },
-      study_phase: { column: 'study_phase.name', title: 'Study-Phase' },
+      study: { column: 'study.name', title: 'Study' },
+      study_phase: { column: 'study_phase.name', title: 'Phase' },
       cost: { title: 'Cost', type: 'currency:$:0' },
       is_unavailable: { title: 'Unavailable', type: 'boolean' }
     },
@@ -26,6 +27,7 @@ cenozoApp.defineModule( 'data_selection', null, ( module ) => {
     data_option_id: {
       title: 'Data-Option',
       type: 'enum',
+      isExcluded: 'add',
       isConstant: 'view'
     },
     study_phase_id: {

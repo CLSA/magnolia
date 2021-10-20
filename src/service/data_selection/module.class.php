@@ -23,6 +23,7 @@ class module extends \cenozo\service\module
 
     $modifier->join( 'data_option', 'data_selection.data_option_id', 'data_option.id' );
     $modifier->join( 'study_phase', 'data_selection.study_phase_id', 'study_phase.id' );
+    $modifier->join( 'study', 'study_phase.study_id', 'study.id' );
     if( $select->has_table_columns( 'data_category' ) )
       $modifier->join( 'data_category', 'data_option.data_category_id', 'data_category.id' );
 
