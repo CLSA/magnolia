@@ -1,5 +1,5 @@
 // extend the framework's module
-define( [ 'reqn', 'review', 'root' ].reduce( function( list, name ) {
+define( [ 'reqn', 'review', 'root' ].reduce( ( list, name ) => {
   return list.concat( cenozoApp.module( name ).getRequiredFiles() );
 }, [] ), function() {
   'use strict';
