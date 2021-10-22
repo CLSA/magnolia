@@ -517,7 +517,7 @@ class reqn_version extends \cenozo\database\record
       'version' => $this->get_amendment_version(),
       'dateofapproval' => is_null( $date_of_approval ) ? 'None' : $date_of_approval->format( 'Y-m-d' ),
       'cost' => is_null( $cost )
-        ? ( 'fr' == $db_language->code ? 'TODO: TRANSLATION' : '(not calculated)' )
+        ? ( 'fr' == $db_language->code ? '(non calculé)' : '(not calculated)' )
         : sprintf( 'fr' == $db_language->code ? '%s $' : '$%s', $cost )
     );
     $data['applicant_name'] = sprintf( '%s %s', $db_user->first_name, $db_user->last_name );

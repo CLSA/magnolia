@@ -456,7 +456,7 @@ cenozo.service( 'CnReqnHelper', [
               applicant_name: { en: 'Name', fr: 'Nom' },
               applicant_position: { en: 'Position', fr: 'Poste' },
               applicant_affiliation: { en: 'Institution', fr: 'Établissement' },
-              applicant_country_id: { en: 'Institution Country', fr: 'TODO: TRANSLATE' },
+              applicant_country_id: { en: 'Institution Country', fr: 'Pays de l’établissement' },
               applicant_address: { en: 'Mailing Address', fr: 'Adresse de correspondance' },
               applicant_phone: { en: 'Phone', fr: 'Téléphone' },
               applicant_email: { en: 'E-mail', fr: 'Courriel' },
@@ -467,7 +467,7 @@ cenozo.service( 'CnReqnHelper', [
               trainee_name: { en: 'Name', fr: 'Nom' },
               trainee_program: { en: 'Degree and Program of Study', fr: 'Grade et programme d’étude' },
               trainee_institution: { en: 'Institution of Enrollment', fr: 'Établissement d’étude' },
-              trainee_country_id: { en: 'Institution Country', fr: 'TODO: TRANSLATE' },
+              trainee_country_id: { en: 'Institution Country', fr: 'Pays de l’établissement' },
               trainee_address: { en: 'Current Mailing Address', fr: 'Adresse de correspondance actuelle' },
               trainee_phone: { en: 'Phone', fr: 'Téléphone' },
               trainee_email: { en: 'E-mail', fr: 'Courriel' },
@@ -640,8 +640,8 @@ cenozo.service( 'CnReqnHelper', [
                 fr: '<strong>Exclus des ensembles de données</strong><ul><li>Informations d’identification recueillies (p. ex. nom, coordonnées, date de naissance, numéro d’assurance maladie et code postal complet)</li></ul>'
               },
               text4: {
-                en: 'For more information on these data, please visit our website: <a href="https://www.clsa-elcv.ca" target="clsa">www.clsa-elcv.ca</a> and consult the <a href="https://www.clsa-elcv.ca/doc/3162" target="data_availability">CLSA Data Availability Table</a>.',
-                fr: 'TODO: TRANSLATION'
+                en: 'For more information on these data, consult the <a href="https://www.clsa-elcv.ca/doc/3162" target="data_availability">CLSA Data Availability Table</a> on our website.',
+                fr: 'Pour en savoir plus sur ces données, consultez le <a href="https://www.clsa-elcv.ca/doc/3162" target="data_availability">tableau de disponibilité des données de l’ÉLCV</a> sur notre site Web.'
               }
             },
             cohort: {
