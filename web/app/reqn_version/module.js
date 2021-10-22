@@ -929,7 +929,7 @@ cenozoApp.defineModule( 'reqn_version', [ 'coapplicant', 'ethics_approval', 'ref
                         // loop through compared reqnVersion2's coapplicants to see if any were removed
                         reqnVersion2.coapplicantList.forEach( c2 => {
                           var c1 = reqnVersion1.coapplicantList.findByProperty( 'name', c2.name );
-                          if( null == c2 ) {
+                          if( null == c1 ) {
                             // reqnVersion1 has coapplicant that compared reqnVersion2 doesn't
                             differences.diff = true;
                             differences[part].diff = true;
