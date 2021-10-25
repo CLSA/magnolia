@@ -1,4 +1,4 @@
-cenozoApp.defineModule( 'applicant', null, ( module ) => {
+cenozoApp.defineModule( { name: 'applicant', models: ['add', 'list'], create: module => {
 
   angular.extend( module, {
     identifier: {},
@@ -50,7 +50,4 @@ cenozoApp.defineModule( 'applicant', null, ( module ) => {
     }
   } );
 
-  /* ######################################################################################################## */
-  cenozo.defineModuleModel( module, [ 'add', 'list' ] );
-
-} );
+} } );

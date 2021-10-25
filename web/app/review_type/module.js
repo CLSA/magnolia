@@ -1,4 +1,4 @@
-cenozoApp.defineModule( 'review_type', null, ( module ) => {
+cenozoApp.defineModule( { name: 'review_type', models: ['list', 'view'], create: module => {
 
   angular.extend( module, {
     identifier: { column: 'name' },
@@ -33,7 +33,4 @@ cenozoApp.defineModule( 'review_type', null, ( module ) => {
     }
   } );
 
-  /* ######################################################################################################## */
-  cenozo.defineModuleModel( module, [ 'list', 'view' ], 'review_type_question' );
-
-} );
+} } );

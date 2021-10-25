@@ -1,4 +1,4 @@
-cenozoApp.defineModule( 'reqn', [ 'output' ], ( module ) => {
+cenozoApp.defineModule( { name: 'reqn', dependencies: [ 'output' ], models: ['add', 'list', 'view'], create: module => {
 
   angular.extend( module, {
     identifier: { column: 'identifier' },
@@ -1355,7 +1355,4 @@ cenozoApp.defineModule( 'reqn', [ 'output' ], ( module ) => {
     }
   ] );
 
-  /* ######################################################################################################## */
-  cenozo.defineModuleModel( module, [ 'add', 'list', 'view' ] );
-
-} );
+} } );

@@ -1,4 +1,4 @@
-cenozoApp.defineModule( 'pdf_form', null, ( module ) => {
+cenozoApp.defineModule( { name: 'pdf_form', models: ['add', 'list', 'view'], create: module => {
 
   angular.extend( module, {
     identifier: {
@@ -82,7 +82,4 @@ cenozoApp.defineModule( 'pdf_form', null, ( module ) => {
     }
   ] );
 
-  /* ######################################################################################################## */
-  cenozo.defineModuleModel( module, [ 'add', 'list', 'view' ] );
-
-} );
+} } );

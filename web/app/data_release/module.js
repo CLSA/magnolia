@@ -1,4 +1,4 @@
-cenozoApp.defineModule( 'data_release', null, ( module ) => {
+cenozoApp.defineModule( { name: 'data_release', models: ['add', 'list', 'view'], create: module => {
 
   angular.extend( module, {
     identifier: {
@@ -90,6 +90,4 @@ cenozoApp.defineModule( 'data_release', null, ( module ) => {
     }
   ] );
 
-  cenozo.defineModuleModel( module, [ 'add', 'list', 'view' ] );
-
-} );
+} } );

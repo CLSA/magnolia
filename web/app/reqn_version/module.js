@@ -1,4 +1,7 @@
-cenozoApp.defineModule( 'reqn_version', [ 'coapplicant', 'ethics_approval', 'reference' ], ( module ) => {
+cenozoApp.defineModule( { name: 'reqn_version',
+                          dependencies: [ 'coapplicant', 'ethics_approval', 'reference' ],
+                          models: ['list', 'view'],
+                          create: module => {
 
   var coapplicantModule = cenozoApp.module( 'coapplicant' );
   var referenceModule = cenozoApp.module( 'reference' );
@@ -2452,7 +2455,4 @@ cenozoApp.defineModule( 'reqn_version', [ 'coapplicant', 'ethics_approval', 'ref
     }
   ] );
 
-  /* ######################################################################################################## */
-  cenozo.defineModuleModel( module, [ 'list', 'view' ] );
-
-} );
+} } );

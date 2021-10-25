@@ -1,4 +1,4 @@
-cenozoApp.defineModule( 'reference', null, ( module ) => {
+cenozoApp.defineModule( { name: 'reference', models: 'add', create: module => {
 
   angular.extend( module, {
     identifier: {
@@ -14,7 +14,4 @@ cenozoApp.defineModule( 'reference', null, ( module ) => {
     }
   } );
 
-  /* ######################################################################################################## */
-  cenozo.defineModuleModel( module, [ 'add' ] );
-
-} );
+} } );

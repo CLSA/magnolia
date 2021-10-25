@@ -1,4 +1,4 @@
-cenozoApp.defineModule( 'notification_type_email', null, ( module ) => {
+cenozoApp.defineModule( { name: 'notification_type_email', models: ['add', 'list', 'view'], create: module => {
 
   angular.extend( module, {
     identifier: {
@@ -41,7 +41,4 @@ cenozoApp.defineModule( 'notification_type_email', null, ( module ) => {
     }
   } );
 
-  /* ######################################################################################################## */
-  cenozo.defineModuleModel( module, [ 'add', 'list', 'view' ] );
-
-} );
+} } );

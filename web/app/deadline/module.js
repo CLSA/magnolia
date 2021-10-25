@@ -1,4 +1,4 @@
-cenozoApp.defineModule( 'deadline', null, ( module ) => {
+cenozoApp.defineModule( { name: 'deadline', models: ['add', 'list', 'view'], create: module => {
 
   angular.extend( module, {
     identifier: { column: 'name' },
@@ -36,7 +36,4 @@ cenozoApp.defineModule( 'deadline', null, ( module ) => {
     }
   } );
 
-  /* ######################################################################################################## */
-  cenozo.defineModuleModel( module, [ 'add', 'list', 'view' ] );
-
-} );
+} } );

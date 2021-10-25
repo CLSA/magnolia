@@ -1,4 +1,4 @@
-cenozoApp.defineModule( 'output_source', null, ( module ) => {
+cenozoApp.defineModule( { name: 'output_source', models: ['add', 'list', 'view'], create: module => {
 
   angular.extend( module, {
     identifier: {
@@ -267,7 +267,4 @@ cenozoApp.defineModule( 'output_source', null, ( module ) => {
     }
   ] );
 
-  /* ######################################################################################################## */
-  cenozo.defineModuleModel( module, [ 'add', 'list', 'view' ] );
-
-} );
+} } );

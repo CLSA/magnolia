@@ -1,4 +1,4 @@
-cenozoApp.defineModule( 'data_version', null, ( module ) => {
+cenozoApp.defineModule( { name: 'data_version', models: ['add', 'list', 'view'], create: module => {
 
   angular.extend( module, {
     identifier: {},
@@ -50,7 +50,4 @@ cenozoApp.defineModule( 'data_version', null, ( module ) => {
     }
   ] );
 
-  /* ######################################################################################################## */
-  cenozo.defineModuleModel( module, [ 'add', 'list', 'view' ] );
-
-} );
+} } );

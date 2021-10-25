@@ -1,4 +1,4 @@
-cenozoApp.defineModule( 'ethics_approval', null, ( module ) => {
+cenozoApp.defineModule( { name: 'ethics_approval', models: ['add', 'list', 'view'], create: module => {
 
   angular.extend( module, {
     identifier: {
@@ -109,7 +109,4 @@ cenozoApp.defineModule( 'ethics_approval', null, ( module ) => {
     }
   ] );
 
-  /* ######################################################################################################## */
-  cenozo.defineModuleModel( module, [ 'add', 'list', 'view' ] );
-
-} );
+} } );

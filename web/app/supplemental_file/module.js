@@ -1,4 +1,4 @@
-cenozoApp.defineModule( 'supplemental_file', null, ( module ) => {
+cenozoApp.defineModule( { name: 'supplemental_file', models: ['add', 'list', 'view'], create: module => {
 
   angular.extend( module, {
     identifier: {},
@@ -47,7 +47,4 @@ cenozoApp.defineModule( 'supplemental_file', null, ( module ) => {
     }
   ] );
 
-  /* ######################################################################################################## */
-  cenozo.defineModuleModel( module, [ 'add', 'list', 'view' ] );
-
-} );
+} } );

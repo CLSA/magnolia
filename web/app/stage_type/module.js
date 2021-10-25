@@ -1,4 +1,4 @@
-cenozoApp.defineModule( 'stage_type', null, ( module ) => {
+cenozoApp.defineModule( { name: 'stage_type', models: ['list', 'view'], create: module => {
 
   angular.extend( module, {
     identifier: { column: 'name' },
@@ -73,7 +73,4 @@ cenozoApp.defineModule( 'stage_type', null, ( module ) => {
     }
   ] );
 
-  /* ######################################################################################################## */
-  cenozo.defineModuleModel( module, [ 'list', 'view' ] );
-
-} );
+} } );

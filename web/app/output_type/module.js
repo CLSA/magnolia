@@ -1,4 +1,4 @@
-cenozoApp.defineModule( 'output_type', null, ( module ) => {
+cenozoApp.defineModule( { name: 'output_type', models: ['add', 'list', 'view'], create: module => {
 
   angular.extend( module, {
     identifier: { column: 'name_en' },
@@ -72,7 +72,4 @@ cenozoApp.defineModule( 'output_type', null, ( module ) => {
     }
   ] );
 
-  /* ######################################################################################################## */
-  cenozo.defineModuleModel( module, [ 'add', 'list', 'view' ] );
-
-} );
+} } );

@@ -1,4 +1,4 @@
-cenozoApp.defineModule( 'coapplicant', null, ( module ) => {
+cenozoApp.defineModule( { name: 'coapplicant', models: 'add', create: module => {
 
   angular.extend( module, {
     identifier: {
@@ -23,7 +23,4 @@ cenozoApp.defineModule( 'coapplicant', null, ( module ) => {
     access: { title: 'Access', type: 'boolean', type: 'boolean' }
   } );
 
-  /* ######################################################################################################## */
-  cenozo.defineModuleModel( module, [ 'add' ] );
-
-} );
+} } );

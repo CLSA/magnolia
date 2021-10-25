@@ -1,4 +1,4 @@
-cenozoApp.defineModule( 'stage', null, ( module ) => {
+cenozoApp.defineModule( { name: 'stage', models: 'list', create: module => {
 
   angular.extend( module, {
     identifier: {}, // standard
@@ -56,7 +56,4 @@ cenozoApp.defineModule( 'stage', null, ( module ) => {
     }
   ] );
 
-  /* ######################################################################################################## */
-  cenozo.defineModuleModel( module, [ 'list' ] );
-
-} );
+} } );

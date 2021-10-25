@@ -1,4 +1,4 @@
-cenozoApp.defineModule( 'notification', null, ( module ) => {
+cenozoApp.defineModule( { name: 'notification', models: 'list', create: module => {
 
   angular.extend( module, {
     identifier: {
@@ -39,7 +39,4 @@ cenozoApp.defineModule( 'notification', null, ( module ) => {
     }
   } );
 
-  /* ######################################################################################################## */
-  cenozo.defineModuleModel( module, [ 'list' ] );
-
-} );
+} } );

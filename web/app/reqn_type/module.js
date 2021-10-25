@@ -1,4 +1,4 @@
-cenozoApp.defineModule( 'reqn_type', null, ( module ) => {
+cenozoApp.defineModule( { name: 'reqn_type', models: ['list', 'view'], create: module => {
 
   angular.extend( module, {
     identifier: { column: 'name' },
@@ -41,7 +41,4 @@ cenozoApp.defineModule( 'reqn_type', null, ( module ) => {
     }
   } );
 
-  /* ######################################################################################################## */
-  cenozo.defineModuleModel( module, [ 'list', 'view' ], 'reqn' );
-
-} );
+} } );

@@ -1,4 +1,4 @@
-cenozoApp.defineModule( 'data_detail', [ 'data_selection' ], ( module ) => {
+cenozoApp.defineModule( { name: 'data_detail', dependencies: [ 'data_selection' ], models: ['add', 'list', 'view'], create: module => {
 
   angular.extend( module, {
     identifier: {
@@ -80,6 +80,4 @@ cenozoApp.defineModule( 'data_detail', [ 'data_selection' ], ( module ) => {
     }
   ] );
 
-  cenozo.defineModuleModel( module, [ 'add', 'list', 'view' ] );
-
-} );
+} } );

@@ -1,4 +1,4 @@
-cenozoApp.defineModule( 'data_category', null, ( module ) => {
+cenozoApp.defineModule( { name: 'data_category', models: ['list', 'view'], create: module => {
 
   angular.extend( module, {
     identifier: { column: 'name_en' },
@@ -57,7 +57,4 @@ cenozoApp.defineModule( 'data_category', null, ( module ) => {
     }
   } );
 
-  /* ######################################################################################################## */
-  cenozo.defineModuleModel( module, [ 'list', 'view' ], 'data_option' );
-
-} );
+} } );

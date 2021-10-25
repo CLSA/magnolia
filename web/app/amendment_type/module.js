@@ -1,4 +1,4 @@
-cenozoApp.defineModule( 'amendment_type', null, ( module ) => {
+cenozoApp.defineModule( { name: 'amendment_type', models: ['add', 'list', 'view'], create: module => {
 
   angular.extend( module, {
     identifier: {},
@@ -46,6 +46,4 @@ cenozoApp.defineModule( 'amendment_type', null, ( module ) => {
     }
   } );
 
-  /* ######################################################################################################## */
-  cenozo.defineModuleModel( module, [ 'add', 'list', 'view' ] );
-} );
+} } );

@@ -1,4 +1,4 @@
-cenozoApp.defineModule( 'final_report', [ 'output' ], ( module ) => {
+cenozoApp.defineModule( { name: 'final_report', dependencies: [ 'output' ], models: ['list', 'view'], create: module => {
 
   angular.extend( module, {
     identifier: {
@@ -475,7 +475,4 @@ cenozoApp.defineModule( 'final_report', [ 'output' ], ( module ) => {
     }
   ] );
 
-  /* ######################################################################################################## */
-  cenozo.defineModuleModel( module, [ 'list', 'view' ] );
-
-} );
+} } );

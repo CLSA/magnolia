@@ -1,4 +1,4 @@
-cenozoApp.defineModule( 'pdf_form_type', null, ( module ) => {
+cenozoApp.defineModule( { name: 'pdf_form_type', models: ['list', 'view'], create: module => {
 
   angular.extend( module, {
     identifier: { column: 'name' },
@@ -31,7 +31,4 @@ cenozoApp.defineModule( 'pdf_form_type', null, ( module ) => {
     }
   } );
 
-  /* ######################################################################################################## */
-  cenozo.defineModuleModel( module, [ 'list', 'view' ] );
-
-} );
+} } );

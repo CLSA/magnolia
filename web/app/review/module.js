@@ -1,4 +1,4 @@
-cenozoApp.defineModule( 'review', null, ( module ) => {
+cenozoApp.defineModule( { name: 'review', models: ['list', 'view'], create: module => {
 
   angular.extend( module, {
     identifier: {
@@ -274,7 +274,4 @@ cenozoApp.defineModule( 'review', null, ( module ) => {
     }
   ] );
 
-  /* ######################################################################################################## */
-  cenozo.defineModuleModel( module, [ 'list', 'view' ] );
-
-} );
+} } );
