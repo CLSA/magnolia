@@ -31,20 +31,19 @@ cenozoApp.defineModule( { name: 'data_version', models: ['add', 'list', 'view'],
       var object = function( parentModel, root ) {
         CnBaseViewFactory.construct( this, parentModel, root );
 
-        var self = this;
-        async function init() {
+        async function init( object ) {
           // Have the data release model point to the requisition instead
-          await self.deferred.promise;
+          await object.deferred.promise;
 
-          if( angular.isDefined( self.dataReleaseModel ) ) {
-            self.dataReleaseModel.listModel.heading = 'Requisition List';
-            self.dataReleaseModel.listModel.parentModel.transitionToViewState = async function( record ) {
+          if( angular.isDefined( object.dataReleaseModel ) ) {
+            object.dataReleaseModel.listModel.heading = 'Requisition List';
+            object.dataReleaseModel.listModel.parentModel.transitionToViewState = async function( record ) {
               await $state.go( 'reqn.view', { identifier: 'identifier=' + record.identifier } );
             };
           }
         }
 
-        init();
+        init( this );
       }
       return { instance: function( parentModel, root ) { return new object( parentModel, root ); } };
     }

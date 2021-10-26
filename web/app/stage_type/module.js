@@ -61,13 +61,12 @@ cenozoApp.defineModule( { name: 'stage_type', models: ['list', 'view'], create: 
       var object = function( parentModel, root ) {
         CnBaseViewFactory.construct( this, parentModel, root );
 
-        var self = this;
-        async function init() {
-          await self.deferred.promise;
-          if( angular.isDefined( self.stageModel ) ) self.stageModel.listModel.heading = 'Requisition List';
+        async function init( object ) {
+          await object.deferred.promise;
+          if( angular.isDefined( object.stageModel ) ) object.stageModel.listModel.heading = 'Requisition List';
         }
 
-        init();
+        init( this );
       }
       return { instance: function( parentModel, root ) { return new object( parentModel, root ); } };
     }
