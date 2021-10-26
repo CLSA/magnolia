@@ -12,7 +12,7 @@ global $SETTINGS;
 // tagged version
 $SETTINGS['general']['application_name'] = 'magnolia';
 $SETTINGS['general']['instance_name'] = $SETTINGS['general']['application_name'];
-$SETTINGS['general']['version'] = '2.7';
+$SETTINGS['general']['version'] = '2.8';
 $SETTINGS['general']['build'] = '777afc1';
 
 // the location of magnolia internal path
