@@ -2334,10 +2334,14 @@ cenozoApp.defineModule( { name: 'reqn_version',
               // build the categories
               this.categoryList = categoryResponse.data;
               this.categoryList.forEach( category => {
-                // determine the character code based on the rank
+                var studyPhaseList = category.study_phase_list.split( ';' ).map( str => str.split( '`' ) );
+
                 angular.extend( category, {
-                  // study phases are delimited by a ";", and each lists the study name then phase name, separated by a "`"
-                  studyPhaseList: category.study_phase_list.split( ';' ).map( str => str.split( '`' ) ),
+                  studyPhaseList: studyPhaseList.reduce( ( list, item ) => {
+                    list.push( 1 < studyPhaseList.length ? item : [item[0]] );
+                    return list;
+                  }, [] ),
+                  // determine the character code based on the rank
                   charCode: String.fromCharCode( 'a'.charCodeAt(0) + category.rank - 1 ),
                   name: { en: category.name_en, fr: category.name_fr },
                   note: { en: category.note_en, fr: category.note_fr },

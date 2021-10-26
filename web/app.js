@@ -722,10 +722,10 @@ cenozo.service( 'CnReqnHelper', [
             finalReport: { en: 'Final Report', fr: 'Rapport final' },
             study: {
               clsa: { en: 'CLSA', fr: 'ÉLCV' },
-              covid19_questionnaire: { en: 'COVID-19, Questionnaire', fr: 'COVID-19, questionnaire' },
-              covid19_antibody: { en: 'COVID-19, Antibody', fr: 'COVID-19, anticorps' },
-              covid19_dbs: { en: 'COVID-19, DBS', fr: 'COVID-19, DBS' },
-              covid19_brain: { en: 'COVID-19, Brain', fr: 'COVID-19, cerveau' },
+              covid_19_questionnaire: { en: 'COVID-19, Questionnaire', fr: 'COVID-19, questionnaire' },
+              covid_19_antibody: { en: 'COVID-19, Antibody', fr: 'COVID-19, anticorps' },
+              covid_19_dbs: { en: 'COVID-19, DBS', fr: 'COVID-19, DBS' },
+              covid_19_brain: { en: 'COVID-19, Brain', fr: 'COVID-19, cerveau' },
             },
             studyPhase: {
               bl: { en: 'Baseline', fr: 'départ' },

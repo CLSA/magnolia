@@ -1057,8 +1057,10 @@
                       <td ng-repeat="studyPhaseCode in category.studyPhaseList"
                           width="{{ 50/category.studyPhaseList.length + '%' }}"
                           style="vertical-align: middle;"
-                          ng-bind-html="t( 'misc.study.' + studyPhaseCode[0] ) + ' - ' +
-                                        t( 'misc.studyPhase.' + studyPhaseCode[1] )"></td>
+                          ng-bind-html="
+                            t( 'misc.study.' + studyPhaseCode[0] ) + (
+                              1 < studyPhaseCode.length ? ( ' - ' + t( 'misc.studyPhase.' + studyPhaseCode[1] ) ) : ''
+                            )"></td>
                     </tr>
                   </thead>
                   <tbody>
@@ -1093,7 +1095,8 @@
                     <tr ng-repeat-end style="background: white">
                       <td colspan="3" style="padding: 0;">
                         <div id="accordion{{ option.id }}" class="collapse text-primary text-left">
-                          <div ng-repeat="selection in option.selectionList">
+                          <div ng-repeat="selection in option.selectionList"
+                               ng-if="1 < selection.detailList || 0 < selection.cost.value">
                             <div class="col-sm-2 vertical-spacer"
                                  ng-bind-html="t( 'misc.studyPhase.' + selection.studyPhaseCode )"></div>
                             <div class="col-sm-1 vertical-spacer">
