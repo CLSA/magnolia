@@ -164,7 +164,7 @@ cenozoApp.defineModule( { name: 'reqn_version',
             scope.liteModel.viewModel.fileList.findByProperty( 'key', key ).size = '';
           } );
 
-          scope.model.viewModel.afterView( async function() {
+          scope.model.viewModel.afterView( async () => {
             var record = scope.model.viewModel.record;
 
             // display final report message if appropriate
@@ -182,7 +182,7 @@ cenozoApp.defineModule( { name: 'reqn_version',
               await scope.model.viewModel.displayNotices();
           } );
 
-          scope.$watch( 'model.viewModel.record.start_date', function( date ) {
+          scope.$watch( 'model.viewModel.record.start_date', date => {
             var element = cenozo.getFormElement( 'start_date' );
             if( element ) {
               // clear out errors
@@ -191,19 +191,19 @@ cenozoApp.defineModule( { name: 'reqn_version',
               cenozo.updateFormElement( element, true );
             }
           } );
-          scope.$watch( 'model.viewModel.record.lay_summary', function( text ) {
+          scope.$watch( 'model.viewModel.record.lay_summary', text => {
             scope.model.viewModel.charCount.lay_summary = text ? text.length : 0;
           } );
-          scope.$watch( 'model.viewModel.record.background', function( text ) {
+          scope.$watch( 'model.viewModel.record.background', text => {
             scope.model.viewModel.charCount.background = text ? text.length : 0;
           } );
-          scope.$watch( 'model.viewModel.record.objectives', function( text ) {
+          scope.$watch( 'model.viewModel.record.objectives', text => {
             scope.model.viewModel.charCount.objectives = text ? text.length : 0;
           } );
-          scope.$watch( 'model.viewModel.record.methodology', function( text ) {
+          scope.$watch( 'model.viewModel.record.methodology', text => {
             scope.model.viewModel.charCount.methodology = text ? text.length : 0;
           } );
-          scope.$watch( 'model.viewModel.record.analysis', function( text ) {
+          scope.$watch( 'model.viewModel.record.analysis', text => {
             scope.model.viewModel.charCount.analysis = text ? text.length : 0;
           } );
 
@@ -265,7 +265,7 @@ cenozoApp.defineModule( { name: 'reqn_version',
               }
               if( !valid ) {
                 // dirty all inputs so we can find the problem
-                cenozo.forEachFormElement( 'part1bForm', function( element ) { element.$dirty = true; } );
+                cenozo.forEachFormElement( 'part1bForm', element => { element.$dirty = true; } );
               } else {
                 try {
                   $scope.isAddingCoapplicant = true;
@@ -302,7 +302,7 @@ cenozoApp.defineModule( { name: 'reqn_version',
               var form = cenozo.getScopeByQuerySelector( '#part1dForm' ).part1dForm;
               if( !form.$valid ) {
                 // dirty all inputs so we can find the problem
-                cenozo.forEachFormElement( 'part1dForm', function( element ) { element.$dirty = true; } );
+                cenozo.forEachFormElement( 'part1dForm', element => { element.$dirty = true; } );
               } else {
                 try {
                   $scope.isAddingReference = true;
@@ -2090,13 +2090,14 @@ cenozoApp.defineModule( { name: 'reqn_version',
                 { title: this.viewModel.record.identifier }
               ];
             } else {
+              var self = this;
               trail = [ {
                 title: 'Requisitions',
                 go: async function() { await $state.go( 'reqn.list' ); }
               }, {
                 title: this.viewModel.record.identifier,
                 go: async function() {
-                  await $state.go( 'reqn.view', { identifier: 'identifier=' + this.viewModel.record.identifier } );
+                  await $state.go( 'reqn.view', { identifier: 'identifier=' + self.viewModel.record.identifier } );
                 }
               }, {
                 title: 'version ' + this.viewModel.record.amendment_version
