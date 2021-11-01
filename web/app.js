@@ -707,7 +707,7 @@ cenozo.service( 'CnReqnHelper', [
             prevButton: { en: 'Return to the previous section', fr: 'Retourner à la section précédente' },
             nextButton: { en: 'Proceed to the next section', fr: 'Passez à la section suivante' },
             pleaseConfirm: { en: 'Please confirm', fr: 'Veuillez confirmer' },
-            totalCost: { en: 'Total cost', fr: 'Coût total' },
+            totalCost: { en: 'Total fee', fr: 'TODO: TRANSLATE' },
             remove: { en: 'Remove', fr: 'Supprimer' },
             chars: { en: 'characters', fr: 'caractères' },
             comments: { en: 'Comments', fr: 'Commentaires' },

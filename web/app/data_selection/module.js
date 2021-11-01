@@ -17,7 +17,7 @@ cenozoApp.defineModule( { name: 'data_selection', models: ['add', 'list', 'view'
       option_name_en: { column: 'data_option.name_en', title: 'Data-Option Name' },
       study: { column: 'study.name', title: 'Study' },
       study_phase: { column: 'study_phase.name', title: 'Phase' },
-      cost: { title: 'Cost', type: 'currency:$:0' },
+      cost: { title: 'Fee', type: 'currency:$:0' },
       is_unavailable: { title: 'Unavailable', type: 'boolean' }
     },
     defaultOrder: { column: 'study_phase_id', reverse: false }
@@ -36,7 +36,7 @@ cenozoApp.defineModule( { name: 'data_selection', models: ['add', 'list', 'view'
       isConstant: 'view'
     },
     cost: {
-      title: 'Cost ($)',
+      title: 'Fee ($)',
       type: 'string',
       format: 'integer'
     },

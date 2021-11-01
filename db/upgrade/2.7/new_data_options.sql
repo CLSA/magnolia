@@ -44,7 +44,7 @@ CREATE PROCEDURE patch_data_option()
 
       -- move back the data options that we're going to keep
       UPDATE data_option SET rank = 9 WHERE name_en = "Retinal Scan (Image)";
-      UPDATE data_option SET rank = 12 WHERE name_en = "Tonometry (Pressure and applination data)";
+      UPDATE data_option SET rank = 12 WHERE name_en = "Tonometry (Pressure and applanation data)";
       UPDATE data_option SET rank = 13 WHERE name_en = "Cognition (Raw data)";
 
       -- set the new data_selection data
