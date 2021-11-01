@@ -132,7 +132,7 @@ cenozoApp.defineModule( { name: 'reqn', dependencies: [ 'output' ], models: ['ad
       title: 'Show Fee',
       type: 'boolean',
       isExcluded: function( $state, model ) { return 'view' != model.getActionFromState(); },
-      help: 'Determines whether the price of the application is calculated. ' +
+      help: 'Determines whether the fee of the application is calculated. ' +
         'This also makes the applicant and trainee country a mandatory field.'
     },
     reqn_type_id: {
