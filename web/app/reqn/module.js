@@ -129,7 +129,7 @@ cenozoApp.defineModule( { name: 'reqn', dependencies: [ 'output' ], models: ['ad
             'Use this option when uploading pre-existing requisitions into the software.'
     },
     show_prices: {
-      title: 'Show Prices',
+      title: 'Show Fee',
       type: 'boolean',
       isExcluded: function( $state, model ) { return 'view' != model.getActionFromState(); },
       help: 'Determines whether the price of the application is calculated. ' +
