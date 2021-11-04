@@ -3,14 +3,6 @@ DELIMITER //
 CREATE PROCEDURE patch_data_option()
   BEGIN
 
-    -- determine the @cenozo database name
-    SET @cenozo = (
-      SELECT unique_constraint_schema
-      FROM information_schema.referential_constraints
-      WHERE constraint_schema = DATABASE()
-      AND constraint_name = "fk_access_site_id"
-    );
-
     -- make sure the old reqn_version_data_option triggers no longer exist
     DROP TRIGGER IF EXISTS reqn_version_data_option_AFTER_INSERT;
     DROP TRIGGER IF EXISTS reqn_version_data_option_AFTER_DELETE;

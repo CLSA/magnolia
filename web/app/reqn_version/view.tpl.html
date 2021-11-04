@@ -1076,7 +1076,7 @@
                       </td>
                       <td
                           ng-repeat="selection in option.selectionList"
-                          ng-style="{ 'width': 50/detailSelection.length + '%' }"
+                          ng-style="{ 'width': 50/detailList.length + '%' }"
                           ng-class="{ 'bg-warning': model.viewModel.compareRecord.differences.part2[category.charCode].selectionList.findByProperty( 'id', selection.id ) }">
                         <span ng-if="null != selection.unavailable[model.viewModel.record.lang]"
                               ng-bind-html="selection.unavailable[model.viewModel.record.lang]"></span>
@@ -1096,7 +1096,8 @@
                       <td colspan="3" style="padding: 0;">
                         <div id="accordion{{ option.id }}" class="collapse text-primary text-left">
                           <div ng-repeat="selection in option.selectionList"
-                               ng-if="1 < selection.detailList || 0 < selection.cost.value">
+                               ng-if="0 < selection.detailList.length ||
+                                      ( null == selection.unavailable[model.viewModel.record.lang] && 0 < selection.cost.value )">
                             <div class="col-sm-2 vertical-spacer"
                                  ng-bind-html="t( 'misc.studyPhase.' + selection.studyPhaseCode )"></div>
                             <div class="col-sm-1 vertical-spacer">
@@ -1199,7 +1200,8 @@
                   <div ng-if="0 == model.viewModel.coapplicantAgreementList.length">None</div>
                   <ul style="padding-left: 1em;" ng-if=" 0 < model.viewModel.coapplicantAgreementList.length">
                     <li ng-repeat="form in model.viewModel.coapplicantAgreementList">
-                      <a ng-click="model.viewModel.downloadCoapplicantAgreement( form.id )" style="cursor: pointer;">Version {{ form.version }}</a>
+                      <a ng-click="model.viewModel.downloadCoapplicantAgreement( form.id )"
+                         style="cursor: pointer;">Version {{ form.version }}</a>
                     </li>
                   </ul>
                 </div>

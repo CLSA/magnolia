@@ -71,9 +71,23 @@ CREATE PROCEDURE patch_data_option()
         "UPDATE data_selection ",
         "JOIN data_option ON data_selection.data_option_id = data_option.id ",
         "JOIN ", @cenozo, ".study_phase ON data_selection.study_phase_id = study_phase.id ",
-        "SET unavailable_en = '(not applicable)' ",
-        "WHERE ( data_option.name_en = 'DXA Whole Body' and study_phase.code = 'f1' ) ",
-        "OR ( data_option.name_en = 'Spirometry Images' and study_phase.code = 'bl' )"
+        "SET unavailable_en = '(not yet available)', ",
+            "unavailable_fr = '(pas encore disponible)' ",
+        "WHERE data_option.name_en = 'DXA Whole Body' ",
+        "AND study_phase.code = 'f1'"
+      );
+      PREPARE statement FROM @sql;
+      EXECUTE statement;
+      DEALLOCATE PREPARE statement;
+
+      SET @sql = CONCAT(
+        "UPDATE data_selection ",
+        "JOIN data_option ON data_selection.data_option_id = data_option.id ",
+        "JOIN ", @cenozo, ".study_phase ON data_selection.study_phase_id = study_phase.id ",
+        "SET unavailable_en = '(not applicable)', ",
+            "unavailable_fr = '(sans objet)' ",
+        "WHERE data_option.name_en = 'Spirometry Images' ",
+        "AND study_phase.code = 'bl'"
       );
       PREPARE statement FROM @sql;
       EXECUTE statement;
@@ -89,8 +103,8 @@ CREATE PROCEDURE patch_data_option()
 
       -- set the new data_detail data
       SET @sql = CONCAT(
-        "INSERT INTO data_detail( data_selection_id, rank, name_en, name_fr, note_en, note_fr ) ",
-        "SELECT data_selection.id, 1, 'Still image (DICOM)', 'Image fixe (DICOM)', NULL, NULL ",
+        "INSERT INTO data_detail( data_selection_id, rank, name_en, name_fr ) ",
+        "SELECT data_selection.id, 1, 'Still image (DICOM)', 'Image fixe (DICOM)' ",
         "FROM data_selection ",
         "JOIN data_option ON data_selection.data_option_id = data_option.id ",
         "JOIN ", @cenozo, ".study_phase ON data_selection.study_phase_id = study_phase.id ",
@@ -104,8 +118,8 @@ CREATE PROCEDURE patch_data_option()
       DEALLOCATE PREPARE statement;
 
       SET @sql = CONCAT(
-        "INSERT INTO data_detail( data_selection_id, rank, name_en, name_fr, note_en, note_fr ) ",
-        "SELECT data_selection.id, 1, 'Cineloops (DICOM)', 'Animations en boucle (DICOM)', 'Please consult the CLSA Data Availability Table on our website for additional information/conditions if requesting these data.', 'Veuillez consulter le tableau de disponibilité des données de l’ÉLCV sur notre site Web pour obtenir des informations supplémentaires et connaître les conditions pour demander ces données.' ",
+        "INSERT INTO data_detail( data_selection_id, rank, name_en, name_fr ) ",
+        "SELECT data_selection.id, 1, 'Cineloops (DICOM)', 'Animations en boucle (DICOM)' ",
         "FROM data_selection ",
         "JOIN data_option ON data_selection.data_option_id = data_option.id ",
         "JOIN ", @cenozo, ".study_phase ON data_selection.study_phase_id = study_phase.id ",
@@ -119,8 +133,8 @@ CREATE PROCEDURE patch_data_option()
       DEALLOCATE PREPARE statement;
 
       SET @sql = CONCAT(
-        "INSERT INTO data_detail( data_selection_id, rank, name_en, name_fr, note_en, note_fr ) ",
-        "SELECT data_selection.id, 1, 'Forearm (image - jpg)', 'Avant-bras (image - jpg)', NULL, NULL ",
+        "INSERT INTO data_detail( data_selection_id, rank, name_en, name_fr ) ",
+        "SELECT data_selection.id, 1, 'Forearm (image - jpg)', 'Avant-bras (image - jpg)' ",
         "FROM data_selection ",
         "JOIN data_option ON data_selection.data_option_id = data_option.id ",
         "JOIN ", @cenozo, ".study_phase ON data_selection.study_phase_id = study_phase.id ",
@@ -134,8 +148,8 @@ CREATE PROCEDURE patch_data_option()
       DEALLOCATE PREPARE statement;
 
       SET @sql = CONCAT(
-        "INSERT INTO data_detail( data_selection_id, rank, name_en, name_fr, note_en, note_fr ) ",
-        "SELECT data_selection.id, 1, 'Hip (image - jpg)', 'Hanche (image - jpg)', NULL, NULL ",
+        "INSERT INTO data_detail( data_selection_id, rank, name_en, name_fr ) ",
+        "SELECT data_selection.id, 1, 'Hip (image - jpg)', 'Hanche (image - jpg)' ",
         "FROM data_selection ",
         "JOIN data_option ON data_selection.data_option_id = data_option.id ",
         "JOIN ", @cenozo, ".study_phase ON data_selection.study_phase_id = study_phase.id ",
@@ -149,8 +163,8 @@ CREATE PROCEDURE patch_data_option()
       DEALLOCATE PREPARE statement;
 
       SET @sql = CONCAT(
-        "INSERT INTO data_detail( data_selection_id, rank, name_en, name_fr, note_en, note_fr ) ",
-        "SELECT data_selection.id, 1, 'Whole Body (image - jpg)', 'Corps entier (image - jpg)', 'Please consult the CLSA Data Availability Table on our website for additional information/conditions if requesting these data.', 'Veuillez consulter le tableau de disponibilité des données de l’ÉLCV sur notre site Web pour obtenir des informations supplémentaires et connaître les conditions pour demander ces données.' ",
+        "INSERT INTO data_detail( data_selection_id, rank, name_en, name_fr ) ",
+        "SELECT data_selection.id, 1, 'Whole Body (image - jpg)', 'Corps entier (image - jpg)' ",
         "FROM data_selection ",
         "JOIN data_option ON data_selection.data_option_id = data_option.id ",
         "JOIN ", @cenozo, ".study_phase ON data_selection.study_phase_id = study_phase.id ",
@@ -164,8 +178,8 @@ CREATE PROCEDURE patch_data_option()
       DEALLOCATE PREPARE statement;
 
       SET @sql = CONCAT(
-        "INSERT INTO data_detail( data_selection_id, rank, name_en, name_fr, note_en, note_fr ) ",
-        "SELECT data_selection.id, 1, 'IVA Lateral Spine (DICOM)', 'Colonne latérale IVA (DICOM)', NULL, NULL ",
+        "INSERT INTO data_detail( data_selection_id, rank, name_en, name_fr ) ",
+        "SELECT data_selection.id, 1, 'IVA Lateral Spine (DICOM)', 'Colonne latérale IVA (DICOM)' ",
         "FROM data_selection ",
         "JOIN data_option ON data_selection.data_option_id = data_option.id ",
         "JOIN ", @cenozo, ".study_phase ON data_selection.study_phase_id = study_phase.id ",
@@ -179,8 +193,8 @@ CREATE PROCEDURE patch_data_option()
       DEALLOCATE PREPARE statement;
 
       SET @sql = CONCAT(
-        "INSERT INTO data_detail( data_selection_id, rank, name_en, name_fr, note_en, note_fr ) ",
-        "SELECT data_selection.id, 1, 'Raw+ (ECG Waveforms)', 'Raw (courbes de l’ECG)', NULL, NULL ",
+        "INSERT INTO data_detail( data_selection_id, rank, name_en, name_fr ) ",
+        "SELECT data_selection.id, 1, 'Raw+ (ECG Waveforms)', 'Raw (courbes de l’ECG)' ",
         "FROM data_selection ",
         "JOIN data_option ON data_selection.data_option_id = data_option.id ",
         "JOIN ", @cenozo, ".study_phase ON data_selection.study_phase_id = study_phase.id ",
@@ -194,8 +208,8 @@ CREATE PROCEDURE patch_data_option()
       DEALLOCATE PREPARE statement;
 
       SET @sql = CONCAT(
-        "INSERT INTO data_detail( data_selection_id, rank, name_en, name_fr, note_en, note_fr ) ",
-        "SELECT data_selection.id, 1, 'Images (ECG Tracing - jpg)', 'Images (tracé de l’ECG - jpg)', NULL, NULL ",
+        "INSERT INTO data_detail( data_selection_id, rank, name_en, name_fr ) ",
+        "SELECT data_selection.id, 1, 'Images (ECG Tracing - jpg)', 'Images (tracé de l’ECG - jpg)' ",
         "FROM data_selection ",
         "JOIN data_option ON data_selection.data_option_id = data_option.id ",
         "JOIN ", @cenozo, ".study_phase ON data_selection.study_phase_id = study_phase.id ",
@@ -209,8 +223,8 @@ CREATE PROCEDURE patch_data_option()
       DEALLOCATE PREPARE statement;
 
       SET @sql = CONCAT(
-        "INSERT INTO data_detail( data_selection_id, rank, name_en, name_fr, note_en, note_fr ) ",
-        "SELECT data_selection.id, 1, 'RAW+ (Flow + Volume curves - text)', 'RAW (Courbes débit-volume - texte)', NULL, NULL ",
+        "INSERT INTO data_detail( data_selection_id, rank, name_en, name_fr ) ",
+        "SELECT data_selection.id, 1, 'RAW+ (Flow + Volume curves - text)', 'RAW (Courbes débit-volume - texte)' ",
         "FROM data_selection ",
         "JOIN data_option ON data_selection.data_option_id = data_option.id ",
         "JOIN ", @cenozo, ".study_phase ON data_selection.study_phase_id = study_phase.id ",
@@ -224,8 +238,8 @@ CREATE PROCEDURE patch_data_option()
       DEALLOCATE PREPARE statement;
 
       SET @sql = CONCAT(
-        "INSERT INTO data_detail( data_selection_id, rank, name_en, name_fr, note_en, note_fr ) ",
-        "SELECT data_selection.id, 1, 'Images (Summary Report - pdf)', 'Images (Rapport sommaire - pdf)', 'Please consult the CLSA Data Availability Table on our website for additional information/conditions if requesting these data.', 'Veuillez consulter le tableau de disponibilité des données de l’ÉLCV sur notre site Web pour obtenir des informations supplémentaires et connaître les conditions pour demander ces données.' ",
+        "INSERT INTO data_detail( data_selection_id, rank, name_en, name_fr ) ",
+        "SELECT data_selection.id, 1, 'Images (Summary Report - pdf)', 'Images (Rapport sommaire - pdf)' ",
         "FROM data_selection ",
         "JOIN data_option ON data_selection.data_option_id = data_option.id ",
         "JOIN ", @cenozo, ".study_phase ON data_selection.study_phase_id = study_phase.id ",
@@ -233,6 +247,21 @@ CREATE PROCEDURE patch_data_option()
         "WHERE data_option.name_en = 'Spirometry Images' ",
         "AND study.name = 'CLSA' ",
         "AND study_phase.code = 'f1'"
+      );
+      PREPARE statement FROM @sql;
+      EXECUTE statement;
+      DEALLOCATE PREPARE statement;
+
+      SET @sql = CONCAT(
+        "INSERT INTO data_detail( data_selection_id, rank, name_en, name_fr ) ",
+        "SELECT data_selection.id, 1, 'Raw data (individual scores)', 'Données brutes (scores individuels)' ",
+        "FROM data_selection ",
+        "JOIN data_option ON data_selection.data_option_id = data_option.id ",
+        "JOIN ", @cenozo, ".study_phase ON data_selection.study_phase_id = study_phase.id ",
+        "JOIN ", @cenozo, ".study ON study_phase.study_id = study.id ",
+        "WHERE data_option.name_en = 'Cognition (Raw data)' ",
+        "AND study.name = 'CLSA' ",
+        "AND study_phase.code IN ( 'bl', 'f1' )"
       );
       PREPARE statement FROM @sql;
       EXECUTE statement;

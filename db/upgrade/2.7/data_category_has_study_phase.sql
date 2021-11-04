@@ -48,6 +48,19 @@ CREATE PROCEDURE patch_data_category_has_study_phase()
       FROM data_option
       JOIN data_option_has_study_phase ON data_option.id = data_option_has_study_phase.data_option_id
       ORDER BY data_option_category_id, study_phase_id;
+
+      SET @sql = CONCAT(
+        "INSERT INTO data_category_has_study_phase( data_category_id, study_phase_id ) ",
+        "SELECT data_category.id, study_phase.id ",
+        "FROM data_category, ", @cenozo, ".study ",
+        "JOIN ", @cenozo, ".study_phase ON study.id = study_phase.study_id ",
+        "WHERE data_category.name_en = 'Linked Data' ",
+        "AND study.name = 'CLSA' ",
+        "AND study_phase.code = 'F1'"
+      );
+      PREPARE statement FROM @sql;
+      EXECUTE statement;
+      DEALLOCATE PREPARE statement;
     END IF;
 
   END //

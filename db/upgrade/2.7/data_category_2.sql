@@ -3,6 +3,14 @@ DELIMITER //
 CREATE PROCEDURE patch_data_category()
   BEGIN
 
+    -- determine the @cenozo database name
+    SET @cenozo = (
+      SELECT unique_constraint_schema
+      FROM information_schema.referential_constraints
+      WHERE constraint_schema = DATABASE()
+      AND constraint_name = "fk_access_site_id"
+    );
+
     SELECT COUNT(*) INTO @test FROM data_category WHERE name_en = "Core CLSA Data";
     IF 0 = @test THEN
       
@@ -204,12 +212,20 @@ CREATE PROCEDURE patch_data_category()
       ( @data_category_id, 1, "Environmental Indicators", "Indicateurs environnementaux", "When requesting these data, please note that if your CLSA Data and Biospecimen Request Application is approved, you will also be required to sign a Data Sharing and Use via Approved Third Party Agreement (available for consultation and download here: http://canue.ca/data/ ), and submit it to the CLSA.", "Lorsque vous demandez ces données, veuillez noter que si votre demande d’accès aux données et aux échantillons biologiques de l’ÉLCV est approuvée, vous devrez également signer une Entente de partage et d’utilisation des données via un tiers autorisé (disponible pour consultation et téléchargement ici : http://canue. ca/data/ ), et la soumettre à l’ÉLCV." );
 
       -- create the new data-selections
-      INSERT INTO data_selection( data_option_id, study_phase_id )
-      SELECT data_option.id, study_phase_id
-      FROM data_option
-      JOIN data_category ON data_option.data_category_id = data_category.id
-      JOIN data_category_has_study_phase ON data_category.id = data_category_has_study_phase.data_category_id
-      WHERE data_option.name_en = "Environmental Indicators";
+      SET @sql = CONCAT(
+        "INSERT INTO data_selection( data_option_id, study_phase_id, unavailable_en, unavailable_fr ) ",
+        "SELECT data_option.id, study_phase_id, ",
+               "IF( 'f1' = study_phase.code, '(not yet available)', NULL ), ",
+               "IF( 'f1' = study_phase.code, '(pas encore disponible)', NULL ) ",
+        "FROM data_option ",
+        "JOIN data_category ON data_option.data_category_id = data_category.id ",
+        "JOIN data_category_has_study_phase ON data_category.id = data_category_has_study_phase.data_category_id ",
+        "JOIN ", @cenozo, ".study_phase ON data_category_has_study_phase.study_phase_id = study_phase.id ",
+        "WHERE data_option.name_en = 'Environmental Indicators'"
+      );
+      PREPARE statement FROM @sql;
+      EXECUTE statement;
+      DEALLOCATE PREPARE statement;
 
       -- metabolomics (baseline only)
       SELECT LAST_INSERT_ID() INTO @data_selection_id;

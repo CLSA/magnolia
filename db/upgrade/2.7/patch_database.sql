@@ -1,7 +1,5 @@
 -- Patch to upgrade database to version 2.7
 
-SET AUTOCOMMIT=0;
-
 SOURCE data_category.sql
 SOURCE data_justification.sql
 SOURCE amendment_justification.sql
@@ -36,5 +34,3 @@ SOURCE application_type_has_report_type.sql
 SOURCE role_has_report_type.sql
 
 SOURCE update_version_number.sql
-
-COMMIT;
