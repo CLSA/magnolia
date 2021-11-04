@@ -426,12 +426,10 @@ cenozo.service( 'CnReqnHelper', [
               en: "Please provide the name of the new primary applicant",
               fr: "Veuillez fournir le nom du nouveau demandeur principal"
             },
-            newUserNoticeTitle: { en: 'Please Note', fr: 'Notez bien' },
             newUserNotice: {
               en: 'Changing the primary applicant, once approved, will remove your access to this application and transfer ownership to the new applicant.\n\nAre you sure you wish to proceed?',
               fr: 'Une fois approuvé, le changement de demandeur principal supprimera votre accès à cette demande et la propriété du compte sera transférée au nouveau demandeur.\n\nÊtes-vous sûr(e) de vouloir continuer?'
             },
-            newUserIsTraineeNoticeTitle: { en: 'Please Note', fr: 'Notez bien' },
             newUserIsTraineeNotice: {
               en: 'The applicant you have selected is a trainee.  Please select a new applicant which does not have a supervisor.',
               fr: 'Le demandeur que vous avez sélectionné est un stagiaire. Veuillez sélectionner un nouveau demandeur qui n’a pas de superviseur.'
@@ -670,7 +668,6 @@ cenozo.service( 'CnReqnHelper', [
                 en: 'Participants providing data through an In-home interview and during a visit to a Data Collection Site. Physical assessment, medications and biomarker data are available for this cohort only. For further information on what data are available for the Tracking Cohort, consult the CLSA Data Availability Table on our website.',
                 fr: 'Cohorte globale (entrevue à domicile et visite à un Site de collecte de données) : Les participants de cette cohorte fournissent des données via une entrevue à domicile et une visite à un Site de collecte de données. Les tests physiques, les médicaments et les données sur les biomarqueurs sont disponibles pour cette cohorte uniquement. Pour plus d’informations sur les données disponibles pour la cohorte globale, consultez le tableau de disponibilité des données de l’ÉLCV sur notre site Web.'
               },
-              bothCohortNoticeTitle: { en: 'Please Note', fr: 'Notez bien' },
               bothCohortNotice: {
                 en: 'Please be sure to fully explain in "Part 1 - Description" section of your application, how you will use the data from both the Tracking and Comprehensive cohorts in your analyses, accounting for the differences in the data available for each cohort. For further information on what data are available for the Tracking and Comprehensive Cohort, consult the CLSA Data Availability Table on our website.',
                 fr: 'À la « Partie 1 - Description » de votre demande d’accès, assurez-vous de bien expliquer comment les données des cohortes globale et de surveillance seront utilisées dans vos analyses, en tenant compte des différences entre les données disponibles pour chaque cohorte. Pour plus d’informations sur les données disponibles pour la cohorte de surveillance et la cohorte globale, consultez le tableau de disponibilité des données de l’ÉLCV sur notre site Web.'
@@ -707,7 +704,8 @@ cenozo.service( 'CnReqnHelper', [
             prevButton: { en: 'Return to the previous section', fr: 'Retourner à la section précédente' },
             nextButton: { en: 'Proceed to the next section', fr: 'Passez à la section suivante' },
             pleaseConfirm: { en: 'Please confirm', fr: 'Veuillez confirmer' },
-            totalCost: { en: 'Total fee', fr: 'TODO: TRANSLATE' },
+            pleaseNote: { en: 'Please Note', fr: 'Notez bien' },
+            totalCost: { en: 'Total fees', fr: 'Total des frais' },
             remove: { en: 'Remove', fr: 'Supprimer' },
             chars: { en: 'characters', fr: 'caractères' },
             comments: { en: 'Comments', fr: 'Commentaires' },
@@ -883,6 +881,10 @@ cenozo.service( 'CnReqnHelper', [
             clickToSelect: {
               en: '(click to select)',
               fr: '(cliquez pour sélectionner)'
+            },
+            dataExpired: {
+              en: 'TODO',
+              fr: 'TODO'
             }
           }
         },

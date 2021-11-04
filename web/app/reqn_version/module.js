@@ -95,6 +95,7 @@ cenozoApp.defineModule( { name: 'reqn_version',
     show_prices: { column: 'reqn.show_prices', type: 'string' },
     state: { column: 'reqn.state', type: 'string' },
     data_directory: { column: 'reqn.data_directory', type: 'string' },
+    data_expiry_date: { column: 'reqn.data_expiry_date', type: 'date' },
     status: { column: 'stage_type.status', type: 'string' },
     has_unread_notice: { type: 'boolean' },
     has_ethics_approval_list: { type: 'boolean' },
@@ -603,7 +604,7 @@ cenozoApp.defineModule( { name: 'reqn_version',
 
                 if( angular.isObject( response.data ) && null != response.data.supervisor_user_id ) {
                   await CnModalMessageFactory.instance( {
-                    title: this.translate( 'amendment.newUserIsTraineeNoticeTitle' ),
+                    title: this.translate( 'misc.pleaseNote' ),
                     message: this.translate( 'amendment.newUserIsTraineeNotice' ),
                     closeText: this.translate( 'misc.close' ),
                     error: true
@@ -626,7 +627,7 @@ cenozoApp.defineModule( { name: 'reqn_version',
                   if( this.record.comprehensive && this.record.tracking ) {
                     // show the cohort warning to the applicant
                     CnModalMessageFactory.instance( {
-                      title: this.translate( 'part2.cohort.bothCohortNoticeTitle' ),
+                      title: this.translate( 'misc.pleaseNote' ),
                       message: this.translate( 'part2.cohort.bothCohortNotice' ),
                       closeText: this.translate( 'misc.close' ),
                     } ).show();
@@ -1220,7 +1221,7 @@ cenozoApp.defineModule( { name: 'reqn_version',
 
                 // show a warning if changing primary applicants
                 var response = await CnModalConfirmFactory.instance( {
-                  title: this.translate( 'amendment.newUserNoticeTitle'),
+                  title: this.translate( 'misc.pleaseNote'),
                   noText: this.translate( 'misc.no' ),
                   yesText: this.translate( 'misc.yes' ),
                   message: this.translate( 'amendment.newUserNotice' )
@@ -1515,7 +1516,18 @@ cenozoApp.defineModule( { name: 'reqn_version',
           },
 
           viewData: function() {
-            $window.open( CnSession.application.studyDataUrl + '/' + this.record.data_directory, 'studyData' + this.record.reqn_id );
+            if( null == this.record.data_expiry_date ) {
+              CnModalMessageFactory.instance( {
+                title: this.translate( 'misc.pleaseNote' ),
+                message: this.translate( 'misc.dataExpired' ),
+                closeText: this.translate( 'misc.close' ),
+              } ).show();
+            } else {
+              $window.open(
+                CnSession.application.studyDataUrl + '/' + this.record.data_directory,
+                'studyData' + this.record.reqn_id
+              );
+            }
           },
 
           canViewData: function() {
