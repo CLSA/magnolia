@@ -883,8 +883,8 @@ cenozo.service( 'CnReqnHelper', [
               fr: '(cliquez pour sélectionner)'
             },
             dataExpired: {
-              en: 'TODO',
-              fr: 'TODO'
+              en: 'The data for this requisition is no longer available. Please send a request to <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a> in order to re-activate the download link.',
+              fr: 'Les données de cette demande ne sont plus disponibles. Veuillez envoyer une demande à <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a> afin de réactiver le lien de téléchargement.'
             }
           }
         },

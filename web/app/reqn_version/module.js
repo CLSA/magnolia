@@ -1521,6 +1521,7 @@ cenozoApp.defineModule( { name: 'reqn_version',
                 title: this.translate( 'misc.pleaseNote' ),
                 message: this.translate( 'misc.dataExpired' ),
                 closeText: this.translate( 'misc.close' ),
+                html: true
               } ).show();
             } else {
               $window.open(
