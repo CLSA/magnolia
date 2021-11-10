@@ -294,7 +294,7 @@ class reqn_version extends \cenozo\database\record
     $select->add_column( '0 < COUNT(*)', 'has_linked_data', false );
     $modifier = lib::create( 'database\modifier' );
     $modifier->join( 'reqn_version_has_data_selection', 'reqn_version.id', 'reqn_version_has_data_selection.reqn_version_id' );
-    $modifier->join( 'data_selection', 'reqn_version_has_data_selection.data_selection_id', 'data_select.id' );
+    $modifier->join( 'data_selection', 'reqn_version_has_data_selection.data_selection_id', 'data_selection.id' );
     $modifier->join( 'data_option', 'data_selection.data_option_id', 'data_option.id' );
     $modifier->join( 'data_category', 'data_option.data_category_id', 'data_category.id' );
     $modifier->where( 'reqn_version.id', '=', $this->id );
