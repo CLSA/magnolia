@@ -17,7 +17,7 @@ CREATE PROCEDURE patch_data_category()
       SELECT "Creating new Core CLSA Data data_category" AS "";
 
       SELECT id INTO @data_category_id FROM data_category WHERE name_en = "Questionnaires";
-      UPDATE data_category SET name_en = "Core CLSA Data" WHERE id = @data_category_id;
+      UPDATE data_category SET name_en = "Core CLSA Data", name_fr = "Données de base de l'ÉLCV" WHERE id = @data_category_id;
 
       -- move the existing data-options ranks out of the way
       UPDATE data_option SET rank = rank + 100 WHERE data_category_id = @data_category_id;
@@ -75,6 +75,65 @@ CREATE PROCEDURE patch_data_category()
       ( @data_selection2_id, 7, "Labour Force", "Population active", NULL, NULL ),
       ( @data_selection1_id, 8, "Social Health", "Santé sociale", NULL, NULL ),
       ( @data_selection2_id, 8, "Social Health", "Santé sociale", NULL, NULL );
+
+      -- physical assessment
+      SELECT data_selection.id INTO @data_selection1_id
+      FROM data_selection
+      JOIN data_option ON data_selection.data_option_id = data_option.id
+      WHERE data_option.name_en = "Physical Assessment"
+      AND data_selection.study_phase_id = @study_phase1_id;
+
+      SELECT data_selection.id INTO @data_selection2_id
+      FROM data_selection
+      JOIN data_option ON data_selection.data_option_id = data_option.id
+      WHERE data_option.name_en = "Physical Assessment"
+      AND data_selection.study_phase_id = @study_phase2_id;
+
+      INSERT INTO data_detail( data_selection_id, rank, name_en, name_fr, note_en, note_fr ) VALUES
+      ( @data_selection1_id, 1, "Contraindications Questionnaire","Questionnaire sur les contre-indications",NULL,NULL ),
+      ( @data_selection2_id, 1, "Contraindications Questionnaire","Questionnaire sur les contre-indications",NULL,NULL ),
+      ( @data_selection1_id, 2, "Weight and Height","Poids et taille",NULL,NULL ),
+      ( @data_selection2_id, 2, "Weight and Height","Poids et taille",NULL,NULL ),
+      ( @data_selection1_id, 3, "Body Mass Index","Indice de masse corporelle",NULL,NULL ),
+      ( @data_selection2_id, 3, "Body Mass Index","Indice de masse corporelle",NULL,NULL ),
+      ( @data_selection1_id, 4, "Hip and Waist Circumference","Circonférence taille et hanche",NULL,NULL ),
+      ( @data_selection2_id, 4, "Hip and Waist Circumference","Circonférence taille et hanche",NULL,NULL ),
+      ( @data_selection1_id, 5, "4 Metre Walk","Marche sur 4 m",NULL,NULL ),
+      ( @data_selection2_id, 5, "4 Metre Walk","Marche sur 4 m",NULL,NULL ),
+      ( @data_selection1_id, 6, "Timed Get Up and Go","Lever-marcher chronométré",NULL,NULL ),
+      ( @data_selection2_id, 6, "Timed Get Up and Go","Lever-marcher chronométré",NULL,NULL ),
+      ( @data_selection1_id, 7, "Standing Balance","Équilibre debout",NULL,NULL ),
+      ( @data_selection2_id, 7, "Standing Balance","Équilibre debout",NULL,NULL ),
+      ( @data_selection1_id, 8, "Chair Rise: Balance and Coordination","Se lever d’une chaise: équilibre et coordination ",NULL,NULL ),
+      ( @data_selection2_id, 8, "Chair Rise: Balance and Coordination","Se lever d’une chaise: équilibre et coordination ",NULL,NULL ),
+      ( @data_selection1_id, 9, "Grip Strength","Force de préhension ",NULL,NULL ),
+      ( @data_selection2_id, 9, "Grip Strength","Force de préhension ",NULL,NULL ),
+      ( @data_selection1_id, 10, "Life Space Index","Évaluation de l’aire de mobilité",NULL,NULL ),
+      ( @data_selection2_id, 10, "Life Space Index","Évaluation de l’aire de mobilité",NULL,NULL ),
+      ( @data_selection1_id, 11, "Pulse Rate & Blood Pressure","Fréquence du pouls et pression sanguine ",NULL,NULL ),
+      ( @data_selection2_id, 11, "Pulse Rate & Blood Pressure","Fréquence du pouls et pression sanguine ",NULL,NULL ),
+      ( @data_selection1_id, 12, "Body Composition (Whole Body & Body Parts) (DXA; COM)","Composition corporelle (Corps entier et parties du corps) (DXA; COM)","Raw data are available by special request. To request raw data, please go to the Additional Data section.","Les données brutes sont disponibles sur demande spéciale. Pour demander les données brutes, visitez la section Données supplémentaires." ),
+      ( @data_selection2_id, 12, "Body Composition (Whole Body & Body Parts) (DXA; COM) (not yet available)","Composition corporelle (Corps entier et parties du corps) (DXA; COM) (pas encore disponible)","Raw data are available by special request. To request raw data, please go to the Additional Data section.  Bio-Impedance by DEXA.","Les données brutes sont disponibles sur demande spéciale. Pour demander les données brutes, visitez la section Données supplémentaires.  Bio-impédance par DEXA." ),
+      ( @data_selection1_id, 13, "Spirometry","Spirométrie","Spirometry (SPR) flow curves are available by special request. To request SPR flow curves, please go to the Additional Data section.","Il est maintenant possible d’obtenir les courbes de débit de spirométrie (SPR) sur demande spéciale. Pour demander les courbes de débit de SPR, visitez la section Données supplémentaires." ),
+      ( @data_selection2_id, 13, "Spirometry","Spirométrie","Spirometry (SPR) flow curves are available by special request. To request SPR flow curves, please go to the Additional Data section.","Il est maintenant possible d’obtenir les courbes de débit de spirométrie (SPR) sur demande spéciale. Pour demander les courbes de débit de SPR, visitez la section Données supplémentaires." ),
+      ( @data_selection1_id, 14, "Hearing","Audition",NULL,NULL ),
+      ( @data_selection2_id, 14, "Hearing","Audition",NULL,NULL ),
+      ( @data_selection1_id, 15, "Visual Acuity","Acuité visuelle ",NULL,NULL ),
+      ( @data_selection2_id, 15, "Visual Acuity","Acuité visuelle ",NULL,NULL ),
+      ( @data_selection1_id, 16, "Tonometry","Tonométrie","Raw data are available by special request. To request raw data, please go to the Additional Data section.","Les données brutes sont disponibles sur demande spéciale. Pour demander les données brutes, visitez la section Données supplémentaires." ),
+      ( @data_selection2_id, 16, "Tonometry","Tonométrie","Raw data are available by special request. To request raw data, please go to the Additional Data section.","Les données brutes sont disponibles sur demande spéciale. Pour demander les données brutes, visitez la section Données supplémentaires." ),
+      ( @data_selection1_id, 17, "Electrocardiogram","Électrocardiogramme","Electrocardiogram (ECG) tracings are available by special request. To request ECG tracings, please go to the Additional Data section.","Il est maintenant possible d’obtenir les tracés d’électrocardiogramme (ECG) sur demande spéciale. Pour demander les tracés d’ECG , visitez la section Données supplémentaires." ),
+      ( @data_selection2_id, 17, "Electrocardiogram","Électrocardiogramme","Electrocardiogram (ECG) tracings are available by special request. To request ECG tracings, please go to the Additional Data section.","Il est maintenant possible d’obtenir les tracés d’électrocardiogramme (ECG) sur demande spéciale. Pour demander les tracés d’ECG , visitez la section Données supplémentaires." ),
+      ( @data_selection1_id, 18, "Carotid Intima Media Thickness","Épaisseur de l’intima media carotidienne","Images are available by special request. To request images, please go to the Additional Data section. Alphanumeric data for Carotid Intima measures are available only for those images classified as useable.","Il est maintenant possible d’obtenir les données en format image sur demande spéciale. Pour demander des données en format images, visitez la section Données supplémentaires. Les données alphanumériques des mesures de l’intima carotidienne sont uniquement disponibles pour les images classées comme étant utilisables." ),
+      ( @data_selection2_id, 18, "Carotid Intima Media Thickness","Épaisseur de l’intima media carotidienne","Images are available by special request. To request images, please go to the Additional Data section. Alphanumeric data for Carotid Intima measures are available only for those images classified as useable.","Il est maintenant possible d’obtenir les données en format image sur demande spéciale. Pour demander des données en format images, visitez la section Données supplémentaires. Les données alphanumériques des mesures de l’intima carotidienne sont uniquement disponibles pour les images classées comme étant utilisables." ),
+      ( @data_selection1_id, 19, "Bone Density by DEXA - Whole Body","Densité osseuse par DEXA - Corps entier","Images and raw data are available by special request. To request images or raw data, please go to the Additional Data section.  Bone Density by DEXA.","Il est maintenant possible d’obtenir les données en format image et les données brutes sur demande spéciale. Pour demander des données en format images ou les données brutes, visitez la section Données supplémentaires.  Densité osseuse par DEXA." ),
+      ( @data_selection2_id, 19, "Bone Density by DEXA - Whole Body (not yet available)","Densité osseuse par DEXA - Corps entier (pas encore disponible)","Images and raw data are available by special request. To request images or raw data, please go to the Additional Data section.  Bone Density by DEXA.","Il est maintenant possible d’obtenir les données en format image et les données brutes sur demande spéciale. Pour demander des données en format images ou les données brutes, visitez la section Données supplémentaires.  Densité osseuse par DEXA." ),
+      ( @data_selection1_id, 20, "Bone Density by DEXA - Body Parts","Densité osseuse par DEXA - Parties du corps","Images and raw data are available by special request. To request images or raw data, please go to the Additional Data section.  Bone Density by DEXA.","Il est maintenant possible d’obtenir les données en format image et les données brutes sur demande spéciale. Pour demander des données en format images ou les données brutes, visitez la section Données supplémentaires.  Densité osseuse par DEXA." ),
+      ( @data_selection2_id, 20, "Bone Density by DEXA - Body Parts (not yet available)","Parties du corps (pas encore disponible)","Images and raw data are available by special request. To request images or raw data, please go to the Additional Data section.  Bone Density by DEXA.","Il est maintenant possible d’obtenir les données en format image et les données brutes sur demande spéciale. Pour demander des données en format images ou les données brutes, visitez la section Données supplémentaires.  Densité osseuse par DEXA." ),
+      ( @data_selection1_id, 21, "Bone Density by DEXA - Dual hip","Densité osseuse par DEXA - Deux hanches","Images and raw data are available by special request. To request images or raw data, please go to the Additional Data section.  Bone Density by DEXA.","Il est maintenant possible d’obtenir les données en format image et les données brutes sur demande spéciale. Pour demander des données en format images ou les données brutes, visitez la section Données supplémentaires.  Densité osseuse par DEXA." ),
+      ( @data_selection2_id, 21, "Bone Density by DEXA - Dual Hip","Densité osseuse par DEXA - Deux hanches","Images and raw data are available by special request. To request images or raw data, please go to the Additional Data section.  Bone Density by DEXA.","Il est maintenant possible d’obtenir les données en format image et les données brutes sur demande spéciale. Pour demander des données en format images ou les données brutes, visitez la section Données supplémentaires.  Densité osseuse par DEXA." ),
+      ( @data_selection1_id, 22, "Bone density by DEXA - Forearm","Densité osseuse par DEXA - Avant-bras","Images and raw data are available by special request. To request images or raw data, please go to the Additional Data section.  Bone Density by DEXA.","Il est maintenant possible d’obtenir les données en format image et les données brutes sur demande spéciale. Pour demander des données en format images ou les données brutes, visitez la section Données supplémentaires.  Densité osseuse par DEXA." ),
+      ( @data_selection2_id, 22, "Bone Density by DEXA - Forearm","Densité osseuse par DEXA - Avant-bras","Images and raw data are available by special request. To request images or raw data, please go to the Additional Data section.  Bone Density by DEXA.","Il est maintenant possible d’obtenir les données en format image et les données brutes sur demande spéciale. Pour demander des données en format images ou les données brutes, visitez la section Données supplémentaires.  Densité osseuse par DEXA." );
 
       -- blood biomarkers
       SELECT data_selection.id INTO @data_selection1_id
@@ -277,6 +336,7 @@ CREATE PROCEDURE patch_data_category()
 
     UPDATE data_category
     SET name_en = "Images and Raw Data",
+        name_fr = "Images et données brutes",
         note_en = "Images (e.g. DXA, Retinal scan) and raw data (e.g. Spirometry, ECG, Cognition) are available for some modules of the CLSA, as described in the CLSA Data Availability Table on our website. To request these data, please check the corresponding field below, and in the Justification box:<ol><li>provide detailed justification explaining how these data will help to achieve proposed objectives</li><li>describe how they will be analysed</li><li>provide evidence, if available, that you have the experience and resources to work with these types of data (i.e. references of publications)</li></ol>Please note that the request for images and raw data usually incurs additional costs beyond the current data access fee, and these are outlined in the Fees section of our website. Requests for images and raw data may prolong the processing time of your application, and it may take longer to receive these data than the 6 months to receive alphanumeric data. For more information, please contact <a href=\"mailto:access@clsa-elcv.ca\">access@clsa-elcv.ca</a>.",
         note_fr = "Les images (p. ex. DEXA, imagerie rétinienne) et les données brutes (p. ex. spirométrie, ECG, cognition) sont disponibles pour certains modules de l’ÉLCV, comme indiqué dans le Tableau de disponibilité des données de l’ÉLCV publié sur notre site Web. Pour demander ces données, veuillez cocher le champ correspondant ci-dessous. Ensuite, dans la case ‘Justification’ :<ol><li>fournissez une justification détaillée expliquant comment ces données aideront à atteindre les objectifs proposés</li><li>décrivez comment ces données seront analysées</li><li>fournissez la preuve, le cas échéant, que vous disposez de l’expérience et des ressources nécessaires pour utiliser ce type de données (références de publications)</li></ol>Veuillez noter que les demandes d’images et de données brutes entraînent généralement des frais supplémentaires en plus des frais d’accès actuels, ces derniers étant décrits dans la section « Frais » de notre site Web. Les demandes d’images et de données brutes peuvent prolonger le traitement de votre demande d’accès et la réception de ces données peut prendre plus de temps que les six mois prévus pour la réception des données alphanumériques. Pour plus d’information, veuillez nous contacter à l’adresse <a href=\"mailto:access@clsa-elcv.ca\">access@clsa-elcv.ca</a>."
     WHERE name_en = "Additional Data";
