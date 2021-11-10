@@ -1100,14 +1100,15 @@
                                       ( null == selection.unavailable[model.viewModel.record.lang] && 0 < selection.cost.value )">
                             <div class="col-sm-2 vertical-spacer"
                                  ng-bind-html="t( 'misc.studyPhase.' + selection.studyPhaseCode )"></div>
-                            <div class="col-sm-1 vertical-spacer">
+                            <div class="col-sm-2 vertical-spacer" ng-if="selection.cost[model.viewModel.record.lang]">
                               <span uib-tooltip-html="selection.costCombined ? t( 'misc.costCombined' ) : ''"
                                     tooltip-popup-delay="100">
                                 <b class="invert" ng-if="selection.costCombined">ⓘ</b>
                                 {{ selection.cost[model.viewModel.record.lang] }}
                               </span>
                             </div>
-                            <div class="col-sm-9 vertical-spacer">
+                            <div class="vertical-spacer"
+                                 ng-class="selection.cost[model.viewModel.record.lang] ? 'col-sm-8' : 'col-sm-10'">
                               <span ng-repeat="detail in selection.detailList"
                                     uib-tooltip-html="detail.note[model.viewModel.record.lang] | cnNewlines"
                                     tooltip-popup-delay="100">
