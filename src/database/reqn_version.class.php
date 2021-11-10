@@ -377,7 +377,7 @@ class reqn_version extends \cenozo\database\record
     $selection_sel = lib::create( 'database\select' );
     $selection_sel->add_column( 'data_option_id' );
     $selection_sel->add_column( 'cost' );
-    $selection_sel->add_table_column( 'data_option', 'combined_cost' );
+    $selection_sel->add_column( 'cost_combined' );
     $selection_mod = lib::create( 'database\modifier' );
     $selection_mod->join( 'data_option', 'data_selection.data_option_id', 'data_option.id' );
     $selection_mod->join( 'data_category', 'data_option.data_category_id', 'data_category.id' );
@@ -385,27 +385,27 @@ class reqn_version extends \cenozo\database\record
     $selection_mod->order( 'data_category.rank' );
     $selection_mod->order( 'data_option.rank' );
     $current_data_option_id = NULL;
-    $max_combined_cost = 0;
+    $max_cost = 0;
     foreach( $this->get_data_selection_list( $selection_sel, $selection_mod ) as $selection )
     {
       if( $selection['data_option_id'] != $current_data_option_id )
       {
         // store the most expensive selection (if there is one)
-        if( 0 < $max_combined_cost ) $cost += $max_combined_cost;
-        $max_combined_cost = 0;
+        if( 0 < $max_cost ) $cost += $max_cost;
+        $max_cost = 0;
       }
 
-      if( $selection['combined_cost'] )
+      if( $selection['cost_combined'] )
       {
         // track the most expensive selection
-        if( $max_combined_cost < $selection['cost'] ) $max_combined_cost = $selection['cost'];
+        if( $max_cost < $selection['cost'] ) $max_cost = $selection['cost'];
       }
       else $cost += $selection['cost'];
 
       $current_data_option_id = $selection['data_option_id'];
     }
 
-    if( 0 < $max_combined_cost ) $cost += $max_combined_cost;
+    if( 0 < $max_cost ) $cost += $max_cost;
 
     return $cost;
   }

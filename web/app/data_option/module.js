@@ -19,7 +19,6 @@ cenozoApp.defineModule( { name: 'data_option', models: ['list', 'view'], create:
       justification: { title: 'Justification', type: 'boolean' },
       name_en: { title: 'Name' },
       has_condition: { title: 'Has Condition', type: 'boolean' },
-      combined_cost: { title: 'Combined Fee', type: 'boolean' },
       note_en: { title: 'Note', type: 'text', limit: 20 }
     },
     defaultOrder: { column: 'rank', reverse: false }
@@ -41,11 +40,6 @@ cenozoApp.defineModule( { name: 'data_option', models: ['list', 'view'], create:
       title: 'Justification',
       type: 'boolean',
       help: 'Whether the applicant must provide a justification when selecting this data-option.'
-    },
-    combined_cost: {
-      title: 'Combined Fee',
-      type: 'boolean',
-      help: 'Determines whether the fee for selecting multiple study phases is the same as selecting a single phase.'
     },
     name_en: {
       title: 'Name (English)',

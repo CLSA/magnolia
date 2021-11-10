@@ -72,6 +72,18 @@ CREATE PROCEDURE patch_data_selection()
       DROP TABLE data_option_has_study_phase;
     END IF;
 
+    SELECT "Adding new cost_combined column to data_selection table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "data_selection"
+    AND column_name = "cost_combined";
+
+    IF @test = 0 THEN
+      ALTER TABLE data_selection ADD COLUMN cost_combined TINYINT(1) NOT NULL DEFAULT 0 AFTER cost;
+    END IF;
+
   END //
 DELIMITER ;
 

@@ -95,7 +95,8 @@ CREATE PROCEDURE patch_data_option()
 
       UPDATE data_selection
       JOIN data_option ON data_selection.data_option_id = data_option.id
-      SET data_selection.cost = IF( data_option.name_en = "cIMT Cineloops", 3000, 500 )
+      SET data_selection.cost = IF( data_option.name_en = "cIMT Cineloops", 3000, 500 ),
+          data_selection.cost_combined = IF( data_option.name_en = "cIMT Cineloops", 1, 0 )
       WHERE data_option.name_en IN(
         "cIMT Still image", "cIMT Cineloops", "DXA Forearm", "DXA Hip", "DXA Whole Body", "DXA IVA Lateral Spine",
         "ECG RAW+", "ECG Images", "Retinal Scan (Image)", "Spirometry RAW+", "Spirometry Images" 
@@ -266,8 +267,6 @@ CREATE PROCEDURE patch_data_option()
       PREPARE statement FROM @sql;
       EXECUTE statement;
       DEALLOCATE PREPARE statement;
-
-      UPDATE data_option SET combined_cost = 1 WHERE name_en = "cIMT Cineloops";
 
       -- fill in which reqn versions have selected the new data options
       CREATE TEMPORARY TABLE new_reqn_version_has_data_selection

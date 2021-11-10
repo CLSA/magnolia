@@ -740,9 +740,9 @@ cenozo.service( 'CnReqnHelper', [
               en: 'This application\'s final report is required, would you like to view it now?',
               fr: 'Il faut fournir un rapport final pour cette demande, souhaitez-vous l’afficher maintenant?'
             },
-            combinedCost: {
-              en: 'Fee payable for any/all study-phases when requested at the same time.',
-              fr: 'Frais à payer pour toutes les phases d’étude lorsqu’elles sont demandées en même temps.'
+            costCombined: {
+              en: 'A combined fee will be applied for these study-phases when requested at the same time.',
+              fr: 'Des frais combinés sont exigés pour ces phases d’étude lorsqu’elles sont demandées en même temps.'
             },
             amend: { en: 'Create Amendment', fr: 'Effectuer une modification' },
             amendWarning: {

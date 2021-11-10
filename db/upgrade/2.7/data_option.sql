@@ -32,18 +32,6 @@ CREATE PROCEDURE patch_data_option()
           ON UPDATE NO ACTION;
     END IF;
   
-    SELECT "Adding new combined_cost column to data_option table" AS "";
-
-    SELECT COUNT(*) INTO @test
-    FROM information_schema.COLUMNS
-    WHERE table_schema = DATABASE()
-    AND table_name = "data_option"
-    AND column_name = "combined_cost";
-
-    IF @test = 0 THEN
-      ALTER TABLE data_option ADD COLUMN combined_cost TINYINT(1) NOT NULL DEFAULT 0 AFTER justification;
-    END IF;
-
   END //
 DELIMITER ;
 

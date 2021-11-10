@@ -1101,9 +1101,9 @@
                             <div class="col-sm-2 vertical-spacer"
                                  ng-bind-html="t( 'misc.studyPhase.' + selection.studyPhaseCode )"></div>
                             <div class="col-sm-1 vertical-spacer">
-                              <span uib-tooltip-html="option.combinedCost ? t( 'misc.combinedCost' ) : ''"
+                              <span uib-tooltip-html="selection.costCombined ? t( 'misc.costCombined' ) : ''"
                                     tooltip-popup-delay="100">
-                                <b class="invert" ng-if="option.combinedCost">ⓘ</b>
+                                <b class="invert" ng-if="selection.costCombined">ⓘ</b>
                                 {{ selection.cost[model.viewModel.record.lang] }}
                               </span>
                             </div>

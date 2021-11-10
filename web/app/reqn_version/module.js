@@ -778,12 +778,12 @@ cenozoApp.defineModule( { name: 'reqn_version',
 
             this.parentModel.categoryList.forEach(
               category => category.optionList.forEach( option => {
-                var maxCombinedCost = 0;
+                var maxCost = 0;
                 option.selectionList.filter( selection => 0 < selection.cost.value ).forEach( selection => {
                   if( angular.isArray( this.record.selectionList ) && this.record.selectionList[selection.id] ) {
-                    if( option.combinedCost ) {
+                    if( selection.costCombined ) {
                       // track the most expensive selection
-                      if( selection.cost.value > maxCombinedCost ) maxCombinedCost = selection.cost.value;
+                      if( selection.cost.value > maxCost ) maxCost = selection.cost.value;
                     } else {
                       // add the selection's cost
                       cost += selection.cost.value;
@@ -791,8 +791,8 @@ cenozoApp.defineModule( { name: 'reqn_version',
                   }
                 } );
 
-                // when combining cost only add the most expensive cost
-                if( option.combinedCost ) cost += maxCombinedCost;
+                // when there is a combined cost then maxCost will be > 0, otherwise it is 0
+                cost += maxCost;
               } )
             );
 
@@ -2155,7 +2155,6 @@ cenozoApp.defineModule( { name: 'reqn_version',
                       'id',
                       'data_category_id',
                       'justification',
-                      'combined_cost',
                       'name_en', 'name_fr',
                       'condition_en', 'condition_fr',
                       'note_en', 'note_fr'
@@ -2174,6 +2173,7 @@ cenozoApp.defineModule( { name: 'reqn_version',
                       'id',
                       'data_option_id',
                       'cost',
+                      'cost_combined',
                       'unavailable_en', 'unavailable_fr',
                       { table: 'study_phase', column: 'code', alias: 'study_phase_code' },
                       { table: 'data_category', column: 'id', alias: 'data_category_id' }
@@ -2382,7 +2382,6 @@ cenozoApp.defineModule( { name: 'reqn_version',
                 angular.extend( option, {
                   name: { en: option.name_en, fr: option.name_fr },
                   note: { en: option.note_en, fr: option.note_fr },
-                  combinedCost: option.combined_cost,
                   selectionList: []
                 } );
 
@@ -2390,7 +2389,6 @@ cenozoApp.defineModule( { name: 'reqn_version',
 
                 // remove stuff we no longer need
                 delete option.data_category_id;
-                delete option.combined_cost;
                 delete option.name_en;
                 delete option.name_fr;
                 delete option.note_en;
@@ -2417,7 +2415,8 @@ cenozoApp.defineModule( { name: 'reqn_version',
                     value: selection.cost,
                     en: 0 < selection.cost ? '$' + selection.cost : '',
                     fr: 0 < selection.cost ? selection.cost + ' $' : ''
-                  }
+                  },
+                  costCombined: selection.cost_combined
                 } );
 
                 option.selectionList.push( selection );
@@ -2426,6 +2425,7 @@ cenozoApp.defineModule( { name: 'reqn_version',
                 delete selection.study_phase_code;
                 delete selection.data_category_id;
                 delete selection.data_option_id;
+                delete option.cost_combined;
                 delete selection.unavailable_en;
                 delete selection.unavailable_fr;
               } );

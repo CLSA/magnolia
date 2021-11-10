@@ -18,6 +18,7 @@ cenozoApp.defineModule( { name: 'data_selection', models: ['add', 'list', 'view'
       study: { column: 'study.name', title: 'Study' },
       study_phase: { column: 'study_phase.name', title: 'Phase' },
       cost: { title: 'Fee', type: 'currency:$:0' },
+      cost_combined: { title: 'Fee Combined', type: 'boolean' },
       is_unavailable: { title: 'Unavailable', type: 'boolean' }
     },
     defaultOrder: { column: 'study_phase_id', reverse: false }
@@ -39,6 +40,11 @@ cenozoApp.defineModule( { name: 'data_selection', models: ['add', 'list', 'view'
       title: 'Fee ($)',
       type: 'string',
       format: 'integer'
+    },
+    cost_combined: {
+      title: 'Fee Combined',
+      type: 'boolean',
+      help: 'Determines whether the fee for this selection is combined with others from the same option.'
     },
     unavailable_en: {
       title: 'Unavailable Text (English)',
