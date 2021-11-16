@@ -34,6 +34,7 @@ cenozoApp.defineModule( { name: 'review', models: ['list', 'view'], create: modu
         title: 'Recommendation'
       },
       note: {
+        column: 'review.note',
         title: 'Note',
         align: 'left',
         isIncluded: function( $state, model ) { return 'root.home' != $state.current.name; }
