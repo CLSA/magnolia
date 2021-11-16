@@ -36,6 +36,7 @@ define( function() {
         title: 'Recommendation'
       },
       note: {
+        column: 'review.note',
         title: 'Note',
         align: 'left',
         isIncluded: function( $state, model ) { return 'root.home' != $state.current.name; }
