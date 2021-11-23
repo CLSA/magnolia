@@ -77,7 +77,8 @@ class notification extends \cenozo\database\record
     $setting_manager = lib::create( 'business\setting_manager' );
     $mail_manager = lib::create( 'business\mail_manager' );
 
-    $language = $this->get_reqn()->get_language()->code;
+    $db_reqn = $this->get_reqn();
+    $language = $db_reqn->get_language()->code;
     $db_notification_type = $this->get_notification_type();
 
     $select = lib::create( 'database\select' );
@@ -103,7 +104,7 @@ class notification extends \cenozo\database\record
       else $mail_manager->set_cc( $email['email'] );
     }
 
-    $this->sent = $setting_manager->get_setting( 'mail', 'enabled' ) && $mail_manager->send();
+    $this->sent = $setting_manager->get_setting( 'mail', 'enabled' ) && !$db_reqn->disable_notification && $mail_manager->send();
     $this->save();
   }
 

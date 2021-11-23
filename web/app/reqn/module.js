@@ -145,6 +145,11 @@ cenozoApp.defineModule( { name: 'reqn', dependencies: [ 'output' ], models: ['ad
       },
       isExcluded: function( $state, model ) { return !model.isRole( 'administrator', 'communication', 'readonly', 'typist' ); }
     },
+    disable_notification: {
+      title: 'Disable Notifications',
+      type: 'boolean',
+      isConstant: function( $state, model ) { return !model.isRole( 'administrator', 'typist' ); }
+    },
     deadline_id: {
       title: 'Deadline',
       type: 'enum',

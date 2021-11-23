@@ -35,6 +35,19 @@ CREATE PROCEDURE patch_reqn()
       DEALLOCATE PREPARE statement;
     END IF;
 
+    SELECT "Adding disable_notification column to reqn table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "disable_notification";
+
+    IF @test = 0 THEN
+      ALTER TABLE reqn ADD COLUMN disable_notification TINYINT(1) NOT NULL DEFAULT 0 AFTER reqn_type_id;
+      UPDATE reqn SET disable_notification = true WHERE legacy = true;
+    END IF;
+
     SELECT "Adding show_prices column to reqn table" AS "";
 
     SELECT COUNT(*) INTO @test
