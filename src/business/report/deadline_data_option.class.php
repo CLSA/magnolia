@@ -27,6 +27,9 @@ class deadline_data_option extends \cenozo\business\report\base_report
     $select = lib::create( 'database\select' );
     $select->from( 'reqn' );
     $select->add_column( 'identifier' );
+    $select->add_table_column( 'reqn_version', 'last_identifier' );
+    $select->add_table_column( 'reqn_version', 'comprehensive' );
+    $select->add_table_column( 'reqn_version', 'tracking' );
     $select->add_table_column( 'data_option', 'name_en' );
     $select->add_table_column( 'reqn_version_has_data_selection', 'reqn_version_id IS NOT NULL', 'selected' );
     $select->add_table_column( 'study', 'name', 'study' );
@@ -76,7 +79,7 @@ class deadline_data_option extends \cenozo\business\report\base_report
 
     $this->apply_restrictions( $modifier );
 
-    $header = array( 'Identifier' );
+    $header = array( 'Identifier', 'Related Identifier', 'Comprehensive', 'Tracking' );
     $contents = array();
     $row = NULL;
     $first_identifier = NULL;
@@ -99,7 +102,13 @@ class deadline_data_option extends \cenozo\business\report\base_report
         if( $first_identifier ) $header[] = sprintf( '%s (%s %s)', $data['name_en'], $data['study'], $data['code'] );
 
         // now start a new row with the identifier and first data-selection's selected value
-        $row = array( $data['identifier'], $data['selected'] ? 'yes' : 'no' );
+        $row = array(
+          $data['identifier'],
+          $data['last_identifier'],
+          $data['comprehensive'] ? 'yes' : 'no',
+          $data['tracking'] ? 'yes' : 'no',
+          $data['selected'] ? 'yes' : 'no'
+        );
 
         $working_identifier = $data['identifier'];
       }
