@@ -1,7 +1,5 @@
-define( function() {
-  'use strict';
+cenozoApp.defineModule( { name: 'applicant', models: ['add', 'list'], create: module => {
 
-  try { var module = cenozoApp.module( 'applicant', true ); } catch( err ) { console.warn( err ); return; }
   angular.extend( module, {
     identifier: {},
     name: {
@@ -52,75 +50,4 @@ define( function() {
     }
   } );
 
-  /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnApplicantAdd', [
-    'CnApplicantModelFactory',
-    function( CnApplicantModelFactory ) {
-      return {
-        templateUrl: module.getFileUrl( 'add.tpl.html' ),
-        restrict: 'E',
-        scope: { model: '=?' },
-        controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnApplicantModelFactory.root;
-        }
-      };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnApplicantList', [
-    'CnApplicantModelFactory',
-    function( CnApplicantModelFactory ) {
-      return {
-        templateUrl: module.getFileUrl( 'list.tpl.html' ),
-        restrict: 'E',
-        scope: { model: '=?' },
-        controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnApplicantModelFactory.root;
-        }
-      };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnApplicantAddFactory', [
-    'CnBaseAddFactory',
-    function( CnBaseAddFactory ) {
-      var object = function( parentModel ) { CnBaseAddFactory.construct( this, parentModel ); };
-      return { instance: function( parentModel ) { return new object( parentModel ); } };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnApplicantListFactory', [
-    'CnBaseListFactory', '$state',
-    function( CnBaseListFactory, $state ) {
-      var object = function( parentModel ) {
-        CnBaseListFactory.construct( this, parentModel );
-        this.onSelect = async function( record ) {
-          await $state.go( 'user.view', { identifier: 'name=' + record.user_name } );
-        };
-      };
-      return { instance: function( parentModel ) { return new object( parentModel ); } };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnApplicantModelFactory', [
-    'CnBaseModelFactory', 'CnApplicantAddFactory', 'CnApplicantListFactory',
-    function( CnBaseModelFactory, CnApplicantAddFactory, CnApplicantListFactory ) {
-      var object = function( root ) {
-        CnBaseModelFactory.construct( this, module );
-        this.addModel = CnApplicantAddFactory.instance( this );
-        this.listModel = CnApplicantListFactory.instance( this );
-        this.getViewEnabled = function() { return true; };
-      };
-
-      return {
-        root: new object( true ),
-        instance: function() { return new object( false ); }
-      };
-    }
-  ] );
-
-} );
+} } );

@@ -22,6 +22,6 @@ class module extends \cenozo\service\module
     parent::prepare_read( $select, $modifier );
 
     $modifier->join( 'reqn_version', 'reqn_version_comment.reqn_version_id', 'reqn_version.id' );
-    $modifier->join( 'data_option_category', 'reqn_version_comment.data_option_category_id', 'data_option_category.id' );
+    $modifier->join( 'data_category', 'reqn_version_comment.data_category_id', 'data_category.id' );
   }
 }

@@ -1,8 +1,4 @@
-// extend the framework's module
-define( [ 'reqn', 'review', 'root' ].reduce( function( list, name ) {
-  return list.concat( cenozoApp.module( name ).getRequiredFiles() );
-}, [] ), function() {
-  'use strict';
+cenozoApp.extendModule( { name: 'root', dependencies: ['reqn', 'review'], create: module => {
 
   var reqnModule = cenozoApp.module( 'reqn' );
   var reviewModule = cenozoApp.module( 'review' );
@@ -77,4 +73,4 @@ define( [ 'reqn', 'review', 'root' ].reduce( function( list, name ) {
     }
   ] );
 
-} );
+} } );

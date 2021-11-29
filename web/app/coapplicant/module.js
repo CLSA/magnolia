@@ -1,7 +1,5 @@
-define( function() {
-  'use strict';
+cenozoApp.defineModule( { name: 'coapplicant', models: 'add', create: module => {
 
-  try { var module = cenozoApp.module( 'coapplicant', true ); } catch( err ) { console.warn( err ); return; }
   angular.extend( module, {
     identifier: {
       parent: {
@@ -25,27 +23,4 @@ define( function() {
     access: { title: 'Access', type: 'boolean', type: 'boolean' }
   } );
 
-  /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnCoapplicantAddFactory', [
-    'CnBaseAddFactory',
-    function( CnBaseAddFactory ) {
-      var object = function( parentModel ) { CnBaseAddFactory.construct( this, parentModel ); };
-      return { instance: function( parentModel ) { return new object( parentModel ); } };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnCoapplicantModelFactory', [
-    'CnBaseModelFactory', 'CnCoapplicantAddFactory',
-    function( CnBaseModelFactory, CnCoapplicantAddFactory ) {
-      var object = function( root ) {
-        var self = this;
-        CnBaseModelFactory.construct( this, module );
-        this.addModel = CnCoapplicantAddFactory.instance( this );
-      };
-
-      return { instance: function() { return new object( false ); } };
-    }
-  ] );
-
-} );
+} } );

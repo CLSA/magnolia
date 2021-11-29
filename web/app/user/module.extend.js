@@ -1,8 +1,4 @@
-// extend the framework's module
-define( [ cenozoApp.module( 'user' ).getFileUrl( 'module.js' ) ], function() {
-  'use strict';
-
-  var module = cenozoApp.module( 'user' );
+cenozoApp.extendModule( { name: 'user', create: module => {
 
   // we don't need the site column since this is a one-site application
   delete module.columnList.sites;
@@ -60,4 +56,4 @@ define( [ cenozoApp.module( 'user' ).getFileUrl( 'module.js' ) ], function() {
     }
   ] );
 
-} );
+} } );

@@ -1,7 +1,5 @@
-define( function() {
-  'use strict';
+cenozoApp.defineModule( { name: 'notification_type', models: ['list', 'view'], create: module => {
 
-  try { var module = cenozoApp.module( 'notification_type', true ); } catch( err ) { console.warn( err ); return; }
   angular.extend( module, {
     identifier: { column: 'name' },
     name: {
@@ -53,78 +51,21 @@ define( function() {
   } );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnNotificationTypeList', [
-    'CnNotificationTypeModelFactory',
-    function( CnNotificationTypeModelFactory ) {
-      return {
-        templateUrl: module.getFileUrl( 'list.tpl.html' ),
-        restrict: 'E',
-        scope: { model: '=?' },
-        controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnNotificationTypeModelFactory.root;
-        }
-      };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnNotificationTypeView', [
-    'CnNotificationTypeModelFactory',
-    function( CnNotificationTypeModelFactory ) {
-      return {
-        templateUrl: module.getFileUrl( 'view.tpl.html' ),
-        restrict: 'E',
-        scope: { model: '=?' },
-        controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnNotificationTypeModelFactory.root;
-        }
-      };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnNotificationTypeListFactory', [
-    'CnBaseListFactory',
-    function( CnBaseListFactory ) {
-      var object = function( parentModel ) { CnBaseListFactory.construct( this, parentModel ); };
-      return { instance: function( parentModel ) { return new object( parentModel ); } };
-    }
-  ] );
-
-  /* ######################################################################################################## */
   cenozo.providers.factory( 'CnNotificationTypeViewFactory', [
     'CnBaseViewFactory',
     function( CnBaseViewFactory ) {
       var object = function( parentModel, root ) {
         CnBaseViewFactory.construct( this, parentModel, root, 'notification' );
 
-        var self = this;
-        async function init() {
-          await self.deferred.promise;
-          if( angular.isDefined( self.stageTypeModel ) ) self.stageTypeModel.listModel.heading = 'Notified Stage Type List';
+        async function init( object ) {
+          await object.deferred.promise;
+          if( angular.isDefined( object.stageTypeModel ) ) object.stageTypeModel.listModel.heading = 'Notified Stage Type List';
         }
 
-        init();
+        init( this );
       }
       return { instance: function( parentModel, root ) { return new object( parentModel, root ); } };
     }
   ] );
 
-  /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnNotificationTypeModelFactory', [
-    'CnBaseModelFactory', 'CnNotificationTypeListFactory', 'CnNotificationTypeViewFactory',
-    function( CnBaseModelFactory, CnNotificationTypeListFactory, CnNotificationTypeViewFactory ) {
-      var object = function( root ) {
-        CnBaseModelFactory.construct( this, module );
-        this.listModel = CnNotificationTypeListFactory.instance( this );
-        this.viewModel = CnNotificationTypeViewFactory.instance( this, root );
-      };
-
-      return {
-        root: new object( true ),
-        instance: function() { return new object( false ); }
-      };
-    }
-  ] );
-
-} );
+} } );

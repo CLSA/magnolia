@@ -48,6 +48,21 @@ CREATE PROCEDURE patch_reqn()
       UPDATE reqn SET disable_notification = true WHERE legacy = true;
     END IF;
 
+    SELECT "Adding show_prices column to reqn table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "show_prices";
+
+    IF @test = 0 THEN
+      ALTER TABLE reqn ADD COLUMN show_prices TINYINT(1) NOT NULL DEFAULT 1 AFTER legacy;
+
+      -- start with all reqns not showing prices
+      UPDATE reqn SET show_prices = 0;
+    END IF;
+
   END //
 DELIMITER ;
 

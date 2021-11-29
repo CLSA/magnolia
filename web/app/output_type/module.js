@@ -1,7 +1,5 @@
-define( function() {
-  'use strict';
+cenozoApp.defineModule( { name: 'output_type', models: ['add', 'list', 'view'], create: module => {
 
-  try { var module = cenozoApp.module( 'output_type', true ); } catch( err ) { console.warn( err ); return; }
   angular.extend( module, {
     identifier: { column: 'name_en' },
     name: {
@@ -47,69 +45,6 @@ define( function() {
   } );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnOutputTypeAdd', [
-    'CnOutputTypeModelFactory',
-    function( CnOutputTypeModelFactory ) {
-      return {
-        templateUrl: module.getFileUrl( 'add.tpl.html' ),
-        restrict: 'E',
-        scope: { model: '=?' },
-        controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnOutputTypeModelFactory.root;
-        }
-      };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnOutputTypeList', [
-    'CnOutputTypeModelFactory',
-    function( CnOutputTypeModelFactory ) {
-      return {
-        templateUrl: module.getFileUrl( 'list.tpl.html' ),
-        restrict: 'E',
-        scope: { model: '=?' },
-        controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnOutputTypeModelFactory.root;
-        }
-      };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnOutputTypeView', [
-    'CnOutputTypeModelFactory',
-    function( CnOutputTypeModelFactory ) {
-      return {
-        templateUrl: module.getFileUrl( 'view.tpl.html' ),
-        restrict: 'E',
-        scope: { model: '=?' },
-        controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnOutputTypeModelFactory.root;
-        }
-      };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnOutputTypeAddFactory', [
-    'CnBaseAddFactory',
-    function( CnBaseAddFactory ) {
-      var object = function( parentModel ) { CnBaseAddFactory.construct( this, parentModel ); };
-      return { instance: function( parentModel ) { return new object( parentModel ); } };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnOutputTypeListFactory', [
-    'CnBaseListFactory',
-    function( CnBaseListFactory ) {
-      var object = function( parentModel ) { CnBaseListFactory.construct( this, parentModel ); };
-      return { instance: function( parentModel ) { return new object( parentModel ); } };
-    }
-  ] );
-
-  /* ######################################################################################################## */
   cenozo.providers.factory( 'CnOutputTypeViewFactory', [
     'CnBaseViewFactory', 'CnReqnHelper',
     function( CnBaseViewFactory, CnReqnHelper ) {
@@ -137,22 +72,4 @@ define( function() {
     }
   ] );
 
-  /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnOutputTypeModelFactory', [
-    'CnBaseModelFactory', 'CnOutputTypeAddFactory', 'CnOutputTypeListFactory', 'CnOutputTypeViewFactory',
-    function( CnBaseModelFactory, CnOutputTypeAddFactory, CnOutputTypeListFactory, CnOutputTypeViewFactory ) {
-      var object = function( root ) {
-        CnBaseModelFactory.construct( this, module );
-        this.addModel = CnOutputTypeAddFactory.instance( this );
-        this.listModel = CnOutputTypeListFactory.instance( this );
-        this.viewModel = CnOutputTypeViewFactory.instance( this, root );
-      };
-
-      return {
-        root: new object( true ),
-        instance: function() { return new object( false ); }
-      };
-    }
-  ] );
-
-} );
+} } );

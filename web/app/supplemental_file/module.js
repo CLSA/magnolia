@@ -1,7 +1,5 @@
-define( function() {
-  'use strict';
+cenozoApp.defineModule( { name: 'supplemental_file', models: ['add', 'list', 'view'], create: module => {
 
-  try { var module = cenozoApp.module( 'supplemental_file', true ); } catch( err ) { console.warn( err ); return; }
   angular.extend( module, {
     identifier: {},
     name: {
@@ -37,69 +35,6 @@ define( function() {
   } );
 
   /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnSupplementalFileAdd', [
-    'CnSupplementalFileModelFactory',
-    function( CnSupplementalFileModelFactory ) {
-      return {
-        templateUrl: module.getFileUrl( 'add.tpl.html' ),
-        restrict: 'E',
-        scope: { model: '=?' },
-        controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnSupplementalFileModelFactory.root;
-        }
-      };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnSupplementalFileList', [
-    'CnSupplementalFileModelFactory',
-    function( CnSupplementalFileModelFactory ) {
-      return {
-        templateUrl: module.getFileUrl( 'list.tpl.html' ),
-        restrict: 'E',
-        scope: { model: '=?' },
-        controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnSupplementalFileModelFactory.root;
-        }
-      };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnSupplementalFileView', [
-    'CnSupplementalFileModelFactory',
-    function( CnSupplementalFileModelFactory ) {
-      return {
-        templateUrl: module.getFileUrl( 'view.tpl.html' ),
-        restrict: 'E',
-        scope: { model: '=?' },
-        controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnSupplementalFileModelFactory.root;
-        }
-      };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnSupplementalFileAddFactory', [
-    'CnBaseAddFactory',
-    function( CnBaseAddFactory ) {
-      var object = function( parentModel ) { CnBaseAddFactory.construct( this, parentModel ); };
-      return { instance: function( parentModel ) { return new object( parentModel ); } };
-    }
-  ] );
-
-  /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnSupplementalFileListFactory', [
-    'CnBaseListFactory',
-    function( CnBaseListFactory ) {
-      var object = function( parentModel ) { CnBaseListFactory.construct( this, parentModel ); };
-      return { instance: function( parentModel ) { return new object( parentModel ); } };
-    }
-  ] );
-
-  /* ######################################################################################################## */
   cenozo.providers.factory( 'CnSupplementalFileViewFactory', [
     'CnBaseViewFactory',
     function( CnBaseViewFactory ) {
@@ -112,23 +47,4 @@ define( function() {
     }
   ] );
 
-  /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnSupplementalFileModelFactory', [
-    'CnBaseModelFactory', 'CnSupplementalFileAddFactory', 'CnSupplementalFileListFactory', 'CnSupplementalFileViewFactory',
-    function( CnBaseModelFactory, CnSupplementalFileAddFactory, CnSupplementalFileListFactory, CnSupplementalFileViewFactory ) {
-      var object = function( root ) {
-        var self = this;
-        CnBaseModelFactory.construct( this, module );
-        this.addModel = CnSupplementalFileAddFactory.instance( this );
-        this.listModel = CnSupplementalFileListFactory.instance( this );
-        this.viewModel = CnSupplementalFileViewFactory.instance( this, root );
-      };
-
-      return {
-        root: new object( true ),
-        instance: function() { return new object( false ); }
-      };
-    }
-  ] );
-
-} );
+} } );

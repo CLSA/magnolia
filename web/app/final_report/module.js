@@ -1,9 +1,4 @@
-define( [ 'output' ].reduce( function( list, name ) {
-  return list.concat( cenozoApp.module( name ).getRequiredFiles() );
-}, [] ), function() {
-  'use strict';
-
-  try { var module = cenozoApp.module( 'final_report', true ); } catch( err ) { console.warn( err ); return; }
+cenozoApp.defineModule( { name: 'final_report', dependencies: [ 'output' ], models: ['list', 'view'], create: module => {
 
   angular.extend( module, {
     identifier: {
@@ -62,21 +57,6 @@ define( [ 'output' ].reduce( function( list, name ) {
     deferral_note_report2: { column: 'reqn.deferral_note_report2', type: 'text' },
     deferral_note_report3: { column: 'reqn.deferral_note_report3', type: 'text' }
   } );
-
-  /* ######################################################################################################## */
-  cenozo.providers.directive( 'cnFinalReportList', [
-    'CnFinalReportModelFactory',
-    function( CnFinalReportModelFactory ) {
-      return {
-        templateUrl: module.getFileUrl( 'list.tpl.html' ),
-        restrict: 'E',
-        scope: { model: '=?' },
-        controller: function( $scope ) {
-          if( angular.isUndefined( $scope.model ) ) $scope.model = CnFinalReportModelFactory.root;
-        }
-      };
-    }
-  ] );
 
   /* ######################################################################################################## */
   cenozo.providers.directive( 'cnFinalReportView', [
@@ -154,15 +134,6 @@ define( [ 'output' ].reduce( function( list, name ) {
   ] );
 
   /* ######################################################################################################## */
-  cenozo.providers.factory( 'CnFinalReportListFactory', [
-    'CnBaseListFactory',
-    function( CnBaseListFactory ) {
-      var object = function( parentModel ) { CnBaseListFactory.construct( this, parentModel ); };
-      return { instance: function( parentModel ) { return new object( parentModel ); } };
-    }
-  ] );
-
-  /* ######################################################################################################## */
   cenozo.providers.factory( 'CnFinalReportViewFactory', [
     'CnBaseViewFactory', 'CnOutputModelFactory', 'CnReqnHelper', 'CnHttpFactory',
     'CnModalMessageFactory', 'CnModalConfirmFactory', 'CnSession', '$state',
@@ -217,7 +188,7 @@ define( [ 'output' ].reduce( function( list, name ) {
               httpObj.onError = function( response ) { self.onPatchError( response ); };
               try {
                 await CnHttpFactory.instance( httpObj ).patch();
-                this.afterPatchFunctions.forEach( function( fn ) { fn(); } );
+                this.afterPatchFunctions.forEach( fn => fn() );
               } catch( error ) {
                 // handled by onError above
               }
@@ -252,7 +223,7 @@ define( [ 'output' ].reduce( function( list, name ) {
 
             // find the tab section
             var selectedTabSection = null;
-            this.tabSectionList.some( function( tabSection ) {
+            this.tabSectionList.some( tabSection => {
               if( tab == tabSection ) {
                 selectedTabSection = tabSection;
                 return true;
@@ -349,10 +320,7 @@ define( [ 'output' ].reduce( function( list, name ) {
             this.versionList.reverse();
 
             this.lastAgreementVersion = null;
-            var self = this;
-            this.versionList.forEach( function( version ) {
-              if( null != version ) version.differences = self.getDifferences( version );
-            } );
+            this.versionList.forEach( version => { if( null != version ) version.differences = this.getDifferences( version ); } );
 
             // if no different list was defined then make it an empty list
             if( null == this.agreementDifferenceList ) this.agreementDifferenceList = [];
@@ -381,16 +349,10 @@ define( [ 'output' ].reduce( function( list, name ) {
               var errorTab = null;
               for( var tab in requiredTabList ) {
                 var firstProperty = null;
-                var self = this;
-                requiredTabList[tab].filter( function( property ) {
-                  if( 'part1' == tab ) {
-                    // only check thesis properties if the reqn has a trainee
-                    return null == property.match( /thesis/ ) || self.record.trainee_user_id;
-                  }
-
-                  // check everything else
-                  return true;
-                } ).forEach( function( property ) {
+                // only check thesis properties if the reqn has a trainee, otherwise check everything else
+                requiredTabList[tab].filter(
+                  property => 'part1' == tab ? null == property.match( /thesis/ ) || this.record.trainee_user_id : true
+                ).forEach( property => {
                   // check for the property's value
                   if( null === record[property] || '' === record[property] ) {
                     var element = cenozo.getFormElement( property );
@@ -398,8 +360,8 @@ define( [ 'output' ].reduce( function( list, name ) {
                     cenozo.updateFormElement( element, true );
                     if( null == errorTab ) errorTab = tab;
                     if( null == error ) error = {
-                      title: self.translate( 'misc.missingFieldTitle' ),
-                      message: self.translate( 'misc.missingFieldMessage' ),
+                      title: this.translate( 'misc.missingFieldTitle' ),
+                      message: this.translate( 'misc.missingFieldMessage' ),
                       error: true
                     };
                   }
@@ -502,8 +464,7 @@ define( [ 'output' ].reduce( function( list, name ) {
         } );
 
         // make the input lists from all groups more accessible
-        var self = this;
-        module.inputGroupList.forEach( group => Object.assign( self.inputList, group.inputList ) );
+        module.inputGroupList.forEach( group => Object.assign( this.inputList, group.inputList ) );
       };
 
       return {
@@ -514,4 +475,4 @@ define( [ 'output' ].reduce( function( list, name ) {
     }
   ] );
 
-} );
+} } );

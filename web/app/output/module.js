@@ -1,9 +1,4 @@
-define( [ 'reqn' ].reduce( function( list, name ) {
-  return list.concat( cenozoApp.module( name ).getRequiredFiles() );
-}, [] ), function() {
-  'use strict';
-
-  try { var module = cenozoApp.module( 'output', true ); } catch( err ) { console.warn( err ); return; }
+cenozoApp.defineModule( { name: 'output', dependencies: [ 'reqn' ], models: ['add', 'list', 'view'], create: module => {
 
   angular.extend( module, {
     identifier: {
@@ -332,7 +327,7 @@ define( [ 'reqn' ].reduce( function( list, name ) {
                 { parentIdentifier: $state.params.identifier, origin: 'final_report' }
               );
             } else {
-              await self.$$transitionToAddState();
+              await this.$$transitionToAddState();
             }
           },
 
@@ -377,16 +372,9 @@ define( [ 'reqn' ].reduce( function( list, name ) {
 
             // we need both languages, we'll dynamically choose which one to use
             this.metadata.columnList.output_type_id.enumLists = { en: [], fr: [] };
-            var self = this;
-            response.data.forEach( function( item ) {
-              self.metadata.columnList.output_type_id.enumLists.en.push( {
-                value: item.id,
-                name: item.name_en
-              } );
-              self.metadata.columnList.output_type_id.enumLists.fr.push( {
-                value: item.id,
-                name: item.name_fr
-              } );
+            response.data.forEach( item => {
+              this.metadata.columnList.output_type_id.enumLists.en.push( { value: item.id, name: item.name_en } );
+              this.metadata.columnList.output_type_id.enumLists.fr.push( { value: item.id, name: item.name_fr } );
             } );
 
             // sort the french enum list
@@ -404,4 +392,4 @@ define( [ 'reqn' ].reduce( function( list, name ) {
     }
   ] );
 
-} );
+} } );

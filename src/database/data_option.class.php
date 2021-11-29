@@ -20,18 +20,18 @@ class data_option extends \cenozo\database\has_rank
   public static function get_record_from_identifier( $identifier )
   {
     $util_class_name = lib::get_class_name( 'util' );
-    $data_option_category_class_name = lib::get_class_name( 'database\data_option_category' ); 
+    $data_category_class_name = lib::get_class_name( 'database\data_category' ); 
 
-    // convert data_option_category_rank to data_option_category_id
-    if( !$util_class_name::string_matches_int( $identifier ) && false === strpos( 'data_option_category_rank=', $identifier ) )
+    // convert data_category_rank to data_category_id
+    if( !$util_class_name::string_matches_int( $identifier ) && false === strpos( 'data_category_rank=', $identifier ) )
     {
-      $regex = '/data_option_category_rank=([0-9]+)/';
+      $regex = '/data_category_rank=([0-9]+)/';
       $matches = array();
       if( preg_match( $regex, $identifier, $matches ) )
       {
-        $db_data_option_category = $data_option_category_class_name::get_unique_record( 'rank', $matches[1] );
-        if( !is_null( $db_data_option_category ) )
-          $identifier = preg_replace( $regex, sprintf( 'data_option_category_id=%d', $db_data_option_category->id ), $identifier );
+        $db_data_category = $data_category_class_name::get_unique_record( 'rank', $matches[1] );
+        if( !is_null( $db_data_category ) )
+          $identifier = preg_replace( $regex, sprintf( 'data_category_id=%d', $db_data_category->id ), $identifier );
       }
     }
 
@@ -44,5 +44,5 @@ class data_option extends \cenozo\database\has_rank
    * @access protected
    * @static
    */
-  protected static $rank_parent = 'data_option_category';
+  protected static $rank_parent = 'data_category';
 }

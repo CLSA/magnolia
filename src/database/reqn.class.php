@@ -146,7 +146,7 @@ class reqn extends \cenozo\database\record
   public function create_version( $new_amendment = false, $db_clone_reqn_version = NULL )
   {
     $reqn_version_comment_class_name = lib::get_class_name( 'database\reqn_version_comment' );
-    $data_option_justification_class_name = lib::get_class_name( 'database\data_option_justification' );
+    $data_justification_class_name = lib::get_class_name( 'database\data_justification' );
 
     // first get the current reqn version to determine the next version number
     $db_current_reqn_version = $this->get_current_reqn_version();
@@ -221,35 +221,34 @@ class reqn extends \cenozo\database\record
         $db_new_reference->save();
       }
 
-      // copy reqn_version_data_option records
-      foreach( $db_clone_reqn_version->get_reqn_version_data_option_object_list() as $db_reqn_version_data_option )
-      {
-        $db_new_reqn_version_data_option = lib::create( 'database\reqn_version_data_option' );
-        $db_new_reqn_version_data_option->copy( $db_reqn_version_data_option );
-        $db_new_reqn_version_data_option->reqn_version_id = $db_reqn_version->id;
-        $db_new_reqn_version_data_option->save();
-      }
+      // copy data_selection records
+      $data_selection_id_list = array();
+      $data_selection_sel = lib::create( 'database\select' );
+      $data_selection_sel->add_column( 'id' );
+      foreach( $db_clone_reqn_version->get_data_selection_list( $data_selection_sel ) as $data_selection )
+        $data_selection_id_list[] = $data_selection['id'];
+      $db_reqn_version->add_data_selection( $data_selection_id_list );
 
       // copy all comments
       foreach( $db_clone_reqn_version->get_reqn_version_comment_object_list() as $db_reqn_version_comment_clone )
       {
         $db_reqn_version_comment = $reqn_version_comment_class_name::get_unique_record(
-          array( 'reqn_version_id', 'data_option_category_id' ),
-          array( $db_reqn_version->id, $db_reqn_version_comment_clone->data_option_category_id )
+          array( 'reqn_version_id', 'data_category_id' ),
+          array( $db_reqn_version->id, $db_reqn_version_comment_clone->data_category_id )
         );
         $db_reqn_version_comment->description = $db_reqn_version_comment_clone->description;
         $db_reqn_version_comment->save();
       }
 
       // copy all justifications
-      foreach( $db_clone_reqn_version->get_data_option_justification_object_list() as $db_data_option_justification_clone )
+      foreach( $db_clone_reqn_version->get_data_justification_object_list() as $db_data_justification_clone )
       {
-        $db_data_option_justification = $data_option_justification_class_name::get_unique_record(
+        $db_data_justification = $data_justification_class_name::get_unique_record(
           array( 'reqn_version_id', 'data_option_id' ),
-          array( $db_reqn_version->id, $db_data_option_justification_clone->data_option_id )
+          array( $db_reqn_version->id, $db_data_justification_clone->data_option_id )
         );
-        $db_data_option_justification->description = $db_data_option_justification_clone->description;
-        $db_data_option_justification->save();
+        $db_data_justification->description = $db_data_justification_clone->description;
+        $db_data_justification->save();
       }
     }
   }

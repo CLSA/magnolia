@@ -21,6 +21,7 @@ class reqn_version extends \cenozo\database\record
   {
     // delete files if peer-review or funding are not selected
     if( !$this->peer_review ) $this->peer_review_filename = NULL;
+
     if( 'yes' != $this->funding )
     {
       if( 'requested' != $this->funding )
@@ -29,6 +30,17 @@ class reqn_version extends \cenozo\database\record
         $this->grant_number = NULL;
       }
       $this->funding_filename = NULL;
+    }
+
+    // don't allow a fee waiver if either the applicant or trainee are not Canadian
+    if( !is_null( $this->waiver ) )
+    {
+      $db_application = lib::create( 'business\session' )->get_application();
+      if( ( !is_null( $this->applicant_country_id ) && $db_application->country_id != $this->applicant_country_id ) ||
+          ( !is_null( $this->trainee_country_id ) && $db_application->country_id != $this->trainee_country_id ) )
+      {
+        $this->waiver = NULL;
+      }
     }
 
     parent::save();
@@ -111,9 +123,8 @@ class reqn_version extends \cenozo\database\record
   {
     $coapplicant_class_name = lib::get_class_name( 'database\coapplicant' );
     $reference_class_name = lib::get_class_name( 'database\reference' );
-    $reqn_version_data_option_class_name = lib::get_class_name( 'database\reqn_version_data_option' );
     $reqn_version_comment_class_name = lib::get_class_name( 'database\reqn_version_comment' );
-    $data_option_justification_class_name = lib::get_class_name( 'database\data_option_justification' );
+    $data_justification_class_name = lib::get_class_name( 'database\data_justification' );
 
     // get the two newest versions
     $version_mod = lib::create( 'database\modifier' );
@@ -164,60 +175,44 @@ class reqn_version extends \cenozo\database\record
           return true;
     }
 
-    // see if there is a different number of data options
-    if( $this->get_reqn_version_data_option_count() != $db_last_reqn_version->get_reqn_version_data_option_count() )
+    // see if there is a different number of data selections
+    if( $this->get_data_selection_count() != $db_last_reqn_version->get_data_selection_count() )
       return true;
 
-    // now check reqn_version_data_option records
-    foreach( $this->get_reqn_version_data_option_object_list() as $db_rvdo )
-    {
-      $db_last_rvdo = $reqn_version_data_option_class_name::get_unique_record(
-        array( 'reqn_version_id', 'data_option_id', 'study_phase_id' ),
-        array( $db_last_reqn_version->id, $db_rvdo->data_option_id, $db_rvdo->study_phase_id )
-      );
-      if( is_null( $db_last_rvdo ) ) return true;
+    // now check each data_selection
+    $data_selection_sel = lib::create( 'database\select' );
+    $data_selection_sel->add_column( 'id' );
+    $data_selection_id_list = array();
+    foreach( $this->get_data_selection_list( $data_selection_sel ) as $data_selection )
+      $data_selection_id_list[] = $data_selection['id'];
+    sort( $data_selection_id_list );
 
-      // check all column values except for id, reqn_version_id and timestamps
-      $ignore_columns = array( 'id', 'reqn_version_id', 'update_timestamp', 'create_timestamp' );
-      foreach( $db_rvdo->get_column_names() as $column )
-        if( !in_array( $column, $ignore_columns ) && $db_rvdo->$column != $db_last_rvdo->$column )
-          return true;
-    }
+    $last_data_selection_id_list = array();
+    foreach( $db_last_reqn_version->get_data_selection_list( $data_selection_sel ) as $data_selection )
+      $last_data_selection_id_list[] = $data_selection['id'];
+    sort( $last_data_selection_id_list );
 
-    // do the same check but from the last version instead
-    foreach( $db_last_reqn_version->get_reqn_version_data_option_object_list() as $db_last_rvdo )
-    {
-      $db_rvdo = $reqn_version_data_option_class_name::get_unique_record(
-        array( 'reqn_version_id', 'data_option_id', 'study_phase_id' ),
-        array( $this->id, $db_last_rvdo->data_option_id, $db_last_rvdo->study_phase_id )
-      );
-      if( is_null( $db_rvdo ) ) return true;
-
-      // check all column values except for id, reqn_version_id and timestamps
-      $ignore_columns = array( 'id', 'reqn_version_id', 'update_timestamp', 'create_timestamp' );
-      foreach( $db_last_rvdo->get_column_names() as $column )
-        if( !in_array( $column, $ignore_columns ) && $db_last_rvdo->$column != $db_rvdo->$column )
-          return true;
-    }
+    foreach( $data_selection_id_list as $index => $id )
+      if( $id != $last_data_selection_id_list[$index] ) return true;
 
     // check comments
     foreach( $this->get_reqn_version_comment_object_list() as $db_reqn_version_comment )
     {
       $db_last_reqn_version_comment = $reqn_version_comment_class_name::get_unique_record(
-        array( 'reqn_version_id', 'data_option_category_id' ),
-        array( $db_last_reqn_version->id, $db_reqn_version_comment->data_option_category_id )
+        array( 'reqn_version_id', 'data_category_id' ),
+        array( $db_last_reqn_version->id, $db_reqn_version_comment->data_category_id )
       );
       if( $db_reqn_version_comment->description != $db_last_reqn_version_comment->description ) return true;
     }
 
     // see if there is a different number of justifications
-    if( $this->get_data_option_justification_count() != $db_last_reqn_version->get_data_option_justification_count() )
+    if( $this->get_data_justification_count() != $db_last_reqn_version->get_data_justification_count() )
       return true;
 
-    // now check data_option_justification records
-    foreach( $this->get_data_option_justification_object_list() as $db_rvj )
+    // now check data_justification records
+    foreach( $this->get_data_justification_object_list() as $db_rvj )
     {
-      $db_last_rvj = $data_option_justification_class_name::get_unique_record(
+      $db_last_rvj = $data_justification_class_name::get_unique_record(
         array( 'reqn_version_id', 'data_option_id' ),
         array( $db_last_reqn_version->id, $db_rvj->data_option_id )
       );
@@ -228,9 +223,9 @@ class reqn_version extends \cenozo\database\record
     }
 
     // do the same check but from the last version instead
-    foreach( $db_last_reqn_version->get_data_option_justification_object_list() as $db_last_rvj )
+    foreach( $db_last_reqn_version->get_data_justification_object_list() as $db_last_rvj )
     {
-      $db_rvj = $data_option_justification_class_name::get_unique_record(
+      $db_rvj = $data_justification_class_name::get_unique_record(
         array( 'reqn_version_id', 'data_option_id' ),
         array( $this->id, $db_last_rvj->data_option_id )
       );
@@ -298,11 +293,12 @@ class reqn_version extends \cenozo\database\record
     $select->from( 'reqn_version' );
     $select->add_column( '0 < COUNT(*)', 'has_linked_data', false );
     $modifier = lib::create( 'database\modifier' );
-    $modifier->join( 'reqn_version_data_option', 'reqn_version.id', 'reqn_version_data_option.reqn_version_id' );
-    $modifier->join( 'data_option', 'reqn_version_data_option.data_option_id', 'data_option.id' );
-    $modifier->join( 'data_option_category', 'data_option.data_option_category_id', 'data_option_category.id' );
+    $modifier->join( 'reqn_version_has_data_selection', 'reqn_version.id', 'reqn_version_has_data_selection.reqn_version_id' );
+    $modifier->join( 'data_selection', 'reqn_version_has_data_selection.data_selection_id', 'data_selection.id' );
+    $modifier->join( 'data_option', 'data_selection.data_option_id', 'data_option.id' );
+    $modifier->join( 'data_category', 'data_option.data_category_id', 'data_category.id' );
     $modifier->where( 'reqn_version.id', '=', $this->id );
-    $modifier->where( 'data_option_category.name_en', '=', 'Linked Data' );
+    $modifier->where( 'data_category.name_en', '=', 'Linked Data' );
 
     return static::db()->get_one( sprintf( '%s %s', $select->get_sql(), $modifier->get_sql() ) );
   }
@@ -348,6 +344,73 @@ class reqn_version extends \cenozo\database\record
   }
 
   /**
+   * Calculate the cost of the reqn (NULL if show_prices is false)
+   * 
+   * Note: this process mirrors CnReqnVersionViewFactory::calculateCost() on the client-side
+   * @return int
+   */
+  public function calculate_cost()
+  {
+    $db_reqn = $this->get_reqn();
+    $base_country_id = lib::create( 'business\session' )->get_application()->country_id;
+    $applicant_country_id = is_null( $this->applicant_country_id ) ? $base_country_id : $this->applicant_country_id;
+    $trainee_country_id = is_null( $this->trainee_country_id ) ? $base_country_id : $this->trainee_country_id;
+    $cost = 3000;
+
+    // only calculate the cost if we have to
+    if( !$db_reqn->show_prices ) return NULL;
+
+    // cost for trainees is different to applicants
+    if( $db_reqn->trainee_user_id ) {
+      if( $base_country_id != $trainee_country_id || $base_country_id != $applicant_country_id ) {
+        // if either the trainee or applicant isn't Canadian then the base fee is 5000
+        $cost = 5000;
+      } else if( $base_country_id == $trainee_country_id && $base_country_id == $applicant_country_id && !is_null( $this->waiver ) ) {
+        // if both are canadian and there is a fee waiver means the base cost is 0
+        $cost = 0;
+      }
+    } else {
+      // if the applicant is not Canadian then the base fee is 5000
+      if( $base_country_id != $applicant_country_id ) $cost = 5000;
+    }
+
+    $selection_sel = lib::create( 'database\select' );
+    $selection_sel->add_column( 'data_option_id' );
+    $selection_sel->add_column( 'cost' );
+    $selection_sel->add_column( 'cost_combined' );
+    $selection_mod = lib::create( 'database\modifier' );
+    $selection_mod->join( 'data_option', 'data_selection.data_option_id', 'data_option.id' );
+    $selection_mod->join( 'data_category', 'data_option.data_category_id', 'data_category.id' );
+    $selection_mod->where( 'data_selection.cost', '>', 0 );
+    $selection_mod->order( 'data_category.rank' );
+    $selection_mod->order( 'data_option.rank' );
+    $current_data_option_id = NULL;
+    $max_cost = 0;
+    foreach( $this->get_data_selection_list( $selection_sel, $selection_mod ) as $selection )
+    {
+      if( $selection['data_option_id'] != $current_data_option_id )
+      {
+        // store the most expensive selection (if there is one)
+        if( 0 < $max_cost ) $cost += $max_cost;
+        $max_cost = 0;
+      }
+
+      if( $selection['cost_combined'] )
+      {
+        // track the most expensive selection
+        if( $max_cost < $selection['cost'] ) $max_cost = $selection['cost'];
+      }
+      else $cost += $selection['cost'];
+
+      $current_data_option_id = $selection['data_option_id'];
+    }
+
+    if( 0 < $max_cost ) $cost += $max_cost;
+
+    return $cost;
+  }
+
+  /**
    * Generates the coapplicant agreement PDF form template
    */
   public function generate_coapplicant_agreement_template_form()
@@ -364,7 +427,7 @@ class reqn_version extends \cenozo\database\record
       'version' => $this->get_amendment_version(),
       'date_of_download' => util::get_datetime_object()->format( 'Y-m-d' )
     );
-    
+
     // get a list of all new coapplicants who have access to the data by first finding the last amendment-version
     $reqn_version_mod = lib::create( 'database\modifier' );
     $reqn_version_mod->where( 'amendment', '<', $this->amendment );
@@ -447,12 +510,16 @@ class reqn_version extends \cenozo\database\record
     $db_user = $db_reqn->get_user();
     $db_trainee_user = $db_reqn->get_trainee_user();
     $date_of_approval = $this->get_date_of_approval();
+    $cost = $this->calculate_cost();
 
     // generate the application form
     $data = array(
       'identifier' => $db_reqn->identifier,
       'version' => $this->get_amendment_version(),
-      'dateofapproval' => is_null( $date_of_approval ) ? 'None' : $date_of_approval->format( 'Y-m-d' )
+      'dateofapproval' => is_null( $date_of_approval ) ? 'None' : $date_of_approval->format( 'Y-m-d' ),
+      'cost' => is_null( $cost )
+        ? ( 'fr' == $db_language->code ? '(non calculé)' : '(not calculated)' )
+        : sprintf( 'fr' == $db_language->code ? '%s $' : '$%s', $cost )
     );
     $data['applicant_name'] = sprintf( '%s %s', $db_user->first_name, $db_user->last_name );
     if( !is_null( $this->title ) ) $data['title'] = $this->title;
@@ -550,7 +617,10 @@ class reqn_version extends \cenozo\database\record
     $data = array(
       'identifier' => $db_reqn->identifier,
       'version' => $this->get_amendment_version(),
-      'dateofapproval' => is_null( $date_of_approval ) ? 'None' : $date_of_approval->format( 'Y-m-d' )
+      'dateofapproval' => is_null( $date_of_approval ) ? 'None' : $date_of_approval->format( 'Y-m-d' ),
+      'cost' => is_null( $cost )
+        ? ( 'fr' == $db_language->code ? '(non calculé)' : '(not calculated)' )
+        : sprintf( 'fr' == $db_language->code ? '%s $' : '$%s', $cost )
     );
     $data['applicant_name'] = sprintf( '%s %s', $db_user->first_name, $db_user->last_name );
     if( !is_null( $this->title ) ) $data['title'] = $this->title;
@@ -566,58 +636,54 @@ class reqn_version extends \cenozo\database\record
                              ? ( 'fr' == $db_language->code ? 'S. o.' : 'N/A' )
                              : $this->last_identifier;
 
-    $reqn_version_data_option_list = array();
-    $reqn_version_data_option_sel = lib::create( 'database\select' );
-    $reqn_version_data_option_sel->add_table_column( 'data_option_category', 'rank', 'data_option_category_rank' );
-    $reqn_version_data_option_sel->add_table_column( 'data_option', 'rank', 'data_option_rank' );
-    $reqn_version_data_option_sel->add_table_column( 'study_phase', 'code' );
-    $reqn_version_data_option_mod = lib::create( 'database\modifier' );
-    $reqn_version_data_option_mod->join( 'data_option', 'reqn_version_data_option.data_option_id', 'data_option.id' );
-    $reqn_version_data_option_mod->join( 'data_option_category', 'data_option.data_option_category_id', 'data_option_category.id' );
-    $reqn_version_data_option_mod->join( 'study_phase', 'reqn_version_data_option.study_phase_id', 'study_phase.id' );
-    $reqn_version_data_option_mod->order( 'data_option_category.rank' );
-    $reqn_version_data_option_mod->order( 'data_option.rank' );
-    $list = $this->get_reqn_version_data_option_list( $reqn_version_data_option_sel, $reqn_version_data_option_mod );
-    foreach( $list as $reqn_version_data_option )
+    $data_selection_sel = lib::create( 'database\select' );
+    $data_selection_sel->add_table_column( 'data_category', 'rank', 'category_rank' );
+    $data_selection_sel->add_table_column( 'data_option', 'rank', 'option_rank' );
+    $data_selection_sel->add_table_column( 'study_phase', 'code' );
+    $data_selection_mod = lib::create( 'database\modifier' );
+    $data_selection_mod->join( 'data_option', 'data_selection.data_option_id', 'data_option.id' );
+    $data_selection_mod->join( 'data_category', 'data_option.data_category_id', 'data_category.id' );
+    $data_selection_mod->join( 'study_phase', 'data_selection.study_phase_id', 'study_phase.id' );
+    foreach( $this->get_data_selection_list( $data_selection_sel, $data_selection_mod ) as $data_selection )
     {
       $data[ sprintf(
         'c%d_o%d_%s',
-        $reqn_version_data_option['data_option_category_rank'],
-        $reqn_version_data_option['data_option_rank'],
-        $reqn_version_data_option['code']
+        $data_selection['category_rank'],
+        $data_selection['option_rank'],
+        $data_selection['code']
       ) ] = 'Yes';
     }
 
     $comment_sel = lib::create( 'database\select' );
-    $comment_sel->add_table_column( 'data_option_category', 'rank' );
+    $comment_sel->add_table_column( 'data_category', 'rank' );
     $comment_sel->add_column( 'description' );
     $comment_mod = lib::create( 'database\modifier' );
-    $comment_mod->join( 'data_option_category', 'reqn_version_comment.data_option_category_id', 'data_option_category.id' );
+    $comment_mod->join( 'data_category', 'reqn_version_comment.data_category_id', 'data_category.id' );
     $comment_mod->where( 'description', '!=', NULL );
-    $comment_mod->order( 'data_option_category.rank' );
+    $comment_mod->order( 'data_category.rank' );
 
     foreach( $this->get_reqn_version_comment_list( $comment_sel, $comment_mod ) as $reqn_version_comment )
       $data[ sprintf( 'c%d_comment', $reqn_version_comment['rank'] ) ] = $reqn_version_comment['description'];
 
     $justification_sel = lib::create( 'database\select' );
-    $justification_sel->add_table_column( 'data_option_category', 'rank', 'data_option_category_rank' );
+    $justification_sel->add_table_column( 'data_category', 'rank', 'data_category_rank' );
     $justification_sel->add_table_column( 'data_option', 'rank', 'data_option_rank' );
     $justification_sel->add_column( 'description' );
     $justification_mod = lib::create( 'database\modifier' );
-    $justification_mod->join( 'data_option', 'data_option_justification.data_option_id', 'data_option.id' );
-    $justification_mod->join( 'data_option_category', 'data_option.data_option_category_id', 'data_option_category.id' );
+    $justification_mod->join( 'data_option', 'data_justification.data_option_id', 'data_option.id' );
+    $justification_mod->join( 'data_category', 'data_option.data_category_id', 'data_category.id' );
     $justification_mod->where( 'description', '!=', NULL );
     $justification_mod->where( 'data_option.justification', '=', true );
-    $justification_mod->order( 'data_option_category.rank' );
+    $justification_mod->order( 'data_category.rank' );
     $justification_mod->order( 'data_option.rank' );
 
-    foreach( $this->get_data_option_justification_list( $justification_sel, $justification_mod ) as $data_option_justification )
+    foreach( $this->get_data_justification_list( $justification_sel, $justification_mod ) as $data_justification )
     {
       $data[ sprintf(
         'c%d_o%d_justification',
-        $data_option_justification['data_option_category_rank'],
-        $data_option_justification['data_option_rank']
-      ) ] = $data_option_justification['description'];
+        $data_justification['data_category_rank'],
+        $data_justification['data_option_rank']
+      ) ] = $data_justification['description'];
     }
 
     if( is_null( $db_pdf_form ) )
@@ -664,11 +730,9 @@ class reqn_version extends \cenozo\database\record
   public function generate_data_option_list_csv()
   {
     $study_class_name = lib::get_class_name( 'database\study' );
-    $study_id = $study_class_name::get_unique_record( 'name', 'CLSA' )->id;
-    $study_phase_class_name = lib::get_class_name( 'database\study_phase' );
-    $bl_id = $study_phase_class_name::get_unique_record( array( 'study_id', 'code' ), array( $study_id, 'bl' ) )->id;
-    $f1_id = $study_phase_class_name::get_unique_record( array( 'study_id', 'code' ), array( $study_id, 'f1' ) )->id;
+    $data_category_class_name = lib::get_class_name( 'database\data_category' );
 
+    $study_id = $study_class_name::get_unique_record( 'name', 'CLSA' )->id;
     $db_user = lib::create( 'business\session' )->get_user();
     $date_of_approval = $this->get_date_of_approval();
     $date_of_approval = is_null( $date_of_approval ) ? 'N/A' : $date_of_approval->format( 'Y-m-d' );
@@ -700,35 +764,77 @@ class reqn_version extends \cenozo\database\record
       true
     );
 
-    $select = lib::create( 'database\select' );
-    $select->from( 'data_option_category' );
-    $select->add_column( 'name_en', 'Category' );
-    $select->add_table_column( 'data_option', 'name_en', 'Data Option' );
-    $select->add_table_column( 'bl_reqn_version_data_option', 'reqn_version_id IS NOT NULL', 'Baseline' );
-    $select->add_table_column( 'f1_reqn_version_data_option', 'reqn_version_id IS NOT NULL', 'Follow-up 1' );
+    // get all selections to fill in below
+    $selection_sel = lib::create( 'database\select' );
+    $selection_sel->add_column( 'CONCAT( "c", data_category.id )', 'c', false );
+    $selection_sel->add_column( 'CONCAT( "o", data_option.id )', 'o', false );
+    $selection_sel->add_table_column( 'study_phase', 'id', 'study_phase_id' );
 
-    $modifier = lib::create( 'database\modifier' );
-    $modifier->join( 'data_option', 'data_option_category.id', 'data_option.data_option_category_id' );
+    $selection_mod = lib::create( 'database\modifier' );
+    $selection_mod->join( 'study_phase', 'data_selection.study_phase_id', 'study_phase.id' );
+    $selection_mod->join( 'data_option', 'data_selection.data_option_id', 'data_option.id' );
+    $selection_mod->join( 'data_category', 'data_option.data_category_id', 'data_category.id' );
+    $selection_mod->order( 'data_category.rank' );
+    $selection_mod->order( 'data_option.rank' );
+    $selection_mod->order( 'study_phase.rank' );
+    $selection_list = array();
+    foreach( $this->get_data_selection_list( $selection_sel, $selection_mod ) as $selection )
+    {
+      $c = $selection['c'];
+      $o = $selection['o'];
 
-    $join_mod = lib::create( 'database\modifier' );
-    $join_mod->where( 'data_option.id', '=', 'bl_reqn_version_data_option.data_option_id', false );
-    $join_mod->where( 'bl_reqn_version_data_option.study_phase_id', '=', $bl_id );
-    $join_mod->where( 'bl_reqn_version_data_option.reqn_version_id', '=', $this->id );
-    $modifier->join_modifier( 'reqn_version_data_option', $join_mod, 'left', 'bl_reqn_version_data_option' );
+      if( !array_key_exists( $c, $selection_list ) ) $selection_list[$c] = array();
+      if( !array_key_exists( $o, $selection_list[$c] ) ) $selection_list[$o] = array();
 
-    $join_mod = lib::create( 'database\modifier' );
-    $join_mod->where( 'data_option.id', '=', 'f1_reqn_version_data_option.data_option_id', false );
-    $join_mod->where( 'f1_reqn_version_data_option.study_phase_id', '=', $f1_id );
-    $join_mod->where( 'f1_reqn_version_data_option.reqn_version_id', '=', $this->id );
-    $modifier->join_modifier( 'reqn_version_data_option', $join_mod, 'left', 'f1_reqn_version_data_option' );
+      $selection_list[$c][$o][] = $selection['study_phase_id'];
+    }
 
-    $modifier->order( 'data_option_category.rank' );
-    $modifier->order( 'data_option.rank' );
+    // build each category's data options one table at a time
+    $data_category_mod = lib::create( 'database\modifier' );
+    $data_category_mod->order( 'rank' );
+    foreach( $data_category_class_name::select_objects( $data_category_mod ) as $db_data_category )
+    {
+      // use this as an array key
+      $c = sprintf( 'c%d', $db_data_category->id );
 
-    $output .= "\n".util::get_data_as_csv(
-      static::db()->get_all( sprintf( '%s %s', $select->get_sql(), $modifier->get_sql() ) ),
-      $db_user
-    );
+      // build this category's header
+      $output .= sprintf( '%s"%s"%s"Data Option"', "\n", strtoupper( $db_data_category->name_en ), "\n" );
+
+      $study_phase_sel = lib::create( 'database\select' );
+      $study_phase_sel->add_column( 'id' );
+      $study_phase_sel->add_table_column( 'study', 'name', 'study_name' );
+      $study_phase_sel->add_column( 'name', 'study_phase_name' );
+
+      $study_phase_mod = lib::create( 'database\modifier' );
+      $study_phase_mod->join( 'study', 'study_phase.study_id', 'study.id' );
+      $study_phase_mod->order( 'study.name' );
+      $study_phase_mod->order( 'study_phase.rank' );
+      $study_phase_list = $db_data_category->get_study_phase_list( $study_phase_sel, $study_phase_mod );
+      foreach( $study_phase_list as $study_phase )
+        $output .= sprintf( ',"%s - %s"', $study_phase['study_name'], $study_phase['study_phase_name'] );
+
+      // now fill in all data options for this category, one option per row with one column for each study phase
+      $data_option_mod = lib::create( 'database\modifier' );
+      $data_option_mod->order( 'data_option.rank' );
+      foreach( $db_data_category->get_data_option_object_list( $data_option_mod ) as $db_data_option )
+      {
+        // use this as an array key
+        $o = sprintf( 'o%d', $db_data_option->id );
+
+        $output .= sprintf( '%s"%s"', "\n", $db_data_option->name_en );
+        foreach( $study_phase_list as $study_phase )
+        {
+          $output .= sprintf(
+            ',"%s"',
+            array_key_exists( $c, $selection_list ) &&
+            array_key_exists( $o, $selection_list[$c] ) &&
+            in_array( $study_phase['id'], $selection_list[$c][$o] ) ? 'yes' : 'no'
+          );
+        }
+      }
+
+      $output .= "\n";
+    }
 
     $filename = sprintf( '%s/%s.csv', DATA_OPTION_LIST_PATH, $this->id );
     $result = file_put_contents( $filename, $output );
