@@ -147,8 +147,8 @@ cenozo.service( 'CnModalSubmitLegacyFactory', [
 
 /* ######################################################################################################## */
 cenozo.service( 'CnModalUploadAgreementFactory', [
-  'CnHttpFactory', '$uibModal',
-  function( CnHttpFactory, $uibModal ) {
+  'CnSession', 'CnHttpFactory', 'CnModalDatetimeFactory', '$uibModal',
+  function( CnSession, CnHttpFactory, CnModalDatetimeFactory, $uibModal ) {
     var object = function( params ) {
       angular.extend( this, params );
 
@@ -160,6 +160,12 @@ cenozo.service( 'CnModalUploadAgreementFactory', [
           templateUrl: cenozoApp.getFileUrl( 'magnolia', 'modal-upload-agreement.tpl.html' ),
           controller: [ '$scope', '$uibModalInstance', function( $scope, $uibModalInstance ) {
             angular.extend( $scope, {
+              filename: null,
+              startDate: null,
+              startDateFormatted: null,
+              endDate: null,
+              endDateFormatted: null,
+
               file: {
                 key: 'agreement_filename',
                 file: null,
@@ -187,9 +193,29 @@ cenozo.service( 'CnModalUploadAgreementFactory', [
                   }
                 }
               },
-              filename: null,
+
+              selectDatetime: async function( input ) {
+                var response = await CnModalDatetimeFactory.instance( {
+                  title: 'startDate' == input ? 'Start Date' : 'End Date',
+                  date: $scope[input],
+                  pickerType: 'date',
+                  emptyAllowed: false,
+                  minDate: 'endDate' == input ? $scope.startDate : null,
+                  maxDate: 'startDate' == input ? $scope.endDate : null
+                } ).show();
+
+                if( false !== response ) {
+                  $scope[input] = response;
+                  $scope[input+'Formatted'] = CnSession.formatValue( response, 'date', true );
+                }
+              },
+
               ok: function() {
-                $uibModalInstance.close( { file: $scope.file } );
+                $uibModalInstance.close( {
+                  file: $scope.file,
+                  startDate: $scope.startDate,
+                  endDate: $scope.endDate
+                } );
               },
               cancel: function() { $uibModalInstance.close( false ); }
             } );

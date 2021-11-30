@@ -1803,7 +1803,11 @@ cenozoApp.defineModule( { name: 'reqn_version',
                           var filePath = this.parentModel.getServiceResourcePath();
                           await CnHttpFactory.instance( {
                             path: filePath,
-                            data: { agreement_filename: response.file.getFilename() }
+                            data: {
+                              agreement_filename: response.file.getFilename(),
+                              agreement_start_date: response.startDate,
+                              agreement_end_date: response.endDate
+                            }
                           } ).patch();
                           await response.file.upload( filePath );
                         } else {
@@ -1858,7 +1862,11 @@ cenozoApp.defineModule( { name: 'reqn_version',
                             var filePath = this.parentModel.getServiceResourcePath();
                             await CnHttpFactory.instance( {
                               path: filePath,
-                              data: { agreement_filename: response.file.getFilename() }
+                              data: {
+                                agreement_filename: response.file.getFilename(),
+                                agreement_start_date: response.startDate,
+                                agreement_end_date: response.endDate
+                              }
                             } ).patch();
 
                             // only proceed if the upload succeeds

@@ -3,7 +3,7 @@
     <h4 class="modal-title">Upload Agreement</h4>
   </div>
   <div class="modal-body">
-    <span style="white-space: pre-wrap;">Please provide the agreement file to attach to this requisition.</span>
+    <span style="white-space: pre-wrap;">Please provide the agreement file to attach to this requisition along with the start and end date that the agreement is valid.</span>
     <div class="row container-fluid vertical-spacer">
       <label for="filename" class="control-label col-sm-3">File</label>
       <div class="col-sm-9">
@@ -13,13 +13,56 @@
           name="filename"
           class="form-control"
           ng-model="file.file"
-          cn-upload="file.getFilename()">
+          cn-upload="file.getFilename()"
+          required>
+        </input>
+      </div>
+    </div>
+    <div class="row container-fluid vertical-spacer">
+      <label for="startDate" class="control-label col-sm-3">Start Date</label>
+      <div class="col-sm-9">
+        <input
+          type="hidden"
+          id="startDate"
+          name="startDate"
+          ng-model="startDate"
+          required>
+        </input>
+        <input
+          type="text"
+          id="startDateFormatted"
+          name="startDateFormatted"
+          ng-model="startDateFormatted"
+          class="form-control"
+          ng-click="selectDatetime( 'startDate' )"
+          onkeydown="return false">
+        </input>
+      </div>
+    </div>
+    <div class="row container-fluid vertical-spacer">
+      <label for="endDate" class="control-label col-sm-3">End Date</label>
+      <div class="col-sm-9">
+        <input
+          type="hidden"
+          id="endDate"
+          name="endDate"
+          ng-model="endDate"
+          required>
+        </input>
+        <input
+          type="text"
+          id="endDateFormatted"
+          name="endDateFormatted"
+          ng-model="endDateFormatted"
+          class="form-control"
+          ng-click="selectDatetime( 'endDate' )"
+          onkeydown="return false">
         </input>
       </div>
     </div>
   </div>
   <div class="modal-footer bg-info">
     <button type="button" class="btn btn-default" ng-click="cancel()">Cancel</button>
-    <button type="submit" class="btn btn-primary" ng-disabled="!file.file" cn-autofocus>OK</button>
+    <button type="submit" class="btn btn-primary" ng-disabled="!file.file || !startDate || !endDate" cn-autofocus>OK</button>
   </div>
 </form>
