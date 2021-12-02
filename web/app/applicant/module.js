@@ -50,4 +50,36 @@ cenozoApp.defineModule( { name: 'applicant', models: ['add', 'list'], create: mo
     }
   } );
 
+  /* ######################################################################################################## */
+  cenozo.providers.factory( 'CnApplicantListFactory', [
+    'CnBaseListFactory', '$state',
+    function( CnBaseListFactory, $state ) {
+      var object = function( parentModel ) {
+        CnBaseListFactory.construct( this, parentModel );
+        this.onSelect = async function( record ) {
+          await $state.go( 'user.view', { identifier: 'name=' + record.user_name } );
+        };
+      };
+      return { instance: function( parentModel ) { return new object( parentModel ); } };
+    }
+  ] );
+
+  /* ######################################################################################################## */
+  cenozo.providers.factory( 'CnApplicantModelFactory', [
+    'CnBaseModelFactory', 'CnApplicantAddFactory', 'CnApplicantListFactory',
+    function( CnBaseModelFactory, CnApplicantAddFactory, CnApplicantListFactory ) {
+      var object = function( root ) {
+        CnBaseModelFactory.construct( this, module );
+        this.addModel = CnApplicantAddFactory.instance( this );
+        this.listModel = CnApplicantListFactory.instance( this );
+        this.getViewEnabled = function() { return true; };
+      };
+
+      return {
+        root: new object( true ),
+        instance: function() { return new object( false ); }
+      };
+    }
+  ] );
+
 } } );
