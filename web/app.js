@@ -1126,7 +1126,7 @@ cenozo.service( 'CnReqnHelper', [
 
     async function init( obj ) {
       // fill in dynamic content
-      obj.promise = await CnHttpFactory.instance( {
+      obj.promise = CnHttpFactory.instance( {
         path: 'data_category',
         data: {
           select: { column: [ 'name_en', 'name_fr' ] },
@@ -1134,8 +1134,9 @@ cenozo.service( 'CnReqnHelper', [
         }
       } ).query();
 
+      var response = await obj.promise;
       var letter = 'a';
-      obj.promise.data.forEach( category => {
+      response.data.forEach( category => {
         obj.lookupData.reqn.part2[letter] = { tab: { en: category.name_en, fr: category.name_fr } };
         letter = String.fromCharCode( letter.charCodeAt(0) + 1 );
       } );

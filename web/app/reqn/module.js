@@ -411,24 +411,6 @@ cenozoApp.defineModule( { name: 'reqn', dependencies: [ 'output' ], models: ['ad
       isExcluded: function( $state, model ) {
         return 'add' == model.getActionFromState() || 'Report Required' == model.viewModel.record.stage_type;
       }
-    },
-    deferral_note_2f: {
-      title: '', // defined dynamically in the model
-      type: 'text',
-      isExcluded: function( $state, model ) {
-        return 'add' == model.getActionFromState() ||
-               model.viewModel.record.external ||
-               'Report Required' == model.viewModel.record.stage_type;
-      }
-    },
-    deferral_note_2g: {
-      title: '', // defined dynamically in the model
-      type: 'text',
-      isExcluded: function( $state, model ) {
-        return 'add' == model.getActionFromState() ||
-               model.viewModel.record.external ||
-               'Report Required' == model.viewModel.record.stage_type;
-      }
     }
   } );
 
