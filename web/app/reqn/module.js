@@ -927,8 +927,7 @@ cenozoApp.defineModule( { name: 'reqn', dependencies: [ 'output' ], models: ['ad
               this.record.deferral_note_1e || this.record.deferral_note_1f ||
               this.record.deferral_note_2a || this.record.deferral_note_2b ||
               this.record.deferral_note_2c || this.record.deferral_note_2d ||
-              this.record.deferral_note_2e || this.record.deferral_note_2f ||
-              this.record.deferral_note_2g
+              this.record.deferral_note_2e
             );
           },
 

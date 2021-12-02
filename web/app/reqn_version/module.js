@@ -115,8 +115,6 @@ cenozoApp.defineModule( { name: 'reqn_version',
     deferral_note_2c: { column: 'reqn.deferral_note_2c', type: 'text' },
     deferral_note_2d: { column: 'reqn.deferral_note_2d', type: 'text' },
     deferral_note_2e: { column: 'reqn.deferral_note_2e', type: 'text' },
-    deferral_note_2f: { column: 'reqn.deferral_note_2f', type: 'text' },
-    deferral_note_2g: { column: 'reqn.deferral_note_2g', type: 'text' },
 
     coapplicant_agreement_filename: { type: 'string' },
     peer_review_filename: { type: 'string' },
