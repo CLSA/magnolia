@@ -247,6 +247,13 @@ class reqn extends \cenozo\database\record
           array( 'reqn_version_id', 'data_option_id' ),
           array( $db_reqn_version->id, $db_data_justification_clone->data_option_id )
         );
+        if( is_null( $db_data_justification ) )
+        {
+          $db_data_justification = lib::create( 'database\data_justification' );
+          $db_data_justification->reqn_version_id = $db_reqn_version->id;
+          $db_data_justification->data_option_id = $db_data_justification_clone->data_option_id;
+        }
+
         $db_data_justification->description = $db_data_justification_clone->description;
         $db_data_justification->save();
       }
