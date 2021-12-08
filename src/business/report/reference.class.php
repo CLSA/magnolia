@@ -23,6 +23,7 @@ class reference extends \cenozo\business\report\base_report
     $review_type_class_name = lib::get_class_name( 'database\review_type' );
     $recommendation_type_class_name = lib::get_class_name( 'database\recommendation_type' );
     $stage_type_class_name = lib::get_class_name( 'database\stage_type' );
+    $coapplicant_class_name = lib::get_class_name( 'database\coapplicant' );
 
     // get various review types, recommendation type and stage type records
     $db_second_smt_review_type = $review_type_class_name::get_unique_record( 'name', 'Second SMT' );
@@ -136,10 +137,11 @@ class reference extends \cenozo\business\report\base_report
 
     $select = lib::create( 'database\select' );
     $select->from( 'reqn' );
+    $select->add_table_column( 'reqn_version', 'id', 'reqn_version_id' );
     $select->add_column( 'identifier', 'Identifier' );
     $select->add_column( 'IF( reqn.website, "Y", "N" )', 'Website', false );
     $select->add_column( 'reqn_type.name', 'Type', false );
-    $select->add_column( 'legacy', 'Legacy' );
+    $select->add_column( 'IF( legacy, "Yes", "No" )', 'Legacy', false );
     $select->add_column( 'reqn_version.title', 'Title', false );
     $select->add_column( 'CONCAT_WS( " ", user.first_name, user.last_name )', 'Primary Applicant', false );
     $select->add_column( 'user.email', 'Email', false );
@@ -148,6 +150,59 @@ class reference extends \cenozo\business\report\base_report
     $select->add_column( 'reqn_version.lay_summary', 'Lay Summary', false );
     $select->add_column( 'reqn_version.keywords', 'Keywords', false );
 
-    $this->add_table_from_select( NULL, $reqn_class_name::select( $select, $modifier ) );
+    // before adding coapplicant data we need to know the maximum number of coapplicants
+    $max_sel = lib::create( 'database\select' );
+    $max_sel->from( 'reqn' );
+    $max_sel->add_column( 'COUNT( DISTINCT coapplicant.id )', 'total', false );
+    $max_mod = lib::create( 'database\modifier' );
+    $max_mod = clone $modifier;
+    $max_mod->join( 'coapplicant', 'reqn_version.id', 'coapplicant.reqn_version_id' );
+    $max_coapplicants = $reqn_class_name::db()->get_one( sprintf(
+      'SELECT MAX( total ) FROM ( %s%s ) AS temp',
+      $max_sel->get_sql(),
+      $max_mod->get_sql()
+    ) );
+    
+    // now add the coapplicant data
+    $reqn_list = $reqn_class_name::select( $select, $modifier );
+    foreach( $reqn_list as $index => $reqn )
+    {
+      $reqn_version_id = $reqn['reqn_version_id'];
+      unset( $reqn_list[$index]['reqn_version_id'] );
+      for( $c = 1; $c <= $max_coapplicants; $c++ )
+      {
+        $reqn_list[$index][sprintf( 'Coapplicant %d', $c )] = '';
+        $reqn_list[$index][sprintf( 'Position %d', $c )] = '';
+        $reqn_list[$index][sprintf( 'Institution %d', $c )] = '';
+        $reqn_list[$index][sprintf( 'Email %d', $c )] = '';
+        $reqn_list[$index][sprintf( 'Role %d', $c )] = '';
+        $reqn_list[$index][sprintf( 'Data Access %d', $c )] = '';
+      }
+      
+      $coapplicant_sel = lib::create( 'database\select' );
+      $coapplicant_sel->add_column( 'name' );
+      $coapplicant_sel->add_column( 'position' );
+      $coapplicant_sel->add_column( 'affiliation' );
+      $coapplicant_sel->add_column( 'email' );
+      $coapplicant_sel->add_column( 'role' );
+      $coapplicant_sel->add_column( 'access' );
+      $coapplicant_mod = lib::create( 'database\modifier' );
+      $coapplicant_mod->where( 'reqn_version_id', '=', $reqn_version_id );
+      $coapplicant_mod->order( 'id' );
+      
+      $c = 1;
+      foreach( $coapplicant_class_name::select( $coapplicant_sel, $coapplicant_mod ) as $coapplicant )
+      {
+        $reqn_list[$index][sprintf( 'Coapplicant %d', $c )] = $coapplicant['name'];
+        $reqn_list[$index][sprintf( 'Position %d', $c )] = $coapplicant['position'];
+        $reqn_list[$index][sprintf( 'Institution %d', $c )] = $coapplicant['affiliation'];
+        $reqn_list[$index][sprintf( 'Email %d', $c )] = $coapplicant['email'];
+        $reqn_list[$index][sprintf( 'Role %d', $c )] = $coapplicant['role'];
+        $reqn_list[$index][sprintf( 'Data Access %d', $c )] = $coapplicant['access'] ? 'Yes' : 'No';
+        $c++;
+      }
+    }
+
+    $this->add_table_from_select( NULL, $reqn_list );
   }
 }
