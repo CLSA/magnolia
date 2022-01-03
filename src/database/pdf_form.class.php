@@ -38,7 +38,7 @@ class pdf_form extends \cenozo\database\record
   {
     $file = is_null( $this->filename ) ? NULL : $this->get_filename();
     parent::delete();
-    if( !is_null( $file ) ) unlink( $file );
+    if( !is_null( $file ) && file_exists( $file ) ) unlink( $file );
   }
 
   /**

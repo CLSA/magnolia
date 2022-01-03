@@ -93,7 +93,7 @@ class reqn extends \cenozo\database\record
 
     parent::delete();
 
-    foreach( $file_list as $file ) unlink( $file );
+    foreach( $file_list as $file ) if( file_exists( $file ) ) unlink( $file );
   }
 
   /**
