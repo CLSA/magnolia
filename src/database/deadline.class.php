@@ -23,8 +23,8 @@ class deadline extends \cenozo\database\record
     $deadline_class_name = lib::get_class_name( 'database\deadline' );
     $deadline_mod = lib::create( 'database\modifier' );
     // use midnight of the local timezone for the deadline crossover time
-    $deadline_mod->where( 'date', '>=', 'DATE( NOW() )', false );
-    $deadline_mod->order( 'date' );
+    $deadline_mod->where( 'datetime', '>=', 'UTC_TIMESTAMP()', false );
+    $deadline_mod->order( 'datetime' );
     $deadline_mod->limit( 1 );
 
     $deadline_list = static::select_objects( $deadline_mod );
@@ -32,13 +32,13 @@ class deadline extends \cenozo\database\record
   }
 
   /**
-   * Returns the next availble identifier for this deadline (yymm##)
+   * Returns the next available identifier for this deadline (yymm##)
    * @access public
    */
   public function get_next_identifier()
   {
     $reqn_class_name = lib::get_class_name( 'database\reqn' );
-    $base = $this->date->format( 'ym' );
+    $base = $this->datetime->format( 'ym' );
     $reqn_sel = lib::create( 'database\select' );
     $reqn_sel->add_column( 'identifier' );
     $reqn_mod = lib::create( 'database\modifier' );

@@ -321,7 +321,7 @@ cenozoApp.defineModule( { name: 'reqn', dependencies: [ 'output' ], models: ['ad
     phase: { column: 'stage_type.phase', type: 'string', isExcluded: true },
     status: { column: 'stage_type.status', type: 'string', isExcluded: true },
     lang: { type: 'string', column: 'language.code', isExcluded: true },
-    deadline: { type: 'date', column: 'deadline.date', isExcluded: true }
+    deadline: { type: 'datetime', column: 'deadline.datetime', isExcluded: true }
   } );
 
   module.addInputGroup( 'Requisition Deferral Notes', {
@@ -1280,7 +1280,7 @@ cenozoApp.defineModule( { name: 'reqn', dependencies: [ 'output' ], models: ['ad
                 path: 'deadline',
                 data: {
                   select: { column: [ 'id', 'name' ] },
-                  modifier: { order: 'date', desc: true, limit: 1000 }
+                  modifier: { order: 'datetime', desc: true, limit: 1000 }
                 }
               } ).query(),
 

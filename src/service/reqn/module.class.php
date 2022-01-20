@@ -272,7 +272,7 @@ class module extends \cenozo\service\module
           '  "deferred" = state, "Action Required", '."\n".
           '  IF( state IS NOT NULL, CONCAT( UPPER( SUBSTRING( state, 1, 1 ) ), SUBSTRING( state, 2 ) ), '."\n".
           '    IF( '."\n".
-          '      "review" = stage_type.phase AND IFNULL( deadline.date, 0 ) > DATE( UTC_TIMESTAMP() ), '."\n".
+          '      "review" = stage_type.phase AND IFNULL( deadline.datetime, 0 ) > UTC_TIMESTAMP(), '."\n".
           '      "Waiting for Review", '."\n".
           '      stage_type.status '."\n".
           '    )'."\n".

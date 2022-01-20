@@ -1378,7 +1378,7 @@ class reqn extends \cenozo\database\record
         // if there are zero or one stages then this is a new requisition which needs its deadline set
         if( 2 > $number_of_stages )
         {
-          if( 0 < $this->get_deadline()->date->diff( util::get_datetime_object() )->days )
+          if( 0 < $this->get_deadline()->datetime->diff( util::get_datetime_object() )->days )
           { // deadline has expired, get the next one
             $db_deadline = $deadline_class_name::get_next();
             $change_deadline = true;

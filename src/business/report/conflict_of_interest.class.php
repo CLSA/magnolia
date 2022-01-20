@@ -20,7 +20,6 @@ class conflict_of_interest extends \cenozo\business\report\base_report
   protected function build()
   {
     $reqn_class_name = lib::get_class_name( 'database\reqn' );
-    $today = util::get_datetime_object();
 
     $data = array();
 
@@ -31,7 +30,7 @@ class conflict_of_interest extends \cenozo\business\report\base_report
     // deadline must have passed
     $base_mod = lib::create( 'database\modifier' );
     $base_mod->join( 'deadline', 'reqn.deadline_id', 'deadline.id' );
-    $base_mod->where( 'deadline.date', '<', $today->format( 'Y-m-d' ) );
+    $base_mod->where( 'deadline.datetime', '<', util::get_datetime_object() );
 
     // current stage must be admin, feasibility or dsac
     $join_mod = lib::create( 'database\modifier' );

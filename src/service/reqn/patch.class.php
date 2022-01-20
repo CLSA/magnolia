@@ -114,7 +114,7 @@ class patch extends \cenozo\service\patch
               $db_reqn->save(); // this will make sure the deadline is appropriate
               if( $db_reqn->deadline_id )
               {
-                $deadline = util::get_datetime_object( $db_reqn->get_deadline()->date );
+                $deadline = util::get_datetime_object( $db_reqn->get_deadline()->datetime );
                 $deadline->add( new \DateInterval( sprintf( 'P%dM', $delay ) ) );
                 if( $db_reqn_version->start_date < $deadline ) $code = 409;
               }
