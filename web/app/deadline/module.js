@@ -11,16 +11,16 @@ cenozoApp.defineModule( { name: 'deadline', models: ['add', 'list', 'view'], cre
       name: {
         title: 'Name'
       },
-      date: {
-        title: 'Date',
-        type: 'date'
+      datetime: {
+        title: 'Date & Time',
+        type: 'datetime'
       },
       reqn_count: {
         title: 'Requisitions'
       }
     },
     defaultOrder: {
-      column: 'date',
+      column: 'datetime',
       reverse: true
     }
   } );
@@ -30,9 +30,9 @@ cenozoApp.defineModule( { name: 'deadline', models: ['add', 'list', 'view'], cre
       title: 'Name',
       type: 'string'
     },
-    date: {
-      title: 'Date',
-      type: 'date'
+    datetime: {
+      title: 'Date & Time',
+      type: 'datetime'
     }
   } );
 
