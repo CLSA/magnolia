@@ -31,10 +31,15 @@ class reference extends \cenozo\business\report\base_report
     $db_smt_review_type = $review_type_class_name::get_unique_record( 'name', 'SMT' );
     $db_chair_review_type = $review_type_class_name::get_unique_record( 'name', 'Chair' );
     $db_approved_recommendation_type = $recommendation_type_class_name::get_unique_record( 'name', 'Approved' );
+    $db_not_approved_recommendation_type = $recommendation_type_class_name::get_unique_record( 'name', 'Not Approved' );
     $db_admin_review_stage_type = $stage_type_class_name::get_unique_record( 'name', 'Admin Review' );
     $db_decision_made_stage_type = $stage_type_class_name::get_unique_record( 'name', 'Decision Made' );
     $db_data_release_stage_type = $stage_type_class_name::get_unique_record( 'name', 'Data Release' );
     $db_active_stage_type = $stage_type_class_name::get_unique_record( 'name', 'Active' );
+
+    $approved = NULL;
+    foreach( $this->get_restriction_list() as $restriction )
+      if( 'approved' == $restriction['name'] ) $approved = $restriction['value'];
 
     $modifier = lib::create( 'database\modifier' );
     $modifier->join( 'reqn_type', 'reqn.reqn_type_id', 'reqn_type.id' );
@@ -92,26 +97,9 @@ class reference extends \cenozo\business\report\base_report
     $join_mod->where( 'active_stage.stage_type_id', '=', $db_active_stage_type->id );
     $modifier->join_modifier( 'stage', $join_mod, 'left', 'active_stage' );
 
-    $modifier->where_bracket( true );
-    $modifier->where( 'reqn.state', '=', NULL );
-    $modifier->or_where( 'reqn.state', '=', 'deferred' );
-    $modifier->where_bracket( false );
-
-    $modifier->where_bracket( true );
-    // is a catalyst grant and has reached the admin review stage
-    $modifier->where( 'reqn_type.name', '=', 'Catalyst Grant' );
-    $modifier->where( 'admin_review_stage.id', '!=', NULL );
-    // OR
-    $modifier->where_bracket( true, true );
-    // must have reached the release or active stage
-    $modifier->where( 'data_release_stage.id', '!=', NULL );
-    $modifier->or_where( 'active_stage.id', '!=', NULL );
-    // OR
-    $modifier->where_bracket( true, true );
-    // reached the decision made stage and...
-    $modifier->where( 'decision_made_stage.id', '!=', NULL );
-    // the reqn was approved
-    $modifier->where(
+    // join to the recommendation_type
+    $join_mod = lib::create( 'database\modifier' );
+    $join_mod->where(
       'IF( '.
         // use the second smt review if it was done
         'second_smt_review.id IS NOT NULL, second_smt_review.recommendation_type_id, '.
@@ -127,11 +115,53 @@ class reference extends \cenozo\business\report\base_report
         ') '.
       ')',
       '=',
-      $db_approved_recommendation_type->id
+      'recommendation_type.id',
+      false
     );
-    $modifier->where_bracket( false );
-    $modifier->where_bracket( false );
-    $modifier->where_bracket( false );
+    $modifier->join_modifier( 'recommendation_type', $join_mod, 'left' );
+
+    // make sure the reqn is not inactive or abandoned
+    $modifier->where( 'IFNULL( reqn.state, "deferred" )', '=', 'deferred' );
+
+    if( 'Not Approved' != $approved )
+    {
+      $modifier->where_bracket( true );
+      // is a catalyst grant and has reached the admin review stage
+      $modifier->where( 'reqn_type.name', '=', 'Catalyst Grant' );
+      $modifier->where( 'admin_review_stage.id', '!=', NULL );
+      $modifier->where_bracket( false );
+      // OR
+      $modifier->where_bracket( true, true );
+      // must have reached the release or active stage
+      $modifier->where( 'data_release_stage.id', '!=', NULL );
+      $modifier->or_where( 'active_stage.id', '!=', NULL );
+      // OR
+      $modifier->where_bracket( true, true );
+      // reached the decision made stage and...
+      $modifier->where( 'decision_made_stage.id', '!=', NULL );
+
+      if( 'Approved' == $approved )
+      {
+        // the reqn was approved
+        $modifier->where( 'recommendation_type.id', '=', $db_approved_recommendation_type->id );
+      }
+      else
+      {
+        // the reqn can either be approved or not approved
+        $modifier->where(
+          'recommendation_type.id',
+          'IN',
+          [ $db_approved_recommendation_type->id, $db_not_approved_recommendation_type->id ]
+        );
+      }
+      $modifier->where_bracket( false );
+      $modifier->where_bracket( false );
+    }
+    else
+    {
+      // the reqn must have not been approved
+      $modifier->where( 'recommendation_type.id', '=', $db_not_approved_recommendation_type->id );
+    }
 
     $modifier->group( 'reqn.id' );
 
@@ -139,6 +169,7 @@ class reference extends \cenozo\business\report\base_report
     $select->from( 'reqn' );
     $select->add_table_column( 'reqn_version', 'id', 'reqn_version_id' );
     $select->add_column( 'identifier', 'Identifier' );
+    $select->add_column( 'IFNULL( recommendation_type.name, "N/A" )', 'Approval', false );
     $select->add_column( 'IF( reqn.website, "Y", "N" )', 'Website', false );
     $select->add_column( 'reqn_type.name', 'Type', false );
     $select->add_column( 'IF( legacy, "Yes", "No" )', 'Legacy', false );
