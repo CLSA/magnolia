@@ -7,6 +7,7 @@ SOURCE reqn.sql
 SOURCE deadline.sql
 SOURCE report_type.sql
 SOURCE report_restriction.sql
+SOURCE report_has_report_restriction.sql
 
 SOURCE update_version_number.sql
 
