@@ -1052,6 +1052,32 @@ cenozoApp.defineModule( { name: 'reqn_version',
                         differences[part].diff = true;
                         differences[part][section].diff = true;
                         differences[part][section][property] = true;
+
+                        // if the property is text then get the diff data
+                        if( angular.isDefined( this.parentModel.metadata.columnList[property] ) ) {
+                          var determineDifferences = false;
+                          var column = this.parentModel.metadata.columnList[property];
+                          if( 'text' == column.data_type ) {
+                            determineDifferences = true;
+                          } else if( 'varchar' == column.data_type ) {
+                            var match = column.type.match( /varchar\(([0-9]+)\)/ );
+                            if( null != match && 256 < match[1] ) {
+                              determineDifferences = true;
+                            }
+                          }
+                        }
+
+                        if( determineDifferences ) {
+                          var diffText = '';
+                          Diff.diffWords( value2, value1 ).forEach( part => {
+                            diffText += ( part.added ? '<b>' : part.removed ? '<del>' : '' )
+                                      + part.value
+                                      + ( part.added ? '</b>' : part.removed ? '</del>' : '' );
+                          } );
+
+                          if( angular.isUndefined( differences.textDiff ) ) differences.textDiff = {};
+                          differences.textDiff[property] = diffText ? diffText.replace( /\r?\n/g, '<br/>' ) : '';
+                        }
                       }
                     }
                   }

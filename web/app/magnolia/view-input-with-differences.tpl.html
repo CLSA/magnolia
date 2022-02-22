@@ -12,8 +12,10 @@
          model.viewModel.compareRecord[input.key] ? (
            'date' == input.type ? (model.viewModel.compareRecord[input.key]|cnDatetime:'date') :
            'boolean' == input.type ? (model.viewModel.compareRecord[input.key]|cnYesNo|cnUCWords) :
-           'text' == input.type ? (model.viewModel.compareRecord[input.key]|cnNewlines) :
-           model.viewModel.compareRecord[input.key]
+           model.viewModel.compareRecord.differences.textDiff[input.key]
+             ? model.viewModel.compareRecord.differences.textDiff[input.key]
+             : model.viewModel.compareRecord[input.key]
          ) : '(empty)'
-       "></div>
+       ">
+  </div>
 </div>
