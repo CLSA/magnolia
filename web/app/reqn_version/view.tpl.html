@@ -405,7 +405,9 @@
                 <h4 ng-if="0 < model.viewModel.compareRecord.differences.part1.b.coapplicantList.length">Current Version List</h4>
                 <span ng-show="0 == model.viewModel.record.coapplicantList.length"
                       ng-bind-html="t( 'part1.b.noCoapplicants' )"></span>
-                <table class="table table-striped" ng-show="0 < model.viewModel.record.coapplicantList.length">
+                <table class="table table-striped"
+                       ng-class="{ 'table-hover': model.getEditEnabled() }"
+                       ng-show="0 < model.viewModel.record.coapplicantList.length">
                   <thead class="bg-info">
                     <tr>
                       <td ng-bind-html="t( 'part1.b.name' )"></td>
@@ -418,7 +420,7 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr ng-repeat="coapplicant in model.viewModel.record.coapplicantList">
+                    <tr ng-repeat="coapplicant in model.viewModel.record.coapplicantList" ng-click="editCoapplicant( coapplicant.id )">
                       <td>{{ coapplicant.name }}</td>
                       <td>{{ coapplicant.position }}</td>
                       <td>{{ coapplicant.affiliation }}</td>

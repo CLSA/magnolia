@@ -282,6 +282,12 @@ cenozoApp.defineModule( { name: 'reqn_version',
             }
           };
 
+          $scope.editCoapplicant = async function( id ) {
+            if( $scope.model.viewModel.coapplicantModel.getEditEnabled() ) {
+              await $scope.model.viewModel.editCoapplicant( id );
+            }
+          };
+
           $scope.removeCoapplicant = async function( id ) {
             if( $scope.model.viewModel.coapplicantModel.getDeleteEnabled() ) {
               if( !$scope.isDeletingCoapplicant.includes( id ) ) $scope.isDeletingCoapplicant.push( id );
@@ -403,11 +409,11 @@ cenozoApp.defineModule( { name: 'reqn_version',
 
   /* ######################################################################################################## */
   cenozo.providers.factory( 'CnReqnVersionViewFactory', [
-    'CnReqnHelper', 'CnModalNoticeListFactory', 'CnModalUploadAgreementFactory',
+    'CnReqnHelper', 'CnModalNoticeListFactory', 'CnModalUploadAgreementFactory', 'CnModalRecordViewFactory',
     'CnCoapplicantModelFactory', 'CnReferenceModelFactory', 'CnEthicsApprovalModelFactory', 'CnBaseViewFactory',
     'CnSession', 'CnHttpFactory', 'CnModalMessageFactory', 'CnModalConfirmFactory', 'CnModalSubmitLegacyFactory',
     '$state', '$window', '$rootScope',
-    function( CnReqnHelper, CnModalNoticeListFactory, CnModalUploadAgreementFactory,
+    function( CnReqnHelper, CnModalNoticeListFactory, CnModalUploadAgreementFactory, CnModalRecordViewFactory,
               CnCoapplicantModelFactory, CnReferenceModelFactory, CnEthicsApprovalModelFactory, CnBaseViewFactory,
               CnSession, CnHttpFactory, CnModalMessageFactory, CnModalConfirmFactory, CnModalSubmitLegacyFactory,
               $state, $window, $rootScope ) {
@@ -1296,6 +1302,17 @@ cenozoApp.defineModule( { name: 'reqn_version',
             } ).query();
 
             object.coapplicantList = response.data;
+          },
+
+          editCoapplicant: async function( id ) {
+            // open a modal dialog to edit the selected coapplicant
+            this.coapplicantModel.getServiceResourcePath = function() { return 'coapplicant/' + id; };
+            await CnModalRecordViewFactory.instance( {
+              title: this.translate( 'misc.coapplicant' ),
+              closeText: this.translate( 'misc.close' ),
+              model: this.coapplicantModel
+            } ).show();
+            await this.getCoapplicantList();
           },
 
           removeCoapplicant: async function( id ) {

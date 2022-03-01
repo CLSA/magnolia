@@ -1,4 +1,4 @@
-cenozoApp.defineModule( { name: 'coapplicant', models: 'add', create: module => {
+cenozoApp.defineModule( { name: 'coapplicant', models: ['add','view'], create: module => {
 
   angular.extend( module, {
     identifier: {

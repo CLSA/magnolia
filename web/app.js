@@ -735,6 +735,7 @@ cenozo.service( 'CnReqnHelper', [
             remove: { en: 'Remove', fr: 'Supprimer' },
             chars: { en: 'characters', fr: 'caractères' },
             comments: { en: 'Comments', fr: 'Commentaires' },
+            coapplicant: { en: 'Co-Applicant', fr: 'Codemandeur' },
             delete: { en: 'Delete', fr: 'Effacer' },
             download: { en: 'Download', fr: 'Télécharger' },
             application: { en: 'Application', fr: 'Soumission' },
