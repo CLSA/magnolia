@@ -25,6 +25,22 @@ class patch extends \cenozo\service\user\patch
       unset( $patch_array['supervisor_user_id'] );
     }
 
+    // remove newsletter from the patch array
+    if( array_key_exists( 'newsletter', $patch_array ) )
+    {
+      $this->newsletter = $patch_array['newsletter'];
+      $this->update_newsletter = true;
+      unset( $patch_array['newsletter'] );
+    }
+
+    // remove note from the patch array
+    if( array_key_exists( 'note', $patch_array ) )
+    {
+      $this->note = $patch_array['note'];
+      $this->update_note = true;
+      unset( $patch_array['note'] );
+    }
+
     return $patch_array;
   }
 
@@ -35,17 +51,11 @@ class patch extends \cenozo\service\user\patch
   {
     parent::execute();
 
-    // process the supervisor, if it exists
-    if( $this->update_supervisor ) $this->set_supervisor();
-  }
-
-  /**
-   * Sets the user's supervisor
-   */
-  protected function set_supervisor()
-  {
+    // process the extra data, if it exists
     $db_applicant = $this->get_leaf_record()->get_applicant();
-    $db_applicant->supervisor_user_id = $this->supervisor_user_id;
+    if( $this->update_supervisor ) $db_applicant->supervisor_user_id = $this->supervisor_user_id;
+    if( $this->update_newsletter ) $db_applicant->newsletter = $this->newsletter;
+    if( $this->update_note ) $db_applicant->note = $this->note;
     $db_applicant->save();
   }
 
@@ -62,4 +72,32 @@ class patch extends \cenozo\service\user\patch
    * @access protected
    */
   protected $supervisor_user_id = NULL;
+
+  /**
+   * Whether the newsletter needs to be updated
+   * @var boolean
+   * @access protected
+   */
+  protected $update_newsletter = false;
+
+  /**
+   * What to chante the user's newsletter to
+   * @var int
+   * @access protected
+   */
+  protected $newsletter = NULL;
+
+  /**
+   * Whether the note needs to be updated
+   * @var boolean
+   * @access protected
+   */
+  protected $update_note = false;
+
+  /**
+   * What to chante the user's note to
+   * @var int
+   * @access protected
+   */
+  protected $note = NULL;
 }

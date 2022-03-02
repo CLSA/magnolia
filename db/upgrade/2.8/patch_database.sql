@@ -8,6 +8,8 @@ SOURCE deadline.sql
 SOURCE report_type.sql
 SOURCE report_restriction.sql
 SOURCE report_has_report_restriction.sql
+SOURCE applicant.sql
+SOURCE role.sql
 SOURCE service.sql
 SOURCE role_has_service.sql
 

@@ -300,9 +300,14 @@ cenozoApp.defineModule( { name: 'reqn', dependencies: [ 'output' ], models: ['ad
       }
     },
     note: {
-      title: 'Administrative Note',
+      title: 'Administrative Notes',
       type: 'text',
       isExcluded: function( $state, model ) { return !model.isRole( 'administrator', 'readonly', 'typist' ); }
+    },
+    chair_note: {
+      title: 'Chair\'s Notes',
+      type: 'text',
+      isExcluded: function( $state, model ) { return !model.isRole( 'administrator', 'chair' ); }
     },
 
     current_reqn_version_id: { column: 'reqn_version.id', type: 'string', isExcluded: true },
@@ -372,6 +377,13 @@ cenozoApp.defineModule( { name: 'reqn', dependencies: [ 'output' ], models: ['ad
     },
     deferral_note_1f: {
       title: '', // defined dynamically in the model
+      type: 'text',
+      isExcluded: function( $state, model ) {
+        return 'add' == model.getActionFromState() || 'Report Required' == model.viewModel.record.stage_type;
+      }
+    },
+    deferral_note_cohort: {
+      title: 'Cohort & Longitudinal Analyses',
       type: 'text',
       isExcluded: function( $state, model ) {
         return 'add' == model.getActionFromState() || 'Report Required' == model.viewModel.record.stage_type;
@@ -925,6 +937,7 @@ cenozoApp.defineModule( { name: 'reqn', dependencies: [ 'output' ], models: ['ad
               this.record.deferral_note_1a || this.record.deferral_note_1b ||
               this.record.deferral_note_1c || this.record.deferral_note_1d ||
               this.record.deferral_note_1e || this.record.deferral_note_1f ||
+              this.record.deferral_note_cohort ||
               this.record.deferral_note_2a || this.record.deferral_note_2b ||
               this.record.deferral_note_2c || this.record.deferral_note_2d ||
               this.record.deferral_note_2e

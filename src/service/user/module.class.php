@@ -20,15 +20,10 @@ class module extends \cenozo\service\user\module
   {
     parent::prepare_read( $select, $modifier );
 
-    if( $select->has_column( 'newsletter' ) )
-    {
-      $modifier->left_join( 'applicant', 'user.id', 'applicant.user_id' );
-      $select->add_column( 'IFNULL( applicant.newsletter, false )', 'newsletter', false );
-    }
+    $modifier->left_join( 'applicant', 'user.id', 'applicant.user_id' );
 
     if( $select->has_column( 'supervisor_user_id' ) )
     {
-      $modifier->left_join( 'applicant', 'user.id', 'applicant.user_id' );
       $modifier->left_join( 'user', 'applicant.supervisor_user_id', 'supervisor_user.id', 'supervisor_user' );
       $select->add_column( 'applicant.supervisor_user_id', 'supervisor_user_id', false );
       $select->add_column(
@@ -37,6 +32,11 @@ class module extends \cenozo\service\user\module
         false
       );
     }
+
+    if( $select->has_column( 'newsletter' ) )
+      $select->add_column( 'IFNULL( applicant.newsletter, false )', 'newsletter', false, 'boolean' );
+
+    if( $select->has_column( 'note' ) ) $select->add_column( 'applicant.note', 'note', false );
 
     if( $this->get_argument( 'reviewer_only', false ) )
     {

@@ -110,6 +110,7 @@ cenozoApp.defineModule( { name: 'reqn_version',
     deferral_note_1d: { column: 'reqn.deferral_note_1d', type: 'text' },
     deferral_note_1e: { column: 'reqn.deferral_note_1e', type: 'text' },
     deferral_note_1f: { column: 'reqn.deferral_note_1f', type: 'text' },
+    deferral_note_cohort: { column: 'reqn.deferral_note_cohort', type: 'text' },
     deferral_note_2a: { column: 'reqn.deferral_note_2a', type: 'text' },
     deferral_note_2b: { column: 'reqn.deferral_note_2b', type: 'text' },
     deferral_note_2c: { column: 'reqn.deferral_note_2c', type: 'text' },
@@ -153,6 +154,7 @@ cenozoApp.defineModule( { name: 'reqn_version',
             isDeletingReference: [],
             isDeletingEthicsApproval: [],
             reportRequiredWarningShown: false,
+            isTitleConstant: function() { return !scope.model.isRole( 'administrator' ) && scope.isDescriptionConstant() },
             isDescriptionConstant: function() { return '.' != scope.model.viewModel.record.amendment; }
           } );
 

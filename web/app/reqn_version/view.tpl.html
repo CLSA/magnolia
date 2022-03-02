@@ -125,6 +125,7 @@
         <a ng-click="model.viewModel.setFormTab(0,'part2')"
            ng-class="{
              'text-warning flashing': model.getEditEnabled() && (
+               model.viewModel.record.deferral_note_cohort ||
                model.viewModel.record.deferral_note_2a || model.viewModel.record.deferral_note_2b ||
                model.viewModel.record.deferral_note_2c || model.viewMOdel.record.deferral_note_2d ||
                model.viewModel.record.deferral_note_2e
@@ -604,7 +605,7 @@
                     key: 'title',
                     title: t( 'part1.d.title' ),
                     type: model.inputList.title.type,
-                    isConstant: isDescriptionConstant
+                    isConstant: isTitleConstant
                   }"
                   difference="model.viewModel.compareRecord.differences.part1.d.title"
                   model="model">
@@ -957,7 +958,10 @@
               ng-class="{'active':section[2] == model.viewModel.formTab[2]}">
             <a ng-click="model.viewModel.setFormTab(2,section[2])"
                ng-class="{
-                 'text-warning flashing':model.getEditEnabled() && model.viewModel.record['deferral_note_2'+section[2]],
+                 'text-warning flashing':model.getEditEnabled() && ( 
+                   ( 'cohort' == section[2] && model.viewModel.record.deferral_note_cohort ) ||
+                   model.viewModel.record['deferral_note_2'+section[2]]
+                 ),
                  'bg-warning': model.viewModel.compareRecord.differences.part2[section[2]].diff
                }"
                ng-bind-html="t( 'part2.'+section[2]+'.tab' )"></a>
@@ -976,6 +980,7 @@
         <div ng-show="'cohort'==model.viewModel.formTab[2]" class="panel panel-default" style="border-top-left-radius: 0px;">
           <div class="panel-body" style="padding-bottom: 0px;">
             <form ng-attr-id="part2CohortForm" ng-attr-name="part2CohortForm" novalidate>
+              <cn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_cohort"></cn-deferral-note>
               <p class="text-primary" ng-bind-html="t( 'part2.cohort.text1' )"></p>
               <div class="container-fluid form-horizontal">
                 <fieldset ng-disabled="!model.getEditEnabled()">

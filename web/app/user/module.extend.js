@@ -10,10 +10,9 @@ cenozoApp.extendModule( { name: 'user', create: module => {
     type: 'boolean'
   } );
 
-  // add the supervisor input
+  // add extra inputs
   module.addInput( '', 'supervisor_user_id', {
     title: 'Supervisor',
-    type: 'string',
     type: 'lookup-typeahead',
     typeahead: {
       table: 'user',
@@ -24,6 +23,14 @@ cenozoApp.extendModule( { name: 'user', create: module => {
     help: 'If set then all new requisitions created by this user will define the supervisor as the primary applicant ' +
           'and this user as the trainee.'
   } );
+
+  module.addInput( '', 'newsletter', {
+    title: 'Newsletter Consent',
+    type: 'boolean',
+    help: 'Whether the user will be included in the newsletter mailouts.'
+  } );
+
+  module.addInput( '', 'note', { title: 'Note', type: 'text' } );
 
   // extend the model factory
   cenozo.providers.decorator( 'CnUserModelFactory', [

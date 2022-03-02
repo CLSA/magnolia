@@ -74,7 +74,7 @@ cenozo.service( 'CnModalNoticeListFactory', [
             CnModalMessageFactory.instance( {
               title: 'Permission Required',
               message: 'Your web browser is not allowing this site to open pop-up windows. ' +
-                       'In order to download your notices you must allow pop-up windows in your browser\'s settings.',
+                       'In order to download your notices you must allow pop-up windows in your browser’s settings.',
               error: true
             } ).show();
           } else {
@@ -437,8 +437,8 @@ cenozo.service( 'CnReqnHelper', [
               fr: "Les demandes de modification seront évalués au fur et à mesure qu’ils seront reçus. Vous DEVEZ attendre l’autorisation avant d’effectuer les modifications demandées."
             },
             text2: {
-              en: 'All requests will be reviewed by the CLSA. If the change is deemed to be significant, the request will be forwarded to the Chair of the CLSA Data and Biospecimen Access Committee (DSAC) who may request a new application be submitted for review and approval. Certain changes may require an amendment to your CLSA Access Agreement.',
-              fr: 'Toutes les demandes seront révisées par l’ÉLCV. Si les changements apportés sont jugés majeurs, la demande sera envoyée au président du Comité chargé de l’accès aux données et aux échantillons biologiques qui pourrait exiger qu’une nouvelle demande d’accès soit soumise et approuvée. Certains changements peuvent nécessiter une modification de votre Entente d’accès de l’ÉLCV.'
+              en: 'All requests will be reviewed by the CLSA. If the change is deemed to be significant, the request will be forwarded to the Chair of the CLSA Data and Biospecimen Access Committee (DSAC) who may request a new application be submitted for review and approval. Certain changes may require an amendment to your CLSA Access Agreement.  If you require a change to the title of your project please contact <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.',
+              fr: 'Toutes les demandes seront révisées par l’ÉLCV. Si les changements apportés sont jugés majeurs, la demande sera envoyée au président du Comité chargé de l’accès aux données et aux échantillons biologiques qui pourrait exiger qu’une nouvelle demande d’accès soit soumise et approuvée. Certains changements peuvent nécessiter une modification de votre Entente d’accès de l’ÉLCV.  Si vous souhaitez modifier le titre de votre projet, veuillez contacter access@clsa-elcv.ca.'
             },
             text3: {
               en: "Please indicate the purpose of your amendment request. (Check ALL that apply):",
@@ -474,8 +474,8 @@ cenozo.service( 'CnReqnHelper', [
                 fr: '<strong>Demandeur principal</strong> : Le demandeur principal sera la personne-ressource pour l’Entente d’accès de l’ÉLCV, ainsi que pour la transmission des données et toute mise à jour pertinente.  Le demandeur principal doit occuper un poste admissible (à titre continu ou pour une durée déterminée) dans un établissement admissible qui est en mesure de respecter les conditions de l’Entente d’accès aux données, d’administrer les fonds de la subvention et de fournir l’approbation du comité d’éthique de la recherche.'
               },
               text2: {
-                en: 'For Trainee (MSc, PhD and Postdoctoral Fellow) applications, the primary applicant must be the supervisor and the trainee must be clearly identified.',
-                fr: 'Pour les demandes soumises par des étudiants (M. Sc., Ph. D.) ou des chercheurs postdoctoraux, le demandeur principal doit être le superviseur. L’étudiant ou le chercheur postdoctoral doit être clairement identifié dans la demande.'
+                en: 'For Trainee (Master’s, PhD and Postdoctoral Fellow) applications, the primary applicant must be the supervisor and the trainee must be clearly identified.',
+                fr: 'Pour les demandes soumises par des étudiants (Maîtrise, Ph. D.) ou des chercheurs postdoctoraux, le demandeur principal doit être le superviseur. L’étudiant ou le chercheur postdoctoral doit être clairement identifié dans la demande.'
               },
               applicant_name: { en: 'Name', fr: 'Nom' },
               applicant_position: { en: 'Position', fr: 'Poste' },
@@ -485,8 +485,8 @@ cenozo.service( 'CnReqnHelper', [
               applicant_phone: { en: 'Phone', fr: 'Téléphone' },
               applicant_email: { en: 'E-mail', fr: 'Courriel' },
               text3: {
-                en: 'Complete this section if this is a Trainee application (MSc, PhD and Postdoctoral Fellow).',
-                fr: 'Remplissez cette section si la demande est pour un étudiant (M. Sc., Ph. D.) ou un chercheur postdoctoral.'
+                en: 'Complete this section if this is a Trainee application (Master’s, PhD and Postdoctoral Fellow).',
+                fr: 'Remplissez cette section si la demande est pour un étudiant (Maîtrise, Ph. D.) ou un chercheur postdoctoral.'
               },
               trainee_name: { en: 'Name', fr: 'Nom' },
               trainee_program: { en: 'Degree and Program of Study', fr: 'Grade et programme d’étude' },
@@ -496,8 +496,8 @@ cenozo.service( 'CnReqnHelper', [
               trainee_phone: { en: 'Phone', fr: 'Téléphone' },
               trainee_email: { en: 'E-mail', fr: 'Courriel' },
               text4: {
-                en: 'Graduate students (MSc or PhD) who wish to obtain the CLSA data for the sole purpose of their thesis, and postdoctoral fellows (limit 1 waiver per postdoc) who wish to obtain the CLSA data for the sole purpose of their postdoctoral project who are enrolled at Canadian institutions for their graduate degree or postdoc, can apply for a fee waiver. Canadian trainees working outside Canada but funded through a Canadian source are also eligible for a fee waiver. The CIHR Catalyst Grants for the use of CLSA Data are not eligible for Trainee Fee Waivers.',
-                fr: 'Les étudiants de deuxième et troisième cycle (M. Sc. ou Ph. D.) et les chercheurs postdoctoraux (limite d’une exonération par post doctorat) qui désirent utiliser les données de l’ÉLCV uniquement pour leur recherche et qui sont inscrits à un établissement canadien peuvent demander une exonération des frais. Les stagiaires canadiens qui travaillent à l’extérieur du Canada, mais qui sont financés par un organisme canadien peuvent également demander une exonération des frais. Les subventions catalyseur pour l’analyse des données de l’ÉLCV ne sont pas admissibles à l’exonération des frais pour les stagiaires.'
+                en: 'Graduate students (Master’s or PhD) who wish to obtain the CLSA data for the sole purpose of their thesis, and postdoctoral fellows (limit 1 waiver per postdoc) who wish to obtain the CLSA data for the sole purpose of their postdoctoral project who are enrolled at Canadian institutions for their graduate degree or postdoc, can apply for a fee waiver. Canadian trainees working outside Canada but funded through a Canadian source are also eligible for a fee waiver. The CIHR Catalyst Grants for the use of CLSA Data are not eligible for Trainee Fee Waivers.',
+                fr: 'Les étudiants de deuxième et troisième cycle (Maîtrise ou Ph. D.) et les chercheurs postdoctoraux (limite d’une exonération par post doctorat) qui désirent utiliser les données de l’ÉLCV uniquement pour leur recherche et qui sont inscrits à un établissement canadien peuvent demander une exonération des frais. Les stagiaires canadiens qui travaillent à l’extérieur du Canada, mais qui sont financés par un organisme canadien peuvent également demander une exonération des frais. Les subventions catalyseur pour l’analyse des données de l’ÉLCV ne sont pas admissibles à l’exonération des frais pour les stagiaires.'
               },
               waiver: { en: 'Fee Waiver Type', fr: 'Type d’exemption de frais' }
             },
@@ -764,7 +764,7 @@ cenozo.service( 'CnReqnHelper', [
             expirationDate: { en: 'Expiration Date', fr: 'Date limite' },
             addEthicsApproval: { en: 'Add Ethics Approval', fr: 'Ajouter une lettre d’approbation éthique' },
             reportRequiredWarning: {
-              en: 'This application\'s final report is required, would you like to view it now?',
+              en: 'This application’s final report is required, would you like to view it now?',
               fr: 'Il faut fournir un rapport final pour cette demande, souhaitez-vous l’afficher maintenant?'
             },
             costCombined: {
@@ -898,8 +898,8 @@ cenozo.service( 'CnReqnHelper', [
               fr: '3 ans + 3 années supplémentaires'
             },
             traineeFeeWaiver: {
-              en: 'Fee Waiver for Graduate student (MSc or PhD) for thesis only',
-              fr: 'Exonération pour un étudiant des cycles supérieurs (M. Sc. ou Ph. D.) pour la thèse seulement'
+              en: 'Fee Waiver for Graduate student (Master’s or PhD) for thesis only',
+              fr: 'Exonération pour un étudiant des cycles supérieurs (Maîtrise ou Ph. D.) pour la thèse seulement'
             },
             postdocFeeWaiver: {
               en: 'Fee Waiver for Postdoctoral Fellow (limit 1 waiver for postdoctoral studies)',
