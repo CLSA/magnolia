@@ -47,7 +47,7 @@ cenozoApp.defineModule( { name: 'reqn', dependencies: [ 'output' ], models: ['ad
       amendment_version: {
         title: 'Version',
         isIncluded: function( $state, model ) {
-          return !model.isRole( 'typist' ) && 'data_sharing' != model.getActionFromState();
+          return !model.isRole( 'applicant', 'designate', 'typist' ) && 'data_sharing' != model.getActionFromState();
         }
       },
       ethics_expiry: {
@@ -56,6 +56,22 @@ cenozoApp.defineModule( { name: 'reqn', dependencies: [ 'output' ], models: ['ad
         type: 'date',
         isIncluded: function( $state, model ) {
           return !model.isRole( 'typist' ) && 'data_sharing' != model.getActionFromState();
+        }
+      },
+      agreement_start_date: {
+        column: 'reqn_version.agreement_start_date',
+        title: 'Agreement Start',
+        type: 'date',
+        isIncluded: function( $state, model ) {
+          return model.isRole( 'applicant', 'designate' ) && 'data_sharing' != model.getActionFromState();
+        }
+      },
+      agreement_end_date: {
+        column: 'reqn_version.agreement_end_date',
+        title: 'Agreement End',
+        type: 'date',
+        isIncluded: function( $state, model ) {
+          return model.isRole( 'applicant', 'designate' ) && 'data_sharing' != model.getActionFromState();
         }
       },
       status: {
