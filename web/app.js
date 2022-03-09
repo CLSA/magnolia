@@ -905,7 +905,7 @@ cenozo.service( 'CnReqnHelper', [
               en: 'Fee waiver for postdoctoral fellow (limit 1 waiver for postdoctoral studies)',
               fr: 'Exonération pour un boursier postdoctoral (limite d’une exonération pour les études postdoctorales)'
             },
-            fellowFeeWaiver: {
+            clinicalFeeWaiver: {
               en: 'Clinical fellow with protected time for research (limit 1 waiver)',
               fr: 'Chercheur-boursier clinicien avec temps réservé à la recherche (limite 1 exonération)'
             },

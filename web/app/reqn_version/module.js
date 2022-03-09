@@ -627,7 +627,7 @@ cenozoApp.defineModule( { name: 'reqn_version',
                 await this.$$onPatch( data );
 
                 if( angular.isDefined( data.applicant_country_id ) || angular.isDefined( data.trainee_country_id ) ) {
-                  // we may have to set the fee waiver type to none if either the applicant or trainee is not Canadian
+                  // we may have to set the fee waiver type to (empty) if either the applicant or trainee is not Canadian
                   if( this.record.waiver && !this.isWaiverAllowed() ) this.record.waiver = '';
                 } else if( angular.isDefined( data.comprehensive ) || angular.isDefined( data.tracking ) ) {
                   if( this.record.comprehensive && this.record.tracking ) {
@@ -773,7 +773,9 @@ cenozoApp.defineModule( { name: 'reqn_version',
               if( baseCountryId != traineeCountryId || baseCountryId != applicantCountryId ) {
                 // if either the trainee or applicant isn't Canadian then the base fee is 5000
                 cost = 5000;
-              } else if( baseCountryId == traineeCountryId && baseCountryId == applicantCountryId && this.record.waiver ) {
+              } else if( baseCountryId == traineeCountryId &&
+                         baseCountryId == applicantCountryId &&
+                         this.record.waiver && 'none' != this.record.waiver ) {
                 // if both are canadian and there is a fee waiver means the base cost is 0
                 cost = 0;
               }
@@ -2386,11 +2388,11 @@ cenozoApp.defineModule( { name: 'reqn_version',
               };
               this.metadata.columnList.waiver.enumList.en[0].name = misc.traineeFeeWaiver.en;
               this.metadata.columnList.waiver.enumList.en[1].name = misc.postdocFeeWaiver.en;
-              this.metadata.columnList.waiver.enumList.en[2].name = misc.fellowFeeWaiver.en;
+              this.metadata.columnList.waiver.enumList.en[2].name = misc.clinicalFeeWaiver.en;
               this.metadata.columnList.waiver.enumList.en[3].name = misc.none.en;
               this.metadata.columnList.waiver.enumList.fr[0].name = misc.traineeFeeWaiver.fr;
               this.metadata.columnList.waiver.enumList.fr[1].name = misc.postdocFeeWaiver.fr;
-              this.metadata.columnList.waiver.enumList.fr[2].name = misc.fellowFeeWaiver.fr;
+              this.metadata.columnList.waiver.enumList.fr[2].name = misc.clinicalFeeWaiver.fr;
               this.metadata.columnList.waiver.enumList.fr[3].name = misc.none.fr;
 
               this.metadata.columnList.waiver.enumList.en.unshift( { value: '', name: misc.choose.en } );

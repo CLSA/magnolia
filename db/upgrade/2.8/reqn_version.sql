@@ -21,7 +21,7 @@ CREATE PROCEDURE patch_reqn_version()
     AND column_type = "enum('graduate','postdoc')";
 
     IF @test = 1 THEN
-      ALTER TABLE reqn_version MODIFY COLUMN waiver ENUM('graduate', 'postdoc', 'fellow', 'none') NULL DEFAULT NULL;
+      ALTER TABLE reqn_version MODIFY COLUMN waiver ENUM('graduate', 'postdoc', 'clinical', 'none') NULL DEFAULT NULL;
 
       -- By default, all reqns except for those in the new stage get waiver = no
       UPDATE reqn_version

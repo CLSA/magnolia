@@ -354,7 +354,10 @@ class reqn_version extends \cenozo\database\record
       if( $base_country_id != $trainee_country_id || $base_country_id != $applicant_country_id ) {
         // if either the trainee or applicant isn't Canadian then the base fee is 5000
         $cost = 5000;
-      } else if( $base_country_id == $trainee_country_id && $base_country_id == $applicant_country_id && !is_null( $this->waiver ) ) {
+      } else if( $base_country_id == $trainee_country_id &&
+                 $base_country_id == $applicant_country_id &&
+                 !is_null( $this->waiver ) &&
+                 'none' != $this->waiver ) {
         // if both are canadian and there is a fee waiver means the base cost is 0
         $cost = 0;
       }
@@ -535,6 +538,7 @@ class reqn_version extends \cenozo\database\record
       {
         if( 'graduate' == $this->waiver ) $data['waiver_graduate'] = 'Yes';
         else if( 'postdoc' == $this->waiver ) $data['waiver_postdoc'] = 'Yes';
+        else if( 'clinical' == $this->waiver ) $data['waiver_clinical'] = 'Yes';
       }
     }
     if( !is_null( $this->start_date ) ) $data['start_date'] = $this->start_date->format( 'Y-m-d' );
