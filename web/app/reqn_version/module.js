@@ -1656,7 +1656,7 @@ cenozoApp.defineModule( { name: 'reqn_version',
               var requiredTabList = {
                 '1a': [
                   'applicant_position', 'applicant_affiliation', 'applicant_address',
-                  'applicant_country_id', 'applicant_phone'
+                  'applicant_country_id', 'applicant_phone', 'waiver'
                 ],
                 '1b': [ 'coapplicant_agreement_filename' ],
                 '1c': [ 'start_date', 'duration' ],
@@ -1705,8 +1705,15 @@ cenozoApp.defineModule( { name: 'reqn_version',
                 var firstProperty = null;
                 requiredTabList[tab].filter( property => {
                   if( '1a' == tab ) {
-                    // only check the country if show_prices is on
-                    return 'applicant_country_id' != property || this.record.show_prices;
+                    if( 'waiver' == property ) {
+                      // only check the waiver if a waiver is allowed
+                      return this.isWaiverAllowed();
+                    } else if ( 'application_country_id' == property ) {
+                      // only check the country if show_prices is on
+                      return this.record.show_prices;
+                    } else {
+                      return true;
+                    }
                   } else if( '1b' == tab ) {
                     // only check 1b properties if there is a new coapplication with access to data
                     return this.addingCoapplicantWithData;
@@ -2373,16 +2380,21 @@ cenozoApp.defineModule( { name: 'reqn_version',
               this.metadata.columnList.ethics.enumList.fr.unshift( { value: '', name: misc.choose.fr } );
 
               // translate waiver enum
-              this.metadata.columnList.waiver.enumList.unshift( { value: '', name: misc.none.en } );
               this.metadata.columnList.waiver.enumList = {
                 en: this.metadata.columnList.waiver.enumList,
                 fr: angular.copy( this.metadata.columnList.waiver.enumList )
               };
-              this.metadata.columnList.waiver.enumList.en[1].name = misc.traineeFeeWaiver.en;
-              this.metadata.columnList.waiver.enumList.en[2].name = misc.postdocFeeWaiver.en;
-              this.metadata.columnList.waiver.enumList.fr[0].name = misc.none.fr;
-              this.metadata.columnList.waiver.enumList.fr[1].name = misc.traineeFeeWaiver.fr;
-              this.metadata.columnList.waiver.enumList.fr[2].name = misc.postdocFeeWaiver.fr;
+              this.metadata.columnList.waiver.enumList.en[0].name = misc.traineeFeeWaiver.en;
+              this.metadata.columnList.waiver.enumList.en[1].name = misc.postdocFeeWaiver.en;
+              this.metadata.columnList.waiver.enumList.en[2].name = misc.fellowFeeWaiver.en;
+              this.metadata.columnList.waiver.enumList.en[3].name = misc.none.en;
+              this.metadata.columnList.waiver.enumList.fr[0].name = misc.traineeFeeWaiver.fr;
+              this.metadata.columnList.waiver.enumList.fr[1].name = misc.postdocFeeWaiver.fr;
+              this.metadata.columnList.waiver.enumList.fr[2].name = misc.fellowFeeWaiver.fr;
+              this.metadata.columnList.waiver.enumList.fr[3].name = misc.none.fr;
+
+              this.metadata.columnList.waiver.enumList.en.unshift( { value: '', name: misc.choose.en } );
+              this.metadata.columnList.waiver.enumList.fr.unshift( { value: '', name: misc.choose.fr } );
             }
 
             // only do the following for the root instance

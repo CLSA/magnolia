@@ -528,7 +528,9 @@ class reqn extends \cenozo\database\record
     $stage_type_class_name = lib::get_class_name( 'database\stage_type' );
     $notification_type_class_name = lib::get_class_name( 'database\notification_type' );
     $setting_manager = lib::create( 'business\setting_manager' );
-    $db_user = lib::create( 'business\session' )->get_user();
+    $session = lib::create( 'business\session' );
+    $db_user = $session->get_user();
+    $db_application = $session->get_application();
     $db_current_stage = $this->get_current_stage();
     $db_current_stage_type = is_null( $db_current_stage ) ? NULL : $db_current_stage->get_stage_type();
     $db_reqn_type = $this->get_reqn_type();
@@ -670,18 +672,28 @@ class reqn extends \cenozo\database\record
     $db_next_stage->stage_type_id = $db_next_stage_type->id;
     $db_next_stage->save();
 
-    // if we have just entered the admin review stage then set the identifier and mark the version datetime
     if( 'Admin Review' == $db_next_stage_type->name )
     {
       // we don't need to do this step if this is a new amendment
       if( !$start_amendment )
       {
+        // if we have just entered the admin review stage then set the identifier...
         $this->identifier = $db_reqn_type->is_deadline_required()
                           ? $this->get_deadline()->get_next_identifier()
                           : $db_reqn_type->get_next_identifier();
         $this->save();
 
+        // ...and mark the version datetime
         $db_reqn_version->datetime = util::get_datetime_object();
+
+        // ...and set the waiver to none if the reqn is not eligible
+        if( is_null( $this->trainee_user_id ) || (
+          !is_null( $db_reqn_version->applicant_country_id ) &&
+          $db_application->country_id != $db_reqn_version->applicant_country_id &&
+          !is_null( $db_reqn_version->trainee_country_id ) &&
+          $db_application->country_id != $db_reqn_version->trainee_country_id
+        ) ) $db_reqn_version->waiver = 'none';
+
         $db_reqn_version->save();
       }
     }

@@ -4,6 +4,7 @@ SET AUTOCOMMIT=0;
 
 SOURCE table_character_sets.sql
 SOURCE reqn.sql
+SOURCE reqn_version.sql
 SOURCE deadline.sql
 SOURCE report_type.sql
 SOURCE report_restriction.sql

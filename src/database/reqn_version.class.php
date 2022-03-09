@@ -32,17 +32,6 @@ class reqn_version extends \cenozo\database\record
       $this->funding_filename = NULL;
     }
 
-    // don't allow a fee waiver if either the applicant or trainee are not Canadian
-    if( !is_null( $this->waiver ) )
-    {
-      $db_application = lib::create( 'business\session' )->get_application();
-      if( ( !is_null( $this->applicant_country_id ) && $db_application->country_id != $this->applicant_country_id ) ||
-          ( !is_null( $this->trainee_country_id ) && $db_application->country_id != $this->trainee_country_id ) )
-      {
-        $this->waiver = NULL;
-      }
-    }
-
     parent::save();
 
     // delete files if they are being set to null

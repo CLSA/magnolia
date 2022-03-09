@@ -474,8 +474,8 @@ cenozo.service( 'CnReqnHelper', [
                 fr: '<strong>Demandeur principal</strong> : Le demandeur principal sera la personne-ressource pour l’Entente d’accès de l’ÉLCV, ainsi que pour la transmission des données et toute mise à jour pertinente.  Le demandeur principal doit occuper un poste admissible (à titre continu ou pour une durée déterminée) dans un établissement admissible qui est en mesure de respecter les conditions de l’Entente d’accès aux données, d’administrer les fonds de la subvention et de fournir l’approbation du comité d’éthique de la recherche.'
               },
               text2: {
-                en: 'For Trainee (Master’s, PhD and Postdoctoral Fellow) applications, the primary applicant must be the supervisor and the trainee must be clearly identified.',
-                fr: 'Pour les demandes soumises par des étudiants (Maîtrise, Ph. D.) ou des chercheurs postdoctoraux, le demandeur principal doit être le superviseur. L’étudiant ou le chercheur postdoctoral doit être clairement identifié dans la demande.'
+                en: '<strong>Fee Waivers</strong>: Please see below to select the fee waiver.',
+                fr: '<strong>Exonération des frais</strong> : Sélectionnez l’exonération des frais ci-dessous.'
               },
               applicant_name: { en: 'Name', fr: 'Nom' },
               applicant_position: { en: 'Position', fr: 'Poste' },
@@ -898,12 +898,16 @@ cenozo.service( 'CnReqnHelper', [
               fr: '3 ans + 3 années supplémentaires'
             },
             traineeFeeWaiver: {
-              en: 'Fee Waiver for Graduate student (Master’s or PhD) for thesis only',
+              en: 'Fee waiver for graduate student (Master’s or PhD) for thesis only',
               fr: 'Exonération pour un étudiant des cycles supérieurs (Maîtrise ou Ph. D.) pour la thèse seulement'
             },
             postdocFeeWaiver: {
-              en: 'Fee Waiver for Postdoctoral Fellow (limit 1 waiver for postdoctoral studies)',
+              en: 'Fee waiver for postdoctoral fellow (limit 1 waiver for postdoctoral studies)',
               fr: 'Exonération pour un boursier postdoctoral (limite d’une exonération pour les études postdoctorales)'
+            },
+            fellowFeeWaiver: {
+              en: 'Clinical fellow with protected time for research (limit 1 waiver)',
+              fr: 'Chercheur-boursier clinicien avec temps réservé à la recherche (limite 1 exonération)'
             },
             clickToSelect: {
               en: '(click to select)',
