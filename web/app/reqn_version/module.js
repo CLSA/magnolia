@@ -100,6 +100,7 @@ cenozoApp.defineModule( { name: 'reqn_version',
     has_unread_notice: { type: 'boolean' },
     has_ethics_approval_list: { type: 'boolean' },
     stage_type: { column: 'stage_type.name', type: 'string' },
+    stage_type_rank: { column: 'stage_type.rank', type: 'string' },
     phase: { column: 'stage_type.phase', type: 'string' },
     lang: { column: 'language.code', type: 'string' },
     deadline: { column: 'deadline.datetime', type: 'datetime' },
@@ -805,6 +806,12 @@ cenozoApp.defineModule( { name: 'reqn_version',
             );
 
             return 'en' == this.record.lang ? '$' + cost : cost + ' $';
+          },
+
+          isWaiverMutable: function() {
+            // waviers can only be changed by administrators once the revision require stage (or after) has been reached
+            return this.parentModel.isRole( 'administrator' ) ||
+                   this.record.stage_type_rank < CnSession.application.revisionRequiredRank;
           },
 
           isWaiverAllowed: function() {

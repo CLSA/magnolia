@@ -387,7 +387,7 @@
                     title: t( 'part1.a.waiver' ),
                     type: 'enum',
                     enumList: model.metadata.columnList.waiver.enumList[model.viewModel.record.lang],
-                    constant: !model.viewModel.isWaiverAllowed()
+                    constant: !model.viewModel.isWaiverAllowed() || !model.viewModel.isWaiverMutable()
                   }"
                   difference="model.viewModel.compareRecord.differences.part1.a.waiver"
                   model="model">

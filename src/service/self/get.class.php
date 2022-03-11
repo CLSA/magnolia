@@ -18,6 +18,7 @@ class get extends \cenozo\service\self\get
    */
   protected function create_resource( $index )
   {
+    $stage_type_class_name = lib::get_class_name( 'database\stage_type' );
     $setting_manager = lib::create( 'business\setting_manager' );
 
     $db_user = lib::create( 'business\session' )->get_user();
@@ -31,6 +32,10 @@ class get extends \cenozo\service\self\get
     $resource['application']['study_data_url'] = sprintf( '%s/%s', str_replace( '/api', '', ROOT_URL ), STUDY_DATA_URL );
     $resource['application']['base_country_id'] = $db_application->country_id;
     $resource['user']['newsletter'] = $db_user->get_newsletter();
+
+    // always include the rank of the revision required stage as it is needed when editing reqns
+    $resource['application']['revision_required_rank'] =
+      $stage_type_class_name::get_unique_record( 'name', 'Revision Required' )->rank;
 
     return $resource;
   }
