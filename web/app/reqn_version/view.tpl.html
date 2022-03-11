@@ -421,7 +421,8 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr ng-repeat="coapplicant in model.viewModel.record.coapplicantList" ng-click="editCoapplicant( coapplicant.id )">
+                    <tr ng-repeat="coapplicant in model.viewModel.record.coapplicantList"
+                        ng-click="model.getEditEnabled() && editCoapplicant( coapplicant.id )">
                       <td>{{ coapplicant.name }}</td>
                       <td>{{ coapplicant.position }}</td>
                       <td>{{ coapplicant.affiliation }}</td>

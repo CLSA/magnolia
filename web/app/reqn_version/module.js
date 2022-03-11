@@ -508,7 +508,7 @@ cenozoApp.defineModule( { name: 'reqn_version',
               if( this.record.has_ethics_approval_list ) promiseList.push( this.getEthicsApprovalList() );
 
               await Promise.all( promiseList );
-              await this.getVersionList();
+              if( !this.parentModel.isRole( 'applicant', 'designate' ) ) await this.getVersionList();
 
               // the category list will have been loaded by now, so we can load the selected tabs
               this.setFormTab( 0, this.parentModel.getQueryParameter( 't0' ), false );
@@ -1086,7 +1086,7 @@ cenozoApp.defineModule( { name: 'reqn_version',
 
                         if( determineDifferences ) {
                           var diffText = '';
-                          Diff.diffWords( value2, value1 ).forEach( part => {
+                          Diff.diffWords( null == value2 ? '' : value2, null == value1 ? '' : value1 ).forEach( part => {
                             diffText += ( part.added ? '<b>' : part.removed ? '<del>' : '' )
                                       + part.value
                                       + ( part.added ? '</b>' : part.removed ? '</del>' : '' );
