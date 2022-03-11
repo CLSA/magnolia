@@ -13,6 +13,7 @@ SOURCE applicant.sql
 SOURCE role.sql
 SOURCE service.sql
 SOURCE role_has_service.sql
+SOURCE notification_type.sql
 
 SOURCE update_version_number.sql
 

@@ -1262,6 +1262,80 @@ class reqn extends \cenozo\database\record
   }
 
   /**
+   * Sends expired reqn notifications
+   */
+  public static function send_expired_reqn_notifications()
+  {
+    $notification_type_class_name = lib::get_class_name( 'database\notification_type' );
+    $setting_manager = lib::create( 'business\setting_manager' );
+    $months = $setting_manager->get_setting( 'general', 'unsubmitted_reqn_expiry' );
+    $db_notification_type = $notification_type_class_name::get_unique_record( 'name', 'Unsubmitted Application Expiry Notice' );
+
+    // first delete expired reqns
+    $modifier = lib::create( 'database\modifier' );
+    $modifier->join( 'reqn_type', 'reqn.reqn_type_id', 'reqn_type.id' );
+    $join_mod = lib::create( 'database\modifier' );
+    $join_mod->where( 'reqn.id', '=', 'stage.reqn_id', false );
+    $join_mod->where( 'stage.datetime', '=', NULL );
+    $modifier->join_modifier( 'stage', $join_mod );
+    $modifier->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
+    $modifier->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
+    $modifier->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
+    $modifier->where( 'stage_type.name', '=', 'New' );
+    $modifier->where( 'reqn.legacy', '=', false );
+    $modifier->where( 'reqn_type.name', '=', 'Standard' );
+    $modifier->where( sprintf( 'reqn_version.datetime + INTERVAL %d MONTH', $months ), '<=', 'UTC_TIMESTAMP()', false );
+
+    $reqn_list = static::select_objects( $modifier );
+    foreach( $reqn_list as $db_reqn )
+    {
+      $db_user = $db_reqn->get_user();
+      log::info( sprintf(
+        'Deleting expired requistion "%s" belonging to "%s %s" dated "%s".',
+        $db_reqn->identifier,
+        $db_user->first_name, $db_user->last_name,
+        $db_reqn->get_current_reqn_version()->datetime->format( 'Y-m-d' )
+      ) );
+      $db_current_stage = $db_reqn->get_current_stage();
+      $db_current_stage->delete();
+      $db_reqn->delete();
+    }
+
+    // next send a notification for reqns with an expiry one month away
+    $modifier = lib::create( 'database\modifier' );
+    $modifier->join( 'reqn_type', 'reqn.reqn_type_id', 'reqn_type.id' );
+    $join_mod = lib::create( 'database\modifier' );
+    $join_mod->where( 'reqn.id', '=', 'stage.reqn_id', false );
+    $join_mod->where( 'stage.datetime', '=', NULL );
+    $modifier->join_modifier( 'stage', $join_mod );
+    $modifier->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
+    $modifier->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
+    $modifier->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
+    $join_mod = lib::create( 'database\modifier' );
+    $join_mod->where( 'reqn.id', '=', 'notification.reqn_id', false );
+    $join_mod->where( 'notification.notification_type_id', '=', $db_notification_type->id );
+    $join_mod->where( 'notification.datetime + INTERVAL 2 MONTH', '>=', 'UTC_TIMESTAMP()', false ); // use 2 months as a buffer
+    $join_mod->where( 'TIMESTAMPDIFF( DAY, UTC_TIMESTAMP(), notification.datetime )', '=', 0 );
+    $modifier->join_modifier( 'notification', $join_mod, 'left' );
+    $modifier->where( 'stage_type.name', '=', 'New' );
+    $modifier->where( 'reqn.legacy', '=', false );
+    $modifier->where( 'reqn_type.name', '=', 'Standard' );
+    $modifier->where( sprintf( 'reqn_version.datetime + INTERVAL %d MONTH', $months - 4 ), '<=', 'UTC_TIMESTAMP()', false );
+    $modifier->where( 'notification.id', '=', NULL );
+
+    $reqn_list = static::select_objects( $modifier );
+    foreach( $reqn_list as $db_reqn )
+    {
+      $db_notification = lib::create( 'database\notification' );
+      $db_notification->notification_type_id = $db_notification_type->id;
+      $db_notification->set_reqn( $db_reqn ); // this saves the record
+      $db_notification->mail();
+    }
+
+    return count( $reqn_list );
+  }
+
+  /**
    * Marks all notices viewed by the given user
    * @param string $type One of primary, trainee or designate
    */

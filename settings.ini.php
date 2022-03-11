@@ -89,3 +89,6 @@ $SETTINGS['general']['max_references_per_reqn'] = 20;
 
 // how many days that study data remains available to the user
 $SETTINGS['general']['study_data_expiry'] = 7;
+
+// how many months before an unsubmitted reqn is considered expired
+$SETTINGS['general']['unsubmitted_reqn_expiry'] = 18;
