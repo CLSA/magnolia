@@ -452,7 +452,11 @@ class reqn extends \cenozo\database\record
           {
             $db_recommendation_type = $db_review->get_recommendation_type();
             if( !is_null( $db_recommendation_type ) )
-              $find_stage_type_name = 'Revise' == $db_recommendation_type->name ? 'Revision Required' : 'Decision Made';
+            {
+              $find_stage_type_name = false !== strpos( $db_recommendation_type->name, 'Revise' )
+                                    ? 'Revision Required'
+                                    : 'Decision Made';
+            }
           }
         }
         else if( 'Second DSAC Decision' == $db_current_stage_type->name )
