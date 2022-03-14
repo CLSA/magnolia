@@ -1,1 +1,22 @@
+<div class="form_group spacer" ng-if="model.listModel.showSearch()">
+  <div class="row">
+    <label 
+      for="search"
+      uib-tooltip="Restricts the list of requisitions to those that contain all search terms.  Enclosing words in double-quotes (&quot;) will search for the exact phrase."
+      class="control-label col-sm-1">
+      <b class="invert">ⓘ</b> Search:
+    </label>
+    <div class="col-sm-11">
+      <input
+        id="search"
+        name="search"
+        ng-model="model.listModel.search"
+        class="form-control"
+        type="text"
+        autocomplete="off"
+        cn-change="model.listModel.applySearch()">
+      </input>
+    </div>
+  </div>
+</div>
 <cn-record-list model="model" remove-columns="{{ removeColumns }}"></cn-record-list>

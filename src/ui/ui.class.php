@@ -56,6 +56,7 @@ class ui extends \cenozo\ui\ui
       $module->add_child( 'ethics_approval' );
       $module->add_child( 'notification' );
       $module->add_child( 'output' );
+      $module->append_action_query( 'list', '?{search}' );
     }
 
     $module = $this->get_module( 'reqn_type' );

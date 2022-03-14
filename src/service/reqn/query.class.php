@@ -13,6 +13,30 @@ class query extends \cenozo\service\query
   /**
    * Extends the parent method
    */
+  protected function prepare()
+  {
+    $reqn_class_name = lib::get_class_name( 'database\reqn' );
+
+    parent::prepare();
+
+    $search = $this->get_argument( 'search', NULL );
+    if( !is_null( $search ) )
+    {
+      // split the search into all of it's terms (preserving phrases enclosed in quotes)
+      preg_match_all( '/[^\s]*"[^"]+"[^\s]*|[^"]?\w+[^"]?/', $search, $matches );
+      $terms = current( $matches );
+      if( 0 < count( $terms ) )
+      {
+        $this->modifier->where_bracket( true );
+        foreach( $terms as $term ) $reqn_class_name::apply_search_term( trim( $term, '" ' ), $this->modifier );
+        $this->modifier->where_bracket( false );
+      }
+    }
+  }
+
+  /**
+   * Extends the parent method
+   */
   protected function execute()
   {
     parent::execute();

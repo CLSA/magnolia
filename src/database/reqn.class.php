@@ -1486,4 +1486,91 @@ class reqn extends \cenozo\database\record
       }
     }
   }
+
+  /**
+   * Applies the search term to the modifier (searches all text elements in the reqn)
+   * 
+   * @param string $search
+   * @param database\modifier $modifier
+   */
+  public static function apply_search_term( $search, &$modifier )
+  {
+    // join to all tables included in the search
+    if( !$modifier->has_join( 'user' ) )
+      $modifier->join( 'user', 'reqn.user_id', 'user.id' );
+    if( !$modifier->has_join( 'trainee_user' ) )
+      $modifier->left_join( 'user', 'reqn.trainee_user_id', 'trainee_user.id', 'trainee_user' );
+    if( !$modifier->has_join( 'designate_user' ) )
+      $modifier->left_join( 'user', 'reqn.designate_user_id', 'designate_user.id', 'designate_user' );
+    if( !$modifier->has_join( 'reqn_version' ) )
+    {
+      $modifier->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
+      $modifier->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
+    }
+    if( !$modifier->has_join( 'applicant_country' ) )
+      $modifier->left_join( 'country', 'reqn_version.applicant_country_id', 'applicant_country.id', 'applicant_country' );
+    if( !$modifier->has_join( 'trainee_country' ) )
+      $modifier->left_join( 'country', 'reqn_version.trainee_country_id', 'trainee_country.id', 'trainee_country' );
+    if( !$modifier->has_join( 'coapplicant' ) )
+    {
+      $modifier->left_join( 'coapplicant', 'reqn_version.id', 'coapplicant.reqn_version_id' );
+      $modifier->group( 'reqn.id' );
+    }
+
+    // convert the search term to an RLIKE search term with word boundaries
+    $search = sprintf( '[[:<:]]%s[[:>:]]', $search );
+    $modifier->where_bracket( true );
+
+    // applicant
+    $modifier->where( 'user.name', 'RLIKE', $search );
+    $modifier->or_where( 'user.first_name', 'RLIKE', $search );
+    $modifier->or_where( 'user.last_name', 'RLIKE', $search );
+    $modifier->or_where( 'CONCAT( user.first_name, " ", user.last_name )', 'RLIKE', $search );
+
+    // trainee
+    $modifier->or_where( 'trainee_user.name', 'RLIKE', $search );
+    $modifier->or_where( 'trainee_user.first_name', 'RLIKE', $search );
+    $modifier->or_where( 'trainee_user.last_name', 'RLIKE', $search );
+    $modifier->or_where( 'CONCAT( trainee_user.first_name, " ", trainee_user.last_name )', 'RLIKE', $search );
+
+    // designate
+    $modifier->or_where( 'designate_user.name', 'RLIKE', $search );
+    $modifier->or_where( 'designate_user.first_name', 'RLIKE', $search );
+    $modifier->or_where( 'designate_user.last_name', 'RLIKE', $search );
+    $modifier->or_where( 'CONCAT( designate_user.first_name, " ", designate_user.last_name )', 'RLIKE', $search );
+
+    // applicant details
+    $modifier->or_where( 'reqn_version.applicant_position', 'RLIKE', $search );
+    $modifier->or_where( 'reqn_version.applicant_affiliation', 'RLIKE', $search );
+    $modifier->or_where( 'reqn_version.applicant_address', 'RLIKE', $search );
+    $modifier->or_where( 'applicant_country.name', 'RLIKE', $search );
+    $modifier->or_where( 'reqn_version.applicant_phone', 'RLIKE', $search );
+
+    // trainee details
+    $modifier->or_where( 'reqn_version.trainee_program', 'RLIKE', $search );
+    $modifier->or_where( 'reqn_version.trainee_institution', 'RLIKE', $search );
+    $modifier->or_where( 'reqn_version.trainee_address', 'RLIKE', $search );
+    $modifier->or_where( 'trainee_country.name', 'RLIKE', $search );
+    $modifier->or_where( 'reqn_version.trainee_phone', 'RLIKE', $search );
+
+    // text elements
+    $modifier->or_where( 'reqn_version.title', 'RLIKE', $search );
+    $modifier->or_where( 'reqn_version.keywords', 'RLIKE', $search );
+    $modifier->or_where( 'reqn_version.lay_summary', 'RLIKE', $search );
+    $modifier->or_where( 'reqn_version.background', 'RLIKE', $search );
+    $modifier->or_where( 'reqn_version.objectives', 'RLIKE', $search );
+    $modifier->or_where( 'reqn_version.methodology', 'RLIKE', $search );
+    $modifier->or_where( 'reqn_version.analysis', 'RLIKE', $search );
+    $modifier->or_where( 'reqn_version.grant_number', 'RLIKE', $search );
+
+    // coapplicant
+    $modifier->or_where( 'coapplicant.name', 'RLIKE', $search );
+    $modifier->or_where( 'coapplicant.position', 'RLIKE', $search );
+    $modifier->or_where( 'coapplicant.affiliation', 'RLIKE', $search );
+    $modifier->or_where( 'coapplicant.email', 'RLIKE', $search );
+    $modifier->or_where( 'coapplicant.role', 'RLIKE', $search );
+
+    $modifier->where_bracket( false );
+    // \cenozo\database\database::$debug = true;
+  }
 }

@@ -713,14 +713,23 @@ cenozoApp.defineModule( { name: 'reqn', dependencies: [ 'output' ], models: ['ad
       var object = function( parentModel ) {
         CnBaseListFactory.construct( this, parentModel );
 
-        // Set the heading as part of the 'onList' function so that it updates if we switch from the main reqn list
-        // to/from the special data-sharing list
-        this.onList = function( replace ) {
-          this.heading = parentModel.module.name.plural.ucWords() + (
-            'data_sharing' == parentModel.getActionFromState() ? ' Requiring CANUE Agreements' : ' List'
-          );
-          return this.$$onList( replace );
-        }
+        angular.extend( this, {
+          // Set the heading as part of the 'onList' function so that it updates if we switch from the main reqn list
+          // to/from the special data-sharing list
+          onList: function( replace ) {
+            this.heading = parentModel.module.name.plural.ucWords() + (
+              'data_sharing' == parentModel.getActionFromState() ? ' Requiring CANUE Agreements' : ' List'
+            );
+            return this.$$onList( replace );
+          },
+
+          search: this.parentModel.getQueryParameter( 'search' ),
+          showSearch: function() { return 'reqn' == this.parentModel.getSubjectFromState(); },
+          applySearch: async function() {
+            this.parentModel.setQueryParameter( 'search', this.search );
+            await this.parentModel.reloadState( true );
+          }
+        } );
       };
       return { instance: function( parentModel ) { return new object( parentModel ); } };
     }
@@ -1255,8 +1264,8 @@ cenozoApp.defineModule( { name: 'reqn', dependencies: [ 'output' ], models: ['ad
           getServiceData: function( type, columnRestrictLists ) {
             var data = this.$$getServiceData( type, columnRestrictLists );
 
-            // chairs only see DSAC reqns from the home screen
             if( 'root' == this.getSubjectFromState() ) {
+              // chairs only see DSAC reqns from the home screen
               if( angular.isUndefined( data.modifier.where ) ) data.modifier.where = [];
               if( this.isRole( 'chair' ) ) {
                 data.modifier.where.push( {
@@ -1264,6 +1273,7 @@ cenozoApp.defineModule( { name: 'reqn', dependencies: [ 'output' ], models: ['ad
                   operator: 'LIKE',
                   value: '%DSAC%'
                 } );
+              // smt only see smt reqns from the home screen
               } else if( this.isRole( 'smt' ) ) {
                 data.modifier.where.push( {
                   column: 'stage_type.name',
@@ -1271,6 +1281,10 @@ cenozoApp.defineModule( { name: 'reqn', dependencies: [ 'output' ], models: ['ad
                   value: '%SMT%'
                 } );
               }
+            } else if( 'list' == type && 'reqn' == this.getSubjectFromState() ) {
+              // apply the search term if there is one
+              var search = this.getQueryParameter( 'search' );
+              if( search ) data.search = search;
             }
 
             return data;
