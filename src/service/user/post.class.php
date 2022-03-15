@@ -8,7 +8,7 @@
 namespace magnolia\service\user;
 use cenozo\lib, cenozo\log, magnolia\util;
 
-class post extends \cenozo\service\post
+class post extends \cenozo\service\user\post
 {
   /**
    * Replace parent method
