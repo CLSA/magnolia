@@ -287,6 +287,7 @@ cenozoApp.defineModule( { name: 'reqn_version',
           $scope.editCoapplicant = async function( id ) {
             if( $scope.model.viewModel.coapplicantModel.getEditEnabled() ) {
               await $scope.model.viewModel.editCoapplicant( id );
+              await $scope.model.viewModel.determineCoapplicantDiffs();
             }
           };
 
@@ -507,7 +508,7 @@ cenozoApp.defineModule( { name: 'reqn_version',
               if( this.record.has_ethics_approval_list ) promiseList.push( this.getEthicsApprovalList() );
 
               await Promise.all( promiseList );
-              if( !this.parentModel.isRole( 'applicant', 'designate' ) ) await this.getVersionList();
+              await this.getVersionList();
 
               // the category list will have been loaded by now, so we can load the selected tabs
               this.setFormTab( 0, this.parentModel.getQueryParameter( 't0' ), false );
