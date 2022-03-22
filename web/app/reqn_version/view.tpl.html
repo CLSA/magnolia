@@ -622,6 +622,7 @@
                   difference="model.viewModel.compareRecord.differences.part1.d.keywords"
                   model="model">
                 </cn-view-input-with-differences>
+                <p class="text-primary" ng-bind-html="t( 'part1.d.text2' )"></p>
                 <cn-view-input-with-differences
                   input="{
                     key: 'lay_summary',
@@ -637,7 +638,7 @@
                   model="model">
                 </cn-view-input-with-differences>
                 <hr/>
-                <p class="text-primary" ng-bind-html="t( 'part1.d.text2' )"></p>
+                <p class="text-primary" ng-bind-html="t( 'part1.d.text3' )"></p>
                 <cn-view-input-with-differences
                   input="{
                     key: 'background',
@@ -691,7 +692,7 @@
                   model="model">
                 </cn-view-input-with-differences>
                 <hr/>
-                <p class="text-primary" ng-bind-html="t( 'part1.d.text3' ) + maxReferencesPerReqn + t( 'part1.d.text4' )"></p>
+                <p class="text-primary" ng-bind-html="t( 'part1.d.text4' ) + maxReferencesPerReqn + t( 'part1.d.text5' )"></p>
                 <div class="panel panel-default">
                   <div class="panel-body"
                        ng-class="{ 'bg-warning': 0 < model.viewModel.compareRecord.differences.part1.d.referenceList.length }">

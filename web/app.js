@@ -565,12 +565,16 @@ cenozo.service( 'CnReqnHelper', [
                 en: 'Please provide 3-5 keywords describing your project.',
                 fr: 'Veuillez fournir 3 à 5 mots clés décrivant votre projet.'
               },
+              text2: {
+                en: 'Please provide a lay language summary of your project (<strong>maximum 1000 characters</strong>) suitable for posting on the CLSA website if your application is approved.',
+                fr: 'Veuillez fournir un résumé non scientifique de votre projet (<strong>maximum 1000 caractères</strong>) pouvant être publié sur le site Web de l’ÉLCV si votre demande est approuvée.'
+              },
               lay_summary: { en: 'Lay Summary', fr: 'Résumé non scientifique' },
               lay_summary_text: {
                 en: 'Please provide a lay language summary of your project (<strong>maximum 1000 characters</strong>) suitable for posting on the CLSA website if your application is approved. Please ensure that the lay summary provides a stand-alone, informative description of your project.',
                 fr: 'Veuillez fournir un résumé non scientifique de votre projet (<strong>maximum 1000 caractères</strong>) pouvant être publié sur le site Web de l’ÉLCV si votre demande est approuvée. Assurez-vous de fournir un résumé détaillé et complet de votre projet.'
               },
-              text2: {
+              text3: {
                 en: 'Please provide a description of the proposed project. The proposal should be informative and specific and <strong>no more than 4500 characters per section. Non-compliant applications will be returned.</strong>',
                 fr: 'Veuillez fournir une description du projet proposé. La proposition doit être informative et précise sans dépasser 4500 caractères par section. Les demandes non conformes seront renvoyées au demandeur.'
               },
@@ -589,11 +593,11 @@ cenozo.service( 'CnReqnHelper', [
                 en: 'Brief description of the data analysis proposed (this section should include justification for the sample size requested). Requests for small subsets of the study participants must be justified.',
                 fr: 'Brève description de l’analyse de données proposée (cette section devrait inclure la justification de la taille d’échantillon demandée). Les demandes de petits sous-groupes de participants doivent être justifiées.'
               },
-              text3: {
+              text4: {
                 en: 'Please include a list of the most relevant references (maximum ',
                 fr: 'Veuillez présenter une liste des références les plus pertinentes (maximum '
               },
-              text4: {
+              text5: {
                 en: ')',
                 fr: ')'
               },
