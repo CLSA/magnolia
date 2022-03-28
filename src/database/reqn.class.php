@@ -1319,7 +1319,6 @@ class reqn extends \cenozo\database\record
     $join_mod->where( 'reqn.id', '=', 'notification.reqn_id', false );
     $join_mod->where( 'notification.notification_type_id', '=', $db_notification_type->id );
     $join_mod->where( 'notification.datetime + INTERVAL 2 MONTH', '>=', 'UTC_TIMESTAMP()', false ); // use 2 months as a buffer
-    $join_mod->where( 'TIMESTAMPDIFF( DAY, UTC_TIMESTAMP(), notification.datetime )', '=', 0 );
     $modifier->join_modifier( 'notification', $join_mod, 'left' );
     $modifier->where( 'stage_type.name', '=', 'New' );
     $modifier->where( 'reqn.legacy', '=', false );
