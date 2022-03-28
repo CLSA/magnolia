@@ -1324,7 +1324,7 @@ class reqn extends \cenozo\database\record
     $modifier->where( 'stage_type.name', '=', 'New' );
     $modifier->where( 'reqn.legacy', '=', false );
     $modifier->where( 'reqn_type.name', '=', 'Standard' );
-    $modifier->where( sprintf( 'reqn_version.datetime + INTERVAL %d MONTH', $months - 4 ), '<=', 'UTC_TIMESTAMP()', false );
+    $modifier->where( sprintf( 'reqn_version.datetime + INTERVAL %d MONTH', $months - 1 ), '<=', 'UTC_TIMESTAMP()', false );
     $modifier->where( 'notification.id', '=', NULL );
 
     $reqn_list = static::select_objects( $modifier );
