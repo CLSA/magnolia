@@ -588,39 +588,42 @@ cenozoApp.defineModule( { name: 'reqn_version',
             } else {
               var proceed = true;
               if( 'new_user_id' == property ) {
-                proceed = false;
                 // make sure the new user isn't a trainee
-                var response = await CnHttpFactory.instance( {
-                  path: 'applicant/user_id=' + data[property],
-                  data: { select: { column: 'supervisor_user_id' } },
-                  onError: async ( error ) => {
-                    if( 404 == error.status ) {
-                      await CnModalMessageFactory.instance( {
-                        title: this.translate( 'misc.invalidNewApplicantTitle' ),
-                        message: this.translate( 'misc.invalidNewApplicantMessage' ),
-                        closeText: this.translate( 'misc.close' ),
-                        error: true
-                      } ).show();
+                if( data.new_user_id ) {
+                  proceed = false;
 
-                      // failed to set the new user so put it back
-                      this.formattedRecord.new_user_id = this.backupRecord.formatted_new_user_id;
-                    } else {
-                      CnModalMessageFactory.httpError( error );
+                  var response = await CnHttpFactory.instance( {
+                    path: 'applicant/user_id=' + data[property],
+                    data: { select: { column: 'supervisor_user_id' } },
+                    onError: async ( error ) => {
+                      if( 404 == error.status ) {
+                        await CnModalMessageFactory.instance( {
+                          title: this.translate( 'misc.invalidNewApplicantTitle' ),
+                          message: this.translate( 'misc.invalidNewApplicantMessage' ),
+                          closeText: this.translate( 'misc.close' ),
+                          error: true
+                        } ).show();
+
+                        // failed to set the new user so put it back
+                        this.formattedRecord.new_user_id = this.backupRecord.formatted_new_user_id;
+                      } else {
+                        CnModalMessageFactory.httpError( error );
+                      }
                     }
+                  } ).get();
+
+                  if( angular.isObject( response.data ) && null != response.data.supervisor_user_id ) {
+                    await CnModalMessageFactory.instance( {
+                      title: this.translate( 'misc.pleaseNote' ),
+                      message: this.translate( 'amendment.newUserIsTraineeNotice' ),
+                      closeText: this.translate( 'misc.close' ),
+                      error: true
+                    } ).show();
+
+                    // failed to set the new user so put it back
+                    this.formattedRecord.new_user_id = this.backupRecord.formatted_new_user_id;
+                    proceed = true;
                   }
-                } ).get();
-
-                if( angular.isObject( response.data ) && null != response.data.supervisor_user_id ) {
-                  await CnModalMessageFactory.instance( {
-                    title: this.translate( 'misc.pleaseNote' ),
-                    message: this.translate( 'amendment.newUserIsTraineeNotice' ),
-                    closeText: this.translate( 'misc.close' ),
-                    error: true
-                  } ).show();
-
-                  // failed to set the new user so put it back
-                  this.formattedRecord.new_user_id = this.backupRecord.formatted_new_user_id;
-                  proceed = true;
                 }
               }
 
