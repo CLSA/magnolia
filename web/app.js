@@ -245,7 +245,7 @@ cenozo.service( 'CnReqnHelper', [
           return ( ['applicant', 'designate', 'administrator', 'typist'].includes( role ) ) &&
                  ( 'new' == phase || 'deferred' == state );
         } else if( 'view' == subject ) {
-          return 'applicant', 'designate' != role;
+          return ![ 'applicant', 'designate' ].includes( role );
         } else if( 'abandon' == subject ) {
           return '.' == record.amendment ?
                  // non-amendment process
@@ -1036,6 +1036,9 @@ cenozo.service( 'CnReqnHelper', [
             }
           },
           misc: {
+            no: { en: 'No', fr: 'Non' },
+            yes: { en: 'Yes', fr: 'Oui' },
+            close: { en: 'Close', fr: 'Ferme' },
             choose: { en: '(choose)', fr: '(choisir)' },
             remove: { en: 'Remove', fr: 'Supprimer' },
             prevButton: { en: 'Return to the previous section', fr: 'Retourner à la section précédente' },

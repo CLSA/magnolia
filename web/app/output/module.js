@@ -81,8 +81,8 @@ cenozoApp.defineModule( { name: 'output', dependencies: [ 'reqn' ], models: ['ad
 
   /* ######################################################################################################## */
   cenozo.providers.directive( 'cnOutputAdd', [
-    'CnOutputModelFactory', 'CnHttpFactory', 'CnReqnHelper', '$timeout',
-    function( CnOutputModelFactory, CnHttpFactory, CnReqnHelper, $timeout ) {
+    'CnOutputModelFactory', 'CnHttpFactory', 'CnReqnHelper',
+    function( CnOutputModelFactory, CnHttpFactory, CnReqnHelper ) {
       return {
         templateUrl: module.getFileUrl( 'add.tpl.html' ),
         restrict: 'E',
@@ -104,14 +104,10 @@ cenozoApp.defineModule( { name: 'output', dependencies: [ 'reqn' ], models: ['ad
 
             await $scope.model.updateLanguage( lang );
 
-            // we need to wait for the next event cycle for some reason, so use timeout with a 0ms delay
-            $timeout( function() {
-              var enumListItem = cnRecordAddView.dataArray[0].inputArray.findByProperty( 'key', 'output_type_id' ).enumList[0];
-              enumListItem.name = CnReqnHelper.translate( 'output', 'choose', lang );
-              angular.extend( cnRecordAddView, {
-                getCancelText: function() { return CnReqnHelper.translate( 'output', 'cancel', lang ); },
-                getSaveText: function() { return CnReqnHelper.translate( 'output', 'save', lang ); }
-              } );
+            // translate the cancel and save buttons
+            angular.extend( cnRecordAddView, {
+              getCancelText: function() { return CnReqnHelper.translate( 'output', 'cancel', lang ); },
+              getSaveText: function() { return CnReqnHelper.translate( 'output', 'save', lang ); }
             } );
           } );
         }

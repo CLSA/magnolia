@@ -333,8 +333,8 @@ cenozoApp.defineModule( { name: 'final_report', dependencies: [ 'output' ], mode
             var record = this.record;
             var response = await CnModalConfirmFactory.instance( {
               title: this.translate( 'misc.pleaseConfirm' ),
-              noText: this.isRole( 'applicant', 'designate' ) ? this.translate( 'misc.no' ) : 'No',
-              yesText: this.isRole( 'applicant', 'designate' ) ? this.translate( 'misc.yes' ) : 'Yes',
+              noText: this.parentModel.isRole( 'applicant', 'designate' ) ? this.translate( 'misc.no' ) : 'No',
+              yesText: this.parentModel.isRole( 'applicant', 'designate' ) ? this.translate( 'misc.yes' ) : 'Yes',
               message: this.translate( 'misc.submitWarning' )
             } ).show();
 
@@ -370,7 +370,7 @@ cenozoApp.defineModule( { name: 'final_report', dependencies: [ 'output' ], mode
 
               if( null != error ) {
                 // if there was an error then display it now
-                if( this.isRole( 'applicant', 'designate' ) ) error.closeText = this.translate( 'misc.close' );
+                if( this.parentModel.isRole( 'applicant', 'designate' ) ) error.closeText = this.translate( 'misc.close' );
                 await CnModalMessageFactory.instance( error ).show();
                 await this.setFormTab( errorTab );
               } else {
@@ -448,10 +448,10 @@ cenozoApp.defineModule( { name: 'final_report', dependencies: [ 'output' ], mode
             } else {
               trail = [ {
                 title: 'Requisitions',
-                go: async function() { await $state.go( 'reqn.list' ); }
+                go: async () => { await $state.go( 'reqn.list' ); }
               }, {
                 title: this.viewModel.record.identifier,
-                go: async function() {
+                go: async () => {
                   await $state.go( 'reqn.view', { identifier: 'identifier=' + this.viewModel.record.identifier } );
                 }
               }, {

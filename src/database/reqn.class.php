@@ -281,18 +281,6 @@ class reqn extends \cenozo\database\record
     $db_final_report->datetime = util::get_datetime_object();
     $db_final_report->version = $version;
     $db_final_report->save();
-
-    if( !is_null( $db_current_final_report ) )
-    {
-      // copy output records
-      foreach( $db_current_final_report->get_output_object_list() as $db_output )
-      {
-        $db_new_output = lib::create( 'database\output' );
-        $db_new_output->copy( $db_output );
-        $db_new_output->final_report_id = $db_final_report->id;
-        $db_new_output->save();
-      }
-    }
   }
 
   /**

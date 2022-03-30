@@ -590,8 +590,6 @@ cenozoApp.defineModule( { name: 'reqn_version',
               if( 'new_user_id' == property ) {
                 // make sure the new user isn't a trainee
                 if( data.new_user_id ) {
-                  proceed = false;
-
                   var response = await CnHttpFactory.instance( {
                     path: 'applicant/user_id=' + data[property],
                     data: { select: { column: 'supervisor_user_id' } },
@@ -622,7 +620,7 @@ cenozoApp.defineModule( { name: 'reqn_version',
 
                     // failed to set the new user so put it back
                     this.formattedRecord.new_user_id = this.backupRecord.formatted_new_user_id;
-                    proceed = true;
+                    proceed = false;
                   }
                 }
               }

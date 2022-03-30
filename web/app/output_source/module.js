@@ -149,11 +149,13 @@ cenozoApp.defineModule( { name: 'output_source', models: ['add', 'list', 'view']
           var lang = 'en';
 
           if( 'final_report' == origin ) {
-            var response = await CnHttpFactory.instance( {
-              path: 'output/' + parent.identifier,
-              data: { select: { column: { table: 'language', column: 'code', alias: 'lang' } } }
-            } ).get();
-            lang = response.data.lang;
+            if( angular.isDefined( parent.identifier ) ) {
+              var response = await CnHttpFactory.instance( {
+                path: 'output/' + parent.identifier,
+                data: { select: { column: { table: 'language', column: 'code', alias: 'lang' } } }
+              } ).get();
+              lang = response.data.lang;
+            }
           }
 
           this.parentModel.updateLanguage( lang );
