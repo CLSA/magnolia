@@ -242,7 +242,7 @@ cenozoApp.defineModule( { name: 'review', models: ['list', 'view'], create: modu
             path: 'recommendation_type',
             data: {
               select: { column: [ 'id', 'name', 'review_type_id_list' ] },
-              modifier: { order: 'id', limit: 1000 }
+              modifier: { order: 'recommendation_type.name', limit: 1000 }
             }
           } ).query();
 
