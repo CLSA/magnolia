@@ -16,6 +16,7 @@ SOURCE role_has_service.sql
 SOURCE notification_type.sql
 SOURCE recommendation_type.sql
 SOURCE review_type_has_recommendation_type.sql
+SOURCE data_option.sql
 
 SOURCE update_version_number.sql
 
