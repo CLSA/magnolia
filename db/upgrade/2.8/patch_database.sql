@@ -17,6 +17,9 @@ SOURCE notification_type.sql
 SOURCE recommendation_type.sql
 SOURCE review_type_has_recommendation_type.sql
 SOURCE data_option.sql
+SOURCE data_category_has_study_phase.sql
+SOURCE data_selection.sql
+SOURCE data_detail.sql
 
 SOURCE update_version_number.sql
 
