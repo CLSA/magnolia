@@ -759,7 +759,11 @@ cenozo.service( 'CnReqnHelper', [
             studyPhase: {
               bl: { en: 'Baseline', fr: 'départ' },
               f1: { en: 'Follow-up 1', fr: '1er suivi' },
-              f2: { en: 'Follow-up 2', fr: 'TODO' }
+              f2: { en: 'Follow-up 2', fr: '2e suivi' },
+              f3: { en: 'Follow-up 3', fr: '3e suivi' },
+              f4: { en: 'Follow-up 4', fr: '4e suivi' },
+              f5: { en: 'Follow-up 5', fr: '5e suivi' },
+              f6: { en: 'Follow-up 6', fr: '6e suivi' }
             },
             data_sharing: {
               en: 'Completed copy of CANUE Data Use and Sharing via Third Party Agreement',
