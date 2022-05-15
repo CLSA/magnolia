@@ -1,36 +1,38 @@
-cenozoApp.defineModule( { name: 'review_type', models: ['list', 'view'], create: module => {
-
-  angular.extend( module, {
-    identifier: { column: 'name' },
-    name: {
-      singular: 'review type',
-      plural: 'review types',
-      possessive: 'review type\'s'
-    },
-    columnList: {
+cenozoApp.defineModule({
+  name: "review_type",
+  models: ["list", "view"],
+  create: (module) => {
+    angular.extend(module, {
+      identifier: { column: "name" },
       name: {
-        title: 'Name'
+        singular: "review type",
+        plural: "review types",
+        possessive: "review type's",
       },
-      review_count: {
-        title: 'Reviews',
-        type: 'number'
+      columnList: {
+        name: {
+          title: "Name",
+        },
+        review_count: {
+          title: "Reviews",
+          type: "number",
+        },
+        role_list: {
+          title: "Roles",
+        },
       },
-      role_list: {
-        title: 'Roles'
-      }
-    },
-    defaultOrder: {
-      column: 'name',
-      reverse: false
-    }
-  } );
+      defaultOrder: {
+        column: "name",
+        reverse: false,
+      },
+    });
 
-  module.addInputGroup( '', {
-    name: {
-      title: 'Name',
-      type: 'string',
-      isConstant: true
-    }
-  } );
-
-} } );
+    module.addInputGroup("", {
+      name: {
+        title: "Name",
+        type: "string",
+        isConstant: true,
+      },
+    });
+  },
+});
