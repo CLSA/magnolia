@@ -20,5 +20,5 @@ class data_detail extends \cenozo\database\has_rank
    * @access protected
    * @static
    */
-  protected static $rank_parent = array( 'data_option', 'study_phase' );
+  protected static $rank_parent = array( 'data_selection' );
 }
