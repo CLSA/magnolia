@@ -227,7 +227,7 @@ class reqn extends \cenozo\database\record
       $data_selection_sel->add_column( 'id' );
       foreach( $db_clone_reqn_version->get_data_selection_list( $data_selection_sel ) as $data_selection )
         $data_selection_id_list[] = $data_selection['id'];
-      $db_reqn_version->add_data_selection( $data_selection_id_list );
+      if( 0 < count( $data_selection_id_list ) ) $db_reqn_version->add_data_selection( $data_selection_id_list );
 
       // copy all comments
       foreach( $db_clone_reqn_version->get_reqn_version_comment_object_list() as $db_reqn_version_comment_clone )
