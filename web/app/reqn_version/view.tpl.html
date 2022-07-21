@@ -432,7 +432,7 @@
                       <td ng-show="model.getEditEnabled()">
                         <button class="btn btn-xs btn-danger"
                                 ng-disabled="isDeletingCoapplicant.includes( coapplicant.id )"
-                                ng-click="removeCoapplicant( coapplicant.id )"
+                                ng-click="removeCoapplicant( coapplicant.id ) && $event.stopPropagation()"
                                 uib-tooltip-html="t( 'misc.remove' )">
                           <i class="glyphicon glyphicon-remove"></i>
                         </button>
