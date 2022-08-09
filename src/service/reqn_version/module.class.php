@@ -25,7 +25,7 @@ class module extends \cenozo\service\module
     $db_user = $session->get_user();
     $db_role = $session->get_role();
 
-    if( 300 > $this->get_status()->get_code() )
+    if( $this->service->may_continue() )
     {
       // make sure to restrict applicants to their own reqns which are not abandoned
       $db_reqn_version = $this->get_resource();

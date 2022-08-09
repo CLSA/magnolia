@@ -22,7 +22,7 @@ class post extends \cenozo\service\post
 
     parent::validate();
 
-    if( 300 > $this->get_status()->get_code() )
+    if( $this->may_continue() )
     {
       // add this user as the supervisor in the applicant's record
       $post_object = $this->get_file_as_object();

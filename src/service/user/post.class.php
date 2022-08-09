@@ -17,7 +17,7 @@ class post extends \cenozo\service\user\post
   {
     parent::execute();
 
-    if( 300 > $this->status->get_code() )
+    if( $this->may_continue() )
     {
       $post_object = $this->get_file_as_object();
       if( property_exists( $post_object, 'newsletter' ) || property_exists( $post_object, 'note' ) )

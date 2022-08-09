@@ -26,7 +26,7 @@ class module extends \cenozo\service\module
     $db_role = $session->get_role();
 
     // restrict some review-types to certain roles
-    if( 300 > $this->get_status()->get_code() )
+    if( $this->service->may_continue() )
     {
       $db_review = $this->get_resource();
       if( !is_null( $db_review ) )
