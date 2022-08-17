@@ -111,9 +111,16 @@ class reqn extends \cenozo\database\record
       $matches = array();
       if( preg_match( $regex, $identifier, $matches ) )
       {
-        $db_final_report = lib::create( 'database\final_report', $matches[1] );
-        $db_reqn = is_null( $db_final_report ) ? NULL : lib::create( 'database\reqn', $db_final_report->reqn_id );
-        if( !is_null( $db_reqn ) ) $identifier = $db_reqn->id;
+        try
+        {
+          $db_final_report = lib::create( 'database\final_report', $matches[1] );
+          $db_reqn = lib::create( 'database\reqn', $db_final_report->reqn_id );
+          $identifier = $db_reqn->id;
+        }
+        catch( \cenozo\exception\runtime $e )
+        {
+          // A runtime exception means the final report or reqn doesn't exist, so leave the identifier unchanged
+        }
       }
     }
 
