@@ -3,6 +3,7 @@
 SET AUTOCOMMIT=0;
 
 SOURCE table_character_sets.sql
+SOURCE data_category.sql
 SOURCE reqn.sql
 SOURCE reqn_version.sql
 SOURCE deadline.sql

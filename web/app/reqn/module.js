@@ -633,6 +633,16 @@ cenozoApp.defineModule({
           );
         },
       },
+      deferral_note_2f: {
+        title: "", // defined dynamically in the model
+        type: "text",
+        isExcluded: function ($state, model) {
+          return (
+            "add" == model.getActionFromState() ||
+            "Report Required" == model.viewModel.record.stage_type
+          );
+        },
+      },
     });
 
     module.addInputGroup("Review Deferral Notes", {
@@ -1508,7 +1518,8 @@ cenozoApp.defineModule({
                   this.record.deferral_note_2b ||
                   this.record.deferral_note_2c ||
                   this.record.deferral_note_2d ||
-                  this.record.deferral_note_2e)
+                  this.record.deferral_note_2e ||
+                  this.record.deferral_note_2f)
               );
             },
 

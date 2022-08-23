@@ -38,12 +38,12 @@ CREATE PROCEDURE patch_data_selection()
     OR name_en LIKE "Epigenetics%"
     OR name_en LIKE "Metabolomics%";
 
-    -- Not yet available selections (all other options except for the COVID-19 Data)
+    -- Not yet available selections (all other options except for the COVID-19 and Mortality Data)
     INSERT IGNORE INTO data_selection( data_option_id, study_phase_id, unavailable_en, unavailable_fr )
     SELECT data_option.id, @study_phase_id, "(not yet available)", "(pas encore disponible)"
     FROM data_option
     JOIN data_category ON data_option.data_category_id = data_category.id
-    WHERE data_category.name_en != "COVID-19 Data";
+    WHERE data_category.name_en NOT IN( "COVID-19 Data", "Mortality Data" );
 
     -- Set selections with costs > 0
     UPDATE data_selection

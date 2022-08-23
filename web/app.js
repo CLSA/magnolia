@@ -44,6 +44,10 @@ cenozo.directive("cnDeferralNote", function () {
     controller: [
       "$scope",
       function ($scope) {
+        if( angular.isUndefined( $scope.$parent.model.inputList[$scope.note] ) ) {
+          throw new Error("Missing deferral note '" + $scope.note + "' in input list.");
+        }
+
         angular.extend($scope, {
           directive: "cnDeferralNote",
           input: {

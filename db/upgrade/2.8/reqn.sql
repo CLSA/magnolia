@@ -11,18 +11,6 @@ CREATE PROCEDURE patch_reqn()
       AND constraint_name = "fk_access_site_id"
     );
 
-    SELECT "Removing deferral_note_2f column from reqn table" AS "";
-
-    SELECT COUNT(*) INTO @test
-    FROM information_schema.COLUMNS
-    WHERE table_schema = DATABASE()
-    AND table_name = "reqn"
-    AND column_name = "deferral_note_2f";
-
-    IF @test = 1 THEN
-      ALTER TABLE reqn DROP COLUMN deferral_note_2f;
-    END IF;
-
     SELECT "Removing deferral_note_2g column from reqn table" AS "";
 
     SELECT COUNT(*) INTO @test
@@ -57,6 +45,18 @@ CREATE PROCEDURE patch_reqn()
 
     IF @test = 0 THEN
       ALTER TABLE reqn ADD COLUMN deferral_note_cohort TEXT NULL DEFAULT NULL AFTER deferral_note_1f;
+    END IF;
+
+    SELECT "Adding deferral_note_2f column to reqn table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "deferral_note_2f";
+
+    IF @test = 0 THEN
+      ALTER TABLE reqn ADD COLUMN deferral_note_2f TEXT NULL DEFAULT NULL AFTER deferral_note_2e;
     END IF;
 
   END //

@@ -31,6 +31,42 @@ CREATE PROCEDURE patch_data_option()
     EXECUTE statement;
     DEALLOCATE PREPARE statement;
   
+    INSERT IGNORE INTO data_option ( data_category_id, rank, name_en, name_fr )
+    SELECT data_category.id, 1, "Participant Status", "Statut de participant"
+    FROM data_category
+    WHERE name_en = "Mortality Data";
+
+    SET @sql = CONCAT(
+      "INSERT IGNORE INTO data_selection( data_option_id, study_phase_id ) ",
+      "SELECT data_option.id, study_phase.id ",
+      "FROM data_option, ", @cenozo, ".study_phase ",
+      "JOIN ", @cenozo, ".study ON study_phase.study_id = study.id ",
+      "WHERE data_option.name_en = 'Participant Status' ",
+      "AND study.name = 'CLSA' ",
+      "AND study_phase.rank = 1"
+    );
+    PREPARE statement FROM @sql;
+    EXECUTE statement;
+    DEALLOCATE PREPARE statement;
+  
+    INSERT IGNORE INTO data_option ( data_category_id, rank, name_en, name_fr )
+    SELECT data_category.id, 2, "Decedent Questionnaire", "Questionnaire sur le défunt"
+    FROM data_category
+    WHERE name_en = "Mortality Data";
+
+    SET @sql = CONCAT(
+      "INSERT IGNORE INTO data_selection( data_option_id, study_phase_id ) ",
+      "SELECT data_option.id, study_phase.id ",
+      "FROM data_option, ", @cenozo, ".study_phase ",
+      "JOIN ", @cenozo, ".study ON study_phase.study_id = study.id ",
+      "WHERE data_option.name_en = 'Decedent Questionnaire' ",
+      "AND study.name = 'CLSA' ",
+      "AND study_phase.rank = 1"
+    );
+    PREPARE statement FROM @sql;
+    EXECUTE statement;
+    DEALLOCATE PREPARE statement;
+  
   END //
 DELIMITER ;
 
