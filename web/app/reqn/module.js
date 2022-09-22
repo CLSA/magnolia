@@ -198,6 +198,10 @@ cenozoApp.defineModule({
       show_prices: {
         title: "Show Fee",
         type: "boolean",
+        isConstant: function($state, model) {
+          // make sure the chair can only edit the chair's notes
+          return model.isRole("chair");
+        },
         isExcluded: function ($state, model) {
           return "view" != model.getActionFromState();
         },
@@ -297,6 +301,10 @@ cenozoApp.defineModule({
           select:
             'CONCAT( user.first_name, " ", user.last_name, " (", user.name, ")" )',
           where: ["user.first_name", "user.last_name", "user.name"],
+        },
+        isConstant: function($state, model) {
+          // make sure the chair can only edit the chair's notes
+          return model.isRole("chair");
         },
         help: "Only users who have the designate role can be selected.",
       },
@@ -1926,12 +1934,11 @@ cenozoApp.defineModule({
                 ? this.viewModel.record.state
                 : "";
               return (
-                this.$$getEditEnabled() &&
-                (this.isRole("applicant", "designate")
-                  ? "new" == phase || ("deferred" == state && "review" == phase)
-                  : ["administrator", "communication", "typist"].includes(
-                      CnSession.role.name
-                    ))
+                this.$$getEditEnabled() && (
+                  this.isRole("applicant", "designate")
+                    ? "new" == phase || ("deferred" == state && "review" == phase)
+                    : this.isRole("administrator", "chair", "communication", "typist")
+                )
               );
             },
 
