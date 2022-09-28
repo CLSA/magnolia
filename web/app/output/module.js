@@ -74,6 +74,13 @@ cenozoApp.defineModule({
         title: "", // defined below
         type: "enum",
       },
+      output_type_note: {
+        title: "",
+        type: "div",
+        getContent: function($state, model) {
+          return model.getOutputTypeNote();
+        }
+      },
       detail: {
         title: "", // defined below
         type: "string",
@@ -106,7 +113,7 @@ cenozoApp.defineModule({
               $scope.model = CnOutputModelFactory.root;
 
             $scope.$on("cnRecordAdd ready", async function (event, data) {
-              var cnRecordAddView = data;
+              var cnRecordAddScope = data;
               var parent = $scope.model.getParentIdentifier();
               var lang = "en";
               if ("final_report" == parent.subject) {
@@ -125,10 +132,15 @@ cenozoApp.defineModule({
                 lang = response.data.lang;
               }
 
+              $scope.model.getOutputTypeNote = function() {
+                return angular.isDefined( cnRecordAddScope.record.output_type_id ) ?
+                  $scope.model.outputTypeNoteList[lang][cnRecordAddScope.record.output_type_id] : '';
+              }
+
               await $scope.model.updateLanguage(lang);
 
               // translate the cancel and save buttons
-              angular.extend(cnRecordAddView, {
+              angular.extend(cnRecordAddScope, {
                 getCancelText: function () {
                   return CnReqnHelper.translate("output", "cancel", lang);
                 },
@@ -207,6 +219,13 @@ cenozoApp.defineModule({
                     : "View " + cnRecordViewScope.parentName(subject);
                 },
               });
+
+              $scope.model.getOutputTypeNote = function() {
+                const lang = this.viewModel.record.lang || 'en';
+                return angular.isDefined( lang ) && angular.isDefined( this.viewModel.record.output_type_id ) ?
+                  this.outputTypeNoteList[lang][this.viewModel.record.output_type_id] : '';
+              }
+
             });
 
             // note, we are changing the output-source list, not the output list
@@ -385,6 +404,10 @@ cenozoApp.defineModule({
           this.viewModel = CnOutputViewFactory.instance(this, root);
 
           angular.extend(this, {
+            outputTypeNoteList: { en: [], fr: [] },
+
+            getOutputTypeNote: function() { return 'Loading...'; },
+
             updateLanguage: async function (lang) {
               var group = this.module.inputGroupList.findByProperty(
                 "title",
@@ -499,7 +522,7 @@ cenozoApp.defineModule({
               var response = await CnHttpFactory.instance({
                 path: "output_type",
                 data: {
-                  select: { column: ["id", "name_en", "name_fr"] },
+                  select: { column: ["id", "name_en", "name_fr", "note_en", "note_fr"] },
                   modifier: { order: "name_en", limit: 1000 },
                 },
               }).query();
@@ -509,6 +532,7 @@ cenozoApp.defineModule({
                 en: [],
                 fr: [],
               };
+              this.outputTypeNoteList = { en: [], fr: [] };
               response.data.forEach((item) => {
                 this.metadata.columnList.output_type_id.enumLists.en.push({
                   value: item.id,
@@ -518,6 +542,8 @@ cenozoApp.defineModule({
                   value: item.id,
                   name: item.name_fr,
                 });
+                this.outputTypeNoteList.en[item.id] = item.note_en;
+                this.outputTypeNoteList.fr[item.id] = item.note_fr;
               });
 
               // sort the french enum list
