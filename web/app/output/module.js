@@ -98,6 +98,19 @@ cenozoApp.defineModule({
       lang: { column: "language.code", type: "string", isExcluded: true },
     });
 
+    module.addInputGroup("Source", {
+      filename: {
+        title: "", // defined below
+        type: "file",
+        isExcluded: "view",
+      },
+      url: {
+        title: "", // defined below
+        type: "string",
+        isExcluded: "view",
+      },
+    });
+
     /* ############################################################################################## */
     cenozo.providers.directive("cnOutputAdd", [
       "CnOutputModelFactory",
@@ -257,6 +270,7 @@ cenozoApp.defineModule({
       function (CnBaseAddFactory, CnHttpFactory, CnReqnHelper) {
         var object = function (parentModel) {
           CnBaseAddFactory.construct(this, parentModel);
+          this.configureFileInput("filename");
 
           this.onNew = async function (record) {
             var parent = this.parentModel.getParentIdentifier();
@@ -409,20 +423,15 @@ cenozoApp.defineModule({
             getOutputTypeNote: function() { return 'Loading...'; },
 
             updateLanguage: async function (lang) {
-              var group = this.module.inputGroupList.findByProperty(
-                "title",
-                ""
-              );
-              group.inputList.output_type_id.title = CnReqnHelper.translate(
-                "output",
-                "output_type",
-                lang
-              );
-              group.inputList.detail.title = CnReqnHelper.translate(
-                "output",
-                "detail",
-                lang
-              );
+              var group = this.module.inputGroupList.findByProperty( "title", "" );
+              group.inputList.output_type_id.title = CnReqnHelper.translate( "output", "output_type", lang );
+              group.inputList.detail.title = CnReqnHelper.translate( "output", "detail", lang );
+
+              var group = this.module.inputGroupList.findByProperty( "title", "Source" );
+
+              group.inputList.filename.title = CnReqnHelper.translate( "output", "filename", lang );
+              group.inputList.url.title = CnReqnHelper.translate( "output", "url", lang );
+
               await this.metadata.getPromise();
               this.metadata.columnList.output_type_id.enumList =
                 this.metadata.columnList.output_type_id.enumLists[lang];
