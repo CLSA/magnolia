@@ -75,7 +75,7 @@ class module extends \cenozo\service\module
     $select->add_column( 'CONCAT_WS( " ", designate_user.first_name, designate_user.last_name )', 'designate_name', false );
     $select->add_column( 'designate_user.email', 'designate_email', false );
 
-    if( $select->has_columns( 'has_agreement_filename' ) )
+    if( $select->has_column( 'has_agreement_filename' ) )
       $select->add_column( 'agreement_filename IS NOT NULL', 'has_agreement_filename', true, 'boolean' );
 
     if( $select->has_table_columns( 'reqn_type' ) )
@@ -117,7 +117,33 @@ class module extends \cenozo\service\module
       $select->add_table_column( 'applicant_country', 'name', 'formatted_applicant_country_id' );
       $select->add_table_column( 'trainee_country', 'name', 'formatted_trainee_country_id' );
 
-      if( $select->has_columns( 'has_unread_notice' ) )
+      if( $select->has_column( 'amendment_justification' ) )
+      {
+        // get a list of all amendment justifications marked as "show_in_description"
+        $join_mod = lib::create( 'database\modifier' );
+        $join_mod->where( 'reqn_version.id', '=', 'amendment_justification.reqn_version_id', false );
+
+        $type_sel = lib::create( 'database\select' );
+        $type_sel->from( 'amendment_type' );
+        $type_sel->add_column( 'id' );
+        $type_mod = lib::create( 'database\modifier' );
+        $type_mod->where( 'show_in_description', '=', true );
+        $join_mod->where(
+          'amendment_justification.amendment_type_id',
+          'IN',
+          sprintf( '(%s%s)', $type_sel->get_sql(), $type_mod->get_sql() ),
+          false
+        );
+        $modifier->join_modifier( 'amendment_justification', $join_mod, 'left' );
+        $modifier->group( 'reqn_version.id' );
+        $select->add_column(
+          'GROUP_CONCAT( amendment_justification.description )',
+          'amendment_justification',
+          false
+        );
+      }
+
+      if( $select->has_column( 'has_unread_notice' ) )
       {
         // check if the most recent notice does not include the current user
         $notice_mod = lib::create( 'database\modifier' );

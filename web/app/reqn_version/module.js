@@ -72,6 +72,7 @@ cenozoApp.defineModule({
       background: { type: "text" },
       objectives: { type: "text" },
       methodology: { type: "text" },
+      amendment_justification: { type: "text" },
       analysis: { type: "text" },
       peer_review: { type: "boolean" },
       funding: { type: "enum" },
@@ -179,6 +180,7 @@ cenozoApp.defineModule({
               isDescriptionConstant: function () {
                 return "." != scope.model.viewModel.record.amendment;
               },
+              isAlwaysTrue: function () { return true; },
             });
 
             scope.liteModel.viewModel.onView();

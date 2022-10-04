@@ -756,6 +756,10 @@ cenozo.service("CnReqnHelper", [
                 en: "Study Design and Methodology",
                 fr: "Modèle d’étude et méthodologie",
               },
+              amendment_justification: {
+                en: "Amendment Justification",
+                fr: "TODO: TRANSLATE",
+              },
               methodology_text: {
                 en: "The study design and methodology including an overview of the variables and/or biospecimens requested for the project. In no more than half a page, describe the inclusion and exclusion criteria for participants to be included in your study (e.g., age, sex, etc.).",
                 fr: "Modèle d’étude et méthodologie comprenant un survol de la liste de variables et/ou échantillons demandés. Sans dépasser une demi-page, décrivez les critères d’inclusion et d’exclusion des participants qui seront inclus dans votre étude (p. ex. âge, sexe, etc.).",

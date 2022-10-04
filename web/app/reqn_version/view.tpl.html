@@ -678,6 +678,18 @@
                   model="model">
                 </cn-view-input-with-differences>
                 <cn-view-input-with-differences
+                  ng-if="'.' != model.viewModel.record.amendment"
+                  input="{
+                    key: 'amendment_justification',
+                    title: '<b class=\'invert\'>ⓘ</b> ' + t( 'part1.d.amendment_justification' ),
+                    type: 'text',
+                    isConstant: isAlwaysTrue
+                  }"
+                  no-help-indicator="true",
+                  difference="model.viewModel.compareRecord.differences.part1.d.amendment_justification"
+                  model="model">
+                </cn-view-input-with-differences>
+                <cn-view-input-with-differences
                   input="{
                     key: 'analysis',
                     title: '<b class=\'invert\'>ⓘ</b> ' + t( 'part1.d.analysis' ) + '<br><span class=text-info>(' +
