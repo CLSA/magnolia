@@ -549,6 +549,18 @@ class reqn_version extends \cenozo\database\record
     if( !is_null( $this->background ) ) $data['background'] = $this->background;
     if( !is_null( $this->objectives ) ) $data['objectives'] = $this->objectives;
     if( !is_null( $this->methodology ) ) $data['methodology'] = $this->methodology;
+    $amendment_justification = NULL;
+    // get the amendment justification, if there is one
+    $justification_sel = lib::create( 'database\select' );
+    $justification_sel->add_table_column( 'amendment_justification', 'description' );
+    $justification_mod = lib::create( 'database\modifier' );
+    $justification_mod->join( 'amendment_type', 'amendment_justification.amendment_type_id', 'amendment_type.id' );
+    $justification_mod->where( 'amdnement_type.show_in_description', '=', true );
+    $justification_list = $this->get_amendment_justification_list( $justification_sel, $justification_mod );
+    if( 0 < count( $justification_list ) ) $justification_list = '';
+    foreach( $justification_list as $amendment_justification )
+      $amendment_justification .= $amendment_justification['description']."\n";
+    if( !is_null( $amendment_justification ) ) $data['amendment_justification'] = $amendment_justification;
     if( !is_null( $this->analysis ) ) $data['analysis'] = $this->analysis;
 
     if( !is_null( $this->peer_review ) )
