@@ -47,9 +47,8 @@ cenozoApp.defineModule({
       stage_type: { column: "stage_type.name", type: "string" },
       phase: { column: "stage_type.phase", type: "string" },
       lang: { column: "language.code", type: "string" },
-      activities: { type: "text" },
+      achieved_objectives: { type: "boolean" },
       findings: { type: "text" },
-      outcomes: { type: "text" },
       thesis_title: { type: "text" },
       thesis_status: { type: "text" },
       impact: { type: "text" },
@@ -241,6 +240,7 @@ cenozoApp.defineModule({
                 this.updateOutputListLanguage(this.record.lang);
                 await this.getVersionList();
               }
+              console.log( this );
             },
 
             onPatch: async function (data) {
@@ -361,15 +361,21 @@ cenozoApp.defineModule({
               CnOutputModelFactory.root.transitionToAddState();
             },
 
+            downloadFinalReport: async function () {
+              await CnReqnHelper.download(
+                "final_report",
+                this.record.getIdentifier()
+              );
+            },
+
             getDifferences: function (finalReport2) {
               var finalReport1 = this.record;
               var differences = {
                 diff: false,
                 part1: {
                   diff: false,
-                  activities: false,
+                  achieved_objectives: false,
                   findings: false,
-                  outcomes: false,
                   thesis_title: false,
                   thesis_status: false,
                 },
@@ -465,9 +471,8 @@ cenozoApp.defineModule({
                 // make sure that certain properties have been defined, one tab at a time
                 var requiredTabList = {
                   part1: [
-                    "activities",
+                    "achieved_objectives",
                     "findings",
-                    "outcomes",
                     "thesis_title",
                     "thesis_status",
                   ],
@@ -581,12 +586,14 @@ cenozoApp.defineModule({
       "CnBaseModelFactory",
       "CnFinalReportListFactory",
       "CnFinalReportViewFactory",
+      "CnReqnHelper",
       "CnSession",
       "$state",
       function (
         CnBaseModelFactory,
         CnFinalReportListFactory,
         CnFinalReportViewFactory,
+        CnReqnHelper,
         CnSession,
         $state
       ) {
@@ -602,6 +609,25 @@ cenozoApp.defineModule({
               "root" == this.type
             ),
             inputList: {},
+
+            getMetadata: async function() {
+              await this.$$getMetadata();
+
+              // create generic yes/no enum
+              const misc = CnReqnHelper.lookupData.finalReport.misc;
+              this.metadata.yesNoEnumList = {
+                en: [
+                  { value: "", name: misc.choose.en },
+                  { value: true, name: misc.yes.en },
+                  { value: false, name: misc.no.en },
+                ],
+                fr: [
+                  { value: "", name: misc.choose.fr },
+                  { value: true, name: misc.yes.fr },
+                  { value: false, name: misc.no.fr },
+                ],
+              };
+            },
 
             setupBreadcrumbTrail: function () {
               var trail = [];

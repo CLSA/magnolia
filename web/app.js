@@ -1202,21 +1202,17 @@ cenozo.service("CnReqnHelper", [
           part1: {
             tab: { en: "Part 1", fr: "1<sup>re</sup> partie" },
             a: {
-              question: {
-                en: "What was accomplished in this study?",
-                fr: "Quelles sont les réalisations de l’étude?",
-              },
-              activities: {
-                en: "Major activities",
-                fr: "Les activités importantes",
+              achieved_objectives: {
+                en: "Were you able to achieve the objectives stated in the approved application?",
+                fr: "TODO: TRANSLATE",
               },
               findings: {
-                en: "Major findings, developments, or conclusions (both positive and negative)",
-                fr: "Les observations, avancées ou conclusions importantes (positives et négatives)",
+                en: "Please provide a lay summary of the key findings to be posted on the CLSA website (1500 characters).",
+                fr: "TODO: TRANSLATE",
               },
-              outcomes: {
-                en: "Key outcomes or other achievements",
-                fr: "Les principaux résultats et autres réalisations",
+              noFindings: {
+                en: "Please provide an explanation why the objectives were not achieved (1500 characters).",
+                fr: "TODO: TRANSLATE",
               },
             },
             b: {

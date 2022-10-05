@@ -85,15 +85,9 @@ class final_report extends \cenozo\database\record
     $data['applicant_email'] = $db_user->email;
     if( !is_null( $db_reqn_version->title ) ) $data['title'] = $db_reqn_version->title;
     if( !is_null( $db_reqn_version->lay_summary ) ) $data['lay_summary'] = $db_reqn_version->lay_summary;
-    if( !is_null( $this->activities ) || !is_null( $this->findings ) || !is_null( $this->outcomes ) )
-    {
-      $data['accomplishments'] = $accomplishments = sprintf(
-        "1) %s\n\n2) %s\n\n3) %s",
-        $this->activities,
-        $this->findings,
-        $this->outcomes
-      );
-    }
+    if( true === $this->achieved_objectives ) $data['achieved_objectives_yes'] = 'Yes';
+    if( false === $this->achieved_objectives ) $data['achieved_objectives_no'] = 'Yes';
+    if( !is_null( $this->findings ) ) $data['findings'] = $this->findings;
     if( !is_null( $db_trainee_user ) ) $data['trainee_name'] =
       sprintf( '%s %s', $db_trainee_user->first_name, $db_trainee_user->last_name );
     if( !is_null( $this->thesis_title ) ) $data['thesis_title'] = $this->thesis_title;

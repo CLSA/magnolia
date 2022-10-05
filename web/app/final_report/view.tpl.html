@@ -119,23 +119,26 @@
         <cn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_report1" class="bg-info"></cn-deferral-note>
         <form name="part1Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
           <div class="container-fluid vertical-spacer">
-            <h4 ng-bind-html="t( 'part1.a.question' )"></h4>
             <cn-view-input-with-differences
-              input="{ key: 'activities', title: t( 'part1.a.activities' ), type: 'text' }"
+              input="{
+                key: 'achieved_objectives',
+                title: t( 'part1.a.achieved_objectives' ),
+                type: 'enum',
+                enumList: model.metadata.yesNoEnumList[model.viewModel.record.lang],
+              }"
               no-cols="true"
-              difference="model.viewModel.compareRecord.differences.part1.activities"
+              difference="model.viewModel.compareRecord.differences.part1.achieved_objectives"
               model="model">
             </cn-view-input-with-differences>
             <cn-view-input-with-differences
-              input="{ key: 'findings', title: t( 'part1.a.findings' ), type: 'text' }"
+              ng-if="'' !== model.viewModel.record.achieved_objectives"
+              input="{
+                key: 'findings',
+                title: t( model.viewModel.record.achieved_objectives ? 'part1.a.findings' : 'part1.a.noFindings' ),
+                type: 'text'
+              }"
               no-cols="true"
               difference="model.viewModel.compareRecord.differences.part1.findings"
-              model="model">
-            </cn-view-input-with-differences>
-            <cn-view-input-with-differences
-              input="{ key: 'outcomes', title: t( 'part1.a.outcomes' ), type: 'text' }"
-              no-cols="true"
-              difference="model.viewModel.compareRecord.differences.part1.outcomes"
               model="model">
             </cn-view-input-with-differences>
           </div>
@@ -143,13 +146,21 @@
             <h4 ng-bind-html="t( 'part1.b.question' )"></h4>
             <p class="text-primary" ng-bind-html="t( 'part1.b.text' )"></p>
             <cn-view-input-with-differences
-              input="{ key: 'thesis_title', title: t( 'part1.b.thesis_title' ), type: 'text' }"
+              input="{
+                key: 'thesis_title',
+                title: t( 'part1.b.thesis_title' ),
+                type: 'text'
+              }"
               no-cols="true"
               difference="model.viewModel.compareRecord.differences.part1.thesis_title"
               model="model">
             </cn-view-input-with-differences>
             <cn-view-input-with-differences
-              input="{ key: 'thesis_status', title: t( 'part1.b.thesis_status' ), type: 'text' }"
+              input="{
+                key: 'thesis_status',
+                title: t( 'part1.b.thesis_status' ),
+                type: 'text'
+              }"
               no-cols="true"
               difference="model.viewModel.compareRecord.differences.part1.thesis_status"
               model="model">
@@ -180,7 +191,11 @@
           <div class="container-fluid vertical-spacer">
             <h4 ng-bind-html="t( 'part3.a.question' )"></h4>
             <cn-view-input-with-differences
-              input="{ key: 'impact', title: t( 'part3.a.text' ), type: 'text' }"
+              input="{
+                key: 'impact',
+                title: t( 'part3.a.text' ),
+                type: 'text'
+              }"
               no-cols="true"
               difference="model.viewModel.compareRecord.differences.part3.impact"
               model="model">
@@ -189,7 +204,11 @@
           <div class="container-fluid vertical-spacer">
             <h4 ng-bind-html="t( 'part3.b.question' )"></h4>
             <cn-view-input-with-differences
-              input="{ key: 'opportunities', title: t( 'part3.b.text' ), type: 'text' }"
+              input="{
+                key: 'opportunities',
+                title: t( 'part3.b.text' ),
+                type: 'text'
+              }"
               no-cols="true"
               difference="model.viewModel.compareRecord.differences.part3.opportunities"
               model="model">
@@ -198,7 +217,11 @@
           <div class="container-fluid vertical-spacer">
             <h4 ng-bind-html="t( 'part3.c.question' )"></h4>
             <cn-view-input-with-differences
-              input="{ key: 'dissemination', title: t( 'part3.c.text' ), type: 'text' }"
+              input="{
+                key: 'dissemination',
+                title: t( 'part3.c.text' ),
+                type: 'text'
+              }"
               no-cols="true"
               difference="model.viewModel.compareRecord.differences.part3.dissemination"
               model="model">

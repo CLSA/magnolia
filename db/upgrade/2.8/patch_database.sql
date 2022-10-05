@@ -22,6 +22,7 @@ SOURCE data_category_has_study_phase.sql
 SOURCE data_selection.sql
 SOURCE data_detail.sql
 SOURCE amendment_type.sql
+SOURCE final_report.sql
 
 SOURCE update_version_number.sql
 
