@@ -2513,8 +2513,7 @@ cenozoApp.defineModule({
 
                     if (this.record.legacy && "." == this.record.amendment) {
                       // when submitting a new legacy reqn ask which stage to move to
-                      var stageType =
-                        await CnModalSubmitLegacyFactory.instance().show();
+                      var stageType = await CnModalSubmitLegacyFactory.instance().show();
 
                       if (null != stageType) {
                         var proceed = true;
@@ -2618,12 +2617,24 @@ cenozoApp.defineModule({
                             }
                           }
                         }
+                      } else if( !this.record.legacy && "." == this.record.amendment ) {
+                        proceed = false;
+
+                        // When moving to the admin stage for the first time show a warning if there are no
+                        // references
+                        if( 'New' == this.record.stage_type && 0 == this.record.referenceList.length ) {
+                          var response = await CnModalConfirmFactory.instance({
+                            title: this.translate("misc.pleaseConfirm"),
+                            noText: this.translate("misc.no"),
+                            yesText: this.translate("misc.yes"),
+                            message: this.translate("misc.confirmNoReferences"),
+                          }).show();
+                          proceed = response;
+                        }
                       }
 
-                      // Only proceed when:
-                      // 1) doing a review, or
-                      // 2) not doing a review and ( an agreement isn't included or uploading an agreement succeeds )
-                      // Do not proceed when uploading an agreement is cancelled
+                      // Now that all possible reasons for not proceeding have been checked, only proceed
+                      // if all checks have passed
                       if (proceed) {
                         try {
                           await CnHttpFactory.instance({
