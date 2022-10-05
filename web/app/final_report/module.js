@@ -240,7 +240,6 @@ cenozoApp.defineModule({
                 this.updateOutputListLanguage(this.record.lang);
                 await this.getVersionList();
               }
-              console.log( this );
             },
 
             onPatch: async function (data) {
