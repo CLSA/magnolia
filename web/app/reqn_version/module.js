@@ -250,6 +250,18 @@ cenozoApp.defineModule({
             scope.$watch("model.viewModel.record.analysis", (text) => {
               scope.model.viewModel.charCount.analysis = text ? text.length : 0;
             });
+            scope.$watch("model.amendmentTypeList", (amendmentTypeList) => {
+              if( angular.isObject( amendmentTypeList ) && angular.isDefined( amendmentTypeList.en ) ) {
+                amendmentTypeList.en.forEach( amendmentType => {
+                  const justificationColumn = "amendment_justification_" + amendmentType.id;
+                  scope.$watch("model.viewModel.record."+justificationColumn, (text) => {
+                    scope.model.viewModel.charCount.amendment_justification_list[justificationColumn] = text
+                      ? text.length
+                      : 0;
+                  });
+                });
+              }
+            });
 
             // fill in the start date delay
             await CnSession.promise;
@@ -895,6 +907,7 @@ cenozoApp.defineModule({
               objectives: 0,
               methodology: 0,
               analysis: 0,
+              amendment_justification_list: {},
             },
             minStartDate: null,
             noAmendmentTypes: false,

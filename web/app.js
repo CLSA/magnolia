@@ -590,6 +590,10 @@ cenozo.service("CnReqnHelper", [
               en: "The applicant you have selected is a trainee.  Please select a new applicant which does not have a supervisor.",
               fr: "Le demandeur que vous avez sélectionné est un stagiaire. Veuillez sélectionner un nouveau demandeur qui n’a pas de superviseur.",
             },
+            justification: {
+              en: "Justification (<strong>maximum 2500 characters</strong>)",
+              fr: "Justification (<strong>maximum 2500 caractères</strong>)",
+            },
           },
           part1: {
             tab: { en: "Part 1", fr: "1<sup>re</sup> partie" },

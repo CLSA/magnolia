@@ -198,8 +198,10 @@
                   no-cols=true
                   input="{
                     key: 'amendment_justification_' + amendmentType.id,
-                    title: 'Justification',
-                    type: 'text'
+                    title: t( 'amendment.justification' ) + '<br><span class=text-info>(' +
+                           model.viewModel.charCount.amendment_justification_list['amendment_justification_' + amendmentType.id] + ' ' + t( 'misc.chars' ) + ')</span>',
+                    type: 'text',
+                    maxLength: 2500
                   }"
                   difference="model.viewModel.compareRecord.differences.amendment.a.amendmentJustificationList.findByProperty( 'id', amendmentType.id )"
                   model="model">
