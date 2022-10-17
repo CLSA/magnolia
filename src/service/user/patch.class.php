@@ -25,6 +25,14 @@ class patch extends \cenozo\service\user\patch
       unset( $patch_array['supervisor_user_id'] );
     }
 
+    // remove suspended from the patch array
+    if( array_key_exists( 'suspended', $patch_array ) )
+    {
+      $this->suspended = $patch_array['suspended'];
+      $this->update_suspended = true;
+      unset( $patch_array['suspended'] );
+    }
+
     // remove newsletter from the patch array
     if( array_key_exists( 'newsletter', $patch_array ) )
     {
@@ -54,6 +62,7 @@ class patch extends \cenozo\service\user\patch
     // process the extra data, if it exists
     $db_applicant = $this->get_leaf_record()->get_applicant();
     if( $this->update_supervisor ) $db_applicant->supervisor_user_id = $this->supervisor_user_id;
+    if( $this->update_suspended ) $db_applicant->suspended = $this->suspended;
     if( $this->update_newsletter ) $db_applicant->newsletter = $this->newsletter;
     if( $this->update_note ) $db_applicant->note = $this->note;
     $db_applicant->save();
@@ -72,6 +81,20 @@ class patch extends \cenozo\service\user\patch
    * @access protected
    */
   protected $supervisor_user_id = NULL;
+
+  /**
+   * Whether the suspended needs to be updated
+   * @var boolean
+   * @access protected
+   */
+  protected $update_suspended = false;
+
+  /**
+   * What to chante the user's suspended to
+   * @var int
+   * @access protected
+   */
+  protected $suspended = NULL;
 
   /**
    * Whether the newsletter needs to be updated

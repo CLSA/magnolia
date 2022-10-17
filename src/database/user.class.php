@@ -14,6 +14,34 @@ use cenozo\lib, cenozo\log, magnolia\util;
 class user extends \cenozo\database\user
 {
   /**
+   * Returns whether a user has signed up for the suspended (checking applicant.suspended)
+   */
+  public function get_suspended()
+  {
+    $select = lib::create( 'database\select' );
+    $select->from( 'applicant' );
+    $select->add_column( 'suspended' );
+
+    $modifier = lib::create( 'database\modifier' );
+    $modifier->where( 'user_id', '=', $this->id );
+    return (boolean) static::db()->get_one( sprintf( '%s %s', $select->get_sql(), $modifier->get_sql() ) );
+  }
+
+  /**
+   * Sets whether a user should be signed up for the suspended (setting applicant.suspended)
+   * @param boolean $suspended
+   */
+  public function set_suspended( $suspended )
+  {
+    return static::db()->execute( sprintf(
+      'INSERT INTO applicant( user_id, suspended ) VALUES ( %s, %s ) '.
+      'ON DUPLICATE KEY UPDATE suspended = VALUES( suspended )',
+      static::db()->format_string( $this->id ),
+      static::db()->format_string( $suspended )
+    ) );
+  }
+
+  /**
    * Returns whether a user has signed up for the newsletter (checking applicant.newsletter)
    */
   public function get_newsletter()

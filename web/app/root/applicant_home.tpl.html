@@ -25,6 +25,13 @@
       </div>
     </div>
     <div class="vertical-spacer"></div>
+    <div ng-if="user.suspended">
+      <h3 class="text-danger">Account Suspended</h3>
+      <div class="container-fluid vertical-spacer text-danger">
+        Your account has been suspended.  Please contact <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a> for support. /<br/>
+        TODO: TRANSLATE
+      </div>
+    </div>
     <h3 class="text-primary">Newsletter</h3>
     <div class="container-fluid vertical-spacer">
       <label style="font-weight: normal">
@@ -33,31 +40,33 @@
         <input type="checkbox" ng-change="toggleNewsletter()" ng-model="user.newsletter"></input>
       </label>
     </div>
-    <h3 class="text-primary">Instructions</h3>
-    <div class="container-fluid vertical-spacer">
-      To begin the online process, please click on the “+ Add” button on the lower right to create a new requisition (Data and Biospecimen Access Application). The information you enter in Magnolia will be auto-saved. You may come back and edit your application at any time. Only once it is finalized and you are ready to submit your application, should you click on 'Submit'. Once you have submitted, you will receive a confirmation email of your submission. Completed but unsubmitted applications will not be reviewed.<br/>
-      <i>Pour commencer le processus de demande en ligne, veuillez cliquer sur le bouton « + Ajouter » en bas à droite pour créer une nouvelle demande (Demande d’accès aux données et aux échantillons biologiques). Les informations que vous entrez dans Magnolia seront sauvegardées automatiquement. Vous pouvez modifier votre demande à tout moment. Lorsque la demande est finalisée et que vous êtes prêt à la soumettre, cliquez sur le bouton « Soumettre ». Une fois la demande soumise, vous recevrez un courriel de confirmation de votre soumission. Les demandes complètes, mais qui n’ont pas été soumises ne seront pas évaluées.</i>
+    <div ng-if="!user.suspended">
+      <h3 class="text-primary">Instructions</h3>
+      <div class="container-fluid vertical-spacer">
+        To begin the online process, please click on the “+ Add” button on the lower right to create a new requisition (Data and Biospecimen Access Application). The information you enter in Magnolia will be auto-saved. You may come back and edit your application at any time. Only once it is finalized and you are ready to submit your application, should you click on 'Submit'. Once you have submitted, you will receive a confirmation email of your submission. Completed but unsubmitted applications will not be reviewed.<br/>
+        <i>Pour commencer le processus de demande en ligne, veuillez cliquer sur le bouton « + Ajouter » en bas à droite pour créer une nouvelle demande (Demande d’accès aux données et aux échantillons biologiques). Les informations que vous entrez dans Magnolia seront sauvegardées automatiquement. Vous pouvez modifier votre demande à tout moment. Lorsque la demande est finalisée et que vous êtes prêt à la soumettre, cliquez sur le bouton « Soumettre ». Une fois la demande soumise, vous recevrez un courriel de confirmation de votre soumission. Les demandes complètes, mais qui n’ont pas été soumises ne seront pas évaluées.</i>
+      </div>
+      <div class="vertical-spacer"></div>
+      <h3 class="text-primary">Messages</h3>
+      <div class="container-fluid" ng-repeat="message in session.messageList">
+        <h4>
+          <button type="button"
+                  class="btn"
+                  ng-class="message.unread ? 'btn-warning' : 'btn-default'"
+                  ng-click="markMessage( message.id )"
+                  uib-tooltip="Click to mark message as {{ message.unread ? 'read' : 'unread' }}"
+                  tooltip-placement="right">
+            <i class="glyphicon" ng-class="message.unread ? 'glyphicon-envelope' : 'glyphicon-ok'"></i>
+          </button>
+          {{ message.title }}
+        </h4>
+        <blockquote class="text-info" style="white-space: pre-wrap;" ng-bind-html="message.note"></blockquote>
+      </div>
+      <div ng-if="0 == session.messageList.length">
+        <blockquote class="text-info" style="white-space: pre-wrap;">There are no messages.</blockquote>
+      </div>
+      <cn-reqn-list model="reqnModel"></cn-reqn-list>
     </div>
-    <div class="vertical-spacer"></div>
-    <h3 class="text-primary">Messages</h3>
-    <div class="container-fluid" ng-repeat="message in session.messageList">
-      <h4>
-        <button type="button"
-                class="btn"
-                ng-class="message.unread ? 'btn-warning' : 'btn-default'"
-                ng-click="markMessage( message.id )"
-                uib-tooltip="Click to mark message as {{ message.unread ? 'read' : 'unread' }}"
-                tooltip-placement="right">
-          <i class="glyphicon" ng-class="message.unread ? 'glyphicon-envelope' : 'glyphicon-ok'"></i>
-        </button>
-        {{ message.title }}
-      </h4>
-      <blockquote class="text-info" style="white-space: pre-wrap;" ng-bind-html="message.note"></blockquote>
-    </div>
-    <div ng-if="0 == session.messageList.length">
-      <blockquote class="text-info" style="white-space: pre-wrap;">There are no messages.</blockquote>
-    </div>
-    <cn-reqn-list model="reqnModel"></cn-reqn-list>
     <div class="vertical-spacer"></div>
   </div>
 </div>

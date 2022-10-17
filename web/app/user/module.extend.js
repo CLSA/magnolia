@@ -4,6 +4,13 @@ cenozoApp.extendModule({
     // we don't need the site column since this is a one-site application
     delete module.columnList.sites;
 
+    // add the suspended column to the column list
+    cenozo.insertPropertyAfter(module.columnList, "active", "suspended", {
+      column: "suspended",
+      title: "Suspended",
+      type: "boolean",
+    });
+
     // add the newsletter column to the column list
     cenozo.insertPropertyAfter(module.columnList, "role_list", "newsletter", {
       column: "newsletter",
@@ -26,6 +33,12 @@ cenozoApp.extendModule({
         "If set then all new requisitions created by this user will define the supervisor as the primary applicant " +
         "and this user as the trainee.",
     });
+
+    module.addInput("", "suspended", {
+      title: "Suspended for Non-payment",
+      type: "boolean",
+      help: "Whether the user's account is suspended due to non-payment of fees.",
+    }, 'active' );
 
     module.addInput("", "newsletter", {
       title: "Newsletter Consent",

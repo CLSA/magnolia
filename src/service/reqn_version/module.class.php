@@ -19,6 +19,17 @@ class module extends \cenozo\service\module
    */
   public function validate()
   {
+    // do not allow access to a suspended applicant
+    $session = lib::create( 'business\session' );
+    $db_user = $session->get_user();
+    $db_role = $session->get_role();
+
+    if( $db_user->get_suspended() && in_array( $db_role->name, ['applicant', 'designate'] ) )
+    {
+      $this->get_status()->set_code( 403 );
+      return;
+    }
+
     parent::validate();
 
     $session = lib::create( 'business\session' );

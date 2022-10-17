@@ -31,6 +31,7 @@ class get extends \cenozo\service\self\get
     $resource['application']['study_data_expiry'] = $setting_manager->get_setting( 'general', 'study_data_expiry' );
     $resource['application']['study_data_url'] = sprintf( '%s/%s', str_replace( '/api', '', ROOT_URL ), STUDY_DATA_URL );
     $resource['application']['base_country_id'] = $db_application->country_id;
+    $resource['user']['suspended'] = $db_user->get_suspended();
     $resource['user']['newsletter'] = $db_user->get_newsletter();
 
     // always include the rank of the revision required stage as it is needed when editing reqns

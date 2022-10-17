@@ -20,6 +20,12 @@ class head extends \cenozo\service\head
   {
     parent::setup();
 
+    $this->columns['suspended'] = array(
+      'data_type' => 'tinyint',
+      'default' => '1',
+      'required' => '1'
+    );
+
     $this->columns['newsletter'] = array(
       'data_type' => 'tinyint',
       'default' => '1',

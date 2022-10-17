@@ -33,6 +33,9 @@ class module extends \cenozo\service\user\module
       );
     }
 
+    if( $select->has_column( 'suspended' ) )
+      $select->add_column( 'IFNULL( applicant.suspended, false )', 'suspended', false, 'boolean' );
+
     if( $select->has_column( 'newsletter' ) )
       $select->add_column( 'IFNULL( applicant.newsletter, false )', 'newsletter', false, 'boolean' );
 
