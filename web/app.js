@@ -756,8 +756,8 @@ cenozo.service("CnReqnHelper", [
                 en: "Study Design and Methodology",
                 fr: "Modèle d’étude et méthodologie",
               },
-              amendment_justification: {
-                en: "Amendment Justification",
+              amendment_justification_summary: {
+                en: "Amendment Justification Summary",
                 fr: "TODO: TRANSLATE",
               },
               methodology_text: {

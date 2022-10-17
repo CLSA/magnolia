@@ -191,10 +191,8 @@ class module extends \cenozo\service\module
           $justification_mod->get_sql()
         ) );
 
-        // now join with no modifier (straight join)
-        $empty_mod = lib::create( 'database\modifier' );
-        $empty_mod->where( 'true', '=', true );
-        $modifier->join_modifier( 'justification_summary', $empty_mod );
+        // now left join with no conditions
+        $modifier->left_join( 'justification_summary', '1', '1' );
         $modifier->group( 'reqn_version.id' );
 
         $select->add_column(

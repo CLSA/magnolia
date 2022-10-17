@@ -681,7 +681,7 @@
                   ng-if="'.' != model.viewModel.record.amendment && 'en' == model.viewModel.record.lang"
                   input="{
                     key: 'justification_summary_en',
-                    title: '<b class=\'invert\'>ⓘ</b> ' + t( 'part1.d.amendment_justification' ),
+                    title: t( 'part1.d.amendment_justification_summary' ),
                     type: 'text',
                     constant: true
                   }"
@@ -691,7 +691,7 @@
                   ng-if="'.' != model.viewModel.record.amendment && 'fr' == model.viewModel.record.lang"
                   input="{
                     key: 'justification_summary_fr',
-                    title: '<b class=\'invert\'>ⓘ</b> ' + t( 'part1.d.amendment_justification' ),
+                    title: t( 'part1.d.amendment_justification_summary' ),
                     type: 'text',
                     isConstant: isAlwaysTrue
                   }"
