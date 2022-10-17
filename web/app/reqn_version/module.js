@@ -2627,18 +2627,28 @@ cenozoApp.defineModule({
                             }
                           }
                         }
-                      } else if( !this.record.legacy && "." == this.record.amendment ) {
+                      } else if (!this.record.legacy && "." == this.record.amendment) {
                         proceed = false;
 
                         // When moving to the admin stage for the first time show a warning if there are no
                         // references
-                        if( 'New' == this.record.stage_type && 0 == this.record.referenceList.length ) {
-                          var response = await CnModalConfirmFactory.instance({
-                            title: this.translate("misc.pleaseConfirm"),
-                            noText: this.translate("misc.no"),
-                            yesText: this.translate("misc.yes"),
-                            message: this.translate("misc.confirmNoReferences"),
-                          }).show();
+                        if ('New' == this.record.stage_type) {
+                          if (0 == this.record.referenceList.length || 0 == this.record.coapplicantList.length) {
+                            let message = this.translate("misc.confirmNoCoapplicantsOrReferences");
+                            if (0 < this.record.referenceList.length) {
+                              message = this.translate("misc.confirmNoCoapplicants");
+                            } else if (0 < this.record.coapplicantList.length) {
+                              message = this.translate("misc.confirmNoReferences");
+                            }
+
+                            var response = await CnModalConfirmFactory.instance({
+                              title: this.translate("misc.pleaseConfirm"),
+                              noText: this.translate("misc.no"),
+                              yesText: this.translate("misc.yes"),
+                              message: message,
+                            }).show();
+                          }
+
                           proceed = response;
                         }
                       }

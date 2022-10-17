@@ -1015,8 +1015,16 @@ cenozo.service("CnReqnHelper", [
               en: "Are you sure you wish to create an amendment?\n\nThe application form will be re-opened and you will be able to make and submit changes.",
               fr: "Êtes-vous sûr de vouloir effectuer une modification? Le formulaire de demande sera rouvert. Vous pourrez alors apporter des modifications et les soumettre.",
             },
+            confirmNoCoapplicants: {
+              en: "Are you sure that you wish to submit the application without including any co-applicants?\n\nIf you wish to add co-applicants to the project team, then please click \"No\" so that you may provide them before submitting your application.  Otherwise, clicking \"Yes\" will submit your application without any co-applicants.",
+              fr: "TODO: TRANSLATE"
+            },
             confirmNoReferences: {
-              en: "You have not provided any co-applicants to the project team, and you have not provided any references.  Are you sure that you wish to submit the application without this information?\n\nIf not then please click \"No\" so that you may fill in the missing details before submitting.  If you are sure then clicking \"Yes\" will proceed with submitting your application for review.",
+              en: "Are you sure that you wish to submit the application without including any references?\n\nIf you wish to provide references, then please click \"No\" so that you may provide them before submitting your application.  Otherwise, clicking \"Yes\" will submit your application without any references.",
+              fr: "TODO: TRANSLATE"
+            },
+            confirmNoCoapplicantsOrReferences: {
+              en: "Are you sure that you wish to submit the application without including any co-applicants or references?\n\nIf you wish to provide either, then please click \"No\" so that you may provide them before submitting your application.  Otherwise, clicking \"Yes\" will submit your application without any co-applicants or references.",
               fr: "TODO: TRANSLATE"
             },
             submit: { en: "Submit", fr: "Soumettre" },
