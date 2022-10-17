@@ -72,7 +72,8 @@ cenozoApp.defineModule({
       background: { type: "text" },
       objectives: { type: "text" },
       methodology: { type: "text" },
-      amendment_justification: { type: "text" },
+      justification_summary_en: { type: "text" },
+      justification_summary_fr: { type: "text" },
       analysis: { type: "text" },
       peer_review: { type: "boolean" },
       funding: { type: "enum" },
@@ -715,6 +716,15 @@ cenozoApp.defineModule({
 
                 this.record["amendment_justification_" + amendmentTypeId] =
                   data[property];
+
+                // now re-read the amendment_justification properties used by the view as it may have changed
+                const response = await CnHttpFactory.instance({
+                  path: this.parentModel.getServiceResourcePath(),
+                  data: { select: { column: ['justification_summary_en', 'justification_summary_fr'] } },
+                }).get();
+
+                this.record.justification_summary_en = response.data.justification_summary_en;
+                this.record.justification_summary_fr = response.data.justification_summary_fr;
               } else if (null != property.match(/^data_justification_/)) {
                 // justifications have their own service
                 var match = property.match(/^data_justification_([0-9]+)$/);
@@ -1343,7 +1353,7 @@ cenozoApp.defineModule({
                         } else if ("amendmentJustificationList" == property) {
                           for (var prop in reqnVersion1) {
                             if (
-                              null != prop.match(/^amendment_justification_/)
+                              null != prop.match(/^amendment_justification_[0-9]+/)
                             ) {
                               if (reqnVersion1[prop] != reqnVersion2[prop]) {
                                 var match = prop.match(

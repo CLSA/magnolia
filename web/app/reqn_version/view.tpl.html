@@ -677,18 +677,26 @@
                   difference="model.viewModel.compareRecord.differences.part1.d.methodology"
                   model="model">
                 </cn-view-input-with-differences>
-                <cn-view-input-with-differences
-                  ng-if="'.' != model.viewModel.record.amendment"
+                <cn-view-input
+                  ng-if="'.' != model.viewModel.record.amendment && 'en' == model.viewModel.record.lang"
                   input="{
-                    key: 'amendment_justification',
+                    key: 'justification_summary_en',
+                    title: '<b class=\'invert\'>ⓘ</b> ' + t( 'part1.d.amendment_justification' ),
+                    type: 'text',
+                    constant: true
+                  }"
+                  model="model">
+                </cn-view-input>
+                <cn-view-input
+                  ng-if="'.' != model.viewModel.record.amendment && 'fr' == model.viewModel.record.lang"
+                  input="{
+                    key: 'justification_summary_fr',
                     title: '<b class=\'invert\'>ⓘ</b> ' + t( 'part1.d.amendment_justification' ),
                     type: 'text',
                     isConstant: isAlwaysTrue
                   }"
-                  no-help-indicator="true",
-                  difference="model.viewModel.compareRecord.differences.part1.d.amendment_justification"
                   model="model">
-                </cn-view-input-with-differences>
+                </cn-view-input>
                 <cn-view-input-with-differences
                   input="{
                     key: 'analysis',

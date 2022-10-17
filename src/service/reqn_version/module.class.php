@@ -51,7 +51,10 @@ class module extends \cenozo\service\module
    */
   public function prepare_read( $select, $modifier )
   {
+    $reqn_version_class_name = lib::get_class_name( 'database\reqn_version' );
+
     parent::prepare_read( $select, $modifier );
+
     $modifier->join( 'reqn', 'reqn_version.reqn_id', 'reqn.id' );
     $modifier->join( 'reqn_current_final_report', 'reqn.id', 'reqn_current_final_report.reqn_id' );
     $modifier->left_join( 'final_report', 'reqn_current_final_report.final_report_id', 'final_report.id' );
@@ -117,28 +120,103 @@ class module extends \cenozo\service\module
       $select->add_table_column( 'applicant_country', 'name', 'formatted_applicant_country_id' );
       $select->add_table_column( 'trainee_country', 'name', 'formatted_trainee_country_id' );
 
-      if( $select->has_column( 'amendment_justification' ) )
+      if( $select->has_column( 'justification_summary_en' ) ||
+          $select->has_column( 'justification_summary_fr' ) )
       {
-        // get a list of all amendment justifications marked as "show_in_description"
-        $join_mod = lib::create( 'database\modifier' );
-        $join_mod->where( 'reqn_version.id', '=', 'amendment_justification.reqn_version_id', false );
+        // Create the justification summary columns
+        // NOTE: This is actually quite complicated.  We must collect the amendment description for the latest
+        // version of all reqn_versions associated with the queried reqn_version, but only those whose amendment
+        // type has "show_in_descriptn" set to true.
+        // This is accomplished by creating a temporary table with a group concat of all amendment descriptions
+        // for each amendment, then joining to that table and group concatting for the queried reqn_version.
 
-        $type_sel = lib::create( 'database\select' );
-        $type_sel->from( 'amendment_type' );
-        $type_sel->add_column( 'id' );
-        $type_mod = lib::create( 'database\modifier' );
-        $type_mod->where( 'show_in_description', '=', true );
-        $join_mod->where(
-          'amendment_justification.amendment_type_id',
-          'IN',
-          sprintf( '(%s%s)', $type_sel->get_sql(), $type_mod->get_sql() ),
+        // create the query necessary to find the highest ranking version of all amendments
+        $version_sel = lib::create( 'database\select' );
+        $version_sel->from( 'reqn_version', 'latest_reqn_version' );
+        $version_sel->add_column( 'MAX( version )', 'max_version', false );
+        $version_mod = lib::create( 'database\modifier' );
+        $version_mod->where( 'latest_reqn_version.reqn_id', '=', 'reqn_version.reqn_id', false );
+        $version_mod->where( 'latest_reqn_version.amendment', '=', 'reqn_version.amendment', false );
+
+        // create a temporary table with the final version of visible justifications for every amendment
+        $justification_sel = lib::create( 'database\select' );
+        $justification_sel->from( 'reqn_version' );
+        $justification_sel->add_table_column( 'reqn_version', 'amendment' );
+        $justification_sel->add_column(
+          'GROUP_CONCAT( '.
+            'CONCAT( '.
+              '\'"\', amendment_type.reason_en, \'"\n\', '.
+              'amendment_justification.description '.
+            ') ORDER BY reqn_version.amendment, amendment_type.rank '.
+            'SEPARATOR "\n\n" '.
+          ')',
+          'description_en',
           false
         );
-        $modifier->join_modifier( 'amendment_justification', $join_mod, 'left' );
-        $modifier->group( 'reqn_version.id' );
-        $select->add_column(
-          'GROUP_CONCAT( amendment_justification.description )',
+        $justification_sel->add_column(
+          'GROUP_CONCAT( '.
+            'CONCAT( '.
+              '\'"\', amendment_type.reason_fr, \'"\n\', '.
+              'amendment_justification.description '.
+            ') ORDER BY reqn_version.amendment, amendment_type.rank '.
+            'SEPARATOR "\n\n" '.
+          ')',
+          'description_fr',
+          false
+        );
+        $justification_mod = lib::create( 'database\modifier' );
+        $justification_mod->join(
           'amendment_justification',
+          'reqn_version.id',
+          'amendment_justification.reqn_version_id'
+        );
+        $justification_mod->join(
+          'amendment_type',
+          'amendment_justification.amendment_type_id',
+          'amendment_type.id'
+        );
+        $justification_mod->where( 'amendment_type.show_in_description', '=', true );
+        $justification_mod->where(
+          'reqn_version.version',
+          '=',
+          sprintf( '( %s%s )', $version_sel->get_sql(), $version_mod->get_sql() ),
+          false
+        );
+        $justification_mod->where( 'reqn_version.reqn_id', '=', $db_reqn_version->reqn_id );
+        $justification_mod->group( 'reqn_version.amendment' );
+
+        $reqn_version_class_name::db()->execute( sprintf(
+          'CREATE TEMPORARY TABLE justification_summary %s %s',
+          $justification_sel->get_sql(),
+          $justification_mod->get_sql()
+        ) );
+
+        // now join with no modifier (straight join)
+        $empty_mod = lib::create( 'database\modifier' );
+        $empty_mod->where( 'true', '=', true );
+        $modifier->join_modifier( 'justification_summary', $empty_mod );
+        $modifier->group( 'reqn_version.id' );
+
+        $select->add_column(
+          'GROUP_CONCAT( '.
+            'CONCAT( '.
+              '"For amendment ", justification_summary.amendment, ":\n\n", '.
+              'justification_summary.description_en '.
+            ') '.
+            'ORDER BY justification_summary.amendment '.
+            'SEPARATOR "\n\n" '.
+          ')',
+          'justification_summary_en',
+          false
+        );
+        $select->add_column(
+          'GROUP_CONCAT( '.
+            'CONCAT( '.
+              '"TODO: TRANSLATE ", justification_summary.amendment, ":\n\n", '.
+              'justification_summary.description_fr '.
+            ') '.
+          ')',
+          'justification_summary_fr',
           false
         );
       }

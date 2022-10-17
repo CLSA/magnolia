@@ -13,6 +13,9 @@ CREATE PROCEDURE patch_amendment_type()
 
     IF @test = 0 THEN
       ALTER TABLE amendment_type ADD COLUMN show_in_description TINYINT(1) NOT NULL DEFAULT 0 AFTER new_user;
+
+      UPDATE amendment_type SET show_in_description = true
+      WHERE reason_en = "Changes to the Approved Project Title, Lay Summary and/or Objectives";
     END IF;
 
   END //
