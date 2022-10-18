@@ -30,16 +30,14 @@ cenozoApp.defineModule({
       identifier: {
         title: "Identifier",
         column: "reqn.identifier",
-        type: "lookup-typeahead",
-        typeahead: {
-          table: "reqn",
-          select: "reqn.identifier",
-          where: "reqn.identifier",
-        },
+        type: "string",
+        isConstant: true,
+        isExcluded: 'add',
       },
       data_version_id: {
         title: "Version",
         type: "enum",
+        multi: true,
       },
       category: {
         title: "Category",
@@ -50,6 +48,22 @@ cenozoApp.defineModule({
         type: "date",
       },
     });
+
+    /* ############################################################################################## */
+    cenozo.providers.factory("CnDataReleaseAddFactory", [
+      "CnBaseAddFactory",
+      function (CnBaseAddFactory) {
+        var object = function (parentModel) {
+          CnBaseAddFactory.construct(this, parentModel);
+          this.heading = "Add Data Version(s) to Requisition";
+        };
+        return {
+          instance: function (parentModel) {
+            return new object(parentModel);
+          },
+        };
+      },
+    ]);
 
     /* ############################################################################################## */
     cenozo.providers.factory("CnDataReleaseModelFactory", [
