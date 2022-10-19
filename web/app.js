@@ -762,7 +762,7 @@ cenozo.service("CnReqnHelper", [
               },
               amendment_justification_summary: {
                 en: "Amendment Justification Summary",
-                fr: "TODO: TRANSLATE",
+                fr: "Résumé de la justification de la modification",
               },
               methodology_text: {
                 en: "The study design and methodology including an overview of the variables and/or biospecimens requested for the project. In no more than half a page, describe the inclusion and exclusion criteria for participants to be included in your study (e.g., age, sex, etc.).",
@@ -1021,15 +1021,15 @@ cenozo.service("CnReqnHelper", [
             },
             confirmNoCoapplicants: {
               en: "Are you sure that you wish to submit the application without including any co-applicants?\n\nIf you wish to add co-applicants to the project team, then please click \"No\" so that you may provide them before submitting your application.  Otherwise, clicking \"Yes\" will submit your application without any co-applicants.",
-              fr: "TODO: TRANSLATE"
+              fr: "Souhaitez-vous soumettre la demande sans aucun co-demandeur ou co-demandeuse? Si vous souhaitez ajouter des co-demandeurs ou co-demandeuses à l'équipe de projet, veuillez cliquer sur « Non » afin de pouvoir les ajouter avant de soumettre la demande. Sinon, cliquez sur « Oui » pour soumettre la demande sans co-demandeur ou co-demandeuse.",
             },
             confirmNoReferences: {
               en: "Are you sure that you wish to submit the application without including any references?\n\nIf you wish to provide references, then please click \"No\" so that you may provide them before submitting your application.  Otherwise, clicking \"Yes\" will submit your application without any references.",
-              fr: "TODO: TRANSLATE"
+              fr: "Souhaitez-vous soumettre la demande sans références? Si vous souhaitez ajouter des références, veuillez cliquer sur « Non » afin de pouvoir les ajouter avant de soumettre la demande. Sinon, cliquez sur « Oui » pour soumettre la demande sans références.",
             },
             confirmNoCoapplicantsOrReferences: {
               en: "Are you sure that you wish to submit the application without including any co-applicants or references?\n\nIf you wish to provide either, then please click \"No\" so that you may provide them before submitting your application.  Otherwise, clicking \"Yes\" will submit your application without any co-applicants or references.",
-              fr: "TODO: TRANSLATE"
+              fr: "Souhaitez-vous soumettre la demande sans co-demandeur ou co-demandeuse ou sans références? Si vous souhaitez ajouter des co-demandeurs ou co-demandeuses ou sans références, veuillez cliquer sur « Non » afin de pouvoir les ajouter avant de soumettre la demande. Sinon, cliquez sur « Oui » pour soumettre la demande sans co-demandeur ou co-demandeuse ou sans références.",
             },
             submit: { en: "Submit", fr: "Soumettre" },
             submitTitle: {
@@ -1216,15 +1216,15 @@ cenozo.service("CnReqnHelper", [
             a: {
               achieved_objectives: {
                 en: "Were you able to achieve the objectives stated in the approved application?",
-                fr: "TODO: TRANSLATE",
+                fr: "Avez-vous été en mesure d'atteindre les objectifs énoncés dans la demande approuvée?",
               },
               findings: {
                 en: "Please provide a lay summary of the key findings to be posted on the CLSA website (1500 characters).",
-                fr: "TODO: TRANSLATE",
+                fr: "Veuillez fournir un résumé non scientifique des principaux résultats qui sera publié sur le site Web de l'ÉLCV (1 500 caractères).",
               },
               noFindings: {
                 en: "Please provide an explanation why the objectives were not achieved (1500 characters).",
-                fr: "TODO: TRANSLATE",
+                fr: "Veuillez expliquer pourquoi les objectifs n'ont pas été atteints (1500 caractères).",
               },
             },
             b: {

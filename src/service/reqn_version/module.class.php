@@ -209,7 +209,7 @@ class module extends \cenozo\service\module
         $select->add_column(
           'GROUP_CONCAT( '.
             'CONCAT( '.
-              '"For amendment ", justification_summary.amendment, ":\n\n", '.
+              '"Amendment \"", justification_summary.amendment, "\":\n\n", '.
               'justification_summary.description_en '.
             ') '.
             'ORDER BY justification_summary.amendment '.
@@ -221,7 +221,7 @@ class module extends \cenozo\service\module
         $select->add_column(
           'GROUP_CONCAT( '.
             'CONCAT( '.
-              '"TODO: TRANSLATE ", justification_summary.amendment, ":\n\n", '.
+              '"Modification \"", justification_summary.amendment, "\":\n\n", '.
               'justification_summary.description_fr '.
             ') '.
           ')',
