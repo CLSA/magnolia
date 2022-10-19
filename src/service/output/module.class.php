@@ -34,6 +34,11 @@ class module extends \cenozo\service\module
     // add empty values for the output source fields (they are only used when adding new outputs)
     if( $select->has_column( 'filename' ) ) $select->add_constant( NULL, 'filename' );
     if( $select->has_column( 'url' ) ) $select->add_constant( NULL, 'url' );
+    for( $i = 1; $i <= 10; $i++ )
+    {
+      $column_name = 'filename'.$i;
+      if( $select->has_column( $column_name ) ) $select->add_constant( NULL, $column_name );
+    }
   }
 
   /**
@@ -46,7 +51,8 @@ class module extends \cenozo\service\module
       $post_array = $this->get_file_as_array();
 
       // add the output source record
-      if( in_array( 'filename', array_keys( $post_array ) ) || in_array( 'url', array_keys( $post_array ) ) )
+      $column_list = array_keys( $post_array );
+      if( in_array( 'filename', $column_list ) || in_array( 'url', $column_list ) )
       {
         try
         {
@@ -62,6 +68,26 @@ class module extends \cenozo\service\module
         {
           $this->get_status()->set_code( $e->is_missing_data() ? 400 : 500 );
           throw $e;
+        }
+      }
+
+      // add multiple output source records
+      foreach( $post_array as $column => $filename )
+      {
+        if( preg_match( '/filename[0-9]+/', $column ) )
+        {
+          try
+          {
+            $db_output_source = lib::create( 'database\output_source' );
+            $db_output_source->output_id = $record->id;
+            $db_output_source->filename = $filename;
+            $db_output_source->save();
+          }
+          catch( \cenozo\exception\database $e )
+          {
+            $this->get_status()->set_code( $e->is_missing_data() ? 400 : 500 );
+            throw $e;
+          }
         }
       }
     }

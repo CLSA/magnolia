@@ -98,16 +98,66 @@ cenozoApp.defineModule({
       lang: { column: "language.code", type: "string", isExcluded: true },
     });
 
-    module.addInputGroup("Source", {
+    module.addInputGroup("Sources", {
       filename: {
         title: "", // defined below
         type: "file",
-        isExcluded: "view",
+        isExcluded: "view", // redefined below
       },
       url: {
         title: "", // defined below
         type: "string",
-        isExcluded: "view",
+        isExcluded: "view", // redefined below
+      },
+      filename1: {
+        title: "", // defined below
+        type: "file",
+        isExcluded: true, // redefined below
+      },
+      filename2: {
+        title: "", // defined below
+        type: "file",
+        isExcluded: true, // redefined below
+      },
+      filename3: {
+        title: "", // defined below
+        type: "file",
+        isExcluded: true, // redefined below
+      },
+      filename4: {
+        title: "", // defined below
+        type: "file",
+        isExcluded: true, // redefined below
+      },
+      filename5: {
+        title: "", // defined below
+        type: "file",
+        isExcluded: true, // redefined below
+      },
+      filename6: {
+        title: "", // defined below
+        type: "file",
+        isExcluded: true, // redefined below
+      },
+      filename7: {
+        title: "", // defined below
+        type: "file",
+        isExcluded: true, // redefined below
+      },
+      filename8: {
+        title: "", // defined below
+        type: "file",
+        isExcluded: true, // redefined below
+      },
+      filename9: {
+        title: "", // defined below
+        type: "file",
+        isExcluded: true, // redefined below
+      },
+      filename10: {
+        title: "", // defined below
+        type: "file",
+        isExcluded: true, // redefined below
       },
     });
 
@@ -153,14 +203,36 @@ cenozoApp.defineModule({
               await $scope.model.updateLanguage(lang);
 
               // translate the cancel and save buttons
+              cnRecordAddScope.baseCheckFn = cnRecordAddScope.check;
               angular.extend(cnRecordAddScope, {
+                updateSourceInputVisibility: function() {
+                  const derivedData = this.record.output_type_id == this.model.derivedDataOutputTypeId;
+                  var group = this.model.module.inputGroupList.findByProperty( "title", "Sources" );
+                  group.inputList.filename.isExcluded = function() { return derivedData ? true : "view"; };
+                  group.inputList.url.isExcluded = function() { return derivedData ? true : "view"; };
+                  for (let n=1; n<=10; n++) {
+                    const columnName = "filename" + n;
+                    group.inputList[columnName].isExcluded = function() { return derivedData ? "view" : true; };
+                  }
+                },
+
                 getCancelText: function () {
                   return CnReqnHelper.translate("output", "cancel", lang);
                 },
+
                 getSaveText: function () {
                   return CnReqnHelper.translate("output", "save", lang);
                 },
+
+                check: function (property) {
+                  this.baseCheckFn;
+
+                  // change the source inputs based on the currently selected output type
+                  if ("output_type_id" == property) this.updateSourceInputVisibility();
+                },
               });
+
+              cnRecordAddScope.updateSourceInputVisibility();
             });
           },
         };
@@ -271,6 +343,7 @@ cenozoApp.defineModule({
         var object = function (parentModel) {
           CnBaseAddFactory.construct(this, parentModel);
           this.configureFileInput("filename");
+          for (let n=1; n<=10; n++) this.configureFileInput("filename"+n);
 
           this.onNew = async function (record) {
             var parent = this.parentModel.getParentIdentifier();
@@ -427,10 +500,14 @@ cenozoApp.defineModule({
               group.inputList.output_type_id.title = CnReqnHelper.translate( "output", "output_type", lang );
               group.inputList.detail.title = CnReqnHelper.translate( "output", "detail", lang );
 
-              var group = this.module.inputGroupList.findByProperty( "title", "Source" );
+              var group = this.module.inputGroupList.findByProperty( "title", "Sources" );
 
               group.inputList.filename.title = CnReqnHelper.translate( "output", "filename", lang );
               group.inputList.url.title = CnReqnHelper.translate( "output", "url", lang );
+              for (let n=1; n<=10; n++) {
+                const columnName = "filename" + n;
+                group.inputList[columnName].title = CnReqnHelper.translate( "output", "filename", lang ) + " " + n;
+              }
 
               await this.metadata.getPromise();
               this.metadata.columnList.output_type_id.enumList =
@@ -553,6 +630,9 @@ cenozoApp.defineModule({
                 });
                 this.outputTypeNoteList.en[item.id] = item.note_en;
                 this.outputTypeNoteList.fr[item.id] = item.note_fr;
+
+                // note the ID for derived data (used by the UI to customize which source inputs appear)
+                if ("Derived Data" == item.name_en) this.derivedDataOutputTypeId = item.id;
               });
 
               // sort the french enum list
@@ -560,6 +640,8 @@ cenozoApp.defineModule({
                 (a, b) => (a.name < b.name ? -1 : a.name == b.name ? 0 : 1)
               );
             },
+
+            derivedDataOutputTypeId: null,
           });
         };
 
