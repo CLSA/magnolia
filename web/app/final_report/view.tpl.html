@@ -134,8 +134,11 @@
               ng-if="'' !== model.viewModel.record.achieved_objectives"
               input="{
                 key: 'findings',
-                title: t( model.viewModel.record.achieved_objectives ? 'part1.a.findings' : 'part1.a.noFindings' ),
-                type: 'text'
+                title: t( model.viewModel.record.achieved_objectives ? 'part1.a.findings' : 'part1.a.noFindings' ) +
+                       '<br><span class=text-info>(' + model.viewModel.charCount.findings + ' ' +
+                       t( 'misc.chars' ) + ')</span>',
+                type: 'text',
+                maxLength: 1500
               }"
               no-cols="true"
               difference="model.viewModel.compareRecord.differences.part1.findings"
@@ -193,8 +196,11 @@
             <cn-view-input-with-differences
               input="{
                 key: 'impact',
-                title: t( 'part3.a.text' ),
-                type: 'text'
+                title: t( 'part3.a.text' ) +
+                       '<br><span class=text-info>(' + model.viewModel.charCount.impact + ' ' +
+                       t( 'misc.chars' ) + ')</span>',
+                type: 'text',
+                maxLength: 1500
               }"
               no-cols="true"
               difference="model.viewModel.compareRecord.differences.part3.impact"
@@ -206,8 +212,11 @@
             <cn-view-input-with-differences
               input="{
                 key: 'opportunities',
-                title: t( 'part3.b.text' ),
-                type: 'text'
+                title: t( 'part3.b.text' ) +
+                       '<br><span class=text-info>(' + model.viewModel.charCount.opportunities + ' ' +
+                       t( 'misc.chars' ) + ')</span>',
+                type: 'text',
+                maxLength: 1500
               }"
               no-cols="true"
               difference="model.viewModel.compareRecord.differences.part3.opportunities"
@@ -219,8 +228,11 @@
             <cn-view-input-with-differences
               input="{
                 key: 'dissemination',
-                title: t( 'part3.c.text' ),
-                type: 'text'
+                title: t( 'part3.c.text' ) +
+                       '<br><span class=text-info>(' + model.viewModel.charCount.dissemination + ' ' +
+                       t( 'misc.chars' ) + ')</span>',
+                type: 'text',
+                maxLength: 1500
               }"
               no-cols="true"
               difference="model.viewModel.compareRecord.differences.part3.dissemination"

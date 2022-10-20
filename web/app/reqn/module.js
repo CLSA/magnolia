@@ -148,6 +148,10 @@ cenozoApp.defineModule({
             return !model.isRole("applicant", "designate", "reviewer");
           },
         },
+        phase: {
+          column: "stage_type.phase",
+          type: "hidden",
+        },
         has_data_sharing_filename: {
           title: "Has Agreement",
           type: "boolean",
@@ -165,6 +169,10 @@ cenozoApp.defineModule({
         },
         reqn_version_id: {
           column: "reqn_version.id",
+          type: "hidden",
+        },
+        final_report_id: {
+          column: "final_report.id",
           type: "hidden",
         },
       },
@@ -419,7 +427,7 @@ cenozoApp.defineModule({
           return (
             "add" == model.getActionFromState() ||
             angular.isUndefined(model.viewModel.record.phase) ||
-            !["active", "complete"].includes(model.viewModel.record.phase)
+            !["active", "finalization", "complete"].includes(model.viewModel.record.phase)
           );
         },
       },
@@ -1100,7 +1108,8 @@ cenozoApp.defineModule({
     /* ############################################################################################## */
     cenozo.providers.factory("CnReqnListFactory", [
       "CnBaseListFactory",
-      function (CnBaseListFactory) {
+      "$state",
+      function (CnBaseListFactory, $state) {
         var object = function (parentModel) {
           CnBaseListFactory.construct(this, parentModel);
 
@@ -1115,6 +1124,19 @@ cenozoApp.defineModule({
                   : " List");
               return this.$$onList(replace);
             },
+
+            /*
+            onSelect: async function (record) {
+              if (this.parentModel.isRole("applicant", "designate", "typist")) {
+                // navigate to the report if in the finalization phase, and the reqn-version if not
+                await $state.go("reqn_version.view", {
+                  identifier: record.reqn_version_id,
+                });
+              } else {
+                this.$$onSelect(record);
+              }
+            },
+            */
 
             search: this.parentModel.getQueryParameter("search"),
             showSearch: function () {
@@ -1985,9 +2007,11 @@ cenozoApp.defineModule({
             // override transitionToViewState (used when application views a reqn)
             transitionToViewState: async function (record) {
               if (this.isRole("applicant", "designate", "typist")) {
-                await $state.go("reqn_version.view", {
-                  identifier: record.reqn_version_id,
-                });
+                if ("finalization" == record.phase) {
+                  await $state.go("final_report.view", { identifier: record.final_report_id, });
+                } else {
+                  await $state.go("reqn_version.view", { identifier: record.reqn_version_id, });
+                }
               } else {
                 await this.$$transitionToViewState(record);
               }

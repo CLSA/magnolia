@@ -37,7 +37,6 @@ class patch extends \cenozo\service\patch
     parent::validate();
 
     $action = $this->get_argument( 'action', false );
-    $review = $this->get_argument( 'review', true );
     if( $action )
     {
       // define whether the action is allowed
@@ -78,7 +77,7 @@ class patch extends \cenozo\service\patch
       }
       else if( 'defer' == $action )
       {
-        if( 'review' != $phase && 'active' != $phase ) $code = 403;
+        if( !in_array( $phase, ['active','finalization','review'] ) ) $code = 403;
       }
       else if( 'amend' == $action )
       {
@@ -104,36 +103,43 @@ class patch extends \cenozo\service\patch
       {
         if( in_array( $db_role->name, array( 'applicant', 'designate', 'administrator', 'typist' ) ) )
         {
-          if( 'new' != $phase && 'deferred' != $state ) $code = 403;
-          else if( !$db_reqn->legacy && 'new' == $phase )
+          if( 'finalization' == $phase )
           {
-            // check to make sure the start date is appropriate (for non-consortium reqns)
-            if( 'Consortium' != $db_reqn->get_reqn_type()->name )
+            if( 'deferred' != $state ) $code = 403;
+          }
+          else
+          {
+            if( 'new' != $phase && 'deferred' != $state ) $code = 403;
+            else if( !$db_reqn->legacy && 'new' == $phase )
             {
-              $delay = lib::create( 'business\setting_manager' )->get_setting( 'general', 'start_date_delay' );
-              $db_reqn->save(); // this will make sure the deadline is appropriate
-              if( $db_reqn->deadline_id )
+              // check to make sure the start date is appropriate (for non-consortium reqns)
+              if( 'Consortium' != $db_reqn->get_reqn_type()->name )
               {
-                $deadline = util::get_datetime_object( $db_reqn->get_deadline()->datetime );
-                $deadline->add( new \DateInterval( sprintf( 'P%dM', $delay ) ) );
-                if( $db_reqn_version->start_date < $deadline ) $code = 409;
+                $delay = lib::create( 'business\setting_manager' )->get_setting( 'general', 'start_date_delay' );
+                $db_reqn->save(); // this will make sure the deadline is appropriate
+                if( $db_reqn->deadline_id )
+                {
+                  $deadline = util::get_datetime_object( $db_reqn->get_deadline()->datetime );
+                  $deadline->add( new \DateInterval( sprintf( 'P%dM', $delay ) ) );
+                  if( $db_reqn_version->start_date < $deadline ) $code = 409;
+                }
               }
             }
-          }
-          else if( !$review )
-          {
-            // only administrators and typists can skip a legacy amendment's review process
-            if( 'administrator' != $db_role->name && 'typist' != $db_role->name )
+            else if( !$this->get_argument( 'review', true ) )
             {
-              $code = 403;
-            }
-            // only legacy amendment reviews can be skipped
-            else if( '.' == $db_reqn_version->amendment || !$db_reqn->legacy )
-            {
-              throw lib::create( 'exception\notice',
-                'Only legacy amendments can skip the review process.',
-                __METHOD__
-              );
+              // only administrators and typists can skip a legacy amendment's review process
+              if( 'administrator' != $db_role->name && 'typist' != $db_role->name )
+              {
+                $code = 403;
+              }
+              // only legacy amendment reviews can be skipped
+              else if( '.' == $db_reqn_version->amendment || !$db_reqn->legacy )
+              {
+                throw lib::create( 'exception\notice',
+                  'Only legacy amendments can skip the review process.',
+                  __METHOD__
+                );
+              }
             }
           }
         }
@@ -225,11 +231,10 @@ class patch extends \cenozo\service\patch
     }
     else
     {
-      $report_required = 'Report Required' == $db_reqn->get_current_stage_type()->name;
       $action = $this->get_argument( 'action', false );
-      $review = $this->get_argument( 'review', true );
       if( $action )
       {
+        $phase = $db_reqn->get_current_stage_type()->phase;
         if( 'reset_data' == $action )
         {
           $this->set_data( $db_reqn->refresh_study_data_files() );
@@ -286,7 +291,7 @@ class patch extends \cenozo\service\patch
           $db_reqn->save();
 
           // create a new reqn version
-          if( $report_required ) $db_reqn->create_final_report();
+          if( 'finalization' == $phase ) $db_reqn->create_final_report();
           else $db_reqn->create_version();
 
           // send a notification
@@ -340,7 +345,7 @@ class patch extends \cenozo\service\patch
         }
         else if( 'submit' == $action )
         {
-          if( !$review )
+          if( 'finalization' != $phase && !$this->get_argument( 'review', true ) )
           {
             // this is a legacy amendment that will skip the review process
 
@@ -365,7 +370,8 @@ class patch extends \cenozo\service\patch
 
             $db_reqn->proceed_to_next_stage( 'Active' );
           }
-          else if( !$db_reqn->legacy || '.' != $db_reqn_version->amendment )
+          // Do not proceed if this is a legacy reqn not in an amendment or finalization
+          else if( !( $db_reqn->legacy && '.' == $db_reqn_version->amendment && 'finalization' != $phase ) )
           {
             // trainees and proxies must be get approval from their supervisor
             if( $approval_required )
@@ -374,7 +380,7 @@ class patch extends \cenozo\service\patch
               $db_notification = lib::create( 'database\notification' );
               $db_notification->notification_type_id = $notification_type_class_name::get_unique_record(
                 'name',
-                $report_required ? 'Approval Required, Final Report' : 'Approval Required'
+                'finalization' == $phase ? 'Approval Required, Final Report' : 'Approval Required'
               )->id;
               $db_notification->set_reqn( $db_reqn );
               $db_notification->mail();
@@ -385,9 +391,10 @@ class patch extends \cenozo\service\patch
               {
                 $db_reqn->state = NULL;
                 $db_reqn->save();
+                $db_reqn->proceed_to_next_stage();
 
                 // when resubmitting set the version/report datetime
-                if( $report_required )
+                if( 'finalization' == $phase )
                 {
                   $db_final_report = $db_reqn->get_current_final_report();
                   $db_final_report->datetime = util::get_datetime_object();
@@ -408,7 +415,11 @@ class patch extends \cenozo\service\patch
               // send a notification
               $db_reqn_user = $db_reqn->get_user();
               $notification_class_name::mail_admin(
-                sprintf( '%s %s: submitted', $report_required ? 'Final Report' : 'Requisition', $db_reqn->identifier ),
+                sprintf(
+                  '%s %s: submitted',
+                  'finalization' == $phase ? 'Final Report' : 'Requisition',
+                  $db_reqn->identifier
+                ),
                 sprintf(
                   "The following %s has been submitted:\n".
                   "\n".
@@ -416,7 +427,7 @@ class patch extends \cenozo\service\patch
                   "Identifier: %s\n".
                   "Applicant: %s %s\n".
                   "Title: %s\n",
-                  $report_required ? 'final report' : 'requisition',
+                  'finalization' == $phase ? 'final report' : 'requisition',
                   $db_reqn->get_reqn_type()->name,
                   $db_reqn->identifier,
                   $db_reqn_user->first_name, $db_reqn_user->last_name,

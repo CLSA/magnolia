@@ -573,12 +573,16 @@ cenozoApp.defineModule({
               // only show the agreement tab to administrators
               return (
                 this.parentModel.isRole("administrator") &&
-                // and when there is an agreement
-                (this.record.has_agreement_filename ||
-                  // or when we're looking at the current version and we're in the active phase or Complete stage
-                  (this.record.is_current_version &&
-                    ("active" == this.record.phase ||
-                      "Complete" == this.record.stage_type)))
+                (
+                  // and when there is an agreement
+                  this.record.has_agreement_filename ||
+                  (
+                    // or when we're looking at the current version and we're in the active/finalization phases
+                    // or Complete stage
+                    this.record.is_current_version &&
+                    (["active","finalization"].includes( this.record.phase ) || "Complete" == this.record.stage_type)
+                  )
+                )
               );
             },
             abandon: async function () {
@@ -2933,18 +2937,22 @@ cenozoApp.defineModule({
 
               var check = false;
               if (this.isRole("applicant", "designate")) {
-                check =
-                  "new" == phase ||
-                  ("deferred" == state &&
-                    ("review" == phase ||
-                      ("lite" == this.type && "Agreement" == stage_type)));
+                check = "new" == phase || (
+                  "deferred" == state && (
+                    "review" == phase || (
+                      "lite" == this.type &&
+                      "Agreement" == stage_type
+                    )
+                  )
+                );
               } else if (this.isRole("administrator", "typist")) {
-                check =
-                  "new" == phase ||
-                  ("abandoned" != state &&
-                    ("review" == phase ||
-                      "Agreement" == stage_type ||
-                      "Data Release" == stage_type));
+                check = "new" == phase || (
+                  "abandoned" != state && (
+                    "review" == phase ||
+                    "Agreement" == stage_type ||
+                    "Data Release" == stage_type
+                  )
+                );
               }
 
               return this.$$getEditEnabled() && is_current_version && check;

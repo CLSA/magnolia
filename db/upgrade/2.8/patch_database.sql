@@ -23,6 +23,9 @@ SOURCE data_selection.sql
 SOURCE data_detail.sql
 SOURCE amendment_type.sql
 SOURCE final_report.sql
+SOURCE stage_type.sql
+SOURCE stage_type_has_stage_type.sql
+SOURCE reqn_type_has_stage_type.sql
 
 SOURCE update_version_number.sql
 

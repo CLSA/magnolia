@@ -313,7 +313,7 @@ cenozo.service("CnReqnHelper", [
         var role = CnSession.role.name;
         var phase = record.phase ? record.phase : "";
         var state = record.state ? record.state : "";
-        var stage_type = record.stage_type ? record.stage_type : "";
+        var stageType = record.stage_type ? record.stage_type : "";
 
         if ("submit" == subject) {
           return (
@@ -332,7 +332,7 @@ cenozo.service("CnReqnHelper", [
                 "review" == phase
             : // amendment process
               ["administrator", "applicant", "designate"].includes(role) &&
-                "Admin Review" == record.stage_type;
+                "Admin Review" == stageType;
         } else if ("delete" == subject) {
           return "new" == phase;
         } else if ("defer" == subject) {
@@ -348,7 +348,7 @@ cenozo.service("CnReqnHelper", [
             ) &&
             !["abandoned", "deferred"].includes(state) &&
             "active" == phase &&
-            "Report Required" != stage_type
+            "Report Required" != stageType
           );
         } else if ("deactivate" == subject) {
           return (
@@ -361,7 +361,7 @@ cenozo.service("CnReqnHelper", [
             "administrator" == role &&
             "." == record.amendment &&
             ("review" == phase ||
-              ["Agreement", "Data Release"].includes(record.stage_type))
+              ["Agreement", "Data Release"].includes(stageType))
           );
         } else if ("withdraw" == subject) {
           return "administrator" == role && "active" == phase;
@@ -372,18 +372,19 @@ cenozo.service("CnReqnHelper", [
         } else if ("recreate" == subject) {
           return "administrator" == role && "complete" == phase;
         } else if ("report" == subject) {
-          return ["Report Required", "Complete"].includes(stage_type);
+          return "finalization" == phase || "Complete" == stageType;
         } else if ("proceed" == subject) {
           return (
             "complete" != phase &&
-            (("administrator" == role && "new" != phase) ||
-              ("chair" == role && stage_type.includes("DSAC")) ||
-              ("smt" == role && stage_type.includes("SMT"))) &&
-            !this.showAction("amendment proceed", record)
+            "Report Required" != stageType && (
+              ("administrator" == role && "new" != phase) ||
+              ("chair" == role && stageType.includes("DSAC")) ||
+              ("smt" == role && stageType.includes("SMT"))
+            ) && !this.showAction("amendment proceed", record)
           );
         } else if ("reject" == subject) {
           return (
-            "DSAC Selection" == stage_type &&
+            "DSAC Selection" == stageType &&
             ["administrator", "chair"].includes(role)
           );
         } else if ("compare" == subject) {
@@ -396,21 +397,21 @@ cenozo.service("CnReqnHelper", [
               "Feasibility Review",
               "Decision Made",
               "Agreement",
-            ].includes(stage_type) &&
+            ].includes(stageType) &&
             "administrator" == role
           );
         } else if ("amendment feasibility review" == subject) {
-          return "Admin Review" == stage_type;
+          return "Admin Review" == stageType;
         } else if ("amendment dsac review" == subject) {
-          return "Feasibility Review" == stage_type;
+          return "Feasibility Review" == stageType;
         } else if ("amendment decision made" == subject) {
-          return ["Admin Review", "Feasibility Review"].includes(stage_type);
+          return ["Admin Review", "Feasibility Review"].includes(stageType);
         } else if ("amendment agreement" == subject) {
-          return "Decision Made" == stage_type;
+          return "Decision Made" == stageType;
         } else if ("amendment data release" == subject) {
-          return ["Decision Made", "Agreement"].includes(stage_type);
+          return ["Decision Made", "Agreement"].includes(stageType);
         } else if ("amendment active" == subject) {
-          return ["Decision Made", "Agreement"].includes(stage_type);
+          return ["Decision Made", "Agreement"].includes(stageType);
         } else return false;
       },
 
@@ -1266,8 +1267,8 @@ cenozo.service("CnReqnHelper", [
                 fr: "Quel est l’impact du projet?",
               },
               text: {
-                en: "Describe distinctive contributions, major accomplishments, innovations, successes, or any change in practice or behavior that has come about as a result of the project.",
-                fr: "Décrivez les contributions marquantes, les réalisations, innovations, succès importants ou les changements dans la pratique ou les comportements qui ont émergé des conclusions de votre projet.",
+                en: "Describe distinctive contributions, major accomplishments, innovations, successes, or any change in practice or behavior that has come about as a result of the project (1500 characters).",
+                fr: "Décrivez les contributions marquantes, les réalisations, innovations, succès importants ou les changements dans la pratique ou les comportements qui ont émergé des conclusions de votre projet (1500 caractères).",
               },
             },
             b: {
@@ -1276,8 +1277,8 @@ cenozo.service("CnReqnHelper", [
                 fr: "Quelles occasions de formation et de perfectionnement professionnel votre projet a-t-il offert?",
               },
               text: {
-                en: "List any opportunities for training (i.e. student research assistants) and professional development (i.e. HQP development opportunities, lectures, courses) that the project has provided.",
-                fr: "Énumérez toutes les occasions de formation et de perfectionnement professionnel que votre projet a offertes.",
+                en: "List any opportunities for training (i.e. student research assistants) and professional development (i.e. HQP development opportunities, lectures, courses) that the project has provided (1500 characters).",
+                fr: "Énumérez toutes les occasions de formation et de perfectionnement professionnel que votre projet a offertes (1500 caractères).",
               },
             },
             c: {
@@ -1286,8 +1287,8 @@ cenozo.service("CnReqnHelper", [
                 fr: "Comment avez-vous diffusé les résultats aux groupes d’intérêt?",
               },
               text: {
-                en: "Describe any knowledge translation and outreach activities that have been undertaken.",
-                fr: "Décrivez toutes les activités d’application des connaissances et de sensibilisation qui ont été réalisées.",
+                en: "Describe any knowledge translation and outreach activities that have been undertaken (1500 characters).",
+                fr: "Décrivez toutes les activités d’application des connaissances et de sensibilisation qui ont été réalisées (1500 caractères).",
               },
             },
           },
@@ -1297,6 +1298,7 @@ cenozo.service("CnReqnHelper", [
             close: { en: "Close", fr: "Ferme" },
             choose: { en: "(choose)", fr: "(choisir)" },
             remove: { en: "Remove", fr: "Supprimer" },
+            chars: { en: "characters", fr: "caractères" },
             prevButton: {
               en: "Return to the previous section",
               fr: "Retourner à la section précédente",
@@ -1333,30 +1335,6 @@ cenozo.service("CnReqnHelper", [
             designateSubmitMessage: {
               en: "You have successfully submitted the Final Report on behalf of the primary applicant and they will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.",
               fr: "Votre rapport final a été soumis avec succès au nom du demandeur principal. Celui-ci recevra une demande d’approbation par courriel. Vous recevrez un courriel avec des instructions supplémentaires en cas de besoin, puis lorsque le processus d’examen sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour consulter l’état de votre rapport.",
-            },
-            resubmitTitle: {
-              en: "Final Report Resubmitted",
-              fr: "Rapport final resoumise",
-            },
-            resubmitMessage: {
-              en: "You have successfully resubmitted your Final Report. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your application.",
-              fr: "Votre rapport final a été resoumis avec succès. Vous recevrez un courriel avec des instructions supplémentaires en cas de besoin et lorsque le processus d’examen sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour voir l’état de votre demande.",
-            },
-            traineeResubmitTitle: {
-              en: "Final Report Resubmitted for Supervisor Approval",
-              fr: "Rapport final envoyée à nouveau au superviseur pour approbation",
-            },
-            traineeResubmitMessage: {
-              en: "You have successfully resubmitted your Final Report and your supervisor will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.",
-              fr: "Votre rapport final a été resoumis avec succès. Votre superviseur recevra un courriel lui demandant son approbation. Vous recevrez un courriel avec des instructions supplémentaires en cas de besoin et lorsque le processus d’examen sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour consulter l’état de votre rapport.",
-            },
-            designateResubmitTitle: {
-              en: "Final Report Resubmitted for Primary Applicant Approval",
-              fr: "Nouvelle soumission du rapport final pour approbation par le demandeur principal",
-            },
-            designateResubmitMessage: {
-              en: "You have successfully resubmitted the Final Report on behalf of the primary applicant and they will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.",
-              fr: "Votre rapport final a été resoumis avec succès au nom du demandeur principal. Celui-ci recevra une demande d’approbation par courriel. Vous recevrez un courriel avec des instructions supplémentaires en cas de besoin, puis lorsque le processus d’examen sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour consulter l’état de votre rapport.",
             },
             submitWarning: {
               en: "Are you sure that all changes are complete and the report is ready to be submitted?",

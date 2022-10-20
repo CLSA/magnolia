@@ -128,6 +128,19 @@ cenozoApp.defineModule({
                 },
               ]);
             });
+
+            scope.$watch("model.viewModel.record.findings", (text) => {
+              scope.model.viewModel.charCount.findings = text ? text.length : 0;
+            });
+            scope.$watch("model.viewModel.record.impact", (text) => {
+              scope.model.viewModel.charCount.impact = text ? text.length : 0;
+            });
+            scope.$watch("model.viewModel.record.opportunities", (text) => {
+              scope.model.viewModel.charCount.opportunities = text ? text.length : 0;
+            });
+            scope.$watch("model.viewModel.record.dissemination", (text) => {
+              scope.model.viewModel.charCount.dissemination = text ? text.length : 0;
+            });
           },
           controller: function ($scope) {
             if (angular.isUndefined($scope.model))
@@ -205,6 +218,12 @@ cenozoApp.defineModule({
           angular.extend(this, {
             compareRecord: null,
             versionList: [],
+            charCount: {
+              findings: 0,
+              impact: 0,
+              opportunities: 0,
+              dissemination: 0,
+            },
             translate: function (value) {
               return this.record.lang
                 ? CnReqnHelper.translate("finalReport", value, this.record.lang)
@@ -540,21 +559,12 @@ cenozoApp.defineModule({
                   if (proceed) {
                     var parent = this.parentModel.getParentIdentifier();
                     await CnHttpFactory.instance({
-                      path:
-                        parent.subject +
-                        "/" +
-                        parent.identifier +
-                        "?action=submit",
+                      path: parent.subject + "/" + parent.identifier + "?action=submit",
                     }).patch();
 
                     var code =
-                      CnSession.user.id == this.record.trainee_user_id
-                        ? "deferred" == this.record.state
-                          ? "traineeResubmit"
-                          : "traineeSubmit"
-                        : "deferred" == this.record.state
-                        ? "resubmit"
-                        : "submit";
+                      CnSession.user.id == this.record.trainee_user_id ? "traineeSubmit" :
+                      CnSession.user.id == this.record.designate_user_id ? "designateSubmit" : "submit";
                     await CnModalMessageFactory.instance({
                       title: this.translate("misc." + code + "Title"),
                       message: this.translate("misc." + code + "Message"),
