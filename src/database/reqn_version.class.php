@@ -333,6 +333,89 @@ class reqn_version extends \cenozo\database\record
   }
 
   /**
+   * Returns a summary of all amendment justifications
+   * 
+   * Note that only justifications whose type is marked as "show_in_description" and which belong to the final
+   * sub-version of each amendment.  Additionally, only amendments the same or older to the current one will
+   * appear.
+   * @param database\language $db_language The language to return the summary in (the reqn's if none is provided)
+   * @return string
+   */
+  public function get_justification_summary( $db_language = NULL )
+  {
+    if( is_null( $db_language ) ) $db_language = $this->get_reqn()->get_language();
+    $lang = $db_language->code;
+    
+    // create the query necessary to find the highest ranking version of all amendments
+    $version_sel = lib::create( 'database\select' );
+    $version_sel->from( 'reqn_version', 'latest_reqn_version' );
+    $version_sel->add_column( 'MAX( version )', 'max_version', false );
+    $version_mod = lib::create( 'database\modifier' );
+    $version_mod->where( 'latest_reqn_version.reqn_id', '=', 'reqn_version.reqn_id', false );
+    $version_mod->where( 'latest_reqn_version.amendment', '=', 'reqn_version.amendment', false );
+
+    // create a temporary table with the final version of visible justifications for every amendment
+    $select = lib::create( 'database\select' );
+    $select->from( 'reqn_version' );
+    $select->add_table_column( 'reqn_version', 'amendment' );
+    $select->add_column(
+      sprintf(
+        'GROUP_CONCAT( '.
+          'CONCAT( '.
+            '\'"\', amendment_type.reason_%s, \'"\n\', '.
+            'amendment_justification.description '.
+          ') ORDER BY reqn_version.amendment, amendment_type.rank '.
+          'SEPARATOR "\n\n" '.
+        ')',
+        $lang
+      ),
+      'description',
+      false
+    );
+    $modifier = lib::create( 'database\modifier' );
+    $modifier->join(
+      'amendment_justification',
+      'reqn_version.id',
+      'amendment_justification.reqn_version_id'
+    );
+    $modifier->join(
+      'amendment_type',
+      'amendment_justification.amendment_type_id',
+      'amendment_type.id'
+    );
+    $modifier->where( 'amendment_type.show_in_description', '=', true );
+    $modifier->where(
+      'reqn_version.version',
+      '=',
+      sprintf( '( %s%s )', $version_sel->get_sql(), $version_mod->get_sql() ),
+      false
+    );
+    $modifier->where( 'reqn_version.reqn_id', '=', $this->reqn_id );
+    $modifier->where( 'reqn_version.amendment', '<=', $this->amendment );
+    $modifier->group( 'reqn_version.amendment' );
+
+    $justification_list = $this->select( $select, $modifier );
+
+    // now create the string by combining all of the justifications by amendment
+    $first = true;
+    $summary = '';
+    foreach( $justification_list as $justification )
+    {
+      $summary .= sprintf(
+        '%sAmendment "%s"%s%s',
+        $first ? '' : "\n\n",
+        $justification['amendment'],
+        "\n\n",
+        $justification['description']
+      );
+
+      $first = false;
+    }
+
+    return $summary;
+  }
+
+  /**
    * Calculate the cost of the reqn (NULL if show_prices is false)
    * 
    * Note: this process mirrors CnReqnVersionViewFactory::calculateCost() on the client-side
@@ -549,18 +632,7 @@ class reqn_version extends \cenozo\database\record
     if( !is_null( $this->background ) ) $data['background'] = $this->background;
     if( !is_null( $this->objectives ) ) $data['objectives'] = $this->objectives;
     if( !is_null( $this->methodology ) ) $data['methodology'] = $this->methodology;
-    $amendment_justification = NULL;
-    // get the amendment justification, if there is one
-    $justification_sel = lib::create( 'database\select' );
-    $justification_sel->add_table_column( 'amendment_justification', 'description' );
-    $justification_mod = lib::create( 'database\modifier' );
-    $justification_mod->join( 'amendment_type', 'amendment_justification.amendment_type_id', 'amendment_type.id' );
-    $justification_mod->where( 'amdnement_type.show_in_description', '=', true );
-    $justification_list = $this->get_amendment_justification_list( $justification_sel, $justification_mod );
-    if( 0 < count( $justification_list ) ) $justification_list = '';
-    foreach( $justification_list as $amendment_justification )
-      $amendment_justification .= $amendment_justification['description']."\n";
-    if( !is_null( $amendment_justification ) ) $data['amendment_justification'] = $amendment_justification;
+    $data['amendment_justification'] = $this->get_justification_summary();
     if( !is_null( $this->analysis ) ) $data['analysis'] = $this->analysis;
 
     if( !is_null( $this->peer_review ) )
