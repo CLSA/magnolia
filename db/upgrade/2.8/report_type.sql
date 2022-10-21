@@ -22,6 +22,19 @@ DROP PROCEDURE IF EXISTS patch_report_type;
     EXECUTE statement;
     DEALLOCATE PREPARE statement;
 
+    SELECT "Adding new Communications report" AS "";
+
+    SET @sql = CONCAT(
+      "INSERT IGNORE INTO ", @cenozo, ".report_type SET ",
+        "name = 'communications', ",
+        "title = 'Communications', ",
+        "subject = 'reqn', ",
+        "description = 'Provides a list of requisitions in the Communications Review stage, including specific details required during that stage.' "
+    );
+    PREPARE statement FROM @sql;
+    EXECUTE statement;
+    DEALLOCATE PREPARE statement;
+
   END //
 DELIMITER ;
 

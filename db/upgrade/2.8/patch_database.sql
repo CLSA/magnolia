@@ -7,9 +7,6 @@ SOURCE data_category.sql
 SOURCE reqn.sql
 SOURCE reqn_version.sql
 SOURCE deadline.sql
-SOURCE report_type.sql
-SOURCE report_restriction.sql
-SOURCE report_has_report_restriction.sql
 SOURCE applicant.sql
 SOURCE role.sql
 SOURCE service.sql
@@ -26,6 +23,12 @@ SOURCE final_report.sql
 SOURCE stage_type.sql
 SOURCE stage_type_has_stage_type.sql
 SOURCE reqn_type_has_stage_type.sql
+
+SOURCE report_type.sql
+SOURCE report_restriction.sql
+SOURCE report_has_report_restriction.sql
+SOURCE application_type_has_report_type.sql
+SOURCE role_has_report_type.sql
 
 SOURCE update_version_number.sql
 
