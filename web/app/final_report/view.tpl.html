@@ -182,6 +182,7 @@
         <div>
           <cn-output-list simple="true"></cn-output-list>
           <button class="btn btn-primary pull-right vertical-spacer"
+                  ng-show="model.getEditEnabled()"
                   ng-click="model.viewModel.addOutput()"
                   ng-bind-html="t( 'part2.addOutput' )"></button>
         </div>

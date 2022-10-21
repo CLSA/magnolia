@@ -301,6 +301,26 @@ cenozoApp.defineModule({
           this.viewModel = CnOutputSourceViewFactory.instance(this, root);
 
           angular.extend(this, {
+            getDeleteEnabled: function() {
+              var phase = this.viewModel.record.phase ? this.viewModel.record.phase : "";
+              var state = this.viewModel.record.state ? this.viewModel.record.state : "";
+              
+              return this.$$getDeleteEnabled() && (
+                // applicants and designates can only change sources if the reqn is deferred
+                this.isRole("applicant","designate") ? "deferred" == phase : true
+              );
+            },
+
+            getEditEnabled: function() {
+              var phase = this.viewModel.record.phase ? this.viewModel.record.phase : "";
+              var state = this.viewModel.record.state ? this.viewModel.record.state : "";
+              
+              return this.$$getEditEnabled() && (
+                // applicants and designates can only change sources if the reqn is deferred
+                this.isRole("applicant","designate") ? "deferred" == phase : true
+              );
+            },
+
             updateLanguage: function (lang) {
               var group = this.module.inputGroupList.findByProperty(
                 "title",

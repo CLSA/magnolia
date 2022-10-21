@@ -638,6 +638,19 @@ cenozoApp.defineModule({
               };
             },
 
+            getEditEnabled: function () {
+              var phase = this.viewModel.record.phase ? this.viewModel.record.phase : "";
+              var state = this.viewModel.record.state ? this.viewModel.record.state : "";
+
+              // only edit when in the finalization phase
+              return this.$$getEditEnabled() && "finalization" == phase && (
+                // applicants and designates can only edit when the reqn is deferred
+                this.isRole("applicant", "designate") ? "deferred" == state :
+                // otherwise administrators and typists can always edit, no other role can
+                this.isRole("administrator", "typist")
+              );
+            },
+
             setupBreadcrumbTrail: function () {
               var trail = [];
 

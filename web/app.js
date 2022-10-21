@@ -339,7 +339,8 @@ cenozo.service("CnReqnHelper", [
           return (
             "administrator" == role &&
             !["abandoned", "inactive", "deferred"].includes(state) &&
-            ["review", "active"].includes(phase)
+            ["review", "active", "finalization"].includes(phase) &&
+            "Pre Data Destruction" != stageType
           );
         } else if ("amend" == subject) {
           return (
@@ -354,7 +355,7 @@ cenozo.service("CnReqnHelper", [
           return (
             "administrator" == role &&
             !["abandoned", "inactive"].includes(state) &&
-            !["new", "complete"].includes(phase)
+            ["review", "active"].includes(phase)
           );
         } else if ("incomplete" == subject) {
           return (
