@@ -57,6 +57,24 @@ cenozoApp.defineModule({
     });
 
     /* ############################################################################################## */
+    cenozo.providers.factory("CnStageTypeListFactory", [
+      "CnBaseListFactory",
+      function (CnBaseListFactory) {
+        var object = function (parentModel) {
+          CnBaseListFactory.construct(this, parentModel);
+
+          // extend the number of items per page to show all stage types on a single page
+          this.paginationModel.itemsPerPage = 50;
+        };
+        return {
+          instance: function (parentModel) {
+            return new object(parentModel);
+          },
+        };
+      },
+    ]);
+
+    /* ############################################################################################## */
     cenozo.providers.factory("CnStageTypeViewFactory", [
       "CnBaseViewFactory",
       function (CnBaseViewFactory) {
