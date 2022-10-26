@@ -99,12 +99,23 @@ class final_report extends \cenozo\database\record
     $data['signature_date'] = util::get_datetime_object()->format( 'd-m-Y' );
 
     $output_sel = lib::create( 'database\select' );
-    $output_sel->add_column( 'output_type_id' );
+    $output_sel->add_table_column( 'output_type', 'name_en' );
     $output_sel->add_column( 'detail' );
     $output_mod = lib::create( 'database\modifier' );
-    $output_mod->order( 'output_type_id', 'id' );
+    $output_mod->join( 'output_type', 'output.output_type_id', 'output_type.id' );
+    $output_mod->order( 'output.output_type_id' );
+    $output_mod->order( 'output.id' );
 
     // the form supports a limited number of output for each type
+    $output_type_list = array(
+      'Collaboration' => 'collaboration',
+      'Conference paper and presentation' => 'conference',
+      'Derived Data' => 'derived_data',
+      'Invention, patent application, or license' => 'invention',
+      'Mass media' => 'mass_media',
+      'Peer-reviewed publication' => 'publication',
+      'Website, technology, equipment or technique' => 'website'
+    );
     $output_limit_list = array( 1=>5, 2=>5, 3=>3, 4=>3, 5=>2, 6=>2, 7=>2 );
 
     $last_output_type_id = NULL;
@@ -113,7 +124,7 @@ class final_report extends \cenozo\database\record
     {
       $count = $last_output_type_id == $output['output_type_id'] ? $count+1 : 1;
       if( $count <= $output_limit_list[$output['output_type_id']] )
-        $data[sprintf( 'output_%d_%d', $output['output_type_id'], $count )] = $output['detail'];
+        $data[sprintf( '%s_%d', $output_type_list[$output['name_en']], $count )] = $output['detail'];
 
       $last_output_type_id = $output['output_type_id'];
     }
