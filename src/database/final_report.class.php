@@ -73,7 +73,7 @@ class final_report extends \cenozo\database\record
     $db_reqn_version = $db_reqn->get_current_reqn_version();
     $data = array(
       'identifier' => $db_reqn->identifier,
-      'version' => $this->version // TODO: make sure version is in the PDF
+      'version' => $this->version
     );
 
     $data['applicant_name'] = sprintf( '%s %s', $db_user->first_name, $db_user->last_name );
@@ -81,14 +81,15 @@ class final_report extends \cenozo\database\record
       $data['applicant_affiliation'] = $db_reqn_version->applicant_affiliation;
     if( !is_null( $db_reqn_version->applicant_address ) )
       $data['applicant_address'] = $db_reqn_version->applicant_address;
-    if( !is_null( $db_reqn_version->applicant_phone ) ) $data['applicant_phone'] = $db_reqn_version->applicant_phone;
+    if( !is_null( $db_reqn_version->applicant_phone ) )
+      $data['applicant_phone'] = $db_reqn_version->applicant_phone;
     $data['applicant_email'] = $db_user->email;
     if( !is_null( $db_reqn_version->title ) ) $data['title'] = $db_reqn_version->title;
     if( !is_null( $db_reqn_version->lay_summary ) ) $data['lay_summary'] = $db_reqn_version->lay_summary;
     if( true === $this->achieved_objectives ) $data['achieved_objectives_yes'] = 'Yes';
     if( false === $this->achieved_objectives ) $data['achieved_objectives_no'] = 'Yes';
     if( !is_null( $this->findings ) ) $data['findings'] = $this->findings;
-    if( !is_null( $db_trainee_user ) ) $data['trainee_name'] =
+    if( !is_null( $db_trainee_user ) ) $data['graduate_name'] =
       sprintf( '%s %s', $db_trainee_user->first_name, $db_trainee_user->last_name );
     if( !is_null( $this->thesis_title ) ) $data['thesis_title'] = $this->thesis_title;
     if( !is_null( $this->thesis_status ) ) $data['thesis_status'] = $this->thesis_status;
@@ -99,6 +100,7 @@ class final_report extends \cenozo\database\record
     $data['signature_date'] = util::get_datetime_object()->format( 'd-m-Y' );
 
     $output_sel = lib::create( 'database\select' );
+    $output_sel->add_column( 'output_type_id' );
     $output_sel->add_table_column( 'output_type', 'name_en' );
     $output_sel->add_column( 'detail' );
     $output_mod = lib::create( 'database\modifier' );
@@ -116,16 +118,13 @@ class final_report extends \cenozo\database\record
       'Peer-reviewed publication' => 'publication',
       'Website, technology, equipment or technique' => 'website'
     );
-    $output_limit_list = array( 1=>5, 2=>5, 3=>3, 4=>3, 5=>2, 6=>2, 7=>2 );
 
     $last_output_type_id = NULL;
     $count = NULL;
     foreach( $this->get_output_list( $output_sel, $output_mod ) as $output )
     {
       $count = $last_output_type_id == $output['output_type_id'] ? $count+1 : 1;
-      if( $count <= $output_limit_list[$output['output_type_id']] )
-        $data[sprintf( '%s_%d', $output_type_list[$output['name_en']], $count )] = $output['detail'];
-
+      $data[sprintf( '%s_%d', $output_type_list[$output['name_en']], $count )] = $output['detail'];
       $last_output_type_id = $output['output_type_id'];
     }
 
