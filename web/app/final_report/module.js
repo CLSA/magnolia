@@ -491,11 +491,14 @@ cenozoApp.defineModule({
                   part1: [
                     "achieved_objectives",
                     "findings",
-                    "thesis_title",
-                    "thesis_status",
                   ],
                   part3: ["impact", "opportunities", "dissemination"],
                 };
+
+                if( "graduate" == this.record.waiver ) {
+                  requiredTabList.part1.push("thesis_title");
+                  requiredTabList.part1.push("thesis_status");
+                }
 
                 var error = null;
                 var errorTab = null;
@@ -516,6 +519,7 @@ cenozoApp.defineModule({
                         "" === record[property]
                       ) {
                         var element = cenozo.getFormElement(property);
+                        console.log( property, element );
                         element.$error.required = true;
                         cenozo.updateFormElement(element, true);
                         if (null == errorTab) errorTab = tab;
