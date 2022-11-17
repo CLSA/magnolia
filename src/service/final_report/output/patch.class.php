@@ -22,7 +22,7 @@ class patch extends \cenozo\service\patch
     $headers = apache_request_headers();
     if( false !== strpos( $headers['Content-Type'], 'application/octet-stream' ) && !is_null( $file ) )
     {
-      if( !preg_match( '/filename[0-9]+/', $file ) )
+      if( !preg_match( '/filename[0-9]*/', $file ) )
         throw lib::create( 'exception\argument', 'file', $file, __METHOD__ );
 
       $db_output = $this->get_leaf_record();
