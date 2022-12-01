@@ -661,7 +661,7 @@ cenozoApp.defineModule({
       },
     });
 
-    module.addInputGroup("Review Deferral Notes", {
+    module.addInputGroup("Report Deferral Notes", {
       deferral_note_report1: {
         title: "Part 1",
         type: "text",
