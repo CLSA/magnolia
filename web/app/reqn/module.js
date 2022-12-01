@@ -523,6 +523,7 @@ cenozoApp.defineModule({
           // show the amendment deferral note to admins when an amendment is active
           return (
             "add" == model.getActionFromState() ||
+            ["finalization", "complete"].includes( model.viewModel.record.phase ) ||
             !model.isRole("administrator") ||
             angular.isUndefined(model.viewModel.record.amendment) ||
             "." == model.viewModel.record.amendment
@@ -535,7 +536,7 @@ cenozoApp.defineModule({
         isExcluded: function ($state, model) {
           return (
             "add" == model.getActionFromState() ||
-            "Report Required" == model.viewModel.record.stage_type
+            ["finalization", "complete"].includes( model.viewModel.record.phase )
           );
         },
       },
@@ -545,7 +546,7 @@ cenozoApp.defineModule({
         isExcluded: function ($state, model) {
           return (
             "add" == model.getActionFromState() ||
-            "Report Required" == model.viewModel.record.stage_type
+            ["finalization", "complete"].includes( model.viewModel.record.phase )
           );
         },
       },
@@ -555,7 +556,7 @@ cenozoApp.defineModule({
         isExcluded: function ($state, model) {
           return (
             "add" == model.getActionFromState() ||
-            "Report Required" == model.viewModel.record.stage_type
+            ["finalization", "complete"].includes( model.viewModel.record.phase )
           );
         },
       },
@@ -565,7 +566,7 @@ cenozoApp.defineModule({
         isExcluded: function ($state, model) {
           return (
             "add" == model.getActionFromState() ||
-            "Report Required" == model.viewModel.record.stage_type
+            ["finalization", "complete"].includes( model.viewModel.record.phase )
           );
         },
       },
@@ -575,7 +576,7 @@ cenozoApp.defineModule({
         isExcluded: function ($state, model) {
           return (
             "add" == model.getActionFromState() ||
-            "Report Required" == model.viewModel.record.stage_type
+            ["finalization", "complete"].includes( model.viewModel.record.phase )
           );
         },
       },
@@ -585,7 +586,7 @@ cenozoApp.defineModule({
         isExcluded: function ($state, model) {
           return (
             "add" == model.getActionFromState() ||
-            "Report Required" == model.viewModel.record.stage_type
+            ["finalization", "complete"].includes( model.viewModel.record.phase )
           );
         },
       },
@@ -595,7 +596,7 @@ cenozoApp.defineModule({
         isExcluded: function ($state, model) {
           return (
             "add" == model.getActionFromState() ||
-            "Report Required" == model.viewModel.record.stage_type
+            ["finalization", "complete"].includes( model.viewModel.record.phase )
           );
         },
       },
@@ -605,7 +606,7 @@ cenozoApp.defineModule({
         isExcluded: function ($state, model) {
           return (
             "add" == model.getActionFromState() ||
-            "Report Required" == model.viewModel.record.stage_type
+            ["finalization", "complete"].includes( model.viewModel.record.phase )
           );
         },
       },
@@ -615,7 +616,7 @@ cenozoApp.defineModule({
         isExcluded: function ($state, model) {
           return (
             "add" == model.getActionFromState() ||
-            "Report Required" == model.viewModel.record.stage_type
+            ["finalization", "complete"].includes( model.viewModel.record.phase )
           );
         },
       },
@@ -625,7 +626,7 @@ cenozoApp.defineModule({
         isExcluded: function ($state, model) {
           return (
             "add" == model.getActionFromState() ||
-            "Report Required" == model.viewModel.record.stage_type
+            ["finalization", "complete"].includes( model.viewModel.record.phase )
           );
         },
       },
@@ -635,7 +636,7 @@ cenozoApp.defineModule({
         isExcluded: function ($state, model) {
           return (
             "add" == model.getActionFromState() ||
-            "Report Required" == model.viewModel.record.stage_type
+            ["finalization", "complete"].includes( model.viewModel.record.phase )
           );
         },
       },
@@ -645,7 +646,7 @@ cenozoApp.defineModule({
         isExcluded: function ($state, model) {
           return (
             "add" == model.getActionFromState() ||
-            "Report Required" == model.viewModel.record.stage_type
+            ["finalization", "complete"].includes( model.viewModel.record.phase )
           );
         },
       },
@@ -655,7 +656,7 @@ cenozoApp.defineModule({
         isExcluded: function ($state, model) {
           return (
             "add" == model.getActionFromState() ||
-            "Report Required" == model.viewModel.record.stage_type
+            ["finalization", "complete"].includes( model.viewModel.record.phase )
           );
         },
       },
@@ -668,7 +669,7 @@ cenozoApp.defineModule({
         isExcluded: function ($state, model) {
           return (
             "add" == model.getActionFromState() ||
-            "Report Required" != model.viewModel.record.stage_type
+            "finalization" != model.viewModel.record.phase
           );
         },
       },
@@ -678,7 +679,7 @@ cenozoApp.defineModule({
         isExcluded: function ($state, model) {
           return (
             "add" == model.getActionFromState() ||
-            "Report Required" != model.viewModel.record.stage_type
+            "finalization" != model.viewModel.record.phase
           );
         },
       },
@@ -688,7 +689,7 @@ cenozoApp.defineModule({
         isExcluded: function ($state, model) {
           return (
             "add" == model.getActionFromState() ||
-            "Report Required" != model.viewModel.record.stage_type
+            "finalization" != model.viewModel.record.phase
           );
         },
       },
@@ -999,8 +1000,8 @@ cenozoApp.defineModule({
             await model.viewModel.downloadFinalReport();
           },
           isIncluded: function ($state, model) {
-            return ["Report Required", "Complete"].includes(
-              model.viewModel.record.stage_type
+            return ["finalization", "complete"].includes(
+              model.viewModel.record.phase
             );
           },
         },
@@ -1531,11 +1532,11 @@ cenozoApp.defineModule({
             },
 
             reqnDeferralNotesExist: function () {
-              var stage_type = this.record.stage_type
-                ? this.record.stage_type
+              var phase = this.record.phase
+                ? this.record.phase
                 : "";
               return (
-                "Report Required" != stage_type &&
+                "finalization" != phase &&
                 (this.record.deferral_note_amendment ||
                   this.record.deferral_note_1a ||
                   this.record.deferral_note_1b ||
@@ -1554,11 +1555,11 @@ cenozoApp.defineModule({
             },
 
             reportDeferralNotesExist: function () {
-              var stage_type = this.record.stage_type
-                ? this.record.stage_type
+              var phase = this.record.phase
+                ? this.record.phase
                 : "";
               return (
-                "Report Required" == stage_type &&
+                "finalization" == phase &&
                 (this.record.deferral_note_report1 ||
                   this.record.deferral_note_report2 ||
                   this.record.deferral_note_report3)
@@ -1859,22 +1860,14 @@ cenozoApp.defineModule({
             getChildList: function () {
               var list = this.$$getChildList();
 
-              // remove the final report item if not in the report-required stage or complete phase
-              if (
-                !["Complete", "Report Required"].includes(
-                  this.record.stage_type
-                )
-              ) {
-                list = list.filter(
-                  (child) => "final_report" != child.subject.snake
-                );
+              // remove the final report item if not in the finalization or complete phase
+              if ( !["finalization", "complete"].includes( this.record.phase ) ) {
+                list = list.filter( (child) => "final_report" != child.subject.snake );
               }
 
               // remove the ethics approval item if this reqn has no ethics approval list
               if (!this.record.has_ethics_approval_list) {
-                list = list.filter(
-                  (child) => "ethics_approval" != child.subject.snake
-                );
+                list = list.filter( (child) => "ethics_approval" != child.subject.snake );
               }
 
               return list;
