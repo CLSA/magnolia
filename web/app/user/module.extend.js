@@ -37,6 +37,7 @@ cenozoApp.extendModule({
     module.addInput("", "suspended", {
       title: "Suspended for Non-payment",
       type: "boolean",
+      isExcluded: "add",
       help: "Whether the user's account is suspended due to non-payment of fees.",
     }, 'active' );
 

@@ -22,7 +22,7 @@ class head extends \cenozo\service\head
 
     $this->columns['suspended'] = array(
       'data_type' => 'tinyint',
-      'default' => '1',
+      'default' => '0',
       'required' => '1'
     );
 
