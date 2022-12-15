@@ -391,7 +391,6 @@ class patch extends \cenozo\service\patch
               {
                 $db_reqn->state = NULL;
                 $db_reqn->save();
-                $db_reqn->proceed_to_next_stage();
 
                 // when resubmitting set the version/report datetime
                 if( 'finalization' == $phase )

@@ -2645,8 +2645,6 @@ cenozoApp.defineModule({
                           }
                         }
                       } else if (!this.record.legacy && "." == this.record.amendment) {
-                        proceed = false;
-
                         // When moving to the admin stage for the first time show a warning if there are no
                         // references
                         if ('New' == this.record.stage_type) {
@@ -2664,9 +2662,8 @@ cenozoApp.defineModule({
                               yesText: this.translate("misc.yes"),
                               message: message,
                             }).show();
+                            proceed = response;
                           }
-
-                          proceed = response;
                         }
                       }
 
