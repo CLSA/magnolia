@@ -2283,12 +2283,8 @@ cenozoApp.defineModule({
             submit: async function (data) {
               var response = await CnModalConfirmFactory.instance({
                 title: this.translate("misc.pleaseConfirm"),
-                noText: this.parentModel.isRole("applicant", "designate")
-                  ? this.translate("misc.no")
-                  : "No",
-                yesText: this.parentModel.isRole("applicant", "designate")
-                  ? this.translate("misc.yes")
-                  : "Yes",
+                noText: this.parentModel.isRole("applicant", "designate") ? this.translate("misc.no") : "No",
+                yesText: this.parentModel.isRole("applicant", "designate") ? this.translate("misc.yes") : "Yes",
                 message: this.translate("misc.submitWarning"),
               }).show();
 
@@ -2333,8 +2329,8 @@ cenozoApp.defineModule({
                 };
 
                 // Now add the data option justifications
-                // We have to do this dynamically because they only exist if their parent data option is selected and
-                // have the "justification" property
+                // We have to do this dynamically because they only exist if their parent data option is selected
+                // and have the "justification" property
                 for (var property in this.record) {
                   if (null != property.match(/^data_justification_/)) {
                     // find which tab the justification belongs to
@@ -2344,22 +2340,20 @@ cenozoApp.defineModule({
                       var tab = "2" + obj.category.charCode;
 
                       // add it to the required tab list
-                      if (angular.isUndefined(requiredTabList[tab]))
-                        requiredTabList[tab] = [];
+                      if (angular.isUndefined(requiredTabList[tab])) requiredTabList[tab] = [];
                       requiredTabList[tab].push(property);
                     }
                   }
                 }
 
                 // Now add the amendment justifications
-                // We have to do this dynamically because they only exist if their parent amendment type is selected and
-                // have the "justification_prompt_*" properties
+                // We have to do this dynamically because they only exist if their parent amendment type is
+                // selected and have the "justification_prompt_*" properties
                 for (var property in this.record) {
                   if (null != property.match(/^amendment_justification_/)) {
                     // add it to the required tab list
                     var tab = "1a";
-                    if (angular.isUndefined(requiredTabList[tab]))
-                      requiredTabList[tab] = [];
+                    if (angular.isUndefined(requiredTabList[tab])) requiredTabList[tab] = [];
                     requiredTabList[tab].push(property);
                   }
                 }
@@ -2367,74 +2361,65 @@ cenozoApp.defineModule({
                 var error = null;
                 var errorTab = null;
 
-                await Promise.all(
-                  this.fileList.map((file) => file.updateFileSize())
-                );
+                await Promise.all( this.fileList.map((file) => file.updateFileSize()) );
 
                 for (var tab in requiredTabList) {
                   var firstProperty = null;
-                  requiredTabList[tab]
-                    .filter((property) => {
-                      if ("1a" == tab) {
-                        if ("waiver" == property) {
-                          // only check the waiver if a waiver is allowed
-                          return this.isWaiverAllowed();
-                        } else if ("application_country_id" == property) {
-                          // only check the country if show_prices is on
-                          return this.record.show_prices;
-                        } else {
-                          return true;
-                        }
-                      } else if ("1b" == tab) {
-                        // only check 1b properties if there is a new coapplication with access to data
-                        return this.addingCoapplicantWithData;
-                      } else if ("1e" == tab) {
-                        // only check 1e funding properties if funding=yes
-                        return !["peer_review", "funding"].includes(property)
-                          ? "yes" == this.record.funding
-                          : true;
-                      } else if ("ethics_filename" == property) {
-                        // only check the ethics filename if ethics=yes or exempt
-                        return ["yes", "exempt"].includes(this.record.ethics);
-                      } else if ("last_identifier" == property) {
-                        // only check the last_identifier if longitidunal=yes (it's a boolean var)
-                        return this.record.longitudinal;
-                      }
-
-                      // check everything else
-                      return true;
-                    })
-                    .forEach((property) => {
-                      var missing = false;
-                      if (property.match("_filename")) {
-                        // check for the file size
-                        var fileDetails = this.fileList.findByProperty(
-                          "key",
-                          property
-                        );
-                        missing =
-                          !angular.isObject(fileDetails) ||
-                          0 == fileDetails.size;
+                  requiredTabList[tab].filter((property) => {
+                    if ("1a" == tab) {
+                      if ("waiver" == property) {
+                        // only check the waiver if a waiver is allowed
+                        return this.isWaiverAllowed();
+                      } else if ("application_country_id" == property) {
+                        // only check the country if show_prices is on
+                        return this.record.show_prices;
                       } else {
-                        // check for the property's value
-                        missing =
-                          null === this.record[property] ||
-                          "" === this.record[property];
+                        return true;
                       }
+                    } else if ("1b" == tab) {
+                      // only check 1b properties if there is a new coapplication with access to data
+                      return this.addingCoapplicantWithData;
+                    } else if ("1e" == tab) {
+                      // only check 1e funding properties if funding=yes
+                      return !["peer_review", "funding"].includes(property)
+                        ? "yes" == this.record.funding
+                        : true;
+                    } else if ("ethics_filename" == property) {
+                      // only check the ethics filename if ethics=yes or exempt
+                      return ["yes", "exempt"].includes(this.record.ethics);
+                    } else if ("last_identifier" == property) {
+                      // only check the last_identifier if longitidunal=yes (it's a boolean var)
+                      return this.record.longitudinal;
+                    }
 
-                      if (missing) {
-                        var element = cenozo.getFormElement(property);
-                        element.$error.required = true;
-                        cenozo.updateFormElement(element, true);
-                        if (null == errorTab) errorTab = tab;
-                        if (null == error)
-                          error = {
-                            title: this.translate("misc.missingFieldTitle"),
-                            message: this.translate("misc.missingFieldMessage"),
-                            error: true,
-                          };
+                    // check everything else
+                    return true;
+                  })
+                  .forEach((property) => {
+                    var missing = false;
+                    if (property.match("_filename")) {
+                      // check for the file size
+                      var fileDetails = this.fileList.findByProperty( "key", property );
+                      missing = !angular.isObject(fileDetails) || 0 == fileDetails.size;
+                    } else {
+                      // check for the property's value
+                      missing = null === this.record[property] || "" === this.record[property];
+                    }
+
+                    if (missing) {
+                      var element = cenozo.getFormElement(property);
+                      element.$error.required = true;
+                      cenozo.updateFormElement(element, true);
+                      if (null == errorTab) errorTab = tab;
+                      if (null == error) {
+                        error = {
+                          title: this.translate("misc.missingFieldTitle"),
+                          message: this.translate("misc.missingFieldMessage"),
+                          error: true,
+                        };
                       }
-                    });
+                    }
+                  });
                 }
 
                 if ("." != this.record.amendment) {
@@ -2449,12 +2434,13 @@ cenozoApp.defineModule({
                   ) {
                     this.noAmendmentTypes = true;
                     if (null == errorTab) errorTab = "amendment";
-                    if (null == error)
+                    if (null == error) {
                       error = {
                         title: this.translate("misc.missingFieldTitle"),
                         message: this.translate("misc.missingFieldMessage"),
                         error: true,
                       };
+                    }
                   }
 
                   // make sure the new user field is filled out when changing the primary applicant
@@ -2468,36 +2454,34 @@ cenozoApp.defineModule({
                     element.$error.required = true;
                     cenozo.updateFormElement(element, true);
                     if (null == errorTab) errorTab = "amendment";
-                    if (null == error)
+                    if (null == error) {
                       error = {
                         title: this.translate("misc.missingFieldTitle"),
                         message: this.translate("misc.missingFieldMessage"),
                         error: true,
                       };
+                    }
                   }
 
                   // make sure that all selected amendment types have a justification
                   this.parentModel.amendmentTypeList.en
-                    .filter(
-                      (amendmentType) => amendmentType.justificationPrompt
-                    )
+                    .filter((amendmentType) => amendmentType.justificationPrompt)
                     .forEach((amendmentType) => {
                       // search for checked amendments with no justification
-                      var columnName =
-                        "amendment_justification_" + amendmentType.id;
+                      var columnName = "amendment_justification_" + amendmentType.id;
                       if (
-                        this.record["amendmentType" + amendmentType.id] &&
-                        !this.record[columnName]
+                        this.record["amendmentType" + amendmentType.id] && !this.record[columnName]
                       ) {
                         var element = cenozo.getFormElement(columnName);
                         element.$error.required = true;
                         if (null == errorTab) errorTab = "amendment";
-                        if (null == error)
+                        if (null == error) {
                           error = {
                             title: this.translate("misc.missingFieldTitle"),
                             message: this.translate("misc.missingFieldMessage"),
                             error: true,
                           };
+                        }
                       }
                     });
                 }
@@ -2520,7 +2504,7 @@ cenozoApp.defineModule({
                     }
                   }
                 } else {
-                  // now check to make sure this version is different from the last (the first is always different)
+                  // now check that this version is different from the last (the first is always different)
                   var response = await CnHttpFactory.instance({
                     path: this.parentModel.getServiceResourcePath(),
                     data: { select: { column: "has_changed" } },
@@ -2547,8 +2531,7 @@ cenozoApp.defineModule({
 
                         // when moving to the active or completed stage an agreement file must be provided
                         if ("Active" == stageType || "Complete" == stageType) {
-                          var response =
-                            await CnModalUploadAgreementFactory.instance().show();
+                          var response = await CnModalUploadAgreementFactory.instance().show();
                           if (response) {
                             // submit the agreement file
                             var filePath =
@@ -2571,9 +2554,7 @@ cenozoApp.defineModule({
                           // finally, we can move to the next requested stage
                           await CnHttpFactory.instance({
                             path:
-                              parent.subject +
-                              "/" +
-                              parent.identifier +
+                              parent.subject + "/" + parent.identifier +
                               "?action=next_stage&stage_type=" +
                               stageType,
                           }).patch();
@@ -2596,11 +2577,8 @@ cenozoApp.defineModule({
                       var proceed = true;
                       var noReview = false;
 
-                      // if an admin or typist is submitting the amendment then ask if we want to skip the review process
-                      if (
-                        this.record.legacy &&
-                        this.parentModel.isRole("administrator", "typist")
-                      ) {
+                      // if admin or typist is submitting then ask if we want to skip the review process
+                      if (this.record.legacy && this.parentModel.isRole("administrator", "typist")) {
                         var response = await CnModalConfirmFactory.instance({
                           title: "Submit legacy amendment",
                           message:
@@ -2616,22 +2594,18 @@ cenozoApp.defineModule({
 
                           // if we're skipping the review then give the option to upload an agreement
                           var response = await CnModalConfirmFactory.instance({
-                            message:
-                              "Do you wish to upload an agreement associated with this legacy amendment?",
+                            message: "Do you wish to upload an agreement associated with this legacy amendment?",
                           }).show();
 
                           if (response) {
-                            var response =
-                              await CnModalUploadAgreementFactory.instance().show();
+                            var response = await CnModalUploadAgreementFactory.instance().show();
                             if (response) {
                               // submit the agreement file
-                              var filePath =
-                                this.parentModel.getServiceResourcePath();
+                              var filePath = this.parentModel.getServiceResourcePath();
                               await CnHttpFactory.instance({
                                 path: filePath,
                                 data: {
-                                  agreement_filename:
-                                    response.file.getFilename(),
+                                  agreement_filename: response.file.getFilename(),
                                   agreement_start_date: response.startDate,
                                   agreement_end_date: response.endDate,
                                 },
@@ -2644,25 +2618,29 @@ cenozoApp.defineModule({
                             }
                           }
                         }
-                      } else if (!this.record.legacy && "." == this.record.amendment) {
-                        // When moving to the admin stage for the first time show a warning if there are no
-                        // references
-                        if ('New' == this.record.stage_type) {
-                          if (0 == this.record.referenceList.length || 0 == this.record.coapplicantList.length) {
-                            let message = this.translate("misc.confirmNoCoapplicantsOrReferences");
-                            if (0 < this.record.referenceList.length) {
-                              message = this.translate("misc.confirmNoCoapplicants");
-                            } else if (0 < this.record.coapplicantList.length) {
-                              message = this.translate("misc.confirmNoReferences");
+                      } else if (!this.record.legacy) {
+                        // There must be references
+                        if (0 == this.record.referenceList.length) {
+                          await CnModalMessageFactory.instance({
+                            title: this.translate("misc.missingReferencesTitle"),
+                            message: this.translate("misc.missingReferencesMessage"),
+                            error: true,
+                          }).show();
+                          proceed = false;
+                          this.setFormTab(0, "part1", false);
+                          await this.setFormTab(1, "d");
+                        } else if("." == this.record.amendment) {
+                          // When moving to the admin stage for the first time show warning if no coapplicants
+                          if ('New' == this.record.stage_type) {
+                            if (0 == this.record.coapplicantList.length) {
+                              var response = await CnModalConfirmFactory.instance({
+                                title: this.translate("misc.pleaseConfirm"),
+                                noText: this.translate("misc.no"),
+                                yesText: this.translate("misc.yes"),
+                                message: this.translate("misc.confirmNoCoapplicants"),
+                              }).show();
+                              proceed = response;
                             }
-
-                            var response = await CnModalConfirmFactory.instance({
-                              title: this.translate("misc.pleaseConfirm"),
-                              noText: this.translate("misc.no"),
-                              yesText: this.translate("misc.yes"),
-                              message: message,
-                            }).show();
-                            proceed = response;
                           }
                         }
                       }
@@ -2673,29 +2651,19 @@ cenozoApp.defineModule({
                         try {
                           await CnHttpFactory.instance({
                             path:
-                              parent.subject +
-                              "/" +
-                              parent.identifier +
-                              "?action=submit" +
-                              (noReview ? "&review=0" : ""),
+                              parent.subject + "/" + parent.identifier +
+                              "?action=submit" + (noReview ? "&review=0" : ""),
                             onError: async (error) => {
                               if (409 == error.status) {
                                 await CnModalMessageFactory.instance({
-                                  title: this.translate(
-                                    "misc.invalidStartDateTitle"
-                                  ),
-                                  message: this.translate(
-                                    "misc.invalidStartDateMessage"
-                                  ),
+                                  title: this.translate("misc.invalidStartDateTitle"),
+                                  message: this.translate("misc.invalidStartDateMessage"),
                                   closeText: this.translate("misc.close"),
                                   error: true,
                                 }).show();
 
-                                var element =
-                                  cenozo.getFormElement("start_date");
-                                element.$error.custom = this.translate(
-                                  "misc.invalidStartDateTitle"
-                                );
+                                var element = cenozo.getFormElement("start_date");
+                                element.$error.custom = this.translate("misc.invalidStartDateTitle");
                                 cenozo.updateFormElement(element, true);
                                 this.setFormTab(0, "part1", false);
                                 await this.setFormTab(1, "c");
@@ -2704,23 +2672,14 @@ cenozoApp.defineModule({
                           }).patch();
 
                           var code =
-                            CnSession.user.id == this.record.trainee_user_id
-                              ? "deferred" == this.record.state
-                                ? "traineeResubmit"
-                                : "traineeSubmit"
-                              : CnSession.user.id ==
-                                this.record.designate_user_id
-                              ? "deferred" == this.record.state
-                                ? "designateResubmit"
-                                : "designateSubmit"
-                              : "deferred" == this.record.state
-                              ? "resubmit"
-                              : "submit";
+                            CnSession.user.id == this.record.trainee_user_id ?
+                              "deferred" == this.record.state ? "traineeResubmit" : "traineeSubmit" :
+                            CnSession.user.id == this.record.designate_user_id ?
+                              "deferred" == this.record.state ? "designateResubmit" : "designateSubmit" :
+                              "deferred" == this.record.state ? "resubmit" : "submit";
 
                           await CnModalMessageFactory.instance({
-                            title: noReview
-                              ? "Amendment Complete"
-                              : this.translate("misc." + code + "Title"),
+                            title: noReview ? "Amendment Complete" : this.translate("misc." + code + "Title"),
                             message: noReview
                               ? "The amendment is now complete and the requisition has been returned to the Active stage."
                               : this.translate("misc." + code + "Message"),

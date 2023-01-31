@@ -1021,17 +1021,17 @@ cenozo.service("CnReqnHelper", [
               en: "Are you sure you wish to create an amendment?\n\nThe application form will be re-opened and you will be able to make and submit changes.",
               fr: "Êtes-vous sûr de vouloir effectuer une modification? Le formulaire de demande sera rouvert. Vous pourrez alors apporter des modifications et les soumettre.",
             },
+            missingReferencesTitle: {
+              en: "Missing References",
+              fr: "Références manquantes",
+            },
+            missingReferencesMessage: {
+              en: "You must provide references (at the bottom of the \"Description\" section) before submitting your application.", 
+              fr: "Vous devez fournir des références (au bas de la section « Description ») avant de soumettre votre demande d’accès.",
+            },
             confirmNoCoapplicants: {
               en: "Are you sure that you wish to submit the application without including any co-applicants?\n\nIf you wish to add co-applicants to the project team, then please click \"No\" so that you may provide them before submitting your application.  Otherwise, clicking \"Yes\" will submit your application without any co-applicants.",
               fr: "Souhaitez-vous soumettre la demande sans aucun co-demandeur ou co-demandeuse? Si vous souhaitez ajouter des co-demandeurs ou co-demandeuses à l'équipe de projet, veuillez cliquer sur « Non » afin de pouvoir les ajouter avant de soumettre la demande. Sinon, cliquez sur « Oui » pour soumettre la demande sans co-demandeur ou co-demandeuse.",
-            },
-            confirmNoReferences: {
-              en: "Are you sure that you wish to submit the application without including any references?\n\nIf you wish to provide references, then please click \"No\" so that you may provide them before submitting your application.  Otherwise, clicking \"Yes\" will submit your application without any references.",
-              fr: "Souhaitez-vous soumettre la demande sans références? Si vous souhaitez ajouter des références, veuillez cliquer sur « Non » afin de pouvoir les ajouter avant de soumettre la demande. Sinon, cliquez sur « Oui » pour soumettre la demande sans références.",
-            },
-            confirmNoCoapplicantsOrReferences: {
-              en: "Are you sure that you wish to submit the application without including any co-applicants or references?\n\nIf you wish to provide either, then please click \"No\" so that you may provide them before submitting your application.  Otherwise, clicking \"Yes\" will submit your application without any co-applicants or references.",
-              fr: "Souhaitez-vous soumettre la demande sans co-demandeur ou co-demandeuse ou sans références? Si vous souhaitez ajouter des co-demandeurs ou co-demandeuses ou sans références, veuillez cliquer sur « Non » afin de pouvoir les ajouter avant de soumettre la demande. Sinon, cliquez sur « Oui » pour soumettre la demande sans co-demandeur ou co-demandeuse ou sans références.",
             },
             submit: { en: "Submit", fr: "Soumettre" },
             submitTitle: {
