@@ -398,6 +398,10 @@ class patch extends \cenozo\service\patch
                   $db_final_report = $db_reqn->get_current_final_report();
                   $db_final_report->datetime = util::get_datetime_object();
                   $db_final_report->save();
+
+                  // if in the report required stage then proceed to the next one
+                  if( 'Report Required' == $db_reqn->get_current_stage_type()->name )
+                    $db_reqn->proceed_to_next_stage();
                 }
                 else
                 {
