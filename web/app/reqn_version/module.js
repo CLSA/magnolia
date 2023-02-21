@@ -86,6 +86,8 @@ cenozoApp.defineModule({
       tracking: { type: "boolean" },
       longitudinal: { type: "boolean" },
       last_identifier: { type: "string" },
+      indigenous: { type: "boolean" },
+      indigenous_description: { type: "text" },
       agreement_start_date: { type: "date" },
       agreement_end_date: { type: "date" },
 
@@ -116,10 +118,8 @@ cenozoApp.defineModule({
       deferral_note_1d: { column: "reqn.deferral_note_1d", type: "text" },
       deferral_note_1e: { column: "reqn.deferral_note_1e", type: "text" },
       deferral_note_1f: { column: "reqn.deferral_note_1f", type: "text" },
-      deferral_note_cohort: {
-        column: "reqn.deferral_note_cohort",
-        type: "text",
-      },
+      deferral_note_cohort: { column: "reqn.deferral_note_cohort", type: "text" },
+      deferral_note_indigenous: { column: "reqn.deferral_note_indigenous", type: "text" },
       deferral_note_2a: { column: "reqn.deferral_note_2a", type: "text" },
       deferral_note_2b: { column: "reqn.deferral_note_2b", type: "text" },
       deferral_note_2c: { column: "reqn.deferral_note_2c", type: "text" },
@@ -686,7 +686,9 @@ cenozoApp.defineModule({
                   promiseList.push(this.getEthicsApprovalList());
 
                 await Promise.all(promiseList);
-                await this.getVersionList();
+
+                // the version list might get long, so don't wait for it (diffs will show once it is loaded)
+                this.getVersionList();
 
                 // the category list will have been loaded by now, so we can load the selected tabs
                 this.setFormTab(
@@ -844,17 +846,11 @@ cenozoApp.defineModule({
                 if (proceed) {
                   await this.$$onPatch(data);
 
-                  if (
-                    angular.isDefined(data.applicant_country_id) ||
-                    angular.isDefined(data.trainee_country_id)
-                  ) {
+                  if (angular.isDefined(data.applicant_country_id) || angular.isDefined(data.trainee_country_id)) {
                     // we may have to set the fee waiver type to (empty) if either the applicant or trainee is not Canadian
                     if (this.record.waiver && !this.isWaiverAllowed())
                       this.record.waiver = "";
-                  } else if (
-                    angular.isDefined(data.comprehensive) ||
-                    angular.isDefined(data.tracking)
-                  ) {
+                  } else if (angular.isDefined(data.comprehensive) || angular.isDefined(data.tracking) ) {
                     if (this.record.comprehensive && this.record.tracking) {
                       // show the cohort warning to the applicant
                       CnModalMessageFactory.instance({
@@ -879,6 +875,11 @@ cenozoApp.defineModule({
                       }
                       // use the root scope to get the view directive to remove the lite model's file
                       $rootScope.$broadcast("file removed", "funding_filename");
+                    }
+                  } else if (angular.isDefined(data.indigenous)) {
+                    // the indigenous_description property is set to null on the server if indigenous=false
+                    if (!this.record.indigenous) {
+                      this.record.indigenous_description = "";
                     }
                   }
                 }
@@ -940,6 +941,7 @@ cenozoApp.defineModule({
               ["part1", "f", null],
               ["part2", null, "notes"],
               ["part2", null, "cohort"],
+              ["part2", null, "indigenous"],
               // one tab for each data category will be added here
               ["part3", null, null],
               ["agreement", null, null],
@@ -1184,6 +1186,11 @@ cenozoApp.defineModule({
                     diff: false,
                     comprehensive: false,
                     tracking: false,
+                  },
+                  indigenous: {
+                    diff: false,
+                    indigenous: false,
+                    indigenous_description: false,
                   },
                 },
               };
@@ -2326,6 +2333,10 @@ cenozoApp.defineModule({
                     "longitudinal",
                     "last_identifier",
                   ],
+                  "2indigenous": [
+                    "indigenous",
+                    "indigenous_description",
+                  ],
                 };
 
                 // Now add the data option justifications
@@ -2352,7 +2363,7 @@ cenozoApp.defineModule({
                 for (var property in this.record) {
                   if (null != property.match(/^amendment_justification_/)) {
                     // add it to the required tab list
-                    var tab = "1a";
+                    var tab = "instructions";
                     if (angular.isUndefined(requiredTabList[tab])) requiredTabList[tab] = [];
                     requiredTabList[tab].push(property);
                   }
@@ -2390,6 +2401,9 @@ cenozoApp.defineModule({
                     } else if ("last_identifier" == property) {
                       // only check the last_identifier if longitidunal=yes (it's a boolean var)
                       return this.record.longitudinal;
+                    } else if ("indigenous_description" == property) {
+                      // only check the indigenous_description if indigenous=yes (it's a boolean var)
+                      return this.record.indigenous;
                     }
 
                     // check everything else
@@ -2495,7 +2509,9 @@ cenozoApp.defineModule({
                   if ("amendment" == errorTab) {
                     this.setFormTab(0, "amendment", false);
                   } else {
-                    if (1 == errorTab.substr(0, 1)) {
+                    if ("instructions" == errorTab ) {
+                      this.setFormTab(0, "instructions", false);
+                    } else if (1 == errorTab.substr(0, 1)) {
                       this.setFormTab(0, "part1", false);
                       await this.setFormTab(1, errorTab.substr(1));
                     } else {
@@ -3325,7 +3341,7 @@ cenozoApp.defineModule({
                 // get the index that we'll be inserting categories in the tab section list
                 var insertIndex = null;
                 this.viewModel.tabSectionList.some((tabSection, index) => {
-                  if ("part2" == tabSection[0] && "cohort" == tabSection[2]) {
+                  if ("part2" == tabSection[0] && "indigenous" == tabSection[2]) {
                     insertIndex = index + 1;
                     return true;
                   }

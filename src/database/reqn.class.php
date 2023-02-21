@@ -154,6 +154,7 @@ class reqn extends \cenozo\database\record
   {
     $reqn_version_comment_class_name = lib::get_class_name( 'database\reqn_version_comment' );
     $data_justification_class_name = lib::get_class_name( 'database\data_justification' );
+    $amendment_justification_class_name = lib::get_class_name( 'database\amendment_justification' );
 
     // first get the current reqn version to determine the next version number
     $db_current_reqn_version = $this->get_current_reqn_version();
@@ -208,6 +209,24 @@ class reqn extends \cenozo\database\record
           $amendment_type_list[] = $amendment_type['id'];
 
         if( 0 < count( $amendment_type_list ) ) $db_reqn_version->add_amendment_type( $amendment_type_list );
+
+        // include any amendment justifications
+        foreach( $db_clone_reqn_version->get_amendment_justification_object_list() as $db_amendment_j_clone )
+        {
+          $db_amendment_justification = $amendment_justification_class_name::get_unique_record(
+            array( 'reqn_version_id', 'amendment_type_id' ),
+            array( $db_reqn_version->id, $db_amendment_j_clone->amendment_type_id )
+          );
+          if( is_null( $db_amendment_justification ) )
+          {
+            $db_amendment_justification = lib::create( 'database\amendment_justification' );
+            $db_amendment_justification->reqn_version_id = $db_reqn_version->id;
+            $db_amendment_justification->amendment_type_id = $db_amendment_j_clone->amendment_type_id;
+          }
+
+          $db_amendment_justification->description = $db_amendment_j_clone->description;
+          $db_amendment_justification->save();
+        }
       }
 
       // copy coapplicant records
@@ -247,21 +266,21 @@ class reqn extends \cenozo\database\record
         $db_reqn_version_comment->save();
       }
 
-      // copy all justifications
-      foreach( $db_clone_reqn_version->get_data_justification_object_list() as $db_data_justification_clone )
+      // copy all data justifications
+      foreach( $db_clone_reqn_version->get_data_justification_object_list() as $db_data_j_clone )
       {
         $db_data_justification = $data_justification_class_name::get_unique_record(
           array( 'reqn_version_id', 'data_option_id' ),
-          array( $db_reqn_version->id, $db_data_justification_clone->data_option_id )
+          array( $db_reqn_version->id, $db_data_j_clone->data_option_id )
         );
         if( is_null( $db_data_justification ) )
         {
           $db_data_justification = lib::create( 'database\data_justification' );
           $db_data_justification->reqn_version_id = $db_reqn_version->id;
-          $db_data_justification->data_option_id = $db_data_justification_clone->data_option_id;
+          $db_data_justification->data_option_id = $db_data_j_clone->data_option_id;
         }
 
-        $db_data_justification->description = $db_data_justification_clone->description;
+        $db_data_justification->description = $db_data_j_clone->description;
         $db_data_justification->save();
       }
     }
