@@ -59,6 +59,18 @@ CREATE PROCEDURE patch_reqn()
       ALTER TABLE reqn ADD COLUMN deferral_note_2f TEXT NULL DEFAULT NULL AFTER deferral_note_2e;
     END IF;
 
+    SELECT "Adding deferral_note_indigenous column to reqn table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "deferral_note_indigenous";
+
+    IF @test = 0 THEN
+      ALTER TABLE reqn ADD COLUMN deferral_note_indigenous TEXT NULL DEFAULT NULL AFTER deferral_note_cohort;
+    END IF;
+
   END //
 DELIMITER ;
 

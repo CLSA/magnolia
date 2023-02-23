@@ -126,6 +126,7 @@
            ng-class="{
              'text-warning flashing': model.getEditEnabled() && (
                model.viewModel.record.deferral_note_cohort ||
+               model.viewModel.record.deferral_note_indigenous ||
                model.viewModel.record.deferral_note_2a || model.viewModel.record.deferral_note_2b ||
                model.viewModel.record.deferral_note_2c || model.viewMOdel.record.deferral_note_2d ||
                model.viewModel.record.deferral_note_2e || model.viewModel.record.deferral_note_2f
@@ -984,6 +985,7 @@
                ng-class="{
                  'text-warning flashing':model.getEditEnabled() && ( 
                    ( 'cohort' == section[2] && model.viewModel.record.deferral_note_cohort ) ||
+                   ( 'indigenous' == section[2] && model.viewModel.record.deferral_note_indigenous ) ||
                    model.viewModel.record['deferral_note_2'+section[2]]
                  ),
                  'bg-warning': model.viewModel.compareRecord.differences.part2[section[2]].diff
@@ -1004,10 +1006,10 @@
         <div ng-show="'cohort'==model.viewModel.formTab[2]" class="panel panel-default" style="border-top-left-radius: 0px;">
           <div class="panel-body" style="padding-bottom: 0px;">
             <form ng-attr-id="part2CohortForm" ng-attr-name="part2CohortForm" novalidate>
-              <cn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_cohort"></cn-deferral-note>
-              <p class="text-primary" ng-bind-html="t( 'part2.cohort.text1' )"></p>
-              <div class="container-fluid form-horizontal">
-                <fieldset ng-disabled="!model.getEditEnabled()">
+              <fieldset ng-disabled="!model.getEditEnabled()">
+                <cn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_cohort"></cn-deferral-note>
+                <p class="text-primary" ng-bind-html="t( 'part2.cohort.text1' )"></p>
+                <div class="form-horizontal">
                   <cn-view-input-with-differences
                     no-cols=true
                     input="{
@@ -1032,12 +1034,10 @@
                     difference="model.viewModel.compareRecord.differences.part2.cohort.comprehensive"
                     model="model">
                   </cn-view-input-with-differences>
-                </fieldset>
-              </div>
-              <p class="text-primary" ng-bind-html="t( 'part2.cohort.text2' )"></p>
-              <hr/>
-              <div class="container-fluid form-horizontal">
-                <fieldset ng-disabled="!model.getEditEnabled()">
+                </div>
+                <p class="text-primary" ng-bind-html="t( 'part2.cohort.text2' )"></p>
+                <hr/>
+                <div class="form-horizontal">
                   <cn-view-input-with-differences
                     no-cols=true
                     input="{
@@ -1060,8 +1060,47 @@
                     difference="model.viewModel.compareRecord.differences.part2.cohort.last_identifier"
                     model="model">
                   </cn-view-input-with-differences>
-                </fieldset>
-              </div>
+                </div>
+              </fieldset>
+            </form>
+          </div>
+        </div>
+        <div ng-show="'indigenous'==model.viewModel.formTab[2]" class="panel panel-default" style="border-top-left-radius: 0px;">
+          <div class="panel-body" style="padding-bottom: 0px;">
+            <form ng-attr-id="part2CohortForm" ng-attr-name="part2CohortForm" novalidate>
+              <fieldset ng-disabled="!model.getEditEnabled()">
+                <cn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_indigenous"></cn-deferral-note>
+                <p class="text-primary" ng-bind-html="t( 'part2.indigenous.text1' )"></p>
+
+                <div class="form-horizontal">
+                  <cn-view-input-with-differences
+                    no-cols=true
+                    input="{
+                      key: 'indigenous',
+                      title: t( 'part2.indigenous.indigenous' ),
+                      type: model.inputList.indigenous.type,
+                      enumList: model.metadata.yesNoEnumList[model.viewModel.record.lang]
+                    }"
+                    difference="model.viewModel.compareRecord.differences.part2.indigenous.indigenous"
+                    model="model">
+                  </cn-view-input-with-differences>
+                </div>
+                <div ng-if="model.viewModel.record.indigenous">
+                  <p class="text-primary" ng-bind-html="t( 'part2.indigenous.indigenous_description' )"></p>
+                  <div class="form-horizontal">
+                    <cn-view-input-with-differences
+                      no-cols=true
+                      input="{
+                        key: 'indigenous_description',
+                        title: '',
+                        type: model.inputList.indigenous_description.type
+                      }"
+                      difference="model.viewModel.compareRecord.differences.part2.indigenous.indigenous_description"
+                      model="model">
+                    </cn-view-input-with-differences>
+                  </div>
+                </div>
+              </fieldset>
             </form>
           </div>
         </div>
@@ -1164,7 +1203,7 @@
                   </tbody>
                 </table>
                 <hr ng-if="'Linked Data' == category.name.en || category.comment" />
-                <div ng-if="'Linked Data' == category.name.en" class="container-fluid form-horizontal">
+                <div ng-if="'Linked Data' == category.name.en" class="form-horizontal">
                   <fieldset ng-disabled="!model.getEditEnabled()">
                     <cn-view-input-with-differences
                       no-cols=true
@@ -1179,19 +1218,17 @@
                   </fieldset>
                   </fieldset>
                 </div>
-                <div class="container-fluid">
-                  <cn-view-input-with-differences
-                    no-cols=true
-                    ng-if="category.comment"
-                    input="{
-                      key: 'comment_' + category.id,
-                      title: t( 'misc.comments' ),
-                      type: 'text'
-                    }"
-                    difference="model.viewModel.compareRecord.differences.part2[category.charCode].comment"
-                    model="model">
-                  </cn-view-input-with-differences>
-                </div>
+                <cn-view-input-with-differences
+                  no-cols=true
+                  ng-if="category.comment"
+                  input="{
+                    key: 'comment_' + category.id,
+                    title: t( 'misc.comments' ),
+                    type: 'text'
+                  }"
+                  difference="model.viewModel.compareRecord.differences.part2[category.charCode].comment"
+                  model="model">
+                </cn-view-input-with-differences>
               </div>
             </form>
           </div>

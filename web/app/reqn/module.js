@@ -600,6 +600,16 @@ cenozoApp.defineModule({
           );
         },
       },
+      deferral_note_indigenous: {
+        title: "Indigenous Identifiers",
+        type: "text",
+        isExcluded: function ($state, model) {
+          return (
+            "add" == model.getActionFromState() ||
+            ["finalization", "complete"].includes( model.viewModel.record.phase )
+          );
+        },
+      },
       deferral_note_2a: {
         title: "", // defined dynamically in the model
         type: "text",
@@ -1545,6 +1555,7 @@ cenozoApp.defineModule({
                   this.record.deferral_note_1e ||
                   this.record.deferral_note_1f ||
                   this.record.deferral_note_cohort ||
+                  this.record.deferral_note_indigenous ||
                   this.record.deferral_note_2a ||
                   this.record.deferral_note_2b ||
                   this.record.deferral_note_2c ||

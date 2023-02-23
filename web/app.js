@@ -917,6 +917,24 @@ cenozo.service("CnReqnHelper", [
                 fr: "Veuillez entrer le numéro de demande du projet connexe approuvé par l’ÉLCV.",
               },
             },
+            indigenous: {
+              tab: {
+                en: "Indigenous Identifiers",
+                fr: "Identificateurs autochtones",
+              },
+              text1: {
+                en: 'Please note that as per <a href="https://ethics.gc.ca/eng/tcps2-eptc2_2018_chapter9-chapitre9.html" target="indigenous">>Chapter 9: Research Involving the First Nations, Inuit and Métis Peoples of Canada of the Tri-Council Policy Statement: Ethical Conduct for Research Involving Humans</a>, projects that include Indigenous identifiers will undergo an additional review to ensure that meaningful and respectful engagement with relevant Indigenous Peoples is integrated throughout the project.',
+                fr: 'Veuillez noter que, conformément au <a href="https://ethics.gc.ca/fra/tcps2-eptc2_2018_chapter9-chapitre9.html" target="indigenous">chapitre 9 : Recherche impliquant les Premières Nations, les Inuits ou les Métis du Canada de l’Énoncé de politique des trois Conseils : Éthique de la recherche avec des êtres humains</a>, les projets qui incluent des identificateurs autochtones feront l’objet d’un examen supplémentaire pour s’assurer que la collaboration respectueuse avec les peuples autochtones concernés est intégrée tout au long du projet.',
+              },
+              indigenous: {
+                en: "Does your proposed project include the use of Indigenous (First Nations, Métis, Inuit) self-identifiers?",
+                fr: "Le projet que vous proposez comprend-il l’utilisation de l’auto-identification autochtone (Premières Nations, Métis, Inuit)?",
+              },
+              indigenous_description: {
+                en: "Please include a description on how you intend to use Indigenous identifiers in your analyses and how you are involving Indigenous organizations, people and governing bodies in your project.",
+                fr: "Veuillez inclure une description de la façon dont vous avez l’intention d’utiliser les identificateurs autochtones dans vos analyses et de la façon dont les organisations, les personnes et les organes directeurs autochtones collaborent à votre projet.",
+              },
+            },
           },
           part3: {
             tab: { en: "Part 3", fr: "3<sup>e</sup> partie" },
