@@ -167,6 +167,10 @@ cenozoApp.defineModule({
           },
           highlight: false, // highlight any unapproved reqns
         },
+        non_payment: {
+          type: "hidden",
+          caution: true, // caution any reqn flagged for non-payment
+        },
         reqn_version_id: {
           column: "reqn_version.id",
           type: "hidden",
@@ -216,6 +220,18 @@ cenozoApp.defineModule({
         help:
           "Determines whether the fee for the application is calculated. " +
           "This also makes the applicant and trainee country a mandatory field.",
+      },
+      non_payment: {
+        title: "Flag for Non-Payment",
+        type: "boolean",
+        isConstant: function($state, model) {
+          // make sure the chair can only edit the chair's notes
+          return model.isRole("chair");
+        },
+        isExcluded: function ($state, model) {
+          return "view" != model.getActionFromState();
+        },
+        help: "Flags a requisition for non-payment.",
       },
       reqn_type_id: {
         title: "Requisition Type",

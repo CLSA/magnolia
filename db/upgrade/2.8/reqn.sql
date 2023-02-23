@@ -71,6 +71,18 @@ CREATE PROCEDURE patch_reqn()
       ALTER TABLE reqn ADD COLUMN deferral_note_indigenous TEXT NULL DEFAULT NULL AFTER deferral_note_cohort;
     END IF;
 
+    SELECT "Adding non_payment column to reqn table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "non_payment";
+
+    IF @test = 0 THEN
+      ALTER TABLE reqn ADD COLUMN non_payment TINYINT(1) NOT NULL DEFAULT 0 AFTER show_prices;
+    END IF;
+
   END //
 DELIMITER ;
 
