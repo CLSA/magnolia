@@ -90,6 +90,7 @@ cenozoApp.defineModule({
       indigenous_description: { type: "text" },
       agreement_start_date: { type: "date" },
       agreement_end_date: { type: "date" },
+      has_agreement_filename: { type: "boolean" },
 
       current_final_report_id: { column: "final_report.id", type: "string" },
       trainee_user_id: { column: "reqn.trainee_user_id", type: "string" },
