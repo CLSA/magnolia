@@ -712,6 +712,8 @@ class reqn_version extends \cenozo\database\record
     $data['last_identifier'] = !$this->longitudinal || is_null( $this->last_identifier )
                              ? ( 'fr' == $db_language->code ? 'S. o.' : 'N/A' )
                              : $this->last_identifier;
+    if( $this->indigenous ) $data['indigenous'] = 'Yes';
+    if( $this->indigenous_description ) $data['indigenous_description'] = $this->indigenous_description;
 
     $data_selection_sel = lib::create( 'database\select' );
     $data_selection_sel->add_table_column( 'data_category', 'rank', 'category_rank' );
