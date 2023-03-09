@@ -519,7 +519,6 @@ cenozoApp.defineModule({
                         "" === record[property]
                       ) {
                         var element = cenozo.getFormElement(property);
-                        console.log( property, element );
                         element.$error.required = true;
                         cenozo.updateFormElement(element, true);
                         if (null == errorTab) errorTab = tab;
