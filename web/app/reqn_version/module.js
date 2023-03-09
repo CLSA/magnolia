@@ -88,6 +88,7 @@ cenozoApp.defineModule({
       last_identifier: { type: "string" },
       indigenous: { type: "boolean" },
       indigenous_description: { type: "text" },
+      data_agreement_id: { type: "enum" },
       agreement_start_date: { type: "date" },
       agreement_end_date: { type: "date" },
       has_agreement_filename: { type: "boolean" },
@@ -181,6 +182,9 @@ cenozoApp.defineModule({
               },
               isDescriptionConstant: function () {
                 return "." != scope.model.viewModel.record.amendment;
+              },
+              isDataAgreementIncluded: function () {
+                return scope.model.isRole("administrator");
               },
               isAlwaysTrue: function () { return true; },
             });
@@ -580,8 +584,10 @@ cenozoApp.defineModule({
                   (
                     // or when we're looking at the current version and we're in the active/finalization phases
                     // or Complete stage
-                    this.record.is_current_version &&
-                    (["active","finalization"].includes( this.record.phase ) || "Complete" == this.record.stage_type)
+                    this.record.is_current_version && (
+                      ["active","finalization"].includes(this.record.phase) ||
+                      ["Decision Made", "Suggested Revisions", "Complete"].includes(this.record.stage_type)
+                    )
                   )
                 )
               );
@@ -3101,6 +3107,20 @@ cenozoApp.defineModule({
                       },
                     },
                   }).query(),
+
+                  this.isRole("administrator") ?
+                    CnHttpFactory.instance({
+                      path: "data_agreement",
+                      data: {
+                        select: {
+                          column: ["id", "institution", "version"],
+                        },
+                        modifier: {
+                          order: ["institution", {"version":true} ],
+                          limit: 1000,
+                        },
+                      },
+                    }).query() : NULL
                 ]);
               }
 
@@ -3111,6 +3131,7 @@ cenozoApp.defineModule({
                 optionResponse,
                 selectionResponse,
                 detailResponse,
+                dataAgreementResponse,
               ] = await Promise.all(promiseList);
 
               var columnList = angular.fromJson(
@@ -3502,6 +3523,13 @@ cenozoApp.defineModule({
                   delete detail.note_en;
                   delete detail.note_fr;
                 });
+
+                this.metadata.columnList.data_agreement_id.enumList =
+                  dataAgreementResponse.data.reduce((list, item) => {
+                    list.push({ value: item.id, name: item.institution + " (" + item.version + ")" });
+                    return list;
+                  }, []);
+                this.metadata.columnList.data_agreement_id.enumList.unshift({ value: "", name: "(empty)" });
               }
             },
           });

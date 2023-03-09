@@ -16,7 +16,7 @@ CREATE PROCEDURE patch_role_has_service()
       "SELECT role.id, service.id ",
       "FROM ", @cenozo, ".role, service ",
       "WHERE role.name = 'administrator' ",
-      "AND service.subject IN( 'notation' ) ",
+      "AND service.subject IN( 'data_agreement', 'notation' ) ",
       "AND service.restricted = 1"
     );
     PREPARE statement FROM @sql;

@@ -1276,6 +1276,16 @@
               </div>
               <cn-view-input-with-differences
                 input="{
+                  key: 'data_agreement_id',
+                  title: 'Master Data Agreement',
+                  type: 'enum',
+                  enumList: model.metadata.columnList.data_agreement_id.enumList,
+                  isIncluded: isDataAgreementIncluded
+                }"
+                model="model">
+              </cn-view-input-with-differences>
+              <cn-view-input-with-differences
+                input="{
                   key: 'agreement_filename',
                   title: 'Agreement File',
                   type: 'file'

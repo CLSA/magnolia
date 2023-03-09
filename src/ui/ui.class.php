@@ -21,6 +21,9 @@ class ui extends \cenozo\ui\ui
   {
     parent::build_module_list();
 
+    $module = $this->get_module( 'data_agreement' );
+    if( !is_null( $module ) ) $module->add_child( 'reqn' );
+
     $module = $this->get_module( 'data_category' );
     if( !is_null( $module ) )
     {
@@ -142,6 +145,7 @@ class ui extends \cenozo\ui\ui
     if( 'typist' != $db_role->name )
     {
       $this->add_listitem( 'Amendment Types', 'amendment_type' );
+      $this->add_listitem( 'Master Data Agreements', 'data_agreement' );
       $this->add_listitem( 'Data Versions', 'data_version' );
       $this->add_listitem( 'Deadlines', 'deadline' );
       $this->add_listitem( 'Notification Types', 'notification_type' );

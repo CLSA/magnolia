@@ -60,6 +60,27 @@ CREATE PROCEDURE patch_reqn_version()
       ALTER TABLE reqn_version ADD COLUMN indigenous_description TEXT NULL DEFAULT NULL AFTER indigenous;
     END IF;
 
+    SELECT "Adding data_agreement_id column to reqn_version table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn_version"
+    AND column_name = "data_agreement_id";
+
+    IF @test = 0 THEN
+      ALTER TABLE reqn_version
+      ADD COLUMN data_agreement_id INT UNSIGNED NULL DEFAULT NULL AFTER agreement_end_date,
+      ADD INDEX fk_data_agreement_id (data_agreement_id ASC);
+
+      ALTER TABLE reqn_version
+      ADD CONSTRAINT fk_reqn_version_data_agreement_id
+        FOREIGN KEY (data_agreement_id)
+        REFERENCES data_agreement (id)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION;
+    END IF;
+
   END //
 DELIMITER ;
 
