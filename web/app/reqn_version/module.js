@@ -3120,7 +3120,7 @@ cenozoApp.defineModule({
                           limit: 1000,
                         },
                       },
-                    }).query() : NULL
+                    }).query() : null
                 ]);
               }
 
@@ -3524,7 +3524,8 @@ cenozoApp.defineModule({
                   delete detail.note_fr;
                 });
 
-                this.metadata.columnList.data_agreement_id.enumList =
+                this.metadata.columnList.data_agreement_id.enumList = null == dataAgreementResponse ?
+                  [] :
                   dataAgreementResponse.data.reduce((list, item) => {
                     list.push({ value: item.id, name: item.institution + " (" + item.version + ")" });
                     return list;
