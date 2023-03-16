@@ -2179,7 +2179,6 @@ cenozoApp.defineModule({
                                 oldValue = null == oldValue ? "(empty)" : '"' + oldValue + '"';
                                 let newValue = this.record[property];
                                 newValue = null == newValue ? "(empty)" : '"' + newValue + '"';
-                                console.log( property, oldValue, newValue );
                                 differenceList.push({
                                   name: property.replace(/_/g, " ").ucWords(),
                                   old: oldValue,
