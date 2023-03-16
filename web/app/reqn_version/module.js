@@ -1229,20 +1229,13 @@ cenozoApp.defineModule({
                     if ("diff" == section) continue; // used to track overall diff
 
                     for (var property in differences[part][section]) {
-                      if (!differences[part][section].hasOwnProperty(property))
-                        continue;
-                      if (
-                        angular.isArray(differences[part][section][property])
-                      ) {
+                      if (!differences[part][section].hasOwnProperty(property)) continue;
+                      if (angular.isArray(differences[part][section][property])) {
                         // an array means we have a list go check through
                         if ("coapplicantList" == property) {
                           // loop through reqnVersion1's coapplicants to see if any were added or changed
                           reqnVersion1.coapplicantList.forEach((c1) => {
-                            var c2 =
-                              reqnVersion2.coapplicantList.findByProperty(
-                                "name",
-                                c1.name
-                              );
+                            var c2 = reqnVersion2.coapplicantList.findByProperty("name", c1.name);
                             if (null == c2) {
                               // reqnVersion1 has coapplicant that compared reqnVersion2 doesn't
                               differences.diff = true;
@@ -1276,11 +1269,7 @@ cenozoApp.defineModule({
 
                           // loop through compared reqnVersion2's coapplicants to see if any were removed
                           reqnVersion2.coapplicantList.forEach((c2) => {
-                            var c1 =
-                              reqnVersion1.coapplicantList.findByProperty(
-                                "name",
-                                c2.name
-                              );
+                            var c1 = reqnVersion1.coapplicantList.findByProperty("name", c2.name);
                             if (null == c1) {
                               // reqnVersion1 has coapplicant that compared reqnVersion2 doesn't
                               differences.diff = true;
@@ -1295,10 +1284,7 @@ cenozoApp.defineModule({
                         } else if ("referenceList" == property) {
                           // loop through reqnVersion1's references to see if any were added or changed
                           reqnVersion1.referenceList.forEach((r1) => {
-                            var r2 = reqnVersion2.referenceList.findByProperty(
-                              "reference",
-                              r1.reference
-                            );
+                            var r2 = reqnVersion2.referenceList.findByProperty("reference", r1.reference);
                             if (null == r2) {
                               // reqnVersion1 has reference that compared reqnVersion2 doesn't
                               differences.diff = true;
@@ -1313,10 +1299,7 @@ cenozoApp.defineModule({
 
                           // loop through compared reqnVersion2's references to see if any were removed
                           reqnVersion2.referenceList.forEach((r2) => {
-                            var r1 = reqnVersion1.referenceList.findByProperty(
-                              "reference",
-                              r2.reference
-                            );
+                            var r1 = reqnVersion1.referenceList.findByProperty("reference", r2.reference);
                             if (null == r1) {
                               // reqnVersion1 has reference that compared reqnVersion2 doesn't
                               differences.diff = true;
@@ -1350,11 +1333,7 @@ cenozoApp.defineModule({
                                           .studyPhase[selection.studyPhaseCode]
                                           .en +
                                         "]",
-                                      diff: reqnVersion1.selectionList[
-                                        selection.id
-                                      ]
-                                        ? "added"
-                                        : "removed",
+                                      diff: reqnVersion1.selectionList[selection.id] ? "added" : "removed",
                                     });
                                   }
                                 });
@@ -1362,21 +1341,22 @@ cenozoApp.defineModule({
                             });
                         } else if ("optionJustificationList" == property) {
                           for (var prop in reqnVersion1) {
-                            if (null != prop.match(/^data_justification_/)) {
-                              if (reqnVersion1[prop] != reqnVersion2[prop]) {
-                                var match = prop.match(
-                                  /^data_justification_([0-9]+)$/
-                                );
-                                var option =
-                                  this.parentModel.getCategoryAndOption(
-                                    match[1]
-                                  ).option;
+                            if (
+                              null != prop.match(/^data_justification_/) &&
+                              reqnVersion1[prop] != reqnVersion2[prop]
+                            ){
+                              var match = prop.match( /^data_justification_([0-9]+)$/);
+                              const { category, option } = this.parentModel.getCategoryAndOption(match[1]);
+                              // only check options belonging to this section
+                              if( section == category.charCode ) {
                                 differences.diff = true;
                                 differences[part].diff = true;
                                 differences[part][section].diff = true;
                                 differences[part][section][property].push({
                                   id: option.id,
-                                  diff: true,
+                                  name: option.name.en,
+                                  diff: !reqnVersion1[prop] ? "removed" :
+                                        !reqnVersion2[prop] ? "added" : "changed"
                                 });
                               }
                             }
@@ -1387,9 +1367,7 @@ cenozoApp.defineModule({
                               null != prop.match(/^amendment_justification_[0-9]+/)
                             ) {
                               if (reqnVersion1[prop] != reqnVersion2[prop]) {
-                                var match = prop.match(
-                                  /^amendment_justification_([0-9]+)$/
-                                );
+                                var match = prop.match( /^amendment_justification_([0-9]+)$/ );
                                 differences.diff = true;
                                 differences[part].diff = true;
                                 differences[part][section].diff = true;
@@ -1403,39 +1381,22 @@ cenozoApp.defineModule({
                         }
                       } else if (null != property.match(/_filename$/)) {
                         // if both file names are empty or null then assume there is no difference
-                        var recordName = angular.isUndefined(
-                          reqnVersion1[property]
-                        )
-                          ? null
-                          : reqnVersion1[property];
-                        var compareName = angular.isUndefined(
-                          reqnVersion2[property]
-                        )
-                          ? null
-                          : reqnVersion2[property];
+                        var recordName = angular.isUndefined(reqnVersion1[property]) ?
+                          null : reqnVersion1[property];
+                        var compareName = angular.isUndefined(reqnVersion2[property]) ?
+                          null : reqnVersion2[property];
 
                         if (!(recordName == null && compareName == null)) {
                           // file size are compared instead of filename
                           var fileDetails =
-                            this.parentModel.viewModel.fileList.findByProperty(
-                              "key",
-                              property
-                            );
-                          var sizeProperty = property.replace(
-                            "_filename",
-                            "_size"
-                          );
+                            this.parentModel.viewModel.fileList.findByProperty("key", property);
+                          var sizeProperty = property.replace("_filename", "_size");
                           var recordSize =
-                            angular.isObject(fileDetails) && fileDetails.size
-                              ? fileDetails.size
-                              : null;
-                          var compareSize = reqnVersion2[sizeProperty]
-                            ? reqnVersion2[sizeProperty]
-                            : null;
-                          if (
-                            (null != recordSize || null != compareSize) &&
-                            recordSize != compareSize
-                          ) {
+                            angular.isObject(fileDetails) && fileDetails.size ?
+                              fileDetails.size : null;
+                          var compareSize = reqnVersion2[sizeProperty] ?
+                            reqnVersion2[sizeProperty] : null;
+                          if ((null != recordSize || null != compareSize) && recordSize != compareSize) {
                             differences.diff = true;
                             differences[part].diff = true;
                             differences[part][section].diff = true;
@@ -1444,42 +1405,26 @@ cenozoApp.defineModule({
                         }
                       } else if ("comment" == property) {
                         // only check comments if they are activated for this category
-                        if ("comment" == property) {
-                          var category =
-                            this.parentModel.categoryList.findByProperty(
-                              "charCode",
-                              section
-                            );
-                          if (category.comment) {
-                            // a comment's property in the record is followed by the data_category_id
-                            var commentProperty = "comment_" + category.id;
-                            var value1 =
-                              "" === reqnVersion1[commentProperty]
-                                ? null
-                                : reqnVersion1[commentProperty];
-                            var value2 =
-                              "" === reqnVersion2[commentProperty]
-                                ? null
-                                : reqnVersion2[commentProperty];
-                            if (value1 != value2) {
-                              differences.diff = true;
-                              differences[part].diff = true;
-                              differences[part][section].diff = true;
-                              differences[part][section][property] = true;
-                            }
+                        var category = this.parentModel.categoryList.findByProperty("charCode", section);
+                        if (category.comment) {
+                          // a comment's property in the record is followed by the data_category_id
+                          var commentProperty = "comment_" + category.id;
+                          var value1 = "" === reqnVersion1[commentProperty] ?
+                            null : reqnVersion1[commentProperty];
+                          var value2 = "" === reqnVersion2[commentProperty] ?
+                            null : reqnVersion2[commentProperty];
+                          if (value1 != value2) {
+                            differences.diff = true;
+                            differences[part].diff = true;
+                            differences[part][section].diff = true;
+                            differences[part][section][property] = true;
                           }
                         }
                       } else {
                         // not an array means we have a property to directly check
                         // note: we need to convert empty strings to null to make sure they compare correctly
-                        var value1 =
-                          "" === reqnVersion1[property]
-                            ? null
-                            : reqnVersion1[property];
-                        var value2 =
-                          "" === reqnVersion2[property]
-                            ? null
-                            : reqnVersion2[property];
+                        var value1 = "" === reqnVersion1[property] ? null : reqnVersion1[property];
+                        var value2 = "" === reqnVersion2[property] ? null : reqnVersion2[property];
                         if (value1 != value2) {
                           differences.diff = true;
                           differences[part].diff = true;
@@ -1487,19 +1432,13 @@ cenozoApp.defineModule({
                           differences[part][section][property] = true;
 
                           // if the property is text then get the diff data
-                          if (
-                            angular.isDefined(
-                              this.parentModel.metadata.columnList[property]
-                            )
-                          ) {
+                          if (angular.isDefined(this.parentModel.metadata.columnList[property])) {
                             var determineDifferences = false;
-                            var column =
-                              this.parentModel.metadata.columnList[property];
+                            var column = this.parentModel.metadata.columnList[property];
                             if ("text" == column.data_type) {
                               determineDifferences = true;
                             } else if ("varchar" == column.data_type) {
-                              var match =
-                                column.type.match(/varchar\(([0-9]+)\)/);
+                              var match = column.type.match(/varchar\(([0-9]+)\)/);
                               if (null != match && 256 < match[1]) {
                                 determineDifferences = true;
                               }
@@ -1508,29 +1447,16 @@ cenozoApp.defineModule({
 
                           if (determineDifferences) {
                             var diffText = "";
-                            Diff.diffWords(
-                              null == value2 ? "" : value2,
-                              null == value1 ? "" : value1
-                            ).forEach((part) => {
+                            Diff.diffWords( null == value2 ? "" : value2, null == value1 ? "" : value1)
+                                .forEach((part) => {
                               diffText +=
-                                (part.added
-                                  ? "<b>"
-                                  : part.removed
-                                  ? "<del>"
-                                  : "") +
+                                (part.added ? "<b>" : part.removed ? "<del>" : "") +
                                 part.value +
-                                (part.added
-                                  ? "</b>"
-                                  : part.removed
-                                  ? "</del>"
-                                  : "");
+                                (part.added ? "</b>" : part.removed ? "</del>" : "");
                             });
 
-                            if (angular.isUndefined(differences.textDiff))
-                              differences.textDiff = {};
-                            differences.textDiff[property] = diffText
-                              ? diffText.replace(/\r?\n/g, "<br/>")
-                              : "";
+                            if (angular.isUndefined(differences.textDiff)) differences.textDiff = {};
+                            differences.textDiff[property] = diffText ? diffText.replace(/\r?\n/g, "<br/>") : "";
                           }
                         }
                       }
@@ -1636,12 +1562,9 @@ cenozoApp.defineModule({
                     });
 
                   // ... and also determine the last agreement version and calculate its differences
-                  if (
-                    null == this.agreementDifferenceList &&
-                    null != version.agreement_filename
-                  )
-                    this.agreementDifferenceList =
-                      this.getDifferenceList(version);
+                  if (null == this.agreementDifferenceList && null != version.agreement_filename) {
+                    this.agreementDifferenceList = this.getDifferenceList(version);
+                  }
                 }
               });
 
@@ -2192,25 +2115,15 @@ cenozoApp.defineModule({
 
             getDifferenceList: function (version) {
               var differenceList = [];
-              var mainInputGroup =
-                this.parentModel.module.inputGroupList.findByProperty(
-                  "title",
-                  ""
-                );
+              var mainInputGroup = this.parentModel.module.inputGroupList.findByProperty("title", "");
 
               if (version.differences.diff) {
                 for (var part in version.differences) {
-                  if (
-                    !version.differences.hasOwnProperty(part) ||
-                    "diff" == part
-                  ) {
+                  if (!version.differences.hasOwnProperty(part) || "diff" == part) {
                     // used to track overall diff
                     // do nothing
                   } else if ("amendment" == part) {
-                    if (
-                      version.differences[part].diff &&
-                      version.differences[part].a.new_user_id
-                    ) {
+                    if (version.differences[part].diff && version.differences[part].a.new_user_id) {
                       differenceList.push({
                         name: "New Primary Applicant",
                         old: null,
@@ -2219,30 +2132,16 @@ cenozoApp.defineModule({
                     }
                   } else if (version.differences[part].diff) {
                     for (var section in version.differences[part]) {
-                      if (!version.differences[part].hasOwnProperty(section))
-                        continue;
+                      if (!version.differences[part].hasOwnProperty(section)) continue;
                       if ("diff" == section) continue; // used to track overall diff
 
                       if (version.differences[part][section].diff) {
-                        for (var property in version.differences[part][
-                          section
-                        ]) {
-                          if (
-                            !version.differences[part][section].hasOwnProperty(
-                              property
-                            )
-                          )
-                            continue;
+                        for (var property in version.differences[part][section]) {
+                          if (!version.differences[part][section].hasOwnProperty(property)) continue;
                           if ("diff" == property) continue; // used to track overall diff
 
-                          if (
-                            angular.isArray(
-                              version.differences[part][section][property]
-                            )
-                          ) {
-                            version.differences[part][section][
-                              property
-                            ].forEach((change) => {
+                          if (angular.isArray(version.differences[part][section][property])) {
+                            version.differences[part][section][property].forEach((change) => {
                               differenceList.push({
                                 type: property
                                   .replace("List", "")
@@ -2256,32 +2155,37 @@ cenozoApp.defineModule({
                             });
                           } else {
                             if (version.differences[part][section][property]) {
-                              differenceList.push(
-                                angular.isDefined(
-                                  mainInputGroup.inputList[property]
-                                ) &&
-                                  "text" ==
-                                    mainInputGroup.inputList[property].type
-                                  ? {
-                                      name: property
-                                        .replace(/_/g, " ")
-                                        .ucWords(),
-                                      diff: "changed",
-                                    }
-                                  : {
-                                      name: property
-                                        .replace(/_/g, " ")
-                                        .ucWords(),
-                                      old:
-                                        null == version[property]
-                                          ? "(empty)"
-                                          : '"' + version[property] + '"',
-                                      new:
-                                        null == this.record[property]
-                                          ? "(empty)"
-                                          : '"' + this.record[property] + '"',
-                                    }
-                              );
+                              if ("comment" == property) {
+                                let cat = this.parentModel.categoryList.findByProperty("charCode", section);
+                                let propertyName = "comment_" + cat.id;
+                                differenceList.push({
+                                  name: cat.name.en + " " + property.replace(/_/g, " ").ucWords(),
+                                  diff: !this.record[propertyName] ? "removed" :
+                                        !version[propertyName] ? "added" : "changed"
+                                });
+                              } else if (
+                                ["applicant_country_id", "trainee_country_id"].includes(property) || (
+                                  angular.isDefined(mainInputGroup.inputList[property]) &&
+                                  "text" == mainInputGroup.inputList[property].type
+                                )
+                              ){
+                                differenceList.push({
+                                  name: property.replace(/_/g, " ").ucWords().replace(/ Id$/, '' ),
+                                  diff: !this.record[property] ? "removed" :
+                                        !version[property] ? "added" : "changed"
+                                });
+                              } else {
+                                let oldValue = version[property];
+                                oldValue = null == oldValue ? "(empty)" : '"' + oldValue + '"';
+                                let newValue = this.record[property];
+                                newValue = null == newValue ? "(empty)" : '"' + newValue + '"';
+                                console.log( property, oldValue, newValue );
+                                differenceList.push({
+                                  name: property.replace(/_/g, " ").ucWords(),
+                                  old: oldValue,
+                                  new: newValue
+                                });
+                              }
                             }
                           }
                         }
