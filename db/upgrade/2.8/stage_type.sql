@@ -61,3 +61,8 @@ DELIMITER ;
 
 CALL patch_stage_type();
 DROP PROCEDURE IF EXISTS patch_stage_type;
+
+SELECT "Renaming SMT to EC in stage type records" AS "";
+
+UPDATE stage_type SET name = "EC Decision" WHERE name = "SMT Decision";
+UPDATE stage_type SET name = "Second EC Decision" WHERE name = "Second SMT Decision";

@@ -380,7 +380,7 @@ cenozo.service("CnReqnHelper", [
             "Report Required" != stageType && (
               ("administrator" == role && "new" != phase) ||
               ("chair" == role && stageType.includes("DSAC")) ||
-              ("smt" == role && stageType.includes("SMT"))
+              ("ec" == role && stageType.includes("EC"))
             ) && !this.showAction("amendment proceed", record)
           );
         } else if ("reject" == subject) {

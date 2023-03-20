@@ -11,12 +11,21 @@ CREATE PROCEDURE patch_role()
       AND constraint_name = "fk_access_site_id"
     );
 
+    SELECT "Renaming smt role to ec" AS "";
+
+    SET @sql = CONCAT(
+      "UPDATE ", @cenozo, ".role SET name = 'ec' WHERE name = 'smt'"
+    );
+    PREPARE statement FROM @sql;
+    EXECUTE statement;
+    DEALLOCATE PREPARE statement;
+
     SELECT "Upgrading some roles to tier 2" AS "";
 
     SET @sql = CONCAT(
       "UPDATE ", @cenozo, ".role ",
       "SET tier = 2 ",
-      "WHERE name IN ( 'chair', 'smt', 'readonly', 'communication', 'typist' )"
+      "WHERE name IN ( 'chair', 'ec', 'readonly', 'communication', 'typist' )"
     );
     PREPARE statement FROM @sql;
     EXECUTE statement;

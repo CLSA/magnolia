@@ -352,12 +352,12 @@ class reqn extends \cenozo\database\record
       $review_list[$review['name']] = $review['recommendation'];
 
     $recommendation = NULL;
-    // if there is a second SMT review then use that decision
-    if( array_key_exists( 'Second SMT', $review_list ) ) $recommendation = $review_list['Second SMT'];
+    // if there is a second EC review then use that decision
+    if( array_key_exists( 'Second EC', $review_list ) ) $recommendation = $review_list['Second EC'];
     // if there is a second chair review then use that decision
     else if( array_key_exists( 'Second Chair', $review_list ) ) $recommendation = $review_list['Second Chair'];
-    // if there is a first SMT review then use that decision
-    else if( array_key_exists( 'SMT', $review_list ) ) $recommendation = $review_list['SMT'];
+    // if there is a first EC review then use that decision
+    else if( array_key_exists( 'EC', $review_list ) ) $recommendation = $review_list['EC'];
     // if there is a first chair review then use that decision
     else if( array_key_exists( 'Chair', $review_list ) ) $recommendation = $review_list['Chair'];
     // if there is a Feasibility review then use that decision
@@ -458,7 +458,7 @@ class reqn extends \cenozo\database\record
           // always proceed to the DSAC Review stage (it goes to decision made when it is rejected)
           $find_stage_type_name = 'DSAC Review';
         }
-        else if( 'SMT Decision' == $db_current_stage_type->name )
+        else if( 'EC Decision' == $db_current_stage_type->name )
         {
           // if revise then go to revision required, otherwise go to decision made
           $db_review = current( $this->get_current_stage()->get_review_object_list() );
@@ -475,13 +475,13 @@ class reqn extends \cenozo\database\record
         }
         else if( 'Second DSAC Decision' == $db_current_stage_type->name )
         {
-          // if approved then go to decision made, otherwise go to the second SMT decision
+          // if approved then go to decision made, otherwise go to the second EC decision
           $db_review = current( $this->get_current_stage()->get_review_object_list() );
           if( $db_review )
           {
             $db_recommendation_type = $db_review->get_recommendation_type();
             if( !is_null( $db_recommendation_type ) )
-              $find_stage_type_name = 'Approved' == $db_recommendation_type->name ? 'Decision Made' : 'Second SMT Decision';
+              $find_stage_type_name = 'Approved' == $db_recommendation_type->name ? 'Decision Made' : 'Second EC Decision';
           }
         }
         else if( 'Decision Made' == $db_current_stage_type->name )

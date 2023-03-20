@@ -158,7 +158,7 @@ class patch extends \cenozo\service\patch
           if( !is_null( $db_reqn->state ) || (
               'administrator' != $db_role->name &&
               ( 'chair' != $db_role->name || false === strpos( $db_current_stage_type->name, 'DSAC' ) ) &&
-              ( 'smt' != $db_role->name || false === strpos( $db_current_stage_type->name, 'SMT' ) )
+              ( 'ec' != $db_role->name || false === strpos( $db_current_stage_type->name, 'EC' ) )
           ) ) $code = 403;
         }
       }

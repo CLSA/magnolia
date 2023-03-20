@@ -51,9 +51,9 @@ class module extends \cenozo\service\module
             {
               if( 'chair' != $db_role->name ) $this->get_status()->set_code( 403 );
             }
-            else if( 'SMT' == $review_type || 'Second SMT' == $review_type )
+            else if( 'EC' == $review_type || 'Second EC' == $review_type )
             {
-              if( 'smt' != $db_role->name ) $this->get_status()->set_code( 403 );
+              if( 'ec' != $db_role->name ) $this->get_status()->set_code( 403 );
             }
           }
 

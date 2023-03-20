@@ -2051,12 +2051,12 @@ cenozoApp.defineModule({
                     operator: "LIKE",
                     value: "%DSAC%",
                   });
-                  // smt only see smt reqns from the home screen
-                } else if (this.isRole("smt")) {
+                  // EC only see EC reqns from the home screen
+                } else if (this.isRole("ec")) {
                   data.modifier.where.push({
                     column: "stage_type.name",
                     operator: "LIKE",
-                    value: "%SMT%",
+                    value: "%EC%",
                   });
                 }
               } else if (

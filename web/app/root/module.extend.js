@@ -48,7 +48,7 @@ cenozoApp.extendModule({
               };
             },
           });
-        } else if (["chair", "smt"].includes(CnSession.role.name)) {
+        } else if (["chair", "ec"].includes(CnSession.role.name)) {
           // show chairs the reqn list on their home page
           angular.extend($delegate[0], {
             compile: function () {
@@ -66,7 +66,7 @@ cenozoApp.extendModule({
               oldController($scope);
               $scope.reqnModel = CnReqnModelFactory.instance();
               $scope.reqnModel.listModel.heading =
-                ("chair" == CnSession.role.name ? "DSAC" : "SMT") +
+                ("chair" == CnSession.role.name ? "DSAC" : "EC") +
                 " " +
                 reqnModule.name.singular.ucWords() +
                 " List";

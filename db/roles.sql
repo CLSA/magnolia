@@ -11,6 +11,6 @@ INSERT IGNORE INTO cenozo.role( name, tier, all_sites ) VALUES
 ( "reviewer", 1, true ),
 ( "chair", 1, true ),
 ( "readonly", 1, true ),
-( "smt", 1, true );
+( "ec", 1, true );
 
 COMMIT;

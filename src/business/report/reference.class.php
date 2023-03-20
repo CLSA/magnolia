@@ -26,9 +26,9 @@ class reference extends \cenozo\business\report\base_report
     $coapplicant_class_name = lib::get_class_name( 'database\coapplicant' );
 
     // get various review types, recommendation type and stage type records
-    $db_second_smt_review_type = $review_type_class_name::get_unique_record( 'name', 'Second SMT' );
+    $db_second_ec_review_type = $review_type_class_name::get_unique_record( 'name', 'Second EC' );
     $db_second_chair_review_type = $review_type_class_name::get_unique_record( 'name', 'Second Chair' );
-    $db_smt_review_type = $review_type_class_name::get_unique_record( 'name', 'SMT' );
+    $db_ec_review_type = $review_type_class_name::get_unique_record( 'name', 'EC' );
     $db_chair_review_type = $review_type_class_name::get_unique_record( 'name', 'Chair' );
     $db_approved_recommendation_type = $recommendation_type_class_name::get_unique_record( 'name', 'Approved' );
     $db_not_approved_recommendation_type = $recommendation_type_class_name::get_unique_record( 'name', 'Not Approved' );
@@ -49,11 +49,11 @@ class reference extends \cenozo\business\report\base_report
     $modifier->left_join( 'user', 'reqn.trainee_user_id', 'trainee_user.id', 'trainee_user' );
     $modifier->order( 'reqn.identifier' );
 
-    // join to the second SMT review
+    // join to the second EC review
     $join_mod = lib::create( 'database\modifier' );
-    $join_mod->where( 'reqn.id', '=', 'second_smt_review.reqn_id', false );
-    $join_mod->where( 'second_smt_review.review_type_id', '=', $db_second_smt_review_type->id );
-    $modifier->join_modifier( 'review', $join_mod, 'left', 'second_smt_review' );
+    $join_mod->where( 'reqn.id', '=', 'second_ec_review.reqn_id', false );
+    $join_mod->where( 'second_ec_review.review_type_id', '=', $db_second_ec_review_type->id );
+    $modifier->join_modifier( 'review', $join_mod, 'left', 'second_ec_review' );
 
     // join to the second chair review
     $join_mod = lib::create( 'database\modifier' );
@@ -61,11 +61,11 @@ class reference extends \cenozo\business\report\base_report
     $join_mod->where( 'second_chair_review.review_type_id', '=', $db_second_chair_review_type->id );
     $modifier->join_modifier( 'review', $join_mod, 'left', 'second_chair_review' );
 
-    // join to the SMT review
+    // join to the EC review
     $join_mod = lib::create( 'database\modifier' );
-    $join_mod->where( 'reqn.id', '=', 'smt_review.reqn_id', false );
-    $join_mod->where( 'smt_review.review_type_id', '=', $db_smt_review_type->id );
-    $modifier->join_modifier( 'review', $join_mod, 'left', 'smt_review' );
+    $join_mod->where( 'reqn.id', '=', 'ec_review.reqn_id', false );
+    $join_mod->where( 'ec_review.review_type_id', '=', $db_ec_review_type->id );
+    $modifier->join_modifier( 'review', $join_mod, 'left', 'ec_review' );
 
     // join to the chair review
     $join_mod = lib::create( 'database\modifier' );
@@ -101,15 +101,15 @@ class reference extends \cenozo\business\report\base_report
     $join_mod = lib::create( 'database\modifier' );
     $join_mod->where(
       'IF( '.
-        // use the second smt review if it was done
-        'second_smt_review.id IS NOT NULL, second_smt_review.recommendation_type_id, '.
+        // use the second EC review if it was done
+        'second_ec_review.id IS NOT NULL, second_ec_review.recommendation_type_id, '.
         'IF( '.
           // if not then use the second chair review if it was done
           'second_chair_review.id IS NOT NULL, second_chair_review.recommendation_type_id, '.
           'IF( '.
-            // if not then use the first smt review if it was done, otherwise use the first char review
-            'smt_review.id IS NOT NULL, '.
-            'smt_review.recommendation_type_id, '.
+            // if not then use the first EC review if it was done, otherwise use the first char review
+            'ec_review.id IS NOT NULL, '.
+            'ec_review.recommendation_type_id, '.
             'chair_review.recommendation_type_id '.
           ') '.
         ') '.
