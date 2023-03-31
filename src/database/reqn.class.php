@@ -541,6 +541,7 @@ class reqn extends \cenozo\database\record
       return;
     }
 
+    $user_class_name = lib::get_class_name( 'database\user' );
     $notification_class_name = lib::get_class_name( 'database\notification' );
     $review_class_name = lib::get_class_name( 'database\review' );
     $stage_type_class_name = lib::get_class_name( 'database\stage_type' );
@@ -831,6 +832,41 @@ class reqn extends \cenozo\database\record
       $this->create_final_report();
 
       // do not send a notification since there is one already sent after leaving the Decision Made stage
+    }
+    // if we have just entered the Communications review stage then alert all communications users
+    else if( 'Communications Review' == $db_next_stage_type->name )
+    {
+      $db_notification_type = $notification_type_class_name::get_unique_record( 'name', 'Communication Review' );
+
+      // send a notification
+      $db_notification = lib::create( 'database\notification' );
+      $db_notification->reqn_id = $this->id;
+      $db_notification->notification_type_id = $db_notification_type->id;
+      $db_notification->datetime = util::get_datetime_object();
+      $db_notification->save();
+
+      $user_mod = lib::create( 'database\modifier' );
+      $user_mod->join( 'access', 'user.id', 'access.user_id' );
+      $user_mod->join( 'role', 'access.role_id', 'role.id' );
+      $user_mod->where( 'user.active', '=', true );
+      $user_mod->where( 'user.email', '!=', NULL );
+      $user_mod->where( 'role.name', '=', 'communication' );
+      foreach( $user_class_name::select_objects( $user_mod ) as $db_user )
+      {
+        // don't include if this is an admin (since they already get an admin email)
+        $access_mod = lib::create( 'database\modifier' );
+        $access_mod->join( 'role', 'access.role_id', 'role.id' );
+        $access_mod->where( 'role.name', '=', 'administrator' );
+        if( 0 == $db_user->get_access_count( $access_mod ) )
+        {
+          $db_notification->add_email(
+            $db_user->email,
+            sprintf( '%s %s', $db_user->first_name, $db_user->last_name )
+          );
+        }
+      }
+
+      $db_notification->mail();
     }
     else if( $incomplete || $withdrawn )
     {
@@ -1609,6 +1645,5 @@ class reqn extends \cenozo\database\record
     $modifier->or_where( 'coapplicant.role', 'RLIKE', $search );
 
     $modifier->where_bracket( false );
-    // \cenozo\database\database::$debug = true;
   }
 }
