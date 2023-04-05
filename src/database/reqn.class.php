@@ -525,6 +525,35 @@ class reqn extends \cenozo\database\record
   }
 
   /**
+   * Reverses the current stage, returning to the previous one
+   * @access public
+   */
+  public function reverse_to_last_stage()
+  {
+    // get the previous stage
+    $stage_mod = lib::create( 'database\modifier' );
+    $stage_mod->where( 'stage.datetime', '!=', NULL );
+    $stage_mod->order_desc( 'stage.datetime' );
+    $stage_mod->limit( 1 );
+    $stage_list = $this->get_stage_object_list( $stage_mod );
+    if( 0 == count( $stage_list ) )
+    {
+      throw lib::create( 'exception\runtime',
+        sprintf(
+          'Tried to reverse requisition %s to previous stage but no appropriate stage found.',
+          $this->identifier
+        ),
+        __METHOD__
+      );
+    }
+    $db_last_stage = current( $stage_list );
+
+    $this->get_current_stage()->delete();
+    $db_last_stage->datetime = NULL;
+    $db_last_stage->save();
+  }
+
+  /**
    * Proceeds to the reqn to the next stage
    * 
    * The next stage is based on the current stage as well as the reqn's reviews

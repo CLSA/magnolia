@@ -851,6 +851,17 @@ cenozoApp.defineModule({
     });
 
     module.addExtraOperation("view", {
+      title: "Reverse",
+      classes: "btn-warning",
+      isIncluded: function ($state, model) {
+        return model.viewModel.show("reverse");
+      },
+      operation: function ($state, model) {
+        model.viewModel.reverse();
+      },
+    });
+
+    module.addExtraOperation("view", {
       title: "Proceed",
       classes: "btn-success",
       isIncluded: function ($state, model) {
@@ -1638,6 +1649,25 @@ cenozoApp.defineModule({
                   [this.onView()]
                 )
               );
+            },
+
+            reverse: async function () {
+              var message =
+                "Are you sure you wish to reverse to the " +
+                this.parentModel.module.name.singular +
+                " to the previous stage?";
+              var response = await CnModalConfirmFactory.instance({
+                message: message,
+              }).show();
+
+              if (response) {
+                await CnHttpFactory.instance({
+                  path:
+                    this.parentModel.getServiceResourcePath() +
+                    "?action=reverse",
+                }).patch();
+                await this.reloadAll(["review", "stage", "notification"]);
+              }
             },
 
             proceed: async function (stageType) {

@@ -374,6 +374,8 @@ cenozo.service("CnReqnHelper", [
           return "administrator" == role && "complete" == phase;
         } else if ("report" == subject) {
           return "finalization" == phase || "Complete" == stageType;
+        } else if ("reverse" == subject) {
+          return "New" != phase && "administrator" == role;
         } else if ("proceed" == subject) {
           return (
             "complete" != phase &&

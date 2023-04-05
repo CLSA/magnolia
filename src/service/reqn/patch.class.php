@@ -162,6 +162,12 @@ class patch extends \cenozo\service\patch
           ) ) $code = 403;
         }
       }
+      else if( 'reverse' == $action )
+      {
+        if( !is_null( $db_reqn->state ) ||
+            'administrator' != $db_role->name ||
+            'new' == $phase ) $code = 403;
+      }
       else if( 'reject' == $action )
       {
         if( !is_null( $db_reqn->state ) ||
@@ -443,6 +449,11 @@ class patch extends \cenozo\service\patch
         else if( 'next_stage' == $action )
         {
           $db_reqn->proceed_to_next_stage( $this->get_argument( 'stage_type', NULL ) );
+        }
+        else if( 'reverse' == $action )
+        {
+          // reverse to the previous stage
+          $db_reqn->reverse_to_last_stage();
         }
         else if( 'reject' == $action )
         {
