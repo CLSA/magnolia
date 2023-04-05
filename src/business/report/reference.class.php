@@ -97,6 +97,13 @@ class reference extends \cenozo\business\report\base_report
     $join_mod->where( 'active_stage.stage_type_id', '=', $db_active_stage_type->id );
     $modifier->join_modifier( 'stage', $join_mod, 'left', 'active_stage' );
 
+    // join to the current stage
+    $join_mod = lib::create( 'database\modifier' );
+    $join_mod->where( 'reqn.id', '=', 'stage.reqn_id', false );
+    $join_mod->where( 'stage.datetime', '=', NULL );
+    $modifier->join_modifier( 'stage', $join_mod );
+    $modifier->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
+
     // join to the recommendation_type
     $join_mod = lib::create( 'database\modifier' );
     $join_mod->where(
@@ -169,6 +176,7 @@ class reference extends \cenozo\business\report\base_report
     $select->from( 'reqn' );
     $select->add_table_column( 'reqn_version', 'id', 'reqn_version_id' );
     $select->add_column( 'identifier', 'Identifier' );
+    $select->add_column( 'stage_type.name', 'Current Stage', false );
     $select->add_column( 'IFNULL( recommendation_type.name, "N/A" )', 'Approval', false );
     $select->add_column( 'IF( reqn.website, "Y", "N" )', 'Website', false );
     $select->add_column( 'reqn_type.name', 'Type', false );
