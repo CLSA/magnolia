@@ -164,9 +164,12 @@ class patch extends \cenozo\service\patch
       }
       else if( 'reverse' == $action )
       {
-        if( !is_null( $db_reqn->state ) ||
-            'administrator' != $db_role->name ||
-            'new' == $phase ) $code = 403;
+        if( 'administrator' != $db_role->name ) $code = 403;
+        else if(
+          !is_null( $db_reqn->state ) ||
+          'new' == $phase ||
+          ( '.' == $db_reqn_version->amendment && 'Admin Review' == $db_current_stage_type->name )
+        ) $code = 400;
       }
       else if( 'reject' == $action )
       {
