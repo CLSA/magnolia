@@ -48,7 +48,11 @@ class communications extends \cenozo\business\report\base_report
     $select->add_column( 'CONCAT_WS( " ", user.first_name, user.last_name )', 'Primary Applicant', false );
     $select->add_column( 'reqn_version.title', 'Title', false );
     $select->add_column( 'reqn_version.keywords', 'Keywords', false ); 
-    $select->add_column( 'GROUP_CONCAT( output_type.name_en ORDER BY output_type.name_en )', 'Outputs', false );
+    $select->add_column(
+      'GROUP_CONCAT( DISTINCT output_type.name_en ORDER BY output_type.name_en )',
+      'Outputs',
+      false
+    );
     $select->add_column( 'final_report.thesis_title', 'Thesis Title', false );
     $select->add_column( 'final_report.thesis_status', 'Thesis Status', false );
     $select->add_column( 'final_report.findings', 'Findings', false );
