@@ -382,12 +382,14 @@ cenozo.service("CnReqnHelper", [
             "administrator" == role // only admins can do this
           );
         } else if ("proceed" == subject) {
+          console.log( role, stageType, stageType.includes("Communication") );
           return (
             "complete" != phase &&
             "Report Required" != stageType && (
               ("administrator" == role && "new" != phase) ||
               ("chair" == role && stageType.includes("DSAC")) ||
-              ("ec" == role && stageType.includes("EC"))
+              ("ec" == role && stageType.includes("EC")) ||
+              ("communication" == role && stageType.includes("Communication"))
             ) && !this.showAction("amendment proceed", record)
           );
         } else if ("reject" == subject) {
