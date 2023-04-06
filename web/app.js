@@ -375,14 +375,17 @@ cenozo.service("CnReqnHelper", [
         } else if ("report" == subject) {
           return "finalization" == phase || "Complete" == stageType;
         } else if ("reverse" == subject) {
+          console.log( state, record.disable_notification, phase, record.amendment, stageType, role );
           return (
-            "" == state && // don't allow if deferred, inactive or abandoned
-            "New" != phase && // don't allow if new (there's no stage to reverse to)
+            (
+              "" == state || // don't allow if deferred, inactive or abandoned
+              ( "deferred" == state && record.disable_notification ) // unless deferred with no notifications
+            ) &&
+            "new" != phase && // don't allow if new (there's no stage to reverse to)
             !( "." != record.amendment && "Admin Review" == stageType ) && // use abandon for this instead
             "administrator" == role // only admins can do this
           );
         } else if ("proceed" == subject) {
-          console.log( role, stageType, stageType.includes("Communication") );
           return (
             "complete" != phase &&
             "Report Required" != stageType && (

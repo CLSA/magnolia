@@ -548,6 +548,13 @@ class reqn extends \cenozo\database\record
     }
     $db_last_stage = current( $stage_list );
 
+    // if deferred then we need to un-defer
+    if( 'deferred' == $this->state )
+    {
+      $this->state = NULL;
+      $this->save();
+    }
+
     $this->get_current_stage()->delete();
     $db_last_stage->datetime = NULL;
     $db_last_stage->save();
