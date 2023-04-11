@@ -101,8 +101,7 @@ BEGIN
 END$$
 
 DROP TRIGGER IF EXISTS reqn_version_AFTER_UPDATE$$
-CREATE = CURRENT_USER TRIGGER reqn_version_AFTER_UPDATE AFTER UPDATE ON reqn_version
-FOR EACH ROW
+CREATE DEFINER = CURRENT_USER TRIGGER reqn_version_AFTER_UPDATE AFTER UPDATE ON reqn_version FOR EACH ROW
 BEGIN
   IF NOT NEW.agreement_filename <=> OLD.agreement_filename THEN
     CALL update_reqn_last_reqn_version_with_agreement( NEW.reqn_id );
