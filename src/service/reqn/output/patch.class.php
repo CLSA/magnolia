@@ -19,8 +19,7 @@ class patch extends \cenozo\service\patch
 
     // when creating an output the file from an output source may be included
     $file = $this->get_argument( 'file', NULL );
-    $headers = apache_request_headers();
-    if( false !== strpos( $headers['Content-Type'], 'application/octet-stream' ) && !is_null( $file ) )
+    if( false !== strpos( util::get_header( 'Content-Type' ), 'application/octet-stream' ) && !is_null( $file ) )
     {
       if( !preg_match( '/filename[0-9]+/', $file ) )
         throw lib::create( 'exception\argument', 'file', $file, __METHOD__ );

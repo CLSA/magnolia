@@ -237,8 +237,7 @@ class patch extends \cenozo\service\patch
       );
     $db_reqn_version = $db_reqn->get_current_reqn_version();
     $file = $this->get_argument( 'file', NULL );
-    $headers = apache_request_headers();
-    if( false !== strpos( $headers['Content-Type'], 'application/octet-stream' ) && !is_null( $file ) )
+    if( false !== strpos( util::get_header( 'Content-Type' ), 'application/octet-stream' ) && !is_null( $file ) )
     {
       $filename = $db_reqn->get_filename( str_replace( '_filename', '', $file ) );
       if( false === file_put_contents( $filename, $this->get_file_as_raw() ) )
