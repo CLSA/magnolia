@@ -375,7 +375,6 @@ cenozo.service("CnReqnHelper", [
         } else if ("report" == subject) {
           return "finalization" == phase || "Complete" == stageType;
         } else if ("reverse" == subject) {
-          console.log( state, record.disable_notification, phase, record.amendment, stageType, role );
           return (
             (
               "" == state || // don't allow if deferred, inactive or abandoned
