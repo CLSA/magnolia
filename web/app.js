@@ -376,10 +376,8 @@ cenozo.service("CnReqnHelper", [
           return "finalization" == phase || "Complete" == stageType;
         } else if ("reverse" == subject) {
           return (
-            (
-              "" == state || // don't allow if deferred, inactive or abandoned
-              ( "deferred" == state && record.disable_notification ) // unless deferred with no notifications
-            ) &&
+            // don't allow if inactive or abandoned
+            !["inactive","abandoned"].includes(state) &&
             "new" != phase && // don't allow if new (there's no stage to reverse to)
             !( "." != record.amendment && "Admin Review" == stageType ) && // use abandon for this instead
             "administrator" == role // only admins can do this

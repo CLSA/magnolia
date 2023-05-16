@@ -555,7 +555,14 @@ class reqn extends \cenozo\database\record
       $this->save();
     }
 
-    $this->get_current_stage()->delete();
+    // if moving from report required to active then delete all final report records
+    $db_current_stage = $this->get_current_stage();
+    if( 'Report Required' == $db_current_stage->get_stage_type()->name )
+    {
+      foreach( $this->get_final_report_object_list() as $db_final_report ) $db_final_report->delete();
+    }
+
+    $db_current_stage->delete();
     $db_last_stage->datetime = NULL;
     $db_last_stage->save();
   }

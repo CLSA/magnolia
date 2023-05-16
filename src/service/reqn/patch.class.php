@@ -171,8 +171,8 @@ class patch extends \cenozo\service\patch
         // only admins are allowed to reverse a reqn
         if( 'administrator' != $db_role->name ) $code = 403;
         else if(
-          // don't allow if deferred, inactive or abandoned, unless deferred with no notifications
-          !( is_null( $db_reqn->state ) || ( "deferred" == $db_reqn->state && $db_reqn->disable_notification ) ) ||
+          // don't allow if inactive or abandoned
+          !in_array( $db_reqn->state, ['inactive', 'abandoned'] ) &&
           // don't allow if new (there's no stage to reverse to)
           'new' == $phase ||
           // use abandon for this instead

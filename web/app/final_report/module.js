@@ -519,15 +519,18 @@ cenozoApp.defineModule({
                         "" === record[property]
                       ) {
                         var element = cenozo.getFormElement(property);
-                        element.$error.required = true;
-                        cenozo.updateFormElement(element, true);
-                        if (null == errorTab) errorTab = tab;
-                        if (null == error)
-                          error = {
-                            title: this.translate("misc.missingFieldTitle"),
-                            message: this.translate("misc.missingFieldMessage"),
-                            error: true,
-                          };
+                        if (element) {
+                          element.$error.required = true;
+                          cenozo.updateFormElement(element, true);
+                          if (null == errorTab) errorTab = tab;
+                          if (null == error) {
+                            error = {
+                              title: this.translate("misc.missingFieldTitle"),
+                              message: this.translate("misc.missingFieldMessage"),
+                              error: true,
+                            };
+                          }
+                        }
                       }
                     });
                 }
