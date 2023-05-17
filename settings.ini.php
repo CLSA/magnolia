@@ -13,31 +13,13 @@ global $SETTINGS;
 $SETTINGS['general']['application_name'] = 'magnolia';
 $SETTINGS['general']['instance_name'] = $SETTINGS['general']['application_name'];
 $SETTINGS['general']['version'] = '2.9';
-$SETTINGS['general']['build'] = '9e44f2b';
+$SETTINGS['general']['build'] = 'b6e6c79';
 
 // the location of magnolia internal path
 $SETTINGS['path']['APPLICATION'] = str_replace( '/settings.ini.php', '', __FILE__ );
 
-// the location of data application forms (defaults to magnolia/doc/data_application)
-$SETTINGS['path']['DATA_APPLICATION'] = str_replace( 'settings.ini.php', 'doc/data_application', __FILE__ );
-
-// the location of data checklist forms (defaults to magnolia/doc/data_checklist)
-$SETTINGS['path']['DATA_CHECKLIST'] = str_replace( 'settings.ini.php', 'doc/data_checklist', __FILE__ );
-
-// the location of data application forms (defaults to magnolia/doc/data_application)
-$SETTINGS['path']['DATA_APPLICATION_AND_CHECKLIST'] = str_replace( 'settings.ini.php', 'doc/data_application_and_checklist', __FILE__ );
-
-// the location of data checklist forms (defaults to magnolia/doc/data_checklist)
-$SETTINGS['path']['DATA_OPTION_LIST'] = str_replace( 'settings.ini.php', 'doc/data_option_list', __FILE__ );
-
-// the location of data reviews forms (defaults to magnolia/doc/data_reviews)
-$SETTINGS['path']['DATA_REVIEWS'] = str_replace( 'settings.ini.php', 'doc/data_reviews', __FILE__ );
-
 // the location of coapplicant agreements (defaults to magnolia/doc/coapplicant_agreement)
 $SETTINGS['path']['COAPPLICANT_AGREEMENT'] = str_replace( 'settings.ini.php', 'doc/coapplicant_agreement', __FILE__ );
-
-// the location of coapplicant agreement templates (defaults to magnolia/doc/coapplicant_agreement_template)
-$SETTINGS['path']['COAPPLICANT_AGREEMENT_TEMPLATE'] = str_replace( 'settings.ini.php', 'doc/coapplicant_agreement_template', __FILE__ );
 
 // the location of proof of peer review (defaults to magnolia/doc/peer_review)
 $SETTINGS['path']['PEER_REVIEW'] = str_replace( 'settings.ini.php', 'doc/peer_review', __FILE__ );
@@ -62,9 +44,6 @@ $SETTINGS['path']['INSTRUCTION_FILE'] = str_replace( 'settings.ini.php', 'doc/da
 
 // the location of requisition output sources (defaults to magnolia/doc/output_source)
 $SETTINGS['path']['OUTPUT_SOURCE'] = str_replace( 'settings.ini.php', 'doc/output_source', __FILE__ );
-
-// the location of final report forms (defaults to magnolia/doc/final_report)
-$SETTINGS['path']['FINAL_REPORT'] = str_replace( 'settings.ini.php', 'doc/final_report', __FILE__ );
 
 // the location of PDF form templates (defaults to magnolia/doc/pdf_form)
 $SETTINGS['path']['PDF_FORM'] = str_replace( 'settings.ini.php', 'doc/pdf_form', __FILE__ );

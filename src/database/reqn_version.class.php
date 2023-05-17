@@ -238,12 +238,12 @@ class reqn_version extends \cenozo\database\record
   public function get_filename( $type )
   {
     $directory = '';
-    if( 'coapplicant_agreement' == $type ) $directory = COAPPLICANT_AGREEMENT_PATH;
+    if( 'agreement' == $type ) $directory = AGREEMENT_LETTER_PATH;
+    else if( 'coapplicant_agreement' == $type ) $directory = COAPPLICANT_AGREEMENT_PATH;
     else if( 'peer_review' == $type ) $directory = PEER_REVIEW_PATH;
     else if( 'funding' == $type ) $directory = FUNDING_LETTER_PATH;
     else if( 'ethics' == $type ) $directory = ETHICS_LETTER_PATH;
     else if( 'data_sharing' == $type ) $directory = DATA_SHARING_LETTER_PATH;
-    else if( 'agreement' == $type ) $directory = AGREEMENT_LETTER_PATH;
     else if( 'instruction' == $type ) $directory = INSTRUCTION_FILE_PATH;
     else throw lib::create( 'exception\argument', 'type', $type, __METHOD__ );
     return sprintf( '%s/%s', $directory, $this->id );
@@ -494,7 +494,7 @@ class reqn_version extends \cenozo\database\record
     $db_reqn = $this->get_reqn();
     $db_pdf_form_type = $pdf_form_type_class_name::get_unique_record( 'name', 'Co-Applicant Agreement' );
     $db_pdf_form = $db_pdf_form_type->get_active_pdf_form();
-    $agreement_filename = sprintf( '%s/%s.pdf', COAPPLICANT_AGREEMENT_TEMPLATE_PATH, $this->id );
+    $agreement_filename = sprintf( '%s/coapplicant_agreement_template_%s.pdf', TEMP_PATH, $this->id );
 
     // generate the agreement file
     $data = array(
@@ -601,7 +601,7 @@ class reqn_version extends \cenozo\database\record
 
     $db_pdf_form_type = $pdf_form_type_class_name::get_unique_record( 'name', 'Data Application' );
     $db_pdf_form = $db_pdf_form_type->get_active_pdf_form();
-    $application_filename = sprintf( '%s/%s.pdf', DATA_APPLICATION_PATH, $this->id );
+    $application_filename = sprintf( '%s/application_%s.pdf', TEMP_PATH, $this->id );
 
     if( !is_null( $this->applicant_position ) ) $data['applicant_position'] = $this->applicant_position;
     if( !is_null( $this->applicant_affiliation ) ) $data['applicant_affiliation'] = $this->applicant_affiliation;
@@ -704,7 +704,7 @@ class reqn_version extends \cenozo\database\record
 
     $db_pdf_form_type = $pdf_form_type_class_name::get_unique_record( 'name', 'Data Checklist' );
     $db_pdf_form = $db_pdf_form_type->get_active_pdf_form();
-    $checklist_filename = sprintf( '%s/%s.pdf', DATA_CHECKLIST_PATH, $this->id );
+    $checklist_filename = sprintf( '%s/checklist_%s.pdf', TEMP_PATH, $this->id );
 
     if( $this->comprehensive ) $data['comprehensive'] = 'Yes';
     if( $this->tracking ) $data['tracking'] = 'Yes';
@@ -787,7 +787,7 @@ class reqn_version extends \cenozo\database\record
     }
 
     // now generate the combined PDF form containing both application and checklist
-    $application_and_checklist_filename = sprintf( '%s/%s.pdf', DATA_APPLICATION_AND_CHECKLIST_PATH, $this->id );
+    $application_and_checklist_filename = sprintf( '%s/application_and_checklist_%s.pdf', TEMP_PATH, $this->id );
     $pdf_writer = lib::create( 'business\pdf_writer' );
     $pdf_writer->merge( array( $application_filename, $checklist_filename ) );
     if( !$pdf_writer->save( $application_and_checklist_filename ) )
@@ -916,7 +916,7 @@ class reqn_version extends \cenozo\database\record
       $output .= "\n";
     }
 
-    $filename = sprintf( '%s/%s.csv', DATA_OPTION_LIST_PATH, $this->id );
+    $filename = sprintf( '%s/data_option_list_%s.csv', TEMP_PATH, $this->id );
     $result = file_put_contents( $filename, $output );
     if( false === $result )
     {

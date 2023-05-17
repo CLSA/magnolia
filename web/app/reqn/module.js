@@ -1269,7 +1269,7 @@ cenozoApp.defineModule({
             },
             downloadDataOptions: async function () {
               await CnReqnHelper.download(
-                "data_options",
+                "data_option_list",
                 this.record.current_reqn_version_id
               );
             },

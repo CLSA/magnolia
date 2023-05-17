@@ -33,7 +33,7 @@ class get extends \cenozo\service\downloadable
    */
   protected function get_downloadable_file_path()
   {
-    return sprintf( '%s/%s.pdf', FINAL_REPORT_PATH, $this->get_leaf_record()->id );
+    return sprintf( '%s/final_report_%s.pdf', TEMP_PATH, $this->get_leaf_record()->id );
   }
 
   /**
@@ -45,5 +45,21 @@ class get extends \cenozo\service\downloadable
 
     // if requesting the final_report as a PDF file then create it first
     if( 'application/pdf' == $this->get_mime_type() ) $this->get_leaf_record()->generate_pdf_form();
+  }
+
+  /**
+   * Extend parent method
+   */
+  public function finish()
+  {
+    parent::finish();
+
+    // clean up by deleting temporary files
+    if( 'application/pdf' == $this->get_mime_type() )
+    {
+      $db_final_report = $this->get_leaf_record();
+      $filename = $this->get_downloadable_file_path();
+      if( file_exists( $filename ) ) unlink( $filename );
+    }
   }
 }

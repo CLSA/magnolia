@@ -41,9 +41,9 @@ class get extends \cenozo\service\downloadable
   {
     $file = $this->get_argument( 'file', NULL );
     $db_reqn = $this->get_leaf_record();
-    if( 'agreements' == $file ) return $db_reqn->get_filename( $file );
+    if( 'agreements' == $file ) return sprintf( '%s/agreements_%d.zip', TEMP_PATH, $db_reqn->id );
     else if( 'instruction_filename' == $file ) return $db_reqn->get_filename( 'instruction' );
-    else if( 'reviews' == $file ) return $db_reqn->get_filename( $file );
+    else if( 'reviews' == $file ) return sprintf( '%s/reviews_%d.txt', TEMP_PATH, $db_reqn->id );
 
     throw lib::create( 'exception\argument', 'file', $file, __METHOD__ );
   }
@@ -84,5 +84,31 @@ class get extends \cenozo\service\downloadable
       if( !is_null( $db_reqn ) && file_exists( $path ) ) $this->set_data( stat( $path )['size'] );
     }
     else parent::execute();
+  }
+
+  /**
+   * Extend parent method
+   */
+  public function finish()
+  {
+    parent::finish();
+
+    // clean up by deleting temporary files
+    $db_reqn = $this->get_leaf_record();
+    $file = $this->get_argument( 'file', NULL );
+    if( 'agreements' == $file )
+    {
+      $filename = sprintf( '%s/agreements_%d.zip', TEMP_PATH, $db_reqn->id );
+      if( file_exists( $filename ) ) unlink( $filename );
+    }
+    else if( 'reviews' == $file )
+    {
+      $filename = sprintf( '%s/reviews_%d.txt', TEMP_PATH, $db_reqn->id );
+      if( file_exists( $filename ) ) unlink( $filename );
+    }
+
+
+
+
   }
 }

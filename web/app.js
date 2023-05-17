@@ -507,7 +507,7 @@ cenozo.service("CnReqnHelper", [
           format:
             "final_report" == subject
               ? "pdf"
-              : "data_options" == subject
+              : "data_option_list" == subject
               ? "csv"
               : "unknown",
         };

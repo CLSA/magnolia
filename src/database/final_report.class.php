@@ -129,7 +129,7 @@ class final_report extends \cenozo\database\record
     }
 
     $pdf_writer->fill_form( $data );
-    $filename = sprintf( '%s/%s.pdf', FINAL_REPORT_PATH, $this->id );
+    $filename = sprintf( '%s/final_report_%s.pdf', TEMP_PATH, $this->id );
     if( !$pdf_writer->save( $filename ) )
     {
       throw lib::create( 'exception\runtime',

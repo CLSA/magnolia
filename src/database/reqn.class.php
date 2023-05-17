@@ -312,16 +312,14 @@ class reqn extends \cenozo\database\record
   /**
    * Returns the path to various files associated with the reqn
    * 
-   * @param string $type Should be 'agreement', 'instruction', or 'reviews'
+   * @param string $type Should be 'instruction'
    * @return string
    * @access public
    */
   public function get_filename( $type )
   {
     $directory = '';
-    if( 'agreements' == $type ) return sprintf( '%s/%s.zip', AGREEMENT_LETTER_PATH, $this->id );
-    else if( 'instruction' == $type ) $directory = INSTRUCTION_FILE_PATH;
-    else if( 'reviews' == $type ) return sprintf( '%s/%s.txt', DATA_REVIEWS_PATH, $this->id );
+    if( 'instruction' == $type ) $directory = INSTRUCTION_FILE_PATH;
     else throw lib::create( 'exception\argument', 'type', $type, __METHOD__ );
     return sprintf( '%s/%s', $directory, $this->id );
   }
@@ -1031,7 +1029,7 @@ class reqn extends \cenozo\database\record
    */
   public function generate_agreements_file()
   {
-    $zip_filename = $this->get_filename( 'agreements' );
+    $zip_filename = sprintf( '%s/agreements_%d.zip', TEMP_PATH, $this->id );
 
     $file_list = array();
     foreach( $this->get_reqn_version_object_list() as $db_reqn_version )
@@ -1135,7 +1133,7 @@ class reqn extends \cenozo\database\record
     // convert for Windows
     $text = util::convert_charset( str_replace( "\n", "\r\n", $text ) );
 
-    $filename = sprintf( '%s/%s.txt', DATA_REVIEWS_PATH, $this->id );
+    $filename = sprintf( '%s/reviews_%d.txt', TEMP_PATH, $this->id );
     if( false === file_put_contents( $filename, $text, LOCK_EX ) )
     {
       throw lib::create( 'exception\runtime',
