@@ -106,9 +106,5 @@ class get extends \cenozo\service\downloadable
       $filename = sprintf( '%s/reviews_%d.txt', TEMP_PATH, $db_reqn->id );
       if( file_exists( $filename ) ) unlink( $filename );
     }
-
-
-
-
   }
 }
