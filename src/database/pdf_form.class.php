@@ -12,7 +12,7 @@ use cenozo\lib, cenozo\log, magnolia\util;
 /**
  * pdf_form: record
  */
-class pdf_form extends \cenozo\database\record
+class pdf_form extends \cenozo\database\has_data
 {
   /**
    * Override parent method
@@ -32,23 +32,25 @@ class pdf_form extends \cenozo\database\record
   }
 
   /**
-   * Override the parent method
-   */
-  public function delete()
-  {
-    $file = is_null( $this->filename ) ? NULL : $this->get_filename();
-    parent::delete();
-    if( !is_null( $file ) && file_exists( $file ) ) unlink( $file );
-  }
-
-  /**
-   * Returns the path to the publication's file
+   * Writes the filled template file to disk, returning any errors.
    * 
-   * @return string
-   * @access public
+   * @param array $data An array of key=>value pairs to fill into the PDF form
+   * @param string $filename Where to write the filled-out PDF file
+   * @return string Any errors encountered while writing the PDF (NULL if there are none)
    */
-  public function get_filename()
+  public function fill_and_write_form( $data, $filename )
   {
-    return sprintf( '%s/%s.pdf', PDF_FORM_PATH, $this->id );
+    // temporarily write the pdf template to disk
+    $this->create_data_file();
+
+    $pdf_writer = lib::create( 'business\pdf_writer' );
+    $pdf_writer->set_template( $this->get_data_filename() );
+    $pdf_writer->fill_form( $data );
+    $success = $pdf_writer->save( $filename );
+
+    // delete the temporary pdf template file
+    $this->delete_data_file();
+
+    return $success ? NULL : $pdf_writer->get_error();
   }
 }

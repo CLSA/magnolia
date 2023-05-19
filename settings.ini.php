@@ -13,7 +13,7 @@ global $SETTINGS;
 $SETTINGS['general']['application_name'] = 'magnolia';
 $SETTINGS['general']['instance_name'] = $SETTINGS['general']['application_name'];
 $SETTINGS['general']['version'] = '2.9';
-$SETTINGS['general']['build'] = 'b6e6c79';
+$SETTINGS['general']['build'] = '08b7ee2';
 
 // the location of magnolia internal path
 $SETTINGS['path']['APPLICATION'] = str_replace( '/settings.ini.php', '', __FILE__ );
@@ -44,12 +44,6 @@ $SETTINGS['path']['INSTRUCTION_FILE'] = str_replace( 'settings.ini.php', 'doc/da
 
 // the location of requisition output sources (defaults to magnolia/doc/output_source)
 $SETTINGS['path']['OUTPUT_SOURCE'] = str_replace( 'settings.ini.php', 'doc/output_source', __FILE__ );
-
-// the location of PDF form templates (defaults to magnolia/doc/pdf_form)
-$SETTINGS['path']['PDF_FORM'] = str_replace( 'settings.ini.php', 'doc/pdf_form', __FILE__ );
-
-// the location of data agreement files (defaults to magnolia/doc/data_agreement)
-$SETTINGS['path']['DATA_AGREEMENT_FORM'] = str_replace( 'settings.ini.php', 'doc/data_agreement', __FILE__ );
 
 // the location of supplemental files (defaults to magnolia/doc/supplemental)
 $SETTINGS['path']['SUPPLEMENTAL_FILE'] = str_replace( 'settings.ini.php', 'doc/supplemental', __FILE__ );

@@ -50,5 +50,17 @@ class module extends \cenozo\service\module
         'data_agreement_join_reqn.data_agreement_id' );
       $select->add_column( 'IFNULL( reqn_count, 0 )', 'reqn_count', false );
     }
+
+    $db_data_agreement = $this->get_resource();
+    if( !is_null( $db_data_agreement ) )
+    {
+      if( $select->has_column( 'filename' ) )
+      {
+        $select->add_constant(
+          basename( $db_data_agreement->get_data_filename() ),
+          'filename'
+        );
+      }
+    }
   }
 }

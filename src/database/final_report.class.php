@@ -64,9 +64,6 @@ class final_report extends \cenozo\database\record
       throw lib::create( 'exception\runtime',
         'Cannot generate PDF form since there is no active Final Report PDF form.', __METHOD__ );
 
-    $pdf_writer = lib::create( 'business\pdf_writer' );
-    $pdf_writer->set_template( sprintf( '%s/%d.pdf', PDF_FORM_PATH, $db_pdf_form->id ) );
-
     $db_reqn = $this->get_reqn();
     $db_user = $db_reqn->get_user();
     $db_trainee_user = $db_reqn->get_trainee_user();
@@ -128,16 +125,16 @@ class final_report extends \cenozo\database\record
       $last_output_type_id = $output['output_type_id'];
     }
 
-    $pdf_writer->fill_form( $data );
     $filename = sprintf( '%s/final_report_%s.pdf', TEMP_PATH, $this->id );
-    if( !$pdf_writer->save( $filename ) )
+    $error = $db_pdf_form->fill_and_write_form( $data, $filename );
+    if( $error )
     {
       throw lib::create( 'exception\runtime',
         sprintf(
           'Failed to generate PDF form "%s" for requisition %s%s',
           $filename,
           $this->identifier,
-          "\n".$pdf_writer->get_error()
+          "\n".$error
         ),
         __METHOD__
       );

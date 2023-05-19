@@ -115,13 +115,6 @@ class get extends \cenozo\service\downloadable
       ];
       if( in_array( $file, $temp_file_list ) )
       {
-        log::debug( sprintf(
-          '%s/%s_%d.%s',
-          TEMP_PATH,
-          $file,
-          $db_reqn_version->id,
-          'data_option_list' == $file ? 'csv' : 'pdf'
-        ) );
         return sprintf(
           '%s/%s_%d.%s',
           TEMP_PATH,

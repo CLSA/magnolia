@@ -3,6 +3,8 @@
 SET AUTOCOMMIT=0;
 
 SOURCE reqn_current_final_report.sql
+SOURCE pdf_form.sql
+SOURCE data_agreement.sql
 
 SOURCE update_version_number.sql
 

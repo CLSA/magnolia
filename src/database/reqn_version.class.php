@@ -555,17 +555,15 @@ class reqn_version extends \cenozo\database\record
       throw lib::create( 'exception\runtime',
         'Cannot generate PDF coapplicant agreement template since there is no active PDF template.', __METHOD__ );
 
-    $pdf_writer = lib::create( 'business\pdf_writer' );
-    $pdf_writer->set_template( sprintf( '%s/%d.pdf', PDF_FORM_PATH, $db_pdf_form->id ) );
-    $pdf_writer->fill_form( $data );
-    if( !$pdf_writer->save( $agreement_filename ) )
+    $error = $db_pdf_form->fill_and_write_form( $data, $agreement_filename );
+    if( $error )
     {
       throw lib::create( 'exception\runtime',
         sprintf(
           'Failed to generate PDF form "%s" for requisition %s%s',
           $agreement_filename,
           $db_reqn->identifier,
-          "\n".$pdf_writer->get_error()
+          "\n".$error
         ),
         __METHOD__
       );
@@ -674,17 +672,15 @@ class reqn_version extends \cenozo\database\record
       throw lib::create( 'exception\runtime',
         'Cannot generate PDF application form since there is no active PDF template.', __METHOD__ );
 
-    $pdf_writer = lib::create( 'business\pdf_writer' );
-    $pdf_writer->set_template( sprintf( '%s/%d.pdf', PDF_FORM_PATH, $db_pdf_form->id ) );
-    $pdf_writer->fill_form( $data );
-    if( !$pdf_writer->save( $application_filename ) )
+    $error = $db_pdf_form->fill_and_write_form( $data, $application_filename );
+    if( $error )
     {
       throw lib::create( 'exception\runtime',
         sprintf(
           'Failed to generate PDF form "%s" for requisition %s%s',
           $application_filename,
           $db_reqn->identifier,
-          "\n".$pdf_writer->get_error()
+          "\n".$error
         ),
         __METHOD__
       );
@@ -770,17 +766,15 @@ class reqn_version extends \cenozo\database\record
       throw lib::create( 'exception\runtime',
         'Cannot generate PDF checklist form since there is no active PDF template.', __METHOD__ );
 
-    $pdf_writer = lib::create( 'business\pdf_writer' );
-    $pdf_writer->set_template( sprintf( '%s/%d.pdf', PDF_FORM_PATH, $db_pdf_form->id ) );
-    $pdf_writer->fill_form( $data );
-    if( !$pdf_writer->save( $checklist_filename ) )
+    $error = $db_pdf_form->fill_and_write_form( $data, $checklist_filename );
+    if( $error )
     {
       throw lib::create( 'exception\runtime',
         sprintf(
           'Failed to generate PDF form "%s" for requisition %s%s',
           $checklist_filename,
           $db_reqn->identifier,
-          "\n".$pdf_writer->get_error()
+          "\n".$error
         ),
         __METHOD__
       );
