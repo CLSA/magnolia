@@ -99,6 +99,7 @@ cenozoApp.defineModule({
       identifier: { column: "reqn.identifier", type: "string" },
       legacy: { column: "reqn.legacy", type: "string" },
       show_prices: { column: "reqn.show_prices", type: "string" },
+      override_price: { column: "reqn.override_price", type: "integer" },
       state: { column: "reqn.state", type: "string" },
       data_directory: { column: "reqn.data_directory", type: "string" },
       data_expiry_date: { column: "reqn.data_expiry_date", type: "date" },
@@ -1032,67 +1033,76 @@ cenozoApp.defineModule({
               // only calculate the cost if we have to
               if (!this.record.show_prices) return null;
 
-              // determine the base cost based on country (assume the base country if none is provided)
-              var baseCountryId = CnSession.application.baseCountryId;
-              var applicantCountryId =
-                null == this.record.applicant_country_id
-                  ? baseCountryId
-                  : this.record.applicant_country_id;
-              var traineeCountryId =
-                null == this.record.trainee_country_id
-                  ? baseCountryId
-                  : this.record.trainee_country_id;
-              var cost = 3000;
-
-              // cost for trainees is different to applicants
-              if (this.record.trainee_user_id) {
-                if (
-                  baseCountryId != traineeCountryId ||
-                  baseCountryId != applicantCountryId
-                ) {
-                  // if either the trainee or applicant isn't Canadian then the base fee is 5000
-                  cost = 5000;
-                } else if (
-                  baseCountryId == traineeCountryId &&
-                  baseCountryId == applicantCountryId &&
-                  this.record.waiver &&
-                  "none" != this.record.waiver
-                ) {
-                  // if both are canadian and there is a fee waiver means the base cost is 0
-                  cost = 0;
-                }
+              let cost = 3000;
+              if (null != this.record.override_price) {
+                cost = this.record.override_price;
               } else {
-                // if the applicant is not Canadian then the base fee is 5000
-                if (baseCountryId != applicantCountryId) cost = 5000;
+                // determine the base cost based on country (assume the base country if none is provided)
+                var baseCountryId = CnSession.application.baseCountryId;
+                var applicantCountryId =
+                  null == this.record.applicant_country_id
+                    ? baseCountryId
+                    : this.record.applicant_country_id;
+                var traineeCountryId =
+                  null == this.record.trainee_country_id
+                    ? baseCountryId
+                    : this.record.trainee_country_id;
+
+                // cost for trainees is different to applicants
+                if (this.record.trainee_user_id) {
+                  if (
+                    baseCountryId != traineeCountryId ||
+                    baseCountryId != applicantCountryId
+                  ) {
+                    // if either the trainee or applicant isn't Canadian then the base fee is 5000
+                    cost = 5000;
+                  } else if (
+                    baseCountryId == traineeCountryId &&
+                    baseCountryId == applicantCountryId &&
+                    this.record.waiver &&
+                    "none" != this.record.waiver
+                  ) {
+                    // if both are canadian and there is a fee waiver means the base cost is 0
+                    cost = 0;
+                  }
+                } else {
+                  // if the applicant is not Canadian then the base fee is 5000
+                  if (baseCountryId != applicantCountryId) cost = 5000;
+                }
+
+                this.parentModel.categoryList.forEach((category) =>
+                  category.optionList.forEach((option) => {
+                    var maxCost = 0;
+                    option.selectionList
+                      .filter((selection) => 0 < selection.cost.value)
+                      .forEach((selection) => {
+                        if (
+                          angular.isArray(this.record.selectionList) &&
+                          this.record.selectionList[selection.id]
+                        ) {
+                          if (selection.costCombined) {
+                            // track the most expensive selection
+                            if (selection.cost.value > maxCost)
+                              maxCost = selection.cost.value;
+                          } else {
+                            // add the selection's cost
+                            cost += selection.cost.value;
+                          }
+                        }
+                      });
+
+                    // when there is a combined cost then maxCost will be > 0, otherwise it is 0
+                    cost += maxCost;
+                  })
+                );
               }
 
-              this.parentModel.categoryList.forEach((category) =>
-                category.optionList.forEach((option) => {
-                  var maxCost = 0;
-                  option.selectionList
-                    .filter((selection) => 0 < selection.cost.value)
-                    .forEach((selection) => {
-                      if (
-                        angular.isArray(this.record.selectionList) &&
-                        this.record.selectionList[selection.id]
-                      ) {
-                        if (selection.costCombined) {
-                          // track the most expensive selection
-                          if (selection.cost.value > maxCost)
-                            maxCost = selection.cost.value;
-                        } else {
-                          // add the selection's cost
-                          cost += selection.cost.value;
-                        }
-                      }
-                    });
-
-                  // when there is a combined cost then maxCost will be > 0, otherwise it is 0
-                  cost += maxCost;
-                })
-              );
-
-              return "en" == this.record.lang ? "$" + cost : cost + " $";
+              // add thousands separators
+              let sep = "fr" == this.record.lang ? ' ' : ',';
+              cost = cost.toString();
+              if (1000000 <= cost) cost = cost.replace( /([0-9]+)([0-9]{3})([0-9]{3})$/, "$1"+sep+"$2"+sep+"$3" );
+              else if (1000 <= cost) cost = cost.replace( /([0-9]+)([0-9]{3})$/, "$1"+sep+"$2" );
+              return "fr" == this.record.lang ? cost + " $" : "$" + cost;
             },
 
             isWaiverMutable: function () {
@@ -2291,9 +2301,9 @@ cenozoApp.defineModule({
                       if ("waiver" == property) {
                         // only check the waiver if a waiver is allowed
                         return this.isWaiverAllowed();
-                      } else if ("application_country_id" == property) {
-                        // only check the country if show_prices is on
-                        return this.record.show_prices;
+                      } else if ("applicant_country_id" == property) {
+                        // only check the country if show_prices is on and override price is off
+                        return this.record.show_prices && null == this.record.override_price;
                       } else {
                         return true;
                       }

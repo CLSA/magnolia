@@ -107,7 +107,7 @@ class requisition extends \cenozo\business\report\base_report
       if( 'N/A' != $row['Cost'] )
       {
         $db_reqn = $reqn_class_name::get_unique_record( 'identifier', $row['Identifier'] );
-        $row['Cost'] = sprintf( '$%d', $db_reqn->get_current_reqn_version()->calculate_cost() );
+        $row['Cost'] = $db_reqn->get_current_reqn_version()->calculate_cost();
       }
 
       $rows[] = array_values( $row );

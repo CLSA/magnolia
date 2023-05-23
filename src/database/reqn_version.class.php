@@ -427,62 +427,78 @@ class reqn_version extends \cenozo\database\record
     $base_country_id = lib::create( 'business\session' )->get_application()->country_id;
     $applicant_country_id = is_null( $this->applicant_country_id ) ? $base_country_id : $this->applicant_country_id;
     $trainee_country_id = is_null( $this->trainee_country_id ) ? $base_country_id : $this->trainee_country_id;
-    $cost = 3000;
 
     // only calculate the cost if we have to
     if( !$db_reqn->show_prices ) return NULL;
-
-    // cost for trainees is different to applicants
-    if( $db_reqn->trainee_user_id ) {
-      if( $base_country_id != $trainee_country_id || $base_country_id != $applicant_country_id ) {
-        // if either the trainee or applicant isn't Canadian then the base fee is 5000
-        $cost = 5000;
-      } else if( $base_country_id == $trainee_country_id &&
-                 $base_country_id == $applicant_country_id &&
-                 !is_null( $this->waiver ) &&
-                 'none' != $this->waiver ) {
-        // if both are canadian and there is a fee waiver means the base cost is 0
-        $cost = 0;
-      }
-    } else {
-      // if the applicant is not Canadian then the base fee is 5000
-      if( $base_country_id != $applicant_country_id ) $cost = 5000;
-    }
-
-    $selection_sel = lib::create( 'database\select' );
-    $selection_sel->add_column( 'data_option_id' );
-    $selection_sel->add_column( 'cost' );
-    $selection_sel->add_column( 'cost_combined' );
-    $selection_mod = lib::create( 'database\modifier' );
-    $selection_mod->join( 'data_option', 'data_selection.data_option_id', 'data_option.id' );
-    $selection_mod->join( 'data_category', 'data_option.data_category_id', 'data_category.id' );
-    $selection_mod->where( 'data_selection.cost', '>', 0 );
-    $selection_mod->order( 'data_category.rank' );
-    $selection_mod->order( 'data_option.rank' );
-    $current_data_option_id = NULL;
-    $max_cost = 0;
-    foreach( $this->get_data_selection_list( $selection_sel, $selection_mod ) as $selection )
+    
+    $cost = 3000;
+    if( !is_null( $db_reqn->override_price ) )
     {
-      if( $selection['data_option_id'] != $current_data_option_id )
-      {
-        // store the most expensive selection (if there is one)
-        if( 0 < $max_cost ) $cost += $max_cost;
-        $max_cost = 0;
+      $cost =$db_reqn->override_price;
+    }
+    else
+    {
+      // cost for trainees is different to applicants
+      if( $db_reqn->trainee_user_id ) {
+        if( $base_country_id != $trainee_country_id || $base_country_id != $applicant_country_id ) {
+          // if either the trainee or applicant isn't Canadian then the base fee is 5000
+          $cost = 5000;
+        } else if( $base_country_id == $trainee_country_id &&
+                   $base_country_id == $applicant_country_id &&
+                   !is_null( $this->waiver ) &&
+                   'none' != $this->waiver ) {
+          // if both are canadian and there is a fee waiver means the base cost is 0
+          $cost = 0;
+        }
+      } else {
+        // if the applicant is not Canadian then the base fee is 5000
+        if( $base_country_id != $applicant_country_id ) $cost = 5000;
       }
 
-      if( $selection['cost_combined'] )
+      $selection_sel = lib::create( 'database\select' );
+      $selection_sel->add_column( 'data_option_id' );
+      $selection_sel->add_column( 'cost' );
+      $selection_sel->add_column( 'cost_combined' );
+      $selection_mod = lib::create( 'database\modifier' );
+      $selection_mod->join( 'data_option', 'data_selection.data_option_id', 'data_option.id' );
+      $selection_mod->join( 'data_category', 'data_option.data_category_id', 'data_category.id' );
+      $selection_mod->where( 'data_selection.cost', '>', 0 );
+      $selection_mod->order( 'data_category.rank' );
+      $selection_mod->order( 'data_option.rank' );
+      $current_data_option_id = NULL;
+      $max_cost = 0;
+      foreach( $this->get_data_selection_list( $selection_sel, $selection_mod ) as $selection )
       {
-        // track the most expensive selection
-        if( $max_cost < $selection['cost'] ) $max_cost = $selection['cost'];
-      }
-      else $cost += $selection['cost'];
+        if( $selection['data_option_id'] != $current_data_option_id )
+        {
+          // store the most expensive selection (if there is one)
+          if( 0 < $max_cost ) $cost += $max_cost;
+          $max_cost = 0;
+        }
 
-      $current_data_option_id = $selection['data_option_id'];
+        if( $selection['cost_combined'] )
+        {
+          // track the most expensive selection
+          if( $max_cost < $selection['cost'] ) $max_cost = $selection['cost'];
+        }
+        else $cost += $selection['cost'];
+
+        $current_data_option_id = $selection['data_option_id'];
+      }
+
+      if( 0 < $max_cost ) $cost += $max_cost;
     }
 
-    if( 0 < $max_cost ) $cost += $max_cost;
-
-    return $cost;
+    $db_language = $db_reqn->get_language();
+    return sprintf(
+      'fr' == $db_language->code ? '%s $' : '$%s',
+      number_format(
+        $cost,
+        0,
+        'fr' == $db_language->code ? ',' : '.',
+        'fr' == $db_language->code ? ' ' : ','
+      )
+    );
   }
 
   /**
@@ -592,7 +608,7 @@ class reqn_version extends \cenozo\database\record
       'dateofapproval' => is_null( $date_of_approval ) ? 'None' : $date_of_approval->format( 'Y-m-d' ),
       'cost' => is_null( $cost )
         ? ( 'fr' == $db_language->code ? '(non calculé)' : '(not calculated)' )
-        : sprintf( 'fr' == $db_language->code ? '%s $' : '$%s', $cost )
+        : $cost
     );
     $data['applicant_name'] = sprintf( '%s %s', $db_user->first_name, $db_user->last_name );
     if( !is_null( $this->title ) ) $data['title'] = $this->title;
@@ -693,7 +709,7 @@ class reqn_version extends \cenozo\database\record
       'dateofapproval' => is_null( $date_of_approval ) ? 'None' : $date_of_approval->format( 'Y-m-d' ),
       'cost' => is_null( $cost )
         ? ( 'fr' == $db_language->code ? '(non calculé)' : '(not calculated)' )
-        : sprintf( 'fr' == $db_language->code ? '%s $' : '$%s', $cost )
+        : $cost
     );
     $data['applicant_name'] = sprintf( '%s %s', $db_user->first_name, $db_user->last_name );
     if( !is_null( $this->title ) ) $data['title'] = $this->title;
