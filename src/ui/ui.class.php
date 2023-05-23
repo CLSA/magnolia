@@ -131,6 +131,10 @@ class ui extends \cenozo\ui\ui
       $module->add_child( 'reqn', 'access' );
       $module->add_child( 'applicant', 'access' );
     }
+
+    // remove viewing a study phase, there's no need
+    $module = $this->get_module( 'study_phase' );
+    if( $module->has_action( 'view' ) ) $module->remove_action( 'view' );
   }
 
   /**
