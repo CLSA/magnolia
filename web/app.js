@@ -624,7 +624,10 @@ cenozo.service("CnReqnHelper", [
               },
               applicant_name: { en: "Name", fr: "Nom" },
               applicant_position: { en: "Position", fr: "Poste" },
-              applicant_affiliation: { en: "Institution", fr: "Établissement" },
+              applicant_affiliation: {
+                en: "Institution (department, research institute or hospital)",
+                fr: "TODO: translate",
+              },
               applicant_country_id: {
                 en: "Institution Country",
                 fr: "Pays de l’établissement",
