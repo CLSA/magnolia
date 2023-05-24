@@ -134,7 +134,7 @@ class ui extends \cenozo\ui\ui
 
     // remove viewing a study phase, there's no need
     $module = $this->get_module( 'study_phase' );
-    if( $module->has_action( 'view' ) ) $module->remove_action( 'view' );
+    if( !is_null( $module ) && $module->has_action( 'view' ) ) $module->remove_action( 'view' );
   }
 
   /**
