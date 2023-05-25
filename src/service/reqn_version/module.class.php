@@ -182,6 +182,20 @@ class module extends \cenozo\service\module
 
       if( $select->has_column( 'has_changed' ) )
         $select->add_constant( $db_reqn_version->has_changed(), 'has_changed', 'boolean' );
+
+      if( $select->has_column( 'additional_fee_total' ) )
+      {
+        $fee_sel = lib::create( 'database\select' );
+        $fee_sel->add_column( 'SUM( cost )', 'fee_total', false );
+        $fee_mod = lib::create( 'database\modifier' );
+        $fee_mod->group( 'reqn.id' );
+        $row = current( $db_reqn_version->get_reqn()->get_additional_fee_list( $fee_sel, $fee_mod ) );
+        $select->add_constant(
+          $row ? $row['fee_total'] : 0,
+          'additional_fee_total',
+          'integer'
+        );
+      }
     }
   }
 }

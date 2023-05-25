@@ -494,6 +494,11 @@ class reqn_version extends \cenozo\database\record
 
       if( 0 < $max_cost ) $cost += $max_cost;
 
+      // now add any additional fees
+      $fee_sel = lib::create( 'database\select' );
+      $fee_sel->add_column( 'cost' );
+      foreach( $db_reqn->get_additional_fee_list( $fee_sel ) as $fee ) $cost += $fee['cost'];
+
       // now add amendment costs (including all past amendments)
       $reqn_version_sel = lib::create( 'database\select' );
       $reqn_version_sel->add_column( 'amendment' );

@@ -111,6 +111,7 @@ cenozoApp.defineModule({
       phase: { column: "stage_type.phase", type: "string" },
       lang: { column: "language.code", type: "string" },
       deadline: { column: "deadline.datetime", type: "datetime" },
+      additional_fee_total: { type: "integer" },
       deferral_note_amendment: {
         column: "reqn.deferral_note_amendment",
         type: "text",
@@ -1101,6 +1102,9 @@ cenozoApp.defineModule({
                     cost += maxCost;
                   })
                 );
+
+                // now add any additional fees
+                cost += this.record.additional_fee_total;
 
                 // now add amendment costs (including all past amendments)
                 if(!this.versionListLoaded || angular.isUndefined(this.parentModel.amendmentTypeList)) {

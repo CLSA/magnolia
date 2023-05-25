@@ -59,6 +59,7 @@ class ui extends \cenozo\ui\ui
       $module->add_child( 'ethics_approval' );
       $module->add_child( 'notification' );
       $module->add_child( 'output' );
+      $module->add_choose( 'additional_fee' );
       $module->append_action_query( 'list', '?{search}' );
     }
 
@@ -132,6 +133,12 @@ class ui extends \cenozo\ui\ui
       $module->add_child( 'applicant', 'access' );
     }
 
+    $module = $this->get_module( "additional_fee" );
+    if( !is_null( $module ) )
+    {
+      $module->add_choose( 'reqn' );
+    }
+
     // remove viewing a study phase, there's no need
     $module = $this->get_module( 'study_phase' );
     if( !is_null( $module ) && $module->has_action( 'view' ) ) $module->remove_action( 'view' );
@@ -148,6 +155,7 @@ class ui extends \cenozo\ui\ui
 
     if( 'typist' != $db_role->name )
     {
+      $this->add_listitem( 'Additional Fee', 'additional_fee' );
       $this->add_listitem( 'Amendment Types', 'amendment_type' );
       $this->add_listitem( 'Master Data Agreements', 'data_agreement' );
       $this->add_listitem( 'Data Versions', 'data_version' );

@@ -350,6 +350,8 @@ class module extends \cenozo\service\module
     $reqn_type_class_name = lib::get_class_name( 'database\reqn_type' );
     $language_class_name = lib::get_class_name( 'database\language' );
 
+    if( is_null( $record ) ) return;
+
     // if no type has been selected then assume standard
     if( is_null( $record->reqn_type_id ) )
     {
