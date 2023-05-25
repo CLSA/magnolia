@@ -1104,7 +1104,7 @@ cenozoApp.defineModule({
 
                 // now add amendment costs (including all past amendments)
                 if(!this.versionListLoaded || angular.isUndefined(this.parentModel.amendmentTypeList)) {
-                  return "Calculating...";
+                  return this.translate("misc.calculating") + "...";
                 } else {
                   var currentAmendment = null;
                   this.versionList.forEach(version => {

@@ -970,6 +970,7 @@ cenozo.service("CnReqnHelper", [
             choose: { en: "(choose)", fr: "(choisir)" },
             exempt: { en: "exempt", fr: "exempt(e)" },
             requested: { en: "requested", fr: "demandé" },
+            calculating: { en: "Calculating", fr: "TODO: translate" },
             prevButton: {
               en: "Return to the previous section",
               fr: "Retourner à la section précédente",
