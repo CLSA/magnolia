@@ -272,7 +272,7 @@ class reqn_version extends \cenozo\database\record
     return parent::get_record_from_identifier( $identifier );
   }
 
-  /** 
+  /**
    * Determines whether or not this reqn version has selected any Linked Data options
    * @return boolean
    */
@@ -345,7 +345,7 @@ class reqn_version extends \cenozo\database\record
   {
     if( is_null( $db_language ) ) $db_language = $this->get_reqn()->get_language();
     $lang = $db_language->code;
-    
+
     // create the query necessary to find the highest ranking version of all amendments
     $version_sel = lib::create( 'database\select' );
     $version_sel->from( 'reqn_version', 'latest_reqn_version' );
@@ -430,7 +430,7 @@ class reqn_version extends \cenozo\database\record
 
     // only calculate the cost if we have to
     if( !$db_reqn->show_prices ) return NULL;
-    
+
     $cost = 3000;
     if( !is_null( $db_reqn->override_price ) )
     {
@@ -439,10 +439,12 @@ class reqn_version extends \cenozo\database\record
     else
     {
       // cost for trainees is different to applicants
+      $international = false;
       if( $db_reqn->trainee_user_id ) {
         if( $base_country_id != $trainee_country_id || $base_country_id != $applicant_country_id ) {
           // if either the trainee or applicant isn't Canadian then the base fee is 5000
           $cost = 5000;
+          $international = true;
         } else if( $base_country_id == $trainee_country_id &&
                    $base_country_id == $applicant_country_id &&
                    !is_null( $this->waiver ) &&
@@ -452,7 +454,11 @@ class reqn_version extends \cenozo\database\record
         }
       } else {
         // if the applicant is not Canadian then the base fee is 5000
-        if( $base_country_id != $applicant_country_id ) $cost = 5000;
+        if( $base_country_id != $applicant_country_id )
+        {
+          $cost = 5000;
+          $international = true;
+        }
       }
 
       $selection_sel = lib::create( 'database\select' );
@@ -487,6 +493,47 @@ class reqn_version extends \cenozo\database\record
       }
 
       if( 0 < $max_cost ) $cost += $max_cost;
+
+      // now add amendment costs (including all past amendments)
+      $reqn_version_sel = lib::create( 'database\select' );
+      $reqn_version_sel->add_column( 'amendment' );
+      $reqn_version_sel->add_column( 'version' );
+      $reqn_version_sel->add_table_column(
+        'amendment_type',
+        $international ? 'fee_international' : 'fee_canada',
+        'fee'
+      );
+      $reqn_version_mod = lib::create( 'database\modifier' );
+      $reqn_version_mod->join(
+        'reqn_version_has_amendment_type',
+        'reqn_version.id',
+        'reqn_version_has_amendment_type.reqn_version_id'
+      );
+      $reqn_version_mod->join(
+        'amendment_type',
+        'reqn_version_has_amendment_type.amendment_type_id',
+        'amendment_type.id'
+      );
+      $reqn_version_mod->where( 'amendment', '!=', '.' );
+      $reqn_version_mod->where( 'amendment', '<=', $this->amendment );
+      $reqn_version_mod->where(
+        sprintf( 'amendment_type.%s', $international ? 'fee_international' : 'fee_canada' ),
+        '>',
+        0
+      );
+      $reqn_version_mod->order( 'amendment' );
+      $reqn_version_mod->order_desc( 'version' );
+      $reqn_version_list = $db_reqn->get_reqn_version_object_list( $reqn_version_mod );
+
+      $current_amendment = NULL;
+      foreach( $db_reqn->get_reqn_version_list( $reqn_version_sel, $reqn_version_mod ) as $reqn_version )
+      {
+        // only process the highest version of each amendment
+        if( $current_amendment == $reqn_version['amendment'] ) continue;
+
+        $cost += $reqn_version['fee'];
+        $current_amendment = $reqn_version['amendment'];
+      }
     }
 
     $db_language = $db_reqn->get_language();

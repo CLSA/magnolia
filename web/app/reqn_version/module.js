@@ -559,6 +559,7 @@ cenozoApp.defineModule({
 
           angular.extend(this, {
             compareRecord: null,
+            versionListLoaded: false,
             versionList: [],
             lastAgreementVersion: null,
             coapplicantAgreementList: [],
@@ -696,7 +697,7 @@ cenozoApp.defineModule({
                 await Promise.all(promiseList);
 
                 // the version list might get long, so don't wait for it (diffs will show once it is loaded)
-                this.getVersionList();
+                this.getVersionList().finally(() => {this.versionListLoaded = true;});
 
                 // the category list will have been loaded by now, so we can load the selected tabs
                 this.setFormTab(
@@ -1049,6 +1050,7 @@ cenozoApp.defineModule({
                     : this.record.trainee_country_id;
 
                 // cost for trainees is different to applicants
+                var international = false;
                 if (this.record.trainee_user_id) {
                   if (
                     baseCountryId != traineeCountryId ||
@@ -1056,6 +1058,7 @@ cenozoApp.defineModule({
                   ) {
                     // if either the trainee or applicant isn't Canadian then the base fee is 5000
                     cost = 5000;
+                    international = true;
                   } else if (
                     baseCountryId == traineeCountryId &&
                     baseCountryId == applicantCountryId &&
@@ -1067,7 +1070,10 @@ cenozoApp.defineModule({
                   }
                 } else {
                   // if the applicant is not Canadian then the base fee is 5000
-                  if (baseCountryId != applicantCountryId) cost = 5000;
+                  if (baseCountryId != applicantCountryId) {
+                    cost = 5000;
+                    international = true;
+                  }
                 }
 
                 this.parentModel.categoryList.forEach((category) =>
@@ -1095,6 +1101,27 @@ cenozoApp.defineModule({
                     cost += maxCost;
                   })
                 );
+
+                // now add amendment costs (including all past amendments)
+                if(!this.versionListLoaded || angular.isUndefined(this.parentModel.amendmentTypeList)) {
+                  return "Calculating...";
+                } else {
+                  var currentAmendment = null;
+                  this.versionList.forEach(version => {
+                    if (null != version &&
+                        '.' != version.amendment &&
+                        this.record.amendment >= version.amendment) {
+                      if(currentAmendment == version.amendment) return;
+
+                      // add the cost of any amendment that this version has selected
+                      let c = international ? "feeInternational" : "feeCanada";
+                      this.parentModel.amendmentTypeList.en
+                        .filter(aType => 0 < aType[c] && version["amendmentType"+aType.id])
+                        .forEach(aType => { cost += aType[c]; });
+                      currentAmendment = version.amendment;
+                    }
+                  });
+                }
               }
 
               // add thousands separators
@@ -1482,8 +1509,8 @@ cenozoApp.defineModule({
               var parent = this.parentModel.getParentIdentifier();
               this.versionList = [];
               var response = await CnHttpFactory.instance({
-                path:
-                  parent.subject + "/" + parent.identifier + "/reqn_version",
+                path: parent.subject + "/" + parent.identifier + "/reqn_version",
+                data: { modifier: { order: [{"amendment": true}, {"version": true}] } },
               }).query();
 
               // we're going to use .then calls below to maximize overall asynchronous processing time
@@ -1511,12 +1538,7 @@ cenozoApp.defineModule({
                   "ethics",
                   "data_sharing",
                 ].forEach((file) => {
-                  var path =
-                    "reqn_version/" +
-                    version.id +
-                    "?file=" +
-                    file +
-                    "_filename";
+                  var path = "reqn_version/" + version.id + "?file=" + file + "_filename";
                   promiseList.push(
                     CnHttpFactory.instance({ path: path })
                       .get()
@@ -3078,6 +3100,8 @@ cenozoApp.defineModule({
                 this.amendmentTypeList.en.push({
                   id: item.id,
                   newUser: item.new_user,
+                  feeCanada: item.fee_canada,
+                  feeInternational: item.fee_international,
                   name: item.reason_en,
                   justificationPrompt: item.justification_prompt_en,
                 });

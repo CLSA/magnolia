@@ -7,6 +7,7 @@ SOURCE reqn_current_final_report.sql
 SOURCE pdf_form.sql
 SOURCE data_agreement.sql
 SOURCE notification_type.sql
+SOURCE amendment_type.sql
 
 SOURCE update_version_number.sql
 
