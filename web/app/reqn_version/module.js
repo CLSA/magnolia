@@ -2387,11 +2387,9 @@ cenozoApp.defineModule({
                   this.noAmendmentTypes = false;
 
                   // for amendments make sure that at least one amendment type has been selected
-                  if (
-                    !this.parentModel.amendmentTypeList.en.some(
-                      (at) => this.record["amendmentType" + at.id]
-                    )
-                  ) {
+                  if (!this.parentModel.amendmentTypeList.en.some(
+                    (at) => this.record["amendmentType" + at.id]
+                  )) {
                     this.noAmendmentTypes = true;
                     if (null == errorTab) errorTab = "amendment";
                     if (null == error) {
@@ -2446,8 +2444,8 @@ cenozoApp.defineModule({
                     });
                 }
 
+                // if there was an error then display it and do not proceed
                 if (null != error) {
-                  // if there was an error then display it now
                   if (this.parentModel.isRole("applicant", "designate"))
                     error.closeText = this.translate("misc.close");
                   await CnModalMessageFactory.instance(error).show();
@@ -2465,202 +2463,225 @@ cenozoApp.defineModule({
                       await this.setFormTab(2, errorTab.substr(1));
                     }
                   }
-                } else {
-                  // now check that this version is different from the last (the first is always different)
-                  var response = await CnHttpFactory.instance({
-                    path: this.parentModel.getServiceResourcePath(),
-                    data: { select: { column: "has_changed" } },
-                  }).get();
+                  return;
+                }
+                
+                // warn the user when no cohort is selected and don't proceed
+                if (!this.record.tracking && !this.record.comprehensive) {
+                  await CnModalMessageFactory.instance({
+                    title: this.translate("misc.noCohortSelectedTitle"),
+                    message: this.translate("misc.noCohortSelectedMessage"),
+                    error: true,
+                    closeText: this.parentModel.isRole("applicant", "designate") ?
+                      this.translate("misc.close") : "Close",
+                  }).show();
+                  
+                  // mark the tracking dropdown in red
+                  var trackingElement = cenozo.getFormElement("tracking");
+                  trackingElement.$error.required = true;
+                  cenozo.updateFormElement(trackingElement, true);
+                  trackingElement.$error.required = false;
+                  
+                  // mark the comprehensive dropdown in red
+                  var comprehensiveElement = cenozo.getFormElement("comprehensive");
+                  comprehensiveElement.$error.required = true;
+                  cenozo.updateFormElement(comprehensiveElement, true);
+                  comprehensiveElement.$error.required = false;
 
-                  var proceed = response.data.has_changed
-                    ? true // changes have been made, so submit now
-                    : // no changes made so warn the user before proceeding
-                      await CnModalConfirmFactory.instance({
-                        title: this.translate("misc.pleaseConfirm"),
-                        noText: this.translate("misc.no"),
-                        yesText: this.translate("misc.yes"),
-                        message: this.translate("misc.noChangesMessage"),
-                      }).show();
-                  if (proceed) {
-                    var parent = this.parentModel.getParentIdentifier();
+                  // go to the cohort tab and don't proceed
+                  this.setFormTab(0, "part2", false);
+                  await this.setFormTab(2, "cohort");
+                  return;
+                }
 
-                    if (this.record.legacy && "." == this.record.amendment) {
-                      // when submitting a new legacy reqn ask which stage to move to
-                      var stageType = await CnModalSubmitLegacyFactory.instance().show();
+                // now check that this version is different from the last (the first is always different)
+                var response = await CnHttpFactory.instance({
+                  path: this.parentModel.getServiceResourcePath(),
+                  data: { select: { column: "has_changed" } },
+                }).get();
 
-                      if (null != stageType) {
-                        var proceed = true;
+                // warn the user when no changes have been made and don't proceed
+                if (!response.data.has_changed) {
+                  await CnModalConfirmFactory.instance({
+                    title: this.translate("misc.pleaseConfirm"),
+                    noText: this.translate("misc.no"),
+                    yesText: this.translate("misc.yes"),
+                    message: this.translate("misc.noChangesMessage"),
+                  }).show();
+                  return;
+                }
 
-                        // when moving to the active or completed stage an agreement file must be provided
-                        if ("Active" == stageType || "Complete" == stageType) {
-                          var response = await CnModalUploadAgreementFactory.instance().show();
-                          if (response) {
-                            // submit the agreement file
-                            var filePath =
-                              this.parentModel.getServiceResourcePath();
-                            await CnHttpFactory.instance({
-                              path: filePath,
-                              data: {
-                                agreement_filename: response.file.getFilename(),
-                                agreement_start_date: response.startDate,
-                                agreement_end_date: response.endDate,
-                              },
-                            }).patch();
-                            await response.file.upload(filePath);
-                          } else {
-                            proceed = false; // don't proceed if the upload is cancelled
-                          }
-                        }
+                var parent = this.parentModel.getParentIdentifier();
 
-                        if (proceed) {
-                          // finally, we can move to the next requested stage
-                          await CnHttpFactory.instance({
-                            path:
-                              parent.subject + "/" + parent.identifier +
-                              "?action=next_stage&stage_type=" +
-                              stageType,
-                          }).patch();
+                // NEW LEGACY REQNS ONLY /////////////////////////////////////////////////////////////
+                if (this.record.legacy && "." == this.record.amendment) {
+                  // when submitting a new legacy reqn ask which stage to move to
+                  var stageType = await CnModalSubmitLegacyFactory.instance().show();
 
-                          await this.onView();
-                          await CnModalMessageFactory.instance({
-                            title:
-                              'Requisition moved to "' + stageType + '" stage',
-                            message:
-                              'The legacy requisition has been moved to the "' +
-                              stageType +
-                              '" stage and is now visible ' +
-                              "to the applicant.",
-                            closeText: "Close",
-                          }).show();
-                        }
-                      }
+                  if (null == stageType) return;
+
+                  // when moving to the active or completed stage an agreement file must be provided
+                  if ("Active" == stageType || "Complete" == stageType) {
+                    var response = await CnModalUploadAgreementFactory.instance().show();
+                    if (response) {
+                      // submit the agreement file
+                      var filePath =
+                        this.parentModel.getServiceResourcePath();
+                      await CnHttpFactory.instance({
+                        path: filePath,
+                        data: {
+                          agreement_filename: response.file.getFilename(),
+                          agreement_start_date: response.startDate,
+                          agreement_end_date: response.endDate,
+                        },
+                      }).patch();
+                      await response.file.upload(filePath);
                     } else {
-                      // from here we're either a legacy reqn doing an amendment or we're not a legacy reqn
-                      var proceed = true;
-                      var noReview = false;
+                      return; // don't proceed if the upload is cancelled
+                    }
+                  }
 
-                      // if admin or typist is submitting then ask if we want to skip the review process
-                      if (this.record.legacy && this.parentModel.isRole("administrator", "typist")) {
-                        var response = await CnModalConfirmFactory.instance({
-                          title: "Submit legacy amendment",
-                          message:
-                            "Do you wish to submit the amendment for review or should the review system be skipped? " +
-                            "If you skip the review the requisition will immediately return to the active stage.",
-                          yesText: "Review",
-                          noText: "Skip Review",
-                        }).show();
+                  // finally, we can move to the next requested stage
+                  await CnHttpFactory.instance({
+                    path:
+                      parent.subject + "/" + parent.identifier +
+                      "?action=next_stage&stage_type=" +
+                      stageType,
+                  }).patch();
 
-                        // determine whether we're skipping a legacy amendment's review
-                        if (!response && "." != this.record.amendment) {
-                          noReview = true;
+                  await this.onView();
+                  await CnModalMessageFactory.instance({
+                    title: 'Requisition moved to "' + stageType + '" stage',
+                    message:
+                      "The legacy requisition has been moved to the " +
+                      '"' + stageType + '" ' + 
+                      "stage and is now visible to the applicant.",
+                    closeText: "Close",
+                  }).show();
 
-                          // if we're skipping the review then give the option to upload an agreement
-                          var response = await CnModalConfirmFactory.instance({
-                            message: "Do you wish to upload an agreement associated with this legacy amendment?",
-                          }).show();
+                  // do nothing else for new legacy reqns
+                  return;
+                }
 
-                          if (response) {
-                            var response = await CnModalUploadAgreementFactory.instance().show();
-                            if (response) {
-                              // submit the agreement file
-                              var filePath = this.parentModel.getServiceResourcePath();
-                              await CnHttpFactory.instance({
-                                path: filePath,
-                                data: {
-                                  agreement_filename: response.file.getFilename(),
-                                  agreement_start_date: response.startDate,
-                                  agreement_end_date: response.endDate,
-                                },
-                              }).patch();
+                // LEGACY AMENDMENT OR NOT A LEGACY REQN /////////////////////////////////////////////
+                var noReview = false;
 
-                              // only proceed if the upload succeeds
-                              await response.file.upload(filePath);
-                            } else {
-                              proceed = false; // don't proceed if the upload is cancelled
-                            }
-                          }
-                        }
-                      } else if (!this.record.legacy) {
-                        // There must be references
-                        if (0 == this.record.referenceList.length) {
-                          await CnModalMessageFactory.instance({
-                            title: this.translate("misc.missingReferencesTitle"),
-                            message: this.translate("misc.missingReferencesMessage"),
-                            error: true,
-                          }).show();
-                          proceed = false;
-                          this.setFormTab(0, "part1", false);
-                          await this.setFormTab(1, "d");
-                        } else if("." == this.record.amendment) {
-                          // When moving to the admin stage for the first time show warning if no coapplicants
-                          if ('New' == this.record.stage_type) {
-                            if (0 == this.record.coapplicantList.length) {
-                              var response = await CnModalConfirmFactory.instance({
-                                title: this.translate("misc.pleaseConfirm"),
-                                noText: this.translate("misc.no"),
-                                yesText: this.translate("misc.yes"),
-                                message: this.translate("misc.confirmNoCoapplicants"),
-                              }).show();
-                              proceed = response;
-                            }
-                          }
-                        }
-                      }
+                // if admin or typist is submitting then ask if we want to skip the review process
+                if (this.record.legacy && this.parentModel.isRole("administrator", "typist")) {
+                  var response = await CnModalConfirmFactory.instance({
+                    title: "Submit legacy amendment",
+                    message:
+                      "Do you wish to submit the amendment for review or should the review system be skipped? " +
+                      "If you skip the review the requisition will immediately return to the active stage.",
+                    yesText: "Review",
+                    noText: "Skip Review",
+                  }).show();
 
-                      // Now that all possible reasons for not proceeding have been checked, only proceed
-                      // if all checks have passed
-                      if (proceed) {
-                        try {
-                          await CnHttpFactory.instance({
-                            path:
-                              parent.subject + "/" + parent.identifier +
-                              "?action=submit" + (noReview ? "&review=0" : ""),
-                            onError: async (error) => {
-                              if (409 == error.status) {
-                                await CnModalMessageFactory.instance({
-                                  title: this.translate("misc.invalidStartDateTitle"),
-                                  message: this.translate("misc.invalidStartDateMessage"),
-                                  closeText: this.translate("misc.close"),
-                                  error: true,
-                                }).show();
+                  // determine whether we're skipping a legacy amendment's review
+                  if (!response && "." != this.record.amendment) {
+                    noReview = true;
 
-                                var element = cenozo.getFormElement("start_date");
-                                element.$error.custom = this.translate("misc.invalidStartDateTitle");
-                                cenozo.updateFormElement(element, true);
-                                this.setFormTab(0, "part1", false);
-                                await this.setFormTab(1, "c");
-                              } else CnModalMessageFactory.httpError(error);
-                            },
-                          }).patch();
+                    // if we're skipping the review then give the option to upload an agreement
+                    var response = await CnModalConfirmFactory.instance({
+                      message: "Do you wish to upload an agreement associated with this legacy amendment?",
+                    }).show();
 
-                          var code =
-                            CnSession.user.id == this.record.trainee_user_id ?
-                              "deferred" == this.record.state ? "traineeResubmit" : "traineeSubmit" :
-                            CnSession.user.id == this.record.designate_user_id ?
-                              "deferred" == this.record.state ? "designateResubmit" : "designateSubmit" :
-                              "deferred" == this.record.state ? "resubmit" : "submit";
+                    if (response) {
+                      var response = await CnModalUploadAgreementFactory.instance().show();
+                      if (response) {
+                        // submit the agreement file
+                        var filePath = this.parentModel.getServiceResourcePath();
+                        await CnHttpFactory.instance({
+                          path: filePath,
+                          data: {
+                            agreement_filename: response.file.getFilename(),
+                            agreement_start_date: response.startDate,
+                            agreement_end_date: response.endDate,
+                          },
+                        }).patch();
 
-                          await CnModalMessageFactory.instance({
-                            title: noReview ? "Amendment Complete" : this.translate("misc." + code + "Title"),
-                            message: noReview
-                              ? "The amendment is now complete and the requisition has been returned to the Active stage."
-                              : this.translate("misc." + code + "Message"),
-                            closeText: this.translate("misc.close"),
-                          }).show();
-
-                          if (
-                            this.parentModel.isRole("applicant", "designate")
-                          ) {
-                            await $state.go("root.home");
-                          } else {
-                            await this.onView(true); // refresh
-                          }
-                        } catch (error) {
-                          // handled by onError above
-                        }
+                        // only proceed if the upload succeeds
+                        await response.file.upload(filePath);
+                      } else {
+                        return; // don't proceed if the upload is cancelled
                       }
                     }
                   }
+                } else if (!this.record.legacy) {
+                  // There must be references
+                  if (0 == this.record.referenceList.length) {
+                    await CnModalMessageFactory.instance({
+                      title: this.translate("misc.missingReferencesTitle"),
+                      message: this.translate("misc.missingReferencesMessage"),
+                      error: true,
+                    }).show();
+                    this.setFormTab(0, "part1", false);
+                    await this.setFormTab(1, "d");
+                    return; // don't proceed if there are no references
+                  } else if("." == this.record.amendment) {
+                    // When moving to the admin stage for the first time show warning if no coapplicants
+                    if ('New' == this.record.stage_type) {
+                      if (0 == this.record.coapplicantList.length) {
+                        var response = await CnModalConfirmFactory.instance({
+                          title: this.translate("misc.pleaseConfirm"),
+                          noText: this.translate("misc.no"),
+                          yesText: this.translate("misc.yes"),
+                          message: this.translate("misc.confirmNoCoapplicants"),
+                        }).show();
+                        
+                        if (!response) return; // don't proceed if there are no coapplicants in a new reqn
+                      }
+                    }
+                  }
+                }
+
+                // Now that all possible reasons for not proceeding have been checked, only proceed
+                // if all checks have passed
+                try {
+                  await CnHttpFactory.instance({
+                    path:
+                      parent.subject + "/" + parent.identifier +
+                      "?action=submit" + (noReview ? "&review=0" : ""),
+                    onError: async (error) => {
+                      if (409 == error.status) {
+                        await CnModalMessageFactory.instance({
+                          title: this.translate("misc.invalidStartDateTitle"),
+                          message: this.translate("misc.invalidStartDateMessage"),
+                          closeText: this.translate("misc.close"),
+                          error: true,
+                        }).show();
+
+                        var element = cenozo.getFormElement("start_date");
+                        element.$error.custom = this.translate("misc.invalidStartDateTitle");
+                        cenozo.updateFormElement(element, true);
+                        this.setFormTab(0, "part1", false);
+                        await this.setFormTab(1, "c");
+                      } else CnModalMessageFactory.httpError(error);
+                    },
+                  }).patch();
+
+                  var code =
+                    CnSession.user.id == this.record.trainee_user_id ?
+                      "deferred" == this.record.state ? "traineeResubmit" : "traineeSubmit" :
+                    CnSession.user.id == this.record.designate_user_id ?
+                      "deferred" == this.record.state ? "designateResubmit" : "designateSubmit" :
+                      "deferred" == this.record.state ? "resubmit" : "submit";
+
+                  await CnModalMessageFactory.instance({
+                    title: noReview ? "Amendment Complete" : this.translate("misc." + code + "Title"),
+                    message: noReview
+                      ? "The amendment is now complete and the requisition has been returned to the Active stage."
+                      : this.translate("misc." + code + "Message"),
+                    closeText: this.translate("misc.close"),
+                  }).show();
+
+                  if (this.parentModel.isRole("applicant", "designate")) {
+                    await $state.go("root.home");
+                  } else {
+                    await this.onView(true); // refresh
+                  }
+                } catch (error) {
+                  // handled by onError above
                 }
               }
             },

@@ -1141,6 +1141,14 @@ cenozo.service("CnReqnHelper", [
               en: "The start date you have provided is not acceptable. You will now be redirected to where the start date field can be found. Please try re-submitting once the start date has been corrected.",
               fr: "La date de début indiquée n’est pas acceptable. Vous serez redirigé à l’endroit où se trouve le champ de date de début. Veuillez essayer de soumettre à nouveau une fois la date de début corrigée.",
             },
+            noCohortSelectedTitle: {
+              en: "No cohort selected",
+              fr: "TODO: translate",
+            },
+            noCohortSelectedMessage: {
+              en: 'You must select "YES" for at least one cohort.',
+              fr: "Vous devez sélectionner au moins une cohorte.",
+            },
             noChangesMessage: {
               en: "You have not made any changes to the form since your last submission.  Are you sure you wish to proceed?",
               fr: "Vous n’avez apporté aucune modification au formulaire depuis votre dernière soumission. Êtes-vous sûr(e) de vouloir continuer?",
