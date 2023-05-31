@@ -155,7 +155,7 @@ class ui extends \cenozo\ui\ui
 
     if( 'typist' != $db_role->name )
     {
-      $this->add_listitem( 'Additional Fee', 'additional_fee' );
+      $this->add_listitem( 'Additional Fees', 'additional_fee' );
       $this->add_listitem( 'Amendment Types', 'amendment_type' );
       $this->add_listitem( 'Master Data Agreements', 'data_agreement' );
       $this->add_listitem( 'Data Versions', 'data_version' );
