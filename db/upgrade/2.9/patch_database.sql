@@ -10,6 +10,7 @@ SOURCE notification_type.sql
 SOURCE amendment_type.sql
 SOURCE additional_fee.sql
 SOURCE reqn_has_additional_fee.sql
+SOURCE data_option.sql
 
 SOURCE service.sql
 SOURCE role_has_service.sql
