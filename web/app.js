@@ -626,7 +626,7 @@ cenozo.service("CnReqnHelper", [
               applicant_position: { en: "Position", fr: "Poste" },
               applicant_affiliation: {
                 en: "Institution (department, research institute or hospital)",
-                fr: "TODO: translate",
+                fr: "Établissement (département, institut de recherche ou hôpital)",
               },
               applicant_country_id: {
                 en: "Institution Country",
@@ -970,7 +970,7 @@ cenozo.service("CnReqnHelper", [
             choose: { en: "(choose)", fr: "(choisir)" },
             exempt: { en: "exempt", fr: "exempt(e)" },
             requested: { en: "requested", fr: "demandé" },
-            calculating: { en: "Calculating", fr: "TODO: translate" },
+            calculating: { en: "Calculating", fr: "Calcul en cours" },
             prevButton: {
               en: "Return to the previous section",
               fr: "Retourner à la section précédente",
@@ -1143,7 +1143,7 @@ cenozo.service("CnReqnHelper", [
             },
             noCohortSelectedTitle: {
               en: "No cohort selected",
-              fr: "TODO: translate",
+              fr: "Aucune cohorte sélectionnée",
             },
             noCohortSelectedMessage: {
               en: 'You must select "YES" for at least one cohort.',
