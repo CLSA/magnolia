@@ -13,7 +13,7 @@ global $SETTINGS;
 $SETTINGS['general']['application_name'] = 'magnolia';
 $SETTINGS['general']['instance_name'] = $SETTINGS['general']['application_name'];
 $SETTINGS['general']['version'] = '2.9';
-$SETTINGS['general']['build'] = '3ea0780';
+$SETTINGS['general']['build'] = '184ea80';
 
 // the location of magnolia internal path
 $SETTINGS['path']['APPLICATION'] = str_replace( '/settings.ini.php', '', __FILE__ );
@@ -47,6 +47,9 @@ $SETTINGS['path']['OUTPUT_SOURCE'] = str_replace( 'settings.ini.php', 'doc/outpu
 
 // the location of supplemental files (defaults to magnolia/doc/supplemental)
 $SETTINGS['path']['SUPPLEMENTAL_FILE'] = str_replace( 'settings.ini.php', 'doc/supplemental', __FILE__ );
+
+// the location of packaged data (defaults to mangolia/doc/packaged_data)
+$SETTINGS['path']['PACKAGED_DATA'] = str_replace( 'settings.ini.php', 'doc/packaged_data', __FILE__ );
 
 // the location of study data documents (defaults to magnolia/doc/study_data)
 $SETTINGS['path']['STUDY_DATA'] = str_replace( 'settings.ini.php', 'doc/study_data', __FILE__ );

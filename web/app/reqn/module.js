@@ -760,7 +760,7 @@ cenozoApp.defineModule({
     module.addExtraOperation("view", {
       title: "Reset Study Data",
       isIncluded: function ($state, model) {
-        return model.viewModel.canResetData();
+        return model.viewModel.canManageData();
       },
       operation: function ($state, model) {
         model.viewModel.resetData();
@@ -1351,8 +1351,8 @@ cenozoApp.defineModule({
 
               await this.onView();
             },
-            canResetData: function () {
-              // administrators and applicants can view data when in the active stage
+            canManageData: function () {
+              // administrators can manage reqn data when in the data release and active stages only
               var stage_type = this.record.stage_type
                 ? this.record.stage_type
                 : "";
@@ -1940,6 +1940,11 @@ cenozoApp.defineModule({
               // remove the ethics approval item if this reqn has no ethics approval list
               if (!this.record.has_ethics_approval_list) {
                 list = list.filter( (child) => "ethics_approval" != child.subject.snake );
+              }
+
+              // remove the packaged data item is not in the data release or active stage
+              if (!["Data Release", "Active"].includes(this.record.stage_type)) {
+                list = list.filter( (child) => "packaged_data" != child.subject.snake );
               }
 
               return list;

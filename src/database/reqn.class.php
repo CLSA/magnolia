@@ -1516,7 +1516,7 @@ class reqn extends \cenozo\database\record
    * @param string $type One of "data" or "web"
    * @return string
    */
-  private function get_study_data_path( $type )
+  public function get_study_data_path( $type )
   {
     if( !in_array( $type, array( 'data', 'web' ) ) ) throw lib::create( 'exception\argument', 'type', $type, __METHOD__ );
 
