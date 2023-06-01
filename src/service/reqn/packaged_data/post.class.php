@@ -68,9 +68,13 @@ class post extends \cenozo\service\post
    */
   protected function add_symlink( $filename )
   {
+    // make sure the data path exists
     $db_reqn = $this->get_parent_record();
+    $data_path = $db_reqn->get_study_data_path( 'data' );
+    if( !is_dir( $data_path ) ) mkdir( $data_path );
+
     $target = sprintf( '%s/%s', PACKAGED_DATA_PATH, $filename );
-    $link = sprintf( '%s/%s', $db_reqn->get_study_data_path( 'data' ), $filename );
+    $link = sprintf( '%s/%s', $data_path, $filename );
     if( file_exists( $target ) && !file_exists( $link ) ) symlink( $target, $link );
   }
 
