@@ -105,12 +105,12 @@ class query extends \cenozo\service\query
   }
 
   /**
-   * A cache of all packaged data filenames (including their full path)
+   * A cache of all packaged data filenames
    */
   protected $file_list = [];
 
   /**
-   * TODO: document
+   * A cache of all packaged data filenames selected by the reqn
    */
   protected $selected_file_list = [];
 }
