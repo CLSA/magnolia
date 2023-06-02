@@ -1206,6 +1206,9 @@ class reqn extends \cenozo\database\record
     // we might not have a web path at this point, so ignore if we don't
     if( !is_null( $data_path ) && !is_null( $web_path ) )
     {
+      // make sure the web path exists
+      if( !is_dir( $web_path ) ) mkdir( $web_path );
+
       // delete all existing links
       util::exec_timeout( sprintf( 'rm -rf %s/*', $web_path ) );
 
