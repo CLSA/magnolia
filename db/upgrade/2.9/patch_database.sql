@@ -12,6 +12,11 @@ SOURCE additional_fee.sql
 SOURCE reqn_has_additional_fee.sql
 SOURCE data_option.sql
 
+SOURCE report_type.sql
+SOURCE application_type_has_report_type.sql
+SOURCE role_has_report_type.sql
+SOURCE report_restriction.sql
+
 SOURCE service.sql
 SOURCE role_has_service.sql
 
