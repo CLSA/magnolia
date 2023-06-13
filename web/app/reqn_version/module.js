@@ -1567,23 +1567,17 @@ cenozoApp.defineModule({
 
               this.lastAmendmentVersion = null;
               if ("." != this.record.amendment) {
-                this.versionList
-                  .slice()
-                  .reverse()
-                  .some((version) => {
-                    // Note that the amendments we're comparing are letters, and since . is considered less than A it works
-                    // whether we're comparing lettered versions or the initial "." version:
-                    if (this.record.amendment > version.amendment) {
-                      this.lastAmendmentVersion = version.amendment_version;
-                      return true;
-                    }
-                  });
+                this.versionList.some((version) => {
+                  // Note that the amendments we're comparing are letters, and since . is considered less than A it works
+                  // whether we're comparing lettered versions or the initial "." version:
+                  if (null != version && this.record.amendment > version.amendment) {
+                    this.lastAmendmentVersion = version.amendment_version;
+                    return true;
+                  }
+                });
               }
 
               await Promise.all(promiseList);
-
-              // Calculate all differences for all versions (in reverse order so we can find the last agreement version)
-              this.versionList.reverse();
 
               this.lastAgreementVersion = null;
               this.versionList.forEach((version) => {
@@ -1607,9 +1601,6 @@ cenozoApp.defineModule({
               // if no different list was defined then make it an empty list
               if (null == this.agreementDifferenceList)
                 this.agreementDifferenceList = [];
-
-              // put the order of the version list back to normal
-              this.versionList.reverse();
             },
 
             determineCoapplicantDiffs: function () {
