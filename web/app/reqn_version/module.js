@@ -2491,15 +2491,17 @@ cenozoApp.defineModule({
                   data: { select: { column: "has_changed" } },
                 }).get();
 
-                // warn the user when no changes have been made and don't proceed
+                // warn the user when no changes have been made
                 if (!response.data.has_changed) {
-                  await CnModalConfirmFactory.instance({
+                  const response = await CnModalConfirmFactory.instance({
                     title: this.translate("misc.pleaseConfirm"),
                     noText: this.translate("misc.no"),
                     yesText: this.translate("misc.yes"),
                     message: this.translate("misc.noChangesMessage"),
                   }).show();
-                  return;
+
+                  // don't proceed if they user has changed their mind
+                  if (!response) return;
                 }
 
                 var parent = this.parentModel.getParentIdentifier();
