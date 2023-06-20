@@ -32,6 +32,15 @@ class reqn_version extends \cenozo\database\record
       $this->funding_filename = NULL;
     }
 
+    if( !$this->indigenous_first_nation && !$this->indigenous_metis && !$this->indigenous_inuit )
+    {
+      $this->indigenous_description = NULL;
+      $this->indigenous1_filename = NULL;
+      $this->indigenous2_filename = NULL;
+      $this->indigenous3_filename = NULL;
+      $this->indigenous4_filename = NULL;
+    }
+
     parent::save();
 
     // delete files if they are being set to null
@@ -39,7 +48,7 @@ class reqn_version extends \cenozo\database\record
     {
       $filename = $this->get_filename( 'coapplicant_agreement' );
       if( file_exists( $filename ) ) unlink( $filename );
-    }
+    } 
     if( is_null( $this->peer_review_filename ) )
     {
       $filename = $this->get_filename( 'peer_review' );
@@ -58,6 +67,26 @@ class reqn_version extends \cenozo\database\record
     if( is_null( $this->data_sharing_filename ) )
     {
       $filename = $this->get_filename( 'data_sharing' );
+      if( file_exists( $filename ) ) unlink( $filename );
+    }
+    if( is_null( $this->indigenous1_filename ) )
+    {
+      $filename = $this->get_filename( 'indigenous1' );
+      if( file_exists( $filename ) ) unlink( $filename );
+    }
+    if( is_null( $this->indigenous2_filename ) )
+    {
+      $filename = $this->get_filename( 'indigenous2' );
+      if( file_exists( $filename ) ) unlink( $filename );
+    }
+    if( is_null( $this->indigenous3_filename ) )
+    {
+      $filename = $this->get_filename( 'indigenous3' );
+      if( file_exists( $filename ) ) unlink( $filename );
+    }
+    if( is_null( $this->indigenous4_filename ) )
+    {
+      $filename = $this->get_filename( 'indigenous4' );
       if( file_exists( $filename ) ) unlink( $filename );
     }
     if( is_null( $this->agreement_filename ) )
@@ -89,6 +118,10 @@ class reqn_version extends \cenozo\database\record
     if( !is_null( $this->funding_filename ) ) $file_list[] = $this->get_filename( 'funding' );
     if( !is_null( $this->ethics_filename ) ) $file_list[] = $this->get_filename( 'ethics' );
     if( !is_null( $this->data_sharing_filename ) ) $file_list[] = $this->get_filename( 'data_sharing' );
+    if( !is_null( $this->indigenous1_filename ) ) $file_list[] = $this->get_filename( 'indigenous1' );
+    if( !is_null( $this->indigenous2_filename ) ) $file_list[] = $this->get_filename( 'indigenous2' );
+    if( !is_null( $this->indigenous3_filename ) ) $file_list[] = $this->get_filename( 'indigenous3' );
+    if( !is_null( $this->indigenous4_filename ) ) $file_list[] = $this->get_filename( 'indigenous4' );
     if( !is_null( $this->agreement_filename ) ) $file_list[] = $this->get_filename( 'agreement' );
 
     parent::delete();
@@ -231,14 +264,17 @@ class reqn_version extends \cenozo\database\record
   /**
    * Returns the path to various files associated with the reqn
    * 
-   * @param string $type Should be 'agreement', 'coapplicant_agreement', 'peer_review', 'funding',
-   *                     'ethics', 'data_sharing' or 'instruction'
+   * @param string $type The image type
    * @return string
    */
   public function get_filename( $type )
   {
+    $indigenous_matches = [];
+    $indigenous = preg_match( '/indigenous([1-9]+)/', $type, $indigenous_matches );
+
     $directory = '';
-    if( 'agreement' == $type ) $directory = AGREEMENT_LETTER_PATH;
+    if( $indigenous ) $directory = INDIGENOUS_FILE_PATH;
+    else if( 'agreement' == $type ) $directory = AGREEMENT_LETTER_PATH;
     else if( 'coapplicant_agreement' == $type ) $directory = COAPPLICANT_AGREEMENT_PATH;
     else if( 'peer_review' == $type ) $directory = PEER_REVIEW_PATH;
     else if( 'funding' == $type ) $directory = FUNDING_LETTER_PATH;
@@ -246,7 +282,10 @@ class reqn_version extends \cenozo\database\record
     else if( 'data_sharing' == $type ) $directory = DATA_SHARING_LETTER_PATH;
     else if( 'instruction' == $type ) $directory = INSTRUCTION_FILE_PATH;
     else throw lib::create( 'exception\argument', 'type', $type, __METHOD__ );
-    return sprintf( '%s/%s', $directory, $this->id );
+
+    return $indigenous ?
+      sprintf( '%s/%d_%d', $directory, $this->id, $indigenous_matches[1] ) :
+      sprintf( '%s/%s', $directory, $this->id );
   }
 
   /**
@@ -776,8 +815,10 @@ class reqn_version extends \cenozo\database\record
     $data['last_identifier'] = !$this->longitudinal || is_null( $this->last_identifier )
                              ? ( 'fr' == $db_language->code ? 'S. o.' : 'N/A' )
                              : $this->last_identifier;
-    if( $this->indigenous ) $data['indigenous_yes'] = 'Yes';
-    else if( !$this->indigenous ) $data['indigenous_no'] = 'Yes';
+
+    if( $this->indigenous_first_nation ) $data['indigenous_first_nation'] = 'Yes';
+    if( $this->indigenous_metis ) $data['indigenous_metis'] = 'Yes';
+    if( $this->indigenous_inuit ) $data['indigenous_inuit'] = 'Yes';
     if( $this->indigenous_description ) $data['indigenous_description'] = $this->indigenous_description;
 
     $data_selection_sel = lib::create( 'database\select' );

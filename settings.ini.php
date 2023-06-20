@@ -13,7 +13,7 @@ global $SETTINGS;
 $SETTINGS['general']['application_name'] = 'magnolia';
 $SETTINGS['general']['instance_name'] = $SETTINGS['general']['application_name'];
 $SETTINGS['general']['version'] = '2.9';
-$SETTINGS['general']['build'] = 'd2b8170';
+$SETTINGS['general']['build'] = '01a0ad2';
 
 // the location of magnolia internal path
 $SETTINGS['path']['APPLICATION'] = str_replace( '/settings.ini.php', '', __FILE__ );
@@ -35,6 +35,9 @@ $SETTINGS['path']['ETHICS_APPROVAL'] = str_replace( 'settings.ini.php', 'doc/eth
 
 // the location of data_sharing letters (defaults to magnolia/doc/data_sharing_letter)
 $SETTINGS['path']['DATA_SHARING_LETTER'] = str_replace( 'settings.ini.php', 'doc/data_sharing_letter', __FILE__ );
+
+// the location of indigenous letters of support (defaults to magnolia/doc/indigenous)
+$SETTINGS['path']['INDIGENOUS_FILE'] = str_replace( 'settings.ini.php', 'doc/indigenous', __FILE__ );
 
 // the location of agreement letters (defaults to magnolia/doc/agreement_letter)
 $SETTINGS['path']['AGREEMENT_LETTER'] = str_replace( 'settings.ini.php', 'doc/agreement_letter', __FILE__ );

@@ -11,6 +11,7 @@ SOURCE amendment_type.sql
 SOURCE additional_fee.sql
 SOURCE reqn_has_additional_fee.sql
 SOURCE data_option.sql
+SOURCE reqn_version.sql
 
 SOURCE report_type.sql
 SOURCE application_type_has_report_type.sql

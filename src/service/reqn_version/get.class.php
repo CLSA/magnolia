@@ -35,6 +35,10 @@ class get extends \cenozo\service\downloadable
     else if( 'funding_filename' == $file ) return $db_reqn_version->funding_filename;
     else if( 'ethics_filename' == $file ) return $db_reqn_version->ethics_filename;
     else if( 'data_sharing_filename' == $file ) return $db_reqn_version->data_sharing_filename;
+    else if( 'indigenous1_filename' == $file ) return $db_reqn_version->indigenous1_filename;
+    else if( 'indigenous2_filename' == $file ) return $db_reqn_version->indigenous2_filename;
+    else if( 'indigenous3_filename' == $file ) return $db_reqn_version->indigenous3_filename;
+    else if( 'indigenous4_filename' == $file ) return $db_reqn_version->indigenous4_filename;
     else if( 'agreement_filename' == $file ) return $db_reqn_version->agreement_filename;
     else if( 'coapplicant_agreement_template' == $file )
     {
@@ -102,6 +106,14 @@ class get extends \cenozo\service\downloadable
       return sprintf( '%s/%s', ETHICS_LETTER_PATH, $db_reqn_version->id );
     else if( 'data_sharing_filename' == $file )
       return sprintf( '%s/%s', DATA_SHARING_LETTER_PATH, $db_reqn_version->id );
+    else if( 'indigenous1_filename' == $file )
+      return sprintf( '%s/%s_1', INDIGENOUS_FILE_PATH, $db_reqn_version->id );
+    else if( 'indigenous2_filename' == $file )
+      return sprintf( '%s/%s_2', INDIGENOUS_FILE_PATH, $db_reqn_version->id );
+    else if( 'indigenous3_filename' == $file )
+      return sprintf( '%s/%s_3', INDIGENOUS_FILE_PATH, $db_reqn_version->id );
+    else if( 'indigenous4_filename' == $file )
+      return sprintf( '%s/%s_4', INDIGENOUS_FILE_PATH, $db_reqn_version->id );
     else if( 'agreement_filename' == $file )
       return sprintf( '%s/%s', AGREEMENT_LETTER_PATH, $db_reqn_version->id );
     else 

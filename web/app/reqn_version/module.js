@@ -86,7 +86,9 @@ cenozoApp.defineModule({
       tracking: { type: "boolean" },
       longitudinal: { type: "boolean" },
       last_identifier: { type: "string" },
-      indigenous: { type: "boolean" },
+      indigenous_first_nation: { type: "boolean" },
+      indigenous_metis: { type: "boolean" },
+      indigenous_inuit: { type: "boolean" },
       indigenous_description: { type: "text" },
       data_agreement_id: { type: "enum" },
       agreement_start_date: { type: "date" },
@@ -135,6 +137,10 @@ cenozoApp.defineModule({
       peer_review_filename: { type: "string" },
       funding_filename: { type: "string" },
       ethics_filename: { type: "string" },
+      indigenous1_filename: { type: "string" },
+      indigenous2_filename: { type: "string" },
+      indigenous3_filename: { type: "string" },
+      indigenous4_filename: { type: "string" },
       new_user_id: {
         type: "lookup-typeahead",
         typeahead: {
@@ -802,7 +808,6 @@ cenozoApp.defineModule({
                   // handled by onError above
                 }
               } else {
-                var proceed = true;
                 if ("new_user_id" == property) {
                   // make sure the new user isn't a trainee
                   if (data.new_user_id) {
@@ -845,52 +850,63 @@ cenozoApp.defineModule({
                       }).show();
 
                       // failed to set the new user so put it back
-                      this.formattedRecord.new_user_id =
-                        this.backupRecord.formatted_new_user_id;
-                      proceed = false;
+                      this.formattedRecord.new_user_id = this.backupRecord.formatted_new_user_id;
+
+                      // do not proceed
+                      return;
                     }
                   }
                 }
 
-                // only proceed if the above check isn't true (prevent trainees to be the new primary applicant)
-                if (proceed) {
-                  await this.$$onPatch(data);
+                await this.$$onPatch(data);
 
-                  if (angular.isDefined(data.applicant_country_id) || angular.isDefined(data.trainee_country_id)) {
-                    // we may have to set the fee waiver type to (empty) if either the applicant or trainee is not Canadian
-                    if (this.record.waiver && !this.isWaiverAllowed())
-                      this.record.waiver = "";
-                  } else if (angular.isDefined(data.comprehensive) || angular.isDefined(data.tracking) ) {
-                    if (this.record.comprehensive && this.record.tracking) {
-                      // show the cohort warning to the applicant
-                      CnModalMessageFactory.instance({
-                        title: this.translate("misc.pleaseNote"),
-                        message: this.translate(
-                          "part2.cohort.bothCohortNotice"
-                        ),
-                        closeText: this.translate("misc.close"),
-                      }).show();
+                if (angular.isDefined(data.applicant_country_id) || angular.isDefined(data.trainee_country_id)) {
+                  // we may have to set the fee waiver type to (empty) if either the applicant or trainee is not Canadian
+                  if (this.record.waiver && !this.isWaiverAllowed())
+                    this.record.waiver = "";
+                } else if (angular.isDefined(data.comprehensive) || angular.isDefined(data.tracking) ) {
+                  if (this.record.comprehensive && this.record.tracking) {
+                    // show the cohort warning to the applicant
+                    CnModalMessageFactory.instance({
+                      title: this.translate("misc.pleaseNote"),
+                      message: this.translate(
+                        "part2.cohort.bothCohortNotice"
+                      ),
+                      closeText: this.translate("misc.close"),
+                    }).show();
+                  }
+                } else if (angular.isDefined(data.peer_review)) {
+                  // use the root scope to get the view directive to remove the lite model's file
+                  $rootScope.$broadcast(
+                    "file removed",
+                    "peer_review_filename"
+                  );
+                } else if (angular.isDefined(data.funding)) {
+                  if ("yes" != data.funding) {
+                    if ("requested" != data.funding) {
+                      this.record.funding_agency = null;
+                      this.record.grant_number = null;
                     }
-                  } else if (angular.isDefined(data.peer_review)) {
                     // use the root scope to get the view directive to remove the lite model's file
-                    $rootScope.$broadcast(
-                      "file removed",
-                      "peer_review_filename"
-                    );
-                  } else if (angular.isDefined(data.funding)) {
-                    if ("yes" != data.funding) {
-                      if ("requested" != data.funding) {
-                        this.record.funding_agency = null;
-                        this.record.grant_number = null;
-                      }
-                      // use the root scope to get the view directive to remove the lite model's file
-                      $rootScope.$broadcast("file removed", "funding_filename");
-                    }
-                  } else if (angular.isDefined(data.indigenous)) {
-                    // the indigenous_description property is set to null on the server if indigenous=false
-                    if (!this.record.indigenous) {
-                      this.record.indigenous_description = "";
-                    }
+                    $rootScope.$broadcast("file removed", "funding_filename");
+                  }
+                } else if (
+                  angular.isDefined(data.indigenous_first_nation) &&
+                  angular.isDefined(data.indigenous_metis) &&
+                  angular.isDefined(data.indigenous_inuit)
+                ) {
+                  // set the indigenous description and filename properties to null if all indigenous
+                  // options are false
+                  if (!(
+                    this.record.indigenous_first_nation ||
+                    this.record.indigenous_metis ||
+                    this.record.indigenous_inuit
+                  )) {
+                    this.record.indigenous_description = "";
+                    this.record.indigenous1_filename = "";
+                    this.record.indigenous2_filename = "";
+                    this.record.indigenous3_filename = "";
+                    this.record.indigenous4_filename = "";
                   }
                 }
               }
@@ -1237,8 +1253,14 @@ cenozoApp.defineModule({
                   },
                   indigenous: {
                     diff: false,
-                    indigenous: false,
+                    indigenous_first_nation: false,
+                    indigenous_metis: false,
+                    indigenous_inuit: false,
                     indigenous_description: false,
+                    indigenous1_filename: false,
+                    indigenous2_filename: false,
+                    indigenous3_filename: false,
+                    indigenous4_filename: false,
                   },
                 },
               };
@@ -2012,7 +2034,6 @@ cenozoApp.defineModule({
 
             toggleSelection: async function (category, option, selection) {
               // when selecting the data-option first check to see if the category or data option have a condition
-              var proceed = true;
               if (!this.record.selectionList[selection.id]) {
                 var column = "condition_" + this.record.lang;
 
@@ -2043,68 +2064,60 @@ cenozoApp.defineModule({
 
                 // now show whichever condition modals are required, category first, then option
                 if (null != categoryModal || null != optionModal) {
-                  proceed = false;
+                  let response = false;
                   if (null != categoryModal && null != optionModal) {
-                    if (await categoryModal.show())
-                      proceed = await optionModal.show();
+                    if (await categoryModal.show()) response = await optionModal.show();
                   } else if (null != categoryModal) {
-                    proceed = await categoryModal.show();
+                    response = await categoryModal.show();
                   } else {
-                    proceed = await optionModal.show();
+                    response = await optionModal.show();
                   }
+
+                  if (!response) return;
                 }
               }
 
-              // don't proceed if the confirm factory says no
-              if (proceed) {
-                var justificationColumn = "data_justification_" + option.id;
+              var justificationColumn = "data_justification_" + option.id;
 
-                // toggle the option
-                this.record.selectionList[selection.id] =
-                  !this.record.selectionList[selection.id];
+              // toggle the option
+              this.record.selectionList[selection.id] = !this.record.selectionList[selection.id];
 
-                try {
-                  var data = {};
-                  if (this.record.selectionList[selection.id])
-                    data.add = selection.id;
-                  else data.remove = selection.id;
-                  await CnHttpFactory.instance({
-                    path:
-                      this.parentModel.getServiceResourcePath() +
-                      "/data_selection",
-                    data: data,
-                    onError: (error) => {
-                      this.record.selectionList[selection.id] =
-                        !this.record.selectionList[selection.id];
-                    },
-                  }).post();
+              try {
+                var data = {};
+                if (this.record.selectionList[selection.id])
+                  data.add = selection.id;
+                else data.remove = selection.id;
+                await CnHttpFactory.instance({
+                  path: this.parentModel.getServiceResourcePath() + "/data_selection",
+                  data: data,
+                  onError: (error) => {
+                    this.record.selectionList[selection.id] = !this.record.selectionList[selection.id];
+                  },
+                }).post();
 
-                  if (this.record.selectionList[selection.id]) {
-                    // add the local copy of the justification if it doesn't already exist
-                    if (
-                      option.justification &&
-                      angular.isUndefined(this.record[justificationColumn])
-                    )
-                      this.record[justificationColumn] = "";
-                  } else {
-                    // delete the local copy of the justification if there are no data options left
-                    if (
-                      option.justification &&
-                      angular.isDefined(this.record[justificationColumn])
-                    ) {
-                      var stillSelected = category.optionList.some((option) =>
-                        option.selectionList.some(
-                          (selection) => this.record.selectionList[selection.id]
-                        )
-                      );
-
-                      if (!stillSelected)
-                        delete this.record[justificationColumn];
-                    }
+                if (this.record.selectionList[selection.id]) {
+                  // add the local copy of the justification if it doesn't already exist
+                  if (
+                    option.justification &&
+                    angular.isUndefined(this.record[justificationColumn])
+                  ) {
+                    this.record[justificationColumn] = "";
                   }
-                } catch (error) {
-                  // handled by onError above
+                } else {
+                  // delete the local copy of the justification if there are no data options left
+                  if (
+                    option.justification &&
+                    angular.isDefined(this.record[justificationColumn])
+                  ) {
+                    var stillSelected = category.optionList.some((option) =>
+                      option.selectionList.some((selection) => this.record.selectionList[selection.id])
+                    );
+
+                    if (!stillSelected) delete this.record[justificationColumn];
+                  }
                 }
+              } catch (error) {
+                // handled by onError above
               }
             },
 
@@ -2273,6 +2286,8 @@ cenozoApp.defineModule({
                   "2indigenous": [
                     "indigenous",
                     "indigenous_description",
+                    "indigenous1_filename",
+                    // filenames 2, 3 and 4 are optional
                   ],
                 };
 
@@ -2338,9 +2353,17 @@ cenozoApp.defineModule({
                     } else if ("last_identifier" == property) {
                       // only check the last_identifier if longitidunal=yes (it's a boolean var)
                       return this.record.longitudinal;
-                    } else if ("indigenous_description" == property) {
-                      // only check the indigenous_description if indigenous=yes (it's a boolean var)
-                      return this.record.indigenous;
+                    } else if (
+                      "indigenous_description" == property ||
+                      "indigenous1_filename" == property
+                    ) {
+                      // only check indigenous description or filename if one of the indigenous options
+                      // is selected
+                      return (
+                        this.record.indigenous_first_nation ||
+                        this.record.indigenous_metis ||
+                        this.record.indigenous_inuit
+                      );
                     }
 
                     // check everything else
@@ -2753,6 +2776,10 @@ cenozoApp.defineModule({
           this.configureFileInput("funding_filename");
           this.configureFileInput("ethics_filename");
           this.configureFileInput("data_sharing_filename");
+          this.configureFileInput("indigenous1_filename");
+          this.configureFileInput("indigenous2_filename");
+          this.configureFileInput("indigenous3_filename");
+          this.configureFileInput("indigenous4_filename");
           this.configureFileInput("agreement_filename");
 
           async function init(object) {
@@ -2827,8 +2854,7 @@ cenozoApp.defineModule({
 
             // override the service collection
             getServiceData: function (type, columnRestrictLists) {
-              // Only include the coapplicant_agreement, peer_review, funding, ethics, data_sharing and agreement filenames in the
-              // view type in the lite instance
+              // Only include filenames in the view type in the lite instance
               return "lite" == this.type
                 ? {
                     select: {
@@ -2839,6 +2865,10 @@ cenozoApp.defineModule({
                         "funding_filename",
                         "ethics_filename",
                         "data_sharing_filename",
+                        "indigenous1_filename",
+                        "indigenous2_filename",
+                        "indigenous3_filename",
+                        "indigenous4_filename",
                         "agreement_filename",
                         { table: "reqn", column: "state" },
                         { table: "stage_type", column: "phase" },

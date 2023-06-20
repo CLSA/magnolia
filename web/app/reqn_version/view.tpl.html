@@ -1076,16 +1076,42 @@
                   <cn-view-input-with-differences
                     no-cols=true
                     input="{
-                      key: 'indigenous',
-                      title: t( 'part2.indigenous.indigenous' ),
-                      type: model.inputList.indigenous.type,
+                      key: 'indigenous_first_nation',
+                      title: t( 'part2.indigenous.indigenous_first_nation' ),
+                      type: model.inputList.indigenous_first_nation.type,
                       enumList: model.metadata.yesNoEnumList[model.viewModel.record.lang]
                     }"
-                    difference="model.viewModel.compareRecord.differences.part2.indigenous.indigenous"
+                    difference="model.viewModel.compareRecord.differences.part2.indigenous.indigenous_first_nation"
+                    model="model">
+                  </cn-view-input-with-differences>
+                  <cn-view-input-with-differences
+                    no-cols=true
+                    input="{
+                      key: 'indigenous_metis',
+                      title: t( 'part2.indigenous.indigenous_metis' ),
+                      type: model.inputList.indigenous_metis.type,
+                      enumList: model.metadata.yesNoEnumList[model.viewModel.record.lang]
+                    }"
+                    difference="model.viewModel.compareRecord.differences.part2.indigenous.indigenous_metis"
+                    model="model">
+                  </cn-view-input-with-differences>
+                  <cn-view-input-with-differences
+                    no-cols=true
+                    input="{
+                      key: 'indigenous_inuit',
+                      title: t( 'part2.indigenous.indigenous_inuit' ),
+                      type: model.inputList.indigenous_inuit.type,
+                      enumList: model.metadata.yesNoEnumList[model.viewModel.record.lang]
+                    }"
+                    difference="model.viewModel.compareRecord.differences.part2.indigenous.indigenous_inuit"
                     model="model">
                   </cn-view-input-with-differences>
                 </div>
-                <div ng-if="model.viewModel.record.indigenous">
+                <div ng-if="
+                  model.viewModel.record.indigenous_first_nation ||
+                  model.viewModel.record.indigenous_metis ||
+                  model.viewModel.record.indigenous_inuit
+                ">
                   <p class="text-primary" ng-bind-html="t( 'part2.indigenous.indigenous_description' )"></p>
                   <div class="form-horizontal">
                     <cn-view-input-with-differences
@@ -1098,6 +1124,66 @@
                       difference="model.viewModel.compareRecord.differences.part2.indigenous.indigenous_description"
                       model="model">
                     </cn-view-input-with-differences>
+                  </div>
+                  <p class="text-primary" ng-bind-html="t( 'part2.indigenous.indigenous_filename' )"></p>
+                  <div class="form-horizontal">
+                    <cn-view-input-with-differences
+                      input="{
+                        key: 'indigenous1_filename',
+                        title: t( 'misc.file' ) + ' 1',
+                        type: 'file'
+                      }"
+                      difference="model.viewModel.compareRecord.differences.part2.indigenous.indigenous1_filename"
+                      model="model">
+                    </cn-view-input-with-differences>
+                    <div ng-show="
+                      model.viewModel.record.indigenous1_filename ||
+                      model.viewModel.record.indigenous2_filename
+                    ">
+                      <div class="form-horizontal">
+                        <cn-view-input-with-differences
+                          input="{
+                            key: 'indigenous2_filename',
+                            title: t( 'misc.file' ) + ' 2',
+                            type: 'file'
+                          }"
+                          difference="model.viewModel.compareRecord.differences.part2.indigenous.indigenous2_filename"
+                          model="model">
+                        </cn-view-input-with-differences>
+                      </div>
+                    </div>
+                    <div ng-show="
+                      model.viewModel.record.indigenous2_filename ||
+                      model.viewModel.record.indigenous3_filename
+                    ">
+                      <div class="form-horizontal">
+                        <cn-view-input-with-differences
+                          input="{
+                            key: 'indigenous3_filename',
+                            title: t( 'misc.file' ) + ' 3',
+                            type: 'file'
+                          }"
+                          difference="model.viewModel.compareRecord.differences.part2.indigenous.indigenous3_filename"
+                          model="model">
+                        </cn-view-input-with-differences>
+                      </div>
+                    </div>
+                    <div ng-show="
+                      model.viewModel.record.indigenous3_filename ||
+                      model.viewModel.record.indigenous4_filename
+                    ">
+                      <div class="form-horizontal">
+                        <cn-view-input-with-differences
+                          input="{
+                            key: 'indigenous4_filename',
+                            title: t( 'misc.file' ) + ' 4',
+                            type: 'file'
+                          }"
+                          difference="model.viewModel.compareRecord.differences.part2.indigenous.indigenous4_filename"
+                          model="model">
+                        </cn-view-input-with-differences>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </fieldset>
