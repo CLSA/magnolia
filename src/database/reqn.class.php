@@ -626,16 +626,30 @@ class reqn extends \cenozo\database\record
     // if moving to the data release or active stage then check for the correct linked-data agreement and approval
     if( 'Data Release' == $db_next_stage_type->name || 'Active' == $db_next_stage_type->name )
     {
-      if( $db_reqn_version->has_linked_data() &&
-          ( is_null( $db_reqn_version->data_sharing_filename ) || !$this->data_sharing_approved ) )
+      if( $db_reqn_version->has_linked_data() )
       {
-        throw lib::create( 'exception\notice',
-          sprintf(
-            'Unable to proceed to the %s stage as this requisition requests linked data without an approved data sharing agreement.',
-            $db_next_stage_type->name
-          ),
-          __METHOD__
-        );
+        if( is_null( $db_reqn_version->data_sharing_filename ) )
+        {
+          throw lib::create( 'exception\notice',
+            sprintf(
+              'Unable to proceed to the %s stage as this requisition requests linked data but the '.
+              'CANUE data use and sharing agreement has not been uploaded.',
+              $db_next_stage_type->name
+            ),
+            __METHOD__
+          );
+        }
+        else if( !$this->data_sharing_approved )
+        {
+          throw lib::create( 'exception\notice',
+            sprintf(
+              'Unable to proceed to the %s stage as the CANUE data use and sharing agreement has not '.
+              'been approved.',
+              $db_next_stage_type->name
+            ),
+            __METHOD__
+          );
+        }
       }
     }
 
