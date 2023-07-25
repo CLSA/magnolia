@@ -1055,6 +1055,8 @@ cenozoApp.defineModule({
               if (null != this.record.override_price) {
                 cost = this.record.override_price;
               } else {
+                const waiveFee = this.record.waiver && "none" != this.record.waiver;
+
                 // determine the base cost based on country (assume the base country if none is provided)
                 var baseCountryId = CnSession.application.baseCountryId;
                 var applicantCountryId =
@@ -1079,8 +1081,7 @@ cenozoApp.defineModule({
                   } else if (
                     baseCountryId == traineeCountryId &&
                     baseCountryId == applicantCountryId &&
-                    this.record.waiver &&
-                    "none" != this.record.waiver
+                    waiveFee
                   ) {
                     // if both are canadian and there is a fee waiver means the base cost is 0
                     cost = 0;
@@ -1122,25 +1123,27 @@ cenozoApp.defineModule({
                 // now add any additional fees
                 cost += this.record.additional_fee_total;
 
-                // now add amendment costs (including all past amendments)
-                if(!this.versionListLoaded || angular.isUndefined(this.parentModel.amendmentTypeList)) {
-                  return this.translate("misc.calculating") + "...";
-                } else {
-                  var currentAmendment = null;
-                  this.versionList.forEach(version => {
-                    if (null != version &&
-                        '.' != version.amendment &&
-                        this.record.amendment >= version.amendment) {
-                      if(currentAmendment == version.amendment) return;
+                // now add amendment costs (including all past amendments) if there is no fee waiver
+                if( !waiveFee ) {
+                  if(!this.versionListLoaded || angular.isUndefined(this.parentModel.amendmentTypeList)) {
+                    return this.translate("misc.calculating") + "...";
+                  } else {
+                    var currentAmendment = null;
+                    this.versionList.forEach(version => {
+                      if (null != version &&
+                          '.' != version.amendment &&
+                          this.record.amendment >= version.amendment) {
+                        if(currentAmendment == version.amendment) return;
 
-                      // add the cost of any amendment that this version has selected
-                      let c = international ? "feeInternational" : "feeCanada";
-                      this.parentModel.amendmentTypeList.en
-                        .filter(aType => 0 < aType[c] && version["amendmentType"+aType.id])
-                        .forEach(aType => { cost += aType[c]; });
-                      currentAmendment = version.amendment;
-                    }
-                  });
+                        // add the cost of any amendment that this version has selected
+                        let c = international ? "feeInternational" : "feeCanada";
+                        this.parentModel.amendmentTypeList.en
+                          .filter(aType => 0 < aType[c] && version["amendmentType"+aType.id])
+                          .forEach(aType => { cost += aType[c]; });
+                        currentAmendment = version.amendment;
+                      }
+                    });
+                  }
                 }
               }
 

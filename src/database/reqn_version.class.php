@@ -477,6 +477,8 @@ class reqn_version extends \cenozo\database\record
     }
     else
     {
+      $waiveFee = !is_null( $this->waiver ) && 'none' != $this->waiver;
+
       // cost for trainees is different to applicants
       $international = false;
       if( $db_reqn->trainee_user_id ) {
@@ -484,10 +486,12 @@ class reqn_version extends \cenozo\database\record
           // if either the trainee or applicant isn't Canadian then the base fee is 5000
           $cost = 5000;
           $international = true;
-        } else if( $base_country_id == $trainee_country_id &&
-                   $base_country_id == $applicant_country_id &&
-                   !is_null( $this->waiver ) &&
-                   'none' != $this->waiver ) {
+        }
+        else if(
+          $base_country_id == $trainee_country_id &&
+          $base_country_id == $applicant_country_id &&
+          $waiveFee
+        ) {
           // if both are canadian and there is a fee waiver means the base cost is 0
           $cost = 0;
         }
@@ -569,14 +573,17 @@ class reqn_version extends \cenozo\database\record
       $reqn_version_mod->order_desc( 'version' );
       $reqn_version_list = $db_reqn->get_reqn_version_object_list( $reqn_version_mod );
 
-      $current_amendment = NULL;
-      foreach( $db_reqn->get_reqn_version_list( $reqn_version_sel, $reqn_version_mod ) as $reqn_version )
+      if( !$waiveFee )
       {
-        // only process the highest version of each amendment
-        if( $current_amendment == $reqn_version['amendment'] ) continue;
+        $current_amendment = NULL;
+        foreach( $db_reqn->get_reqn_version_list( $reqn_version_sel, $reqn_version_mod ) as $reqn_version )
+        {
+          // only process the highest version of each amendment
+          if( $current_amendment == $reqn_version['amendment'] ) continue;
 
-        $cost += $reqn_version['fee'];
-        $current_amendment = $reqn_version['amendment'];
+          $cost += $reqn_version['fee'];
+          $current_amendment = $reqn_version['amendment'];
+        }
       }
     }
 
