@@ -13,7 +13,7 @@ global $SETTINGS;
 $SETTINGS['general']['application_name'] = 'magnolia';
 $SETTINGS['general']['instance_name'] = $SETTINGS['general']['application_name'];
 $SETTINGS['general']['version'] = '2.9';
-$SETTINGS['general']['build'] = '4024338';
+$SETTINGS['general']['build'] = '5499e81';
 
 // the location of magnolia internal path
 $SETTINGS['path']['APPLICATION'] = str_replace( '/settings.ini.php', '', __FILE__ );
@@ -68,6 +68,9 @@ $SETTINGS['general']['start_date_delay'] = 6;
 
 // how many months past a requisition's deadline must its start date be?
 $SETTINGS['general']['max_references_per_reqn'] = 20;
+
+// how many weeks before a notification is sent to remind of a deferrred reqn
+$SETTINGS['general']['deferred_reminder'] = 6;
 
 // how many days that study data remains available to the user
 $SETTINGS['general']['study_data_expiry'] = 7;

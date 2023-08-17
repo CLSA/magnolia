@@ -1,6 +1,7 @@
 cenozoApp.defineModule({
   name: "reqn_type",
   models: ["list", "view"],
+  defaultTab: 'reqn',
   create: (module) => {
     angular.extend(module, {
       identifier: { column: "name" },
