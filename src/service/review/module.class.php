@@ -171,7 +171,6 @@ class module extends \cenozo\service\module
       $join_sel->add_column( 'id', 'review_id' );
       $join_sel->add_column( 'COUNT(*)', 'total', false );
       $join_mod = lib::create( 'database\modifier' );
-      $join_mod->join( 'review_type', 'review.review_type_id', 'review_type.id' );
       $join_mod->join( 'review_answer', 'review.id', 'review_answer.review_id' );
       $join_mod->where( 'review_answer.answer', '!=', NULL );
       $join_mod->group( 'review.id' );
@@ -193,7 +192,6 @@ class module extends \cenozo\service\module
       $join_sel->add_column( 'id', 'review_id' );
       $join_sel->add_column( 'COUNT(*)', 'total', false );
       $join_mod = lib::create( 'database\modifier' );
-      $join_mod->join( 'review_type', 'review.review_type_id', 'review_type.id' );
       $join_mod->join( 'review_answer', 'review.id', 'review_answer.review_id' );
       $join_mod->where( 'review_answer.answer', '=', true );
       $join_mod->group( 'review.id' );
@@ -213,6 +211,43 @@ class module extends \cenozo\service\module
       $select->add_column(
         'IF( num_questions.total = 0, "N/A", CONCAT( IFNULL( num_yes_answers.total, 0 ), " / ", IFNULL( num_answers.total, 0 ) ) )',
         'answered_questions',
+        false
+      );
+    }
+
+    // add review answers comments to the note
+    if( $select->has_table_column( 'review', 'note' ) )
+    {
+      $join_sel = lib::create( 'database\select' );
+      $join_sel->from( 'review' );
+      $join_sel->add_column( 'id', 'review_id' );
+      $join_sel->add_column(
+        'GROUP_CONCAT( CONCAT( "(Q", review_type_question.rank, ") ", comment ) ORDER BY rank SEPARATOR "<br />\n" )',
+        'comments',
+        false
+      );
+      $join_mod = lib::create( 'database\modifier' );
+      $join_mod->join( 'review_answer', 'review.id', 'review_answer.review_id' );
+      $join_mod->join(
+        'review_type_question',
+        'review_answer.review_type_question_id',
+        'review_type_question.id'
+      );
+      $join_mod->group( 'review.id' );
+
+      $modifier->left_join(
+        sprintf( '( %s %s ) AS %s', $join_sel->get_sql(), $join_mod->get_sql(), 'answer_comments' ),
+        'review.id',
+        'answer_comments.review_id'
+      );
+
+      $select->add_column(
+        'IF( '.
+          'answer_comments.comments IS NULL, '.
+          'review.note, '.
+          'CONCAT( review.note, "<br />\n<br />\nQuestion Comments:<br />\n", answer_comments.comments )'.
+        ')',
+        'note',
         false
       );
     }
