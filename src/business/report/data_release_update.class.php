@@ -28,6 +28,8 @@ class data_release_update extends \cenozo\business\report\base_report
     $modifier = lib::create( 'database\modifier' );
 
     $select->from( 'reqn' );
+    $modifier->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
+    $modifier->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
 
     // only display reqns that have not reached the final report
     $db_stage_type = $stage_type_class_name::get_unique_record( 'name', 'Report Required' );
@@ -47,6 +49,7 @@ class data_release_update extends \cenozo\business\report\base_report
     $modifier->order( 'reqn.identifier' );
 
     $select->add_column( 'Identifier', 'Identifier' );
+    $select->add_column( 'reqn_version.title', 'Title', false );
     $select->add_column( 'CONCAT_WS( " ", user.first_name, user.last_name )', 'Applicant Name', false );
     $select->add_column( 'user.email', 'Applicant Email', false );
     $select->add_column(
