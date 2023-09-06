@@ -14,6 +14,7 @@ cenozoApp.defineModule({
           column: "reqn.identifier",
           title: "Requisition",
         },
+        amendment: { title: "Amendment" },
         stage_type: {
           column: "stage_type.name",
           title: "Stage Type",

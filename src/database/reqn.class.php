@@ -743,6 +743,7 @@ class reqn extends \cenozo\database\record
     // create the new stage
     $db_next_stage = lib::create( 'database\stage' );
     $db_next_stage->reqn_id = $this->id;
+    $db_next_stage->amendment = $db_reqn_version->amendment;
     $db_next_stage->stage_type_id = $db_next_stage_type->id;
     $db_next_stage->save();
 

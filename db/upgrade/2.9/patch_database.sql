@@ -25,4 +25,6 @@ SOURCE role_has_service.sql
 
 SOURCE update_version_number.sql
 
+SELECT "TO COMPLETE THE INSTALLATION: you must now run the 'stage.php' script" AS "";
+
 COMMIT;
