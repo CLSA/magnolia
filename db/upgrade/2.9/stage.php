@@ -147,6 +147,11 @@ class patch
         ) );
       }
       $result->free();
+
+      $this->query(
+        'ALTER TABLE stage '.
+        'ADD UNIQUE INDEX uq_reqn_id_amendment_stage_type_id (reqn_id ASC, amendment ASC, stage_type_id ASC)'
+      );
     }
 
     out( 'Disconnecting from the database' );

@@ -14,6 +14,7 @@ SOURCE data_option.sql
 SOURCE reqn_version.sql
 SOURCE reqn_type.sql
 SOURCE reqn_type_has_stage_type.sql
+SOURCE review.sql
 
 SOURCE report_type.sql
 SOURCE application_type_has_report_type.sql

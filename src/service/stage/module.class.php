@@ -25,6 +25,9 @@ class module extends \cenozo\service\module
     $modifier->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
     $modifier->left_join( 'user', 'stage.user_id', 'user.id' );
 
+    if( $select->has_column( 'amendment' ) )
+      $select->add_column( 'REPLACE( stage.amendment, ".", "no" )', 'amendment', false );
+
     if( $select->has_column( 'user_full_name' ) )
       $select->add_column( 'CONCAT( user.first_name, " ", user.last_name )', 'user_full_name', false );
 
