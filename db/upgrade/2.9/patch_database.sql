@@ -16,6 +16,10 @@ SOURCE reqn_type.sql
 SOURCE reqn_type_has_stage_type.sql
 SOURCE review.sql
 
+SOURCE overview.sql
+SOURCE application_type_has_overview.sql
+SOURCE role_has_overview.sql
+
 SOURCE report_type.sql
 SOURCE application_type_has_report_type.sql
 SOURCE role_has_report_type.sql
