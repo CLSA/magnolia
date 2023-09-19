@@ -21,6 +21,7 @@ class patch extends \cenozo\service\patch
     $file = $this->get_argument( 'file', NULL );
     if( false !== strpos( util::get_header( 'Content-Type' ), 'application/octet-stream' ) && !is_null( $file ) )
     {
+      if( 'filename' == $file ) $file = 'filename1';
       if( !preg_match( '/filename[0-9]+/', $file ) )
         throw lib::create( 'exception\argument', 'file', $file, __METHOD__ );
 
