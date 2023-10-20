@@ -1336,6 +1336,40 @@ class reqn extends \cenozo\database\record
   /**
    * Sends expired ethics approval notifications
    */
+  public static function send_deferred_reminder_notifications()
+  {
+    $setting_manager = lib::create( 'business\setting_manager' );
+    $weeks = $setting_manager->get_setting( 'general', 'deferred_reminder' );
+
+    $notification_type_class_name = lib::get_class_name( 'database\notification_type' );
+    $db_notification_type =
+      $notification_type_class_name::get_unique_record( 'name', 'Deferred Application Reminder' );
+
+    $modifier = lib::create( 'database\modifier' );
+    $join_mod = lib::create( 'database\modifier' );
+    $join_mod->where( 'reqn.id', '=', 'notification.reqn_id', false );
+    $join_mod->where( 'notification.notification_type_id', '=', $db_notification_type->id );
+    $join_mod->where( 'TIMESTAMPDIFF( DAY, UTC_TIMESTAMP(), notification.datetime )', '=', 0 );
+    $modifier->join_modifier( 'notification', $join_mod, 'left' );
+    $modifier->where( 'TIMESTAMPDIFF( DAY, state_date, UTC_TIMESTAMP() )', '=', 7*$weeks );
+    $modifier->where( 'notification.id', '=', NULL );
+
+    $reqn_list = static::select_objects( $modifier );
+
+    foreach( $reqn_list as $db_reqn )
+    {
+      $db_notification = lib::create( 'database\notification' );
+      $db_notification->notification_type_id = $db_notification_type->id;
+      $db_notification->set_reqn( $db_reqn ); // this saves the record
+      $db_notification->mail();
+    }
+
+    return count( $reqn_list );
+  }
+
+  /**
+   * Sends expired ethics approval notifications
+   */
   public static function send_expired_ethics_notifications()
   {
     $notification_type_class_name = lib::get_class_name( 'database\notification_type' );

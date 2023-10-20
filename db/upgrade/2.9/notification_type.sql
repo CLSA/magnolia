@@ -15,6 +15,26 @@ La présente est un rappel que votre Entente d’accès aux données de l’ÉLC
 
 L’équipe d’accès aux données de l’ÉLCV";
 
+INSERT IGNORE INTO notification_type SET
+  name = "Deferred Application Reminder",
+  title_en = "Action Required Deferred",
+  title_fr = "Action requise différée",
+  message_en = "Dear Dr. {{applicant_name}},
+
+Your application number {{identifier}}, entitled \"{{title}}\", requires action in order to move it forward.
+Please log in to the CLSA online data application software, Magnolia (https://magnolia.clsa-elcv.ca/live/gl/), complete the changes and submit for further review.
+If you have any questions, please contact us at access@clsa-elcv.ca.
+
+The CLSA Data Access Team",
+
+  message_fr = "Bonjour Dr / Dre {{applicant_name}}, 
+
+Votre demande d’accès {{identifier}}, intitulée « {{title}} », requiert votre attention afin de le faire avancer. 
+Connectez-vous à Magnolia, le logiciel de demande d’accès aux données en ligne de l’ÉLCV (https://magnolia.clsa-elcv.ca/live/gl/), veuillez effectuer toutes les modifications et soumettre la demande à nouveau. 
+Si vous avez des questions, veuillez nous contacter à access@clsa-elcv.ca. 
+
+L’équipe d’accès aux données de l’ÉLCV";
+
 UPDATE notification_type SET
   name = "Agreement Expiry Notice (1 month)"
 WHERE name = "Agreement Expiry Notice";
