@@ -234,6 +234,7 @@
             <cn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_1a" class="bg-info"></cn-deferral-note>
             <p class="text-primary" ng-bind-html="t( 'part1.a.text1' )"></p>
             <p class="text-primary" ng-bind-html="t( 'part1.a.text2' )"></p>
+            <p class="text-primary" ng-bind-html="'<strong>'+t( 'misc.emailText' )+'</strong>'"></p>
             <hr/>
             <form id="part1aForm" name="part1aForm" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
               <div class="form-horizontal">
@@ -403,6 +404,7 @@
           <div class="panel-body">
             <cn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_1b"></cn-deferral-note>
             <p class="text-primary" ng-bind-html="t( 'part1.b.text' )"></p>
+            <p class="text-primary" ng-bind-html="'<strong>'+t( 'misc.emailText' )+'</strong>'"></p>
             <div class="panel panel-default">
               <div class="panel-body"
                    ng-class="{ 'bg-warning': 0 < model.viewModel.compareRecord.differences.part1.b.coapplicantList.length }">
