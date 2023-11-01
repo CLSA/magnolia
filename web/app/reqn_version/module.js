@@ -102,6 +102,7 @@ cenozoApp.defineModule({
       legacy: { column: "reqn.legacy", type: "string" },
       show_prices: { column: "reqn.show_prices", type: "string" },
       override_price: { column: "reqn.override_price", type: "integer" },
+      special_fee_waiver_id: { column: "reqn.special_fee_waiver_id", type: "integer" },
       state: { column: "reqn.state", type: "string" },
       data_directory: { column: "reqn.data_directory", type: "string" },
       data_expiry_date: { column: "reqn.data_expiry_date", type: "date" },
@@ -1054,6 +1055,8 @@ cenozoApp.defineModule({
               let cost = 3000;
               if (null != this.record.override_price) {
                 cost = this.record.override_price;
+              } else if (this.record.special_fee_waiver_id) {
+                cost = 0;
               } else {
                 const waiveFee = this.record.waiver && "none" != this.record.waiver;
 

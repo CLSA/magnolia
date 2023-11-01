@@ -207,6 +207,16 @@ cenozoApp.defineModule({
           "Legacy requisitions are those which were created outside of Magnolia. " +
           "Use this option when uploading pre-existing requisitions into the software.",
       },
+      special_fee_waiver_id: {
+        title: "Special Fee Waiver",
+        type: "enum",
+        isExcluded: function ($state, model) {
+          return "view" != model.getActionFromState();
+        },
+        help:
+          "The special fee waiver can only be applied to requisitions whose deadline falls in the waiver's " +
+          "timespan, and only one requistion can be applied per waiver per applicant.",
+      },
       show_prices: {
         title: "Show Fee",
         type: "boolean",
@@ -1167,8 +1177,8 @@ cenozoApp.defineModule({
           CnBaseListFactory.construct(this, parentModel);
 
           angular.extend(this, {
-            // Set the heading as part of the 'onList' function so that it updates if we switch from the main reqn list
-            // to/from the special data-sharing list
+            // Set the heading as part of the 'onList' function so that it updates if we switch from the main
+            // reqn list to/from the special data-sharing list
             onList: function (replace) {
               this.heading =
                 parentModel.module.name.plural.ucWords() +
@@ -1177,19 +1187,6 @@ cenozoApp.defineModule({
                   : " List");
               return this.$$onList(replace);
             },
-
-            /*
-            onSelect: async function (record) {
-              if (this.parentModel.isRole("applicant", "designate", "typist")) {
-                // navigate to the report if in the finalization phase, and the reqn-version if not
-                await $state.go("reqn_version.view", {
-                  identifier: record.reqn_version_id,
-                });
-              } else {
-                this.$$onSelect(record);
-              }
-            },
-            */
 
             search: this.parentModel.getQueryParameter("search"),
             showSearch: function () {
@@ -1481,6 +1478,18 @@ cenozoApp.defineModule({
                         return true;
                       };
               }
+
+              const deadline = parentModel.metadata.columnList.deadline_id.enumList.findByProperty(
+                "value",
+                this.record.deadline_id
+              );
+              parentModel.metadata.columnList.special_fee_waiver_id.enumList.forEach( item => {
+                item.disabled = !(
+                  null != deadline &&
+                  item.start_date <= deadline.datetime &&
+                  deadline.datetime <= item.end_date
+                );
+              });
             },
 
             updateOutputListLanguage: function () {
@@ -2161,7 +2170,7 @@ cenozoApp.defineModule({
             getMetadata: async function () {
               await this.$$getMetadata();
 
-              var [reqnTypeResponse, deadlineResponse, languageResponse] =
+              var [reqnTypeResponse, deadlineResponse, specialFeeWaiverResponse, languageResponse] =
                 await Promise.all([
                   CnHttpFactory.instance({
                     path: "reqn_type",
@@ -2174,8 +2183,16 @@ cenozoApp.defineModule({
                   CnHttpFactory.instance({
                     path: "deadline",
                     data: {
-                      select: { column: ["id", "name"] },
+                      select: { column: ["id", "name", "datetime"] },
                       modifier: { order: "datetime", desc: true, limit: 1000 },
+                    },
+                  }).query(),
+
+                  CnHttpFactory.instance({
+                    path: "special_fee_waiver",
+                    data: {
+                      select: { column: ["id", "name", "start_date", "end_date"] },
+                      modifier: { order: "start_date", desc: true, limit: 1000 },
                     },
                   }).query(),
 
@@ -2200,7 +2217,19 @@ cenozoApp.defineModule({
 
               this.metadata.columnList.deadline_id.enumList =
                 deadlineResponse.data.reduce((list, item) => {
-                  list.push({ value: item.id, name: item.name });
+                  list.push({ value: item.id, datetime: item.datetime, name: item.name });
+                  return list;
+                }, []);
+
+              this.metadata.columnList.special_fee_waiver_id.enumList =
+                specialFeeWaiverResponse.data.reduce((list, item) => {
+                  list.push({
+                    value: item.id,
+                    name: item.name,
+                    start_date: item.start_date,
+                    end_date: item.end_date,
+                    disabled: true
+                  });
                   return list;
                 }, []);
 

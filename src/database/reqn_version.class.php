@@ -473,7 +473,11 @@ class reqn_version extends \cenozo\database\record
     $cost = 3000;
     if( !is_null( $db_reqn->override_price ) )
     {
-      $cost =$db_reqn->override_price;
+      $cost = $db_reqn->override_price;
+    }
+    else if( !is_null( $db_reqn->special_fee_waiver_id ) )
+    {
+      $cost = 0;
     }
     else
     {

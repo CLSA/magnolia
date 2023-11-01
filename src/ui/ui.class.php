@@ -140,6 +140,12 @@ class ui extends \cenozo\ui\ui
       $module->add_choose( 'reqn' );
     }
 
+    $module = $this->get_module( "special_fee_waiver" );
+    if( !is_null( $module ) )
+    {
+      $module->add_child( 'reqn' );
+    }
+
     // remove viewing a study phase, there's no need
     $module = $this->get_module( 'study_phase' );
     if( !is_null( $module ) && $module->has_action( 'view' ) ) $module->remove_action( 'view' );
@@ -189,6 +195,7 @@ class ui extends \cenozo\ui\ui
     {
       $this->add_listitem( 'Data Categories', 'data_category' );
       $this->add_listitem( 'Output Types', 'output_type' );
+      $this->add_listitem( 'Special Fee Waiver', 'special_fee_waiver' );
     }
     if( in_array( $db_role->name, ['administrator', 'readonly'] ) ) $this->add_listitem( 'Requisition Types', 'reqn_type' );
   }

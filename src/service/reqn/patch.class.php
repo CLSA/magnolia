@@ -36,12 +36,37 @@ class patch extends \cenozo\service\patch
   {
     parent::validate();
 
+    $db_reqn = $this->get_leaf_record();
+    $patch_array = $this->get_file_as_array();
+
+    // if setting the special fee waiver, make sure the applicant hasn't already used it
+    if( is_array( $patch_array ) && array_key_exists( 'special_fee_waiver_id', $patch_array ) )
+    {
+      $special_fee_waiver_id = $patch_array['special_fee_waiver_id'];
+      if( $special_fee_waiver_id )
+      {
+        $db_special_fee_waiver = lib::create( 'database\special_fee_waiver', $special_fee_waiver_id );
+        $db_existing_reqn = $db_special_fee_waiver->get_applied_reqn_by_user( $db_reqn->get_user() );
+        if( !is_null( $db_existing_reqn ) )
+        {
+          throw lib::create( 'exception\notice',
+            sprintf(
+              'The special fee waiver "%s" cannot be applied to this requisition as it has already been applied '.
+              'to "%s" which belongs to the same applicant.',
+              $db_special_fee_waiver->name,
+              $db_existing_reqn->identifier
+            ),
+            __METHOD__
+          );
+        }
+      }
+    }
+
     $action = $this->get_argument( 'action', false );
     if( $action )
     {
       // define whether the action is allowed
       $db_role = lib::create( 'business\session' )->get_role();
-      $db_reqn = $this->get_leaf_record();
       $db_reqn_version = $db_reqn->get_current_reqn_version();
       $db_current_stage_type = $db_reqn->get_current_stage_type();
       $state = $db_reqn->state;

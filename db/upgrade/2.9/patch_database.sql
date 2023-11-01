@@ -2,6 +2,7 @@
 
 SET AUTOCOMMIT=0;
 
+SOURCE special_fee_waiver.sql
 SOURCE reqn.sql
 SOURCE reqn_current_final_report.sql
 SOURCE pdf_form.sql
