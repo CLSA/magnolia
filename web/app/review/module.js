@@ -39,9 +39,8 @@ cenozoApp.defineModule({
           column: "recommendation_type.name",
           title: "Recommendation",
         },
-        note: {
-          column: "review.note",
-          title: "Note",
+        full_note: {
+          title: "Full Note",
           align: "left",
           isIncluded: function ($state, model) {
             return "root.home" != $state.current.name;
