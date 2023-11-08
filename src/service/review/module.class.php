@@ -216,7 +216,7 @@ class module extends \cenozo\service\module
     }
 
     // add review answers comments to the note
-    if( $select->has_table_column( 'review', 'note' ) )
+    if( $select->has_column( 'full_note' ) )
     {
       $join_sel = lib::create( 'database\select' );
       $join_sel->from( 'review' );
@@ -245,9 +245,13 @@ class module extends \cenozo\service\module
         'IF( '.
           'answer_comments.comments IS NULL, '.
           'review.note, '.
-          'CONCAT( review.note, "<br />\n<br />\nQuestion Comments:<br />\n", answer_comments.comments )'.
+          'IF( '.
+            'review.note IS NULL, '.
+            'CONCAT( "Question Comments:<br />\n", answer_comments.comments ), '.
+            'CONCAT( review.note, "<br />\n<br />\nQuestion Comments:<br />\n", answer_comments.comments )'.
+          ') '.
         ')',
-        'note',
+        'full_note',
         false
       );
     }
