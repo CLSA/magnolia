@@ -37,43 +37,14 @@ cenozoApp.defineModule({
         title: "Version",
         type: "date",
       },
-      filename: {
+      data: {
         title: "File",
-        type: "file",
+        type: "base64",
+        mimeType: "application/pdf",
+        getFilename: function ($state, model) {
+          return model.viewModel.record.institution + " (" + model.viewModel.record.version + ")";
+        }
       },
     });
-
-    /* ############################################################################################## */
-    cenozo.providers.factory("CnDataAgreementAddFactory", [
-      "CnBaseAddFactory",
-      function (CnBaseAddFactory) {
-        var object = function (parentModel) {
-          CnBaseAddFactory.construct(this, parentModel);
-          this.configureFileInput("filename");
-        };
-        return {
-          instance: function (parentModel) {
-            return new object(parentModel);
-          },
-        };
-      },
-    ]);
-
-    /* ############################################################################################## */
-    cenozo.providers.factory("CnDataAgreementViewFactory", [
-      "CnBaseViewFactory",
-      "CnHttpFactory",
-      function (CnBaseViewFactory, CnHttpFactory) {
-        var object = function (parentModel, root) {
-          CnBaseViewFactory.construct(this, parentModel, root);
-          this.configureFileInput("filename");
-        };
-        return {
-          instance: function (parentModel, root) {
-            return new object(parentModel, root);
-          },
-        };
-      },
-    ]);
   },
 });

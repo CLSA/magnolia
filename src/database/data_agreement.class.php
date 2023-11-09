@@ -12,4 +12,4 @@ use cenozo\lib, cenozo\log, magnolia\util;
 /**
  * data_agreement: record
  */
-class data_agreement extends \cenozo\database\has_data {}
+class data_agreement extends \cenozo\database\record {}

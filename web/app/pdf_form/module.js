@@ -42,55 +42,11 @@ cenozoApp.defineModule({
         type: "boolean",
         help: "Determines whether this is the actively used version of the form (only one version may be active)",
       },
-      filename: {
+      data: {
         title: "File",
-        type: "file",
+        type: "base64",
+        isConstant: true
       },
     });
-
-    /* ############################################################################################## */
-    cenozo.providers.factory("CnPdfFormAddFactory", [
-      "CnBaseAddFactory",
-      function (CnBaseAddFactory) {
-        var object = function (parentModel) {
-          CnBaseAddFactory.construct(this, parentModel);
-          this.configureFileInput("filename", "pdf");
-        };
-        return {
-          instance: function (parentModel) {
-            return new object(parentModel);
-          },
-        };
-      },
-    ]);
-
-    /* ############################################################################################## */
-    cenozo.providers.factory("CnPdfFormViewFactory", [
-      "CnBaseViewFactory",
-      "CnHttpFactory",
-      function (CnBaseViewFactory, CnHttpFactory) {
-        var object = function (parentModel, root) {
-          CnBaseViewFactory.construct(this, parentModel, root);
-          this.configureFileInput("filename", "pdf");
-
-          var self = this;
-          this.afterView(function () {
-            if (angular.isUndefined(self.downloadFile)) {
-              self.downloadFile = async function () {
-                await CnHttpFactory.instance({
-                  path: self.parentModel.getServiceResourcePath(),
-                  format: "pdf",
-                }).file();
-              };
-            }
-          });
-        };
-        return {
-          instance: function (parentModel, root) {
-            return new object(parentModel, root);
-          },
-        };
-      },
-    ]);
   },
 });
