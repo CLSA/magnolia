@@ -2,6 +2,8 @@
 
 SET AUTOCOMMIT=0;
 
+SOURCE custom_report.sql
+SOURCE role_has_custom_report.sql
 SOURCE special_fee_waiver.sql
 SOURCE reqn.sql
 SOURCE reqn_current_final_report.sql
