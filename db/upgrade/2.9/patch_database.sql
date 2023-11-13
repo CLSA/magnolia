@@ -8,6 +8,7 @@ SOURCE special_fee_waiver.sql
 SOURCE reqn.sql
 SOURCE reqn_current_final_report.sql
 SOURCE pdf_form.sql
+SOURCE supplemental_file.sql
 SOURCE data_agreement.sql
 SOURCE notification_type.sql
 SOURCE amendment_type.sql

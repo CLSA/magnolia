@@ -24,33 +24,22 @@ cenozoApp.defineModule({
         type: "string",
         help: "The name of the file (in French) as it will appear along with study data.",
       },
-      filename_en: {
+      data_en: {
         title: "File (English)",
-        type: "file",
-        isExcluded: "add",
+        type: "base64",
+        mimeType: "application/pdf",
+        getFilename: function ($state, model) {
+          return model.viewModel.record.name_en;
+        },
       },
-      filename_fr: {
+      data_fr: {
         title: "File (French)",
-        type: "file",
-        isExcluded: "add",
+        type: "base64",
+        mimeType: "application/pdf",
+        getFilename: function ($state, model) {
+          return model.viewModel.record.name_fr;
+        },
       },
     });
-
-    /* ############################################################################################## */
-    cenozo.providers.factory("CnSupplementalFileViewFactory", [
-      "CnBaseViewFactory",
-      function (CnBaseViewFactory) {
-        var object = function (parentModel, root) {
-          CnBaseViewFactory.construct(this, parentModel, root);
-          this.configureFileInput("filename_en");
-          this.configureFileInput("filename_fr");
-        };
-        return {
-          instance: function (parentModel, root) {
-            return new object(parentModel, root);
-          },
-        };
-      },
-    ]);
   },
 });
