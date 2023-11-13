@@ -337,10 +337,14 @@ cenozo.service("CnReqnHelper", [
           return "new" == phase;
         } else if ("defer" == subject) {
           return (
-            "administrator" == role &&
-            !["abandoned", "inactive", "deferred"].includes(state) &&
-            ["review", "active", "finalization"].includes(phase) &&
-            "Pre Data Destruction" != stageType
+            !["abandoned", "inactive", "deferred"].includes(state) && ((
+              "administrator" == role &&
+              ["review", "active", "finalization"].includes(phase) &&
+              "Pre Data Destruction" != stageType
+            ) || (
+              "communication" == role &&
+              "Communications Review" == stageType
+            ))
           );
         } else if ("amend" == subject) {
           return (
