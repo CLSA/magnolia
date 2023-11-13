@@ -383,7 +383,7 @@ cenozoApp.defineModule({
         type: "enum",
         isConstant: true,
         isExcluded: function ($state, model) {
-          return model.isRole("administrator", "readonly") ? "add" : true;
+          return model.isRole("administrator", "communication", "readonly") ? "add" : true;
         },
       },
       state_date: {
@@ -391,7 +391,7 @@ cenozoApp.defineModule({
         type: "date",
         isConstant: true,
         isExcluded: function ($state, model) {
-          return model.isRole("administrator", "readonly") ? "add" : true;
+          return model.isRole("administrator", "communication", "readonly") ? "add" : true;
         },
       },
       website: {

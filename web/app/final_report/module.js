@@ -652,8 +652,8 @@ cenozoApp.defineModule({
               return this.$$getEditEnabled() && "finalization" == phase && (
                 // applicants and designates can only edit when the reqn is deferred
                 this.isRole("applicant", "designate") ? "deferred" == state :
-                // otherwise administrators and typists can always edit, no other role can
-                this.isRole("administrator", "typist")
+                // otherwise only certain roles can always edit
+                this.isRole("administrator", "communication", "typist")
               );
             },
 
