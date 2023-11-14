@@ -24,7 +24,7 @@ CREATE PROCEDURE patch_role_has_service()
     DEALLOCATE PREPARE statement;
 
     SET @sql = CONCAT(
-      "INSERT INTO role_has_service( role_id, service_id ) ",
+      "INSERT IGNORE INTO role_has_service( role_id, service_id ) ",
       "SELECT role.id, service.id ",
       "FROM ", @cenozo, ".role, service ",
       "WHERE role.name = 'communication' ",
