@@ -7,9 +7,9 @@ cenozoApp.defineModule({
         column: "name",
       },
       name: {
-        singular: "additional fee",
-        plural: "additional fees",
-        possessive: "additional fee's",
+        singular: "special fee waiver",
+        plural: "special fee waivers",
+        possessive: "special fee waiver's",
       },
       columnList: {
         name: { title: "Name", },
