@@ -317,9 +317,7 @@ cenozo.service("CnReqnHelper", [
 
         if ("submit" == subject) {
           return (
-            ["applicant", "designate", "administrator", "typist"].includes(
-              role
-            ) &&
+            ["applicant", "designate", "administrator", "typist"].includes(role) &&
             ("new" == phase || "deferred" == state)
           );
         } else if ("view" == subject) {
@@ -353,7 +351,7 @@ cenozo.service("CnReqnHelper", [
             ) &&
             !["abandoned", "deferred"].includes(state) &&
             "active" == phase &&
-            "Report Required" != stageType
+            !["Report Required", "Data Destruction"].includes(stageType)
           );
         } else if ("deactivate" == subject) {
           return (
@@ -376,8 +374,10 @@ cenozo.service("CnReqnHelper", [
           );
         } else if ("recreate" == subject) {
           return "administrator" == role && "complete" == phase;
-        } else if ("report" == subject) {
+        } else if ("final report" == subject) {
           return "finalization" == phase || "Complete" == stageType;
+        } else if ("destruction report" == subject) {
+          return ["Data Destruction", "Complete"].includes(stageType);
         } else if ("reverse" == subject) {
           return (
             // don't allow if inactive or abandoned
@@ -505,15 +505,13 @@ cenozo.service("CnReqnHelper", [
       download: async function (subject, id) {
         var http = {
           path:
-            "final_report" == subject
-              ? "final_report/" + id
-              : "reqn_version/" + id + "?file=" + subject,
+            "final_report" == subject ? "final_report/" + id :
+            "destruction_report" == subject ? "destruction_report/" + id :
+            "reqn_version/" + id + "?file=" + subject,
           format:
-            "final_report" == subject
-              ? "pdf"
-              : "data_option_list" == subject
-              ? "csv"
-              : "unknown",
+            ["final_report", "destruction_report"].includes(subject) ? "pdf" :
+            "data_option_list" == subject ? "csv" :
+            "unknown",
         };
         await CnHttpFactory.instance(http).file();
       },
@@ -1020,6 +1018,7 @@ cenozo.service("CnReqnHelper", [
             notices: { en: "Notices", fr: "Notifications" },
             studyData: { en: "Study Data", fr: "Données d’étude" },
             finalReport: { en: "Final Report", fr: "Rapport final" },
+            destructionReport: { en: "Data Destruction Report", fr: "TODO: TRANSLATE" },
             study: {
               clsa: { en: "CLSA", fr: "ÉLCV" },
               covid_19_questionnaire: {
@@ -1055,9 +1054,13 @@ cenozo.service("CnReqnHelper", [
               en: "Add Ethics Approval",
               fr: "Ajouter une lettre d’approbation éthique",
             },
-            reportRequiredWarning: {
+            finalReportRequiredWarning: {
               en: "This application’s final report is required, would you like to view it now?",
               fr: "Il faut fournir un rapport final pour cette demande, souhaitez-vous l’afficher maintenant?",
+            },
+            destructionReportRequiredWarning: {
+              en: "This application’s data destruction report is required, would you like to view it now?",
+              fr: "TODO: TRANSLATE",
             },
             costCombined: {
               en: "A combined fee will be applied for these study-phases when requested at the same time.",
@@ -1365,8 +1368,9 @@ cenozo.service("CnReqnHelper", [
             },
             download: { en: "Download", fr: "Télécharger" },
             application: { en: "Application", fr: "Soumission" },
-            submit: { en: "Submit", fr: "Soumettre" },
             finalReport: { en: "Final Report", fr: "Rapport final" },
+            destructionReport: { en: "Data Destruction Report", fr: "TODO TRANSLATE" },
+            submit: { en: "Submit", fr: "Soumettre" },
             pleaseConfirm: { en: "Please confirm", fr: "Veuillez confirmer" },
             submitTitle: {
               en: "Final Report Submitted",
@@ -1407,6 +1411,74 @@ cenozo.service("CnReqnHelper", [
             noChangesMessage: {
               en: "You have not made any changes to the report since your last submission.  Are you sure you wish to proceed?",
               fr: "Vous n’avez apporté aucune modification au rapport depuis votre dernière soumission. Êtes-vous sûr de vouloir continuer?",
+            },
+          },
+        },
+        destructionReport: {
+          heading: {
+            en: "CLSA Approved User Research Data Destruction Report",
+            fr: "TODO: TRANSLATE",
+          },
+          instructions: {
+            tab: { en: "Instructions", fr: "Consignes" },
+            title: {
+              en: "Completing the CLSA Approved User Data Destruction Report",
+              fr: "TODO: TRANSLATE",
+            },
+            text1: {
+              en: "TODO",
+              fr: "TODO: TRANSLATE",
+            },
+          },
+          dataList: {
+            tab: { en: "Data List", fr: "TODO: TRANSLATE" },
+            text: {
+              en: "TODO",
+              fr: "TODO: TRANSLATE",
+            },
+          },
+          misc: {
+            prevButton: {
+              en: "Return to the previous section",
+              fr: "Retourner à la section précédente",
+            },
+            nextButton: {
+              en: "Proceed to the next section",
+              fr: "Passez à la section suivante",
+            },
+            download: { en: "Download", fr: "Télécharger" },
+            application: { en: "Application", fr: "Soumission" },
+            submit: { en: "Submit", fr: "Soumettre" },
+            finalReport: { en: "Final Report", fr: "Rapport final" },
+            destructionReport: { en: "Data Destruction Report", fr: "TODO: TRANSLATE" },
+            pleaseConfirm: { en: "Please confirm", fr: "Veuillez confirmer" },
+            submitTitle: {
+              en: "Data Destruction Report Submitted",
+              fr: "TODO: TRANSLATE",
+            },
+            submitMessage: {
+              en: "You have successfully submitted your Destruction Report and it will now be reviewed. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.",
+              fr: "TODO: TRANSLATE",
+            },
+            traineeSubmitTitle: {
+              en: "Data Destruction Report Submitted for Supervisor Approval",
+              fr: "TODO: TRANSLATE",
+            },
+            traineeSubmitMessage: {
+              en: "You have successfully submitted your Destruction Report and your supervisor will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.",
+              fr: "TODO: TRANSLATE",
+            },
+            designateSubmitTitle: {
+              en: "Data Destruction Report Submitted for Primary Applicant Approval",
+              fr: "TODO: TRANSLATE",
+            },
+            designateSubmitMessage: {
+              en: "You have successfully submitted the Destruction Report on behalf of the primary applicant and they will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.",
+              fr: "TODO: TRANSLATE",
+            },
+            submitWarning: {
+              en: "Are you sure that all changes are complete and the report is ready to be submitted?",
+              fr: "Êtes-vous sûr d’avoir apporté toutes les modifications souhaitées et de vouloir soumettre le rapport?",
             },
           },
         },

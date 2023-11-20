@@ -70,6 +70,12 @@ class module extends \cenozo\service\module
     $modifier->join( 'reqn', 'reqn_version.reqn_id', 'reqn.id' );
     $modifier->join( 'reqn_current_final_report', 'reqn.id', 'reqn_current_final_report.reqn_id' );
     $modifier->left_join( 'final_report', 'reqn_current_final_report.final_report_id', 'final_report.id' );
+    $modifier->join( 'reqn_current_destruction_report', 'reqn.id', 'reqn_current_destruction_report.reqn_id' );
+    $modifier->left_join(
+      'destruction_report',
+      'reqn_current_destruction_report.destruction_report_id',
+      'destruction_report.id'
+    );
     $modifier->join( 'user', 'reqn.user_id', 'user.id' );
     $modifier->left_join( 'user', 'reqn.trainee_user_id', 'trainee_user.id', 'trainee_user' );
     $modifier->left_join( 'user', 'reqn.designate_user_id', 'designate_user.id', 'designate_user' );

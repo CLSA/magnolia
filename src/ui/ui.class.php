@@ -51,10 +51,12 @@ class ui extends \cenozo\ui\ui
     if( !is_null( $module ) )
     {
       $module->add_child( 'final_report' );
+      $module->add_child( 'destruction_report' );
       $module->add_child( 'reqn_version' );
       $module->add_child( 'review' );
       $module->add_child( 'stage' );
       $module->add_child( 'data_release' );
+      $module->add_child( 'data_destroy' );
       $module->add_child( 'notice' );
       $module->add_child( 'ethics_approval' );
       $module->add_child( 'notification' );
@@ -111,6 +113,9 @@ class ui extends \cenozo\ui\ui
       $module->add_child( 'output' );
       $module->append_action_query( 'view', '?{t}&{c}' );
     }
+
+    $module = $this->get_module( 'destruction_report' );
+    if( !is_null( $module ) ) $module->append_action_query( 'view', '?{t}&{c}' );
 
     $module = $this->get_module( 'stage_type' );
     if( !is_null( $module ) ) $module->add_child( 'reqn' );

@@ -44,6 +44,18 @@ CREATE PROCEDURE patch_reqn()
         ON UPDATE NO ACTION;
     END IF;
 
+    SELECT "Adding deferral_note_destruction column to reqn table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "deferral_note_destruction";
+
+    IF @test = 0 THEN
+      ALTER TABLE reqn ADD COLUMN deferral_note_destruction TEXT NULL DEFAULT NULL AFTER deferral_note_report3;
+    END IF;
+
   END //
 DELIMITER ;
 

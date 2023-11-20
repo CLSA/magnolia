@@ -67,6 +67,7 @@ cenozoApp.defineModule({
         column: "reqn.deferral_note_report3",
         type: "text",
       },
+      current_destruction_report_id: { column: "destruction_report.id", type: "string" },
     });
 
     /* ############################################################################################## */
@@ -232,17 +233,22 @@ cenozoApp.defineModule({
             show: function (subject) {
               return CnReqnHelper.showAction(subject, this.record);
             },
-            viewReqn: function () {
-              return this.parentModel.transitionToParentViewState(
+            viewReqn: async function () {
+              await this.parentModel.transitionToParentViewState(
                 "reqn",
                 "identifier=" + this.record.identifier
               );
             },
-            viewReqnVersion: function () {
-              return this.parentModel.transitionToParentViewState(
+            viewReqnVersion: async function () {
+              await this.parentModel.transitionToParentViewState(
                 "reqn_version",
                 this.record.current_reqn_version_id
               );
+            },
+            viewDestructionReport: async function () {
+              await $state.go("destruction_report.view", {
+                identifier: this.record.current_destruction_report_id,
+              });
             },
 
             onView: async function (force) {
@@ -457,8 +463,6 @@ cenozoApp.defineModule({
 
               // Calculate all differences for all versions (in reverse order so we can find the last agreement version)
               this.versionList.reverse();
-
-              this.lastAgreementVersion = null;
               this.versionList.forEach((version) => {
                 if (null != version)
                   version.differences = this.getDifferences(version);

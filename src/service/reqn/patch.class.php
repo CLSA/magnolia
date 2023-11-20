@@ -106,9 +106,10 @@ class patch extends \cenozo\service\patch
       }
       else if( 'amend' == $action )
       {
-        if( !in_array( $db_role->name, array( 'applicant', 'designate', 'administrator', 'typist' ) ) ||
-            'active' != $phase ||
-            'Report Required' == $db_current_stage_type->name ) $code = 403;
+        if(
+          !in_array( $db_role->name, array( 'applicant', 'designate', 'administrator', 'typist' ) ) ||
+          'active' != $phase
+        ) $code = 403;
       }
       else if( 'incomplete' == $action )
       {
@@ -275,7 +276,18 @@ class patch extends \cenozo\service\patch
       $action = $this->get_argument( 'action', false );
       if( $action )
       {
-        $phase = $db_reqn->get_current_stage_type()->phase;
+        $db_current_stage_type = $db_reqn->get_current_stage_type();
+        $phase = $db_current_stage_type->phase;
+        $stage_type = $db_current_stage_type->name;
+
+        // determine the working form based on the current phase and stage type
+        $working_form = 'requisition';
+        if( 'finalization' == $phase )
+        {
+          // determine which report is being done
+          $working_form = 'Data Destruction' == $stage_type ? 'destruction report' : 'final report';
+        }
+
         if( 'reset_data' == $action )
         {
           $this->set_data( $db_reqn->refresh_study_data_files() );
@@ -296,9 +308,9 @@ class patch extends \cenozo\service\patch
             $reqn_version_mod->order_desc( 'version' );
             foreach( $db_reqn->get_reqn_version_object_list( $reqn_version_mod ) as $db_amendment_reqn_version )
             {
-              $report_mod = lib::create( 'database\modifier' );
-              $report_mod->where( 'amendment', '=', $db_amendment_reqn_version->amendment );
-              foreach( $db_reqn->get_review_object_list( $report_mod ) as $db_review ) $db_review->delete();
+              $review_mod = lib::create( 'database\modifier' );
+              $review_mod->where( 'amendment', '=', $db_amendment_reqn_version->amendment );
+              foreach( $db_reqn->get_review_object_list( $review_mod ) as $db_review ) $db_review->delete();
               $db_amendment_reqn_version->delete();
             }
 
@@ -331,8 +343,9 @@ class patch extends \cenozo\service\patch
           $db_reqn->state = 'deferred';
           $db_reqn->save();
 
-          // create a new reqn version
-          if( 'finalization' == $phase ) $db_reqn->create_final_report();
+          // create a new document version
+          if( 'final report' == $working_form ) $db_reqn->create_final_report();
+          else if( 'destruction report' == $working_form ) $db_reqn->create_destruction_report();
           else $db_reqn->create_version();
 
           // send a notification
@@ -393,10 +406,15 @@ class patch extends \cenozo\service\patch
             // first fill in the admin review
             $db_review = $review_class_name::get_unique_record(
               array( 'reqn_id', 'amendment', 'review_type_id' ),
-              array( $db_reqn->id, $db_reqn_version->amendment, $review_type_class_name::get_unique_record( 'name', 'Admin' )->id )
+              array(
+                $db_reqn->id,
+                $db_reqn_version->amendment,
+                $review_type_class_name::get_unique_record( 'name', 'Admin' )->id
+              )
             );
             $db_review->user_id = $db_user->id;
-            $db_review->recommendation_type_id = $recommendation_type_class_name::get_unique_record( 'name', 'Satisfactory' )->id;
+            $db_review->recommendation_type_id =
+              $recommendation_type_class_name::get_unique_record( 'name', 'Satisfactory' )->id;
             $db_review->datetime = util::get_datetime_object();
             $db_review->note = 'Legacy amendment review process skipped.';
             $db_review->save();
@@ -405,7 +423,7 @@ class patch extends \cenozo\service\patch
             $db_reqn->state = NULL;
             $db_reqn->save();
 
-            // when resubmitting set the version/report datetime
+            // when resubmitting set the version datetime
             $db_reqn_version->datetime = util::get_datetime_object();
             $db_reqn_version->save();
 
@@ -419,10 +437,12 @@ class patch extends \cenozo\service\patch
             {
               // send a notification to the supervisor
               $db_notification = lib::create( 'database\notification' );
-              $db_notification->notification_type_id = $notification_type_class_name::get_unique_record(
-                'name',
-                'finalization' == $phase ? 'Approval Required, Final Report' : 'Approval Required'
-              )->id;
+              $name = 'Approval Required';
+              if( 'final report' == $working_form ) $name .= ', Final Report';
+              else if( 'destruction report' == $working_form ) $name .= ', Destruction Report';
+
+              $db_notification->notification_type_id =
+                $notification_type_class_name::get_unique_record( 'name', $name )->id;
               $db_notification->set_reqn( $db_reqn );
               $db_notification->mail();
             }
@@ -434,7 +454,7 @@ class patch extends \cenozo\service\patch
                 $db_reqn->save();
 
                 // when resubmitting set the version/report datetime
-                if( 'finalization' == $phase )
+                if( 'final report' == $working_form )
                 {
                   $db_final_report = $db_reqn->get_current_final_report();
                   $db_final_report->datetime = util::get_datetime_object();
@@ -443,6 +463,12 @@ class patch extends \cenozo\service\patch
                   // if in the report required stage then proceed to the next one
                   if( 'Report Required' == $db_reqn->get_current_stage_type()->name )
                     $db_reqn->proceed_to_next_stage();
+                }
+                else if( 'destruction report' == $working_form )
+                {
+                  $db_destruction_report = $db_reqn->get_current_destruction_report();
+                  $db_destruction_report->datetime = util::get_datetime_object();
+                  $db_destruction_report->save();
                 }
                 else
                 {
@@ -458,26 +484,25 @@ class patch extends \cenozo\service\patch
 
               // send a notification
               $db_reqn_user = $db_reqn->get_user();
-              $notification_class_name::mail_admin(
-                sprintf(
-                  '%s %s: submitted',
-                  'finalization' == $phase ? 'Final Report' : 'Requisition',
-                  $db_reqn->identifier
-                ),
-                sprintf(
-                  "The following %s has been submitted:\n".
-                  "\n".
-                  "Type: %s\n".
-                  "Identifier: %s\n".
-                  "Applicant: %s %s\n".
-                  "Title: %s\n",
-                  'finalization' == $phase ? 'final report' : 'requisition',
-                  $db_reqn->get_reqn_type()->name,
-                  $db_reqn->identifier,
-                  $db_reqn_user->first_name, $db_reqn_user->last_name,
-                  $db_reqn_version->title
-                )
+              $subject = sprintf(
+                '%s %s: submitted',
+                ucwords( $working_form ),
+                $db_reqn->identifier
               );
+              $message = sprintf(
+                "The following %s has been submitted:\n".
+                "\n".
+                "Type: %s\n".
+                "Identifier: %s\n".
+                "Applicant: %s %s\n".
+                "Title: %s\n",
+                $working_form,
+                $db_reqn->get_reqn_type()->name,
+                $db_reqn->identifier,
+                $db_reqn_user->first_name, $db_reqn_user->last_name,
+                $db_reqn_version->title
+              );
+              $notification_class_name::mail_admin( $subject, $message );
             }
           }
         }

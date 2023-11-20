@@ -105,7 +105,10 @@ class reqn extends \cenozo\database\record
     $reqn_class_name = lib::get_class_name( 'database\reqn' );
 
     // convert final_report_id to reqn_id
-    if( !$util_class_name::string_matches_int( $identifier ) && false === strpos( 'final_report_id=', $identifier ) )
+    if(
+      !$util_class_name::string_matches_int( $identifier ) &&
+      false === strpos( 'final_report_id=', $identifier )
+    )
     {
       $regex = '/final_report_id=([0-9]+)/';
       $matches = array();
@@ -120,6 +123,29 @@ class reqn extends \cenozo\database\record
         catch( \cenozo\exception\runtime $e )
         {
           // A runtime exception means the final report or reqn doesn't exist, so leave the identifier unchanged
+        }
+      }
+    }
+
+    // convert destruction_report_id to reqn_id
+    if(
+      !$util_class_name::string_matches_int( $identifier ) &&
+      false === strpos( 'destruction_report_id=', $identifier )
+    )
+    {
+      $regex = '/destruction_report_id=([0-9]+)/';
+      $matches = array();
+      if( preg_match( $regex, $identifier, $matches ) )
+      {
+        try
+        {
+          $db_destruction_report = lib::create( 'database\destruction_report', $matches[1] );
+          $db_reqn = lib::create( 'database\reqn', $db_destruction_report->reqn_id );
+          $identifier = $db_reqn->id;
+        }
+        catch( \cenozo\exception\runtime $e )
+        {
+          // A runtime exception means the destruction report or reqn doesn't exist, so leave the identifier unchanged
         }
       }
     }
@@ -310,6 +336,30 @@ class reqn extends \cenozo\database\record
   }
 
   /**
+   * Creates a new version of the requisition's destruction report
+   * 
+   * If no destruction report exists then the first (empty) version will be created.  Otherwise the current
+   * destruction report will be copied exactly into a new version
+   */
+  public function create_destruction_report()
+  {
+    // first get the current destruction_report to determine the next version number
+    $db_current_destruction_report = $this->get_current_destruction_report();
+    $version = is_null( $db_current_destruction_report ) ? 1 : $db_current_destruction_report->version + 1;
+
+    // create the new record and copy the current record (if it exists)
+    $db_destruction_report = lib::create( 'database\destruction_report' );
+    if( !is_null( $db_current_destruction_report ) )
+      $db_destruction_report->copy( $db_current_destruction_report );
+
+    // define some of the column values insetad of using the clone
+    $db_destruction_report->reqn_id = $this->id;
+    $db_destruction_report->datetime = util::get_datetime_object();
+    $db_destruction_report->version = $version;
+    $db_destruction_report->save();
+  }
+
+  /**
    * Returns the path to various files associated with the reqn
    * 
    * @param string $type Should be 'instruction'
@@ -494,6 +544,10 @@ class reqn extends \cenozo\database\record
                                   : 'Not Approved';
           }
         }
+        else if( 'Pre Data Destruction' == $db_current_stage_type->name )
+        {
+          $find_stage_type_name = 0 < $this->get_data_destroy_count() ? 'Data Destruction' : 'Complete';
+        }
 
         // now find the approrpiate stage type
         if( !is_null( $find_stage_type_name ) )
@@ -558,6 +612,14 @@ class reqn extends \cenozo\database\record
     if( 'Report Required' == $db_current_stage->get_stage_type()->name )
     {
       foreach( $this->get_final_report_object_list() as $db_final_report ) $db_final_report->delete();
+    }
+
+    // if moving from data destruction to pre data destruction then delete all destruction report records
+    $db_current_stage = $this->get_current_stage();
+    if( 'Data Destruction' == $db_current_stage->get_stage_type()->name )
+    {
+      foreach( $this->get_destruction_report_object_list() as $db_destruction_report )
+        $db_destruction_report->delete();
     }
 
     $db_current_stage->delete();
@@ -700,6 +762,10 @@ class reqn extends \cenozo\database\record
       if( $incomplete ) $db_notification_type = $notification_type_class_name::get_unique_record( 'name', 'Incomplete' );
       else if( $withdrawn ) $db_notification_type = $notification_type_class_name::get_unique_record( 'name', 'Withdrawn' );
       else $db_notification_type = $db_current_stage_type->get_notification_type();
+
+      // don't notify of data destruction if there is no data to destroy
+      if( 'Pre Data Destruction' == $db_current_stage_type->name && 'Complete' == $db_next_stage_type->name )
+        $db_notification_type = NULL;
 
       if( !( $start_amendment || is_null( $db_notification_type ) ) )
       {
@@ -924,6 +990,39 @@ class reqn extends \cenozo\database\record
 
       $db_notification->mail();
     }
+    // when reaching the pre data destruction stage automatically create all data_destroy records
+    else if( 'Pre Data Destruction' == $db_next_stage_type->name )
+    {
+      // delete any existing data_destroy records (there shouldn't be any)
+      $data_destroy_mod = lib::create( 'database\modifier' );
+      $data_destroy_mod->where( 'reqn_id', '=', $this->id );
+      static::db()->execute( 'DELETE FROM data_destroy %s', $data_destroy_mod->get_sql() );
+
+      $data_sel = lib::create( 'database\select' );
+      $data_sel->add_table_column( 'data_version', 'name' );
+      $data_sel->set_distinct( true );
+      $data_mod = lib::create( 'database\modifier' );
+      $data_mod->join( 'data_version', 'data_release.data_version_id', 'data_version.id' );
+      $data_mod->order( 'data_version.name' );
+      foreach( $this->get_data_release_list( $data_sel, $data_mod ) as $data )
+      {
+        $db_data_destroy = lib::create( 'database\data_destroy' );
+        $db_data_destroy->reqn_id = $this->id;
+        $db_data_destroy->name = $data['name'];
+        $db_data_destroy->save();
+      }
+    }
+    // if the destruction report is now required then automatically defer the reqn
+    else if( 'Data Destruction' == $db_next_stage_type->name )
+    {
+      $this->state = 'deferred';
+      $this->save();
+
+      // create a new destruction report
+      $this->create_destruction_report();
+
+      // do not send a notification since there is one already sent after leaving the Decision Made stage
+    }
     else if( $incomplete || $withdrawn )
     {
       $this->state = NULL;
@@ -999,6 +1098,31 @@ class reqn extends \cenozo\database\record
 
     $final_report_id = static::db()->get_one( sprintf( '%s %s', $select->get_sql(), $modifier->get_sql() ) );
     return $final_report_id ? lib::create( 'database\final_report', $final_report_id ) : NULL;
+  }
+
+  /**
+   * Returns this reqn's latest destruction_report record
+   * 
+   * @access public
+   */
+  public function get_current_destruction_report()
+  {
+    // check the primary key value
+    if( is_null( $this->id ) )
+    {
+      log::warning( 'Tried to query reqn with no primary key.' );
+      return NULL;
+    }
+
+    $select = lib::create( 'database\select' );
+    $select->from( 'reqn_current_destruction_report' );
+    $select->add_column( 'destruction_report_id' );
+    $modifier = lib::create( 'database\modifier' );
+    $modifier->where( 'reqn_id', '=', $this->id );
+
+    $destruction_report_id =
+      static::db()->get_one( sprintf( '%s %s', $select->get_sql(), $modifier->get_sql() ) );
+    return $destruction_report_id ? lib::create( 'database\destruction_report', $destruction_report_id ) : NULL;
   }
 
   /**

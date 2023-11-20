@@ -179,6 +179,10 @@ cenozoApp.defineModule({
           column: "final_report.id",
           type: "hidden",
         },
+        destruction_report_id: {
+          column: "destruction_report.id",
+          type: "hidden",
+        },
       },
       defaultOrder: {
         column: "identifier",
@@ -511,6 +515,11 @@ cenozoApp.defineModule({
         type: "string",
         isExcluded: true,
       },
+      current_destruction_report_id: {
+        column: "destruction_report.id",
+        type: "string",
+        isExcluded: true,
+      },
       next_stage_type: { type: "string", isExcluded: true },
       amendment: {
         column: "reqn_version.amendment",
@@ -720,7 +729,8 @@ cenozoApp.defineModule({
         isExcluded: function ($state, model) {
           return (
             "add" == model.getActionFromState() ||
-            "finalization" != model.viewModel.record.phase
+            "finalization" != model.viewModel.record.phase ||
+            null != model.viewModel.record.stage_type.match(/Data Destruction/)
           );
         },
       },
@@ -730,7 +740,8 @@ cenozoApp.defineModule({
         isExcluded: function ($state, model) {
           return (
             "add" == model.getActionFromState() ||
-            "finalization" != model.viewModel.record.phase
+            "finalization" != model.viewModel.record.phase ||
+            null != model.viewModel.record.stage_type.match(/Data Destruction/)
           );
         },
       },
@@ -740,7 +751,18 @@ cenozoApp.defineModule({
         isExcluded: function ($state, model) {
           return (
             "add" == model.getActionFromState() ||
-            "finalization" != model.viewModel.record.phase
+            "finalization" != model.viewModel.record.phase ||
+            null != model.viewModel.record.stage_type.match(/Data Destruction/)
+          );
+        },
+      },
+      deferral_note_destruction: {
+        title: "Data Destruction List",
+        type: "text",
+        isExcluded: function ($state, model) {
+          return (
+            "add" == model.getActionFromState() ||
+            "Data Destruction" != model.viewModel.record.stage_type
           );
         },
       },
@@ -756,13 +778,25 @@ cenozoApp.defineModule({
     });
 
     module.addExtraOperation("view", {
-      title: "View Report",
+      title: "View Final Report",
       isIncluded: function ($state, model) {
         return model.viewModel.record.current_final_report_id;
       },
       operation: async function ($state, model) {
         await $state.go("final_report.view", {
           identifier: model.viewModel.record.current_final_report_id,
+        });
+      },
+    });
+
+    module.addExtraOperation("view", {
+      title: "View Destruction Report",
+      isIncluded: function ($state, model) {
+        return model.viewModel.record.current_destruction_report_id;
+      },
+      operation: async function ($state, model) {
+        await $state.go("destruction_report.view", {
+          identifier: model.viewModel.record.current_destruction_report_id,
         });
       },
     });
@@ -1062,9 +1096,19 @@ cenozoApp.defineModule({
             await model.viewModel.downloadFinalReport();
           },
           isIncluded: function ($state, model) {
-            return ["finalization", "complete"].includes(
-              model.viewModel.record.phase
+            return (
+              "finalization" == model.viewModel.record.phase ||
+              "Complete" == model.viewModel.record.stage_type
             );
+          },
+        },
+        {
+          title: "Destruction Report",
+          operation: async function ($state, model) {
+            await model.viewModel.downloadDestructionReport();
+          },
+          isIncluded: function ($state, model) {
+            return ["Data Destruction", "Complete"].includes(model.viewModel.record.stage_type);
           },
         },
         {
@@ -1324,6 +1368,12 @@ cenozoApp.defineModule({
                 this.record.current_final_report_id
               );
             },
+            downloadDestructionReport: async function () {
+              await CnReqnHelper.download(
+                "destruction_report",
+                this.record.current_destruction_report_id
+              );
+            },
 
             resetData: async function () {
               var response = await CnHttpFactory.instance({
@@ -1457,8 +1507,16 @@ cenozoApp.defineModule({
                 }
               }
 
-              // update the column languages in case they were changed while viewing a final report
+              // update the column languages in case they were changed while viewing a report
               await this.$$onView(force);
+
+              // update whether we can edit the data destroy list
+              if (angular.isDefined(this.dataDestroyModel)) {
+                this.dataDestroyModel.getAddEnabled = "Pre Data Destruction" == this.record.stage_type ?
+                  function () { return this.$$getAddEnabled(); } : function () { return false; }
+                this.dataDestroyModel.getDeleteEnabled = "Pre Data Destruction" == this.record.stage_type ?
+                  function () { return this.$$getDeleteEnabled(); } : function () { return false; }
+              }
 
               if (angular.isDefined(this.noticeModel)) {
                 this.noticeModel.columnList.viewed_by_trainee_user.isIncluded =
@@ -1616,16 +1674,22 @@ cenozoApp.defineModule({
               );
             },
 
-            reportDeferralNotesExist: function () {
-              var phase = this.record.phase
-                ? this.record.phase
-                : "";
+            finalReportDeferralNotesExist: function () {
+              var phase = this.record.phase ? this.record.phase : "";
+              var stage_type = this.record.stage_type ? this.record.stage_type : "";
               return (
                 "finalization" == phase &&
-                (this.record.deferral_note_report1 ||
+                null == stage_type.match(/Data Destruction/) && (
+                  this.record.deferral_note_report1 ||
                   this.record.deferral_note_report2 ||
-                  this.record.deferral_note_report3)
+                  this.record.deferral_note_report3
+                )
               );
+            },
+
+            destructionReportDeferralNotesExist: function () {
+              var stage_type = this.record.stage_type ? this.record.stage_type : "";
+              return "Data Destruction" == stage_type && this.record.deferral_note_destruction;
             },
 
             enabled: function (subject) {
@@ -1704,9 +1768,11 @@ cenozoApp.defineModule({
                   : this.record.next_stage_type) +
                 '" stage?';
               if (
-                this.parentModel.isRole("administrator") &&
-                (this.reqnDeferralNotesExist() ||
-                  this.reportDeferralNotesExist())
+                this.parentModel.isRole("administrator") && (
+                  this.reqnDeferralNotesExist() ||
+                  this.finalReportDeferralNotesExist() ||
+                  this.destructionReportDeferralNotesExist()
+                )
               ) {
                 message +=
                   "\n\nWARNING: There are deferral notes present, you may wish to remove them before proceeding.";
@@ -1737,6 +1803,33 @@ cenozoApp.defineModule({
                       " has no ethics agreement, " +
                       "you may not wish to proceed until one has been uploaded.";
                   }
+                }
+              } else if ("Pre Data Destruction" == this.record.stage_type) {
+                // the next stage depends on data destroy records, so get the current next stage now
+                const response = await CnHttpFactory.instance({
+                  path: this.parentModel.getServiceResourcePath(),
+                  data: { select: { column: 'next_stage_type' } },
+                }).get();
+
+                message =
+                  "Are you sure you wish to move this " +
+                  this.parentModel.module.name.singular +
+                  ' to the "' + response.data.next_stage_type + '" stage?';
+                if ("Complete" == response.data.next_stage_type) {
+                  message +=
+                    "\n\nWARNING: There is no data to destroy, so the Data Destruction stage will be skipped.";
+                }
+              } else if ("Data Destruction" == this.record.stage_type) {
+                // warn if there are any data-destroy records without a date
+                const response = await CnHttpFactory.instance({
+                  path: this.parentModel.getServiceResourcePath() + "/data_destroy",
+                  data: { modifier: { where: { column: "data_destroy.datetime", operator: "=", value: null } } },
+                }).count();
+
+                const count = parseInt(response.headers("Total"));
+                if(0 < count) {
+                  message +=
+                    "\n\nWARNING: There are " + count + " data versions that do not have a date of destruction.";
                 }
               }
 
@@ -1780,7 +1873,8 @@ cenozoApp.defineModule({
                 "A notification will be sent indicating that an action is required by the applicant.";
               if (
                 !this.reqnDeferralNotesExist() &&
-                !this.reportDeferralNotesExist()
+                !this.finalReportDeferralNotesExist() &&
+                !this.destructionReportDeferralNotesExist()
               ) {
                 message +=
                   "\n\nWARNING: there are currently no deferral notes to instruct the applicant why " +
@@ -1941,9 +2035,14 @@ cenozoApp.defineModule({
             getChildList: function () {
               var list = this.$$getChildList();
 
-              // remove the final report item if not in the finalization or complete phase
-              if ( !["finalization", "complete"].includes( this.record.phase ) ) {
+              // remove the final report item if not in the finalization phase or complete stage
+              if ("finalization" == this.record.phase || "Complete" == this.record.stage_type) {
                 list = list.filter( (child) => "final_report" != child.subject.snake );
+              }
+
+              // remove the destruction report item if not in the data destruction or complete stage
+              if ( !["Data Destruction", "Complete"].includes( this.record.stage_type ) ) {
+                list = list.filter( (child) => "destruction_report" != child.subject.snake );
               }
 
               // remove the ethics approval item if this reqn has no ethics approval list
@@ -1954,6 +2053,11 @@ cenozoApp.defineModule({
               // remove the packaged data item is not in the data release or active stage
               if (!["Data Release", "Active"].includes(this.record.stage_type)) {
                 list = list.filter( (child) => "packaged_data" != child.subject.snake );
+              }
+
+              // remove the data destruction item if not in the data destruction stages
+              if (!["Pre Data Destruction", "Data Destruction"].includes(this.record.stage_type)) {
+                list = list.filter( (child) => "data_destroy" != child.subject.snake );
               }
 
               return list;
@@ -2086,11 +2190,18 @@ cenozoApp.defineModule({
             // override transitionToViewState (used when application views a reqn)
             transitionToViewState: async function (record) {
               if (this.isRole("applicant", "designate", "typist")) {
+                let state = "reqn_version.view";
+                let args = { identifier: record.reqn_version_id };
                 if ("finalization" == record.phase) {
-                  await $state.go("final_report.view", { identifier: record.final_report_id, });
-                } else {
-                  await $state.go("reqn_version.view", { identifier: record.reqn_version_id, });
+                  if ("Data Destruction" == record.stage_type) {
+                    state = "destruction_report.view";
+                    args = { identifier: record.destruction_report_id };
+                  } else if (null == record.stage_type.match(/Data Destruction/)) {
+                    state = "final_report.view";
+                    args = { identifier: record.final_report_id };
+                  }
                 }
+                await $state.go(state, args);
               } else {
                 await this.$$transitionToViewState(record);
               }

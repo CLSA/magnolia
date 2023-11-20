@@ -96,6 +96,7 @@ cenozoApp.defineModule({
       has_agreement_filename: { type: "boolean" },
 
       current_final_report_id: { column: "final_report.id", type: "string" },
+      current_destruction_report_id: { column: "destruction_report.id", type: "string" },
       trainee_user_id: { column: "reqn.trainee_user_id", type: "string" },
       designate_user_id: { column: "reqn.designate_user_id", type: "string" },
       identifier: { column: "reqn.identifier", type: "string" },
@@ -182,7 +183,8 @@ cenozoApp.defineModule({
               isAddingReference: false,
               isDeletingReference: [],
               isDeletingEthicsApproval: [],
-              reportRequiredWarningShown: false,
+              finalReportRequiredWarningShown: false,
+              destructionReportRequiredWarningShown: false,
               isTitleConstant: function () {
                 return (
                   !scope.model.isRole("administrator") &&
@@ -210,25 +212,26 @@ cenozoApp.defineModule({
 
             scope.model.viewModel.afterView(async () => {
               var record = scope.model.viewModel.record;
-
-              // display final report message if appropriate
               var stage_type = record.stage_type ? record.stage_type : "";
-              if (
-                scope.model.isRole("applicant", "designate") &&
-                "Report Required" == stage_type &&
-                "deferred" == scope.model.viewModel.record.state &&
-                !scope.reportRequiredWarningShown
-              ) {
-                scope.reportRequiredWarningShown = true;
-                await scope.model.viewModel.displayReportRequiredWarning();
-              }
 
               // display notices to the applicant if they've never seen it
+              if (scope.model.isRole("applicant", "designate") && record.has_unread_notice) {
+                await scope.model.viewModel.displayNotices();
+              }
+
+              // display report messages if appropriate
               if (
                 scope.model.isRole("applicant", "designate") &&
-                record.has_unread_notice
-              )
-                await scope.model.viewModel.displayNotices();
+                "deferred" == scope.model.viewModel.record.state
+              ) {
+                if ("Report Required" == stage_type && !scope.finalReportRequiredWarningShown) {
+                  scope.finalReportRequiredWarningShown = true;
+                  await scope.model.viewModel.displayFinalReportRequiredWarning();
+                } else if ("Data Destruction" == stage_type && !scope.destructionReportRequiredWarningShown) {
+                  scope.destructionReportRequiredWarningShown = true;
+                  await scope.model.viewModel.displayDestructionReportRequiredWarning();
+                }
+              }
             });
 
             scope.$watch("model.viewModel.record.start_date", (date) => {
@@ -626,9 +629,14 @@ cenozoApp.defineModule({
                 ? CnReqnHelper.translate("reqn", value, this.record.lang)
                 : "";
             },
-            viewReport: async function () {
+            viewFinalReport: async function () {
               await $state.go("final_report.view", {
                 identifier: this.record.current_final_report_id,
+              });
+            },
+            viewDestructionReport: async function () {
+              await $state.go("destruction_report.view", {
+                identifier: this.record.current_destruction_report_id,
               });
             },
             downloadApplication: async function () {
@@ -2752,15 +2760,26 @@ cenozoApp.defineModule({
               );
             },
 
-            displayReportRequiredWarning: async function () {
+            displayFinalReportRequiredWarning: async function () {
               var response = await CnModalConfirmFactory.instance({
                 title: this.translate("misc.pleaseConfirm"),
                 noText: this.translate("misc.no"),
                 yesText: this.translate("misc.yes"),
-                message: this.translate("misc.reportRequiredWarning"),
+                message: this.translate("misc.finalReportRequiredWarning"),
               }).show();
 
-              if (response) await this.viewReport();
+              if (response) await this.viewFinalReport();
+            },
+
+            displayDestructionReportRequiredWarning: async function () {
+              var response = await CnModalConfirmFactory.instance({
+                title: this.translate("misc.pleaseConfirm"),
+                noText: this.translate("misc.no"),
+                yesText: this.translate("misc.yes"),
+                message: this.translate("misc.destructionReportRequiredWarning"),
+              }).show();
+
+              if (response) await this.viewDestructionReport();
             },
 
             displayNotices: async function () {

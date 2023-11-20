@@ -16,7 +16,10 @@ CREATE PROCEDURE patch_role_has_service()
       "SELECT role.id, service.id ",
       "FROM ", @cenozo, ".role, service ",
       "WHERE role.name = 'administrator' ",
-      "AND service.subject IN( 'additional_fee', 'log_entry', 'packaged_data', 'special_fee_waiver' ) ",
+      "AND service.subject IN( ",
+        "'additional_fee', 'data_destroy', 'destruction_report', 'log_entry', ",
+        "'packaged_data', 'special_fee_waiver' ",
+      ") ",
       "AND service.restricted = 1"
     );
     PREPARE statement FROM @sql;
@@ -59,6 +62,18 @@ CREATE PROCEDURE patch_role_has_service()
         "( service.subject = 'final_report' AND service.method != 'POST' ) OR",
         "( service.subject IN ('output', 'output_source') ) ",
       ")"
+    );
+    PREPARE statement FROM @sql;
+    EXECUTE statement;
+    DEALLOCATE PREPARE statement;
+
+    SET @sql = CONCAT(
+      "INSERT IGNORE INTO role_has_service( role_id, service_id ) ",
+      "SELECT role.id, service.id ",
+      "FROM ", @cenozo, ".role, service ",
+      "WHERE role.name IN( 'applicant', 'designate' ) ",
+      "AND service.subject IN( 'data_destroy', 'destruction_report' ) ",
+      "AND service.restricted = 1"
     );
     PREPARE statement FROM @sql;
     EXECUTE statement;

@@ -72,6 +72,8 @@ class module extends \cenozo\service\module
     $modifier->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
     $modifier->join( 'reqn_current_final_report', 'reqn.id', 'reqn_current_final_report.reqn_id' );
     $modifier->left_join( 'final_report', 'reqn_current_final_report.final_report_id', 'final_report.id' );
+    $modifier->join( 'reqn_current_destruction_report', 'reqn.id', 'reqn_current_destruction_report.reqn_id' );
+    $modifier->left_join( 'destruction_report', 'reqn_current_destruction_report.destruction_report_id', 'destruction_report.id' );
     $modifier->left_join( 'deadline', 'reqn.deadline_id', 'deadline.id' );
     $modifier->join( 'user', 'reqn.user_id', 'user.id' );
     $modifier->left_join( 'user', 'reqn.trainee_user_id', 'trainee_user.id', 'trainee_user' );
@@ -255,6 +257,8 @@ class module extends \cenozo\service\module
         $select->add_column( 'IF( "deferred" = reqn.state, deferral_note_report2, NULL )', 'deferral_note_report2', false );
       if( $select->has_column( 'deferral_note_report3' ) )
         $select->add_column( 'IF( "deferred" = reqn.state, deferral_note_report3, NULL )', 'deferral_note_report3', false );
+      if( $select->has_column( 'deferral_note_destruction' ) )
+        $select->add_column( 'IF( "deferred" = reqn.state, deferral_note_destruction, NULL )', 'deferral_note_destruction', false );
     }
     else if( 'reviewer' == $db_role->name )
     {

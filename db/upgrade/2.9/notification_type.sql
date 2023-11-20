@@ -35,6 +35,37 @@ Si vous avez des questions, veuillez nous contacter à access@clsa-elcv.ca. 
 
 L’équipe d’accès aux données de l’ÉLCV";
 
+INSERT IGNORE INTO notification_type SET
+  name = "Data Destruction Required",
+  title_en = "CLSA Data Access - Data Destruction Required ({{identifier}})",
+  title_fr = "TODO (FR)",
+  message_en = "Dear Dr. {{applicant_name}},
+
+TODO: message to applicant
+If you have any questions, please contact us at access@clsa-elcv.ca.
+
+The CLSA Data Access Team",
+
+  message_fr = "Bonjour Dr / Dre {{applicant_name}}, 
+
+TODO: message to applicant (FR)
+L’équipe d’accès aux données de l’ÉLCV";
+
+INSERT IGNORE INTO notification_type SET
+  name = "Approval Required, Destruction Report",
+  title_en = "CLSA Data Access - Destruction Report Approval Required ({{identifier}})",
+  title_fr = "TODO (FR)",
+  message_en = "Dear Dr. {{applicant_name}},
+
+Your approval is required on the destruction report for your application number {{identifier}}, {{if_trainee}}on behalf of {{trainee_name}}, {{endif_trainee}}entitled \"{{title}}\".
+
+Please log in to the CLSA online data application software, Magnolia (https://magnolia.clsa-elcv.ca/live/gl/). Review the final report and, if you are satisfied, submit the final report.
+
+If you have any questions, please contact us at access@clsa-elcv.ca.
+
+The CLSA Data Access Team",
+  message_fr = "TODO (FR)";
+
 UPDATE notification_type SET
   name = "Agreement Expiry Notice (1 month)"
 WHERE name = "Agreement Expiry Notice";

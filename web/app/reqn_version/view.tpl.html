@@ -42,9 +42,14 @@
         </ul>
       </div>
       <button class="btn btn-default"
-              ng-if="model.viewModel.show('report')"
-              ng-click="model.viewModel.viewReport()"
+              ng-if="model.viewModel.show('final report')"
+              ng-click="model.viewModel.viewFinalReport()"
               ng-bind-html="t( 'misc.finalReport' )"
+              type="button"></button>
+      <button class="btn btn-default"
+              ng-if="model.viewModel.show('destruction report')"
+              ng-click="model.viewModel.viewDestructionReport()"
+              ng-bind-html="t( 'misc.destructionReport' )"
               type="button"></button>
       <div class="btn-group dropdown" ng-if="model.viewModel.show( 'compare' ) && 1 < model.viewModel.versionList.length">
         <button type="button"
