@@ -18,16 +18,14 @@
   </div>
   <div class="form-footer text-right bg-info" style="height:4.6em;">
     <div class="btn-group">
-      <div class="btn-group dropdown">
-        <button type="button"
-                class="btn btn-default dropdown-toggle"
-                id="downloadForms"
-                data-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false"
-                ng-click="model.viewModel.downloadDestructionReport()"
-                ng-bind-html="t( 'misc.download' )"></button>
-      </div>
+      <button type="button"
+              class="btn btn-default dropdown-toggle"
+              id="downloadForms"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
+              ng-click="model.viewModel.downloadDestructionReport()"
+              ng-bind-html="t( 'misc.download' )"></button>
       <button class="btn btn-default"
               ng-click="model.viewModel.viewReqnVersion()"
               ng-bind-html="t( 'misc.application' )"

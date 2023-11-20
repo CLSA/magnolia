@@ -33,69 +33,14 @@ cenozoApp.defineModule({
         isExcluded: 'add',
       },
       name: {
-        title: "", // defined below
+        title: "Data to Destroy",
         type: "string",
       },
       datetime: {
-        title: "", // defined below
+        title: "Date & Time of Destruction",
         type: "datetime",
       },
-      lang: { column: "language.code", type: "string", isExcluded: true },
-
-      // the following are for the form and will not appear in the view
     });
-
-    /* ############################################################################################## */
-    cenozo.providers.directive("cnDataDestroyAdd", [
-      "CnDataDestroyModelFactory",
-      "CnHttpFactory",
-      "CnReqnHelper",
-      function (CnDataDestroyModelFactory, CnHttpFactory, CnReqnHelper) {
-        return {
-          templateUrl: module.getFileUrl("add.tpl.html"),
-          restrict: "E",
-          scope: { model: "=?" },
-          controller: function ($scope) {
-            if (angular.isUndefined($scope.model))
-              $scope.model = CnDataDestroyModelFactory.root;
-
-            $scope.$on("cnRecordAdd ready", async function (event, data) {
-              var cnRecordAddScope = data;
-              var parent = $scope.model.getParentIdentifier();
-              var lang = "en";
-              if ("destruction_report" == parent.subject) {
-                var response = await CnHttpFactory.instance({
-                  path: "destruction_report/" + parent.identifier,
-                  data: {
-                    select: {
-                      column: {
-                        table: "language",
-                        column: "code",
-                        alias: "lang",
-                      },
-                    },
-                  },
-                }).get();
-                lang = response.data.lang;
-              }
-
-              await $scope.model.updateLanguage(lang);
-
-              // translate the cancel and save buttons
-              angular.extend(cnRecordAddScope, {
-                getCancelText: function () {
-                  return CnReqnHelper.translate("dataDestroy", "cancel", lang);
-                },
-
-                getSaveText: function () {
-                  return CnReqnHelper.translate("dataDestroy", "save", lang);
-                },
-              });
-            });
-          },
-        };
-      },
-    ]);
 
   },
 });

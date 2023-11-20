@@ -416,25 +416,6 @@ cenozoApp.defineModule({
             ),
             inputList: {},
 
-            getMetadata: async function() {
-              await this.$$getMetadata();
-
-              // create generic yes/no enum
-              const misc = CnReqnHelper.lookupData.destructionReport.misc;
-              this.metadata.yesNoEnumList = {
-                en: [
-                  { value: "", name: misc.choose.en },
-                  { value: true, name: misc.yes.en },
-                  { value: false, name: misc.no.en },
-                ],
-                fr: [
-                  { value: "", name: misc.choose.fr },
-                  { value: true, name: misc.yes.fr },
-                  { value: false, name: misc.no.fr },
-                ],
-              };
-            },
-
             getEditEnabled: function () {
               var stage_type = this.viewModel.record.stage_type ? this.viewModel.record.stage_type : "";
               var state = this.viewModel.record.state ? this.viewModel.record.state : "";
