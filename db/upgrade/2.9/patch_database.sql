@@ -23,6 +23,7 @@ SOURCE stage_type_has_stage_type.sql
 SOURCE review.sql
 SOURCE data_release.sql
 SOURCE data_destroy.sql
+SOURCE pdf_form_type.sql
 
 SOURCE destruction_report.sql
 SOURCE reqn_current_destruction_report.sql
