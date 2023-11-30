@@ -958,7 +958,7 @@ cenozo.service("CnReqnHelper", [
               },
               indigenous_filename: {
                 en: "Please attach a letter of support or other documents to prove engagement.",
-                fr: "Veuillez joindre une lettre de soutien ou d'autres documents pour démontrer l'engagement.",
+                fr: "Veuillez joindre une lettre de soutien ou d’autres documents pour démontrer l’engagement.",
               },
             },
           },
@@ -1018,7 +1018,7 @@ cenozo.service("CnReqnHelper", [
             notices: { en: "Notices", fr: "Notifications" },
             studyData: { en: "Study Data", fr: "Données d’étude" },
             finalReport: { en: "Final Report", fr: "Rapport final" },
-            destructionReport: { en: "Data Destruction Report", fr: "TODO: TRANSLATE" },
+            destructionReport: { en: "Data Destruction Report", fr: "Rapport de destruction de données" },
             study: {
               clsa: { en: "CLSA", fr: "ÉLCV" },
               covid_19_questionnaire: {
@@ -1060,7 +1060,7 @@ cenozo.service("CnReqnHelper", [
             },
             destructionReportRequiredWarning: {
               en: "This application’s data destruction report is required, would you like to view it now?",
-              fr: "TODO: TRANSLATE",
+              fr: "Il faut fournir un rapport de destruction de données pour cette demande, souhaitez-vous l’afficher maintenant?",
             },
             costCombined: {
               en: "A combined fee will be applied for these study-phases when requested at the same time.",
@@ -1081,7 +1081,7 @@ cenozo.service("CnReqnHelper", [
             },
             confirmNoCoapplicants: {
               en: "Are you sure that you wish to submit the application without including any co-applicants?\n\nIf you wish to add co-applicants to the project team, then please click \"No\" so that you may provide them before submitting your application.  Otherwise, clicking \"Yes\" will submit your application without any co-applicants.",
-              fr: "Souhaitez-vous soumettre la demande sans aucun co-demandeur ou co-demandeuse? Si vous souhaitez ajouter des co-demandeurs ou co-demandeuses à l'équipe de projet, veuillez cliquer sur « Non » afin de pouvoir les ajouter avant de soumettre la demande. Sinon, cliquez sur « Oui » pour soumettre la demande sans co-demandeur ou co-demandeuse.",
+              fr: "Souhaitez-vous soumettre la demande sans aucun co-demandeur ou co-demandeuse? Si vous souhaitez ajouter des co-demandeurs ou co-demandeuses à l’équipe de projet, veuillez cliquer sur « Non » afin de pouvoir les ajouter avant de soumettre la demande. Sinon, cliquez sur « Oui » pour soumettre la demande sans co-demandeur ou co-demandeuse.",
             },
             submit: { en: "Submit", fr: "Soumettre" },
             submitTitle: {
@@ -1276,15 +1276,15 @@ cenozo.service("CnReqnHelper", [
             a: {
               achieved_objectives: {
                 en: "Were you able to achieve the objectives stated in the approved application?",
-                fr: "Avez-vous été en mesure d'atteindre les objectifs énoncés dans la demande approuvée?",
+                fr: "Avez-vous été en mesure d’atteindre les objectifs énoncés dans la demande approuvée?",
               },
               findings: {
                 en: "Please provide a lay summary of the key findings to be posted on the CLSA website (1500 characters).",
-                fr: "Veuillez fournir un résumé non scientifique des principaux résultats qui sera publié sur le site Web de l'ÉLCV (1 500 caractères).",
+                fr: "Veuillez fournir un résumé non scientifique des principaux résultats qui sera publié sur le site Web de l’ÉLCV (1 500 caractères).",
               },
               noFindings: {
                 en: "Please provide an explanation why the objectives were not achieved (1500 characters).",
-                fr: "Veuillez expliquer pourquoi les objectifs n'ont pas été atteints (1500 caractères).",
+                fr: "Veuillez expliquer pourquoi les objectifs n’ont pas été atteints (1500 caractères).",
               },
             },
             b: {
@@ -1369,7 +1369,7 @@ cenozo.service("CnReqnHelper", [
             download: { en: "Download", fr: "Télécharger" },
             application: { en: "Application", fr: "Soumission" },
             finalReport: { en: "Final Report", fr: "Rapport final" },
-            destructionReport: { en: "Data Destruction Report", fr: "TODO TRANSLATE" },
+            destructionReport: { en: "Data Destruction Report", fr: "Rapport de destruction de données" },
             submit: { en: "Submit", fr: "Soumettre" },
             pleaseConfirm: { en: "Please confirm", fr: "Veuillez confirmer" },
             submitTitle: {
@@ -1417,68 +1417,56 @@ cenozo.service("CnReqnHelper", [
         destructionReport: {
           heading: {
             en: "CLSA Approved User Research Data Destruction Report",
-            fr: "TODO: TRANSLATE",
+            fr: "Rapport de destruction des données de recherche des utilisateur·trices approuvé·es par l’ÉLCV",
           },
-          instructions: {
-            tab: { en: "Instructions", fr: "Consignes" },
-            title: {
-              en: "Completing the CLSA Approved User Data Destruction Report",
-              fr: "TODO: TRANSLATE",
-            },
-            text1: {
-              en: "TODO",
-              fr: "TODO: TRANSLATE",
-            },
+          title: {
+            en: "Completing the CLSA Approved User Data Destruction Report",
+            fr: "Remplir le rapport de destruction des données de recherche des utilisateur·trices approuvé·es par l’ÉLCV",
           },
-          dataList: {
-            tab: { en: "Data List", fr: "TODO: TRANSLATE" },
-            text: {
-              en: "TODO",
-              fr: "TODO: TRANSLATE",
-            },
+          text1: {
+            en: "The Approved User must complete the data destruction information and submit to McMaster one year after following the termination of the CLSA Access Agreement.  All electronic storage media used in the processing of the Information, including all back-up and transportable media must be sanitized or destroyed on completion of their use.",
+            fr: "L’utilisateur ou utilisatrice approuvé·e doit remplir le rapport de destruction des données et le soumettre à l’Université McMaster un an après la résiliation de l’Entente d’accès aux données de l’ÉLCV. L’ensemble des supports de stockage électroniques utilisés pour l’analyse des informations, y compris tous les supports de sauvegarde et de transport, doivent être nettoyés ou détruits à la fin de leur utilisation.",
+          },
+          text2: {
+            en: "Complete this section and submit, please note that once completed this is your attestation that this data has been properly destroyed as per the CLSA Access Agreement.",
+            fr: "Remplissez cette section et soumettez-la. Veuillez noter qu’une fois soumise, elle constitue votre attestation que ces données ont été correctement détruites, conformément à l’Entente d’accès aux données de l’ÉLCV.",
           },
           misc: {
-            prevButton: {
-              en: "Return to the previous section",
-              fr: "Retourner à la section précédente",
-            },
-            nextButton: {
-              en: "Proceed to the next section",
-              fr: "Passez à la section suivante",
-            },
             download: { en: "Download", fr: "Télécharger" },
             application: { en: "Application", fr: "Soumission" },
-            submit: { en: "Submit", fr: "Soumettre" },
             finalReport: { en: "Final Report", fr: "Rapport final" },
-            destructionReport: { en: "Data Destruction Report", fr: "TODO: TRANSLATE" },
+            submit: { en: "Submit", fr: "Soumettre" },
             pleaseConfirm: { en: "Please confirm", fr: "Veuillez confirmer" },
-            submitTitle: {
-              en: "Data Destruction Report Submitted",
-              fr: "TODO: TRANSLATE",
-            },
-            submitMessage: {
-              en: "You have successfully submitted your Destruction Report and it will now be reviewed. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.",
-              fr: "TODO: TRANSLATE",
-            },
-            traineeSubmitTitle: {
-              en: "Data Destruction Report Submitted for Supervisor Approval",
-              fr: "TODO: TRANSLATE",
-            },
-            traineeSubmitMessage: {
-              en: "You have successfully submitted your Destruction Report and your supervisor will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.",
-              fr: "TODO: TRANSLATE",
-            },
-            designateSubmitTitle: {
-              en: "Data Destruction Report Submitted for Primary Applicant Approval",
-              fr: "TODO: TRANSLATE",
-            },
-            designateSubmitMessage: {
-              en: "You have successfully submitted the Destruction Report on behalf of the primary applicant and they will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.",
-              fr: "TODO: TRANSLATE",
-            },
+            no: { en: "No", fr: "Non" },
+            yes: { en: "Yes", fr: "Oui" },
+            close: { en: "Close", fr: "Ferme" },
             submitWarning: {
               en: "Are you sure that all changes are complete and the report is ready to be submitted?",
               fr: "Êtes-vous sûr d’avoir apporté toutes les modifications souhaitées et de vouloir soumettre le rapport?",
+            },
+            submitTitle: {
+              en: "Data Destruction Report Submitted",
+              fr: "Rapport de destruction de données soumis",
+            },
+            submitMessage: {
+              en: "You have successfully submitted your Destruction Report and it will now be reviewed. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.",
+              fr: "Votre rapport de destruction a bien été soumis et sera révisé. Vous recevrez un courriel une fois le processus de révision terminé ou, si votre attention est requise, avec des instructions supplémentaires. Vous pouvez consulter l’état du rapport à tout moment en ligne via Magnolia.",
+            },
+            traineeSubmitTitle: {
+              en: "Data Destruction Report Submitted for Supervisor Approval",
+              fr: "Rapport de destruction des données soumis pour approbation du/de la superviseur·e",
+            },
+            traineeSubmitMessage: {
+              en: "You have successfully submitted your Destruction Report and your supervisor will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.",
+              fr: "Votre rapport de destruction a bien été soumis. Votre superviseur·e recevra une demande d’approbation par courriel. Vous recevrez un courriel une fois le processus de révision terminé ou, si votre attention est requise, avec des instructions supplémentaires. Vous pouvez consulter l’état du rapport à tout moment en ligne via Magnolia.",
+            },
+            designateSubmitTitle: {
+              en: "Data Destruction Report Submitted for Primary Applicant Approval",
+              fr: "Rapport de destruction des données soumis pour approbation du/de la demandeur·se principal·e",
+            },
+            designateSubmitMessage: {
+              en: "You have successfully submitted the Destruction Report on behalf of the primary applicant and they will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.",
+              fr: "Votre rapport de destruction a bien été soumis au nom du/de la demandeur·se principal·e. Il/Elle recevra une demande d’approbation par courriel. Vous recevrez un courriel une fois le processus de révision terminé ou, si votre attention est requise, avec des instructions supplémentaires. Vous pouvez consulter l’état du rapport à tout moment en ligne via Magnolia.",
             },
           },
         },

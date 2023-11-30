@@ -50,7 +50,6 @@ class destruction_report extends \cenozo\database\record
 
   /**
    * Generates a PDF form version of the reqn (overwritting the previous version)
-   * TODO: PDF form needs to be created
    * 
    * @access public
    */

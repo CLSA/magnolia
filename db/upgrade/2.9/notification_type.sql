@@ -38,23 +38,31 @@ L’équipe d’accès aux données de l’ÉLCV";
 INSERT IGNORE INTO notification_type SET
   name = "Data Destruction Required",
   title_en = "CLSA Data Access - Data Destruction Required ({{identifier}})",
-  title_fr = "TODO (FR)",
+  title_fr = "Accès aux données de l’ÉLCV - Destruction des données requise",
   message_en = "Dear Dr. {{applicant_name}},
 
-TODO: message to applicant
+As per your CLSA Access Agreement, you are required to submit a Data Destruction Certificate for your application number {{identifier}}, entitled \"{{title}}\".
+
+Please log in to the CLSA online data application software, Magnolia (https://magnolia.clsa-elcv.ca/live/gl/), where you will be able to complete the required information and submit for review.
+
 If you have any questions, please contact us at access@clsa-elcv.ca.
 
 The CLSA Data Access Team",
 
-  message_fr = "Bonjour Dr / Dre {{applicant_name}}, 
+  message_fr = "Dr/Dre {{applicant_name}},
 
-TODO: message to applicant (FR)
+Conformément à votre Entente d’accès aux données de l’ÉLCV, vous devez soumettre une attestation de destruction de données pour votre projet numéro {{identifier}}, intitulé « {{title}} ».
+
+Vous pouvez soumettre les informations requises via Magnolia, le logiciel de demande d’accès en ligne de l’ÉLCV (https://magnolia.clsa-elcv.ca/live/gl/).
+
+Si vous avez des questions, n’hésitez pas à nous contacter à access@clsa-elcv.ca.
+
 L’équipe d’accès aux données de l’ÉLCV";
 
 INSERT IGNORE INTO notification_type SET
   name = "Approval Required, Destruction Report",
   title_en = "CLSA Data Access - Destruction Report Approval Required ({{identifier}})",
-  title_fr = "TODO (FR)",
+  title_fr = "Accès aux données de l’ÉLCV - Approbation du rapport de destruction requise",
   message_en = "Dear Dr. {{applicant_name}},
 
 Your approval is required on the destruction report for your application number {{identifier}}, {{if_trainee}}on behalf of {{trainee_name}}, {{endif_trainee}}entitled \"{{title}}\".
@@ -64,8 +72,13 @@ Please log in to the CLSA online data application software, Magnolia (https://ma
 If you have any questions, please contact us at access@clsa-elcv.ca.
 
 The CLSA Data Access Team",
-  message_fr = "TODO (FR)";
+  message_fr = "Dr/Dre {{applicant_name}},
 
-UPDATE notification_type SET
-  name = "Agreement Expiry Notice (1 month)"
+Le rapport final de votre projet numéro {{identifier}}, {{if_trainee}} au nom de {{trainee_name}}, {{endif_trainee}} intitulé « {{title}} » requiert votre approbation.
+
+Veuillez vous connecter à Magnolia, le logiciel de demande d’accès en ligne de l’ÉLCV (https://magnolia.clsa-elcv.ca/live/gl/). Vous pourrez passer en revue le rapport final et, si le tout vous convient, le soumettre. Si vous avez des questions, n’hésitez pas à nous contacter à access@clsa-elcv.ca.
+
+L’équipe d’accès aux données de l’ÉLCV";
+
+UPDATE notification_type SET name = "Agreement Expiry Notice (1 month)"
 WHERE name = "Agreement Expiry Notice";

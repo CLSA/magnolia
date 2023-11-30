@@ -192,8 +192,6 @@ cenozoApp.defineModule({
             },
 
             onView: async function (force) {
-              // reset tab value
-              this.setFormTab(this.parentModel.getQueryParameter("t"), false);
               await this.$$onView(force);
               cenozoApp.setLang(this.record.lang);
 
@@ -280,7 +278,7 @@ cenozoApp.defineModule({
               }
             },
 
-            // setup language and tab state parameters
+            // setup language parameter
             toggleLanguage: function () {
               this.record.lang = "en" == this.record.lang ? "fr" : "en";
 
@@ -288,52 +286,6 @@ cenozoApp.defineModule({
                 path: "reqn/identifier=" + this.record.identifier,
                 data: { language: this.record.lang },
               }).patch();
-            },
-
-            formTab: "",
-            tabSectionList: ["instructions", "dataList"],
-            setFormTab: async function (tab, transition) {
-              if (angular.isUndefined(transition)) transition = true;
-
-              // find the tab section
-              var selectedTabSection = null;
-              this.tabSectionList.some((tabSection) => {
-                if (tab == tabSection) {
-                  selectedTabSection = tabSection;
-                  return true;
-                }
-              });
-
-              // get the tab (or default of none was found)
-              tab =
-                null != selectedTabSection
-                  ? selectedTabSection
-                  : "instructions";
-
-              this.formTab = tab;
-              this.parentModel.setQueryParameter("t", tab);
-
-              if (transition)
-                await this.parentModel.reloadState(false, false, "replace");
-
-              // update all textarea sizes
-              angular.element("textarea[cn-elastic]").trigger("elastic");
-            },
-
-            nextSection: async function (reverse) {
-              if (angular.isUndefined(reverse)) reverse = false;
-
-              var currentTabSectionIndex = this.tabSectionList.indexOf(
-                this.formTab
-              );
-              if (null != currentTabSectionIndex) {
-                var tabSection =
-                  this.tabSectionList[
-                    currentTabSectionIndex + (reverse ? -1 : 1)
-                  ];
-                if (angular.isDefined(tabSection))
-                  await this.setFormTab(tabSection);
-              }
             },
 
             downloadDestructionReport: async function () {
