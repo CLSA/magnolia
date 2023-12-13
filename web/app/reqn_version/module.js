@@ -684,18 +684,13 @@ cenozoApp.defineModule({
 
               await this.$$onView(force);
 
-              // define the earliest date that the reqn may start (based on the deadline, or today if there is no deadline)
-              // note that consortium reqns have no restriction on their start date
-              if (
-                !this.record.legacy &&
-                "Consortium" != this.record.reqn_type
-              ) {
-                this.minStartDate = this.record.deadline
-                  ? moment(this.record.deadline).add(
-                      CnSession.application.startDateDelay,
-                      "months"
-                    )
-                  : moment();
+              // Define the earliest date that the reqn may start (based on the deadline)
+              // Note that the restriction won't apply to admins or consortium reqns
+              if (!this.record.legacy && "Consortium" != this.record.reqn_type) {
+                this.minStartDate =
+                  this.record.deadline && !this.parentModel.isRole("administrator") ?
+                  moment(this.record.deadline).add(CnSession.application.startDateDelay, "months") :
+                  moment();
               }
 
               if ("lite" != this.parentModel.type) {
@@ -716,21 +711,9 @@ cenozoApp.defineModule({
                 this.getVersionList().finally(() => {this.versionListLoaded = true;});
 
                 // the category list will have been loaded by now, so we can load the selected tabs
-                this.setFormTab(
-                  0,
-                  this.parentModel.getQueryParameter("t0"),
-                  false
-                );
-                this.setFormTab(
-                  1,
-                  this.parentModel.getQueryParameter("t1"),
-                  false
-                );
-                this.setFormTab(
-                  2,
-                  this.parentModel.getQueryParameter("t2"),
-                  false
-                );
+                this.setFormTab(0, this.parentModel.getQueryParameter("t0"), false);
+                this.setFormTab(1, this.parentModel.getQueryParameter("t1"), false);
+                this.setFormTab(2, this.parentModel.getQueryParameter("t2"), false);
               }
             },
 
@@ -757,8 +740,7 @@ cenozoApp.defineModule({
                   data: { description: data[property] },
                 }).patch();
 
-                this.record["amendment_justification_" + amendmentTypeId] =
-                  data[property];
+                this.record["amendment_justification_" + amendmentTypeId] = data[property];
 
                 // now re-read the amendment_justification properties used by the view as it may have changed
                 const response = await CnHttpFactory.instance({
