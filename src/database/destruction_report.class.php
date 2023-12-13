@@ -56,6 +56,7 @@ class destruction_report extends \cenozo\database\record
   public function generate_pdf_form()
   {
     $pdf_form_type_class_name = lib::get_class_name( 'database\pdf_form_type' );
+    $db_user = $this->get_reqn()->get_user();
 
     // get the data application
     $db_pdf_form_type = $pdf_form_type_class_name::get_unique_record( 'name', 'Destruction Report' );
@@ -80,10 +81,7 @@ class destruction_report extends \cenozo\database\record
       $data['applicant_address'] = $db_reqn_version->applicant_address;
     if( !is_null( $db_reqn_version->applicant_phone ) )
       $data['applicant_phone'] = $db_reqn_version->applicant_phone;
-    $data['applicant_email'] = $db_user->email;
     if( !is_null( $db_reqn_version->title ) ) $data['title'] = $db_reqn_version->title;
-    $data['signature_name'] = $data['applicant_name'];
-    $data['signature_date'] = util::get_datetime_object()->format( 'd-m-Y' );
 
     $data_destroy_mod = lib::create( 'database\modifier' );
     $data_destroy_mod->order( 'name' );
@@ -92,7 +90,13 @@ class destruction_report extends \cenozo\database\record
     foreach( $this->get_data_destroy_object_list( $data_destroy_mod ) as $index => $db_data_destroy )
     {
       $data[sprintf( 'name_%d', $index+1 )] = $db_data_destroy->name;
-      $data[sprintf( 'datetime_%d', $index+1 )] = $db_data_destroy->datetime;
+
+      $datetime_obj = $db_data_destroy->datetime;
+      if( !is_null( $datetime_obj ) )
+      {
+        $datetime_obj->setTimezone( $db_user->get_timezone_object() );
+        $data[sprintf( 'datetime_%d', $index+1 )] = $datetime_obj->format( 'Y-m-d H:i T' );
+      }
     }
 
     $filename = sprintf( '%s/destruction_report_%s.pdf', TEMP_PATH, $this->id );

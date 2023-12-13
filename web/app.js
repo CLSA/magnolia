@@ -1424,7 +1424,7 @@ cenozo.service("CnReqnHelper", [
             fr: "Remplir le rapport de destruction des données de recherche des utilisateur·trices approuvé·es par l’ÉLCV",
           },
           text1: {
-            en: "The Approved User must complete the data destruction information and submit to McMaster one year after following the termination of the CLSA Access Agreement.  All electronic storage media used in the processing of the Information, including all back-up and transportable media must be sanitized or destroyed on completion of their use.",
+            en: "The Approved User must complete the data destruction information and submit to McMaster one year following the termination of the CLSA Access Agreement.  All electronic storage media used in the processing of the Information, including all back-up and transportable media must be sanitized or destroyed on completion of their use.",
             fr: "L’utilisateur ou utilisatrice approuvé·e doit remplir le rapport de destruction des données et le soumettre à l’Université McMaster un an après la résiliation de l’Entente d’accès aux données de l’ÉLCV. L’ensemble des supports de stockage électroniques utilisés pour l’analyse des informations, y compris tous les supports de sauvegarde et de transport, doivent être nettoyés ou détruits à la fin de leur utilisation.",
           },
           text2: {

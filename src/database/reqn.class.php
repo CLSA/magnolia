@@ -996,7 +996,7 @@ class reqn extends \cenozo\database\record
       // delete any existing data_destroy records (there shouldn't be any)
       $data_destroy_mod = lib::create( 'database\modifier' );
       $data_destroy_mod->where( 'reqn_id', '=', $this->id );
-      static::db()->execute( 'DELETE FROM data_destroy %s', $data_destroy_mod->get_sql() );
+      static::db()->execute( sprintf( 'DELETE FROM data_destroy %s', $data_destroy_mod->get_sql() ) );
 
       $data_sel = lib::create( 'database\select' );
       $data_sel->add_table_column( 'data_version', 'name' );
