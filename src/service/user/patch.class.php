@@ -11,45 +11,16 @@ use cenozo\lib, cenozo\log, magnolia\util;
 class patch extends \cenozo\service\user\patch
 {
   /**
-   * Extend parent method
+   * Override parent method
    */
-  public function get_file_as_array()
+  protected function prepare()
   {
-    $patch_array = parent::get_file_as_array();
+    $this->extract_parameter_list = array_merge(
+      $this->extract_parameter_list,
+      ['supervisor_user_id', 'suspended', 'newsletter', 'note']
+    );
 
-    // remove supervisor_user_id from the patch array
-    if( array_key_exists( 'supervisor_user_id', $patch_array ) )
-    {
-      $this->supervisor_user_id = $patch_array['supervisor_user_id'];
-      $this->update_supervisor = true;
-      unset( $patch_array['supervisor_user_id'] );
-    }
-
-    // remove suspended from the patch array
-    if( array_key_exists( 'suspended', $patch_array ) )
-    {
-      $this->suspended = $patch_array['suspended'];
-      $this->update_suspended = true;
-      unset( $patch_array['suspended'] );
-    }
-
-    // remove newsletter from the patch array
-    if( array_key_exists( 'newsletter', $patch_array ) )
-    {
-      $this->newsletter = $patch_array['newsletter'];
-      $this->update_newsletter = true;
-      unset( $patch_array['newsletter'] );
-    }
-
-    // remove note from the patch array
-    if( array_key_exists( 'note', $patch_array ) )
-    {
-      $this->note = $patch_array['note'];
-      $this->update_note = true;
-      unset( $patch_array['note'] );
-    }
-
-    return $patch_array;
+    parent::prepare();
   }
 
   /**
@@ -61,66 +32,19 @@ class patch extends \cenozo\service\user\patch
 
     // process the extra data, if it exists
     $db_applicant = $this->get_leaf_record()->get_applicant();
-    if( $this->update_supervisor ) $db_applicant->supervisor_user_id = $this->supervisor_user_id;
-    if( $this->update_suspended ) $db_applicant->suspended = $this->suspended;
-    if( $this->update_newsletter ) $db_applicant->newsletter = $this->newsletter;
-    if( $this->update_note ) $db_applicant->note = $this->note;
+
+    $supervisor_user_id = $this->get_argument( 'supervisor_user_id', -1 );
+    if( -1 !== $supervisor_user_id ) $db_applicant->supervisor_user_id = $supervisor_user_id;
+
+    $suspended = $this->get_argument( 'suspended', -1 );
+    if( -1 !== $suspended ) $db_applicant->suspended = $suspended;
+
+    $newsletter = $this->get_argument( 'newsletter', -1 );
+    if( -1 !== $newsletter ) $db_applicant->newsletter = $newsletter;
+
+    $note = $this->get_argument( 'note', -1 );
+    if( -1 !== $note ) $db_applicant->note = $note;
+
     $db_applicant->save();
   }
-
-  /**
-   * Whether the supervisor needs to be updated
-   * @var boolean
-   * @access protected
-   */
-  protected $update_supervisor = false;
-
-  /**
-   * What to chante the user's supervisor to
-   * @var int
-   * @access protected
-   */
-  protected $supervisor_user_id = NULL;
-
-  /**
-   * Whether the suspended needs to be updated
-   * @var boolean
-   * @access protected
-   */
-  protected $update_suspended = false;
-
-  /**
-   * What to chante the user's suspended to
-   * @var int
-   * @access protected
-   */
-  protected $suspended = NULL;
-
-  /**
-   * Whether the newsletter needs to be updated
-   * @var boolean
-   * @access protected
-   */
-  protected $update_newsletter = false;
-
-  /**
-   * What to chante the user's newsletter to
-   * @var int
-   * @access protected
-   */
-  protected $newsletter = NULL;
-
-  /**
-   * Whether the note needs to be updated
-   * @var boolean
-   * @access protected
-   */
-  protected $update_note = false;
-
-  /**
-   * What to chante the user's note to
-   * @var int
-   * @access protected
-   */
-  protected $note = NULL;
 }

@@ -13,20 +13,20 @@ class patch extends \cenozo\service\patch
   /**
    * Extend parent method
    */
-  public function get_file_as_array()
+  public function get_file_as_object()
   {
-    $patch_array = parent::get_file_as_array();
+    $patch_object = parent::get_file_as_object();
 
     // convert column "language" to language_id
-    if( is_array( $patch_array ) && array_key_exists( 'language', $patch_array ) )
+    if( is_object( $patch_object ) && property_exists( $patch_object, 'language' ) )
     {
       $language_class_name = lib::get_class_name( 'database\language' );
-      $patch_array['language_id'] =
-        $language_class_name::get_unique_record( 'code', $patch_array['language'] )->id;
-      unset( $patch_array['language'] );
+      $patch_object->language_id =
+        $language_class_name::get_unique_record( 'code', $patch_object->language )->id;
+      unset( $patch_object->language );
     }
 
-    return $patch_array;
+    return $patch_object;
   }
 
   /**
