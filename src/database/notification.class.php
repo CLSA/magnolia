@@ -59,7 +59,7 @@ class notification extends \cenozo\database\record
         sprintf( '%s %s', $db_trainee_user->first_name, $db_trainee_user->last_name )
       );
     }
-    
+
     if( !is_null( $db_designate_user ) )
     {
       $this->add_email(
@@ -78,7 +78,7 @@ class notification extends \cenozo\database\record
     $mail_manager = lib::create( 'business\mail_manager' );
 
     $db_reqn = $this->get_reqn();
-    $language = $db_reqn->get_language()->code;
+    $db_language = $db_reqn->get_language();
     $db_notification_type = $this->get_notification_type();
 
     $select = lib::create( 'database\select' );
@@ -87,11 +87,20 @@ class notification extends \cenozo\database\record
     foreach( $this->get_notification_email_list() as $email ) $mail_manager->to( $email['email'], $email['name'] );
 
     // fill in dynamic details in the message's subject and body
+    $column = sprintf( 'title_%s', $db_language->code );
     $mail_manager->set_subject(
-      $this->compile( 'en' == $language ? $db_notification_type->title_en : $db_notification_type->title_fr )
+      $this->compile(
+        $db_notification_type->$column,
+        $db_language
+      )
     );
+
+    $column = sprintf( 'message_%s', $db_language->code );
     $mail_manager->set_body(
-      $this->compile( 'en' == $language ? $db_notification_type->message_en : $db_notification_type->message_fr )
+      $this->compile(
+        $db_notification_type->$column,
+        $db_language
+      )
     );
 
     // add cc and bcc recipients
@@ -104,6 +113,7 @@ class notification extends \cenozo\database\record
       else $mail_manager->set_cc( $email['email'] );
     }
 
+    log::debug( $mail_manager );
     $this->sent = $setting_manager->get_setting( 'mail', 'enabled' ) && !$db_reqn->disable_notification && $mail_manager->send();
     $this->save();
   }
@@ -128,7 +138,7 @@ class notification extends \cenozo\database\record
   /**
    * Fills in dynamic text
    */
-  private function compile( $string )
+  private function compile( $string, $db_language )
   {
     $db_reqn = $this->get_reqn();
     $db_reqn_version = $db_reqn->get_current_reqn_version();
@@ -139,8 +149,7 @@ class notification extends \cenozo\database\record
                   : sprintf( '%s %s', $db_trainee_user->first_name, $db_trainee_user->last_name );
 
     // fill in dynamic details in the message subject
-
-    return preg_replace(
+    $string = preg_replace(
       // remove all trainee text if no trainee, otherwise just remove the if/endif syntax
       is_null( $db_reqn->trainee_user_id ) ?
         '/{{if_trainee}}.*?{{endif_trainee}}/' :
@@ -165,5 +174,35 @@ class notification extends \cenozo\database\record
         $string
       )
     );
+
+    // fill in dynamic dates (eg: {{TODAY}}, {{TODAY-6W}}, {{TODAY+1Y}})
+    $matches = [];
+    preg_match_all( '/{{TODAY([+-][0-9]+[YMDW])?}}/', $string, $matches );
+    foreach( $matches[0] as $index => $match )
+    {
+      $today = util::get_datetime_object();
+
+      // add/subtract the interval if one is provided
+      $interval = $matches[1][$index];
+      if( 0 < strlen( $interval ) )
+      {
+        // get the +/- char, then replace it with P (need by DateInterval)
+        $subtract = '-' == $interval[0];
+        $interval[0] = 'P';
+        if( $subtract ) $today->sub( new \DateInterval( $interval ) );
+        else $today->add( new \DateInterval( $interval ) );
+      }
+
+      $string = str_replace(
+        $match,
+        util::convert_datetime_language(
+          $today->format( 'en' == $db_language->code ? 'F j, Y' : 'j F Y' ),
+          $db_language
+        ),
+        $string
+      );
+    }
+
+    return $string;
   }
 }
