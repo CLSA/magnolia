@@ -113,7 +113,6 @@ class notification extends \cenozo\database\record
       else $mail_manager->set_cc( $email['email'] );
     }
 
-    log::debug( $mail_manager );
     $this->sent = $setting_manager->get_setting( 'mail', 'enabled' ) && !$db_reqn->disable_notification && $mail_manager->send();
     $this->save();
   }
