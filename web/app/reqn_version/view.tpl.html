@@ -133,7 +133,7 @@
                model.viewModel.record.deferral_note_cohort ||
                model.viewModel.record.deferral_note_indigenous ||
                model.viewModel.record.deferral_note_2a || model.viewModel.record.deferral_note_2b ||
-               model.viewModel.record.deferral_note_2c || model.viewMOdel.record.deferral_note_2d ||
+               model.viewModel.record.deferral_note_2c || model.viewModel.record.deferral_note_2d ||
                model.viewModel.record.deferral_note_2e || model.viewModel.record.deferral_note_2f
              ),
              'bg-warning': model.viewModel.compareRecord.differences.part2.diff
@@ -1245,7 +1245,7 @@
                         <button ng-if="null == selection.unavailable[model.viewModel.record.lang]"
                                 class="btn full-width"
                                 ng-class="model.viewModel.record.selectionList[selection.id] ? 'btn-success' : 'btn-default'"
-                                ng-disabled="!model.getEditEnabled() && !model.isRole( 'administrator' )"
+                                ng-disabled="!model.getEditEnabled()"
                                 ng-click="model.viewModel.toggleSelection( category, option, selection )">
                           <i class="glyphicon glyphicon-ok" ng-if="model.viewModel.record.selectionList[selection.id]"></i>
                           <span style="font-weight: normal"
