@@ -1323,51 +1323,6 @@ cenozoApp.defineModule({
               }
             },
 
-            // TODO: re-implement
-            reqnDeferralNotesExist: function () {
-              var phase = this.record.phase
-                ? this.record.phase
-                : "";
-              return (
-                "finalization" != phase &&
-                (this.record.deferral_note_amendment ||
-                  this.record.deferral_note_1a ||
-                  this.record.deferral_note_1b ||
-                  this.record.deferral_note_1c ||
-                  this.record.deferral_note_1d ||
-                  this.record.deferral_note_1e ||
-                  this.record.deferral_note_1f ||
-                  this.record.deferral_note_cohort ||
-                  this.record.deferral_note_indigenous ||
-                  this.record.deferral_note_2a ||
-                  this.record.deferral_note_2b ||
-                  this.record.deferral_note_2c ||
-                  this.record.deferral_note_2d ||
-                  this.record.deferral_note_2e ||
-                  this.record.deferral_note_2f)
-              );
-            },
-
-            // TODO: re-implement
-            finalReportDeferralNotesExist: function () {
-              var phase = this.record.phase ? this.record.phase : "";
-              var stage_type = this.record.stage_type ? this.record.stage_type : "";
-              return (
-                "finalization" == phase &&
-                null == stage_type.match(/Data Destruction/) && (
-                  this.record.deferral_note_report1 ||
-                  this.record.deferral_note_report2 ||
-                  this.record.deferral_note_report3
-                )
-              );
-            },
-
-            // TODO: re-implement
-            destructionReportDeferralNotesExist: function () {
-              var stage_type = this.record.stage_type ? this.record.stage_type : "";
-              return "Data Destruction" == stage_type && this.record.deferral_note_destruction;
-            },
-
             enabled: function (subject) {
               var state = this.record.state ? this.record.state : "";
               if (
@@ -1386,6 +1341,14 @@ cenozoApp.defineModule({
               } else if (["proceed", "reject"].includes(subject)) {
                 return !state && null != this.record.next_stage_type;
               } else return false;
+            },
+
+            getActiveForm: function() {
+              var phase = this.record.phase ? this.record.phase : "";
+              let stageType = this.record.stage_type ? this.record.stage_type : "";
+              if (stageType.match(/Destruction/)) return "destruction_report";
+              else if ("finalization" == phase) return "final_report";
+              return "application";
             },
 
             reloadAll: async function (modelList) {
@@ -1431,14 +1394,15 @@ cenozoApp.defineModule({
                   ? stageType
                   : this.record.next_stage_type) +
                 '" stage?';
-              // TODO: re-implement
-              if (
-                this.parentModel.isRole("administrator") && (
-                  this.reqnDeferralNotesExist() ||
-                  this.finalReportDeferralNotesExist() ||
-                  this.destructionReportDeferralNotesExist()
-                )
-              ) {
+
+              // check to see if there are any active deferral notes for the active form
+              var response = await CnHttpFactory.instance({
+                path: this.parentModel.getServiceResourcePath() + '/deferral_note',
+                data: { modifier: { where: { column: "form", operator: '=', value: this.getActiveForm() } } }
+              }).count();
+              const deferralNotes = parseInt(response.headers("Total"));
+
+              if (this.parentModel.isRole("administrator") && 0 < deferralNotes ) {
                 message +=
                   "\n\nWARNING: There are deferral notes present, you may wish to remove them before proceeding.";
               }
@@ -1533,15 +1497,17 @@ cenozoApp.defineModule({
             },
 
             defer: async function () {
-              // TODO: re-implement
+              // check to see if there are any active deferral notes for the active form
+              var response = await CnHttpFactory.instance({
+                path: this.parentModel.getServiceResourcePath() + '/deferral_note',
+                data: { modifier: { where: { column: "form", operator: '=', value: this.getActiveForm() } } }
+              }).count();
+              const deferralNotes = parseInt(response.headers("Total"));
+
               var message =
                 "Are you sure you wish to defer to the applicant?  " +
                 "A notification will be sent indicating that an action is required by the applicant.";
-              if (
-                !this.reqnDeferralNotesExist() &&
-                !this.finalReportDeferralNotesExist() &&
-                !this.destructionReportDeferralNotesExist()
-              ) {
+              if (0 == deferralNotes) {
                 message +=
                   "\n\nWARNING: there are currently no deferral notes to instruct the applicant why " +
                   "their attention is required.";
@@ -1798,12 +1764,8 @@ cenozoApp.defineModule({
             },
 
             getEditEnabled: function () {
-              var phase = this.viewModel.record.phase
-                ? this.viewModel.record.phase
-                : "";
-              var state = this.viewModel.record.state
-                ? this.viewModel.record.state
-                : "";
+              var phase = this.viewModel.record.phase ? this.viewModel.record.phase : "";
+              var state = this.viewModel.record.state ? this.viewModel.record.state : "";
               return (
                 this.$$getEditEnabled() && (
                   this.isRole("applicant", "designate")
