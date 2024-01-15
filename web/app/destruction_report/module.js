@@ -47,7 +47,6 @@ cenozoApp.defineModule({
       stage_type: { column: "stage_type.name", type: "string" },
       phase: { column: "stage_type.phase", type: "string" },
       lang: { column: "language.code", type: "string" },
-      deferral_note_destruction: { column: "reqn.deferral_note_destruction", type: "text" },
       current_final_report_id: { column: "final_report.id", type: "string" },
     });
 
@@ -142,8 +141,7 @@ cenozoApp.defineModule({
 
     /* ############################################################################################## */
     cenozo.providers.factory("CnDestructionReportViewFactory", [
-      "CnBaseViewFactory",
-      "CnReqnHelper",
+      "CnBaseFormViewFactory",
       "CnHttpFactory",
       "CnModalMessageFactory",
       "CnModalConfirmFactory",
@@ -151,8 +149,7 @@ cenozoApp.defineModule({
       "CnSession",
       "$state",
       function (
-        CnBaseViewFactory,
-        CnReqnHelper,
+        CnBaseFormViewFactory,
         CnHttpFactory,
         CnModalMessageFactory,
         CnModalConfirmFactory,
@@ -161,39 +158,15 @@ cenozoApp.defineModule({
         $state
       ) {
         var object = function (parentModel, root) {
-          CnBaseViewFactory.construct(this, parentModel, root);
+          CnBaseFormViewFactory.construct(this, "destructionReport", parentModel, root);
 
           angular.extend(this, {
             isLoading: false,
-            translate: function (value) {
-              return this.record.lang
-                ? CnReqnHelper.translate("destructionReport", value, this.record.lang)
-                : "";
-            },
-            show: function (subject) {
-              return CnReqnHelper.showAction(subject, this.record);
-            },
-            viewReqn: function () {
-              return this.parentModel.transitionToParentViewState(
-                "reqn",
-                "identifier=" + this.record.identifier
-              );
-            },
-            viewReqnVersion: async function () {
-              await this.parentModel.transitionToParentViewState(
-                "reqn_version",
-                this.record.current_reqn_version_id
-              );
-            },
-            viewFinalReport: async function () {
-              await $state.go("final_report.view", {
-                identifier: this.record.current_final_report_id,
-              });
-            },
+
+            tabList: [ "data_destroy" ],
 
             onView: async function (force) {
               await this.$$onView(force);
-              cenozoApp.setLang(this.record.lang);
 
               // get a list of all data-destroy
               this.isLoading = true;
@@ -218,33 +191,6 @@ cenozoApp.defineModule({
               }
             },
 
-            onPatch: async function (data) {
-              var property = Object.keys(data)[0];
-              if (!this.parentModel.getEditEnabled())
-                throw new Error("Calling onPatch() but edit is not enabled.");
-
-              if (null == property.match(/^deferral_note/)) {
-                await this.$$onPatch(data);
-              } else {
-                // make sure to send patches to deferral notes to the parent reqn
-                var parent = this.parentModel.getParentIdentifier();
-                var httpObj = {
-                  path: parent.subject + "/" + parent.identifier,
-                  data: data,
-                };
-                var self = this;
-                httpObj.onError = function (response) {
-                  self.onPatchError(response);
-                };
-                try {
-                  await CnHttpFactory.instance(httpObj).patch();
-                  this.afterPatchFunctions.forEach((fn) => fn());
-                } catch (error) {
-                  // handled by onError above
-                }
-              }
-            },
-
             selectDataDestroyDatetime: async function(dataDestroy) {
               if (this.parentModel.getEditEnabled()) {
                 const response = await CnModalDatetimeFactory.instance({
@@ -255,7 +201,6 @@ cenozoApp.defineModule({
                   emptyAllowed: true,
                 }).show();
 
-                console.log( response );
                 if (false !== response) {
                   dataDestroy.isPatching = true;
                   try {
@@ -276,23 +221,6 @@ cenozoApp.defineModule({
                   }
                 }
               }
-            },
-
-            // setup language parameter
-            toggleLanguage: function () {
-              this.record.lang = "en" == this.record.lang ? "fr" : "en";
-
-              return CnHttpFactory.instance({
-                path: "reqn/identifier=" + this.record.identifier,
-                data: { language: this.record.lang },
-              }).patch();
-            },
-
-            downloadDestructionReport: async function () {
-              await CnReqnHelper.download(
-                "destruction_report",
-                this.record.getIdentifier()
-              );
             },
 
             submit: async function () {

@@ -41,16 +41,21 @@
           </li>
         </ul>
       </div>
-      <button class="btn btn-default"
-              ng-if="model.viewModel.show('final report')"
-              ng-click="model.viewModel.viewFinalReport()"
-              ng-bind-html="t( 'misc.finalReport' )"
-              type="button"></button>
-      <button class="btn btn-default"
-              ng-if="model.viewModel.show('destruction report')"
-              ng-click="model.viewModel.viewDestructionReport()"
-              ng-bind-html="t( 'misc.destructionReport' )"
-              type="button"></button>
+      <div class="btn-group dropdown">
+        <button type="button"
+                class="btn btn-default dropdown-toggle"
+                id="switchForms"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+                ng-if="0 < model.viewModel.formList.length"
+                ng-bind-html="t( 'misc.switchForm' ) + ' <span class=\'caret\' ng-if=\'op.operations\'></span>'"></button>
+        <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="switchForms">
+          <li ng-repeat="form in model.viewModel.formList">
+            <a ng-click="model.viewModel.transitionTo(form.name)" ng-bind-html="t('misc.'+form.title)"></a>
+          </li>
+        </ul>
+      </div>
       <div class="btn-group dropdown" ng-if="model.viewModel.show( 'compare' ) && 1 < model.viewModel.versionList.length">
         <button type="button"
                 class="btn btn-info dropdown-toggle"
@@ -72,7 +77,7 @@
       </div>
       <button class="btn btn-primary"
               ng-if="model.viewModel.show( 'view' )"
-              ng-click="model.viewModel.viewReqn()"
+              ng-click="model.viewModel.transitionTo('reqn')"
               type="button">Show Record</button>
       <button class="btn btn-success"
               ng-if="model.viewModel.show( 'submit' )"
@@ -104,50 +109,63 @@
          ng-bind-html="t( 'misc.totalCost' ) + ': ' + model.viewModel.calculateCost()">
     </div>
     <ul class="nav nav-tabs">
-      <li ng-class="{'active':'instructions'==model.viewModel.formTab[0]}">
-        <a ng-click="model.viewModel.setFormTab(0,'instructions')"
+      <li ng-class="{'active':'instructions'==model.viewModel.formTab}">
+        <a ng-click="model.viewModel.setFormTab('instructions')"
            ng-class="{
-             'text-warning flashing': model.getEditEnabled() && (
-               model.viewModel.record.deferral_note_amendment
-             ),
-             'bg-warning': model.viewModel.compareRecord.differences.amendment.diff
+             'text-warning flashing':
+               model.getEditEnabled() && model.viewModel.record.deferral_note_instructions,
+             'bg-warning': model.viewModel.compareRecord.differences.instructions.diff
            }"
            ng-bind-html="t( 'instructions.tab' )"></a>
       </li>
-      <li ng-class="{'active':'part1'==model.viewModel.formTab[0]}">
-        <a ng-click="model.viewModel.setFormTab(0,'part1')"
+      <li ng-class="{'active':'part1' == modelviewModel.getTabPart()}">
+        <a ng-click="model.viewModel.setFormTab('applicant')"
            ng-class="{
-             'text-warning flashing': model.getEditEnabled() && (
-               model.viewModel.record.deferral_note_1a || model.viewModel.record.deferral_note_1b ||
-               model.viewModel.record.deferral_note_1c || model.viewModel.record.deferral_note_1d ||
-               model.viewModel.record.deferral_note_1e || model.viewModel.record.deferral_note_1f
-             ),
+             'text-warning flashing':
+               model.getEditEnabled() && (
+                 model.viewModel.record.deferral_note_applicant ||
+                 model.viewModel.record.deferral_note_project_team ||
+                 model.viewModel.record.deferral_note_timeline ||
+                 model.viewModel.record.deferral_note_description ||
+                 model.viewModel.record.deferral_note_scientific_review ||
+                 model.viewModel.record.deferral_note_ethics
+               ),
              'bg-warning': model.viewModel.compareRecord.differences.part1.diff
            }"
            ng-bind-html="t( 'part1.tab' )"></a>
       </li>
-      <li ng-class="{'active':'part2'==model.viewModel.formTab[0]}">
-        <a ng-click="model.viewModel.setFormTab(0,'part2')"
+      <li ng-class="{ 'active': 'part2' == model.viewModel.getTabPart() }">
+        <a ng-click="model.viewModel.setFormTab('notes')"
            ng-class="{
              'text-warning flashing': model.getEditEnabled() && (
+               model.viewModel.record.deferral_note_notes ||
                model.viewModel.record.deferral_note_cohort ||
                model.viewModel.record.deferral_note_indigenous ||
-               model.viewModel.record.deferral_note_2a || model.viewModel.record.deferral_note_2b ||
-               model.viewModel.record.deferral_note_2c || model.viewModel.record.deferral_note_2d ||
-               model.viewModel.record.deferral_note_2e || model.viewModel.record.deferral_note_2f
+               model.viewModel.record.deferral_note_data_core_clsa_data ||
+               model.viewModel.record.deferral_note_data_linked_data ||
+               model.viewModel.record.deferral_note_data_images_and_raw_data ||
+               model.viewModel.record.deferral_note_data_geographic_indicators ||
+               model.viewModel.record.deferral_note_data_covid_19_data ||
+               model.viewModel.record.deferral_note_data_mortality_data
              ),
              'bg-warning': model.viewModel.compareRecord.differences.part2.diff
            }"
            ng-bind-html="t( 'part2.tab' )"></a>
       </li>
-      <li ng-class="{'active':'part3'==model.viewModel.formTab[0]}">
-        <a ng-click="model.viewModel.setFormTab(0,'part3')" ng-bind-html="t( 'part3.tab' )"></a>
+      <li ng-class="{'active':'part3' == model.viewModel.getTabPart()}">
+        <a ng-click="model.viewModel.setFormTab('biospecimen_access')"
+           ng-class="{
+             'text-warning flashing':
+               model.getEditEnabled() && model.viewModel.record.deferral_note_biospecimen_access,
+             'bg-warning': model.viewModel.compareRecord.differences.part3.diff
+           }"
+           ng-bind-html="t( 'part3.tab' )"></a>
       </li>
-      <li ng-class="{'active':'agreement'==model.viewModel.formTab[0]}" ng-if="model.viewModel.showAgreement()">
-        <a ng-click="model.viewModel.setFormTab(0,'agreement')">Agreement</a>
+      <li ng-class="{'active':'agreement' == model.viewModel.getTabPart()}" ng-if="model.viewModel.showAgreement()">
+        <a ng-click="model.viewModel.setFormTab('agreement')">Agreement</a>
       </li>
     </ul>
-    <div ng-show="'instructions'==model.viewModel.formTab[0]" class="panel panel-default" style="border-top-left-radius: 0px;">
+    <div ng-show="'instructions'==model.viewModel.formTab" class="panel panel-default" style="border-top-left-radius: 0px;">
       <div class="panel-body" style="padding-bottom: 0px;" ng-if="'.' == model.viewModel.record.amendment">
         <h4 ng-bind-html="t( 'instructions.title' )"></h4>
         <ul class="list-group">
@@ -161,12 +179,12 @@
       </div>
       <div class="panel-body" style="padding-bottom: 0px;" ng-if="'.' != model.viewModel.record.amendment">
         <h4 style="margin-top: 0; margin-bottom: 1em;" ng-bind-html="t( 'amendment.title' )"></h4>
-        <cn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_amendment" class="bg-info"></cn-deferral-note>
+        <cn-deferral-note ng-if="model.getEditEnabled()" page="instructions" class="bg-info"></cn-deferral-note>
         <ul class="list-group">
           <li class="list-group-item" ng-bind-html="t( 'amendment.text1' )"></li>
           <li class="list-group-item" ng-bind-html="t( 'amendment.text2' )"></li>
         </ul>
-        <form id="amendmentForm" name="amendmentForm" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
+        <form id="amendment_form" name="amendment_form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
           <p class="text-primary" ng-bind-html="t( 'amendment.text3' )"></p>
           <div class="input-group spacer"
                ng-class="{'has-feedback has-error':model.viewModel.noAmendmentTypes}"
@@ -175,7 +193,7 @@
               <div style="margin: 0;"
                    class="row"
                    ng-class="{
-                     'bg-warning': model.viewModel.compareRecord.differences.amendment.a['amendmentType'+amendmentType.id]
+                     'bg-warning': model.viewModel.compareRecord.differences.instructions.amendments['amendmentType'+amendmentType.id]
                    }">
                 <input type="checkbox"
                        id="amendmentType{{ amendmentType.id }}"
@@ -196,7 +214,7 @@
               </div>
               <div style="padding: 0 2em;"
                    ng-class="{
-                     'bg-warning': model.viewModel.compareRecord.differences.amendment.a['amendmentType'+amendmentType.id]
+                     'bg-warning': model.viewModel.compareRecord.differences.instructions.amendments['amendmentType'+amendmentType.id]
                    }"
                    ng-if="amendmentType.justificationPrompt && model.viewModel.record['amendmentType'+amendmentType.id]">
                 <span class="text-info" ng-bind-html="amendmentType.justificationPrompt"></span>
@@ -209,7 +227,7 @@
                     type: 'text',
                     maxLength: 2500
                   }"
-                  difference="model.viewModel.compareRecord.differences.amendment.a.amendmentJustificationList.findByProperty( 'id', amendmentType.id )"
+                  difference="model.viewModel.compareRecord.differences.instructions.amendments.amendmentJustificationList.findByProperty( 'id', amendmentType.id )"
                   model="model">
                 </cn-view-input-with-differences>
               </div>
@@ -219,214 +237,218 @@
         </fieldset></form>
       </div>
     </div>
-    <div ng-show="'part1'==model.viewModel.formTab[0]" class="panel panel-default">
+    <div ng-show="'part1'==model.viewModel.getTabPart()" class="panel panel-default">
       <div class="panel-body" style="padding-bottom: 0px;">
         <h4 style="margin-top: 0; margin-bottom: 1em;" ng-bind-html="t( 'part1.title' )"></h4>
         <ul class="nav nav-tabs">
-          <li ng-repeat="section in model.viewModel.tabSectionList"
-              ng-if="'part1' == section[0]"
-              ng-class="{'active':section[1] == model.viewModel.formTab[1]}">
-            <a ng-click="model.viewModel.setFormTab(1,section[1])"
+          <li ng-repeat="tab in model.viewModel.tabList"
+              ng-if="'part1' == model.viewModel.getTabPart(tab)"
+              ng-class="{'active':tab == model.viewModel.formTab}">
+            <a ng-click="model.viewModel.setFormTab(tab)"
                ng-class="{
-                 'text-warning flashing':model.getEditEnabled() && model.viewModel.record['deferral_note_1'+section[1]],
-                 'bg-warning': model.viewModel.compareRecord.differences.part1[section[1]].diff
+                 'text-warning flashing':model.getEditEnabled() && model.viewModel.record['deferral_note_'+tab],
+                 'bg-warning': model.viewModel.compareRecord.differences.part1[tab].diff
                }"
-               ng-bind-html="t( 'part1.'+section[1]+'.tab' )"></a>
+               ng-bind-html="t( 'part1.'+tab+'.tab' )"></a>
           </li>
         </ul>
-        <div ng-show="'a'==model.viewModel.formTab[1]" class="panel panel-default" style="border-top-left-radius: 0px;">
+        <div
+          ng-show="'applicant'==model.viewModel.formTab"
+          class="panel panel-default"
+          style="border-top-left-radius: 0px;"
+        >
           <div class="panel-body">
-            <cn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_1a" class="bg-info"></cn-deferral-note>
-            <p class="text-primary" ng-bind-html="t( 'part1.a.text1' )"></p>
-            <p class="text-primary" ng-bind-html="t( 'part1.a.text2' )"></p>
+            <cn-deferral-note ng-if="model.getEditEnabled()" page="applicant" class="bg-info"></cn-deferral-note>
+            <p class="text-primary" ng-bind-html="t( 'part1.applicant.text1' )"></p>
+            <p class="text-primary" ng-bind-html="t( 'part1.applicant.text2' )"></p>
             <p class="text-primary" ng-bind-html="'<strong>'+t( 'misc.emailText' )+'</strong>'"></p>
             <hr/>
-            <form id="part1aForm" name="part1aForm" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
+            <form id="applicant_form" name="applicant_form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
               <div class="form-horizontal">
                 <cn-view-input-with-differences
                   input="{
                     key: 'applicant_name',
-                    title: t( 'part1.a.applicant_name' ),
+                    title: t( 'part1.applicant.applicant_name' ),
                     type: model.inputList.applicant_name.type,
                     constant: true
                   }"
-                  difference="model.viewModel.compareRecord.differences.part1.a.applicant_name"
+                  difference="model.viewModel.compareRecord.differences.part1.applicant.applicant_name"
                   model="model">
                 </cn-view-input-with-differences>
                 <cn-view-input-with-differences
                   input="{
                     key: 'applicant_position',
-                    title: t( 'part1.a.applicant_position' ),
+                    title: t( 'part1.applicant.applicant_position' ),
                     type: model.inputList.applicant_position.type
                   }"
-                  difference="model.viewModel.compareRecord.differences.part1.a.applicant_position"
+                  difference="model.viewModel.compareRecord.differences.part1.applicant.applicant_position"
                   model="model">
                 </cn-view-input-with-differences>
                 <cn-view-input-with-differences
                   input="{
                     key: 'applicant_affiliation',
-                    title: t( 'part1.a.applicant_affiliation' ),
+                    title: t( 'part1.applicant.applicant_affiliation' ),
                     type: model.inputList.applicant_affiliation.type
                   }"
-                  difference="model.viewModel.compareRecord.differences.part1.a.applicant_affiliation"
+                  difference="model.viewModel.compareRecord.differences.part1.applicant.applicant_affiliation"
                   model="model">
                 </cn-view-input-with-differences>
                 <cn-view-input-with-differences
                   input="{
                     key: 'applicant_country_id',
-                    title: t( 'part1.a.applicant_country_id' ),
+                    title: t( 'part1.applicant.applicant_country_id' ),
                     type: model.inputList.applicant_country_id.type,
                     typeahead: model.inputList.applicant_country_id.typeahead
                   }"
-                  difference="model.viewModel.compareRecord.differences.part1.a.applicant_country_id"
+                  difference="model.viewModel.compareRecord.differences.part1.applicant.applicant_country_id"
                   model="model">
                 </cn-view-input-with-differences>
                 <cn-view-input-with-differences
                   input="{
                     key: 'applicant_address',
-                    title: t( 'part1.a.applicant_address' ),
+                    title: t( 'part1.applicant.applicant_address' ),
                     type: model.inputList.applicant_address.type
                   }"
-                  difference="model.viewModel.compareRecord.differences.part1.a.applicant_address"
+                  difference="model.viewModel.compareRecord.differences.part1.applicant.applicant_address"
                   model="model">
                 </cn-view-input-with-differences>
                 <cn-view-input-with-differences
                   input="{
                     key: 'applicant_phone',
-                    title: t( 'part1.a.applicant_phone' ),
+                    title: t( 'part1.applicant.applicant_phone' ),
                     type: model.inputList.applicant_phone.type
                   }"
-                  difference="model.viewModel.compareRecord.differences.part1.a.applicant_phone"
+                  difference="model.viewModel.compareRecord.differences.part1.applicant.applicant_phone"
                   model="model">
                 </cn-view-input-with-differences>
                 <cn-view-input-with-differences
                   input="{
                     key: 'applicant_email',
-                    title: t( 'part1.a.applicant_email' ),
+                    title: t( 'part1.applicant.applicant_email' ),
                     type: model.inputList.applicant_email.type,
                     constant: true,
                     help: t( 'misc.emailText' )
                   }"
-                  difference="model.viewModel.compareRecord.differences.part1.a.applicant_email"
+                  difference="model.viewModel.compareRecord.differences.part1.applicant.applicant_email"
                   model="model">
                 </cn-view-input-with-differences>
               </div>
               <hr />
-              <p class="text-primary" ng-bind-html="t( 'part1.a.text3' )"></p>
+              <p class="text-primary" ng-bind-html="t( 'part1.applicant.text3' )"></p>
               <div class="form-horizontal">
                 <cn-view-input-with-differences
                   input="{
                     key: 'trainee_name',
-                    title: t( 'part1.a.trainee_name' ),
+                    title: t( 'part1.applicant.trainee_name' ),
                     type: model.inputList.trainee_name.type,
                     constant: true
                   }"
-                  difference="model.viewModel.compareRecord.differences.part1.a.trainee_name"
+                  difference="model.viewModel.compareRecord.differences.part1.applicant.trainee_name"
                   model="model">
                 </cn-view-input-with-differences>
                 <cn-view-input-with-differences
                   input="{
                     key: 'trainee_program',
-                    title: t( 'part1.a.trainee_program' ),
+                    title: t( 'part1.applicant.trainee_program' ),
                     type: model.inputList.trainee_program.type,
                     constant: !model.viewModel.record.trainee_name
                   }"
-                  difference="model.viewModel.compareRecord.differences.part1.a.trainee_program"
+                  difference="model.viewModel.compareRecord.differences.part1.applicant.trainee_program"
                   model="model">
                 </cn-view-input-with-differences>
                 <cn-view-input-with-differences
                   input="{
                     key: 'trainee_institution',
-                    title: t( 'part1.a.trainee_institution' ),
+                    title: t( 'part1.applicant.trainee_institution' ),
                     type: 'string',
                     constant: !model.viewModel.record.trainee_name
                   }"
-                  difference="model.viewModel.compareRecord.differences.part1.a.trainee_institution"
+                  difference="model.viewModel.compareRecord.differences.part1.applicant.trainee_institution"
                   model="model">
                 </cn-view-input-with-differences>
                 <cn-view-input-with-differences
                   input="{
                     key: 'trainee_country_id',
-                    title: t( 'part1.a.trainee_country_id' ),
+                    title: t( 'part1.applicant.trainee_country_id' ),
                     type: model.inputList.trainee_country_id.type,
                     typeahead: model.inputList.trainee_country_id.typeahead,
                     constant: !model.viewModel.record.trainee_name
                   }"
-                  difference="model.viewModel.compareRecord.differences.part1.a.trainee_country_id"
+                  difference="model.viewModel.compareRecord.differences.part1.applicant.trainee_country_id"
                   model="model">
                 </cn-view-input-with-differences>
                 <cn-view-input-with-differences
                   input="{
                     key: 'trainee_address',
-                    title: t( 'part1.a.trainee_address' ),
+                    title: t( 'part1.applicant.trainee_address' ),
                     type: model.inputList.trainee_address.type,
                     constant: !model.viewModel.record.trainee_name
                   }"
-                  difference="model.viewModel.compareRecord.differences.part1.a.trainee_address"
+                  difference="model.viewModel.compareRecord.differences.part1.applicant.trainee_address"
                   model="model">
                 </cn-view-input-with-differences>
                 <cn-view-input-with-differences
                   input="{
                     key: 'trainee_phone',
-                    title: t( 'part1.a.trainee_phone' ),
+                    title: t( 'part1.applicant.trainee_phone' ),
                     type: model.inputList.trainee_phone.type,
                     constant: !model.viewModel.record.trainee_name
                   }"
-                  difference="model.viewModel.compareRecord.differences.part1.a.trainee_phone"
+                  difference="model.viewModel.compareRecord.differences.part1.applicant.trainee_phone"
                   model="model">
                 </cn-view-input-with-differences>
                 <cn-view-input-with-differences
                   input="{
                     key: 'trainee_email',
-                    title: t( 'part1.a.trainee_email' ),
+                    title: t( 'part1.applicant.trainee_email' ),
                     type: model.inputList.trainee_email.type,
                     constant: true,
                     help: t( 'misc.emailText' )
                   }"
-                  difference="model.viewModel.compareRecord.differences.part1.a.trainee_email"
+                  difference="model.viewModel.compareRecord.differences.part1.applicant.trainee_email"
                   model="model">
                 </cn-view-input-with-differences>
               </div>
               <hr />
-              <p class="text-primary" ng-bind-html="t( 'part1.a.text4' )"></p>
+              <p class="text-primary" ng-bind-html="t( 'part1.applicant.text4' )"></p>
               <div class="form-horizontal">
                 <cn-view-input-with-differences
                   input="{
                     key: 'waiver',
-                    title: t( 'part1.a.waiver' ),
+                    title: t( 'part1.applicant.waiver' ),
                     type: 'enum',
                     enumList: model.metadata.columnList.waiver.enumList[model.viewModel.record.lang],
                     constant: !model.viewModel.isWaiverAllowed() || !model.viewModel.isWaiverMutable()
                   }"
-                  difference="model.viewModel.compareRecord.differences.part1.a.waiver"
+                  difference="model.viewModel.compareRecord.differences.part1.applicant.waiver"
                   model="model">
                 </cn-view-input-with-differences>
               </div>
             </fieldset></form>
           </div>
         </div>
-        <div ng-show="'b'==model.viewModel.formTab[1]" class="panel panel-default">
+        <div ng-show="'project_team'==model.viewModel.formTab" class="panel panel-default">
           <div class="panel-body">
-            <cn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_1b"></cn-deferral-note>
-            <p class="text-primary" ng-bind-html="t( 'part1.b.text' )"></p>
+            <cn-deferral-note ng-if="model.getEditEnabled()" page="project_team"></cn-deferral-note>
+            <p class="text-primary" ng-bind-html="t( 'part1.project_team.text' )"></p>
             <p class="text-primary" ng-bind-html="'<strong>'+t( 'misc.emailText' )+'</strong>'"></p>
             <div class="panel panel-default">
               <div class="panel-body"
-                   ng-class="{ 'bg-warning': 0 < model.viewModel.compareRecord.differences.part1.b.coapplicantList.length }">
-                <h4 ng-if="0 < model.viewModel.compareRecord.differences.part1.b.coapplicantList.length">Current Version List</h4>
+                   ng-class="{ 'bg-warning': 0 < model.viewModel.compareRecord.differences.part1.project_team.coapplicantList.length }">
+                <h4 ng-if="0 < model.viewModel.compareRecord.differences.part1.project_team.coapplicantList.length">Current Version List</h4>
                 <span ng-show="0 == model.viewModel.record.coapplicantList.length"
-                      ng-bind-html="t( 'part1.b.noCoapplicants' )"></span>
+                      ng-bind-html="t( 'part1.project_team.noCoapplicants' )"></span>
                 <table class="table table-striped"
                        ng-class="{ 'table-hover': model.getEditEnabled() }"
                        ng-show="0 < model.viewModel.record.coapplicantList.length">
                   <thead class="bg-info">
                     <tr>
-                      <td ng-bind-html="t( 'part1.b.name' )"></td>
-                      <td ng-bind-html="t( 'part1.b.position' )"></td>
-                      <td ng-bind-html="t( 'part1.b.affiliation' )"></td>
-                      <td ng-bind-html="t( 'part1.b.email' )"></td>
-                      <td ng-bind-html="t( 'part1.b.role' )"></td>
-                      <td ng-bind-html="t( 'part1.b.access' )"></td>
+                      <td ng-bind-html="t( 'part1.project_team.name' )"></td>
+                      <td ng-bind-html="t( 'part1.project_team.position' )"></td>
+                      <td ng-bind-html="t( 'part1.project_team.affiliation' )"></td>
+                      <td ng-bind-html="t( 'part1.project_team.email' )"></td>
+                      <td ng-bind-html="t( 'part1.project_team.role' )"></td>
+                      <td ng-bind-html="t( 'part1.project_team.access' )"></td>
                       <td ng-show="model.getEditEnabled()"></td>
                     </tr>
                   </thead>
@@ -450,20 +472,20 @@
                     </tr>
                   </tbody>
                 </table>
-                <div ng-if="0 < model.viewModel.compareRecord.differences.part1.b.coapplicantList.length">
+                <div ng-if="0 < model.viewModel.compareRecord.differences.part1.project_team.coapplicantList.length">
                   <hr style="border-top-color: gray;"/>
                   <h4>Version {{ model.viewModel.compareRecord.amendment_version }} List</h4>
                   <span ng-show="0 == model.viewModel.compareRecord.coapplicantList.length"
-                        ng-bind-html="t( 'part1.b.noCoapplicants' )"></span>
+                        ng-bind-html="t( 'part1.project_team.noCoapplicants' )"></span>
                   <table class="table table-striped" ng-show="0 < model.viewModel.compareRecord.coapplicantList.length">
                     <thead class="bg-info">
                       <tr>
-                        <td ng-bind-html="t( 'part1.b.name' )"></td>
-                        <td ng-bind-html="t( 'part1.b.position' )"></td>
-                        <td ng-bind-html="t( 'part1.b.affiliation' )"></td>
-                        <td ng-bind-html="t( 'part1.b.email' )"></td>
-                        <td ng-bind-html="t( 'part1.b.role' )"></td>
-                        <td ng-bind-html="t( 'part1.b.access' )"></td>
+                        <td ng-bind-html="t( 'part1.project_team.name' )"></td>
+                        <td ng-bind-html="t( 'part1.project_team.position' )"></td>
+                        <td ng-bind-html="t( 'part1.project_team.affiliation' )"></td>
+                        <td ng-bind-html="t( 'part1.project_team.email' )"></td>
+                        <td ng-bind-html="t( 'part1.project_team.role' )"></td>
+                        <td ng-bind-html="t( 'part1.project_team.access' )"></td>
                       </tr>
                     </thead>
                     <tbody>
@@ -480,23 +502,23 @@
                 </div>
               </div>
             </div>
-            <form id="part1bForm" name="part1bForm" ng-show="model.getEditEnabled()" novalidate>
+            <form id="project_team_form" name="project_team_form" ng-show="model.getEditEnabled()" novalidate>
               <fieldset ng-disabled="!model.getEditEnabled()">
                 <div class="form-horizontal">
                   <cn-add-input
-                    input="{ key: 'name', title: t( 'part1.b.name' ), type: 'string' }"
+                    input="{ key: 'name', title: t( 'part1.project_team.name' ), type: 'string' }"
                     record="coapplicantRecord"
                     model="model.viewModel.coapplicantModel"
                     first="true">
                   </cn-add-input>
                   <cn-add-input
-                    input="{ key: 'position', title: t( 'part1.b.position' ), type: 'string' }"
+                    input="{ key: 'position', title: t( 'part1.project_team.position' ), type: 'string' }"
                     record="coapplicantRecord"
                     model="model.viewModel.coapplicantModel"
                     first="false">
                   </cn-add-input>
                   <cn-add-input
-                    input="{ key: 'affiliation', title: t( 'part1.b.affiliation' ), type: 'string' }"
+                    input="{ key: 'affiliation', title: t( 'part1.project_team.affiliation' ), type: 'string' }"
                     record="coapplicantRecord"
                     model="model.viewModel.coapplicantModel"
                     first="false">
@@ -504,7 +526,7 @@
                   <cn-add-input
                     input="{
                       key: 'email',
-                      title: t( 'part1.b.email' ),
+                      title: t( 'part1.project_team.email' ),
                       type: 'string',
                       help: t( 'misc.emailText' )
                     }"
@@ -513,7 +535,7 @@
                     first="false">
                   </cn-add-input>
                   <cn-add-input
-                    input="{ key: 'role', title: t( 'part1.b.role' ), type: 'string' }"
+                    input="{ key: 'role', title: t( 'part1.project_team.role' ), type: 'string' }"
                     record="coapplicantRecord"
                     model="model.viewModel.coapplicantModel"
                     first="false">
@@ -521,7 +543,7 @@
                   <cn-add-input
                     input="{
                       key: 'access',
-                      title: t( 'part1.b.access' ),
+                      title: t( 'part1.project_team.access' ),
                       type: 'boolean',
                       enumList: model.metadata.accessEnumList[model.viewModel.record.lang]
                     }"
@@ -532,64 +554,64 @@
                   <button class="btn btn-primary pull-right"
                           ng-disabled="isAddingCoapplicant"
                           ng-click="addCoapplicant()"
-                          ng-bind-html="t( 'part1.b.addCoapplicant' )"></button>
+                          ng-bind-html="t( 'part1.project_team.addCoapplicant' )"></button>
                 </div>
               </fieldset>
             </form>
             <div ng-if="model.viewModel.addingCoapplicantWithData">
               <hr/>
-              <p class="text-primary" ng-bind-html="t( 'part1.b.coapplicantAgreementText' )"></p>
+              <p class="text-primary" ng-bind-html="t( 'part1.project_team.coapplicantAgreementText' )"></p>
               <button class="btn btn-default full-width"
                       ng-click="model.viewModel.downloadCoapplicantAgreementTemplate()"
-                      ng-bind-html="t( 'part1.b.coapplicantAgreementButton' )"></button>
+                      ng-bind-html="t( 'part1.project_team.coapplicantAgreementButton' )"></button>
               <fieldset ng-disabled="!liteModel.getEditEnabled()">
                 <cn-view-input-with-differences
                   input="{
                     key: 'coapplicant_agreement_filename',
-                    title: t( 'part1.b.coapplicantAgreement' ),
+                    title: t( 'part1.project_team.coapplicantAgreement' ),
                     type: 'file'
                   }"
-                  difference="model.viewModel.compareRecord.differences.part1.b.coapplicant_agreement_filename"
+                  difference="model.viewModel.compareRecord.differences.part1.project_team.coapplicant_agreement_filename"
                   model="liteModel">
                 </cn-view-input-with-differences>
               </fieldset>
             </div>
           </div>
         </div>
-        <div ng-show="'c'==model.viewModel.formTab[1]" class="panel panel-default">
+        <div ng-show="'timeline'==model.viewModel.formTab" class="panel panel-default">
           <div class="panel-body">
-            <cn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_1c"></cn-deferral-note>
-            <p class="text-primary" ng-bind-html="t( 'part1.c.text1' ) + startDateDelay + t( 'part1.c.text2' )"></p>
-            <p class="text-primary" ng-bind-html="t( 'part1.c.text3' )"></p>
-            <p class="text-primary" ng-bind-html="t( 'part1.c.text4' )"></p>
+            <cn-deferral-note ng-if="model.getEditEnabled()" page="timeline"></cn-deferral-note>
+            <p class="text-primary" ng-bind-html="t( 'part1.timeline.text1' ) + startDateDelay + t( 'part1.timeline.text2' )"></p>
+            <p class="text-primary" ng-bind-html="t( 'part1.timeline.text3' )"></p>
+            <p class="text-primary" ng-bind-html="t( 'part1.timeline.text4' )"></p>
             <hr/>
-            <form id="part1cForm" name="part1cForm" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
+            <form id="timeline_form" name="timeline_form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
               <div class="form-horizontal">
                 <cn-view-input
                   input="{
                     key: 'deadline',
-                    title: t( 'part1.c.deadline' ),
+                    title: t( 'part1.timeline.deadline' ),
                     type: 'datetime',
                     constant: true
                   }"
                   ng-if="model.viewModel.record.deadline"
-                  difference="model.viewModel.compareRecord.differences.part1.c.deadline"
+                  difference="model.viewModel.compareRecord.differences.part1.timeline.deadline"
                   model="model">
                 </cn-view-input>
                 <cn-view-input-with-differences
                   input="{
                     key: 'start_date',
-                    title: t( 'part1.c.start_date' ),
+                    title: t( 'part1.timeline.start_date' ),
                     type: model.inputList.start_date.type,
                     min: model.viewModel.minStartDate
                   }"
-                  difference="model.viewModel.compareRecord.differences.part1.c.start_date"
+                  difference="model.viewModel.compareRecord.differences.part1.timeline.start_date"
                   model="model">
                 </cn-view-input-with-differences>
                 <cn-view-input-with-differences
                   input="{
                     key: 'duration',
-                    title: t( 'part1.c.duration' ),
+                    title: t( 'part1.timeline.duration' ),
                     type: 'enum',
                     enumList: '.' == model.viewModel.record.amendment
                       ? model.metadata.columnList.duration.standardEnumList[model.viewModel.record.lang]
@@ -597,101 +619,101 @@
                       ? model.metadata.columnList.duration.amendment2EnumList[model.viewModel.record.lang]
                       : model.metadata.columnList.duration.amendment3EnumList[model.viewModel.record.lang]
                   }"
-                  difference="model.viewModel.compareRecord.differences.part1.c.duration"
+                  difference="model.viewModel.compareRecord.differences.part1.timeline.duration"
                   model="model">
                 </cn-view-input-with-differences>
               </div>
             </fieldset></form>
           </div>
         </div>
-        <div ng-show="'d'==model.viewModel.formTab[1]" class="panel panel-default">
+        <div ng-show="'description'==model.viewModel.formTab" class="panel panel-default">
           <div class="panel-body">
-            <cn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_1d"></cn-deferral-note>
-            <p class="text-primary" ng-bind-html="t( 'part1.d.text1' )"></p>
+            <cn-deferral-note ng-if="model.getEditEnabled()" page="description"></cn-deferral-note>
+            <p class="text-primary" ng-bind-html="t( 'part1.description.text1' )"></p>
             <hr/>
-            <form id="part1dForm" name="part1dForm" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
+            <form id="description_form" name="description_form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
               <div class="form-horizontal">
                 <cn-view-input-with-differences
                   input="{
                     key: 'title',
-                    title: t( 'part1.d.title' ),
+                    title: t( 'part1.description.title' ),
                     type: model.inputList.title.type,
                     isConstant: isTitleConstant
                   }"
-                  difference="model.viewModel.compareRecord.differences.part1.d.title"
+                  difference="model.viewModel.compareRecord.differences.part1.description.title"
                   model="model">
                 </cn-view-input-with-differences>
                 <cn-view-input-with-differences
                   input="{
                     key: 'keywords',
-                    title: t( 'part1.d.keywords' ),
+                    title: t( 'part1.description.keywords' ),
                     type: 'string',
                     isConstant: isDescriptionConstant,
-                    help: t( 'part1.d.keywords_text' )
+                    help: t( 'part1.description.keywords_text' )
                   }"
-                  difference="model.viewModel.compareRecord.differences.part1.d.keywords"
+                  difference="model.viewModel.compareRecord.differences.part1.description.keywords"
                   model="model">
                 </cn-view-input-with-differences>
-                <p class="text-primary" ng-bind-html="t( 'part1.d.text2' )"></p>
+                <p class="text-primary" ng-bind-html="t( 'part1.description.text2' )"></p>
                 <cn-view-input-with-differences
                   input="{
                     key: 'lay_summary',
-                    title: '<b class=\'invert\'>ⓘ</b> ' + t( 'part1.d.lay_summary' ) + '<br><span class=text-info>(' +
+                    title: '<b class=\'invert\'>ⓘ</b> ' + t( 'part1.description.lay_summary' ) + '<br><span class=text-info>(' +
                            model.viewModel.charCount.lay_summary + ' ' + t( 'misc.chars' ) + ')</span>',
                     type: model.inputList.lay_summary.type,
                     isConstant: isDescriptionConstant,
                     maxLength: 1000,
-                    help: t( 'part1.d.lay_summary_text' )
+                    help: t( 'part1.description.lay_summary_text' )
                   }"
                   no-help-indicator="true",
-                  difference="model.viewModel.compareRecord.differences.part1.d.lay_summary"
+                  difference="model.viewModel.compareRecord.differences.part1.description.lay_summary"
                   model="model">
                 </cn-view-input-with-differences>
                 <hr/>
-                <p class="text-primary" ng-bind-html="t( 'part1.d.text3' )"></p>
+                <p class="text-primary" ng-bind-html="t( 'part1.description.text3' )"></p>
                 <cn-view-input-with-differences
                   input="{
                     key: 'background',
-                    title: t( 'part1.d.background' ) + '<br><span class=text-info>(' +
+                    title: t( 'part1.description.background' ) + '<br><span class=text-info>(' +
                            model.viewModel.charCount.background + ' ' + t( 'misc.chars' ) + ')</span>',
                     type: model.inputList.background.type,
                     isConstant: isDescriptionConstant,
                     maxLength: 4500
                   }"
-                  difference="model.viewModel.compareRecord.differences.part1.d.background"
+                  difference="model.viewModel.compareRecord.differences.part1.description.background"
                   model="model">
                 </cn-view-input-with-differences>
                 <cn-view-input-with-differences
                   input="{
                     key: 'objectives',
-                    title: t( 'part1.d.objectives' ) + '<br><span class=text-info>(' +
+                    title: t( 'part1.description.objectives' ) + '<br><span class=text-info>(' +
                            model.viewModel.charCount.objectives + ' ' + t( 'misc.chars' ) + ')</span>',
                     type: model.inputList.objectives.type,
                     isConstant: isDescriptionConstant,
                     maxLength: 4500
                   }"
-                  difference="model.viewModel.compareRecord.differences.part1.d.objectives"
+                  difference="model.viewModel.compareRecord.differences.part1.description.objectives"
                   model="model">
                 </cn-view-input-with-differences>
                 <cn-view-input-with-differences
                   input="{
                     key: 'methodology',
-                    title: '<b class=\'invert\'>ⓘ</b> ' + t( 'part1.d.methodology' ) + '<br><span class=text-info>(' +
+                    title: '<b class=\'invert\'>ⓘ</b> ' + t( 'part1.description.methodology' ) + '<br><span class=text-info>(' +
                            model.viewModel.charCount.methodology + ' ' + t( 'misc.chars' ) + ')</span>',
                     type: 'text',
                     isConstant: isDescriptionConstant,
                     maxLength: 4500,
-                    help: t( 'part1.d.methodology_text' )
+                    help: t( 'part1.description.methodology_text' )
                   }"
                   no-help-indicator="true",
-                  difference="model.viewModel.compareRecord.differences.part1.d.methodology"
+                  difference="model.viewModel.compareRecord.differences.part1.description.methodology"
                   model="model">
                 </cn-view-input-with-differences>
                 <cn-view-input
                   ng-if="'.' != model.viewModel.record.amendment && 'en' == model.viewModel.record.lang"
                   input="{
                     key: 'justification_summary_en',
-                    title: t( 'part1.d.amendment_justification_summary' ),
+                    title: t( 'part1.description.amendment_justification_summary' ),
                     type: 'text',
                     constant: true
                   }"
@@ -701,7 +723,7 @@
                   ng-if="'.' != model.viewModel.record.amendment && 'fr' == model.viewModel.record.lang"
                   input="{
                     key: 'justification_summary_fr',
-                    title: t( 'part1.d.amendment_justification_summary' ),
+                    title: t( 'part1.description.amendment_justification_summary' ),
                     type: 'text',
                     isConstant: isAlwaysTrue
                   }"
@@ -710,30 +732,30 @@
                 <cn-view-input-with-differences
                   input="{
                     key: 'analysis',
-                    title: '<b class=\'invert\'>ⓘ</b> ' + t( 'part1.d.analysis' ) + '<br><span class=text-info>(' +
+                    title: '<b class=\'invert\'>ⓘ</b> ' + t( 'part1.description.analysis' ) + '<br><span class=text-info>(' +
                            model.viewModel.charCount.analysis + ' ' + t( 'misc.chars' ) + ')</span>',
                     type: 'text',
                     isConstant: isDescriptionConstant,
                     maxLength: 4500,
-                    help: t( 'part1.d.analysis_text' )
+                    help: t( 'part1.description.analysis_text' )
                   }"
                   no-help-indicator="true",
-                  difference="model.viewModel.compareRecord.differences.part1.d.analysis"
+                  difference="model.viewModel.compareRecord.differences.part1.description.analysis"
                   model="model">
                 </cn-view-input-with-differences>
                 <hr/>
-                <p class="text-primary" ng-bind-html="t( 'part1.d.text4' ) + maxReferencesPerReqn + t( 'part1.d.text5' )"></p>
+                <p class="text-primary" ng-bind-html="t( 'part1.description.text4' ) + maxReferencesPerReqn + t( 'part1.description.text5' )"></p>
                 <div class="panel panel-default">
                   <div class="panel-body"
-                       ng-class="{ 'bg-warning': 0 < model.viewModel.compareRecord.differences.part1.d.referenceList.length }">
-                    <h4 ng-if="0 < model.viewModel.compareRecord.differences.part1.d.referenceList.length">Current Version List</h4>
+                       ng-class="{ 'bg-warning': 0 < model.viewModel.compareRecord.differences.part1.description.referenceList.length }">
+                    <h4 ng-if="0 < model.viewModel.compareRecord.differences.part1.description.referenceList.length">Current Version List</h4>
                     <span ng-show="0 == model.viewModel.record.referenceList.length"
-                          ng-bind-html="t( 'part1.d.noReferences' )"></span>
+                          ng-bind-html="t( 'part1.description.noReferences' )"></span>
                     <table class="table table-striped" ng-show="0 < model.viewModel.record.referenceList.length">
                       <thead class="bg-info">
                         <tr>
-                          <td ng-bind-html="t( 'part1.d.number' )"></td>
-                          <td ng-bind-html="t( 'part1.d.reference' )"></td>
+                          <td ng-bind-html="t( 'part1.description.number' )"></td>
+                          <td ng-bind-html="t( 'part1.description.reference' )"></td>
                           <td ng-show="model.getEditEnabled() && !isDescriptionConstant()"></td>
                         </tr>
                       </thead>
@@ -769,16 +791,16 @@
                         </tr>
                       </tbody>
                     </table>
-                    <div ng-if="0 < model.viewModel.compareRecord.differences.part1.d.referenceList.length">
+                    <div ng-if="0 < model.viewModel.compareRecord.differences.part1.description.referenceList.length">
                       <hr style="border-top-color: gray;"/>
                       <h4>Version {{ model.viewModel.compareRecord.amendment_version }} List</h4>
                       <span ng-show="0 == model.viewModel.compareRecord.referenceList.length"
-                            ng-bind-html="t( 'part1.d.noReferences' )"></span>
+                            ng-bind-html="t( 'part1.description.noReferences' )"></span>
                       <table class="table table-striped" ng-show="0 < model.viewModel.compareRecord.referenceList.length">
                         <thead class="bg-info">
                           <tr>
-                            <td ng-bind-html="t( 'part1.d.number' )"></td>
-                            <td ng-bind-html="t( 'part1.d.reference' )"></td>
+                            <td ng-bind-html="t( 'part1.description.number' )"></td>
+                            <td ng-bind-html="t( 'part1.description.reference' )"></td>
                           </tr>
                         </thead>
                         <tbody>
@@ -794,7 +816,7 @@
                 <div ng-show="model.getEditEnabled() && !isDescriptionConstant()">
                   <cn-add-input
                     class="col-sm-10"
-                    input="{ key: 'reference', title: t( 'part1.d.reference' ), type: 'string' }"
+                    input="{ key: 'reference', title: t( 'part1.description.reference' ), type: 'string' }"
                     record="referenceRecord"
                     model="model.viewModel.referenceModel"
                     first="false">
@@ -802,27 +824,27 @@
                   <button class="btn btn-primary col-sm-2"
                           ng-disabled="isAddingReference"
                           ng-click="addReference()"
-                          ng-bind-html="t( 'part1.d.addReference' )"></button>
+                          ng-bind-html="t( 'part1.description.addReference' )"></button>
                 </div>
               </div>
             </fieldset></form>
           </div>
         </div>
-        <div ng-show="'e'==model.viewModel.formTab[1]" class="panel panel-default">
+        <div ng-show="'scientific_review'==model.viewModel.formTab" class="panel panel-default">
           <div class="panel-body">
-            <cn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_1e"></cn-deferral-note>
-            <p class="text-primary" ng-bind-html="t( 'part1.e.text' )"></p>
+            <cn-deferral-note ng-if="model.getEditEnabled()" page="scientific_review"></cn-deferral-note>
+            <p class="text-primary" ng-bind-html="t( 'part1.scientific_review.text' )"></p>
             <hr/>
-            <form id="part1eForm" name="part1eForm" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
+            <form id="scientific_review_form" name="scientific_review_form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
               <div class="form-horizontal">
                 <cn-view-input-with-differences
                   input="{
                     key: 'peer_review',
-                    title: t( 'part1.e.peer_review' ),
+                    title: t( 'part1.scientific_review.peer_review' ),
                     type: model.inputList.peer_review.type,
                     enumList: model.metadata.yesNoEnumList[model.viewModel.record.lang],
                   }"
-                  difference="model.viewModel.compareRecord.differences.part1.e.peer_review"
+                  difference="model.viewModel.compareRecord.differences.part1.scientific_review.peer_review"
                   model="model">
                 </cn-view-input-with-differences>
                 <fieldset ng-disabled="!liteModel.getEditEnabled()">
@@ -830,41 +852,41 @@
                     ng-if="model.viewModel.record.peer_review"
                     input="{
                       key: 'peer_review_filename',
-                      title: t( 'part1.e.peer_review_filename' ),
+                      title: t( 'part1.scientific_review.peer_review_filename' ),
                       type: 'file'
                     }"
-                    difference="model.viewModel.compareRecord.differences.part1.e.peer_review_filename"
+                    difference="model.viewModel.compareRecord.differences.part1.scientific_review.peer_review_filename"
                     model="liteModel">
                   </cn-view-input-with-differences>
                 </fieldset>
                 <cn-view-input-with-differences
                   input="{
                     key: 'funding',
-                    title: t( 'part1.e.funding' ),
+                    title: t( 'part1.scientific_review.funding' ),
                     type: 'enum',
                     enumList: model.metadata.columnList.funding.enumList[model.viewModel.record.lang]
                   }"
-                  difference="model.viewModel.compareRecord.differences.part1.e.funding"
+                  difference="model.viewModel.compareRecord.differences.part1.scientific_review.funding"
                   model="model">
                 </cn-view-input-with-differences>
                 <cn-view-input-with-differences
                   input="{
                     key: 'funding_agency',
-                    title: t( 'part1.e.funding_agency' ),
+                    title: t( 'part1.scientific_review.funding_agency' ),
                     type: model.inputList.funding_agency.type
                   }"
                   ng-if="['yes', 'requested'].includes( model.viewModel.record.funding )"
-                  difference="model.viewModel.compareRecord.differences.part1.e.funding_agency"
+                  difference="model.viewModel.compareRecord.differences.part1.scientific_review.funding_agency"
                   model="model">
                 </cn-view-input-with-differences>
                 <cn-view-input-with-differences
                   input="{
                     key: 'grant_number',
-                    title: t( 'part1.e.grant_number' ),
+                    title: t( 'part1.scientific_review.grant_number' ),
                     type: model.inputList.grant_number.type
                   }"
                   ng-if="['yes', 'requested'].includes( model.viewModel.record.funding )"
-                  difference="model.viewModel.compareRecord.differences.part1.e.grant_number"
+                  difference="model.viewModel.compareRecord.differences.part1.scientific_review.grant_number"
                   model="model">
                 </cn-view-input-with-differences>
                 <fieldset ng-disabled="!liteModel.getEditEnabled()">
@@ -872,10 +894,10 @@
                     ng-if="'yes' === model.viewModel.record.funding"
                     input="{
                       key: 'funding_filename',
-                      title: t( 'part1.e.letter' ),
+                      title: t( 'part1.scientific_review.letter' ),
                       type: 'file'
                     }"
-                    difference="model.viewModel.compareRecord.differences.part1.e.funding_filename"
+                    difference="model.viewModel.compareRecord.differences.part1.scientific_review.funding_filename"
                     model="liteModel">
                   </cn-view-input-with-differences>
                 </fieldset>
@@ -883,22 +905,22 @@
             </fieldset></form>
           </div>
         </div>
-        <div ng-show="'f'==model.viewModel.formTab[1]" class="panel panel-default">
+        <div ng-show="'ethics'==model.viewModel.formTab" class="panel panel-default">
           <div class="panel-body">
-            <cn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_1f"></cn-deferral-note>
-            <p class="text-primary" ng-bind-html="t( 'part1.f.text' )"></p>
+            <cn-deferral-note ng-if="model.getEditEnabled()" page="ethics"></cn-deferral-note>
+            <p class="text-primary" ng-bind-html="t( 'part1.ethics.text' )"></p>
             <hr/>
-            <form id="part1fForm" name="part1fForm" novalidate>
+            <form id="ethics_form" name="ethics_form" novalidate>
               <div class="form-horizontal">
                 <fieldset ng-disabled="!model.getEditEnabled()">
                   <cn-view-input-with-differences
                     input="{
                       key: 'ethics',
-                      title: t( 'part1.f.ethics' ),
+                      title: t( 'part1.ethics.ethics' ),
                       type: 'enum',
                       enumList: model.metadata.columnList.ethics.enumList[model.viewModel.record.lang]
                     }"
-                    difference="model.viewModel.compareRecord.differences.part1.f.ethics"
+                    difference="model.viewModel.compareRecord.differences.part1.ethics.ethics"
                     model="model">
                   </cn-view-input-with-differences>
                   <div ng-if="!model.viewModel.record.has_ethics_approval_list">
@@ -906,20 +928,20 @@
                       ng-if="'yes' === model.viewModel.record.ethics"
                       input="{
                         key: 'ethics_date',
-                        title: t( 'part1.f.expiration' ),
+                        title: t( 'part1.ethics.expiration' ),
                         type: model.inputList.ethics_date.type
                       }"
-                      difference="model.viewModel.compareRecord.differences.part1.f.ethics_date"
+                      difference="model.viewModel.compareRecord.differences.part1.ethics.ethics_date"
                       model="model">
                     </cn-view-input-with-differences>
                     <cn-view-input-with-differences
                       ng-if="'no' === model.viewModel.record.ethics"
                       input="{
                         key: 'ethics_date',
-                        title: t( 'part1.f.response' ),
+                        title: t( 'part1.ethics.response' ),
                         type: model.inputList.ethics_date.type
                       }"
-                      difference="model.viewModel.compareRecord.differences.part1.f.response"
+                      difference="model.viewModel.compareRecord.differences.part1.ethics.response"
                       model="model">
                     </cn-view-input-with-differences>
                   </div>
@@ -929,17 +951,17 @@
                     ng-if="'yes' === model.viewModel.record.ethics || 'exempt' === model.viewModel.record.ethics"
                     input="{
                       key: 'ethics_filename',
-                      title: t( 'part1.f.letter' ),
+                      title: t( 'part1.ethics.letter' ),
                       type: 'file'
                     }"
-                    difference="model.viewModel.compareRecord.differences.part1.f.ethics_filename"
+                    difference="model.viewModel.compareRecord.differences.part1.ethics.ethics_filename"
                     model="liteModel">
                   </cn-view-input-with-differences>
                 </fieldset>
                 <div ng-if="model.viewModel.record.has_ethics_approval_list">
                   <div class="panel panel-default">
                     <div class="panel-body">
-                      <p class="text-primary" ng-bind-html="t( 'part1.f.approvalListNote' )"></p>
+                      <p class="text-primary" ng-bind-html="t( 'part1.ethics.approvalListNote' )"></p>
                       <table class="table table-striped">
                         <thead class="bg-info">
                           <tr>
@@ -981,26 +1003,26 @@
         </div>
       </div>
     </div>
-    <div ng-show="'part2'==model.viewModel.formTab[0]" class="panel panel-default">
+    <div ng-show="'part2'==model.viewModel.getTabPart()" class="panel panel-default">
       <div class="panel-body" style="padding-bottom: 0px;">
         <h4 style="margin-top: 0; margin-bottom: 1em;" ng-bind-html="t( 'part2.title' )"></h4>
         <ul class="nav nav-tabs">
-          <li ng-repeat="section in model.viewModel.tabSectionList"
-              ng-if="'part2' == section[0]"
-              ng-class="{'active':section[2] == model.viewModel.formTab[2]}">
-            <a ng-click="model.viewModel.setFormTab(2,section[2])"
+          <li ng-repeat="tab in model.viewModel.tabList"
+              ng-if="'part2' == model.viewModel.getTabPart(tab)"
+              ng-class="{'active':tab == model.viewModel.formTab}">
+            <a ng-click="model.viewModel.setFormTab(tab)"
                ng-class="{
                  'text-warning flashing':model.getEditEnabled() && ( 
-                   ( 'cohort' == section[2] && model.viewModel.record.deferral_note_cohort ) ||
-                   ( 'indigenous' == section[2] && model.viewModel.record.deferral_note_indigenous ) ||
-                   model.viewModel.record['deferral_note_2'+section[2]]
+                   ( 'cohort' == tab && model.viewModel.record.deferral_note_cohort ) ||
+                   ( 'indigenous' == tab && model.viewModel.record.deferral_note_indigenous ) ||
+                   model.viewModel.record['deferral_note_'+tab]
                  ),
-                 'bg-warning': model.viewModel.compareRecord.differences.part2[section[2]].diff
+                 'bg-warning': model.viewModel.compareRecord.differences.part2[tab].diff
                }"
-               ng-bind-html="t( 'part2.'+section[2]+'.tab' )"></a>
+               ng-bind-html="t( 'part2.'+tab+'.tab' )"></a>
           </li>
         </ul>
-        <div ng-show="'notes'==model.viewModel.formTab[2]" class="panel panel-default" style="border-top-left-radius: 0px;">
+        <div ng-show="'notes'==model.viewModel.formTab" class="panel panel-default" style="border-top-left-radius: 0px;">
           <div class="panel-body" style="padding-bottom: 0px;">
             <ul class="list-group">
               <li class="list-group-item" ng-bind-html="t( 'part2.notes.text1' )"></li>
@@ -1010,11 +1032,11 @@
             </ul>
           </div>
         </div>
-        <div ng-show="'cohort'==model.viewModel.formTab[2]" class="panel panel-default" style="border-top-left-radius: 0px;">
+        <div ng-show="'cohort'==model.viewModel.formTab" class="panel panel-default" style="border-top-left-radius: 0px;">
           <div class="panel-body" style="padding-bottom: 0px;">
-            <form ng-attr-id="part2CohortForm" ng-attr-name="part2CohortForm" novalidate>
+            <form ng-attr-id="cohort_form" ng-attr-name="cohort_form" novalidate>
               <fieldset ng-disabled="!model.getEditEnabled()">
-                <cn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_cohort"></cn-deferral-note>
+                <cn-deferral-note ng-if="model.getEditEnabled()" page="cohort"></cn-deferral-note>
                 <p class="text-primary" ng-bind-html="t( 'part2.cohort.text1' )"></p>
                 <div class="form-horizontal">
                   <cn-view-input-with-differences
@@ -1072,11 +1094,11 @@
             </form>
           </div>
         </div>
-        <div ng-show="'indigenous'==model.viewModel.formTab[2]" class="panel panel-default" style="border-top-left-radius: 0px;">
+        <div ng-show="'indigenous'==model.viewModel.formTab" class="panel panel-default" style="border-top-left-radius: 0px;">
           <div class="panel-body" style="padding-bottom: 0px;">
-            <form ng-attr-id="part2CohortForm" ng-attr-name="part2CohortForm" novalidate>
+            <form ng-attr-id="indigenous_form" ng-attr-name="indigenous_form" novalidate>
               <fieldset ng-disabled="!model.getEditEnabled()">
-                <cn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_indigenous"></cn-deferral-note>
+                <cn-deferral-note ng-if="model.getEditEnabled()" page="indigenous"></cn-deferral-note>
                 <p class="text-primary" ng-bind-html="t( 'part2.indigenous.text1' )"></p>
 
                 <div class="form-horizontal">
@@ -1198,11 +1220,12 @@
           </div>
         </div>
         <div ng-repeat="category in model.categoryList"
-             ng-show="category.charCode == model.viewModel.formTab[2]"
+             ng-show="category.tabName == model.viewModel.formTab"
              class="panel panel-default">
           <div class="panel-body">
-            <form ng-attr-id="part2{{ category.charCode }}Form" ng-attr-name="part2{{ category.charCode }}Form" novalidate>
-              <cn-deferral-note ng-if="model.getEditEnabled()" note="deferral_note_2{{ category.charCode }}"></cn-deferral-note>
+            <form ng-attr-id="{{ category.tabName }}_form" ng-attr-name="{{ category.tabName }}_form" novalidate>
+              <cn-deferral-note ng-if="model.getEditEnabled()" page="{{ category.tabName }}">
+              </cn-deferral-note>
               <div class="form-horizontal">
                 <div ng-if="category.note[model.viewModel.record.lang]">
                   <div ng-bind-html="category.note[model.viewModel.record.lang]"></div>
@@ -1239,7 +1262,7 @@
                       <td
                           ng-repeat="selection in option.selectionList"
                           ng-style="{ 'width': 50/detailList.length + '%' }"
-                          ng-class="{ 'bg-warning': model.viewModel.compareRecord.differences.part2[category.charCode].selectionList.findByProperty( 'id', selection.id ) }">
+                          ng-class="{ 'bg-warning': model.viewModel.compareRecord.differences.part2[category.tabName].selectionList.findByProperty( 'id', selection.id ) }">
                         <span ng-if="null != selection.unavailable[model.viewModel.record.lang]"
                               ng-bind-html="selection.unavailable[model.viewModel.record.lang]"></span>
                         <button ng-if="null == selection.unavailable[model.viewModel.record.lang]"
@@ -1287,7 +1310,7 @@
                               title: 'Justification',
                               type: 'text'
                             }"
-                            difference="model.viewModel.compareRecord.differences.part2[category.charCode].optionJustificationList.findByProperty( 'id', option.id )"
+                            difference="model.viewModel.compareRecord.differences.part2[category.tabName].optionJustificationList.findByProperty( 'id', option.id )"
                             model="model">
                           </cn-view-input-with-differences>
                         </div>
@@ -1305,7 +1328,7 @@
                         title: t( 'misc.data_sharing' ),
                         type: 'file'
                       }"
-                      difference="model.viewModel.compareRecord.differences.part2.b.data_sharing_filename"
+                      difference="model.viewModel.compareRecord.differences.part2.linked_data.data_sharing_filename"
                       model="liteModel">
                     </cn-view-input-with-differences>
                   </fieldset>
@@ -1319,7 +1342,7 @@
                     title: t( 'misc.comments' ),
                     type: 'text'
                   }"
-                  difference="model.viewModel.compareRecord.differences.part2[category.charCode].comment"
+                  difference="model.viewModel.compareRecord.differences.part2[category.tabName].comment"
                   model="model">
                 </cn-view-input-with-differences>
               </div>
@@ -1328,16 +1351,16 @@
         </div>
       </div>
     </div>
-    <div ng-show="'part3'==model.viewModel.formTab[0]" class="panel panel-default">
+    <div ng-show="'part3'==model.viewModel.getTabPart()" class="panel panel-default">
       <div class="panel-body" style="padding-bottom: 0px;">
         <h4 style="margin-top: 0; margin-bottom: 1em;" ng-bind-html="t( 'part3.title' )"></h4>
         <p class="text-primary" ng-bind-html="t( 'part3.text' )"></p>
       </div>
     </div>
-    <div ng-show="'agreement'==model.viewModel.formTab[0]" class="panel panel-default" ng-if="model.viewModel.showAgreement()">
+    <div ng-show="'agreement'==model.viewModel.getTabPart()" class="panel panel-default" ng-if="model.viewModel.showAgreement()">
       <div class="panel-body" style="padding-bottom: 0px;">
         <h4 style="margin-top: 0; margin-bottom: 1em;">Agreement Details</h4>
-        <form id="agreementForm" name="agreementForm" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
+        <form id="agreement_form" name="agreement_form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
           <div class="form-horizontal">
             <fieldset ng-disabled="!liteModel.getEditEnabled()">
               <div class="row allow-select">
@@ -1409,13 +1432,13 @@
   </div>
   <div class="form-footer text-right rounded-bottom bg-info" style="height:4.6em;">
     <button class="btn btn-primary pull-left"
-            ng-if="'instructions' != model.viewModel.formTab[0]"
-            ng-click="model.viewModel.nextSection( true )"
+            ng-if="'instructions' != model.viewModel.getTabPart()"
+            ng-click="model.viewModel.nextTab( true )"
             ng-bind-html="'<i class=\'glyphicon glyphicon-arrow-left\'></i> ' + t( 'misc.prevButton' )">
     </button>
     <button class="btn btn-primary"
-            ng-if="'part3' != model.viewModel.formTab[0]"
-            ng-click="model.viewModel.nextSection( false )"
+            ng-if="'part3' != model.viewModel.getTabPart()"
+            ng-click="model.viewModel.nextTab( false )"
             ng-bind-html="t( 'misc.nextButton' ) + ' <i class=\'glyphicon glyphicon-arrow-right\'></i>'">
     </button>
   </div>

@@ -40,26 +40,253 @@ cenozo.directive("cnDeferralNote", function () {
   return {
     templateUrl: cenozoApp.getFileUrl("magnolia", "deferral-note.tpl.html"),
     restrict: "E",
-    scope: { note: "@" },
+    scope: { page: "@" },
     controller: [
       "$scope",
       function ($scope) {
-        if( angular.isUndefined( $scope.$parent.model.inputList[$scope.note] ) ) {
-          throw new Error("Missing deferral note '" + $scope.note + "' in input list.");
-        }
-
         angular.extend($scope, {
           directive: "cnDeferralNote",
           input: {
-            key: $scope.note,
+            key: "deferral_note_" + $scope.page,
             title: "Note to Applicant",
-            type: $scope.$parent.model.inputList[$scope.note].type,
+            type: "text",
           },
         });
       },
     ],
   };
 });
+
+/* ############################################################################################## */
+cenozo.factory("CnBaseFormViewFactory", [
+  "CnBaseViewFactory",
+  "CnReqnHelper",
+  "CnHttpFactory",
+  "$state",
+  function (
+    CnBaseViewFactory,
+    CnReqnHelper,
+    CnHttpFactory,
+    $state
+  ){
+    return {
+      construct: function (object, formType, parentModel, root) {
+        // formType: application, finalReport, destructionReport
+        CnBaseViewFactory.construct(object, parentModel, root);
+
+        // extend the base $$onView function (see below)
+        object.baseOnView = object.$$onView;
+
+        angular.extend(object, {
+
+          translate: function (value) {
+            return this.record.lang ? CnReqnHelper.translate(formType, value, this.record.lang) : ""
+          },
+
+          show: function (subject) {
+            let phase = this.record.phase ? this.record.phase : "";
+            let stageType = this.record.stage_type ? this.record.stage_type : "";
+
+            // do not show submit button if the form is no longer active
+            if ("submit" == subject) {
+              if ("application" == formType) {
+                // do not allow the reqn to be submitted when in the finalization phase
+                if ("finalization" == phase) return false;
+              } else if ("finalReport" == formType) {
+                // do not allow the final report to be submitted when in the destruction phase
+                if (stageType.match(/Destruction/)) return false;
+              }
+            } else if ("application" == subject) {
+              return "application" != formType;
+            } else if ("final_report" == subject) {
+              return "finalReport" != formType && ("finalization" == phase || "Complete" == stageType);
+            } else if ("destruction_report" == subject) {
+              return "destructionReport" != formType && ["Data Destruction", "Complete"].includes(stageType);
+            }
+
+            return CnReqnHelper.showAction(subject, this.record);
+          },
+
+          toggleLanguage: function () {
+            this.record.lang = "en" == this.record.lang ? "fr" : "en";
+            return CnHttpFactory.instance({
+              path: "reqn/identifier=" + this.record.identifier,
+              data: { language: this.record.lang },
+            }).patch();
+          },
+
+          formList: [],
+          formTab: "",
+          tabList: [],
+          setFormTab: async function (newTab, transition) {
+            if (angular.isUndefined(transition)) transition = true;
+
+            // find the tab section
+            var selectedTab = null;
+            this.tabList.some((tab) => {
+              if (newTab == tab) {
+                selectedTab = tab;
+                return true;
+              }
+            });
+
+            // if the tab wasn't found then use the first tab
+            if (null == selectedTab) selectedTab = this.tabList[0];
+
+            this.formTab = selectedTab;
+            this.parentModel.setQueryParameter("t", selectedTab);
+            if (transition) await this.parentModel.reloadState(false, false, "replace");
+
+            // update all textarea sizes
+            angular.element("textarea[cn-elastic]").trigger("elastic");
+          },
+
+          nextTab: async function (reverse) {
+            if (angular.isUndefined(reverse)) reverse = false;
+            var currentTabSectionIndex = this.tabList.indexOf(this.formTab);
+            if (null != currentTabSectionIndex) {
+              var tab = this.tabList[currentTabSectionIndex + (reverse ? -1 : 1)];
+              if (angular.isDefined(tab)) await this.setFormTab(tab);
+            }
+          },
+
+          transitionTo: async function (subject) {
+            // "application" is an alias for "reqn_version"
+            if ("application" == subject) subject = "reqn_version";
+            await this.parentModel.transitionToParentViewState(
+              subject,
+              // the "reqn" uses the identifier, the rest have a current_<subject>_id ID
+              "reqn" == subject ?
+                "identifier=" + this.record.identifier :
+                this.record["current_" + subject + "_id"]
+            );
+          },
+
+          downloadForm: async function () {
+            await CnReqnHelper.download(
+              formType.camelToSnake(),
+              this.record.getIdentifier()
+            );
+          },
+
+          $$onView: async function (force) {
+            await object.baseOnView(force);
+
+            if ("lite" != this.parentModel.type) {
+              // setup the form's deferral notes
+              let deferralObject = {};
+              
+              // remove the current form-type from the form list
+              this.formList = [
+                { name: "application", title: "application" },
+                { name: "final_report", title: "finalReport" },
+                { name: "destruction_report", title: "destructionReport" },
+              ].filter(form => this.show(form.name));
+
+              // create an object containing all possible deferral notes for this form
+              deferralObject = this.tabList.reduce((obj,tab) => {
+                obj["deferral_note_"+tab] = null;
+                return obj;
+              }, {});
+
+              angular.extend(this.record, deferralObject);
+              angular.extend(this.backupRecord, deferralObject);
+
+              const response = await CnHttpFactory.instance({
+                path: "reqn/identifier=" + this.record.identifier + "/deferral_note",
+                data: {
+                  modifier: {
+                    where: { column: "form", operator: "=", value: formType.camelToSnake() },
+                    order: "page",
+                  },
+                  select: { column: ["page", "note"] }
+                }
+              }).query();
+
+              response.data.forEach(item => {
+                // add the note to the record (for patching the value)
+                this.record["deferral_note_"+item.page] = item.note;
+                this.backupRecord["deferral_note_"+item.page] = item.note;
+              });
+            }
+          },
+
+          onPatch: async function (data) {
+            var property = Object.keys(data)[0];
+            if (!this.parentModel.getEditEnabled()) {
+              throw new Error("Calling onPatch() but edit is not enabled.");
+            }
+
+            if (null == property.match(/^deferral_note/)) {
+              await this.$$onPatch(data);
+            } else {
+              // make sure to send patches to deferral notes
+              var self = this;
+              const page = property.replace( /^deferral_note_/, "" );
+              const basePath = [
+                "reqn",
+                "identifier=" + this.record.identifier,
+                "deferral_note"
+              ].join( "/" );
+
+              // re-read the deferral note before making changes to it
+              let deferralNote = null;
+              try {
+                const response = await CnHttpFactory.instance({
+                  path: [
+                    basePath,
+                    "form=" + formType.camelToSnake() + ";page=" + page
+                  ].join( "/" ),
+                  onError: function (error) {
+                    // ignore 404 errors, it just means there is no deferral note
+                    if (404 != error.status) self.onPatchError(error);
+                  }
+                }).get();
+                deferralNote = response.data;
+              } catch (error) {
+                // handled by onError above
+              }
+
+              // error function to use when deleting, posting or patching the deferral record
+              const onError = function (error) { self.onPatchError(error); };
+
+              // if setting the note to an empty string then delete it
+              if (!data[property]) {
+                if (null != deferralNote) {
+                  await CnHttpFactory.instance({
+                    path: "deferral_note/" + deferralNote.id,
+                    onError: onError,
+                  }).delete();
+                }
+              } else {
+                // if the note doesn't exist then we need to create it
+                if (null == deferralNote) {
+                  await CnHttpFactory.instance({
+                    path: basePath,
+                    data: {
+                      form: formType.camelToSnake(),
+                      page: page,
+                      note: data[property],
+                    },
+                    onError: onError,
+                  }).post();
+                } else { // otherwise we just need to patch the existing record
+                  await CnHttpFactory.instance({
+                    path: "deferral_note/" + deferralNote.id,
+                    data: { note: data[property] },
+                    onError: onError,
+                  }).patch();
+                }
+              }
+            }
+          },
+
+        });
+
+      },
+    };
+  },
+]);
 
 /* ############################################################################################## */
 cenozo.service("CnModalNoticeListFactory", [
@@ -374,10 +601,6 @@ cenozo.service("CnReqnHelper", [
           );
         } else if ("recreate" == subject) {
           return "administrator" == role && "complete" == phase;
-        } else if ("final report" == subject) {
-          return "finalization" == phase || "Complete" == stageType;
-        } else if ("destruction report" == subject) {
-          return ["Data Destruction", "Complete"].includes(stageType);
         } else if ("reverse" == subject) {
           return (
             // don't allow if inactive or abandoned
@@ -533,7 +756,7 @@ cenozo.service("CnReqnHelper", [
       },
 
       lookupData: {
-        reqn: {
+        application: {
           heading: {
             en: "Data and Biospecimen Request Application",
             fr: "Demande d’accès aux données et aux échantillons",
@@ -614,7 +837,7 @@ cenozo.service("CnReqnHelper", [
               en: "Part 1 of 3: General Project Information",
               fr: "Partie 1 de 3 : Renseignements généraux",
             },
-            a: {
+            applicant: {
               tab: { en: "Applicant", fr: "Demandeur" },
               text1: {
                 en: "<strong>Primary Applicant</strong>: The primary applicant will be the contact person for the CLSA Access Agreement as well as for the data release and any relevant updates.  The primary applicant must hold an eligible appointment (continuing or term appointment) at an eligible institution (that is able to uphold the conditions of the data access agreement, administer grant funds, and provide Research Ethics Board approval).",
@@ -672,7 +895,7 @@ cenozo.service("CnReqnHelper", [
                 fr: "Type d’exemption de frais",
               },
             },
-            b: {
+            project_team: {
               tab: { en: "Project Team", fr: "Équipe de projet" },
               text: {
                 en: "All Co-Applicants and Other Personnel must be listed below. You must inform your collaborators that you have included them on this application. Please note that changes to the project team, including change of Primary Applicant and addition or removal of Co-Applicants and Support Personnel <strong>require an amendment</strong>. To submit an Amendment request, please click on “Create Amendment” in the upper-right corner of your screen and follow the instructions.",
@@ -708,7 +931,7 @@ cenozo.service("CnReqnHelper", [
                 fr: "Modifications à apporter à l’entente de codemandeur",
               },
             },
-            c: {
+            timeline: {
               tab: { en: "Timeline", fr: "Échéancier" },
               text1: {
                 en: "What is the anticipated time frame for this proposed project? In planning for your project, please consider in your time frame <strong>at least ",
@@ -739,7 +962,7 @@ cenozo.service("CnReqnHelper", [
                 fr: "Durée proposée du projet",
               },
             },
-            d: {
+            description: {
               tab: { en: "Description", fr: "Description" },
               text1: {
                 en: "<strong>Provide the level of detail you would normally provide in a grant application. Failure to provide adequate detail to assess feasibility will result in rejection of the application.</strong> Please adhere to character count limits.",
@@ -805,7 +1028,7 @@ cenozo.service("CnReqnHelper", [
               },
               addReference: { en: "Add Reference", fr: "Ajouter référence" },
             },
-            e: {
+            scientific_review: {
               tab: { en: "Scientific Review", fr: "Évaluation scientifique" },
               text: {
                 en: 'Evidence of peer reviewed funding will be considered evidence of scientific review. If you have selected "yes, the project received approval for funding", please upload proof of funding notification. If there are no plans to submit an application for financial support for this project, please provide alternate evidence of peer review (e.g., internal departmental review, thesis protocol defense, etc.), if available.',
@@ -836,7 +1059,7 @@ cenozo.service("CnReqnHelper", [
                 fr: "Copie numérique de la lettre de financement",
               },
             },
-            f: {
+            ethics: {
               tab: { en: "Ethics", fr: "Éthique" },
               text: {
                 en: "Please note that ethics approval is NOT required at the time of this application, but <strong>no data or biospecimens will be released until proof of ethics approval has been received by the CLSA.</strong>",
@@ -1002,7 +1225,6 @@ cenozo.service("CnReqnHelper", [
             coapplicant: { en: "Co-Applicant", fr: "Codemandeur" },
             delete: { en: "Delete", fr: "Effacer" },
             download: { en: "Download", fr: "Télécharger" },
-            application: { en: "Application", fr: "Soumission" },
             dataChecklist: {
               en: "Data Checklist",
               fr: "Sélection des données",
@@ -1017,6 +1239,8 @@ cenozo.service("CnReqnHelper", [
             },
             notices: { en: "Notices", fr: "Notifications" },
             studyData: { en: "Study Data", fr: "Données d’étude" },
+            switchForm: { en: "Switch Form", fr: "Switch Form" }, // TODO: TRANSLATE
+            application: { en: "Application", fr: "Soumission" },
             finalReport: { en: "Final Report", fr: "Rapport final" },
             destructionReport: { en: "Data Destruction Report", fr: "Rapport de destruction de données" },
             study: {
@@ -1076,7 +1300,7 @@ cenozo.service("CnReqnHelper", [
               fr: "Références manquantes",
             },
             missingReferencesMessage: {
-              en: "You must provide references (at the bottom of the \"Description\" section) before submitting your application.", 
+              en: "You must provide references (at the bottom of the \"Description\" section) before submitting your application.",
               fr: "Vous devez fournir des références (au bas de la section « Description ») avant de soumettre votre demande d’accès.",
             },
             confirmNoCoapplicants: {
@@ -1271,7 +1495,7 @@ cenozo.service("CnReqnHelper", [
               fr: 'Veuillez adresser toute question relative au rapport final à <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.',
             },
           },
-          part1: {
+          part_1: {
             tab: { en: "Part 1", fr: "1<sup>re</sup> partie" },
             a: {
               achieved_objectives: {
@@ -1306,7 +1530,7 @@ cenozo.service("CnReqnHelper", [
               },
             },
           },
-          part2: {
+          part_2: {
             tab: { en: "Part 2", fr: "2<sup>e</sup> partie" },
             question: {
               en: "What has the project produced?",
@@ -1318,7 +1542,7 @@ cenozo.service("CnReqnHelper", [
             },
             addOutput: { en: "Add Output", fr: "Ajouter une réalisation" },
           },
-          part3: {
+          part_3: {
             tab: { en: "Part 3", fr: "3<sup>e</sup> partie" },
             a: {
               question: {
@@ -1367,6 +1591,7 @@ cenozo.service("CnReqnHelper", [
               fr: "Passez à la section suivante",
             },
             download: { en: "Download", fr: "Télécharger" },
+            switchForm: { en: "Switch Form", fr: "Switch Form" }, // TODO: TRANSLATE
             application: { en: "Application", fr: "Soumission" },
             finalReport: { en: "Final Report", fr: "Rapport final" },
             destructionReport: { en: "Data Destruction Report", fr: "Rapport de destruction de données" },
@@ -1433,8 +1658,10 @@ cenozo.service("CnReqnHelper", [
           },
           misc: {
             download: { en: "Download", fr: "Télécharger" },
+            switchForm: { en: "Switch Form", fr: "Switch Form" }, // TODO: TRANSLATE
             application: { en: "Application", fr: "Soumission" },
             finalReport: { en: "Final Report", fr: "Rapport final" },
+            destructionReport: { en: "Data Destruction Report", fr: "Rapport de destruction de données" },
             submit: { en: "Submit", fr: "Soumettre" },
             pleaseConfirm: { en: "Please confirm", fr: "Veuillez confirmer" },
             no: { en: "No", fr: "Non" },
@@ -1524,12 +1751,9 @@ cenozo.service("CnReqnHelper", [
       }).query();
 
       var response = await obj.promise;
-      var letter = "a";
       response.data.forEach((category) => {
-        obj.lookupData.reqn.part2[letter] = {
-          tab: { en: category.name_en, fr: category.name_fr },
-        };
-        letter = String.fromCharCode(letter.charCodeAt(0) + 1);
+        const tabName = category.name_en.toLowerCase().replace(/[- ]/g, "_");
+        obj.lookupData.application.part2[tabName] = { tab: { en: category.name_en, fr: category.name_fr } };
       });
     }
 

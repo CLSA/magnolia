@@ -17,7 +17,7 @@ CREATE PROCEDURE patch_role_has_service()
       "FROM ", @cenozo, ".role, service ",
       "WHERE role.name = 'administrator' ",
       "AND service.subject IN( ",
-        "'additional_fee', 'data_destroy', 'destruction_report', 'log_entry', ",
+        "'additional_fee', 'data_destroy', 'deferral_note', 'destruction_report', 'log_entry', ",
         "'packaged_data', 'special_fee_waiver' ",
       ") ",
       "AND service.restricted = 1"

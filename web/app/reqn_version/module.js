@@ -116,24 +116,6 @@ cenozoApp.defineModule({
       lang: { column: "language.code", type: "string" },
       deadline: { column: "deadline.datetime", type: "datetime" },
       additional_fee_total: { type: "integer" },
-      deferral_note_amendment: {
-        column: "reqn.deferral_note_amendment",
-        type: "text",
-      },
-      deferral_note_1a: { column: "reqn.deferral_note_1a", type: "text" },
-      deferral_note_1b: { column: "reqn.deferral_note_1b", type: "text" },
-      deferral_note_1c: { column: "reqn.deferral_note_1c", type: "text" },
-      deferral_note_1d: { column: "reqn.deferral_note_1d", type: "text" },
-      deferral_note_1e: { column: "reqn.deferral_note_1e", type: "text" },
-      deferral_note_1f: { column: "reqn.deferral_note_1f", type: "text" },
-      deferral_note_cohort: { column: "reqn.deferral_note_cohort", type: "text" },
-      deferral_note_indigenous: { column: "reqn.deferral_note_indigenous", type: "text" },
-      deferral_note_2a: { column: "reqn.deferral_note_2a", type: "text" },
-      deferral_note_2b: { column: "reqn.deferral_note_2b", type: "text" },
-      deferral_note_2c: { column: "reqn.deferral_note_2c", type: "text" },
-      deferral_note_2d: { column: "reqn.deferral_note_2d", type: "text" },
-      deferral_note_2e: { column: "reqn.deferral_note_2e", type: "text" },
-      deferral_note_2f: { column: "reqn.deferral_note_2f", type: "text" },
 
       coapplicant_agreement_filename: { type: "string" },
       peer_review_filename: { type: "string" },
@@ -337,7 +319,7 @@ cenozoApp.defineModule({
             $scope.addCoapplicant = async function () {
               if ($scope.model.viewModel.coapplicantModel.getAddEnabled()) {
                 var form =
-                  cenozo.getScopeByQuerySelector("#part1bForm").part1bForm;
+                  cenozo.getScopeByQuerySelector("#project_team_form").project_team_form;
 
                 // we need to check each add-input for errors
                 var valid = true;
@@ -354,7 +336,7 @@ cenozoApp.defineModule({
                 }
                 if (!valid) {
                   // dirty all inputs so we can find the problem
-                  cenozo.forEachFormElement("part1bForm", (element) => {
+                  cenozo.forEachFormElement("project_team_form", (element) => {
                     element.$dirty = true;
                   });
                 } else {
@@ -400,10 +382,10 @@ cenozoApp.defineModule({
             $scope.addReference = async function () {
               if ($scope.model.viewModel.referenceModel.getAddEnabled()) {
                 var form =
-                  cenozo.getScopeByQuerySelector("#part1dForm").part1dForm;
+                  cenozo.getScopeByQuerySelector("#description_form").description_form;
                 if (!form.$valid) {
                   // dirty all inputs so we can find the problem
-                  cenozo.forEachFormElement("part1dForm", (element) => {
+                  cenozo.forEachFormElement("description_form", (element) => {
                     element.$dirty = true;
                   });
                 } else {
@@ -538,7 +520,7 @@ cenozoApp.defineModule({
       "CnCoapplicantModelFactory",
       "CnReferenceModelFactory",
       "CnEthicsApprovalModelFactory",
-      "CnBaseViewFactory",
+      "CnBaseFormViewFactory",
       "CnSession",
       "CnHttpFactory",
       "CnModalMessageFactory",
@@ -555,7 +537,7 @@ cenozoApp.defineModule({
         CnCoapplicantModelFactory,
         CnReferenceModelFactory,
         CnEthicsApprovalModelFactory,
-        CnBaseViewFactory,
+        CnBaseFormViewFactory,
         CnSession,
         CnHttpFactory,
         CnModalMessageFactory,
@@ -566,8 +548,10 @@ cenozoApp.defineModule({
         $rootScope
       ) {
         var object = function (parentModel, root) {
-          CnBaseViewFactory.construct(this, parentModel, root);
+          CnBaseFormViewFactory.construct(this, "application", parentModel, root);
 
+          // extend the base onPatch function that is defined in CnBaseFormViewFactory
+          this.baseOnPatch = this.onPatch;
           angular.extend(this, {
             compareRecord: null,
             versionListLoaded: false,
@@ -577,16 +561,6 @@ cenozoApp.defineModule({
             agreementDifferenceList: null,
             lastAmendmentVersion: null, // used to determine the addingCoapplicantWithData variable
             addingCoapplicantWithData: false, // used when an amendment is adding a new coap
-            show: function (subject) {
-              var stage_type = this.record.stage_type
-                ? this.record.stage_type
-                : "";
-              return (
-                CnReqnHelper.showAction(subject, this.record) &&
-                // the submit button should be hidden once a report is required
-                ("submit" != subject || "Report Required" != stage_type)
-              );
-            },
             showAgreement: function () {
               // only show the agreement tab to administrators
               return (
@@ -612,68 +586,28 @@ cenozoApp.defineModule({
                 this.record.lang
               );
               if (response)
-                await $state.go(
-                  this.parentModel.isRole("applicant", "designate")
-                    ? "root.home"
-                    : "reqn.list"
-                );
+                await $state.go( this.parentModel.isRole("applicant", "designate") ? "root.home" : "reqn.list" );
             },
             delete: async function () {
-              await CnReqnHelper.delete(
-                "identifier=" + this.record.identifier,
-                this.record.lang
-              );
-            },
-            translate: function (value) {
-              return this.record.lang
-                ? CnReqnHelper.translate("reqn", value, this.record.lang)
-                : "";
-            },
-            viewFinalReport: async function () {
-              await $state.go("final_report.view", {
-                identifier: this.record.current_final_report_id,
-              });
-            },
-            viewDestructionReport: async function () {
-              await $state.go("destruction_report.view", {
-                identifier: this.record.current_destruction_report_id,
-              });
+              await CnReqnHelper.delete("identifier=" + this.record.identifier, this.record.lang);
             },
             downloadApplication: async function () {
-              await CnReqnHelper.download(
-                "application",
-                this.record.getIdentifier()
-              );
+              await CnReqnHelper.download("application", this.record.getIdentifier());
             },
             downloadChecklist: async function () {
-              await CnReqnHelper.download(
-                "checklist",
-                this.record.getIdentifier()
-              );
+              await CnReqnHelper.download("checklist", this.record.getIdentifier());
             },
             downloadApplicationAndChecklist: async function () {
-              await CnReqnHelper.download(
-                "application_and_checklist",
-                this.record.getIdentifier()
-              );
+              await CnReqnHelper.download("application_and_checklist", this.record.getIdentifier());
             },
             downloadDataSharing: async function () {
-              await CnReqnHelper.download(
-                "data_sharing_filename",
-                this.record.getIdentifier()
-              );
+              await CnReqnHelper.download("data_sharing_filename", this.record.getIdentifier());
             },
             downloadCoapplicantAgreement: async function (reqnVersionId) {
-              await CnReqnHelper.download(
-                "coapplicant_agreement_filename",
-                reqnVersionId
-              );
+              await CnReqnHelper.download("coapplicant_agreement_filename", reqnVersionId);
             },
             downloadCoapplicantAgreementTemplate: async function () {
-              await CnReqnHelper.download(
-                "coapplicant_agreement_template",
-                this.record.getIdentifier()
-              );
+              await CnReqnHelper.download("coapplicant_agreement_template", this.record.getIdentifier());
             },
 
             onView: async function (force) {
@@ -702,32 +636,27 @@ cenozoApp.defineModule({
                   this.getReferenceList(),
                   this.getSelectionList(),
                 ];
-                if (this.record.has_ethics_approval_list)
-                  promiseList.push(this.getEthicsApprovalList());
-
+                if (this.record.has_ethics_approval_list) promiseList.push(this.getEthicsApprovalList());
                 await Promise.all(promiseList);
 
                 // the version list might get long, so don't wait for it (diffs will show once it is loaded)
                 this.getVersionList().finally(() => {this.versionListLoaded = true;});
 
                 // the category list will have been loaded by now, so we can load the selected tabs
-                this.setFormTab(0, this.parentModel.getQueryParameter("t0"), false);
-                this.setFormTab(1, this.parentModel.getQueryParameter("t1"), false);
-                this.setFormTab(2, this.parentModel.getQueryParameter("t2"), false);
+                this.setFormTab(this.parentModel.getQueryParameter("t"), false);
               }
             },
 
             onPatch: async function (data) {
-              if (!this.parentModel.getEditEnabled())
+              if (!this.parentModel.getEditEnabled()) {
                 throw new Error("Calling onPatch() but edit is not enabled.");
+              }
 
               var property = Object.keys(data)[0];
 
               if (null != property.match(/^amendment_justification_/)) {
                 // justifications have their own service
-                var match = property.match(
-                  /^amendment_justification_([0-9]+)$/
-                );
+                var match = property.match(/^amendment_justification_([0-9]+)$/);
                 var amendmentTypeId = match[1];
 
                 await CnHttpFactory.instance({
@@ -783,21 +712,8 @@ cenozoApp.defineModule({
 
                 this.record["comment_" + categoryId] = data[property];
               } else if (null != property.match(/^deferral_note/)) {
-                // make sure to send patches to deferral notes to the parent reqn
-                var parent = this.parentModel.getParentIdentifier();
-                var httpObj = {
-                  path: parent.subject + "/" + parent.identifier,
-                  data: data,
-                };
-                httpObj.onError = (error) => {
-                  this.onPatchError(error);
-                };
-                try {
-                  await CnHttpFactory.instance(httpObj).patch();
-                  this.afterPatchFunctions.forEach((fn) => fn());
-                } catch (error) {
-                  // handled by onError above
-                }
+                // the base form handles patching deferral notes
+                this.baseOnPatch(data);
               } else {
                 if ("new_user_id" == property) {
                   // make sure the new user isn't a trainee
@@ -808,34 +724,24 @@ cenozoApp.defineModule({
                       onError: async (error) => {
                         if (404 == error.status) {
                           await CnModalMessageFactory.instance({
-                            title: this.translate(
-                              "misc.invalidNewApplicantTitle"
-                            ),
-                            message: this.translate(
-                              "misc.invalidNewApplicantMessage"
-                            ),
+                            title: this.translate("misc.invalidNewApplicantTitle"),
+                            message: this.translate("misc.invalidNewApplicantMessage"),
                             closeText: this.translate("misc.close"),
                             error: true,
                           }).show();
 
                           // failed to set the new user so put it back
-                          this.formattedRecord.new_user_id =
-                            this.backupRecord.formatted_new_user_id;
+                          this.formattedRecord.new_user_id = this.backupRecord.formatted_new_user_id;
                         } else {
                           CnModalMessageFactory.httpError(error);
                         }
                       },
                     }).get();
 
-                    if (
-                      angular.isObject(response.data) &&
-                      null != response.data.supervisor_user_id
-                    ) {
+                    if (angular.isObject(response.data) && null != response.data.supervisor_user_id) {
                       await CnModalMessageFactory.instance({
                         title: this.translate("misc.pleaseNote"),
-                        message: this.translate(
-                          "amendment.newUserIsTraineeNotice"
-                        ),
+                        message: this.translate("amendment.newUserIsTraineeNotice"),
                         closeText: this.translate("misc.close"),
                         error: true,
                       }).show();
@@ -852,26 +758,21 @@ cenozoApp.defineModule({
                 await this.$$onPatch(data);
 
                 if (angular.isDefined(data.applicant_country_id) || angular.isDefined(data.trainee_country_id)) {
-                  // we may have to set the fee waiver type to (empty) if either the applicant or trainee is not Canadian
-                  if (this.record.waiver && !this.isWaiverAllowed())
-                    this.record.waiver = "";
+                  // We may have to set the fee waiver type to (empty) if either the
+                  // applicant or trainee is not Canadian
+                  if (this.record.waiver && !this.isWaiverAllowed()) this.record.waiver = "";
                 } else if (angular.isDefined(data.comprehensive) || angular.isDefined(data.tracking) ) {
                   if (this.record.comprehensive && this.record.tracking) {
                     // show the cohort warning to the applicant
                     CnModalMessageFactory.instance({
                       title: this.translate("misc.pleaseNote"),
-                      message: this.translate(
-                        "part2.cohort.bothCohortNotice"
-                      ),
+                      message: this.translate("part2.cohort.bothCohortNotice"),
                       closeText: this.translate("misc.close"),
                     }).show();
                   }
                 } else if (angular.isDefined(data.peer_review)) {
                   // use the root scope to get the view directive to remove the lite model's file
-                  $rootScope.$broadcast(
-                    "file removed",
-                    "peer_review_filename"
-                  );
+                  $rootScope.$broadcast("file removed", "peer_review_filename");
                 } else if (angular.isDefined(data.funding)) {
                   if ("yes" != data.funding) {
                     if ("requested" != data.funding) {
@@ -906,14 +807,10 @@ cenozoApp.defineModule({
             onPatchError: function (response) {
               if (
                 306 == response.status &&
-                null !=
-                  response.data.match(
-                    /^"You cannot change the primary applicant/
-                  )
+                null != response.data.match(/^"You cannot change the primary applicant/)
               ) {
                 // failed to set the new user so put it back
-                this.formattedRecord.new_user_id =
-                  this.backupRecord.formatted_new_user_id;
+                this.formattedRecord.new_user_id = this.backupRecord.formatted_new_user_id;
               }
 
               return this.$$onPatchError(response);
@@ -934,107 +831,44 @@ cenozoApp.defineModule({
             minStartDate: null,
             noAmendmentTypes: false,
 
-            // setup language and tab state parameters
-            toggleLanguage: async function () {
-              var parent = this.parentModel.getParentIdentifier();
-              this.record.lang = "en" == this.record.lang ? "fr" : "en";
-              cenozoApp.setLang(this.record.lang);
-              await CnHttpFactory.instance({
-                path: parent.subject + "/" + parent.identifier,
-                data: { language: this.record.lang },
-              }).patch();
-            },
-
-            // the sequencial list of all tabs where every item has an array of the three indexed tab values
-            formTab: [],
-            tabSectionListIsBuilt: false,
-            tabSectionList: [
-              ["instructions", null, null],
-              ["part1", "a", null],
-              ["part1", "b", null],
-              ["part1", "c", null],
-              ["part1", "d", null],
-              ["part1", "e", null],
-              ["part1", "f", null],
-              ["part2", null, "notes"],
-              ["part2", null, "cohort"],
-              ["part2", null, "indigenous"],
-              // one tab for each data category will be added here
-              ["part3", null, null],
-              ["agreement", null, null],
+            tabList: [
+              "instructions",
+              "applicant",
+              "project_team",
+              "timeline",
+              "description",
+              "scientific_review",
+              "ethics",
+              "notes",
+              "cohort",
+              "indigenous",
+              "core_clsa_data",
+              "linked_data",
+              "images_and_raw_data",
+              "geographic_indicators",
+              "covid_19_data",
+              "mortality_data",
+              "biospecimen_access",
+              "agreement",
             ],
 
-            setFormTab: async function (index, tab, transition) {
-              if (angular.isUndefined(transition)) transition = true;
-              if (!(0 <= index && index <= 2)) index = 0;
+            // returns which part of the form a tab belongs to (leave empty to use the current tab)
+            getTabPart: (tab) => {
+              if (angular.isUndefined(tab)) tab = this.formTab;
+              part1Tabs = ["applicant", "project_team", "timeline", "description", "scientific_review", "ethics"];
+              part2Tabs = [
+                "notes", "cohort", "indigenous", "core_clsa_data", "linked_data", "images_and_raw_data",
+                "geographic_indicators", "covid_19_data", "mortality_data"
+              ];
+              part3Tabs = ["biospecimen_access"];
 
-              // find the tab section
-              var selectedTabSection = null;
-              this.tabSectionList.some((tabSection) => {
-                if (tab == tabSection[index]) {
-                  selectedTabSection = tabSection;
-                  return true;
-                }
-              });
-
-              // get the tab (or default if none was found)
-              tab =
-                null != selectedTabSection && null != selectedTabSection[index]
-                  ? selectedTabSection[index]
-                  : 0 == index
-                  ? "instructions"
-                  : 1 == index
-                  ? "a"
-                  : "notes";
-
-              this.formTab[index] = tab;
-              this.parentModel.setQueryParameter("t" + index, tab);
-
-              if (transition)
-                await this.parentModel.reloadState(false, false, "replace");
-
-              // update all textarea sizes
-              angular.element("textarea[cn-elastic]").trigger("elastic");
-            },
-
-            nextSection: async function (reverse) {
-              if (angular.isUndefined(reverse)) reverse = false;
-
-              var currentTabSectionIndex = null;
-              this.tabSectionList.some((tabSection, index) => {
-                if (this.formTab[0] == tabSection[0]) {
-                  if (
-                    (null == tabSection[1] ||
-                      this.formTab[1] == tabSection[1]) &&
-                    (null == tabSection[2] || this.formTab[2] == tabSection[2])
-                  ) {
-                    currentTabSectionIndex = index;
-                    return true;
-                  }
-                }
-              });
-
-              if (null != currentTabSectionIndex) {
-                var tabSection =
-                  this.tabSectionList[
-                    currentTabSectionIndex + (reverse ? -1 : 1)
-                  ];
-
-                // always skip the agreement section
-                if ("agreement" == tabSection[0])
-                  tabSection =
-                    this.tabSectionList[
-                      currentTabSectionIndex + (reverse ? -2 : 2)
-                    ];
-
-                if (angular.isDefined(tabSection)) {
-                  if (null != tabSection[2])
-                    this.setFormTab(2, tabSection[2], false);
-                  if (null != tabSection[1])
-                    this.setFormTab(1, tabSection[1], false);
-                  await this.setFormTab(0, tabSection[0]);
-                }
-              }
+              return (
+                part1Tabs.includes(tab) ? "part1" :
+                part2Tabs.includes(tab) ? "part2" :
+                part3Tabs.includes(tab) ? "part3" :
+                "agreement" == tab ? "agreement" :
+                "instructions"
+              );
             },
 
             // NOTE: This process mirrors database\reqn_version::calculate_cost() on the server side
@@ -1093,14 +927,10 @@ cenozoApp.defineModule({
                     option.selectionList
                       .filter((selection) => 0 < selection.cost.value)
                       .forEach((selection) => {
-                        if (
-                          angular.isArray(this.record.selectionList) &&
-                          this.record.selectionList[selection.id]
-                        ) {
+                        if (angular.isArray(this.record.selectionList) && this.record.selectionList[selection.id]) {
                           if (selection.costCombined) {
                             // track the most expensive selection
-                            if (selection.cost.value > maxCost)
-                              maxCost = selection.cost.value;
+                            if (selection.cost.value > maxCost) maxCost = selection.cost.value;
                           } else {
                             // add the selection's cost
                             cost += selection.cost.value;
@@ -1123,9 +953,11 @@ cenozoApp.defineModule({
                   } else {
                     var currentAmendment = null;
                     this.versionList.forEach(version => {
-                      if (null != version &&
-                          '.' != version.amendment &&
-                          this.record.amendment >= version.amendment) {
+                      if (
+                        null != version &&
+                        '.' != version.amendment &&
+                        this.record.amendment >= version.amendment
+                      ) {
                         if(currentAmendment == version.amendment) return;
 
                         // add the cost of any amendment that this version has selected
@@ -1152,8 +984,7 @@ cenozoApp.defineModule({
               // waviers can only be changed by administrators once the revision require stage (or after) has been reached
               return (
                 this.parentModel.isRole("administrator") ||
-                this.record.stage_type_rank <
-                  CnSession.application.revisionRequiredRank
+                this.record.stage_type_rank < CnSession.application.revisionRequiredRank
               );
             },
 
@@ -1161,10 +992,8 @@ cenozoApp.defineModule({
               var baseCountryId = CnSession.application.baseCountryId;
               return (
                 this.record.trainee_name &&
-                (null == this.record.applicant_country_id ||
-                  baseCountryId == this.record.applicant_country_id) &&
-                (null == this.record.trainee_country_id ||
-                  baseCountryId == this.record.trainee_country_id)
+                (null == this.record.applicant_country_id || baseCountryId == this.record.applicant_country_id) &&
+                (null == this.record.trainee_country_id || baseCountryId == this.record.trainee_country_id)
               );
             },
 
@@ -1172,10 +1001,9 @@ cenozoApp.defineModule({
               var reqnVersion1 = this.record;
               var differences = {
                 diff: false,
-                amendment: {
+                instructions: {
                   diff: false,
-                  a: {
-                    // the only unnamed amendment category
+                  amendments: {
                     diff: false,
                     new_user_id: false,
                     amendmentJustificationList: [],
@@ -1183,7 +1011,7 @@ cenozoApp.defineModule({
                 },
                 part1: {
                   diff: false,
-                  a: {
+                  applicant: {
                     // applicant
                     diff: false,
                     applicant_position: false,
@@ -1198,19 +1026,19 @@ cenozoApp.defineModule({
                     trainee_phone: false,
                     waiver: false,
                   },
-                  b: {
+                  project_team: {
                     // project team
                     diff: false,
                     coapplicantList: [],
                     coapplicant_agreement_filename: false,
                   },
-                  c: {
+                  timeline: {
                     // timeline
                     diff: false,
                     start_date: false,
                     duration: false,
                   },
-                  d: {
+                  description: {
                     // description
                     diff: false,
                     title: false,
@@ -1222,7 +1050,7 @@ cenozoApp.defineModule({
                     analysis: false,
                     referenceList: [],
                   },
-                  e: {
+                  scientific_review: {
                     // scientific review
                     diff: false,
                     peer_review: false,
@@ -1232,7 +1060,7 @@ cenozoApp.defineModule({
                     funding_agency: false,
                     grant_number: false,
                   },
-                  f: {
+                  ethics: {
                     // ethics
                     diff: false,
                     ethics: false,
@@ -1258,24 +1086,48 @@ cenozoApp.defineModule({
                     indigenous3_filename: false,
                     indigenous4_filename: false,
                   },
+                  core_clsa_data: {
+                    diff: false,
+                    selectionList: [],
+                    optionJustificationList: [],
+                    comment: false,
+                  },
+                  linked_data: {
+                    diff: false,
+                    selectionList: [],
+                    optionJustificationList: [],
+                    comment: false,
+                  },
+                  images_and_raw_data: {
+                    diff: false,
+                    selectionList: [],
+                    optionJustificationList: [],
+                    comment: false,
+                  },
+                  geographic_indicators: {
+                    diff: false,
+                    selectionList: [],
+                    optionJustificationList: [],
+                    comment: false,
+                  },
+                  covid_19_data: {
+                    diff: false,
+                    selectionList: [],
+                    optionJustificationList: [],
+                    comment: false,
+                  },
+                  mortality_data: {
+                    diff: false,
+                    selectionList: [],
+                    optionJustificationList: [],
+                    comment: false,
+                  },
                 },
               };
 
-              // add a section for each category
-              this.parentModel.categoryList.forEach((category) => {
-                differences.part2[category.charCode] = {
-                  diff: false,
-                  selectionList: [],
-                  optionJustificationList: [],
-                  comment: false,
-                };
-              });
-
               // add all amendment types
               this.parentModel.amendmentTypeList.en.forEach((amendmentType) => {
-                differences.amendment.a[
-                  "amendmentType" + amendmentType.id
-                ] = false;
+                differences.instructions.amendments["amendmentType" + amendmentType.id] = false;
               });
 
               if (null != reqnVersion2) {
@@ -1283,13 +1135,13 @@ cenozoApp.defineModule({
                   if (!differences.hasOwnProperty(part)) continue;
                   if ("diff" == part) continue; // used to track overall diff
 
-                  for (var section in differences[part]) {
-                    if (!differences[part].hasOwnProperty(section)) continue;
-                    if ("diff" == section) continue; // used to track overall diff
+                  for (var tab in differences[part]) {
+                    if (!differences[part].hasOwnProperty(tab)) continue;
+                    if ("diff" == tab) continue; // used to track overall diff
 
-                    for (var property in differences[part][section]) {
-                      if (!differences[part][section].hasOwnProperty(property)) continue;
-                      if (angular.isArray(differences[part][section][property])) {
+                    for (var property in differences[part][tab]) {
+                      if (!differences[part][tab].hasOwnProperty(property)) continue;
+                      if (angular.isArray(differences[part][tab][property])) {
                         // an array means we have a list go check through
                         if ("coapplicantList" == property) {
                           // loop through reqnVersion1's coapplicants to see if any were added or changed
@@ -1299,29 +1151,17 @@ cenozoApp.defineModule({
                               // reqnVersion1 has coapplicant that compared reqnVersion2 doesn't
                               differences.diff = true;
                               differences[part].diff = true;
-                              differences[part][section].diff = true;
-                              differences[part][section][property].push({
-                                name: c1.name,
-                                diff: "added",
-                              });
+                              differences[part][tab].diff = true;
+                              differences[part][tab][property].push({ name: c1.name, diff: "added" });
                             } else {
                               if (
-                                [
-                                  "position",
-                                  "affiliation",
-                                  "email",
-                                  "role",
-                                  "access",
-                                ].some((p) => c1[p] != c2[p])
+                                ["position", "affiliation", "email", "role", "access"].some((p) => c1[p] != c2[p])
                               ) {
                                 // reqnVersion1 has coapplicant which is different than compared reqnVersion2
                                 differences.diff = true;
                                 differences[part].diff = true;
-                                differences[part][section].diff = true;
-                                differences[part][section][property].push({
-                                  name: c1.name,
-                                  diff: "changed",
-                                });
+                                differences[part][tab].diff = true;
+                                differences[part][tab][property].push({ name: c1.name, diff: "changed" });
                               }
                             }
                           });
@@ -1333,11 +1173,8 @@ cenozoApp.defineModule({
                               // reqnVersion1 has coapplicant that compared reqnVersion2 doesn't
                               differences.diff = true;
                               differences[part].diff = true;
-                              differences[part][section].diff = true;
-                              differences[part][section][property].push({
-                                name: c2.name,
-                                diff: "removed",
-                              });
+                              differences[part][tab].diff = true;
+                              differences[part][tab][property].push({ name: c2.name, diff: "removed" });
                             }
                           });
                         } else if ("referenceList" == property) {
@@ -1348,11 +1185,8 @@ cenozoApp.defineModule({
                               // reqnVersion1 has reference that compared reqnVersion2 doesn't
                               differences.diff = true;
                               differences[part].diff = true;
-                              differences[part][section].diff = true;
-                              differences[part][section][property].push({
-                                name: r1.reference,
-                                diff: "added",
-                              });
+                              differences[part][tab].diff = true;
+                              differences[part][tab][property].push({ name: r1.reference, diff: "added" });
                             }
                           });
 
@@ -1363,16 +1197,13 @@ cenozoApp.defineModule({
                               // reqnVersion1 has reference that compared reqnVersion2 doesn't
                               differences.diff = true;
                               differences[part].diff = true;
-                              differences[part][section].diff = true;
-                              differences[part][section][property].push({
-                                name: r2.reference,
-                                diff: "removed",
-                              });
+                              differences[part][tab].diff = true;
+                              differences[part][tab][property].push({ name: r2.reference, diff: "removed" });
                             }
                           });
                         } else if ("selectionList" == property) {
                           this.parentModel.categoryList
-                            .filter((category) => section == category.charCode)
+                            .filter((category) => tab == category.tabName)
                             .forEach((category) => {
                               category.optionList.forEach((option) => {
                                 option.selectionList.forEach((selection) => {
@@ -1382,13 +1213,13 @@ cenozoApp.defineModule({
                                   ) {
                                     differences.diff = true;
                                     differences[part].diff = true;
-                                    differences[part][section].diff = true;
-                                    differences[part][section][property].push({
+                                    differences[part][tab].diff = true;
+                                    differences[part][tab][property].push({
                                       id: selection.id,
                                       name:
                                         option.name.en +
                                         " [" +
-                                        CnReqnHelper.lookupData.reqn.misc
+                                        CnReqnHelper.lookupData.application.misc
                                           .studyPhase[selection.studyPhaseCode]
                                           .en +
                                         "]",
@@ -1406,12 +1237,12 @@ cenozoApp.defineModule({
                             ){
                               var match = prop.match( /^data_justification_([0-9]+)$/);
                               const { category, option } = this.parentModel.getCategoryAndOption(match[1]);
-                              // only check options belonging to this section
-                              if( section == category.charCode ) {
+                              // only check options belonging to this tab
+                              if (tab == category.tabName) {
                                 differences.diff = true;
                                 differences[part].diff = true;
-                                differences[part][section].diff = true;
-                                differences[part][section][property].push({
+                                differences[part][tab].diff = true;
+                                differences[part][tab][property].push({
                                   id: option.id,
                                   name: option.name.en,
                                   diff: !reqnVersion1[prop] ? "removed" :
@@ -1429,54 +1260,44 @@ cenozoApp.defineModule({
                                 var match = prop.match( /^amendment_justification_([0-9]+)$/ );
                                 differences.diff = true;
                                 differences[part].diff = true;
-                                differences[part][section].diff = true;
-                                differences[part][section][property].push({
-                                  id: match[1],
-                                  diff: true,
-                                });
+                                differences[part][tab].diff = true;
+                                differences[part][tab][property].push({ id: match[1], diff: true });
                               }
                             }
                           }
                         }
                       } else if (null != property.match(/_filename$/)) {
                         // if both file names are empty or null then assume there is no difference
-                        var recordName = angular.isUndefined(reqnVersion1[property]) ?
-                          null : reqnVersion1[property];
-                        var compareName = angular.isUndefined(reqnVersion2[property]) ?
-                          null : reqnVersion2[property];
+                        var recordName = angular.isUndefined(reqnVersion1[property]) ?  null : reqnVersion1[property];
+                        var compareName = angular.isUndefined(reqnVersion2[property]) ?  null : reqnVersion2[property];
 
                         if (!(recordName == null && compareName == null)) {
                           // file size are compared instead of filename
-                          var fileDetails =
-                            this.parentModel.viewModel.fileList.findByProperty("key", property);
+                          var fileDetails = this.parentModel.viewModel.fileList.findByProperty("key", property);
                           var sizeProperty = property.replace("_filename", "_size");
-                          var recordSize =
-                            angular.isObject(fileDetails) && fileDetails.size ?
-                              fileDetails.size : null;
-                          var compareSize = reqnVersion2[sizeProperty] ?
-                            reqnVersion2[sizeProperty] : null;
+                          var recordSize = angular.isObject(fileDetails) && fileDetails.size ?
+                            fileDetails.size : null;
+                          var compareSize = reqnVersion2[sizeProperty] ?  reqnVersion2[sizeProperty] : null;
                           if ((null != recordSize || null != compareSize) && recordSize != compareSize) {
                             differences.diff = true;
                             differences[part].diff = true;
-                            differences[part][section].diff = true;
-                            differences[part][section][property] = true;
+                            differences[part][tab].diff = true;
+                            differences[part][tab][property] = true;
                           }
                         }
                       } else if ("comment" == property) {
                         // only check comments if they are activated for this category
-                        var category = this.parentModel.categoryList.findByProperty("charCode", section);
+                        var category = this.parentModel.categoryList.findByProperty("tabName", tab);
                         if (category.comment) {
                           // a comment's property in the record is followed by the data_category_id
                           var commentProperty = "comment_" + category.id;
-                          var value1 = "" === reqnVersion1[commentProperty] ?
-                            null : reqnVersion1[commentProperty];
-                          var value2 = "" === reqnVersion2[commentProperty] ?
-                            null : reqnVersion2[commentProperty];
+                          var value1 = "" === reqnVersion1[commentProperty] ?  null : reqnVersion1[commentProperty];
+                          var value2 = "" === reqnVersion2[commentProperty] ?  null : reqnVersion2[commentProperty];
                           if (value1 != value2) {
                             differences.diff = true;
                             differences[part].diff = true;
-                            differences[part][section].diff = true;
-                            differences[part][section][property] = true;
+                            differences[part][tab].diff = true;
+                            differences[part][tab][property] = true;
                           }
                         }
                       } else {
@@ -1487,8 +1308,8 @@ cenozoApp.defineModule({
                         if (value1 != value2) {
                           differences.diff = true;
                           differences[part].diff = true;
-                          differences[part][section].diff = true;
-                          differences[part][section][property] = true;
+                          differences[part][tab].diff = true;
+                          differences[part][tab][property] = true;
 
                           // if the property is text then get the diff data
                           if (angular.isDefined(this.parentModel.metadata.columnList[property])) {
@@ -1498,9 +1319,7 @@ cenozoApp.defineModule({
                               determineDifferences = true;
                             } else if ("varchar" == column.data_type) {
                               var match = column.type.match(/varchar\(([0-9]+)\)/);
-                              if (null != match && 256 < match[1]) {
-                                determineDifferences = true;
-                              }
+                              if (null != match && 256 < match[1]) determineDifferences = true;
                             }
                           }
 
@@ -1542,29 +1361,17 @@ cenozoApp.defineModule({
                   this.getAmendmentTypeList(version.id, version),
 
                   // see if there is a difference between this list and the view's list
-                  this.getCoapplicantList(version.id, version).then(() =>
-                    this.setCoapplicantDiff(version)
-                  ),
+                  this.getCoapplicantList(version.id, version).then(() => this.setCoapplicantDiff(version)),
                   // see if there is a difference between this list and the view's list
-                  this.getReferenceList(version.id, version).then(() =>
-                    this.setReferenceDiff(version)
-                  ),
+                  this.getReferenceList(version.id, version).then(() => this.setReferenceDiff(version)),
                   this.getSelectionList(version.id, version),
                 ]);
 
                 // add the file sizes
-                [
-                  "coapplicant_agreement",
-                  "peer_review",
-                  "funding",
-                  "ethics",
-                  "data_sharing",
-                ].forEach((file) => {
+                ["coapplicant_agreement", "peer_review", "funding", "ethics", "data_sharing"].forEach((file) => {
                   var path = "reqn_version/" + version.id + "?file=" + file + "_filename";
                   promiseList.push(
-                    CnHttpFactory.instance({ path: path })
-                      .get()
-                      .then((r) => (version[file + "_size"] = r.data))
+                    CnHttpFactory.instance({ path: path }).get().then((r) => (version[file + "_size"] = r.data))
                   );
                 });
 
@@ -1573,10 +1380,7 @@ cenozoApp.defineModule({
 
               var compareVersion = this.parentModel.getQueryParameter("c");
               if (angular.isDefined(compareVersion))
-                this.compareRecord = this.versionList.findByProperty(
-                  "amendment_version",
-                  compareVersion
-                );
+                this.compareRecord = this.versionList.findByProperty("amendment_version", compareVersion);
 
               if (1 < this.versionList.length) {
                 // add a null object to the version list so we can turn off comparisons
@@ -1604,10 +1408,7 @@ cenozoApp.defineModule({
 
                   // while we're at it determine the list of coapplicant agreements
                   if (null != version.coapplicant_agreement_filename)
-                    this.coapplicantAgreementList.push({
-                      version: version.amendment_version,
-                      id: version.id,
-                    });
+                    this.coapplicantAgreementList.push({ version: version.amendment_version, id: version.id });
 
                   // ... and also determine the last agreement version and calculate its differences
                   if (null == this.agreementDifferenceList && null != version.agreement_filename) {
@@ -1622,9 +1423,7 @@ cenozoApp.defineModule({
             },
 
             determineCoapplicantDiffs: function () {
-              this.versionList.forEach((version) =>
-                this.setCoapplicantDiff(version)
-              );
+              this.versionList.forEach((version) => this.setCoapplicantDiff(version));
             },
 
             setCoapplicantDiff: function (version) {
@@ -1636,24 +1435,14 @@ cenozoApp.defineModule({
                   version.coapplicantList.some(
                     (c1) =>
                       !this.record.coapplicantList.some(
-                        (c2) =>
-                          ![
-                            "name",
-                            "position",
-                            "affiliation",
-                            "email",
-                            "role",
-                            "access",
-                          ].some((prop) => c1[prop] != c2[prop])
+                        (c2) => !["name", "position", "affiliation", "email", "role", "access"]
+                          .some((prop) => c1[prop] != c2[prop])
                       )
                   );
 
                 // When an amendment is made which adds coapplicants with access to data we need to get a signed agreement
                 // form from the user.  In order to do this we need a variable that tracks when this is the case:
-                if (
-                  "." != this.record.amendment &&
-                  this.lastAmendmentVersion == version.amendment_version
-                ) {
+                if ("." != this.record.amendment && this.lastAmendmentVersion == version.amendment_version) {
                   this.addingCoapplicantWithData = false;
                   if (version.coapplicantDiff) {
                     // There is a difference between this and the previous amendment version, so now determine if there is now
@@ -1663,17 +1452,14 @@ cenozoApp.defineModule({
                         (oldCoapplicant) => {
                           if (oldCoapplicant.name == coapplicant.name) {
                             // check if an existing coap has been given access to the data
-                            if (!oldCoapplicant.access && coapplicant.access)
-                              this.addingCoapplicantWithData = true;
+                            if (!oldCoapplicant.access && coapplicant.access) this.addingCoapplicantWithData = true;
                             return true;
                           }
                         }
                       );
 
                       // check if a new coap has been given access to the data
-                      if (!found && coapplicant.access)
-                        this.addingCoapplicantWithData = true;
-
+                      if (!found && coapplicant.access) this.addingCoapplicantWithData = true;
                       return this.addingCoapplicantWithData;
                     });
                   }
@@ -1702,32 +1488,20 @@ cenozoApp.defineModule({
                 },
               }).query();
 
-              response.data.forEach((row) => {
-                object["amendmentType" + row.id] = true;
-              });
+              response.data.forEach((row) => { object["amendmentType" + row.id] = true; });
             },
 
             toggleAmendmentTypeValue: async function (amendmentTypeId) {
-              var onErrorFn = (error) => {
-                this.record[property] = !this.record[property];
-              };
-              var path =
-                this.parentModel.getServiceResourcePath() + "/amendment_type";
-              var amendmentType =
-                this.parentModel.amendmentTypeList.en.findByProperty(
-                  "id",
-                  amendmentTypeId
-                );
-              var justificationColumn =
-                "amendment_justification_" + amendmentTypeId;
+              var onErrorFn = (error) => { this.record[property] = !this.record[property]; };
+              var path = this.parentModel.getServiceResourcePath() + "/amendment_type";
+              var amendmentType = this.parentModel.amendmentTypeList.en.findByProperty("id", amendmentTypeId);
+              var justificationColumn = "amendment_justification_" + amendmentTypeId;
 
               var property = "amendmentType" + amendmentTypeId;
               if (this.record[property]) {
                 var proceed = true;
 
-                if (
-                  amendmentTypeId == this.parentModel.newUserAmendmentTypeId
-                ) {
+                if (amendmentTypeId == this.parentModel.newUserAmendmentTypeId) {
                   proceed = false;
 
                   // show a warning if changing primary applicants
@@ -1750,10 +1524,7 @@ cenozoApp.defineModule({
                     }).post();
 
                     // add the local copy of the justification if it doesn't already exist
-                    if (
-                      amendmentType.justificationPrompt &&
-                      angular.isUndefined(this.record[justificationColumn])
-                    ) {
+                    if (amendmentType.justificationPrompt && angular.isUndefined(this.record[justificationColumn])) {
                       this.record[justificationColumn] = "";
                     }
                   } catch (error) {
@@ -1766,10 +1537,7 @@ cenozoApp.defineModule({
               } else {
                 // delete the amendment type
                 try {
-                  await CnHttpFactory.instance({
-                    path: path + "/" + amendmentTypeId,
-                    onError: onErrorFn,
-                  }).delete();
+                  await CnHttpFactory.instance({ path: path + "/" + amendmentTypeId, onError: onErrorFn }).delete();
                   delete this.record[justificationColumn];
                 } catch (error) {
                   // handled by onError above
@@ -1787,17 +1555,7 @@ cenozoApp.defineModule({
               var response = await CnHttpFactory.instance({
                 path: basePath + "/coapplicant",
                 data: {
-                  select: {
-                    column: [
-                      "id",
-                      "name",
-                      "position",
-                      "affiliation",
-                      "email",
-                      "role",
-                      "access",
-                    ],
-                  },
+                  select: { column: ["id", "name", "position", "affiliation", "email", "role", "access"] },
                   modifier: { order: "id", limit: 1000 },
                 },
               }).query();
@@ -1820,35 +1578,25 @@ cenozoApp.defineModule({
 
             removeCoapplicant: async function (id) {
               await CnHttpFactory.instance({
-                path:
-                  this.parentModel.getServiceResourcePath() +
-                  "/coapplicant/" +
-                  id,
+                path: this.parentModel.getServiceResourcePath() + "/coapplicant/" + id
               }).delete();
               await this.getCoapplicantList();
               this.determineCoapplicantDiffs();
             },
 
             determineReferenceDiffs: function () {
-              this.versionList.forEach((version) =>
-                this.setReferenceDiff(version)
-              );
+              this.versionList.forEach((version) => this.setReferenceDiff(version));
             },
 
             setReferenceDiff: function (version) {
               if (null != version) {
                 // see if there is a difference between this list and the view's list
                 version.referenceDiff =
-                  version.referenceList.length !=
-                    this.record.referenceList.length ||
+                  version.referenceList.length != this.record.referenceList.length ||
                   version.referenceList.some(
-                    (c1) =>
-                      !this.record.referenceList.some(
-                        (c2) =>
-                          !["rank", "reference"].some(
-                            (prop) => c1[prop] != c2[prop]
-                          )
-                      )
+                    (c1) => !this.record.referenceList.some(
+                      (c2) => !["rank", "reference"].some((prop) => c1[prop] != c2[prop])
+                    )
                   );
               }
             },
@@ -1872,10 +1620,7 @@ cenozoApp.defineModule({
 
             setReferenceRank: async function (id, rank) {
               await CnHttpFactory.instance({
-                path:
-                  this.parentModel.getServiceResourcePath() +
-                  "/reference/" +
-                  id,
+                path: this.parentModel.getServiceResourcePath() + "/reference/" + id,
                 data: { rank: rank },
               }).patch();
 
@@ -1885,10 +1630,7 @@ cenozoApp.defineModule({
 
             removeReference: async function (id) {
               await CnHttpFactory.instance({
-                path:
-                  this.parentModel.getServiceResourcePath() +
-                  "/reference/" +
-                  id,
+                path: this.parentModel.getServiceResourcePath() + "/reference/" + id,
               }).delete();
 
               await this.getReferenceList();
@@ -1897,9 +1639,7 @@ cenozoApp.defineModule({
 
             getEthicsApprovalList: async function () {
               var response = await CnHttpFactory.instance({
-                path: ["reqn", this.record.reqn_id, "ethics_approval"].join(
-                  "/"
-                ),
+                path: ["reqn", this.record.reqn_id, "ethics_approval"].join("/"),
                 data: {
                   select: { column: ["id", "filename", "date", "one_day_old"] },
                   modifier: { order: { date: true }, limit: 1000 },
@@ -1910,9 +1650,7 @@ cenozoApp.defineModule({
             },
 
             removeEthicsApproval: async function (id) {
-              await CnHttpFactory.instance({
-                path: "ethics_approval/" + id,
-              }).delete();
+              await CnHttpFactory.instance({ path: "ethics_approval/" + id }).delete();
               await this.getEthicsApprovalList();
             },
 
@@ -1934,9 +1672,7 @@ cenozoApp.defineModule({
               object.selectionList = [];
               this.parentModel.categoryList.forEach((category) =>
                 category.optionList.forEach((option) =>
-                  option.selectionList.forEach(
-                    (selection) => (object.selectionList[selection.id] = false)
-                  )
+                  option.selectionList.forEach((selection) => (object.selectionList[selection.id] = false))
                 )
               );
 
@@ -1964,30 +1700,22 @@ cenozoApp.defineModule({
 
                 CnHttpFactory.instance({
                   path: basePath + "/reqn_version_comment",
-                  data: {
-                    select: { column: ["data_category_id", "description"] },
-                  },
+                  data: { select: { column: ["data_category_id", "description"] } },
                 }).query(),
 
                 CnHttpFactory.instance({
                   path: basePath + "/data_justification",
-                  data: {
-                    select: { column: ["data_option_id", "description"] },
-                  },
+                  data: { select: { column: ["data_option_id", "description"] } },
                 }).query(),
 
                 CnHttpFactory.instance({
                   path: basePath + "/amendment_justification",
-                  data: {
-                    select: { column: ["amendment_type_id", "description"] },
-                  },
+                  data: { select: { column: ["amendment_type_id", "description"] } },
                 }).query(),
               ]);
 
               // set all reqn-version selections
-              selectionResponse.data.forEach((selection) => {
-                object.selectionList[selection.id] = true;
-              });
+              selectionResponse.data.forEach((selection) => { object.selectionList[selection.id] = true; });
 
               // define all reqn-version comments
               commentResponse.data.forEach((comment) => {
@@ -1998,16 +1726,14 @@ cenozoApp.defineModule({
 
               // define all reqn-version data-option justifications
               optionJustificationResponse.data.forEach((justification) => {
-                var column =
-                  "data_justification_" + justification.data_option_id;
+                var column = "data_justification_" + justification.data_option_id;
                 object[column] = justification.description;
                 this.backupRecord[column] = object[column];
               });
 
               // define all reqn-version amendment justifications
               amendmentJustificationResponse.data.forEach((justification) => {
-                var column =
-                  "amendment_justification_" + justification.amendment_type_id;
+                var column = "amendment_justification_" + justification.amendment_type_id;
                 object[column] = justification.description;
                 this.backupRecord[column] = object[column];
               });
@@ -2016,16 +1742,12 @@ cenozoApp.defineModule({
             isOptionSelected: function (option) {
               return (
                 angular.isArray(this.record.selectionList) &&
-                option.selectionList.some(
-                  (selection) => this.record.selectionList[selection.id]
-                )
+                option.selectionList.some((selection) => this.record.selectionList[selection.id])
               );
             },
 
             isCategorySelected: function (category) {
-              return category.optionList.some((option) =>
-                this.isOptionSelected(option)
-              );
+              return category.optionList.some((option) => this.isOptionSelected(option));
             },
 
             toggleSelection: async function (category, option, selection) {
@@ -2048,15 +1770,14 @@ cenozoApp.defineModule({
                 }
 
                 // create a modal for the option condition, if required
-                var optionModal =
-                  null != option[column]
-                    ? CnModalConfirmFactory.instance({
-                        title: this.translate("misc.pleaseConfirm"),
-                        noText: this.translate("misc.no"),
-                        yesText: this.translate("misc.yes"),
-                        message: option[column],
-                      })
-                    : null;
+                var optionModal = null != option[column] ?
+                  CnModalConfirmFactory.instance({
+                    title: this.translate("misc.pleaseConfirm"),
+                    noText: this.translate("misc.no"),
+                    yesText: this.translate("misc.yes"),
+                    message: option[column],
+                  }) :
+                  null;
 
                 // now show whichever condition modals are required, category first, then option
                 if (null != categoryModal || null != optionModal) {
@@ -2080,8 +1801,7 @@ cenozoApp.defineModule({
 
               try {
                 var data = {};
-                if (this.record.selectionList[selection.id])
-                  data.add = selection.id;
+                if (this.record.selectionList[selection.id]) data.add = selection.id;
                 else data.remove = selection.id;
                 await CnHttpFactory.instance({
                   path: this.parentModel.getServiceResourcePath() + "/data_selection",
@@ -2093,18 +1813,12 @@ cenozoApp.defineModule({
 
                 if (this.record.selectionList[selection.id]) {
                   // add the local copy of the justification if it doesn't already exist
-                  if (
-                    option.justification &&
-                    angular.isUndefined(this.record[justificationColumn])
-                  ) {
+                  if (option.justification && angular.isUndefined(this.record[justificationColumn])) {
                     this.record[justificationColumn] = "";
                   }
                 } else {
                   // delete the local copy of the justification if there are no data options left
-                  if (
-                    option.justification &&
-                    angular.isDefined(this.record[justificationColumn])
-                  ) {
+                  if (option.justification && angular.isDefined(this.record[justificationColumn])) {
                     var stillSelected = category.optionList.some((option) =>
                       option.selectionList.some((selection) => this.record.selectionList[selection.id])
                     );
@@ -2127,9 +1841,7 @@ cenozoApp.defineModule({
                 }).show();
               } else {
                 $window.open(
-                  CnSession.application.studyDataUrl +
-                    "/" +
-                    this.record.data_directory,
+                  CnSession.application.studyDataUrl + "/" + this.record.data_directory,
                   "studyData" + this.record.reqn_id
                 );
               }
@@ -2137,9 +1849,7 @@ cenozoApp.defineModule({
 
             canViewData: function () {
               // administrators and applicants can view data when in the active stage
-              var stage_type = this.record.stage_type
-                ? this.record.stage_type
-                : "";
+              var stage_type = this.record.stage_type ? this.record.stage_type : "";
               return (
                 this.parentModel.isRole(
                   "administrator",
@@ -2167,17 +1877,17 @@ cenozoApp.defineModule({
                       });
                     }
                   } else if (version.differences[part].diff) {
-                    for (var section in version.differences[part]) {
-                      if (!version.differences[part].hasOwnProperty(section)) continue;
-                      if ("diff" == section) continue; // used to track overall diff
+                    for (var tab in version.differences[part]) {
+                      if (!version.differences[part].hasOwnProperty(tab)) continue;
+                      if ("diff" == tab) continue; // used to track overall diff
 
-                      if (version.differences[part][section].diff) {
-                        for (var property in version.differences[part][section]) {
-                          if (!version.differences[part][section].hasOwnProperty(property)) continue;
+                      if (version.differences[part][tab].diff) {
+                        for (var property in version.differences[part][tab]) {
+                          if (!version.differences[part][tab].hasOwnProperty(property)) continue;
                           if ("diff" == property) continue; // used to track overall diff
 
-                          if (angular.isArray(version.differences[part][section][property])) {
-                            version.differences[part][section][property].forEach((change) => {
+                          if (angular.isArray(version.differences[part][tab][property])) {
+                            version.differences[part][tab][property].forEach((change) => {
                               differenceList.push({
                                 type: property
                                   .replace("List", "")
@@ -2190,9 +1900,9 @@ cenozoApp.defineModule({
                               });
                             });
                           } else {
-                            if (version.differences[part][section][property]) {
+                            if (version.differences[part][tab][property]) {
                               if ("comment" == property) {
-                                let cat = this.parentModel.categoryList.findByProperty("charCode", section);
+                                let cat = this.parentModel.categoryList.findByProperty("tabName", tab);
                                 let propertyName = "comment_" + cat.id;
                                 differenceList.push({
                                   name: cat.name.en + " " + property.replace(/_/g, " ").ucWords(),
@@ -2244,7 +1954,7 @@ cenozoApp.defineModule({
               if (response) {
                 // make sure that certain properties have been defined, one tab at a time
                 var requiredTabList = {
-                  "1a": [
+                  "applicant": [
                     "applicant_position",
                     "applicant_affiliation",
                     "applicant_address",
@@ -2252,9 +1962,9 @@ cenozoApp.defineModule({
                     "applicant_phone",
                     "waiver",
                   ],
-                  "1b": ["coapplicant_agreement_filename"],
-                  "1c": ["start_date", "duration"],
-                  "1d": [
+                  "project_team": ["coapplicant_agreement_filename"],
+                  "timeline": ["start_date", "duration"],
+                  "description": [
                     "title",
                     "keywords",
                     "lay_summary",
@@ -2263,23 +1973,21 @@ cenozoApp.defineModule({
                     "methodology",
                     "analysis",
                   ],
-                  "1e": [
+                  "scientific_review": [
                     "peer_review",
                     "funding",
                     "funding_filename",
                     "funding_agency",
                     "grant_number",
                   ],
-                  "1f": this.record.has_ethics_approval_list
-                    ? ["ethics"]
-                    : ["ethics", "ethics_filename"],
-                  "2cohort": [
+                  "ethics": this.record.has_ethics_approval_list ? ["ethics"] : ["ethics", "ethics_filename"],
+                  "cohort": [
                     "tracking",
                     "comprehensive",
                     "longitudinal",
                     "last_identifier",
                   ],
-                  "2indigenous": [
+                  "indigenous": [
                     "indigenous",
                     "indigenous_description",
                     "indigenous1_filename",
@@ -2296,7 +2004,7 @@ cenozoApp.defineModule({
                     var match = property.match(/^data_justification_([0-9]+)$/);
                     var obj = this.parentModel.getCategoryAndOption(match[1]);
                     if (obj.option.justification) {
-                      var tab = "2" + obj.category.charCode;
+                      var tab = obj.category.tabName;
 
                       // add it to the required tab list
                       if (angular.isUndefined(requiredTabList[tab])) requiredTabList[tab] = [];
@@ -2325,7 +2033,7 @@ cenozoApp.defineModule({
                 for (var tab in requiredTabList) {
                   var firstProperty = null;
                   requiredTabList[tab].filter((property) => {
-                    if ("1a" == tab) {
+                    if ("applicant" == tab) {
                       if ("waiver" == property) {
                         // only check the waiver if a waiver is allowed
                         return this.isWaiverAllowed();
@@ -2335,11 +2043,11 @@ cenozoApp.defineModule({
                       } else {
                         return true;
                       }
-                    } else if ("1b" == tab) {
-                      // only check 1b properties if there is a new coapplication with access to data
+                    } else if ("project_team" == tab) {
+                      // only check project team properties if there is a new coapplication with access to data
                       return this.addingCoapplicantWithData;
-                    } else if ("1e" == tab) {
-                      // only check 1e funding properties if funding=yes
+                    } else if ("scientific_review" == tab) {
+                      // only check scientific review funding properties if funding=yes
                       return !["peer_review", "funding"].includes(property)
                         ? "yes" == this.record.funding
                         : true;
@@ -2459,20 +2167,7 @@ cenozoApp.defineModule({
                   if (this.parentModel.isRole("applicant", "designate"))
                     error.closeText = this.translate("misc.close");
                   await CnModalMessageFactory.instance(error).show();
-
-                  if ("amendment" == errorTab) {
-                    this.setFormTab(0, "amendment", false);
-                  } else {
-                    if ("instructions" == errorTab ) {
-                      this.setFormTab(0, "instructions", false);
-                    } else if (1 == errorTab.substr(0, 1)) {
-                      this.setFormTab(0, "part1", false);
-                      await this.setFormTab(1, errorTab.substr(1));
-                    } else {
-                      this.setFormTab(0, "part2", false);
-                      await this.setFormTab(2, errorTab.substr(1));
-                    }
-                  }
+                  await this.setFormTab(errorTab);
                   return;
                 }
                 
@@ -2735,13 +2430,6 @@ cenozoApp.defineModule({
               }
             },
 
-            viewReqn: async function () {
-              await this.parentModel.transitionToParentViewState(
-                "reqn",
-                "identifier=" + this.record.identifier
-              );
-            },
-
             displayFinalReportRequiredWarning: async function () {
               var response = await CnModalConfirmFactory.instance({
                 title: this.translate("misc.pleaseConfirm"),
@@ -2831,7 +2519,7 @@ cenozoApp.defineModule({
           if ("lite" != this.type)
             this.listModel = CnReqnVersionListFactory.instance(this);
 
-          var misc = CnReqnHelper.lookupData.reqn.misc;
+          var misc = CnReqnHelper.lookupData.application.misc;
           angular.extend(this, {
             viewModel: CnReqnVersionViewFactory.instance(
               this,
@@ -3352,15 +3040,6 @@ cenozoApp.defineModule({
 
               // only do the following for the root instance
               if ("root" == this.type) {
-                // get the index that we'll be inserting categories in the tab section list
-                var insertIndex = null;
-                this.viewModel.tabSectionList.some((tabSection, index) => {
-                  if ("part2" == tabSection[0] && "indigenous" == tabSection[2]) {
-                    insertIndex = index + 1;
-                    return true;
-                  }
-                });
-
                 // build the categories
                 this.categoryList = categoryResponse.data;
                 this.categoryList.forEach((category) => {
@@ -3373,21 +3052,12 @@ cenozoApp.defineModule({
                       list.push(1 < studyPhaseList.length ? item : [item[0]]);
                       return list;
                     }, []),
-                    // determine the character code based on the rank
-                    charCode: String.fromCharCode(
-                      "a".charCodeAt(0) + category.rank - 1
-                    ),
+                    // convert the category's english name to a snake_case_variable_name
+                    tabName: category.name_en.toLowerCase().replace(/[- ]/g, "_"),
                     name: { en: category.name_en, fr: category.name_fr },
                     note: { en: category.note_en, fr: category.note_fr },
                     optionList: [],
                   });
-
-                  this.viewModel.tabSectionList.splice(insertIndex, 0, [
-                    "part2",
-                    null,
-                    category.charCode,
-                  ]);
-                  insertIndex++;
 
                   // remove stuff we no longer need
                   delete category.study_phase_list;

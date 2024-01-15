@@ -53,6 +53,7 @@ class ui extends \cenozo\ui\ui
       $module->add_child( 'final_report' );
       $module->add_child( 'destruction_report' );
       $module->add_child( 'reqn_version' );
+      $module->add_child( 'deferral_note' );
       $module->add_child( 'review' );
       $module->add_child( 'stage' );
       $module->add_child( 'data_release' );
@@ -74,7 +75,7 @@ class ui extends \cenozo\ui\ui
     }
 
     $module = $this->get_module( 'reqn_version' );
-    if( !is_null( $module ) ) $module->append_action_query( 'view', '?{t0}&{t1}&{t2}&{c}' );
+    if( !is_null( $module ) ) $module->append_action_query( 'view', '?{t}&{c}' );
 
     $module = $this->get_module( 'notification_type' );
     if( !is_null( $module ) )

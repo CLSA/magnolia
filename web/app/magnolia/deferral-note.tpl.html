@@ -3,10 +3,13 @@
     <cn-view-input no-cols=true class="text-danger" input="input" model="$parent.model"></cn-view-input>
   </div>
 </span>
-<span ng-show="!$parent.model.isRole( 'administrator' ) && $parent.model.viewModel.record[note]">
+<span ng-show="
+  !$parent.model.isRole( 'administrator' ) &&
+  'deferred' == $parent.model.viewModel.record.state &&
+  $parent.model.viewModel.record['deferral_note_'+page]
+">
   <div class="vertical-spacer bg-warning rounded" style="padding: 0.5em 1em 1em;">
     <h4 class="text-danger flashing"><i class="glyphicon glyphicon-warning-sign"></i> Attention</h4>
-    <pre class="text-danger"
-         style="font-weight: bold;">{{ $parent.model.viewModel.record[note] }}</pre>
+    <pre class="text-danger" style="font-weight: bold;">{{ $parent.model.viewModel.record['deferral_note_'+page] }}</pre>
   </div>
 </span>

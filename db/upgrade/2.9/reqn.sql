@@ -44,7 +44,259 @@ CREATE PROCEDURE patch_reqn()
         ON UPDATE NO ACTION;
     END IF;
 
-    SELECT "Adding deferral_note_destruction column to reqn table" AS "";
+    SELECT "Removing defunct deferral_note columns from reqn table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "deferral_note_amendment";
+
+    IF @test = 1 THEN
+      -- move all notes to the deferral_note table
+      INSERT INTO deferral_note( reqn_id, form, page, note )
+      SELECT reqn.id, "application", "instructions", deferral_note_amendment
+      FROM reqn WHERE deferral_note_amendment IS NOT NULL;
+      -- ALTER TABLE reqn DROP COLUMN deferral_note_amendment;
+    END IF;
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "deferral_note_1a";
+
+    IF @test = 1 THEN
+      -- move all notes to the deferral_note table
+      INSERT INTO deferral_note( reqn_id, form, page, note )
+      SELECT reqn.id, "application", "applicant", deferral_note_1a
+      FROM reqn WHERE deferral_note_1a IS NOT NULL;
+      -- ALTER TABLE reqn DROP COLUMN deferral_note_1a;
+    END IF;
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "deferral_note_1b";
+
+    IF @test = 1 THEN
+      -- move all notes to the deferral_note table
+      INSERT INTO deferral_note( reqn_id, form, page, note )
+      SELECT reqn.id, "application", "project_team", deferral_note_1b
+      FROM reqn WHERE deferral_note_1b IS NOT NULL;
+      -- ALTER TABLE reqn DROP COLUMN deferral_note_1b;
+    END IF;
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "deferral_note_1c";
+
+    IF @test = 1 THEN
+      -- move all notes to the deferral_note table
+      INSERT INTO deferral_note( reqn_id, form, page, note )
+      SELECT reqn.id, "application", "timeline", deferral_note_1c
+      FROM reqn WHERE deferral_note_1c IS NOT NULL;
+      -- ALTER TABLE reqn DROP COLUMN deferral_note_1c;
+    END IF;
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "deferral_note_1d";
+
+    IF @test = 1 THEN
+      -- move all notes to the deferral_note table
+      INSERT INTO deferral_note( reqn_id, form, page, note )
+      SELECT reqn.id, "application", "description", deferral_note_1d
+      FROM reqn WHERE deferral_note_1d IS NOT NULL;
+      -- ALTER TABLE reqn DROP COLUMN deferral_note_1d;
+    END IF;
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "deferral_note_1e";
+
+    IF @test = 1 THEN
+      -- move all notes to the deferral_note table
+      INSERT INTO deferral_note( reqn_id, form, page, note )
+      SELECT reqn.id, "application", "scientific_review", deferral_note_1e
+      FROM reqn WHERE deferral_note_1e IS NOT NULL;
+      -- ALTER TABLE reqn DROP COLUMN deferral_note_1e;
+    END IF;
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "deferral_note_1f";
+
+    IF @test = 1 THEN
+      -- move all notes to the deferral_note table
+      INSERT INTO deferral_note( reqn_id, form, page, note )
+      SELECT reqn.id, "application", "ethics", deferral_note_1f
+      FROM reqn WHERE deferral_note_1f IS NOT NULL;
+      -- ALTER TABLE reqn DROP COLUMN deferral_note_1f;
+    END IF;
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "deferral_note_cohort";
+
+    IF @test = 1 THEN
+      -- move all notes to the deferral_note table
+      INSERT INTO deferral_note( reqn_id, form, page, note )
+      SELECT reqn.id, "application", "cohort", deferral_note_cohort
+      FROM reqn WHERE deferral_note_cohort IS NOT NULL;
+      -- ALTER TABLE reqn DROP COLUMN deferral_note_cohort;
+    END IF;
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "deferral_note_indigenous";
+
+    IF @test = 1 THEN
+      -- move all notes to the deferral_note table
+      INSERT INTO deferral_note( reqn_id, form, page, note )
+      SELECT reqn.id, "application", "indigenous", deferral_note_indigenous
+      FROM reqn WHERE deferral_note_indigenous IS NOT NULL;
+      -- ALTER TABLE reqn DROP COLUMN deferral_note_indigenous;
+    END IF;
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "deferral_note_2a";
+
+    IF @test = 1 THEN
+      -- move all notes to the deferral_note table
+      INSERT INTO deferral_note( reqn_id, form, page, note )
+      SELECT reqn.id, "application", "core_clsa_data", deferral_note_2a
+      FROM reqn WHERE deferral_note_2a IS NOT NULL;
+      -- ALTER TABLE reqn DROP COLUMN deferral_note_2a;
+    END IF;
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "deferral_note_2b";
+
+    IF @test = 1 THEN
+      -- move all notes to the deferral_note table
+      INSERT INTO deferral_note( reqn_id, form, page, note )
+      SELECT reqn.id, "application", "linked_data", deferral_note_2b
+      FROM reqn WHERE deferral_note_2b IS NOT NULL;
+      -- ALTER TABLE reqn DROP COLUMN deferral_note_2b;
+    END IF;
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "deferral_note_2c";
+
+    IF @test = 1 THEN
+      -- move all notes to the deferral_note table
+      INSERT INTO deferral_note( reqn_id, form, page, note )
+      SELECT reqn.id, "application", "images_and_raw_data", deferral_note_2c
+      FROM reqn WHERE deferral_note_2c IS NOT NULL;
+      -- ALTER TABLE reqn DROP COLUMN deferral_note_2c;
+    END IF;
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "deferral_note_2d";
+
+    IF @test = 1 THEN
+      -- move all notes to the deferral_note table
+      INSERT INTO deferral_note( reqn_id, form, page, note )
+      SELECT reqn.id, "application", "geographic_indicators", deferral_note_2d
+      FROM reqn WHERE deferral_note_2d IS NOT NULL;
+      -- ALTER TABLE reqn DROP COLUMN deferral_note_2d;
+    END IF;
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "deferral_note_2e";
+
+    IF @test = 1 THEN
+      -- move all notes to the deferral_note table
+      INSERT INTO deferral_note( reqn_id, form, page, note )
+      SELECT reqn.id, "application", "covid_19_data", deferral_note_2e
+      FROM reqn WHERE deferral_note_2e IS NOT NULL;
+      -- ALTER TABLE reqn DROP COLUMN deferral_note_2e;
+    END IF;
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "deferral_note_2f";
+
+    IF @test = 1 THEN
+      -- move all notes to the deferral_note table
+      INSERT INTO deferral_note( reqn_id, form, page, note )
+      SELECT reqn.id, "application", "mortality_data", deferral_note_2f
+      FROM reqn WHERE deferral_note_2f IS NOT NULL;
+      -- ALTER TABLE reqn DROP COLUMN deferral_note_2f;
+    END IF;
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "deferral_note_report1";
+
+    IF @test = 1 THEN
+      -- move all notes to the deferral_note table
+      INSERT INTO deferral_note( reqn_id, form, page, note )
+      SELECT reqn.id, "final_report", "part_1", deferral_note_report1
+      FROM reqn WHERE deferral_note_report1 IS NOT NULL;
+      -- ALTER TABLE reqn DROP COLUMN deferral_note_report1;
+    END IF;
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "deferral_note_report2";
+
+    IF @test = 1 THEN
+      -- move all notes to the deferral_note table
+      INSERT INTO deferral_note( reqn_id, form, page, note )
+      SELECT reqn.id, "final_report", "part_2", deferral_note_report2
+      FROM reqn WHERE deferral_note_report2 IS NOT NULL;
+      -- ALTER TABLE reqn DROP COLUMN deferral_note_report2;
+    END IF;
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "deferral_note_report3";
+
+    IF @test = 1 THEN
+      -- move all notes to the deferral_note table
+      INSERT INTO deferral_note( reqn_id, form, page, note )
+      SELECT reqn.id, "final_report", "part_3", deferral_note_report3
+      FROM reqn WHERE deferral_note_report3 IS NOT NULL;
+      -- ALTER TABLE reqn DROP COLUMN deferral_note_report3;
+    END IF;
 
     SELECT COUNT(*) INTO @test
     FROM information_schema.COLUMNS
@@ -52,8 +304,12 @@ CREATE PROCEDURE patch_reqn()
     AND table_name = "reqn"
     AND column_name = "deferral_note_destruction";
 
-    IF @test = 0 THEN
-      ALTER TABLE reqn ADD COLUMN deferral_note_destruction TEXT NULL DEFAULT NULL AFTER deferral_note_report3;
+    IF @test = 1 THEN
+      -- move all notes to the deferral_note table
+      INSERT INTO deferral_note( reqn_id, form, page, note )
+      SELECT reqn.id, "destruction", "data_destroy", deferral_note_destruction
+      FROM reqn WHERE deferral_note_destruction IS NOT NULL;
+      -- ALTER TABLE reqn DROP COLUMN deferral_note_destruction;
     END IF;
 
   END //

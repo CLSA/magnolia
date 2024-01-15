@@ -55,18 +55,6 @@ cenozoApp.defineModule({
       opportunities: { type: "text" },
       dissemination: { type: "text" },
       waiver: { column: "reqn_version.waiver", type: "string" },
-      deferral_note_report1: {
-        column: "reqn.deferral_note_report1",
-        type: "text",
-      },
-      deferral_note_report2: {
-        column: "reqn.deferral_note_report2",
-        type: "text",
-      },
-      deferral_note_report3: {
-        column: "reqn.deferral_note_report3",
-        type: "text",
-      },
       current_destruction_report_id: { column: "destruction_report.id", type: "string" },
     });
 
@@ -102,19 +90,14 @@ cenozoApp.defineModule({
               CnSession.setBreadcrumbTrail([
                 {
                   title: reqnModel.module.name.plural.ucWords(),
-                  go: async function () {
-                    await reqnModel.transitionToListState();
-                  },
+                  go: async function () { await reqnModel.transitionToListState(); },
                 },
                 {
                   title: scope.model.viewModel.record.identifier,
                   go: async function () {
                     await reqnModel.transitionToViewState({
                       getIdentifier: function () {
-                        return (
-                          "identifier=" +
-                          scope.model.viewModel.record.identifier
-                        );
+                        return ("identifier=" + scope.model.viewModel.record.identifier);
                       },
                     });
                   },
@@ -122,9 +105,7 @@ cenozoApp.defineModule({
                 {
                   title: scope.model.module.name.singular.ucWords(),
                   go: async function () {
-                    await scope.model.transitionToViewState(
-                      scope.model.viewModel.record
-                    );
+                    await scope.model.transitionToViewState(scope.model.viewModel.record);
                   },
                 },
               ]);
@@ -144,27 +125,20 @@ cenozoApp.defineModule({
             });
           },
           controller: function ($scope) {
-            if (angular.isUndefined($scope.model))
-              $scope.model = CnFinalReportModelFactory.root;
-            if (angular.isUndefined($scope.liteModel))
-              $scope.liteModel = CnFinalReportModelFactory.lite;
+            if (angular.isUndefined($scope.model)) $scope.model = CnFinalReportModelFactory.root;
+            if (angular.isUndefined($scope.liteModel)) $scope.liteModel = CnFinalReportModelFactory.lite;
             cnRecordView.controller[1]($scope);
             $scope.t = function (value) {
-              return $scope.model.viewModel.record.lang
-                ? CnReqnHelper.translate(
-                    "finalReport",
-                    value,
-                    $scope.model.viewModel.record.lang
-                  )
-                : "";
+              return (
+                $scope.model.viewModel.record.lang ?
+                  CnReqnHelper.translate("finalReport", value, $scope.model.viewModel.record.lang) : ""
+              );
             };
 
             $scope.getHeading = function () {
               var status = null;
               if ("deferred" == $scope.model.viewModel.record.state) {
-                status = $scope.model.isRole("applicant", "designate")
-                  ? "Action Required"
-                  : "Deferred to Applicant";
+                status = $scope.model.isRole("applicant", "designate") ? "Action Required" : "Deferred to Applicant";
               } else if ($scope.model.viewModel.record.state) {
                 status = $scope.model.viewModel.record.state.ucWords();
               }
@@ -182,10 +156,7 @@ cenozoApp.defineModule({
             $scope.compareTo = async function (version) {
               $scope.model.viewModel.compareRecord = version;
               $scope.liteModel.viewModel.compareRecord = version;
-              $scope.model.setQueryParameter(
-                "c",
-                null == version ? undefined : version.version
-              );
+              $scope.model.setQueryParameter("c", null == version ? undefined : version.version);
               await $scope.model.reloadState(false, false, "replace");
             };
           },
@@ -195,7 +166,7 @@ cenozoApp.defineModule({
 
     /* ############################################################################################## */
     cenozo.providers.factory("CnFinalReportViewFactory", [
-      "CnBaseViewFactory",
+      "CnBaseFormViewFactory",
       "CnOutputModelFactory",
       "CnReqnHelper",
       "CnHttpFactory",
@@ -204,7 +175,7 @@ cenozoApp.defineModule({
       "CnSession",
       "$state",
       function (
-        CnBaseViewFactory,
+        CnBaseFormViewFactory,
         CnOutputModelFactory,
         CnReqnHelper,
         CnHttpFactory,
@@ -214,7 +185,7 @@ cenozoApp.defineModule({
         $state
       ) {
         var object = function (parentModel, root) {
-          CnBaseViewFactory.construct(this, parentModel, root);
+          CnBaseFormViewFactory.construct(this, "finalReport", parentModel, root);
 
           angular.extend(this, {
             compareRecord: null,
@@ -225,31 +196,8 @@ cenozoApp.defineModule({
               opportunities: 0,
               dissemination: 0,
             },
-            translate: function (value) {
-              return this.record.lang
-                ? CnReqnHelper.translate("finalReport", value, this.record.lang)
-                : "";
-            },
-            show: function (subject) {
-              return CnReqnHelper.showAction(subject, this.record);
-            },
-            viewReqn: async function () {
-              await this.parentModel.transitionToParentViewState(
-                "reqn",
-                "identifier=" + this.record.identifier
-              );
-            },
-            viewReqnVersion: async function () {
-              await this.parentModel.transitionToParentViewState(
-                "reqn_version",
-                this.record.current_reqn_version_id
-              );
-            },
-            viewDestructionReport: async function () {
-              await $state.go("destruction_report.view", {
-                identifier: this.record.current_destruction_report_id,
-              });
-            },
+
+            tabList: [ "instructions", "part_1", "part_2", "part_3" ],
 
             onView: async function (force) {
               // reset tab value
@@ -259,69 +207,20 @@ cenozoApp.defineModule({
               this.compareRecord = null;
 
               await this.$$onView(force);
-
               if ("lite" != this.parentModel.type) {
-                cenozoApp.setLang(this.record.lang);
                 this.updateOutputListLanguage(this.record.lang);
                 await this.getVersionList();
               }
             },
 
-            onPatch: async function (data) {
-              var property = Object.keys(data)[0];
-              if (!this.parentModel.getEditEnabled())
-                throw new Error("Calling onPatch() but edit is not enabled.");
-
-              if (null == property.match(/^deferral_note/)) {
-                await this.$$onPatch(data);
-              } else {
-                // make sure to send patches to deferral notes to the parent reqn
-                var parent = this.parentModel.getParentIdentifier();
-                var httpObj = {
-                  path: parent.subject + "/" + parent.identifier,
-                  data: data,
-                };
-                var self = this;
-                httpObj.onError = function (response) {
-                  self.onPatchError(response);
-                };
-                try {
-                  await CnHttpFactory.instance(httpObj).patch();
-                  this.afterPatchFunctions.forEach((fn) => fn());
-                } catch (error) {
-                  // handled by onError above
-                }
-              }
-            },
-
             updateOutputListLanguage: function (lang) {
               var columnList = cenozoApp.module("output").columnList;
-              columnList.output_type_en.isIncluded = function ($state, model) {
-                return "en" == lang;
-              };
-              columnList.output_type_fr.isIncluded = function ($state, model) {
-                return "fr" == lang;
-              };
-              columnList.output_type_en.title = CnReqnHelper.translate(
-                "output",
-                "output_type",
-                "en"
-              );
-              columnList.output_type_fr.title = CnReqnHelper.translate(
-                "output",
-                "output_type",
-                "fr"
-              );
-              columnList.detail.title = CnReqnHelper.translate(
-                "output",
-                "detail",
-                lang
-              );
-              columnList.output_source_count.title = CnReqnHelper.translate(
-                "output",
-                "output_source_count",
-                lang
-              );
+              columnList.output_type_en.isIncluded = function ($state, model) { return "en" == lang; };
+              columnList.output_type_fr.isIncluded = function ($state, model) { return "fr" == lang; };
+              columnList.output_type_en.title = CnReqnHelper.translate("output", "output_type", "en");
+              columnList.output_type_fr.title = CnReqnHelper.translate("output", "output_type", "fr");
+              columnList.detail.title = CnReqnHelper.translate("output", "detail", lang);
+              columnList.output_source_count.title = CnReqnHelper.translate("output", "output_source_count", lang);
             },
 
             // setup language and tab state parameters
@@ -335,75 +234,22 @@ cenozoApp.defineModule({
               }).patch();
             },
 
-            formTab: "",
-            tabSectionList: ["instructions", "part1", "part2", "part3"],
-            setFormTab: async function (tab, transition) {
-              if (angular.isUndefined(transition)) transition = true;
-
-              // find the tab section
-              var selectedTabSection = null;
-              this.tabSectionList.some((tabSection) => {
-                if (tab == tabSection) {
-                  selectedTabSection = tabSection;
-                  return true;
-                }
-              });
-
-              // get the tab (or default of none was found)
-              tab =
-                null != selectedTabSection
-                  ? selectedTabSection
-                  : "instructions";
-
-              this.formTab = tab;
-              this.parentModel.setQueryParameter("t", tab);
-
-              if (transition)
-                await this.parentModel.reloadState(false, false, "replace");
-
-              // update all textarea sizes
-              angular.element("textarea[cn-elastic]").trigger("elastic");
-            },
-
-            nextSection: async function (reverse) {
-              if (angular.isUndefined(reverse)) reverse = false;
-
-              var currentTabSectionIndex = this.tabSectionList.indexOf(
-                this.formTab
-              );
-              if (null != currentTabSectionIndex) {
-                var tabSection =
-                  this.tabSectionList[
-                    currentTabSectionIndex + (reverse ? -1 : 1)
-                  ];
-                if (angular.isDefined(tabSection))
-                  await this.setFormTab(tabSection);
-              }
-            },
-
             addOutput: function () {
               CnOutputModelFactory.root.transitionToAddState();
-            },
-
-            downloadFinalReport: async function () {
-              await CnReqnHelper.download(
-                "final_report",
-                this.record.getIdentifier()
-              );
             },
 
             getDifferences: function (finalReport2) {
               var finalReport1 = this.record;
               var differences = {
                 diff: false,
-                part1: {
+                part_1: {
                   diff: false,
                   achieved_objectives: false,
                   findings: false,
                   thesis_title: false,
                   thesis_status: false,
                 },
-                part3: {
+                part_3: {
                   diff: false,
                   impact: false,
                   opportunities: false,
@@ -421,14 +267,8 @@ cenozoApp.defineModule({
 
                     // not an array means we have a property to directly check
                     // note: we need to convert empty strings to null to make sure they compare correctly
-                    var value1 =
-                      "" === finalReport1[property]
-                        ? null
-                        : finalReport1[property];
-                    var value2 =
-                      "" === finalReport2[property]
-                        ? null
-                        : finalReport2[property];
+                    var value1 = "" === finalReport1[property] ? null : finalReport1[property];
+                    var value2 = "" === finalReport2[property] ? null : finalReport2[property];
                     if (value1 != value2) {
                       differences.diff = true;
                       differences[part].diff = true;
@@ -445,18 +285,15 @@ cenozoApp.defineModule({
               var parent = this.parentModel.getParentIdentifier();
               this.versionList = [];
               var response = await CnHttpFactory.instance({
-                path:
-                  parent.subject + "/" + parent.identifier + "/final_report",
+                path: parent.subject + "/" + parent.identifier + "/final_report",
               }).query();
 
               this.versionList = response.data;
 
               var compareVersion = this.parentModel.getQueryParameter("c");
-              if (angular.isDefined(compareVersion))
-                this.compareRecord = this.versionList.findByProperty(
-                  "version",
-                  compareVersion
-                );
+              if (angular.isDefined(compareVersion)) {
+                this.compareRecord = this.versionList.findByProperty("version", compareVersion);
+              }
 
               // add a null object to the version list so we can turn off comparisons
               if (1 < this.versionList.length) this.versionList.unshift(null);
@@ -464,13 +301,11 @@ cenozoApp.defineModule({
               // Calculate all differences for all versions (in reverse order so we can find the last agreement version)
               this.versionList.reverse();
               this.versionList.forEach((version) => {
-                if (null != version)
-                  version.differences = this.getDifferences(version);
+                if (null != version) version.differences = this.getDifferences(version);
               });
 
               // if no different list was defined then make it an empty list
-              if (null == this.agreementDifferenceList)
-                this.agreementDifferenceList = [];
+              if (null == this.agreementDifferenceList) this.agreementDifferenceList = [];
 
               // put the order of the version list back to normal
               this.versionList.reverse();
@@ -480,28 +315,21 @@ cenozoApp.defineModule({
               var record = this.record;
               var response = await CnModalConfirmFactory.instance({
                 title: this.translate("misc.pleaseConfirm"),
-                noText: this.parentModel.isRole("applicant", "designate")
-                  ? this.translate("misc.no")
-                  : "No",
-                yesText: this.parentModel.isRole("applicant", "designate")
-                  ? this.translate("misc.yes")
-                  : "Yes",
+                noText: this.parentModel.isRole("applicant", "designate") ? this.translate("misc.no") : "No",
+                yesText: this.parentModel.isRole("applicant", "designate") ? this.translate("misc.yes") : "Yes",
                 message: this.translate("misc.submitWarning"),
               }).show();
 
               if (response) {
                 // make sure that certain properties have been defined, one tab at a time
                 var requiredTabList = {
-                  part1: [
-                    "achieved_objectives",
-                    "findings",
-                  ],
-                  part3: ["impact", "opportunities", "dissemination"],
+                  part_1: ["achieved_objectives", "findings"],
+                  part_3: ["impact", "opportunities", "dissemination"],
                 };
 
                 if( "graduate" == this.record.waiver ) {
-                  requiredTabList.part1.push("thesis_title");
-                  requiredTabList.part1.push("thesis_status");
+                  requiredTabList.part_1.push("thesis_title");
+                  requiredTabList.part_1.push("thesis_status");
                 }
 
                 var error = null;
@@ -511,17 +339,11 @@ cenozoApp.defineModule({
                   // only check thesis properties if the reqn has a trainee, otherwise check everything else
                   requiredTabList[tab]
                     .filter((property) =>
-                      "part1" == tab
-                        ? null == property.match(/thesis/) ||
-                          this.record.trainee_user_id
-                        : true
+                      "part_1" == tab ? (null == property.match(/thesis/) || this.record.trainee_user_id) : true
                     )
                     .forEach((property) => {
                       // check for the property's value
-                      if (
-                        null === record[property] ||
-                        "" === record[property]
-                      ) {
+                      if (null === record[property] || "" === record[property]) {
                         var element = cenozo.getFormElement(property);
                         if (element) {
                           element.$error.required = true;
@@ -541,51 +363,53 @@ cenozoApp.defineModule({
 
                 if (null != error) {
                   // if there was an error then display it now
-                  if (this.parentModel.isRole("applicant", "designate"))
+                  if (this.parentModel.isRole("applicant", "designate")) {
                     error.closeText = this.translate("misc.close");
+                  }
                   await CnModalMessageFactory.instance(error).show();
                   await this.setFormTab(errorTab);
+                  return;
+                }
+
+                // now check to make sure this version is different from the last (the first is always different)
+                var response = await CnHttpFactory.instance({
+                  path: this.parentModel.getServiceResourcePath(),
+                  data: { select: { column: "has_changed" } },
+                }).get();
+
+                var proceed = false;
+                if (response.data.has_changed) {
+                  proceed = true;
                 } else {
-                  // now check to make sure this version is different from the last (the first is always different)
-                  var response = await CnHttpFactory.instance({
-                    path: this.parentModel.getServiceResourcePath(),
-                    data: { select: { column: "has_changed" } },
-                  }).get();
+                  // no changes made so warn the user before proceeding
+                  proceed = await CnModalConfirmFactory.instance({
+                    title: this.translate("misc.pleaseConfirm"),
+                    noText: this.translate("misc.no"),
+                    yesText: this.translate("misc.yes"),
+                    message: this.translate("misc.noChangesMessage"),
+                  }).show();
+                }
 
-                  var proceed = false;
-                  if (response.data.has_changed) {
-                    proceed = true;
+                // changes have been made, so submit now
+                if (proceed) {
+                  var parent = this.parentModel.getParentIdentifier();
+                  await CnHttpFactory.instance({
+                    path: parent.subject + "/" + parent.identifier + "?action=submit",
+                  }).patch();
+
+                  var code =
+                    CnSession.user.id == this.record.trainee_user_id ? "traineeSubmit" :
+                    CnSession.user.id == this.record.designate_user_id ? "designateSubmit" : "submit";
+                  await CnModalMessageFactory.instance({
+                    title: this.translate("misc." + code + "Title"),
+                    message: this.translate("misc." + code + "Message"),
+                    closeText: this.translate("misc.close"),
+                  }).show();
+
+                  if (this.parentModel.isRole("applicant", "designate")) {
+                    await $state.go("root.home");
                   } else {
-                    // no changes made so warn the user before proceeding
-                    proceed = await CnModalConfirmFactory.instance({
-                      title: this.translate("misc.pleaseConfirm"),
-                      noText: this.translate("misc.no"),
-                      yesText: this.translate("misc.yes"),
-                      message: this.translate("misc.noChangesMessage"),
-                    }).show();
-                  }
-
-                  // changes have been made, so submit now
-                  if (proceed) {
-                    var parent = this.parentModel.getParentIdentifier();
-                    await CnHttpFactory.instance({
-                      path: parent.subject + "/" + parent.identifier + "?action=submit",
-                    }).patch();
-
-                    var code =
-                      CnSession.user.id == this.record.trainee_user_id ? "traineeSubmit" :
-                      CnSession.user.id == this.record.designate_user_id ? "designateSubmit" : "submit";
-                    await CnModalMessageFactory.instance({
-                      title: this.translate("misc." + code + "Title"),
-                      message: this.translate("misc." + code + "Message"),
-                      closeText: this.translate("misc.close"),
-                    }).show();
-
-                    if (this.parentModel.isRole("applicant", "designate")) {
-                      await $state.go("root.home");
-                    } else {
-                      await this.onView(true); // refresh
-                    }
+                    await this.onView(true); // refresh
                   }
                 }
               }
@@ -623,10 +447,7 @@ cenozoApp.defineModule({
             this.listModel = CnFinalReportListFactory.instance(this);
 
           angular.extend(this, {
-            viewModel: CnFinalReportViewFactory.instance(
-              this,
-              "root" == this.type
-            ),
+            viewModel: CnFinalReportViewFactory.instance(this, "root" == this.type),
             inputList: {},
 
             getMetadata: async function() {
@@ -673,22 +494,16 @@ cenozoApp.defineModule({
                 trail = [
                   {
                     title: "Requisitions",
-                    go: async () => {
-                      await $state.go("reqn.list");
-                    },
+                    go: async () => { await $state.go("reqn.list"); },
                   },
                   {
                     title: this.viewModel.record.identifier,
                     go: async () => {
-                      await $state.go("reqn.view", {
-                        identifier:
-                          "identifier=" + this.viewModel.record.identifier,
-                      });
+                      await $state.go("reqn.view", { identifier: "identifier=" + this.viewModel.record.identifier });
                     },
                   },
                   {
-                    title:
-                      "Final Report version " + this.viewModel.record.version,
+                    title: "Final Report version " + this.viewModel.record.version,
                   },
                 ];
               }

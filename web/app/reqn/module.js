@@ -565,454 +565,164 @@ cenozoApp.defineModule({
       },
     });
 
-    module.addInputGroup("Requisition Deferral Notes", {
-      deferral_note_amendment: {
-        title: "Amendment",
-        type: "text",
-        isExcluded: function ($state, model) {
-          // show the amendment deferral note to admins when an amendment is active
-          return (
-            "add" == model.getActionFromState() ||
-            ["finalization", "complete"].includes( model.viewModel.record.phase ) ||
-            !model.isRole("administrator") ||
-            angular.isUndefined(model.viewModel.record.amendment) ||
-            "." == model.viewModel.record.amendment
-          );
-        },
-      },
-      deferral_note_1a: {
-        title: "", // defined dynamically in the model
-        type: "text",
-        isExcluded: function ($state, model) {
-          return (
-            "add" == model.getActionFromState() ||
-            ["finalization", "complete"].includes( model.viewModel.record.phase )
-          );
-        },
-      },
-      deferral_note_1b: {
-        title: "", // defined dynamically in the model
-        type: "text",
-        isExcluded: function ($state, model) {
-          return (
-            "add" == model.getActionFromState() ||
-            ["finalization", "complete"].includes( model.viewModel.record.phase )
-          );
-        },
-      },
-      deferral_note_1c: {
-        title: "", // defined dynamically in the model
-        type: "text",
-        isExcluded: function ($state, model) {
-          return (
-            "add" == model.getActionFromState() ||
-            ["finalization", "complete"].includes( model.viewModel.record.phase )
-          );
-        },
-      },
-      deferral_note_1d: {
-        title: "", // defined dynamically in the model
-        type: "text",
-        isExcluded: function ($state, model) {
-          return (
-            "add" == model.getActionFromState() ||
-            ["finalization", "complete"].includes( model.viewModel.record.phase )
-          );
-        },
-      },
-      deferral_note_1e: {
-        title: "", // defined dynamically in the model
-        type: "text",
-        isExcluded: function ($state, model) {
-          return (
-            "add" == model.getActionFromState() ||
-            ["finalization", "complete"].includes( model.viewModel.record.phase )
-          );
-        },
-      },
-      deferral_note_1f: {
-        title: "", // defined dynamically in the model
-        type: "text",
-        isExcluded: function ($state, model) {
-          return (
-            "add" == model.getActionFromState() ||
-            ["finalization", "complete"].includes( model.viewModel.record.phase )
-          );
-        },
-      },
-      deferral_note_cohort: {
-        title: "Cohort & Longitudinal Analyses",
-        type: "text",
-        isExcluded: function ($state, model) {
-          return (
-            "add" == model.getActionFromState() ||
-            ["finalization", "complete"].includes( model.viewModel.record.phase )
-          );
-        },
-      },
-      deferral_note_indigenous: {
-        title: "Indigenous Identifiers",
-        type: "text",
-        isExcluded: function ($state, model) {
-          return (
-            "add" == model.getActionFromState() ||
-            ["finalization", "complete"].includes( model.viewModel.record.phase )
-          );
-        },
-      },
-      deferral_note_2a: {
-        title: "", // defined dynamically in the model
-        type: "text",
-        isExcluded: function ($state, model) {
-          return (
-            "add" == model.getActionFromState() ||
-            ["finalization", "complete"].includes( model.viewModel.record.phase )
-          );
-        },
-      },
-      deferral_note_2b: {
-        title: "", // defined dynamically in the model
-        type: "text",
-        isExcluded: function ($state, model) {
-          return (
-            "add" == model.getActionFromState() ||
-            ["finalization", "complete"].includes( model.viewModel.record.phase )
-          );
-        },
-      },
-      deferral_note_2c: {
-        title: "", // defined dynamically in the model
-        type: "text",
-        isExcluded: function ($state, model) {
-          return (
-            "add" == model.getActionFromState() ||
-            ["finalization", "complete"].includes( model.viewModel.record.phase )
-          );
-        },
-      },
-      deferral_note_2d: {
-        title: "", // defined dynamically in the model
-        type: "text",
-        isExcluded: function ($state, model) {
-          return (
-            "add" == model.getActionFromState() ||
-            ["finalization", "complete"].includes( model.viewModel.record.phase )
-          );
-        },
-      },
-      deferral_note_2e: {
-        title: "", // defined dynamically in the model
-        type: "text",
-        isExcluded: function ($state, model) {
-          return (
-            "add" == model.getActionFromState() ||
-            ["finalization", "complete"].includes( model.viewModel.record.phase )
-          );
-        },
-      },
-      deferral_note_2f: {
-        title: "", // defined dynamically in the model
-        type: "text",
-        isExcluded: function ($state, model) {
-          return (
-            "add" == model.getActionFromState() ||
-            ["finalization", "complete"].includes( model.viewModel.record.phase )
-          );
-        },
-      },
-    });
-
-    module.addInputGroup("Report Deferral Notes", {
-      deferral_note_report1: {
-        title: "Part 1",
-        type: "text",
-        isExcluded: function ($state, model) {
-          return (
-            "add" == model.getActionFromState() ||
-            "finalization" != model.viewModel.record.phase ||
-            null != model.viewModel.record.stage_type.match(/Data Destruction/)
-          );
-        },
-      },
-      deferral_note_report2: {
-        title: "Part 2",
-        type: "text",
-        isExcluded: function ($state, model) {
-          return (
-            "add" == model.getActionFromState() ||
-            "finalization" != model.viewModel.record.phase ||
-            null != model.viewModel.record.stage_type.match(/Data Destruction/)
-          );
-        },
-      },
-      deferral_note_report3: {
-        title: "Part 3",
-        type: "text",
-        isExcluded: function ($state, model) {
-          return (
-            "add" == model.getActionFromState() ||
-            "finalization" != model.viewModel.record.phase ||
-            null != model.viewModel.record.stage_type.match(/Data Destruction/)
-          );
-        },
-      },
-      deferral_note_destruction: {
-        title: "Data Destruction List",
-        type: "text",
-        isExcluded: function ($state, model) {
-          return (
-            "add" == model.getActionFromState() ||
-            "Data Destruction" != model.viewModel.record.stage_type
-          );
-        },
-      },
-    });
-
-    module.addExtraOperation("view", {
-      title: "View Form",
-      operation: async function ($state, model) {
-        await $state.go("reqn_version.view", {
-          identifier: model.viewModel.record.current_reqn_version_id,
-        });
-      },
-    });
-
-    module.addExtraOperation("view", {
-      title: "View Final Report",
-      isIncluded: function ($state, model) {
-        return model.viewModel.record.current_final_report_id;
-      },
-      operation: async function ($state, model) {
-        await $state.go("final_report.view", {
-          identifier: model.viewModel.record.current_final_report_id,
-        });
-      },
-    });
-
-    module.addExtraOperation("view", {
-      title: "View Destruction Report",
-      isIncluded: function ($state, model) {
-        return model.viewModel.record.current_destruction_report_id;
-      },
-      operation: async function ($state, model) {
-        await $state.go("destruction_report.view", {
-          identifier: model.viewModel.record.current_destruction_report_id,
-        });
-      },
-    });
-
-    module.addExtraOperation("view", {
-      title: "Reset Study Data",
-      isIncluded: function ($state, model) {
-        return model.viewModel.canManageData();
-      },
-      operation: function ($state, model) {
-        model.viewModel.resetData();
-      },
-    });
-
-    module.addExtraOperation("view", {
-      title: "Defer to Applicant",
-      classes: "btn-warning",
-      isIncluded: function ($state, model) {
-        return model.viewModel.show("defer");
-      },
-      isDisabled: function ($state, model) {
-        return !model.viewModel.enabled("defer");
-      },
-      operation: function ($state, model) {
-        model.viewModel.defer();
-      },
-    });
-
-    module.addExtraOperation("view", {
-      title: "Abandon",
-      classes: "btn-danger",
-      isIncluded: function ($state, model) {
-        return model.viewModel.show("abandon");
-      },
-      isDisabled: function ($state, model) {
-        return !model.viewModel.enabled("abandon");
-      },
-      operation: function ($state, model) {
-        model.viewModel.abandon();
-      },
-    });
-
-    module.addExtraOperation("view", {
-      title: "De-activate",
-      classes: "btn-danger",
-      isIncluded: function ($state, model) {
-        return model.viewModel.show("deactivate");
-      },
-      isDisabled: function ($state, model) {
-        return !model.viewModel.enabled("deactivate");
-      },
-      operation: function ($state, model) {
-        model.viewModel.deactivate();
-      },
-    });
-
-    module.addExtraOperation("view", {
-      title: "Re-activate",
-      classes: "btn-warning",
-      isIncluded: function ($state, model) {
-        return model.viewModel.show("reactivate");
-      },
-      isDisabled: function ($state, model) {
-        return !model.viewModel.enabled("reactivate");
-      },
-      operation: function ($state, model) {
-        model.viewModel.reactivate();
-      },
-    });
-
-    module.addExtraOperation("view", {
-      title: "Incomplete",
-      classes: "btn-danger",
-      isIncluded: function ($state, model) {
-        return model.viewModel.show("incomplete");
-      },
-      isDisabled: function ($state, model) {
-        return !model.viewModel.enabled("incomplete");
-      },
-      operation: function ($state, model) {
-        model.viewModel.incomplete();
-      },
-    });
-
-    module.addExtraOperation("view", {
-      title: "Withdraw",
-      classes: "btn-danger",
-      isIncluded: function ($state, model) {
-        return model.viewModel.show("withdraw");
-      },
-      isDisabled: function ($state, model) {
-        return !model.viewModel.enabled("withdraw");
-      },
-      operation: function ($state, model) {
-        model.viewModel.withdraw();
-      },
-    });
-
-    module.addExtraOperation("view", {
-      title: "Recreate",
-      classes: "btn-success",
-      isIncluded: function ($state, model) {
-        return model.viewModel.show("recreate");
-      },
-      isDisabled: function ($state, model) {
-        return !model.viewModel.enabled("recreate");
-      },
-      operation: function ($state, model) {
-        model.viewModel.recreate();
-      },
-    });
-
-    module.addExtraOperation("view", {
-      title: "Reverse",
-      classes: "btn-warning",
-      isIncluded: function ($state, model) {
-        return model.viewModel.show("reverse");
-      },
-      operation: function ($state, model) {
-        model.viewModel.reverse();
-      },
-    });
-
-    module.addExtraOperation("view", {
-      title: "Proceed",
-      classes: "btn-success",
-      isIncluded: function ($state, model) {
-        return model.viewModel.show("proceed");
-      },
-      isDisabled: function ($state, model) {
-        return !model.viewModel.enabled("proceed");
-      },
-      operation: function ($state, model) {
-        model.viewModel.proceed();
-      },
-    });
-
     module.addExtraOperationGroup("view", {
-      title: "Proceed...",
-      isIncluded: function ($state, model) {
-        return model.viewModel.show("amendment proceed");
-      },
-      isDisabled: function ($state, model) {
-        return !model.viewModel.enabled("proceed");
-      },
-      classes: "btn-success",
+      title: "View Form",
       operations: [
         {
-          title: "To Feasibility Review",
-          operation: function ($state, model) {
-            model.viewModel.proceed("Feasibility Review");
-          },
-          isIncluded: function ($state, model) {
-            return model.viewModel.show("amendment feasibility review");
-          },
-        },
-        {
-          title: "To DSAC Review",
-          operation: function ($state, model) {
-            model.viewModel.proceed("DSAC Review");
-          },
-          isIncluded: function ($state, model) {
-            return model.viewModel.show("amendment dsac review");
+          title: "Application",
+          operation: async function ($state, model) {
+            await $state.go(
+              "reqn_version.view",
+              { identifier: model.viewModel.record.current_reqn_version_id }
+            );
           },
         },
         {
-          title: "To Decision Made",
-          operation: function ($state, model) {
-            model.viewModel.proceed("Decision Made");
-          },
+          title: "Final Report",
           isIncluded: function ($state, model) {
-            return model.viewModel.show("amendment decision made");
+            return model.viewModel.record.current_final_report_id;
+          },
+          operation: async function ($state, model) {
+            await $state.go(
+              "final_report.view",
+              { identifier: model.viewModel.record.current_final_report_id }
+            );
           },
         },
         {
-          title: "To Agreement",
-          operation: function ($state, model) {
-            model.viewModel.proceed("Agreement");
-          },
+          title: "Destruction Report",
           isIncluded: function ($state, model) {
-            return model.viewModel.show("amendment agreement");
+            return model.viewModel.record.current_destruction_report_id;
           },
-        },
-        {
-          title: "To Data Release",
-          operation: function ($state, model) {
-            model.viewModel.proceed("Data Release");
-          },
-          isIncluded: function ($state, model) {
-            return model.viewModel.show("amendment data release");
-          },
-        },
-        {
-          title: "To Active",
-          operation: function ($state, model) {
-            model.viewModel.proceed("Active");
-          },
-          isIncluded: function ($state, model) {
-            return model.viewModel.show("amendment active");
+          operation: async function ($state, model) {
+            await $state.go(
+              "destruction_report.view",
+              { identifier: model.viewModel.record.current_destruction_report_id }
+            );
           },
         },
       ],
     });
 
+    module.addExtraOperationGroup("view", {
+      title: "Action",
+      operations: [
+        {
+          title: "Reset Study Data",
+          isIncluded: function ($state, model) { return model.viewModel.canManageData(); },
+          operation: function ($state, model) { model.viewModel.resetData(); },
+        },
+        {
+          title: "Defer to Applicant",
+          classes: "btn-warning",
+          isIncluded: function ($state, model) { return model.viewModel.show("defer"); },
+          isDisabled: function ($state, model) { return !model.viewModel.enabled("defer"); },
+          operation: function ($state, model) { model.viewModel.defer(); },
+        },
+        {
+          title: "Abandon",
+          classes: "btn-danger",
+          isIncluded: function ($state, model) { return model.viewModel.show("abandon"); },
+          isDisabled: function ($state, model) { return !model.viewModel.enabled("abandon"); },
+          operation: function ($state, model) { model.viewModel.abandon(); },
+        },
+        {
+          title: "De-activate",
+          classes: "btn-danger",
+          isIncluded: function ($state, model) { return model.viewModel.show("deactivate"); },
+          isDisabled: function ($state, model) { return !model.viewModel.enabled("deactivate"); },
+          operation: function ($state, model) { model.viewModel.deactivate(); },
+        },
+        {
+          title: "Re-activate",
+          classes: "btn-warning",
+          isIncluded: function ($state, model) { return model.viewModel.show("reactivate"); },
+          isDisabled: function ($state, model) { return !model.viewModel.enabled("reactivate"); },
+          operation: function ($state, model) { model.viewModel.reactivate(); },
+        },
+        {
+          title: "Incomplete",
+          classes: "btn-danger",
+          isIncluded: function ($state, model) { return model.viewModel.show("incomplete"); },
+          isDisabled: function ($state, model) { return !model.viewModel.enabled("incomplete"); },
+          operation: function ($state, model) { model.viewModel.incomplete(); },
+        },
+        {
+          title: "Withdraw",
+          classes: "btn-danger",
+          isIncluded: function ($state, model) { return model.viewModel.show("withdraw"); },
+          isDisabled: function ($state, model) { return !model.viewModel.enabled("withdraw"); },
+          operation: function ($state, model) { model.viewModel.withdraw(); },
+        },
+        {
+          title: "Recreate",
+          classes: "btn-success",
+          isIncluded: function ($state, model) { return model.viewModel.show("recreate"); },
+          isDisabled: function ($state, model) { return !model.viewModel.enabled("recreate"); },
+          operation: function ($state, model) { model.viewModel.recreate(); },
+        },
+        {
+          title: "Reverse",
+          classes: "btn-warning",
+          isIncluded: function ($state, model) { return model.viewModel.show("reverse"); },
+          isDisabled: function ($state, model) { return !model.viewModel.enabled("reverse"); },
+          operation: function ($state, model) { model.viewModel.reverse(); },
+        },
+        {
+          title: "Reject",
+          classes: "btn-danger",
+          isIncluded: function ($state, model) { return model.viewModel.show("reject"); },
+          isDisabled: function ($state, model) { return !model.viewModel.enabled("reject"); },
+          operation: function ($state, model) { model.viewModel.reject(); },
+        },
+      ],
+    });
+
     module.addExtraOperation("view", {
-      title: "Reject",
-      classes: "btn-danger",
-      isIncluded: function ($state, model) {
-        return model.viewModel.show("reject");
-      },
-      isDisabled: function ($state, model) {
-        return !model.viewModel.enabled("reject");
-      },
-      operation: function ($state, model) {
-        model.viewModel.reject();
-      },
+      title: "Proceed",
+      classes: "btn-success",
+      isIncluded: function ($state, model) { return model.viewModel.show("proceed"); },
+      isDisabled: function ($state, model) { return !model.viewModel.enabled("proceed"); },
+      operation: function ($state, model) { model.viewModel.proceed(); },
+    });
+
+    module.addExtraOperationGroup("view", {
+      title: "Proceed...",
+      isIncluded: function ($state, model) { return model.viewModel.show("amendment proceed"); },
+      isDisabled: function ($state, model) { return !model.viewModel.enabled("proceed"); },
+      classes: "btn-success",
+      operations: [
+        {
+          title: "To Feasibility Review",
+          operation: function ($state, model) { model.viewModel.proceed("Feasibility Review"); },
+          isIncluded: function ($state, model) { return model.viewModel.show("amendment feasibility review"); },
+        },
+        {
+          title: "To DSAC Review",
+          operation: function ($state, model) { model.viewModel.proceed("DSAC Review"); },
+          isIncluded: function ($state, model) { return model.viewModel.show("amendment dsac review"); },
+        },
+        {
+          title: "To Decision Made",
+          operation: function ($state, model) { model.viewModel.proceed("Decision Made"); },
+          isIncluded: function ($state, model) { return model.viewModel.show("amendment decision made"); },
+        },
+        {
+          title: "To Agreement",
+          operation: function ($state, model) { model.viewModel.proceed("Agreement"); },
+          isIncluded: function ($state, model) { return model.viewModel.show("amendment agreement"); },
+        },
+        {
+          title: "To Data Release",
+          operation: function ($state, model) { model.viewModel.proceed("Data Release"); },
+          isIncluded: function ($state, model) { return model.viewModel.show("amendment data release"); },
+        },
+        {
+          title: "To Active",
+          operation: function ($state, model) { model.viewModel.proceed("Active"); },
+          isIncluded: function ($state, model) { return model.viewModel.show("amendment active"); },
+        },
+      ],
     });
 
     module.addExtraOperationGroup("view", {
@@ -1140,47 +850,12 @@ cenozoApp.defineModule({
             CnSession.setBreadcrumbTrail([
               {
                 title: $scope.model.module.name.plural.ucWords(),
-                go: async function () {
-                  await $state.go("reqn.list");
-                },
+                go: async function () { await $state.go("reqn.list"); },
               },
               {
                 title: "CANUE Approvals",
               },
             ]);
-          },
-        };
-      },
-    ]);
-
-    /* ############################################################################################## */
-    cenozo.providers.directive("cnReqnView", [
-      "CnReqnModelFactory",
-      "CnSession",
-      function (CnReqnModelFactory, CnSession) {
-        return {
-          templateUrl: module.getFileUrl("view.tpl.html"),
-          restrict: "E",
-          scope: { model: "=?" },
-          controller: function ($scope) {
-            if (angular.isUndefined($scope.model))
-              $scope.model = CnReqnModelFactory.root;
-
-            // remove the deferral note input groups if we're not an admin
-            if (3 > CnSession.role.tier) {
-              $scope.$on("cnRecordView linked", function (event, data) {
-                var index = data.dataArray.findIndexByProperty(
-                  "title",
-                  "Requisition Deferral Notes"
-                );
-                if (null != index) data.dataArray.splice(index, 1);
-                var index = data.dataArray.findIndexByProperty(
-                  "title",
-                  "Report Deferral Notes"
-                );
-                if (null != index) data.dataArray.splice(index, 1);
-              });
-            }
           },
         };
       },
@@ -1198,9 +873,7 @@ cenozoApp.defineModule({
           // immediately view the user record after it has been created
           this.transitionOnSave = function (record) {
             CnSession.workingTransition(async function () {
-              await $state.go("reqn_version.view", {
-                identifier: "identifier=" + record.identifier,
-              });
+              await $state.go("reqn_version.view", { identifier: "identifier=" + record.identifier });
             });
           };
         };
@@ -1650,6 +1323,7 @@ cenozoApp.defineModule({
               }
             },
 
+            // TODO: re-implement
             reqnDeferralNotesExist: function () {
               var phase = this.record.phase
                 ? this.record.phase
@@ -1674,6 +1348,7 @@ cenozoApp.defineModule({
               );
             },
 
+            // TODO: re-implement
             finalReportDeferralNotesExist: function () {
               var phase = this.record.phase ? this.record.phase : "";
               var stage_type = this.record.stage_type ? this.record.stage_type : "";
@@ -1687,6 +1362,7 @@ cenozoApp.defineModule({
               );
             },
 
+            // TODO: re-implement
             destructionReportDeferralNotesExist: function () {
               var stage_type = this.record.stage_type ? this.record.stage_type : "";
               return "Data Destruction" == stage_type && this.record.deferral_note_destruction;
@@ -1694,28 +1370,16 @@ cenozoApp.defineModule({
 
             enabled: function (subject) {
               var state = this.record.state ? this.record.state : "";
-
               if (
-                [
-                  "abandon",
-                  "deactivate",
-                  "defer",
-                  "incomplete",
-                  "withdraw",
-                  "reactivate",
-                  "recreate",
-                ].includes(subject)
+                ["abandon", "deactivate", "defer", "incomplete", "withdraw", "reactivate", "recreate", "reverse"]
+                  .includes(subject)
               ) {
                 return true;
               } else if (
                 "proceed" == subject &&
                 "." != this.record.amendment &&
-                [
-                  "Admin Review",
-                  "Feasibility Review",
-                  "Decision Made",
-                  "Agreement",
-                ].includes(this.record.stage_type)
+                ["Admin Review", "Feasibility Review", "Decision Made", "Agreement"]
+                  .includes(this.record.stage_type)
               ) {
                 // the next stage isn't always set when in an amendment, so only check for state
                 return !state;
@@ -1767,6 +1431,7 @@ cenozoApp.defineModule({
                   ? stageType
                   : this.record.next_stage_type) +
                 '" stage?';
+              // TODO: re-implement
               if (
                 this.parentModel.isRole("administrator") && (
                   this.reqnDeferralNotesExist() ||
@@ -1868,6 +1533,7 @@ cenozoApp.defineModule({
             },
 
             defer: async function () {
+              // TODO: re-implement
               var message =
                 "Are you sure you wish to defer to the applicant?  " +
                 "A notification will be sent indicating that an action is required by the applicant.";
@@ -2181,9 +1847,7 @@ cenozoApp.defineModule({
                   },
                 }).get();
 
-                await $state.go("reqn_version.view", {
-                  identifier: response.data.reqn_version_id,
-                });
+                await $state.go("reqn_version.view", { identifier: response.data.reqn_version_id });
               }
             },
 
@@ -2352,33 +2016,6 @@ cenozoApp.defineModule({
             },
           });
 
-          async function init() {
-            await CnReqnHelper.promise;
-            module.inputGroupList.forEach((group) => {
-              if ("Requisition Deferral Notes" == group.title) {
-                for (var property in group.inputList) {
-                  if (group.inputList.hasOwnProperty(property)) {
-                    var parts = property.match(
-                      /deferral_note_([0-9]+)([a-z]+)/
-                    );
-                    if (angular.isArray(parts)) {
-                      group.inputList[property].title =
-                        "Part " +
-                        parts[1] +
-                        ": " +
-                        CnReqnHelper.translate(
-                          "reqn",
-                          "part" + parts[1] + "." + parts[2] + ".tab",
-                          "en"
-                        );
-                    }
-                  }
-                }
-              }
-            });
-          }
-
-          init();
         };
 
         return {
