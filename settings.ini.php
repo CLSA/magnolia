@@ -77,3 +77,6 @@ $SETTINGS['general']['study_data_expiry'] = 7;
 
 // how many months before an unsubmitted reqn is considered expired
 $SETTINGS['general']['unsubmitted_reqn_expiry'] = 18;
+
+// how many days to try sending a scheduled notification before giving up
+$SETTINGS['general']['scheduled_notification_retry_days'] = 5;
