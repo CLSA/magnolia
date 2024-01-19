@@ -57,7 +57,7 @@ CREATE PROCEDURE patch_reqn()
       INSERT INTO deferral_note( reqn_id, form, page, note )
       SELECT reqn.id, "application", "instructions", deferral_note_amendment
       FROM reqn WHERE deferral_note_amendment IS NOT NULL;
-      -- ALTER TABLE reqn DROP COLUMN deferral_note_amendment;
+      ALTER TABLE reqn DROP COLUMN deferral_note_amendment;
     END IF;
 
     SELECT COUNT(*) INTO @test
@@ -71,7 +71,7 @@ CREATE PROCEDURE patch_reqn()
       INSERT INTO deferral_note( reqn_id, form, page, note )
       SELECT reqn.id, "application", "applicant", deferral_note_1a
       FROM reqn WHERE deferral_note_1a IS NOT NULL;
-      -- ALTER TABLE reqn DROP COLUMN deferral_note_1a;
+      ALTER TABLE reqn DROP COLUMN deferral_note_1a;
     END IF;
 
     SELECT COUNT(*) INTO @test
@@ -85,7 +85,7 @@ CREATE PROCEDURE patch_reqn()
       INSERT INTO deferral_note( reqn_id, form, page, note )
       SELECT reqn.id, "application", "project_team", deferral_note_1b
       FROM reqn WHERE deferral_note_1b IS NOT NULL;
-      -- ALTER TABLE reqn DROP COLUMN deferral_note_1b;
+      ALTER TABLE reqn DROP COLUMN deferral_note_1b;
     END IF;
 
     SELECT COUNT(*) INTO @test
@@ -99,7 +99,7 @@ CREATE PROCEDURE patch_reqn()
       INSERT INTO deferral_note( reqn_id, form, page, note )
       SELECT reqn.id, "application", "timeline", deferral_note_1c
       FROM reqn WHERE deferral_note_1c IS NOT NULL;
-      -- ALTER TABLE reqn DROP COLUMN deferral_note_1c;
+      ALTER TABLE reqn DROP COLUMN deferral_note_1c;
     END IF;
 
     SELECT COUNT(*) INTO @test
@@ -113,7 +113,7 @@ CREATE PROCEDURE patch_reqn()
       INSERT INTO deferral_note( reqn_id, form, page, note )
       SELECT reqn.id, "application", "description", deferral_note_1d
       FROM reqn WHERE deferral_note_1d IS NOT NULL;
-      -- ALTER TABLE reqn DROP COLUMN deferral_note_1d;
+      ALTER TABLE reqn DROP COLUMN deferral_note_1d;
     END IF;
 
     SELECT COUNT(*) INTO @test
@@ -127,7 +127,7 @@ CREATE PROCEDURE patch_reqn()
       INSERT INTO deferral_note( reqn_id, form, page, note )
       SELECT reqn.id, "application", "scientific_review", deferral_note_1e
       FROM reqn WHERE deferral_note_1e IS NOT NULL;
-      -- ALTER TABLE reqn DROP COLUMN deferral_note_1e;
+      ALTER TABLE reqn DROP COLUMN deferral_note_1e;
     END IF;
 
     SELECT COUNT(*) INTO @test
@@ -141,7 +141,7 @@ CREATE PROCEDURE patch_reqn()
       INSERT INTO deferral_note( reqn_id, form, page, note )
       SELECT reqn.id, "application", "ethics", deferral_note_1f
       FROM reqn WHERE deferral_note_1f IS NOT NULL;
-      -- ALTER TABLE reqn DROP COLUMN deferral_note_1f;
+      ALTER TABLE reqn DROP COLUMN deferral_note_1f;
     END IF;
 
     SELECT COUNT(*) INTO @test
@@ -155,7 +155,7 @@ CREATE PROCEDURE patch_reqn()
       INSERT INTO deferral_note( reqn_id, form, page, note )
       SELECT reqn.id, "application", "cohort", deferral_note_cohort
       FROM reqn WHERE deferral_note_cohort IS NOT NULL;
-      -- ALTER TABLE reqn DROP COLUMN deferral_note_cohort;
+      ALTER TABLE reqn DROP COLUMN deferral_note_cohort;
     END IF;
 
     SELECT COUNT(*) INTO @test
@@ -169,7 +169,7 @@ CREATE PROCEDURE patch_reqn()
       INSERT INTO deferral_note( reqn_id, form, page, note )
       SELECT reqn.id, "application", "indigenous", deferral_note_indigenous
       FROM reqn WHERE deferral_note_indigenous IS NOT NULL;
-      -- ALTER TABLE reqn DROP COLUMN deferral_note_indigenous;
+      ALTER TABLE reqn DROP COLUMN deferral_note_indigenous;
     END IF;
 
     SELECT COUNT(*) INTO @test
@@ -183,7 +183,7 @@ CREATE PROCEDURE patch_reqn()
       INSERT INTO deferral_note( reqn_id, form, page, note )
       SELECT reqn.id, "application", "core_clsa_data", deferral_note_2a
       FROM reqn WHERE deferral_note_2a IS NOT NULL;
-      -- ALTER TABLE reqn DROP COLUMN deferral_note_2a;
+      ALTER TABLE reqn DROP COLUMN deferral_note_2a;
     END IF;
 
     SELECT COUNT(*) INTO @test
@@ -197,7 +197,7 @@ CREATE PROCEDURE patch_reqn()
       INSERT INTO deferral_note( reqn_id, form, page, note )
       SELECT reqn.id, "application", "linked_data", deferral_note_2b
       FROM reqn WHERE deferral_note_2b IS NOT NULL;
-      -- ALTER TABLE reqn DROP COLUMN deferral_note_2b;
+      ALTER TABLE reqn DROP COLUMN deferral_note_2b;
     END IF;
 
     SELECT COUNT(*) INTO @test
@@ -211,7 +211,7 @@ CREATE PROCEDURE patch_reqn()
       INSERT INTO deferral_note( reqn_id, form, page, note )
       SELECT reqn.id, "application", "images_and_raw_data", deferral_note_2c
       FROM reqn WHERE deferral_note_2c IS NOT NULL;
-      -- ALTER TABLE reqn DROP COLUMN deferral_note_2c;
+      ALTER TABLE reqn DROP COLUMN deferral_note_2c;
     END IF;
 
     SELECT COUNT(*) INTO @test
@@ -225,7 +225,7 @@ CREATE PROCEDURE patch_reqn()
       INSERT INTO deferral_note( reqn_id, form, page, note )
       SELECT reqn.id, "application", "geographic_indicators", deferral_note_2d
       FROM reqn WHERE deferral_note_2d IS NOT NULL;
-      -- ALTER TABLE reqn DROP COLUMN deferral_note_2d;
+      ALTER TABLE reqn DROP COLUMN deferral_note_2d;
     END IF;
 
     SELECT COUNT(*) INTO @test
@@ -239,7 +239,7 @@ CREATE PROCEDURE patch_reqn()
       INSERT INTO deferral_note( reqn_id, form, page, note )
       SELECT reqn.id, "application", "covid_19_data", deferral_note_2e
       FROM reqn WHERE deferral_note_2e IS NOT NULL;
-      -- ALTER TABLE reqn DROP COLUMN deferral_note_2e;
+      ALTER TABLE reqn DROP COLUMN deferral_note_2e;
     END IF;
 
     SELECT COUNT(*) INTO @test
@@ -253,7 +253,7 @@ CREATE PROCEDURE patch_reqn()
       INSERT INTO deferral_note( reqn_id, form, page, note )
       SELECT reqn.id, "application", "mortality_data", deferral_note_2f
       FROM reqn WHERE deferral_note_2f IS NOT NULL;
-      -- ALTER TABLE reqn DROP COLUMN deferral_note_2f;
+      ALTER TABLE reqn DROP COLUMN deferral_note_2f;
     END IF;
 
     SELECT COUNT(*) INTO @test
@@ -267,7 +267,7 @@ CREATE PROCEDURE patch_reqn()
       INSERT INTO deferral_note( reqn_id, form, page, note )
       SELECT reqn.id, "final_report", "part_1", deferral_note_report1
       FROM reqn WHERE deferral_note_report1 IS NOT NULL;
-      -- ALTER TABLE reqn DROP COLUMN deferral_note_report1;
+      ALTER TABLE reqn DROP COLUMN deferral_note_report1;
     END IF;
 
     SELECT COUNT(*) INTO @test
@@ -281,7 +281,7 @@ CREATE PROCEDURE patch_reqn()
       INSERT INTO deferral_note( reqn_id, form, page, note )
       SELECT reqn.id, "final_report", "part_2", deferral_note_report2
       FROM reqn WHERE deferral_note_report2 IS NOT NULL;
-      -- ALTER TABLE reqn DROP COLUMN deferral_note_report2;
+      ALTER TABLE reqn DROP COLUMN deferral_note_report2;
     END IF;
 
     SELECT COUNT(*) INTO @test
@@ -295,7 +295,7 @@ CREATE PROCEDURE patch_reqn()
       INSERT INTO deferral_note( reqn_id, form, page, note )
       SELECT reqn.id, "final_report", "part_3", deferral_note_report3
       FROM reqn WHERE deferral_note_report3 IS NOT NULL;
-      -- ALTER TABLE reqn DROP COLUMN deferral_note_report3;
+      ALTER TABLE reqn DROP COLUMN deferral_note_report3;
     END IF;
 
     SELECT COUNT(*) INTO @test
@@ -309,7 +309,7 @@ CREATE PROCEDURE patch_reqn()
       INSERT INTO deferral_note( reqn_id, form, page, note )
       SELECT reqn.id, "destruction", "data_destroy", deferral_note_destruction
       FROM reqn WHERE deferral_note_destruction IS NOT NULL;
-      -- ALTER TABLE reqn DROP COLUMN deferral_note_destruction;
+      ALTER TABLE reqn DROP COLUMN deferral_note_destruction;
     END IF;
 
   END //
