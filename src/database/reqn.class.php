@@ -1394,9 +1394,9 @@ class reqn extends \cenozo\database\record
 
       // add the instructions
       $filename = $this->get_filename( 'instruction' );
-      if( is_file( $filename ) )
+      $link = sprintf( '%s/%s', $web_path, $this->instruction_filename );
+      if( is_file( $filename ) && !is_file( $link ) )
       {
-        $link = sprintf( '%s/%s', $web_path, $this->instruction_filename );
         $result = symlink( $filename, $link );
         if( !$result )
         {
@@ -1416,7 +1416,7 @@ class reqn extends \cenozo\database\record
         $filename = $db_supplemental_file->get_filename( $lang );
         $link = sprintf( '%s/%s', $web_path, $db_supplemental_file->$name );
 
-        if( is_file( $filename ) )
+        if( is_file( $filename ) && !is_file( $link ) )
         {
           $result = symlink( $filename, $link );
           if( !$result )
