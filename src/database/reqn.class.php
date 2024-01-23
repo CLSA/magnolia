@@ -1463,11 +1463,37 @@ class reqn extends \cenozo\database\record
   public static function send_deferred_reminder_notifications()
   {
     $setting_manager = lib::create( 'business\setting_manager' );
+    $notification_type_class_name = lib::get_class_name( 'database\notification_type' );
     $weeks = $setting_manager->get_setting( 'general', 'deferred_reminder' );
 
-    $notification_type_class_name = lib::get_class_name( 'database\notification_type' );
+    $total = 0;
+
     $db_notification_type =
-      $notification_type_class_name::get_unique_record( 'name', 'Deferred Application Reminder' );
+      $notification_type_class_name::get_unique_record( 'name', 'Deferred Application Reminder (second)' );
+
+    $modifier = lib::create( 'database\modifier' );
+    $join_mod = lib::create( 'database\modifier' );
+    $join_mod->where( 'reqn.id', '=', 'notification.reqn_id', false );
+    $join_mod->where( 'notification.notification_type_id', '=', $db_notification_type->id );
+    $join_mod->where( 'TIMESTAMPDIFF( DAY, UTC_TIMESTAMP(), notification.datetime )', '=', 0 );
+    $modifier->join_modifier( 'notification', $join_mod, 'left' );
+    $modifier->where( 'TIMESTAMPDIFF( DAY, state_date, UTC_TIMESTAMP() )', '=', 2*7*$weeks );
+    $modifier->where( 'notification.id', '=', NULL );
+
+    $reqn_list = static::select_objects( $modifier );
+
+    foreach( $reqn_list as $db_reqn )
+    {
+      $db_notification = lib::create( 'database\notification' );
+      $db_notification->notification_type_id = $db_notification_type->id;
+      $db_notification->set_reqn( $db_reqn ); // this saves the record
+      $db_notification->mail();
+    }
+
+    $total += count( $reqn_list );
+
+    $db_notification_type =
+      $notification_type_class_name::get_unique_record( 'name', 'Deferred Application Reminder (first)' );
 
     $modifier = lib::create( 'database\modifier' );
     $join_mod = lib::create( 'database\modifier' );
@@ -1488,7 +1514,9 @@ class reqn extends \cenozo\database\record
       $db_notification->mail();
     }
 
-    return count( $reqn_list );
+    $total += count( $reqn_list );
+
+    return $total;
   }
 
   /**

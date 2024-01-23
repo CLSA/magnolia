@@ -15,8 +15,13 @@ La présente est un rappel que votre Entente d’accès aux données de l’ÉLC
 
 L’équipe d’accès aux données de l’ÉLCV";
 
+-- the name of the next notification type has changed
+UPDATE notification_type
+SET name = "Deferred Application Reminder (first)"
+WHERE name = "Deferred Application Reminder";
+
 INSERT IGNORE INTO notification_type SET
-  name = "Deferred Application Reminder",
+  name = "Deferred Application Reminder (first)",
   title_en = "Action Required Deferred",
   title_fr = "Action requise différée",
   message_en = "Dear Dr. {{applicant_name}},
@@ -32,6 +37,33 @@ The CLSA Data Access Team",
 Votre demande d’accès {{identifier}}, intitulée « {{title}} », requiert votre attention afin de le faire avancer. 
 Connectez-vous à Magnolia, le logiciel de demande d’accès aux données en ligne de l’ÉLCV (https://magnolia.clsa-elcv.ca/live/gl/), veuillez effectuer toutes les modifications et soumettre la demande à nouveau. 
 Si vous avez des questions, veuillez nous contacter à access@clsa-elcv.ca. 
+
+L’équipe d’accès aux données de l’ÉLCV";
+
+INSERT IGNORE INTO notification_type SET
+  name = "Deferred Application Reminder (second)",
+  title_en = "Action Required Deferred 2nd Reminder",
+  title_fr = "Action requise différée 2e rappel",
+  message_en = "Dear Dr. {{applicant_name}},
+ 
+Your application number {{identifier}}, entitled \"{{title}}\", requires action in order to move it forward.
+ 
+As per the previous reminder on {{TODAY-6W}} your application is not in an active stage. If you do not complete the action by {{TODAY+2W}}, your application will be returned to the last active stage and any changes that you were making will not be approved.
+ 
+Please log in to the CLSA online data application software, Magnolia (https://magnolia.clsa-elcv.ca/live/gl/), complete the changes and submit for further review.
+ 
+If you have any questions, please contact us at access@clsa-elcv.ca.
+ 
+The CLSA Data Access Team",
+  message_fr = "Bonjour Dr / Dre {{applicant_name}}, 
+
+Votre demande d’accès {{identifier}}, intitulée « {{title}} », requiert votre attention avant de poursuivre son évaluation. 
+
+Comme indiqué dans le rappel du {{TODAY-6W}}, votre demande n’est pas active. Si vous ne faites pas l’action requise avant le {{TODAY+2W}}, elle retournera à la dernière étape active, ce qui rejettera les modifications apportées.
+
+Pour modifier votre demande et la soumettre à nouveau, connectez-vous à Magnolia, le logiciel de demande d’accès aux données en ligne de l’ÉLCV (https://magnolia.clsa-elcv.ca/live/gl/). 
+
+Si vous avez des questions, veuillez nous contacter à access@clsa-elcv.ca. 
 
 L’équipe d’accès aux données de l’ÉLCV";
 
