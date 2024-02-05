@@ -31,10 +31,12 @@ cenozoApp.defineModule({
       name_en: {
         title: "Name (English)",
         type: "string",
+        format: "identifier",
       },
       name_fr: {
         title: "Name (French)",
         type: "string",
+        format: "identifier",
       },
       note_en: {
         title: "Note (English)",
