@@ -194,6 +194,7 @@ cenozoApp.defineModule({
       identifier: {
         title: "Identifier",
         type: "string",
+        format: "identifier",
         isConstant: function ($state, model) {
           return !model.isRole("administrator", "typist");
         },

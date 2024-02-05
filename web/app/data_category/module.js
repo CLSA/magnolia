@@ -32,10 +32,12 @@ cenozoApp.defineModule({
       name_en: {
         title: "Name (English)",
         type: "string",
+        format: "identifier",
       },
       name_fr: {
         title: "Name (French)",
         type: "string",
+        format: "identifier",
       },
       condition_en: {
         title: "Condition (English)",

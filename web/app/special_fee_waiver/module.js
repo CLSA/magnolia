@@ -27,6 +27,7 @@ cenozoApp.defineModule({
       name: {
         title: "Name",
         type: "string",
+        format: "identifier",
       },
       start_date: {
         title: "Start Date",
