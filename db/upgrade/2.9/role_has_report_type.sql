@@ -17,8 +17,10 @@ DROP PROCEDURE IF EXISTS patch_role_has_report_type;
       "INSERT IGNORE INTO ", @cenozo, ".role_has_report_type( role_id, report_type_id ) ",
       "SELECT role.id, report_type.id ",
       "FROM ", @cenozo, ".role, ", @cenozo, ".report_type ",
-      "WHERE role.name IN( 'administrator' ) ",
-      "AND report_type.name = 'data_release_update'"
+      "WHERE role.name IN( 'dao' ) ",
+      "AND report_type.name IN( ",
+        " 'data_release_update', 'deadline_data_option', 'reference', 'requisition', 'review_summary' ",
+      ")"
     );
     PREPARE statement FROM @sql;
     EXECUTE statement;

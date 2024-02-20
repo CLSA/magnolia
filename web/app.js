@@ -537,10 +537,16 @@ cenozo.service("CnReqnHelper", [
       promise: null,
 
       showAction: function (subject, record) {
-        var role = CnSession.role.name;
-        var phase = record.phase ? record.phase : "";
-        var state = record.state ? record.state : "";
-        var stageType = record.stage_type ? record.stage_type : "";
+        let role = CnSession.role.name;
+        let phase = record.phase ? record.phase : "";
+        let state = record.state ? record.state : "";
+        let stageType = record.stage_type ? record.stage_type : "";
+        let isChairStage = stageType.includes("DSAC");
+        let isECStage = stageType.includes("EC");
+        let isCommunicationStage = stageType.includes("Communication");
+        let isDAOStage = [
+          "Feasibility Review", "Data Release", "DCC Review", "Pre Data Destruction"
+        ].includes(stageType);
 
         if ("submit" == subject) {
           return (
@@ -563,7 +569,7 @@ cenozo.service("CnReqnHelper", [
         } else if ("defer" == subject) {
           return (
             !["abandoned", "inactive", "deferred"].includes(state) && ((
-              "administrator" == role &&
+              ["administrator", "dao"].includes(role) &&
               ["review", "active", "finalization"].includes(phase) &&
               "Pre Data Destruction" != stageType
             ) || (
@@ -590,8 +596,10 @@ cenozo.service("CnReqnHelper", [
           return (
             "administrator" == role &&
             "." == record.amendment &&
-            ("review" == phase ||
-              ["Agreement", "Data Release"].includes(stageType))
+            (
+              "review" == phase ||
+              ["Agreement", "Data Release"].includes(stageType)
+            )
           );
         } else if ("withdraw" == subject) {
           return "administrator" == role && "active" == phase;
@@ -607,16 +615,20 @@ cenozo.service("CnReqnHelper", [
             !["inactive","abandoned"].includes(state) &&
             "new" != phase && // don't allow if new (there's no stage to reverse to)
             !( "." != record.amendment && "Admin Review" == stageType ) && // use abandon for this instead
-            "administrator" == role // only admins can do this
+            (
+              "administrator" == role || // administrators can do this anytime
+              ("dao" == role && isDAOStage) // dao can do this for their stages only
+            )
           );
         } else if ("proceed" == subject) {
           return (
             "complete" != phase &&
             "Report Required" != stageType && (
               ("administrator" == role && "new" != phase) ||
-              ("chair" == role && stageType.includes("DSAC")) ||
-              ("ec" == role && stageType.includes("EC")) ||
-              ("communication" == role && stageType.includes("Communication"))
+              ("dao" == role && isDAOStage) ||
+              ("chair" == role && isChairStage) ||
+              ("ec" == role && isECStage) ||
+              ("communication" == role && isCommunicationStage)
             ) && !this.showAction("amendment proceed", record)
           );
         } else if ("reject" == subject) {
@@ -635,7 +647,10 @@ cenozo.service("CnReqnHelper", [
               "Decision Made",
               "Agreement",
             ].includes(stageType) &&
-            "administrator" == role
+            (
+              "administrator" == role || 
+              ("dao" == role && isDAOStage)
+            )
           );
         } else if ("amendment feasibility review" == subject) {
           return "Admin Review" == stageType;

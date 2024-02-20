@@ -177,7 +177,7 @@ cenozoApp.defineModule({
                 return "." != scope.model.viewModel.record.amendment;
               },
               isDataAgreementIncluded: function () {
-                return scope.model.isRole("administrator");
+                return scope.model.isRole("administrator", "dao");
               },
               isAlwaysTrue: function () { return true; },
             });
@@ -186,10 +186,7 @@ cenozoApp.defineModule({
 
             scope.$on("file removed", function (event, key) {
               scope.liteModel.viewModel.record.funding_filename = null;
-              scope.liteModel.viewModel.fileList.findByProperty(
-                "key",
-                key
-              ).size = "";
+              scope.liteModel.viewModel.fileList.findByProperty("key", key).size = "";
             });
 
             scope.model.viewModel.afterView(async () => {
@@ -220,31 +217,22 @@ cenozoApp.defineModule({
               var element = cenozo.getFormElement("start_date");
               if (element) {
                 // clear out errors
-                if (null != date && element.$error.required)
-                  element.$error.required = false;
+                if (null != date && element.$error.required) element.$error.required = false;
                 if (element.$error.custom) element.$error.custom = false;
                 cenozo.updateFormElement(element, true);
               }
             });
             scope.$watch("model.viewModel.record.lay_summary", (text) => {
-              scope.model.viewModel.charCount.lay_summary = text
-                ? text.length
-                : 0;
+              scope.model.viewModel.charCount.lay_summary = text ? text.length : 0;
             });
             scope.$watch("model.viewModel.record.background", (text) => {
-              scope.model.viewModel.charCount.background = text
-                ? text.length
-                : 0;
+              scope.model.viewModel.charCount.background = text ? text.length : 0;
             });
             scope.$watch("model.viewModel.record.objectives", (text) => {
-              scope.model.viewModel.charCount.objectives = text
-                ? text.length
-                : 0;
+              scope.model.viewModel.charCount.objectives = text ? text.length : 0;
             });
             scope.$watch("model.viewModel.record.methodology", (text) => {
-              scope.model.viewModel.charCount.methodology = text
-                ? text.length
-                : 0;
+              scope.model.viewModel.charCount.methodology = text ? text.length : 0;
             });
             scope.$watch("model.viewModel.record.analysis", (text) => {
               scope.model.viewModel.charCount.analysis = text ? text.length : 0;
@@ -254,9 +242,8 @@ cenozoApp.defineModule({
                 amendmentTypeList.en.forEach( amendmentType => {
                   const justificationColumn = "amendment_justification_" + amendmentType.id;
                   scope.$watch("model.viewModel.record."+justificationColumn, (text) => {
-                    scope.model.viewModel.charCount.amendment_justification_list[justificationColumn] = text
-                      ? text.length
-                      : 0;
+                    scope.model.viewModel.charCount.amendment_justification_list[justificationColumn] =
+                      text ? text.length : 0;
                   });
                 });
               }
@@ -265,28 +252,22 @@ cenozoApp.defineModule({
             // fill in the start date delay
             await CnSession.promise;
             scope.startDateDelay = CnSession.application.startDateDelay;
-            scope.maxReferencesPerReqn =
-              CnSession.application.maxReferencesPerReqn;
+            scope.maxReferencesPerReqn = CnSession.application.maxReferencesPerReqn;
           },
           controller: function ($scope) {
-            if (angular.isUndefined($scope.model))
-              $scope.model = CnReqnVersionModelFactory.root;
-            if (angular.isUndefined($scope.liteModel))
-              $scope.liteModel = CnReqnVersionModelFactory.lite;
+            if (angular.isUndefined($scope.model)) $scope.model = CnReqnVersionModelFactory.root;
+            if (angular.isUndefined($scope.liteModel)) $scope.liteModel = CnReqnVersionModelFactory.lite;
             cnRecordView.controller[1]($scope);
 
             // coapplicant resources
-            var coapplicantAddModel =
-              $scope.model.viewModel.coapplicantModel.addModel;
+            var coapplicantAddModel = $scope.model.viewModel.coapplicantModel.addModel;
             $scope.coapplicantRecord = {};
             coapplicantAddModel.onNew($scope.coapplicantRecord);
 
             $scope.getHeading = function () {
               var status =
                 $scope.model.viewModel.record[
-                  $scope.model.isRole("applicant", "designate")
-                    ? "status"
-                    : "stage_type"
+                  $scope.model.isRole("applicant", "designate") ? "status" : "stage_type"
                 ];
               if ("deferred" == $scope.model.viewModel.record.state) {
                 status = $scope.model.isRole("applicant", "designate")
@@ -309,17 +290,13 @@ cenozoApp.defineModule({
             $scope.compareTo = async function (version) {
               $scope.model.viewModel.compareRecord = version;
               $scope.liteModel.viewModel.compareRecord = version;
-              $scope.model.setQueryParameter(
-                "c",
-                null == version ? undefined : version.amendment_version
-              );
+              $scope.model.setQueryParameter("c", null == version ? undefined : version.amendment_version);
               await $scope.model.reloadState(false, false, "replace");
             };
 
             $scope.addCoapplicant = async function () {
               if ($scope.model.viewModel.coapplicantModel.getAddEnabled()) {
-                var form =
-                  cenozo.getScopeByQuerySelector("#project_team_form").project_team_form;
+                var form = cenozo.getScopeByQuerySelector("#project_team_form").project_team_form;
 
                 // we need to check each add-input for errors
                 var valid = true;
@@ -336,9 +313,7 @@ cenozoApp.defineModule({
                 }
                 if (!valid) {
                   // dirty all inputs so we can find the problem
-                  cenozo.forEachFormElement("project_team_form", (element) => {
-                    element.$dirty = true;
-                  });
+                  cenozo.forEachFormElement("project_team_form", (element) => { element.$dirty = true; });
                 } else {
                   try {
                     $scope.isAddingCoapplicant = true;
@@ -365,8 +340,7 @@ cenozoApp.defineModule({
 
             $scope.removeCoapplicant = async function (id) {
               if ($scope.model.viewModel.coapplicantModel.getDeleteEnabled()) {
-                if (!$scope.isDeletingCoapplicant.includes(id))
-                  $scope.isDeletingCoapplicant.push(id);
+                if (!$scope.isDeletingCoapplicant.includes(id)) $scope.isDeletingCoapplicant.push(id);
                 var index = $scope.isDeletingCoapplicant.indexOf(id);
                 await $scope.model.viewModel.removeCoapplicant(id);
                 if (0 <= index) $scope.isDeletingCoapplicant.splice(index, 1);
@@ -374,20 +348,16 @@ cenozoApp.defineModule({
             };
 
             // reference resources
-            var referenceAddModel =
-              $scope.model.viewModel.referenceModel.addModel;
+            var referenceAddModel = $scope.model.viewModel.referenceModel.addModel;
             $scope.referenceRecord = {};
             referenceAddModel.onNew($scope.referenceRecord);
 
             $scope.addReference = async function () {
               if ($scope.model.viewModel.referenceModel.getAddEnabled()) {
-                var form =
-                  cenozo.getScopeByQuerySelector("#description_form").description_form;
+                var form = cenozo.getScopeByQuerySelector("#description_form").description_form;
                 if (!form.$valid) {
                   // dirty all inputs so we can find the problem
-                  cenozo.forEachFormElement("description_form", (element) => {
-                    element.$dirty = true;
-                  });
+                  cenozo.forEachFormElement("description_form", (element) => { element.$dirty = true; });
                 } else {
                   try {
                     $scope.isAddingReference = true;
@@ -407,8 +377,7 @@ cenozoApp.defineModule({
 
             $scope.removeReference = async function (id) {
               if ($scope.model.viewModel.referenceModel.getDeleteEnabled()) {
-                if (!$scope.isDeletingReference.includes(id))
-                  $scope.isDeletingReference.push(id);
+                if (!$scope.isDeletingReference.includes(id)) $scope.isDeletingReference.push(id);
                 var index = $scope.isDeletingReference.indexOf(id);
                 await $scope.model.viewModel.removeReference(id);
                 if (0 <= index) $scope.isDeletingReference.splice(index, 1);
@@ -449,16 +418,10 @@ cenozoApp.defineModule({
             };
 
             $scope.isRemoveEthicsApprovalAllowed = function (id) {
-              if (
-                $scope.model.viewModel.ethicsApprovalModel.getDeleteEnabled()
-              ) {
+              if ($scope.model.viewModel.ethicsApprovalModel.getDeleteEnabled()) {
                 if ($scope.model.isRole("administrator")) return true;
                 else if ($scope.model.isRole("applicant", "designate")) {
-                  var ethicsApproval =
-                    $scope.model.viewModel.record.ethicsApprovalList.findByProperty(
-                      "id",
-                      id
-                    );
+                  var ethicsApproval = $scope.model.viewModel.record.ethicsApprovalList.findByProperty("id", id);
                   return null != ethicsApproval && ethicsApproval.one_day_old;
                 }
               }
@@ -466,15 +429,11 @@ cenozoApp.defineModule({
             };
 
             $scope.removeEthicsApproval = async function (id) {
-              if (
-                $scope.model.viewModel.ethicsApprovalModel.getDeleteEnabled()
-              ) {
-                if (!$scope.isDeletingEthicsApproval.includes(id))
-                  $scope.isDeletingEthicsApproval.push(id);
+              if ($scope.model.viewModel.ethicsApprovalModel.getDeleteEnabled()) {
+                if (!$scope.isDeletingEthicsApproval.includes(id)) $scope.isDeletingEthicsApproval.push(id);
                 var index = $scope.isDeletingEthicsApproval.indexOf(id);
                 await $scope.model.viewModel.removeEthicsApproval(id);
-                if (0 <= index)
-                  $scope.isDeletingEthicsApproval.splice(index, 1);
+                if (0 <= index) $scope.isDeletingEthicsApproval.splice(index, 1);
               }
             };
 
@@ -487,17 +446,15 @@ cenozoApp.defineModule({
                 // Both the coapplicant and reference cn-add-input directives share this method, so differentiate
                 // by checking to see which module has the property
                 if (null != coapplicantModule.getInput(property)) {
-                  element.$error.format =
-                    !$scope.model.viewModel.coapplicantModel.testFormat(
-                      property,
-                      $scope.coapplicantRecord[property]
-                    );
+                  element.$error.format = !$scope.model.viewModel.coapplicantModel.testFormat(
+                    property,
+                    $scope.coapplicantRecord[property]
+                  );
                 } else if (null != referenceModule.getInput(property)) {
-                  element.$error.format =
-                    !$scope.model.viewModel.referenceModel.testFormat(
-                      property,
-                      $scope.referenceRecord[property]
-                    );
+                  element.$error.format = !$scope.model.viewModel.referenceModel.testFormat(
+                    property,
+                    $scope.referenceRecord[property]
+                  );
                 }
                 cenozo.updateFormElement(element, true);
               }
@@ -585,8 +542,9 @@ cenozoApp.defineModule({
                 "." != this.record.amendment,
                 this.record.lang
               );
-              if (response)
+              if (response) {
                 await $state.go( this.parentModel.isRole("applicant", "designate") ? "root.home" : "reqn.list" );
+              }
             },
             delete: async function () {
               await CnReqnHelper.delete("identifier=" + this.record.identifier, this.record.lang);
@@ -898,10 +856,7 @@ cenozoApp.defineModule({
                 // cost for trainees is different to applicants
                 var international = false;
                 if (this.record.trainee_user_id) {
-                  if (
-                    baseCountryId != traineeCountryId ||
-                    baseCountryId != applicantCountryId
-                  ) {
+                  if (baseCountryId != traineeCountryId || baseCountryId != applicantCountryId) {
                     // if either the trainee or applicant isn't Canadian then the base fee is 5000
                     cost = 5000;
                     international = true;
@@ -927,7 +882,10 @@ cenozoApp.defineModule({
                     option.selectionList
                       .filter((selection) => 0 < selection.cost.value)
                       .forEach((selection) => {
-                        if (angular.isArray(this.record.selectionList) && this.record.selectionList[selection.id]) {
+                        if (
+                          angular.isArray(this.record.selectionList) &&
+                          this.record.selectionList[selection.id]
+                        ) {
                           if (selection.costCombined) {
                             // track the most expensive selection
                             if (selection.cost.value > maxCost) maxCost = selection.cost.value;
@@ -981,7 +939,7 @@ cenozoApp.defineModule({
             },
 
             isWaiverMutable: function () {
-              // waviers can only be changed by administrators once the revision require stage (or after) has been reached
+              // waivers can only be changed by admins once a stage on or after revision require is reached
               return (
                 this.parentModel.isRole("administrator") ||
                 this.record.stage_type_rank < CnSession.application.revisionRequiredRank
@@ -1268,8 +1226,14 @@ cenozoApp.defineModule({
                         }
                       } else if (null != property.match(/_filename$/)) {
                         // if both file names are empty or null then assume there is no difference
-                        var recordName = angular.isUndefined(reqnVersion1[property]) ?  null : reqnVersion1[property];
-                        var compareName = angular.isUndefined(reqnVersion2[property]) ?  null : reqnVersion2[property];
+                        var recordName =
+                          angular.isUndefined(reqnVersion1[property]) ?
+                          null :
+                          reqnVersion1[property];
+                        var compareName =
+                          angular.isUndefined(reqnVersion2[property]) ?
+                          null :
+                          reqnVersion2[property];
 
                         if (!(recordName == null && compareName == null)) {
                           // file size are compared instead of filename
@@ -1291,8 +1255,14 @@ cenozoApp.defineModule({
                         if (category.comment) {
                           // a comment's property in the record is followed by the data_category_id
                           var commentProperty = "comment_" + category.id;
-                          var value1 = "" === reqnVersion1[commentProperty] ?  null : reqnVersion1[commentProperty];
-                          var value2 = "" === reqnVersion2[commentProperty] ?  null : reqnVersion2[commentProperty];
+                          var value1 =
+                            "" === reqnVersion1[commentProperty] ?
+                            null :
+                            reqnVersion1[commentProperty];
+                          var value2 =
+                            "" === reqnVersion2[commentProperty] ?
+                            null :
+                            reqnVersion2[commentProperty];
                           if (value1 != value2) {
                             differences.diff = true;
                             differences[part].diff = true;
@@ -1429,30 +1399,32 @@ cenozoApp.defineModule({
             setCoapplicantDiff: function (version) {
               if (null != version) {
                 // see if there is a difference between this list and the view's list
+                let columns = ["name", "position", "affiliation", "email", "role", "access"];
                 version.coapplicantDiff =
-                  version.coapplicantList.length !=
-                    this.record.coapplicantList.length ||
+                  version.coapplicantList.length != this.record.coapplicantList.length ||
                   version.coapplicantList.some(
-                    (c1) =>
-                      !this.record.coapplicantList.some(
-                        (c2) => !["name", "position", "affiliation", "email", "role", "access"]
-                          .some((prop) => c1[prop] != c2[prop])
-                      )
+                    (c1) => !this.record.coapplicantList.some(
+                      (c2) => !columns.some((prop) => c1[prop] != c2[prop])
+                    )
                   );
 
-                // When an amendment is made which adds coapplicants with access to data we need to get a signed agreement
-                // form from the user.  In order to do this we need a variable that tracks when this is the case:
+                // When an amendment is made which adds coapplicants with access to data we need to get a signed
+                // agreement form from the user.
+                // In order to do this we need a variable that tracks when this is the case:
                 if ("." != this.record.amendment && this.lastAmendmentVersion == version.amendment_version) {
                   this.addingCoapplicantWithData = false;
                   if (version.coapplicantDiff) {
-                    // There is a difference between this and the previous amendment version, so now determine if there is now
-                    // a coapplicant with access to the data which didn't exist in the previous version
+                    // There is a difference between this and the previous amendment version, so now determine
+                    // if there is now a coapplicant with access to the data which didn't exist in the previous
+                    // version
                     this.record.coapplicantList.some((coapplicant) => {
                       var found = version.coapplicantList.some(
                         (oldCoapplicant) => {
                           if (oldCoapplicant.name == coapplicant.name) {
                             // check if an existing coap has been given access to the data
-                            if (!oldCoapplicant.access && coapplicant.access) this.addingCoapplicantWithData = true;
+                            if (!oldCoapplicant.access && coapplicant.access) {
+                              this.addingCoapplicantWithData = true;
+                            }
                             return true;
                           }
                         }
@@ -1524,7 +1496,10 @@ cenozoApp.defineModule({
                     }).post();
 
                     // add the local copy of the justification if it doesn't already exist
-                    if (amendmentType.justificationPrompt && angular.isUndefined(this.record[justificationColumn])) {
+                    if (
+                      amendmentType.justificationPrompt &&
+                      angular.isUndefined(this.record[justificationColumn])
+                    ) {
                       this.record[justificationColumn] = "";
                     }
                   } catch (error) {
@@ -1537,7 +1512,10 @@ cenozoApp.defineModule({
               } else {
                 // delete the amendment type
                 try {
-                  await CnHttpFactory.instance({ path: path + "/" + amendmentTypeId, onError: onErrorFn }).delete();
+                  await CnHttpFactory.instance({
+                    path: path + "/" + amendmentTypeId,
+                    onError: onErrorFn
+                  }).delete();
                   delete this.record[justificationColumn];
                 } catch (error) {
                   // handled by onError above
@@ -1848,11 +1826,12 @@ cenozoApp.defineModule({
             },
 
             canViewData: function () {
-              // administrators and applicants can view data when in the active stage
+              // administrators, daos and applicants can view data when in the active stage
               var stage_type = this.record.stage_type ? this.record.stage_type : "";
               return (
                 this.parentModel.isRole(
                   "administrator",
+                  "dao",
                   "applicant",
                   "designate"
                 ) && "Active" == stage_type
@@ -2786,7 +2765,7 @@ cenozoApp.defineModule({
                     },
                   }).query(),
 
-                  this.isRole("administrator") ?
+                  this.isRole("administrator", "dao") ?
                     CnHttpFactory.instance({
                       path: "data_agreement",
                       data: {

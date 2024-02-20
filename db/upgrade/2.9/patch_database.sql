@@ -2,6 +2,8 @@
 
 SET AUTOCOMMIT=0;
 
+SOURCE role.sql
+SOURCE application_type_has_role.sql
 SOURCE custom_report.sql
 SOURCE role_has_custom_report.sql
 SOURCE special_fee_waiver.sql
@@ -21,6 +23,7 @@ SOURCE reqn_version.sql
 SOURCE reqn_type.sql
 SOURCE reqn_type_has_stage_type.sql
 SOURCE stage_type_has_stage_type.sql
+SOURCE role_has_review_type.sql
 SOURCE review.sql
 SOURCE data_release.sql
 SOURCE data_destroy.sql

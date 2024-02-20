@@ -16,7 +16,7 @@ DROP PROCEDURE IF EXISTS patch_role_has_overview;
       "INSERT IGNORE INTO ", @cenozo, ".role_has_overview( role_id, overview_id ) ",
       "SELECT role.id, overview.id ",
       "FROM ", @cenozo, ".role, ", @cenozo, ".overview ",
-      "WHERE role.name IN ( 'administrator', 'chair', 'communication', 'ec', 'readonly' ) ",
+      "WHERE role.name IN ( 'administrator', 'chair', 'communication', 'dao', 'ec', 'readonly' ) ",
       "AND overview.name = 'outcome'" );
     PREPARE statement FROM @sql;
     EXECUTE statement;

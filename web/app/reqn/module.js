@@ -206,7 +206,7 @@ cenozoApp.defineModule({
           return "view" == model.getActionFromState();
         },
         isExcluded: function ($state, model) {
-          return !model.isRole("administrator");
+          return !model.isRole("administrator", "dao");
         },
         help:
           "Legacy requisitions are those which were created outside of Magnolia. " +
@@ -215,6 +215,9 @@ cenozoApp.defineModule({
       special_fee_waiver_id: {
         title: "Special Fee Waiver",
         type: "enum",
+        isConstant: function ($state, model) {
+          return !model.isRole("administrator");
+        },
         isExcluded: function ($state, model) {
           return "view" != model.getActionFromState();
         },
@@ -225,9 +228,8 @@ cenozoApp.defineModule({
       show_prices: {
         title: "Show Fee",
         type: "boolean",
-        isConstant: function($state, model) {
-          // make sure the chair can only edit the chair's notes
-          return model.isRole("chair");
+        isConstant: function ($state, model) {
+          return !model.isRole("administrator");
         },
         isExcluded: function ($state, model) {
           return "view" != model.getActionFromState();
@@ -240,9 +242,8 @@ cenozoApp.defineModule({
         title: "Override Fee ($)",
         type: "string",
         format: "integer",
-        isConstant: function($state, model) {
-          // make sure the chair can only edit the chair's notes
-          return model.isRole("chair");
+        isConstant: function ($state, model) {
+          return !model.isRole("administrator");
         },
         isExcluded: function ($state, model) {
           return "view" != model.getActionFromState();
@@ -254,9 +255,8 @@ cenozoApp.defineModule({
       non_payment: {
         title: "Flag for Non-Payment",
         type: "boolean",
-        isConstant: function($state, model) {
-          // make sure the chair can only edit the chair's notes
-          return model.isRole("chair");
+        isConstant: function ($state, model) {
+          return !model.isRole("administrator");
         },
         isExcluded: function ($state, model) {
           return "view" != model.getActionFromState();
@@ -277,6 +277,7 @@ cenozoApp.defineModule({
           return !model.isRole(
             "administrator",
             "communication",
+            "dao",
             "readonly",
             "typist"
           );
@@ -301,7 +302,7 @@ cenozoApp.defineModule({
           );
         },
         isExcluded: function ($state, model) {
-          return !model.isRole("administrator") ||
+          return !model.isRole("administrator", "dao") ||
             angular.isUndefined(model.viewModel.record.deadline_id) ||
             null == model.viewModel.record.deadline_id
             ? true
@@ -356,9 +357,8 @@ cenozoApp.defineModule({
             'CONCAT( user.first_name, " ", user.last_name, " (", user.name, ")" )',
           where: ["user.first_name", "user.last_name", "user.name"],
         },
-        isConstant: function($state, model) {
-          // make sure the chair can only edit the chair's notes
-          return model.isRole("chair");
+        isConstant: function ($state, model) {
+          return !model.isRole("administrator");
         },
         help: "Only users who have the designate role can be selected.",
       },
@@ -369,7 +369,7 @@ cenozoApp.defineModule({
           return !model.isRole("administrator", "typist");
         },
         isExcluded: function ($state, model) {
-          return !model.isRole("administrator", "readonly", "typist");
+          return !model.isRole("administrator", "communication", "dao", "readonly", "typist");
         },
       },
       stage_type: {
@@ -378,9 +378,7 @@ cenozoApp.defineModule({
         type: "string",
         isConstant: true,
         isExcluded: function ($state, model) {
-          return model.isRole("administrator", "communication", "readonly")
-            ? "add"
-            : true;
+          return model.isRole("administrator", "communication", "dao", "readonly", "typist") ? "add" : true;
         },
       },
       state: {
@@ -388,7 +386,7 @@ cenozoApp.defineModule({
         type: "enum",
         isConstant: true,
         isExcluded: function ($state, model) {
-          return model.isRole("administrator", "communication", "readonly") ? "add" : true;
+          return model.isRole("administrator", "communication", "dao", "readonly", "typist") ? "add" : true;
         },
       },
       state_date: {
@@ -396,7 +394,7 @@ cenozoApp.defineModule({
         type: "date",
         isConstant: true,
         isExcluded: function ($state, model) {
-          return model.isRole("administrator", "communication", "readonly") ? "add" : true;
+          return model.isRole("administrator", "communication", "dao", "readonly", "typist") ? "add" : true;
         },
       },
       website: {
@@ -414,13 +412,13 @@ cenozoApp.defineModule({
         type: "boolean",
         isConstant: function ($state, model) {
           return (
-            !model.isRole("administrator") ||
+            !model.isRole("administrator", "dao") ||
             null == model.viewModel.record.data_sharing_filename
           );
         },
         isExcluded: function ($state, model) {
           return (
-            !model.isRole("administrator") ||
+            !model.isRole("administrator", "dao") ||
             "add" == model.getActionFromState() ||
             !model.viewModel.record.has_linked_data
           );
@@ -440,7 +438,7 @@ cenozoApp.defineModule({
           );
         },
         isExcluded: function ($state, model) {
-          return model.isRole("administrator", "readonly") ? "add" : true;
+          return model.isRole("administrator", "dao", "readonly") ? "add" : true;
         },
       },
       title: {
@@ -449,7 +447,7 @@ cenozoApp.defineModule({
         type: "string",
         isConstant: true,
         isExcluded: function ($state, model) {
-          return model.isRole("administrator", "readonly", "typist");
+          return model.isRole("administrator", "dao", "readonly", "typist");
         },
       },
       lay_summary: {
@@ -458,7 +456,7 @@ cenozoApp.defineModule({
         type: "text",
         isConstant: true,
         isExcluded: function ($state, model) {
-          return model.isRole("administrator", "readonly", "typist");
+          return model.isRole("administrator", "dao", "readonly", "typist");
         },
       },
       instruction_filename: {
@@ -495,7 +493,7 @@ cenozoApp.defineModule({
         title: "Administrative Notes",
         type: "text",
         isExcluded: function ($state, model) {
-          return !model.isRole("administrator", "readonly", "typist");
+          return !model.isRole("administrator", "dao", "readonly", "typist");
         },
       },
       chair_note: {
@@ -1073,12 +1071,12 @@ cenozoApp.defineModule({
               await this.onView();
             },
             canManageData: function () {
-              // administrators can manage reqn data when in the data release and active stages only
+              // administrators, daos can manage reqn data when in the data release and active stages only
               var stage_type = this.record.stage_type
                 ? this.record.stage_type
                 : "";
               return (
-                this.parentModel.isRole("administrator") &&
+                this.parentModel.isRole("administrator", "dao") &&
                 ("Data Release" == stage_type || "Active" == stage_type)
               );
             },
@@ -1091,12 +1089,12 @@ cenozoApp.defineModule({
               );
             },
             canViewData: function () {
-              // administrators and applicants can view data when in the active stage
+              // administrators, daos and applicants can view data when in the active stage
               var stage_type = this.record.stage_type
                 ? this.record.stage_type
                 : "";
               return (
-                (this.parentModel.isRole("administrator") &&
+                (this.parentModel.isRole("administrator", "dao") &&
                   ["Data Release", "Active"].includes(stage_type)) ||
                 (this.parentModel.isRole("applicant", "designate") &&
                   "Active" == stage_type)
@@ -1403,7 +1401,7 @@ cenozoApp.defineModule({
               }).count();
               const deferralNotes = parseInt(response.headers("Total"));
 
-              if (this.parentModel.isRole("administrator") && 0 < deferralNotes ) {
+              if (this.parentModel.isRole("administrator", "communication", "dao") && 0 < deferralNotes ) {
                 message +=
                   "\n\nWARNING: There are deferral notes present, you may wish to remove them before proceeding.";
               }
@@ -1771,7 +1769,7 @@ cenozoApp.defineModule({
                 this.$$getEditEnabled() && (
                   this.isRole("applicant", "designate")
                     ? "new" == phase || ("deferred" == state && "review" == phase)
-                    : this.isRole("administrator", "chair", "communication", "typist")
+                    : this.isRole("administrator", "chair", "communication", "dao", "typist")
                 )
               );
             },
