@@ -74,9 +74,13 @@ class patch extends \cenozo\service\patch
       $code = NULL;
       if( 'reset_data' == $action )
       {
-        // make sure only admins can release data to reqns in the data-release or active stages
-        if( 'administrator' != $db_role->name ||
-            ( !in_array( $db_current_stage_type->name, array( 'Data Release', 'Active' ) ) ) ) $code = 403;
+        // make sure only admins and daos can release data to reqns in the data-release or active stages
+        if(
+          !in_array( $db_role->name, ['administrator', 'dao'] ) ||
+          !in_array( $db_current_stage_type->name, array( 'Data Release', 'Active' ) )
+        ) {
+          $code = 403;
+        }
         // make sure the reqn has at least one data-release
         else if( 0 == $db_reqn->get_data_release_count() )
         {
@@ -181,21 +185,29 @@ class patch extends \cenozo\service\patch
         }
         else
         {
-          if( !is_null( $db_reqn->state ) || (
-              'administrator' != $db_role->name &&
-              ( 'chair' != $db_role->name || false === strpos( $db_current_stage_type->name, 'DSAC' ) ) &&
-              ( 'ec' != $db_role->name || false === strpos( $db_current_stage_type->name, 'EC' ) ) &&
-              (
-                'communication' != $db_role->name ||
-                false === strpos( $db_current_stage_type->name, 'Communication' )
-              )
-          ) ) $code = 403;
+          $isChairStage = false !== strpos( $db_current_stage_type->name, 'DSAC' );
+          $isECStage = false !== strpos( $db_current_stage_type->name, 'EC' );
+          $isCommunicationStage = false !== strpos( $db_current_stage_type->name, 'Communication' );
+          $isDAOStage = in_array(
+            $db_current_stage_type->name,
+            ["Feasibility Review", "Data Release", "DCC Review", "Pre Data Destruction"]
+          );
+
+          if(
+            !(
+              'administrator' == $db_role->name ||
+              ( 'chair' == $db_role->name && $isChairStage ) ||
+              ( 'dao' == $db_role->name && $isDAOStage ) ||
+              ( 'ec' == $db_role->name && $isECStage ) ||
+              ( 'communication' == $db_role->name && $isCommunicationStage )
+            )
+          ) $code = 403;
         }
       }
       else if( 'reverse' == $action )
       {
-        // only admins are allowed to reverse a reqn
-        if( 'administrator' != $db_role->name ) $code = 403;
+        // only admins and dao are allowed to reverse a reqn
+        if( in_array( $db_role->name, ['administrator', 'dao'] ) ) $code = 403;
         else if(
           // don't allow if inactive or abandoned
           !in_array( $db_reqn->state, ['inactive', 'abandoned'] ) &&

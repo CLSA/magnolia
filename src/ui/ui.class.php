@@ -197,13 +197,14 @@ class ui extends \cenozo\ui\ui
     }
 
     if( 'administrator' != $db_role->name ) $this->remove_listitem( 'Users' );
-    if( 'administrator' == $db_role->name )
+    if( in_array( $db_role->name, ['administrator', 'dao'] ) )
     {
       $this->add_listitem( 'Data Categories', 'data_category' );
       $this->add_listitem( 'Output Types', 'output_type' );
       $this->add_listitem( 'Special Fee Waivers', 'special_fee_waiver' );
     }
-    if( in_array( $db_role->name, ['administrator', 'readonly'] ) ) $this->add_listitem( 'Requisition Types', 'reqn_type' );
+    if( in_array( $db_role->name, ['administrator', 'dao', 'readonly'] ) )
+      $this->add_listitem( 'Requisition Types', 'reqn_type' );
   }
 
   /**

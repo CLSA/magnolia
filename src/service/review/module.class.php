@@ -42,7 +42,11 @@ class module extends \cenozo\service\module
         {
           if( 'administrator' != $db_role->name )
           {
-            if( 'Admin' == $review_type || 'Feasibility' == $review_type ) $this->get_status()->set_code( 403 );
+            if( 'Admin' == $review_type ) $this->get_status()->set_code( 403 );
+            else if( 'Feasibility' == $review_type )
+            {
+              if( 'dao' != $db_role->name ) $this->get_status()->set_code( 403 );
+            }
             else if( 'Reviewer 1' == $review_type || 'Reviewer 2' == $review_type )
             {
               if( 'reviewer' != $db_role->name && 'chair' != $db_role->name ) $this->get_status()->set_code( 403 );
