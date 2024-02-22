@@ -568,14 +568,20 @@ cenozo.service("CnReqnHelper", [
           return "new" == phase;
         } else if ("defer" == subject) {
           return (
-            !["abandoned", "inactive", "deferred"].includes(state) && ((
-              ["administrator", "dao"].includes(role) &&
-              ["review", "active", "finalization"].includes(phase) &&
-              "Pre Data Destruction" != stageType
-            ) || (
-              "communication" == role &&
-              "Communications Review" == stageType
-            ))
+            !["abandoned", "inactive", "deferred"].includes(state) && (
+              (
+                "administrator" == role &&
+                ["review", "active", "finalization"].includes(phase) &&
+                "Pre Data Destruction" != stageType
+              ) || (
+                "dao" == role &&
+                ( isDAOStage || "Data Destruction" == stageType ) &&
+                "Pre Data Destruction" != stageType
+              ) || (
+                "communication" == role &&
+                "Communications Review" == stageType
+              )
+            )
           );
         } else if ("amend" == subject) {
           return (
@@ -615,10 +621,7 @@ cenozo.service("CnReqnHelper", [
             !["inactive","abandoned"].includes(state) &&
             "new" != phase && // don't allow if new (there's no stage to reverse to)
             !( "." != record.amendment && "Admin Review" == stageType ) && // use abandon for this instead
-            (
-              "administrator" == role || // administrators can do this anytime
-              ("dao" == role && isDAOStage) // dao can do this for their stages only
-            )
+            "administrator" == role // only admins can reverse stages
           );
         } else if ("proceed" == subject) {
           return (

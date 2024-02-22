@@ -179,9 +179,13 @@ class patch extends \cenozo\service\patch
       {
         if( $this->get_argument( 'stage_type', false ) )
         {
-          // only administrators or typists with legacy applications can proceed to a specific stage type
-          if( !is_null( $db_reqn->state ) ||
-              ( 'administrator' != $db_role->name && ( 'typist' != $db_role->name || !$db_reqn->legacy ) ) ) $code = 403;
+          // only administrators and daos, or typists with legacy applications can proceed to a specific stage type
+          if(
+            !is_null( $db_reqn->state ) || (
+              !in_array( $db_role->name, ['administrator', 'dao'] ) &&
+              ( 'typist' != $db_role->name || !$db_reqn->legacy )
+            )
+          ) $code = 403;
         }
         else
         {
@@ -207,7 +211,7 @@ class patch extends \cenozo\service\patch
       else if( 'reverse' == $action )
       {
         // only admins and dao are allowed to reverse a reqn
-        if( in_array( $db_role->name, ['administrator', 'dao'] ) ) $code = 403;
+        if( 'administrator' != $db_role->name ) $code = 403;
         else if(
           // don't allow if inactive or abandoned
           !in_array( $db_reqn->state, ['inactive', 'abandoned'] ) &&
