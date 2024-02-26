@@ -102,10 +102,9 @@ CREATE PROCEDURE patch_role_has_service()
         "'custom_report', 'data_agreement', 'data_category', 'data_detail', 'data_option', 'data_selection', ",
         "'deadline', 'ethics_approval', 'failed_login', 'log_entry', 'notation', 'notification', ",
         "'notification_type', 'notification_type_email', 'output', 'output_source', 'output_type', ",
-        "'packaged_data', 'pdf_form', 'pdf_form_type', 'publication', 'reference', 'report', ",
-        "'report_restriction', 'report_schedule', 'report_type', 'reqn_type', 'review_type', ",
-        "'review_type_question', 'setting', 'site', 'special_fee_waiver', 'stage', 'stage_type', ",
-        "'study_phase', 'supplemental_file', 'user' ",
+        "'packaged_data', 'pdf_form', 'pdf_form_type', 'publication', 'reference', 'report_restriction', ",
+        "'report_schedule', 'report_type', 'reqn_type', 'review_type', 'review_type_question', 'setting', ",
+        "'site', 'special_fee_waiver', 'stage', 'stage_type', 'study_phase', 'supplemental_file', 'user' ",
       ") ",
       "AND service.method = 'GET' ",
       "AND service.restricted = 1"
@@ -122,7 +121,7 @@ CREATE PROCEDURE patch_role_has_service()
       "WHERE role.name = 'dao' ",
       "AND service.subject IN( ",
         "'data_destroy', 'data_release', 'data_version', 'deferral_note', 'destruction_report', 'notice', ",
-        "'reqn', 'review', 'review_answer', 'system_message' ",
+        "'report', 'reqn', 'review', 'review_answer', 'system_message' ",
       ") ",
       "AND service.restricted = 1"
     );
