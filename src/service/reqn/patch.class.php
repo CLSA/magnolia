@@ -194,7 +194,7 @@ class patch extends \cenozo\service\patch
           $isCommunicationStage = false !== strpos( $db_current_stage_type->name, 'Communication' );
           $isDAOStage = in_array(
             $db_current_stage_type->name,
-            ["Feasibility Review", "Data Release", "DCC Review", "Pre Data Destruction"]
+            ["Feasibility Review", "Decision Made", "Data Release", "DCC Review", "Pre Data Destruction"]
           );
 
           if(
