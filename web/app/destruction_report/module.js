@@ -74,7 +74,7 @@ cenozoApp.defineModule({
           scope: { model: "=?" },
           link: function (scope, element, attrs) {
             cnRecordView.link(scope, element, attrs);
-
+            scope.isDAO = function () { return scope.model.isRole("dao"); };
             scope.model.viewModel.afterView(function () {
               // setup the breadcrumbtrail
               CnSession.setBreadcrumbTrail([
@@ -292,14 +292,18 @@ cenozoApp.defineModule({
 
           angular.extend(this, {
             getEditEnabled: function () {
-              var stage_type = this.viewModel.record.stage_type ? this.viewModel.record.stage_type : "";
+              var stageType = this.viewModel.record.stage_type ? this.viewModel.record.stage_type : "";
               var state = this.viewModel.record.state ? this.viewModel.record.state : "";
 
-              // only edit when in the data destruction stage
-              return this.$$getEditEnabled() && "Data Destruction" == stage_type && (
-                // applicants and designates can only edit when the reqn is deferred
-                this.isRole("applicant", "designate") ? "deferred" == state : true
-              );
+              if (!this.$$getEditEnabled() || "Data Destruction" != stageType) return false;
+
+              if (this.isRole("applicant", "designate")) {
+                return "deferred" == state;
+              } else if (this.isRole("administrator", "dao")) {
+                return true;
+              }
+
+              return false;
             },
           });
         };

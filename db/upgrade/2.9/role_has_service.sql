@@ -120,8 +120,8 @@ CREATE PROCEDURE patch_role_has_service()
       "FROM ", @cenozo, ".role, service ",
       "WHERE role.name = 'dao' ",
       "AND service.subject IN( ",
-        "'data_destroy', 'data_release', 'data_version', 'deferral_note', 'destruction_report', 'notice', ",
-        "'report', 'reqn', 'review', 'review_answer', 'system_message' ",
+        "'data_destroy', 'data_release', 'data_version', 'deferral_note', 'destruction_report', 'final_report', ",
+        "'notice', 'report', 'reqn', 'reqn_version', 'review', 'review_answer', 'system_message' ",
       ") ",
       "AND service.restricted = 1"
     );

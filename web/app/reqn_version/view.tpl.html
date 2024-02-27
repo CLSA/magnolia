@@ -184,7 +184,7 @@
           <li class="list-group-item" ng-bind-html="t( 'amendment.text1' )"></li>
           <li class="list-group-item" ng-bind-html="t( 'amendment.text2' )"></li>
         </ul>
-        <form id="amendment_form" name="amendment_form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
+        <form id="amendment_form" name="amendment_form" novalidate><fieldset ng-disabled="!model.getEditEnabled() || isDAO()">
           <p class="text-primary" ng-bind-html="t( 'amendment.text3' )"></p>
           <div class="input-group spacer"
                ng-class="{'has-feedback has-error':model.viewModel.noAmendmentTypes}"
@@ -225,6 +225,7 @@
                     title: t( 'amendment.justification' ) + '<br><span class=text-info>(' +
                            model.viewModel.charCount.amendment_justification_list['amendment_justification_' + amendmentType.id] + ' ' + t( 'misc.chars' ) + ')</span>',
                     type: 'text',
+                    isConstant: isDAO,
                     maxLength: 2500
                   }"
                   difference="model.viewModel.compareRecord.differences.instructions.amendments.amendmentJustificationList.findByProperty( 'id', amendmentType.id )"
@@ -263,7 +264,7 @@
             <p class="text-primary" ng-bind-html="t( 'part1.applicant.text2' )"></p>
             <p class="text-primary" ng-bind-html="'<strong>'+t( 'misc.emailText' )+'</strong>'"></p>
             <hr/>
-            <form id="applicant_form" name="applicant_form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
+            <form id="applicant_form" name="applicant_form" novalidate><fieldset ng-disabled="!model.getEditEnabled() || isDAO()">
               <div class="form-horizontal">
                 <cn-view-input-with-differences
                   input="{
@@ -439,7 +440,7 @@
                 <span ng-show="0 == model.viewModel.record.coapplicantList.length"
                       ng-bind-html="t( 'part1.project_team.noCoapplicants' )"></span>
                 <table class="table table-striped"
-                       ng-class="{ 'table-hover': model.getEditEnabled() }"
+                       ng-class="{ 'table-hover': model.getEditEnabled() && !isDAO() }"
                        ng-show="0 < model.viewModel.record.coapplicantList.length">
                   <thead class="bg-info">
                     <tr>
@@ -449,19 +450,19 @@
                       <td ng-bind-html="t( 'part1.project_team.email' )"></td>
                       <td ng-bind-html="t( 'part1.project_team.role' )"></td>
                       <td ng-bind-html="t( 'part1.project_team.access' )"></td>
-                      <td ng-show="model.getEditEnabled()"></td>
+                      <td ng-show="model.getEditEnabled() && !isDAO()"></td>
                     </tr>
                   </thead>
                   <tbody>
                     <tr ng-repeat="coapplicant in model.viewModel.record.coapplicantList"
-                        ng-click="model.getEditEnabled() && editCoapplicant( coapplicant.id )">
+                        ng-click="model.getEditEnabled() && !isDAO() && editCoapplicant( coapplicant.id )">
                       <td>{{ coapplicant.name }}</td>
                       <td>{{ coapplicant.position }}</td>
                       <td>{{ coapplicant.affiliation }}</td>
                       <td>{{ coapplicant.email }}</td>
                       <td>{{ coapplicant.role }}</td>
                       <td>{{ coapplicant.access ? 'Yes' : 'No' }}</td>
-                      <td ng-show="model.getEditEnabled()">
+                      <td ng-show="model.getEditEnabled() && !isDAO()">
                         <button class="btn btn-xs btn-danger"
                                 ng-disabled="isDeletingCoapplicant.includes( coapplicant.id )"
                                 ng-click="removeCoapplicant( coapplicant.id ) && $event.stopPropagation()"
@@ -502,8 +503,13 @@
                 </div>
               </div>
             </div>
-            <form id="project_team_form" name="project_team_form" ng-show="model.getEditEnabled()" novalidate>
-              <fieldset ng-disabled="!model.getEditEnabled()">
+            <form
+              id="project_team_form"
+              name="project_team_form"
+              ng-show="model.getEditEnabled() && !isDAO()"
+              novalidate
+            >
+              <fieldset ng-disabled="!model.getEditEnabled() && !isDAO()">
                 <div class="form-horizontal">
                   <cn-add-input
                     input="{ key: 'name', title: t( 'part1.project_team.name' ), type: 'string' }"
@@ -564,7 +570,7 @@
               <button class="btn btn-default full-width"
                       ng-click="model.viewModel.downloadCoapplicantAgreementTemplate()"
                       ng-bind-html="t( 'part1.project_team.coapplicantAgreementButton' )"></button>
-              <fieldset ng-disabled="!liteModel.getEditEnabled()">
+              <fieldset ng-disabled="!liteModel.getEditEnabled() || isDAO()">
                 <cn-view-input-with-differences
                   input="{
                     key: 'coapplicant_agreement_filename',
@@ -585,7 +591,7 @@
             <p class="text-primary" ng-bind-html="t( 'part1.timeline.text3' )"></p>
             <p class="text-primary" ng-bind-html="t( 'part1.timeline.text4' )"></p>
             <hr/>
-            <form id="timeline_form" name="timeline_form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
+            <form id="timeline_form" name="timeline_form" novalidate><fieldset ng-disabled="!model.getEditEnabled() || isDAO()">
               <div class="form-horizontal">
                 <cn-view-input
                   input="{
@@ -631,7 +637,7 @@
             <cn-deferral-note ng-if="model.getEditEnabled()" page="description"></cn-deferral-note>
             <p class="text-primary" ng-bind-html="t( 'part1.description.text1' )"></p>
             <hr/>
-            <form id="description_form" name="description_form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
+            <form id="description_form" name="description_form" novalidate><fieldset ng-disabled="!model.getEditEnabled() || isDAO()">
               <div class="form-horizontal">
                 <cn-view-input-with-differences
                   input="{
@@ -725,7 +731,7 @@
                     key: 'justification_summary_fr',
                     title: t( 'part1.description.amendment_justification_summary' ),
                     type: 'text',
-                    isConstant: isAlwaysTrue
+                    constant: true
                   }"
                   model="model">
                 </cn-view-input>
@@ -756,16 +762,16 @@
                         <tr>
                           <td ng-bind-html="t( 'part1.description.number' )"></td>
                           <td ng-bind-html="t( 'part1.description.reference' )"></td>
-                          <td ng-show="model.getEditEnabled() && !isDescriptionConstant()"></td>
+                          <td ng-show="model.getEditEnabled() && !isDescriptionConstant() && !isDAO()"></td>
                         </tr>
                       </thead>
                       <tbody>
                         <tr ng-repeat="reference in model.viewModel.record.referenceList | orderBy: 'rank'">
                           <td>
-                            <div ng-if="!model.getEditEnabled() || isDescriptionConstant()">
+                            <div ng-if="!model.getEditEnabled() || isDescriptionConstant() || isDAO()">
                               {{ reference.rank }}
                             </div>
-                            <div class="btn-group" ng-if="model.getEditEnabled() && !isDescriptionConstant()">
+                            <div class="btn-group" ng-if="model.getEditEnabled() && !isDescriptionConstant() && !isDAO()">
                               <button class="btn btn-info dropdown-toggle" data-toggle="dropdown" type="button">
                                 {{ reference.rank }}
                               </button>
@@ -780,7 +786,7 @@
                             </div>
                           </td>
                           <td class="text-left">{{ reference.reference }}</td>
-                          <td ng-show="model.getEditEnabled() && !isDescriptionConstant()">
+                          <td ng-show="model.getEditEnabled() && !isDescriptionConstant() && !isDAO()">
                             <button class="btn btn-xs btn-danger"
                                     ng-disabled="isDeletingReference.includes( reference.id )"
                                     ng-click="removeReference( reference.id )"
@@ -813,7 +819,7 @@
                     </div>
                   </div>
                 </div>
-                <div ng-show="model.getEditEnabled() && !isDescriptionConstant()">
+                <div ng-show="model.getEditEnabled() && !isDescriptionConstant() && !isDAO()">
                   <cn-add-input
                     class="col-sm-10"
                     input="{ key: 'reference', title: t( 'part1.description.reference' ), type: 'string' }"
@@ -835,7 +841,7 @@
             <cn-deferral-note ng-if="model.getEditEnabled()" page="scientific_review"></cn-deferral-note>
             <p class="text-primary" ng-bind-html="t( 'part1.scientific_review.text' )"></p>
             <hr/>
-            <form id="scientific_review_form" name="scientific_review_form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
+            <form id="scientific_review_form" name="scientific_review_form" novalidate><fieldset ng-disabled="!model.getEditEnabled() || isDAO()">
               <div class="form-horizontal">
                 <cn-view-input-with-differences
                   input="{
@@ -847,7 +853,7 @@
                   difference="model.viewModel.compareRecord.differences.part1.scientific_review.peer_review"
                   model="model">
                 </cn-view-input-with-differences>
-                <fieldset ng-disabled="!liteModel.getEditEnabled()">
+                <fieldset ng-disabled="!liteModel.getEditEnabled() || isDAO()">
                   <cn-view-input-with-differences
                     ng-if="model.viewModel.record.peer_review"
                     input="{
@@ -889,7 +895,7 @@
                   difference="model.viewModel.compareRecord.differences.part1.scientific_review.grant_number"
                   model="model">
                 </cn-view-input-with-differences>
-                <fieldset ng-disabled="!liteModel.getEditEnabled()">
+                <fieldset ng-disabled="!liteModel.getEditEnabled() || isDAO()">
                   <cn-view-input-with-differences
                     ng-if="'yes' === model.viewModel.record.funding"
                     input="{
@@ -912,7 +918,7 @@
             <hr/>
             <form id="ethics_form" name="ethics_form" novalidate>
               <div class="form-horizontal">
-                <fieldset ng-disabled="!model.getEditEnabled()">
+                <fieldset ng-disabled="!model.getEditEnabled() || isDAO()">
                   <cn-view-input-with-differences
                     input="{
                       key: 'ethics',
@@ -946,7 +952,7 @@
                     </cn-view-input-with-differences>
                   </div>
                 </fieldset>
-                <fieldset ng-if="!model.viewModel.record.has_ethics_approval_list" ng-disabled="!liteModel.getEditEnabled()">
+                <fieldset ng-if="!model.viewModel.record.has_ethics_approval_list" ng-disabled="!liteModel.getEditEnabled() || isDAO()">
                   <cn-view-input-with-differences
                     ng-if="'yes' === model.viewModel.record.ethics || 'exempt' === model.viewModel.record.ethics"
                     input="{
@@ -990,7 +996,7 @@
                       </table>
                     </div>
                   </div>
-                  <div ng-show="model.viewModel.ethicsApprovalModel.getEditEnabled()">
+                  <div ng-show="model.viewModel.ethicsApprovalModel.getEditEnabled() && !isDAO()">
                     <button class="btn btn-primary col-sm-2 pull-right"
                             ng-disabled="isAddingEthicsApproval"
                             ng-click="addEthicsApproval()"
@@ -1035,8 +1041,8 @@
         <div ng-show="'cohort'==model.viewModel.formTab" class="panel panel-default" style="border-top-left-radius: 0px;">
           <div class="panel-body" style="padding-bottom: 0px;">
             <form ng-attr-id="cohort_form" ng-attr-name="cohort_form" novalidate>
-              <fieldset ng-disabled="!model.getEditEnabled()">
-                <cn-deferral-note ng-if="model.getEditEnabled()" page="cohort"></cn-deferral-note>
+              <cn-deferral-note ng-if="model.getEditEnabled()" page="cohort"></cn-deferral-note>
+              <fieldset ng-disabled="!model.getEditEnabled() || isDAO()">
                 <p class="text-primary" ng-bind-html="t( 'part2.cohort.text1' )"></p>
                 <div class="form-horizontal">
                   <cn-view-input-with-differences
@@ -1097,8 +1103,8 @@
         <div ng-show="'indigenous'==model.viewModel.formTab" class="panel panel-default" style="border-top-left-radius: 0px;">
           <div class="panel-body" style="padding-bottom: 0px;">
             <form ng-attr-id="indigenous_form" ng-attr-name="indigenous_form" novalidate>
-              <fieldset ng-disabled="!model.getEditEnabled()">
-                <cn-deferral-note ng-if="model.getEditEnabled()" page="indigenous"></cn-deferral-note>
+              <cn-deferral-note ng-if="model.getEditEnabled()" page="indigenous"></cn-deferral-note>
+              <fieldset ng-disabled="!model.getEditEnabled() || isDAO()">
                 <p class="text-primary" ng-bind-html="t( 'part2.indigenous.text1' )"></p>
 
                 <div class="form-horizontal">
@@ -1268,7 +1274,7 @@
                         <button ng-if="null == selection.unavailable[model.viewModel.record.lang]"
                                 class="btn full-width"
                                 ng-class="model.viewModel.record.selectionList[selection.id] ? 'btn-success' : 'btn-default'"
-                                ng-disabled="!model.getEditEnabled()"
+                                ng-disabled="!model.getEditEnabled() || isDAO()"
                                 ng-click="model.viewModel.toggleSelection( category, option, selection )">
                           <i class="glyphicon glyphicon-ok" ng-if="model.viewModel.record.selectionList[selection.id]"></i>
                           <span style="font-weight: normal"
@@ -1308,7 +1314,8 @@
                             input="{
                               key: 'data_justification_' + option.id,
                               title: 'Justification',
-                              type: 'text'
+                              type: 'text',
+                              isConstant: isDAO
                             }"
                             difference="model.viewModel.compareRecord.differences.part2[category.tabName].optionJustificationList.findByProperty( 'id', option.id )"
                             model="model">
@@ -1320,7 +1327,7 @@
                 </table>
                 <hr ng-if="'Linked Data' == category.name.en || category.comment" />
                 <div ng-if="'Linked Data' == category.name.en" class="form-horizontal">
-                  <fieldset ng-disabled="!model.getEditEnabled()">
+                  <fieldset ng-disabled="!model.getEditEnabled() || isDAO()">
                     <cn-view-input-with-differences
                       no-cols=true
                       input="{
@@ -1340,6 +1347,7 @@
                   input="{
                     key: 'comment_' + category.id,
                     title: t( 'misc.comments' ),
+                    isConstant: isDAO,
                     type: 'text'
                   }"
                   difference="model.viewModel.compareRecord.differences.part2[category.tabName].comment"
@@ -1360,7 +1368,7 @@
     <div ng-show="'agreement'==model.viewModel.getTabPart()" class="panel panel-default" ng-if="model.viewModel.showAgreement()">
       <div class="panel-body" style="padding-bottom: 0px;">
         <h4 style="margin-top: 0; margin-bottom: 1em;">Agreement Details</h4>
-        <form id="agreement_form" name="agreement_form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
+        <form id="agreement_form" name="agreement_form" novalidate><fieldset ng-disabled="!model.getEditEnabled() || isDAO()">
           <div class="form-horizontal">
             <fieldset ng-disabled="!liteModel.getEditEnabled()">
               <div class="row allow-select">

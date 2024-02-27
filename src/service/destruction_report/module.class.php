@@ -17,6 +17,24 @@ class module extends \cenozo\service\module
   /**
    * Extend parent method
    */
+  public function validate()
+  {
+    parent::validate();
+
+    if( $this->service->may_continue() && 'PATCH' == $this->get_method() )
+    {
+      // don't allow DAO to make any changes
+      if( 'dao' == lib::create( 'business\session' )->get_role()->name )
+      {
+        $this->get_status()->set_code( 403 );
+        return;
+      }
+    }
+  }
+
+  /**
+   * Extend parent method
+   */
   public function prepare_read( $select, $modifier )
   {
     parent::prepare_read( $select, $modifier );

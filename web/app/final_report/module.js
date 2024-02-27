@@ -82,9 +82,8 @@ cenozoApp.defineModule({
           scope: { model: "=?" },
           link: function (scope, element, attrs) {
             cnRecordView.link(scope, element, attrs);
-
+            scope.isDAO = function () { return scope.model.isRole("dao"); };
             scope.liteModel.viewModel.onView();
-
             scope.model.viewModel.afterView(function () {
               // setup the breadcrumbtrail
               CnSession.setBreadcrumbTrail([
@@ -473,12 +472,24 @@ cenozoApp.defineModule({
             getEditEnabled: function () {
               var phase = this.viewModel.record.phase ? this.viewModel.record.phase : "";
               var state = this.viewModel.record.state ? this.viewModel.record.state : "";
+              var stageType = this.viewModel.record.stage_type ? this.viewModel.record.stage_type : "";
 
-              // only edit when in the finalization phase
-              return this.$$getEditEnabled() && "finalization" == phase && (
-                // applicants and designates can only edit when the reqn is deferred
-                this.isRole("applicant", "designate") ? "deferred" == state : true
-              );
+              // only edit when in finalization and not a destruction stage
+              if (!this.$$getEditEnabled() || "finalization" != phase || null != stageType.match(/Destruction/)) {
+                return false;
+              }
+
+              if (this.isRole("applicant", "designate")) {
+                return "deferred" == state;
+              } else if (this.isRole("administrator")) {
+                return true;
+              } else if (this.isRole("communication")) {
+                return "Communications Review" == stageType;
+              } else if (this.isRole("dao")) {
+                return "DCC Review" == stageType;
+              }
+
+              return false;
             },
           });
         };

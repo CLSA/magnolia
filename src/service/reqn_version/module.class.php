@@ -38,6 +38,13 @@ class module extends \cenozo\service\module
 
     if( $this->service->may_continue() )
     {
+      // don't allow DAO to make any changes
+      if( 'PATCH' == $this->get_method() && 'dao' == $db_role->name )
+      {
+        $this->get_status()->set_code( 403 );
+        return;
+      }
+
       // make sure to restrict applicants to their own reqns which are not abandoned
       $db_reqn_version = $this->get_resource();
       if( !is_null( $db_reqn_version ) )

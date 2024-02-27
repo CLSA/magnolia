@@ -173,13 +173,9 @@ cenozoApp.defineModule({
                   scope.isDescriptionConstant()
                 );
               },
-              isDescriptionConstant: function () {
-                return "." != scope.model.viewModel.record.amendment;
-              },
-              isDataAgreementIncluded: function () {
-                return scope.model.isRole("administrator", "dao");
-              },
-              isAlwaysTrue: function () { return true; },
+              isDAO: function () { return scope.model.isRole("dao"); },
+              isDescriptionConstant: function () { return "." != scope.model.viewModel.record.amendment; },
+              isDataAgreementIncluded: function () { return scope.model.isRole("administrator", "dao"); },
             });
 
             scope.liteModel.viewModel.onView();
@@ -2555,40 +2551,40 @@ cenozoApp.defineModule({
             },
 
             getEditEnabled: function () {
-              var is_current_version = this.viewModel.record.is_current_version
+              var isCurrentVersion = this.viewModel.record.is_current_version
                 ? this.viewModel.record.is_current_version
                 : "";
-              var phase = this.viewModel.record.phase
-                ? this.viewModel.record.phase
-                : "";
-              var state = this.viewModel.record.state
-                ? this.viewModel.record.state
-                : "";
-              var stage_type = this.viewModel.record.stage_type
-                ? this.viewModel.record.stage_type
-                : "";
+              var phase = this.viewModel.record.phase ? this.viewModel.record.phase : "";
+              var state = this.viewModel.record.state ? this.viewModel.record.state : "";
+              var stageType = this.viewModel.record.stage_type ? this.viewModel.record.stage_type : "";
 
-              var check = false;
+              if (!this.$$getEditEnabled() || !isCurrentVersion) return false;
+
               if (this.isRole("applicant", "designate")) {
-                check = "new" == phase || (
-                  "deferred" == state && (
-                    "review" == phase || (
-                      "lite" == this.type &&
-                      "Agreement" == stage_type
+                return (
+                  "new" == phase || (
+                    "deferred" == state &&
+                    (
+                      "review" == phase ||
+                      ("lite" == this.type && "Agreement" == stageType)
                     )
                   )
                 );
               } else if (this.isRole("administrator", "typist")) {
-                check = "new" == phase || (
-                  "abandoned" != state && (
-                    "review" == phase ||
-                    "Agreement" == stage_type ||
-                    "Data Release" == stage_type
+                return (
+                  "new" == phase || (
+                    "abandoned" != state &&
+                    ("review" == phase || ["Agreement", "Data Release"].includes(stageType))
                   )
+                );
+              } else if (this.isRole("dao")) {
+                return (
+                  "abandoned" != state &&
+                  ["Feasibility Review", "Decision Made", "Data Release"].includes(stageType)
                 );
               }
 
-              return this.$$getEditEnabled() && is_current_version && check;
+              return false;
             },
 
             getDeleteEnabled: function () {

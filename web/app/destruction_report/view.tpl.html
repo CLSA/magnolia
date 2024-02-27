@@ -97,7 +97,7 @@
                 class="form-control"
                 type="text"
                 ng-click="model.viewModel.selectDataDestroyDatetime(dataDestroy)"
-                ng-disabled="!model.getEditEnabled() || dataDestroy.isPatching"
+                ng-disabled="!model.getEditEnabled() || isDAO() || dataDestroy.isPatching"
                 onkeydown="return false"
               ></input>
             </div>

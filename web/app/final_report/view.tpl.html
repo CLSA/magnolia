@@ -110,7 +110,7 @@
       <div class="panel-body">
         <cn-deferral-note ng-if="model.getEditEnabled()" page="part_1" class="bg-info">
         </cn-deferral-note>
-        <form name="part_1Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
+        <form name="part_1Form" novalidate><fieldset ng-disabled="!model.getEditEnabled() || isDAO()">
           <div class="container-fluid vertical-spacer">
             <cn-view-input-with-differences
               input="{
@@ -176,7 +176,7 @@
         <div>
           <cn-output-list simple="true"></cn-output-list>
           <button class="btn btn-primary pull-right vertical-spacer"
-                  ng-show="model.getEditEnabled()"
+                  ng-show="model.getEditEnabled() && !isDAO()"
                   ng-click="model.viewModel.addOutput()"
                   ng-bind-html="t( 'part_2.addOutput' )"></button>
         </div>
@@ -186,7 +186,7 @@
       <div class="panel-body">
         <cn-deferral-note ng-if="model.getEditEnabled()" page="part_3" class="bg-info">
         </cn-deferral-note>
-        <form name="part_3Form" novalidate><fieldset ng-disabled="!model.getEditEnabled()">
+        <form name="part_3Form" novalidate><fieldset ng-disabled="!model.getEditEnabled() || isDAO()">
           <div class="container-fluid vertical-spacer">
             <h4 ng-bind-html="t( 'part_3.a.question' )"></h4>
             <cn-view-input-with-differences
