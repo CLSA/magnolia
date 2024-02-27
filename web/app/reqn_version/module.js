@@ -576,6 +576,9 @@ cenozoApp.defineModule({
 
               await this.$$onView(force);
 
+              // used in the breadcrumb trail
+              this.record.version_name = this.record.amendment_version;
+
               // Define the earliest date that the reqn may start (based on the deadline)
               // Note that the restriction won't apply to admins or consortium reqns
               if (!this.record.legacy && "Consortium" != this.record.reqn_type) {
@@ -2477,37 +2480,31 @@ cenozoApp.defineModule({
     /* ############################################################################################## */
     cenozo.providers.factory("CnReqnVersionModelFactory", [
       "CnReqnHelper",
-      "CnBaseModelFactory",
+      "CnBaseFormModelFactory",
       "CnReqnVersionListFactory",
       "CnReqnVersionViewFactory",
-      "CnSession",
       "CnHttpFactory",
-      "$state",
       function (
         CnReqnHelper,
-        CnBaseModelFactory,
+        CnBaseFormModelFactory,
         CnReqnVersionListFactory,
         CnReqnVersionViewFactory,
-        CnSession,
-        CnHttpFactory,
-        $state
+        CnHttpFactory
       ) {
         var object = function (type) {
-          CnBaseModelFactory.construct(this, module);
-          this.type = type;
-          if ("lite" != this.type)
-            this.listModel = CnReqnVersionListFactory.instance(this);
+          CnBaseFormModelFactory.construct(
+            this,
+            "application",
+            type,
+            CnReqnVersionListFactory,
+            CnReqnVersionViewFactory,
+            module
+          );
 
           var misc = CnReqnHelper.lookupData.application.misc;
           angular.extend(this, {
-            viewModel: CnReqnVersionViewFactory.instance(
-              this,
-              "root" == this.type
-            ),
-
             // we'll need to track which amendment type changes the reqn's owner
             newUserAmendmentTypeId: null,
-            inputList: {},
             categoryList: [],
 
             getCategoryAndOption: function (optionId) {
@@ -2600,41 +2597,6 @@ cenozoApp.defineModule({
                 angular.isDefined(this.viewModel.record) &&
                 "new" == this.viewModel.record.phase
               );
-            },
-
-            setupBreadcrumbTrail: function () {
-              var trail = [];
-
-              if (this.isRole("applicant", "designate")) {
-                trail = [
-                  { title: "Requisition" },
-                  { title: this.viewModel.record.identifier },
-                ];
-              } else {
-                var self = this;
-                trail = [
-                  {
-                    title: "Requisitions",
-                    go: async function () {
-                      await $state.go("reqn.list");
-                    },
-                  },
-                  {
-                    title: this.viewModel.record.identifier,
-                    go: async function () {
-                      await $state.go("reqn.view", {
-                        identifier:
-                          "identifier=" + self.viewModel.record.identifier,
-                      });
-                    },
-                  },
-                  {
-                    title: "version " + this.viewModel.record.amendment_version,
-                  },
-                ];
-              }
-
-              CnSession.setBreadcrumbTrail(trail);
             },
 
             getMetadata: async function () {
@@ -3175,11 +3137,6 @@ cenozoApp.defineModule({
               }
             },
           });
-
-          // make the input lists from all groups more accessible
-          module.inputGroupList.forEach((group) =>
-            Object.assign(this.inputList, group.inputList)
-          );
         };
 
         return {

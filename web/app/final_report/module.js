@@ -207,6 +207,10 @@ cenozoApp.defineModule({
               this.compareRecord = null;
 
               await this.$$onView(force);
+
+              // used in the breadcrumb trail
+              this.record.version_name = this.record.version;
+
               if ("lite" != this.parentModel.type) {
                 this.updateOutputListLanguage(this.record.lang);
                 await this.getVersionList();
@@ -426,30 +430,27 @@ cenozoApp.defineModule({
 
     /* ############################################################################################## */
     cenozo.providers.factory("CnFinalReportModelFactory", [
-      "CnBaseModelFactory",
+      "CnBaseFormModelFactory",
       "CnFinalReportListFactory",
       "CnFinalReportViewFactory",
       "CnReqnHelper",
-      "CnSession",
-      "$state",
       function (
-        CnBaseModelFactory,
+        CnBaseFormModelFactory,
         CnFinalReportListFactory,
         CnFinalReportViewFactory,
-        CnReqnHelper,
-        CnSession,
-        $state
+        CnReqnHelper
       ) {
         var object = function (type) {
-          CnBaseModelFactory.construct(this, module);
-          this.type = type;
-          if ("lite" != this.type)
-            this.listModel = CnFinalReportListFactory.instance(this);
+          CnBaseFormModelFactory.construct(
+            this,
+            "finalReport",
+            type,
+            CnFinalReportListFactory,
+            CnFinalReportViewFactory,
+            module
+          );
 
           angular.extend(this, {
-            viewModel: CnFinalReportViewFactory.instance(this, "root" == this.type),
-            inputList: {},
-
             getMetadata: async function() {
               await this.$$getMetadata();
 
@@ -479,41 +480,7 @@ cenozoApp.defineModule({
                 this.isRole("applicant", "designate") ? "deferred" == state : true
               );
             },
-
-            setupBreadcrumbTrail: function () {
-              var trail = [];
-
-              if (this.isRole("applicant", "designate")) {
-                trail = [
-                  { title: "Final Report" },
-                  { title: this.viewModel.record.identifier },
-                ];
-              } else {
-                trail = [
-                  {
-                    title: "Requisitions",
-                    go: async () => { await $state.go("reqn.list"); },
-                  },
-                  {
-                    title: this.viewModel.record.identifier,
-                    go: async () => {
-                      await $state.go("reqn.view", { identifier: "identifier=" + this.viewModel.record.identifier });
-                    },
-                  },
-                  {
-                    title: "Final Report version " + this.viewModel.record.version,
-                  },
-                ];
-              }
-
-              CnSession.setBreadcrumbTrail(trail);
-            },
           });
-
-          // make the input lists from all groups more accessible
-          module.inputGroupList.forEach((group) =>
-            Object.assign(this.inputList, group.inputList)
-          );
         };
 
         return {

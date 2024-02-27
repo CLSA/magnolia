@@ -78,7 +78,6 @@ cenozo.factory("CnBaseFormViewFactory", [
         object.baseOnView = object.$$onView;
 
         angular.extend(object, {
-
           translate: function (value) {
             return this.record.lang ? CnReqnHelper.translate(formType, value, this.record.lang) : ""
           },
@@ -175,7 +174,7 @@ cenozo.factory("CnBaseFormViewFactory", [
             if ("lite" != this.parentModel.type) {
               // setup the form's deferral notes
               let deferralObject = {};
-              
+
               // remove the current form-type from the form list
               this.formList = [
                 { name: "application", title: "application" },
@@ -286,6 +285,70 @@ cenozo.factory("CnBaseFormViewFactory", [
       },
     };
   },
+]);
+
+/* ############################################################################################## */
+cenozo.factory("CnBaseFormModelFactory", [
+  "CnBaseModelFactory",
+  "CnSession",
+  "$state",
+  function (CnBaseModelFactory, CnSession, $state){
+    return {
+      construct: function (object, formType, type, listFactory, viewFactory, module) {
+        // formType: application, finalReport, destructionReport
+        CnBaseModelFactory.construct(object, module);
+
+        object.type = type;
+        if ("lite" != object.type) object.listModel = listFactory.instance(object);
+
+        angular.extend(object, {
+          viewModel: viewFactory.instance(object, "root" == object.type),
+
+          inputList: {},
+
+          setupBreadcrumbTrail: function () {
+            var trail = [];
+
+            if (this.isRole("applicant", "designate")) {
+              trail = [
+                { title: this.module.name.singular.ucWords() },
+                { title: this.viewModel.record.identifier },
+              ];
+            } else {
+              var self = this;
+              trail = [
+                {
+                  title: this.module.name.plural.ucWords(),
+                  go: async function () { await $state.go("reqn.list"); },
+                },
+                {
+                  title: this.viewModel.record.identifier,
+                  go: async function () {
+                    await $state.go(
+                      "reqn.view",
+                      { identifier: "identifier=" + self.viewModel.record.identifier }
+                    );
+                  },
+                },
+                {
+                  title:
+                    this.module.name.singular.ucWords() +
+                    " version " + this.viewModel.record.version_name,
+                },
+              ];
+            }
+
+            CnSession.setBreadcrumbTrail(trail);
+          },
+        });
+
+        // make the input lists from all groups more accessible
+        module.inputGroupList.forEach((group) =>
+          Object.assign(object.inputList, group.inputList)
+        );
+      },
+    };
+  }
 ]);
 
 /* ############################################################################################## */
@@ -651,7 +714,7 @@ cenozo.service("CnReqnHelper", [
               "Agreement",
             ].includes(stageType) &&
             (
-              "administrator" == role || 
+              "administrator" == role ||
               ("dao" == role && isDAOStage)
             )
           );
