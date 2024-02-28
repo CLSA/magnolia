@@ -121,13 +121,28 @@ CREATE PROCEDURE patch_role_has_service()
       "WHERE role.name = 'dao' ",
       "AND service.subject IN( ",
         "'data_destroy', 'data_release', 'data_version', 'deferral_note', 'destruction_report', 'final_report', ",
-        "'notice', 'report', 'reqn', 'reqn_version', 'review', 'review_answer', 'system_message' ",
+        "'notice', 'report', 'reqn_version', 'review', 'review_answer' ",
       ") ",
       "AND service.restricted = 1"
     );
     PREPARE statement FROM @sql;
     EXECUTE statement;
     DEALLOCATE PREPARE statement;
+
+    -- only allow DAOs to patch the reqn service
+    SET @sql = CONCAT(
+      "INSERT IGNORE INTO role_has_service( role_id, service_id ) ",
+      "SELECT role.id, service.id ",
+      "FROM ", @cenozo, ".role, service ",
+      "WHERE role.name = 'dao' ",
+      "AND service.subject = 'reqn' ",
+      "AND service.method = 'PATCH' ",
+      "AND service.restricted = 1"
+    );
+    PREPARE statement FROM @sql;
+    EXECUTE statement;
+    DEALLOCATE PREPARE statement;
+
 
   END //
 DELIMITER ;

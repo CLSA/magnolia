@@ -196,7 +196,7 @@ class ui extends \cenozo\ui\ui
       $this->remove_listitem( 'Requisitions' );
     }
 
-    if( 'administrator' != $db_role->name ) $this->remove_listitem( 'Users' );
+    if( !in_array($db_role->name, ['administrator', 'dao'] ) ) $this->remove_listitem( 'Users' );
     if( in_array( $db_role->name, ['administrator', 'dao'] ) )
     {
       $this->add_listitem( 'Data Categories', 'data_category' );
@@ -221,7 +221,7 @@ class ui extends \cenozo\ui\ui
     if( array_key_exists( 'Participant Search', $list ) ) unset( $list['Participant Search'] );
     if( array_key_exists( 'Tracing', $list ) ) unset( $list['Tracing'] );
 
-    if( 'administrator' == $db_role->name ) $list['Manage CANUE Approvals'] = array(
+    if( in_array( $db_role->name, ['administrator', 'dao'] ) ) $list['Manage CANUE Approvals'] = array(
       'subject' => 'reqn',
       'action' => 'data_sharing'
     );
