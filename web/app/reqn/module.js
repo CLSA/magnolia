@@ -973,9 +973,7 @@ cenozoApp.defineModule({
               );
             },
             translate: async function (value) {
-              (await this.record.lang)
-                ? CnReqnHelper.translate("reqn", value, this.record.lang)
-                : "";
+              this.record.lang ? CnReqnHelper.translate("application", value, this.record.lang) : "";
             },
             downloadApplication: async function () {
               await CnReqnHelper.download(

@@ -107,7 +107,7 @@ cenozoApp.defineModule({
                     },
                     t: function (value) {
                       return CnReqnHelper.translate(
-                        "reqn",
+                        "application",
                         value,
                         self.language
                       );
