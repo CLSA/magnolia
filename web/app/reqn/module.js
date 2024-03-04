@@ -972,9 +972,6 @@ cenozoApp.defineModule({
                 this.record.lang
               );
             },
-            translate: async function (value) {
-              this.record.lang ? CnReqnHelper.translate("application", value, this.record.lang) : "";
-            },
             downloadApplication: async function () {
               await CnReqnHelper.download(
                 "application",
@@ -1650,7 +1647,6 @@ cenozoApp.defineModule({
 
               CnModalNoticeListFactory.instance({
                 title: "Notice List",
-                closeText: this.translate("misc.close"),
                 noticeList: response.data,
               }).printMessage();
             },

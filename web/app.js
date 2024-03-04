@@ -361,7 +361,6 @@ cenozo.service("CnModalNoticeListFactory", [
     var object = function (params) {
       angular.extend(this, {
         title: "Title",
-        closeText: "Close",
         noticeList: [],
       });
       angular.extend(this, params);
