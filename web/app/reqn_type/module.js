@@ -25,6 +25,10 @@ cenozoApp.defineModule({
         stage_type_list: {
           title: "Stage Types",
         },
+        description: {
+          title: "Description",
+          align: "left",
+        },
       },
       defaultOrder: {
         column: "name",
@@ -42,6 +46,10 @@ cenozoApp.defineModule({
         title: "Available",
         type: "boolean",
         help: "Determines whether this type is available to applicants when creating new requisitions.",
+      },
+      description: {
+        title: "Description",
+        type: "text",
       },
     });
   },
