@@ -736,11 +736,7 @@ cenozo.service("CnReqnHelper", [
         var message = "";
         if (amendment) {
           if (["applicant", "designate"].includes(CnSession.role.name)) {
-            message = this.translate(
-              "reqn",
-              "misc.abandonAmendmentWarning",
-              language
-            );
+            message = this.translate("application", "misc.abandonAmendmentWarning", language);
           } else {
             message =
               "Are you sure you want to abandon the amendment?" +
@@ -748,7 +744,7 @@ cenozo.service("CnReqnHelper", [
           }
         } else {
           if (["applicant", "designate"].includes(CnSession.role.name)) {
-            message = this.translate("reqn", "misc.abandonWarning", language);
+            message = this.translate("application", "misc.abandonWarning", language);
           } else {
             message =
               "Are you sure you wish to abandon the requisition?" +
@@ -758,13 +754,13 @@ cenozo.service("CnReqnHelper", [
         }
         var response = await CnModalConfirmFactory.instance({
           title: ["applicant", "designate"].includes(CnSession.role.name)
-            ? this.translate("reqn", "misc.pleaseConfirm", language)
+            ? this.translate("application", "misc.pleaseConfirm", language)
             : "Please Confirm",
           noText: ["applicant", "designate"].includes(CnSession.role.name)
-            ? this.translate("reqn", "misc.no", language)
+            ? this.translate("application", "misc.no", language)
             : "No",
           yesText: ["applicant", "designate"].includes(CnSession.role.name)
-            ? this.translate("reqn", "misc.yes", language)
+            ? this.translate("application", "misc.yes", language)
             : "Yes",
           message: message,
         }).show();
@@ -782,15 +778,15 @@ cenozo.service("CnReqnHelper", [
       delete: async function (reqnIdentifier, language) {
         var response = await CnModalConfirmFactory.instance({
           title: ["applicant", "designate"].includes(CnSession.role.name)
-            ? this.translate("reqn", "misc.pleaseConfirm", language)
+            ? this.translate("application", "misc.pleaseConfirm", language)
             : "Please Confirm",
           noText: ["applicant", "designate"].includes(CnSession.role.name)
-            ? this.translate("reqn", "misc.no", language)
+            ? this.translate("application", "misc.no", language)
             : "No",
           yesText: ["applicant", "designate"].includes(CnSession.role.name)
-            ? this.translate("reqn", "misc.yes", language)
+            ? this.translate("application", "misc.yes", language)
             : "Yes",
-          message: this.translate("reqn", "misc.deleteWarning", language),
+          message: this.translate("application", "misc.deleteWarning", language),
         }).show();
 
         if (response) {
