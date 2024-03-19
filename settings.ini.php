@@ -48,9 +48,6 @@ $SETTINGS['path']['INSTRUCTION_FILE'] = str_replace( 'settings.ini.php', 'doc/da
 // the location of requisition output sources (defaults to magnolia/doc/output_source)
 $SETTINGS['path']['OUTPUT_SOURCE'] = str_replace( 'settings.ini.php', 'doc/output_source', __FILE__ );
 
-// the location of supplemental files (defaults to magnolia/doc/supplemental)
-$SETTINGS['path']['SUPPLEMENTAL_FILE'] = str_replace( 'settings.ini.php', 'doc/supplemental', __FILE__ );
-
 // the location of packaged data (defaults to mangolia/doc/packaged_data)
 $SETTINGS['path']['PACKAGED_DATA'] = str_replace( 'settings.ini.php', 'doc/packaged_data', __FILE__ );
 
