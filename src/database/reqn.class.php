@@ -1413,20 +1413,14 @@ class reqn extends \cenozo\database\record
       foreach( $supplemental_file_class_name::select_objects() as $db_supplemental_file )
       {
         $name = sprintf( 'name_%s', $lang );
-        $filename = $db_supplemental_file->get_filename( $lang );
-        $link = sprintf( '%s/%s', $web_path, $db_supplemental_file->$name );
-
-        if( is_file( $filename ) && !is_file( $link ) )
+        $file = base64_decode( $db_supplemental_file->data_en );
+        $filename = sprintf( '%s/%s', $web_path, $db_supplemental_file->$name );
+        if( false === file_put_contents( $filename, $file ) )
         {
-          $result = symlink( $filename, $link );
-          if( !$result )
-          {
-            throw lib::create( 'exception\runtime', sprintf(
-              'Unable to create link to "%s" named "%s".',
-              $link,
-              $filename
-            ), __METHOD__ );
-          }
+          throw lib::create( 'exception\runtime', sprintf(
+            'Unable to write supplemental file "%s".',
+            $filename
+          ), __METHOD__ );
         }
       }
     }
