@@ -984,6 +984,7 @@ cenozo.service("CnReqnHelper", [
               name: { en: "Name", fr: "Nom" },
               position: { en: "Position", fr: "Poste" },
               affiliation: { en: "Institution", fr: "Établissement" },
+              country: { en: "Country", fr: "Pays" },
               email: { en: "E-mail", fr: "Courriel" },
               role: { en: "Role", fr: "Rôle" },
               access: {
@@ -1382,6 +1383,10 @@ cenozo.service("CnReqnHelper", [
             confirmNoCoapplicants: {
               en: "Are you sure that you wish to submit the application without including any co-applicants?\n\nIf you wish to add co-applicants to the project team, then please click \"No\" so that you may provide them before submitting your application.  Otherwise, clicking \"Yes\" will submit your application without any co-applicants.",
               fr: "Souhaitez-vous soumettre la demande sans aucun co-demandeur ou co-demandeuse? Si vous souhaitez ajouter des co-demandeurs ou co-demandeuses à l’équipe de projet, veuillez cliquer sur « Non » afin de pouvoir les ajouter avant de soumettre la demande. Sinon, cliquez sur « Oui » pour soumettre la demande sans co-demandeur ou co-demandeuse.",
+            },
+            missingCoapplicantCountryMessage: {
+              en: "You must include the country of all co-applicants.",
+              fr: "You must include the country of all co-applicants.", // TODO: TRANSLATE
             },
             submit: { en: "Submit", fr: "Soumettre" },
             submitTitle: {

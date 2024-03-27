@@ -20,6 +20,7 @@ cenozoApp.defineModule({
       name: { title: "Name", type: "string" },
       position: { title: "Position", type: "string" },
       affiliation: { title: "Affiliation", type: "string" },
+      country_id: { title: "Country", type: "lookup-typeahead", typeahead: { table: "country" } },
       email: { title: "E-mail", type: "string", format: "email" },
       role: { title: "Role", type: "string" },
       access: { title: "Access", type: "boolean", type: "boolean" },

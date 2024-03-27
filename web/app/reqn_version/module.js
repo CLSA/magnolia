@@ -258,6 +258,7 @@ cenozoApp.defineModule({
             // coapplicant resources
             var coapplicantAddModel = $scope.model.viewModel.coapplicantModel.addModel;
             $scope.coapplicantRecord = {};
+            $scope.coapplicantFormattedRecord = {};
             coapplicantAddModel.onNew($scope.coapplicantRecord);
 
             $scope.getHeading = function () {
@@ -1112,7 +1113,7 @@ cenozoApp.defineModule({
                               differences[part][tab][property].push({ name: c1.name, diff: "added" });
                             } else {
                               if (
-                                ["position", "affiliation", "email", "role", "access"].some((p) => c1[p] != c2[p])
+                                ["position", "affiliation", "country", "email", "role", "access"].some((p) => c1[p] != c2[p])
                               ) {
                                 // reqnVersion1 has coapplicant which is different than compared reqnVersion2
                                 differences.diff = true;
@@ -1398,7 +1399,7 @@ cenozoApp.defineModule({
             setCoapplicantDiff: function (version) {
               if (null != version) {
                 // see if there is a difference between this list and the view's list
-                let columns = ["name", "position", "affiliation", "email", "role", "access"];
+                let columns = ["name", "position", "affiliation", "country", "email", "role", "access"];
                 version.coapplicantDiff =
                   version.coapplicantList.length != this.record.coapplicantList.length ||
                   version.coapplicantList.some(
@@ -1532,7 +1533,11 @@ cenozoApp.defineModule({
               var response = await CnHttpFactory.instance({
                 path: basePath + "/coapplicant",
                 data: {
-                  select: { column: ["id", "name", "position", "affiliation", "email", "role", "access"] },
+                  select: { column: [
+                    "id", "name", "position", "affiliation",
+                    { table: "country", column: "name", alias: "country" },
+                    "email", "role", "access"
+                  ] },
                   modifier: { order: "id", limit: 1000 },
                 },
               }).query();
@@ -2172,8 +2177,7 @@ cenozoApp.defineModule({
                   comprehensiveElement.$error.required = false;
 
                   // go to the cohort tab and don't proceed
-                  this.setFormTab(0, "part2", false);
-                  await this.setFormTab(2, "cohort");
+                  this.setFormTab("cohort");
                   return;
                 }
 
@@ -2300,22 +2304,28 @@ cenozoApp.defineModule({
                       message: this.translate("misc.missingReferencesMessage"),
                       error: true,
                     }).show();
-                    this.setFormTab(0, "part1", false);
-                    await this.setFormTab(1, "d");
+                    this.setFormTab("description");
                     return; // don't proceed if there are no references
-                  } else if("." == this.record.amendment) {
+                  } else if("." == this.record.amendment && 'New' == this.record.stage_type) {
                     // When moving to the admin stage for the first time show warning if no coapplicants
-                    if ('New' == this.record.stage_type) {
-                      if (0 == this.record.coapplicantList.length) {
-                        var response = await CnModalConfirmFactory.instance({
-                          title: this.translate("misc.pleaseConfirm"),
-                          noText: this.translate("misc.no"),
-                          yesText: this.translate("misc.yes"),
-                          message: this.translate("misc.confirmNoCoapplicants"),
-                        }).show();
-                        
-                        if (!response) return; // don't proceed if there are no coapplicants in a new reqn
-                      }
+                    if (0 == this.record.coapplicantList.length) {
+                      var response = await CnModalConfirmFactory.instance({
+                        title: this.translate("misc.pleaseConfirm"),
+                        noText: this.translate("misc.no"),
+                        yesText: this.translate("misc.yes"),
+                        message: this.translate("misc.confirmNoCoapplicants"),
+                      }).show();
+                      
+                      if (!response) return; // don't proceed if there are no coapplicants in a new reqn
+                    } else if (0 < this.record.coapplicantList.filter(c => null == c.country).length) {
+                      // all co-applicants must have a country
+                      await CnModalMessageFactory.instance({
+                        title: this.translate("misc.missingFieldTitle"),
+                        message: this.translate("misc.missingCoapplicantCountryMessage"),
+                        error: true,
+                      }).show();
+                      this.setFormTab("project_team");
+                      return; // don't proceed if a co-applicant is missing the country field
                     }
                   }
                 }
@@ -2339,8 +2349,7 @@ cenozoApp.defineModule({
                         var element = cenozo.getFormElement("start_date");
                         element.$error.custom = this.translate("misc.invalidStartDateTitle");
                         cenozo.updateFormElement(element, true);
-                        this.setFormTab(0, "part1", false);
-                        await this.setFormTab(1, "c");
+                        this.setFormTab("timeline");
                       } else CnModalMessageFactory.httpError(error);
                     },
                   }).patch();

@@ -165,11 +165,16 @@ cenozoApp.defineModule({
           isIncluded: function ($state, model) {
             return "data_sharing" == model.getActionFromState();
           },
-          highlight: false, // highlight any unapproved reqns
+          // highlight: false, // highlight any unapproved reqns
         },
         non_payment: {
           type: "hidden",
           caution: true, // caution any reqn flagged for non-payment
+        },
+        country_is_flagged: {
+          type: "hidden",
+          highlight: true,
+          caution: true,
         },
         reqn_version_id: {
           column: "reqn_version.id",

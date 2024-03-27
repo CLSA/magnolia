@@ -1876,6 +1876,7 @@ class reqn extends \cenozo\database\record
     if( !$modifier->has_join( 'coapplicant' ) )
     {
       $modifier->left_join( 'coapplicant', 'reqn_version.id', 'coapplicant.reqn_version_id' );
+      $modifier->left_join( 'country', 'coapplicant.country_id', 'coapplicant_country.id', 'coapplicant_country' );
       $modifier->group( 'reqn.id' );
     }
 
@@ -1931,6 +1932,7 @@ class reqn extends \cenozo\database\record
     $modifier->or_where( 'coapplicant.affiliation', 'RLIKE', $search );
     $modifier->or_where( 'coapplicant.email', 'RLIKE', $search );
     $modifier->or_where( 'coapplicant.role', 'RLIKE', $search );
+    $modifier->or_where( 'coapplicant_country.name', 'RLIKE', $search );
 
     $modifier->where_bracket( false );
   }

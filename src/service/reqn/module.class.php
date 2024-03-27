@@ -130,6 +130,57 @@ class module extends \cenozo\service\module
     if( $select->has_column( 'has_data_sharing_filename' ) )
       $select->add_column( '( reqn_version.data_sharing_filename IS NOT NULL )', 'has_data_sharing_filename', false, 'boolean' );
 
+    if( $select->has_column( 'country_is_flagged' ) )
+    {
+      // get a list of restricted country IDs
+      $country_id_list = [];
+      $country_sel = lib::create( 'database\select' );
+      $country_sel->from( 'country' );
+      $country_sel->add_column( 'id' );
+      $country_mod = lib::create( 'database\modifier' );
+      $country_mod->where( 'name', 'IN', ['China', 'Iran', 'Russia'] );
+      $country_id_list = $stage_type_class_name::db()->get_col( sprintf(
+        '%s %s',
+        $country_sel->get_sql(),
+        $country_mod->get_sql()
+      ) );
+      $flagged_country = sprintf( '(%s)', join( ',', $country_id_list ) );
+
+      // create a temporary table of reqns with coapplicants in the restricted country list
+      $coapplicant_sel = lib::create( 'database\select' );
+      $coapplicant_sel->from( 'reqn_version' );
+      $coapplicant_sel->add_column( 'id', 'reqn_version_id' );
+      $coapplicant_sel->add_column(
+        sprintf( 'IF( COUNT( IF( country_id IN %s, 1, NULL ) ), 1, 0 )', $flagged_country ),
+        'flagged',
+        false
+      );
+      $coapplicant_mod = lib::create( 'database\modifier' );
+      $coapplicant_mod->left_join( 'coapplicant', 'reqn_version.id', 'coapplicant.reqn_version_id' );
+      $coapplicant_mod->group( 'reqn_version.id' );
+
+      $stage_type_class_name::db()->execute( sprintf(
+        'CREATE TEMPORARY TABLE coapplicant_flagged %s %s',
+        $coapplicant_sel->get_sql(),
+        $coapplicant_mod->get_sql()
+      ) );
+
+      $stage_type_class_name::db()->execute(
+        'ALTER TABLE coapplicant_flagged ADD UNIQUE KEY uq_reqn_version_id (reqn_version_id)'
+      );
+
+      $modifier->join( 'coapplicant_flagged', 'reqn_version.id', 'coapplicant_flagged.reqn_version_id' );
+      $select->add_column(
+        sprintf(
+          'IF( coapplicant_flagged.flagged OR applicant_country_id IN %s OR trainee_country_id IN %s, 1, 0 )',
+          $flagged_country,
+          $flagged_country
+        ),
+        'country_is_flagged',
+        false
+      );
+    }
+
     if( $select->has_column( 'state_days' ) )
       $select->add_column( 'DATEDIFF( NOW(), state_date )', 'state_days', false, 'integer' );
 
