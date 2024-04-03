@@ -38,7 +38,7 @@ class module extends \cenozo\service\module
       else if( $db_user->id == $db_reqn->trainee_user_id ) $user_type = 'trainee';
       else if( $db_user->id == $db_reqn->designate_user_id )$user_type = 'designate';
 
-      if( !is_null( $user_type ) ) $db_reqn->mark_notices_as_read( 'primary' );
+      if( !is_null( $user_type ) ) $db_reqn->mark_notices_as_read( $user_type );
     }
 
     if( $select->has_column( 'viewed_by_user' ) )
