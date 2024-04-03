@@ -165,7 +165,7 @@ cenozoApp.defineModule({
           isIncluded: function ($state, model) {
             return "data_sharing" == model.getActionFromState();
           },
-          // highlight: false, // highlight any unapproved reqns
+          highlight: false, // highlight any unapproved reqns
         },
         non_payment: {
           type: "hidden",
