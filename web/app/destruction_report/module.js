@@ -55,13 +55,13 @@ cenozoApp.defineModule({
       "CnDestructionReportModelFactory",
       "cnRecordViewDirective",
       "CnReqnModelFactory",
-      "CnReqnHelper",
+      "CnLocalization",
       "CnSession",
       function (
         CnDestructionReportModelFactory,
         cnRecordViewDirective,
         CnReqnModelFactory,
-        CnReqnHelper,
+        CnLocalization,
         CnSession
       ) {
         // used to piggy-back on the basic view controller's functionality
@@ -114,8 +114,11 @@ cenozoApp.defineModule({
             if (angular.isUndefined($scope.model)) $scope.model = CnDestructionReportModelFactory.root;
             cnRecordView.controller[1]($scope);
             $scope.t = function (value) {
-              return $scope.model.viewModel.record.lang ?
-                CnReqnHelper.translate("destructionReport", value, $scope.model.viewModel.record.lang) : "";
+              return CnLocalization.translate(
+                "destructionReport",
+                value,
+                $scope.model.viewModel.record.lang
+              );
             };
 
             $scope.getHeading = function () {
@@ -273,12 +276,10 @@ cenozoApp.defineModule({
       "CnBaseFormModelFactory",
       "CnDestructionReportListFactory",
       "CnDestructionReportViewFactory",
-      "CnReqnHelper",
       function (
         CnBaseFormModelFactory,
         CnDestructionReportListFactory,
-        CnDestructionReportViewFactory,
-        CnReqnHelper
+        CnDestructionReportViewFactory
       ) {
         var object = function (type) {
           CnBaseFormModelFactory.construct(

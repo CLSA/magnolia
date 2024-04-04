@@ -51,8 +51,8 @@ cenozoApp.defineModule({
     /* ############################################################################################## */
     cenozo.providers.factory("CnOutputTypeViewFactory", [
       "CnBaseViewFactory",
-      "CnReqnHelper",
-      function (CnBaseViewFactory, CnReqnHelper) {
+      "CnLocalization",
+      function (CnBaseViewFactory, CnLocalization) {
         var object = function (parentModel, root) {
           CnBaseViewFactory.construct(this, parentModel, root);
 
@@ -64,32 +64,13 @@ cenozoApp.defineModule({
 
             updateOutputListLanguage: function () {
               var columnList = cenozoApp.module("output").columnList;
-              columnList.output_type_en.isIncluded = function ($state, model) {
-                return true;
-              };
-              columnList.output_type_fr.isIncluded = function ($state, model) {
-                return false;
-              };
-              columnList.output_type_en.title = CnReqnHelper.translate(
-                "output",
-                "output_type",
-                "en"
-              );
-              columnList.output_type_fr.title = CnReqnHelper.translate(
-                "output",
-                "output_type",
-                "fr"
-              );
-              columnList.detail.title = CnReqnHelper.translate(
-                "output",
-                "detail",
-                "en"
-              );
-              columnList.output_source_count.title = CnReqnHelper.translate(
-                "output",
-                "output_source_count",
-                "en"
-              );
+              columnList.output_type_en.isIncluded = function ($state, model) { return true; };
+              columnList.output_type_fr.isIncluded = function ($state, model) { return false; };
+              columnList.output_type_en.title = CnLocalization.translate("output", "output_type", "en");
+              columnList.output_type_fr.title = CnLocalization.translate("output", "output_type", "fr");
+              columnList.detail.title = CnLocalization.translate("output", "detail", "en");
+              columnList.output_source_count.title =
+                CnLocalization.translate("output", "output_source_count", "en");
             },
           });
         };

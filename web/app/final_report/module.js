@@ -63,13 +63,13 @@ cenozoApp.defineModule({
       "CnFinalReportModelFactory",
       "cnRecordViewDirective",
       "CnReqnModelFactory",
-      "CnReqnHelper",
+      "CnLocalization",
       "CnSession",
       function (
         CnFinalReportModelFactory,
         cnRecordViewDirective,
         CnReqnModelFactory,
-        CnReqnHelper,
+        CnLocalization,
         CnSession
       ) {
         // used to piggy-back on the basic view controller's functionality
@@ -128,10 +128,7 @@ cenozoApp.defineModule({
             if (angular.isUndefined($scope.liteModel)) $scope.liteModel = CnFinalReportModelFactory.lite;
             cnRecordView.controller[1]($scope);
             $scope.t = function (value) {
-              return (
-                $scope.model.viewModel.record.lang ?
-                  CnReqnHelper.translate("finalReport", value, $scope.model.viewModel.record.lang) : ""
-              );
+              return CnLocalization.translate("finalReport", value, $scope.model.viewModel.record.lang);
             };
 
             $scope.getHeading = function () {
@@ -167,7 +164,7 @@ cenozoApp.defineModule({
     cenozo.providers.factory("CnFinalReportViewFactory", [
       "CnBaseFormViewFactory",
       "CnOutputModelFactory",
-      "CnReqnHelper",
+      "CnLocalization",
       "CnHttpFactory",
       "CnModalMessageFactory",
       "CnModalConfirmFactory",
@@ -176,7 +173,7 @@ cenozoApp.defineModule({
       function (
         CnBaseFormViewFactory,
         CnOutputModelFactory,
-        CnReqnHelper,
+        CnLocalization,
         CnHttpFactory,
         CnModalMessageFactory,
         CnModalConfirmFactory,
@@ -220,10 +217,10 @@ cenozoApp.defineModule({
               var columnList = cenozoApp.module("output").columnList;
               columnList.output_type_en.isIncluded = function ($state, model) { return "en" == lang; };
               columnList.output_type_fr.isIncluded = function ($state, model) { return "fr" == lang; };
-              columnList.output_type_en.title = CnReqnHelper.translate("output", "output_type", "en");
-              columnList.output_type_fr.title = CnReqnHelper.translate("output", "output_type", "fr");
-              columnList.detail.title = CnReqnHelper.translate("output", "detail", lang);
-              columnList.output_source_count.title = CnReqnHelper.translate("output", "output_source_count", lang);
+              columnList.output_type_en.title = CnLocalization.translate("output", "output_type", "en");
+              columnList.output_type_fr.title = CnLocalization.translate("output", "output_type", "fr");
+              columnList.detail.title = CnLocalization.translate("output", "detail", lang);
+              columnList.output_source_count.title = CnLocalization.translate("output", "output_source_count", lang);
             },
 
             // setup language and tab state parameters
@@ -432,12 +429,12 @@ cenozoApp.defineModule({
       "CnBaseFormModelFactory",
       "CnFinalReportListFactory",
       "CnFinalReportViewFactory",
-      "CnReqnHelper",
+      "CnLocalization",
       function (
         CnBaseFormModelFactory,
         CnFinalReportListFactory,
         CnFinalReportViewFactory,
-        CnReqnHelper
+        CnLocalization
       ) {
         var object = function (type) {
           CnBaseFormModelFactory.construct(
@@ -454,7 +451,7 @@ cenozoApp.defineModule({
               await this.$$getMetadata();
 
               // create generic yes/no enum
-              const misc = CnReqnHelper.lookupData.finalReport.misc;
+              const misc = CnLocalization.lookupData.finalReport.misc;
               this.metadata.yesNoEnumList = {
                 en: [
                   { value: "", name: misc.choose.en },

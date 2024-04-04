@@ -60,11 +60,13 @@ cenozo.directive("cnDeferralNote", function () {
 /* ############################################################################################## */
 cenozo.factory("CnBaseFormViewFactory", [
   "CnBaseViewFactory",
+  "CnLocalization",
   "CnReqnHelper",
   "CnHttpFactory",
   "$state",
   function (
     CnBaseViewFactory,
+    CnLocalization,
     CnReqnHelper,
     CnHttpFactory,
     $state
@@ -79,7 +81,7 @@ cenozo.factory("CnBaseFormViewFactory", [
 
         angular.extend(object, {
           translate: function (value) {
-            return this.record.lang ? CnReqnHelper.translate(formType, value, this.record.lang) : ""
+            return CnLocalization.translate(formType, value, this.record.lang);
           },
 
           show: function (subject) {
@@ -590,13 +592,19 @@ cenozo.service("CnModalUploadAgreementFactory", [
 
 /* ############################################################################################## */
 cenozo.service("CnReqnHelper", [
+  "CnLocalization",
   "CnSession",
   "CnHttpFactory",
   "CnModalConfirmFactory",
   "$state",
-  function (CnSession, CnHttpFactory, CnModalConfirmFactory, $state) {
+  function (CnLocalization, CnSession, CnHttpFactory, CnModalConfirmFactory, $state) {
     var object = {
       promise: null,
+
+      translate: function (address, language) {
+        // always use the application subject
+        return CnLocalization.translate("application", address, language);
+      },
 
       showAction: function (subject, record) {
         let role = CnSession.role.name;
@@ -736,7 +744,7 @@ cenozo.service("CnReqnHelper", [
         var message = "";
         if (amendment) {
           if (["applicant", "designate"].includes(CnSession.role.name)) {
-            message = this.translate("application", "misc.abandonAmendmentWarning", language);
+            message = this.translate("misc.abandonAmendmentWarning", language);
           } else {
             message =
               "Are you sure you want to abandon the amendment?" +
@@ -744,7 +752,7 @@ cenozo.service("CnReqnHelper", [
           }
         } else {
           if (["applicant", "designate"].includes(CnSession.role.name)) {
-            message = this.translate("application", "misc.abandonWarning", language);
+            message = this.translate("misc.abandonWarning", language);
           } else {
             message =
               "Are you sure you wish to abandon the requisition?" +
@@ -754,13 +762,13 @@ cenozo.service("CnReqnHelper", [
         }
         var response = await CnModalConfirmFactory.instance({
           title: ["applicant", "designate"].includes(CnSession.role.name)
-            ? this.translate("application", "misc.pleaseConfirm", language)
+            ? this.translate("misc.pleaseConfirm", language)
             : "Please Confirm",
           noText: ["applicant", "designate"].includes(CnSession.role.name)
-            ? this.translate("application", "misc.no", language)
+            ? this.translate("misc.no", language)
             : "No",
           yesText: ["applicant", "designate"].includes(CnSession.role.name)
-            ? this.translate("application", "misc.yes", language)
+            ? this.translate("misc.yes", language)
             : "Yes",
           message: message,
         }).show();
@@ -778,15 +786,15 @@ cenozo.service("CnReqnHelper", [
       delete: async function (reqnIdentifier, language) {
         var response = await CnModalConfirmFactory.instance({
           title: ["applicant", "designate"].includes(CnSession.role.name)
-            ? this.translate("application", "misc.pleaseConfirm", language)
+            ? this.translate("misc.pleaseConfirm", language)
             : "Please Confirm",
           noText: ["applicant", "designate"].includes(CnSession.role.name)
-            ? this.translate("application", "misc.no", language)
+            ? this.translate("misc.no", language)
             : "No",
           yesText: ["applicant", "designate"].includes(CnSession.role.name)
-            ? this.translate("application", "misc.yes", language)
+            ? this.translate("misc.yes", language)
             : "Yes",
-          message: this.translate("application", "misc.deleteWarning", language),
+          message: this.translate("misc.deleteWarning", language),
         }).show();
 
         if (response) {
@@ -814,8 +822,21 @@ cenozo.service("CnReqnHelper", [
         };
         await CnHttpFactory.instance(http).file();
       },
+    };
 
+    return object;
+  },
+]);
+
+/* ############################################################################################## */
+cenozo.service("CnLocalization", [
+  "CnHttpFactory",
+  function (CnHttpFactory) {
+    var object = {
       translate: function (subject, address, language) {
+        // return an empty string if the language isn't valid
+        if (!["en", "fr"].includes(language)) return "";
+
         var addressParts = address.split(".");
 
         function get(array, index) {

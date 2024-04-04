@@ -46,12 +46,12 @@ cenozoApp.defineModule({
       "CnOutputSourceModelFactory",
       "CnModalMessageFactory",
       "CnHttpFactory",
-      "CnReqnHelper",
+      "CnLocalization",
       function (
         CnOutputSourceModelFactory,
         CnModalMessageFactory,
         CnHttpFactory,
-        CnReqnHelper
+        CnLocalization
       ) {
         return {
           templateUrl: module.getFileUrl("add.tpl.html"),
@@ -70,15 +70,7 @@ cenozoApp.defineModule({
               if ("final_report" == origin) {
                 var response = await CnHttpFactory.instance({
                   path: "output/" + parent.identifier,
-                  data: {
-                    select: {
-                      column: {
-                        table: "language",
-                        column: "code",
-                        alias: "lang",
-                      },
-                    },
-                  },
+                  data: { select: { column: { table: "language", column: "code", alias: "lang" } } },
                 }).get();
                 lang = response.data.lang;
               }
@@ -86,10 +78,10 @@ cenozoApp.defineModule({
               cnRecordAddScope.baseSaveFn = cnRecordAddScope.save;
               angular.extend(cnRecordAddScope, {
                 getCancelText: function () {
-                  return CnReqnHelper.translate("output", "cancel", lang);
+                  return CnLocalization.translate("output", "cancel", lang);
                 },
                 getSaveText: function () {
-                  return CnReqnHelper.translate("output", "save", lang);
+                  return CnLocalization.translate("output", "save", lang);
                 },
                 save: function () {
                   if (
@@ -97,16 +89,8 @@ cenozoApp.defineModule({
                     angular.isUndefined(cnRecordAddScope.record.url)
                   ) {
                     CnModalMessageFactory.instance({
-                      title: CnReqnHelper.translate(
-                        "output",
-                        "newOutputSourceTitle",
-                        lang
-                      ),
-                      message: CnReqnHelper.translate(
-                        "output",
-                        "newOutputSourceMessage",
-                        lang
-                      ),
+                      title: CnLocalization.translate("output", "newOutputSourceTitle", lang),
+                      message: CnLocalization.translate("output", "newOutputSourceMessage", lang),
                       error: true,
                     }).show();
                   } else cnRecordAddScope.baseSaveFn();
@@ -122,11 +106,11 @@ cenozoApp.defineModule({
     cenozo.providers.directive("cnOutputSourceView", [
       "CnOutputSourceModelFactory",
       "CnModalMessageFactory",
-      "CnReqnHelper",
+      "CnLocalization",
       function (
         CnOutputSourceModelFactory,
         CnModalMessageFactory,
-        CnReqnHelper
+        CnLocalization
       ) {
         return {
           templateUrl: module.getFileUrl("view.tpl.html"),
@@ -143,22 +127,14 @@ cenozoApp.defineModule({
               cnRecordViewScope.basePatchFn = cnRecordViewScope.patch;
               angular.extend(cnRecordViewScope, {
                 getDeleteText: function () {
-                  return "final_report" == origin
-                    ? CnReqnHelper.translate(
-                        "output",
-                        "delete",
-                        $scope.model.viewModel.record.lang
-                      )
-                    : "Delete";
+                  return "final_report" == origin ?
+                    CnLocalization.translate("output", "delete", $scope.model.viewModel.record.lang) :
+                    "Delete";
                 },
                 getViewText: function (subject) {
-                  return "final_report" == origin
-                    ? CnReqnHelper.translate(
-                        "output",
-                        "viewOutput",
-                        $scope.model.viewModel.record.lang
-                      )
-                    : "View " + cnRecordViewScope.parentName(subject);
+                  return "final_report" == origin ?
+                    CnLocalization.translate("output", "viewOutput", $scope.model.viewModel.record.lang) :
+                    "View " + cnRecordViewScope.parentName(subject);
                 },
                 patch: function () {
                   if (
@@ -201,8 +177,8 @@ cenozoApp.defineModule({
     cenozo.providers.factory("CnOutputSourceAddFactory", [
       "CnBaseAddFactory",
       "CnHttpFactory",
-      "CnReqnHelper",
-      function (CnBaseAddFactory, CnHttpFactory, CnReqnHelper) {
+      "CnLocalization",
+      function (CnBaseAddFactory, CnHttpFactory, CnLocalization) {
         var object = function (parentModel) {
           CnBaseAddFactory.construct(this, parentModel);
           this.configureFileInput("filename");
@@ -216,26 +192,14 @@ cenozoApp.defineModule({
               if (angular.isDefined(parent.identifier)) {
                 var response = await CnHttpFactory.instance({
                   path: "output/" + parent.identifier,
-                  data: {
-                    select: {
-                      column: {
-                        table: "language",
-                        column: "code",
-                        alias: "lang",
-                      },
-                    },
-                  },
+                  data: { select: { column: { table: "language", column: "code", alias: "lang" } } },
                 }).get();
                 lang = response.data.lang;
               }
             }
 
             this.parentModel.updateLanguage(lang);
-            this.heading = CnReqnHelper.translate(
-              "output",
-              "createOutputSource",
-              lang
-            );
+            this.heading = CnLocalization.translate("output", "createOutputSource", lang);
           };
         };
         return {
@@ -249,8 +213,8 @@ cenozoApp.defineModule({
     /* ############################################################################################## */
     cenozo.providers.factory("CnOutputSourceViewFactory", [
       "CnBaseViewFactory",
-      "CnReqnHelper",
-      function (CnBaseViewFactory, CnReqnHelper) {
+      "CnLocalization",
+      function (CnBaseViewFactory, CnLocalization) {
         var object = function (parentModel, root) {
           CnBaseViewFactory.construct(this, parentModel, root);
           this.configureFileInput("filename");
@@ -261,11 +225,7 @@ cenozoApp.defineModule({
             var origin = this.parentModel.getQueryParameter("origin", true);
             var lang = "final_report" == origin ? this.record.lang : "en";
             this.parentModel.updateLanguage(lang);
-            this.heading = CnReqnHelper.translate(
-              "output",
-              "outputSourceDetails",
-              lang
-            );
+            this.heading = CnLocalization.translate("output", "outputSourceDetails", lang);
           };
         };
         return {
@@ -283,7 +243,7 @@ cenozoApp.defineModule({
       "CnOutputSourceListFactory",
       "CnOutputSourceViewFactory",
       "CnSession",
-      "CnReqnHelper",
+      "CnLocalization",
       "$state",
       function (
         CnBaseModelFactory,
@@ -291,7 +251,7 @@ cenozoApp.defineModule({
         CnOutputSourceListFactory,
         CnOutputSourceViewFactory,
         CnSession,
-        CnReqnHelper,
+        CnLocalization,
         $state
       ) {
         var object = function (root) {
@@ -322,20 +282,9 @@ cenozoApp.defineModule({
             },
 
             updateLanguage: function (lang) {
-              var group = this.module.inputGroupList.findByProperty(
-                "title",
-                ""
-              );
-              group.inputList.filename.title = CnReqnHelper.translate(
-                "output",
-                "filename",
-                lang
-              );
-              group.inputList.url.title = CnReqnHelper.translate(
-                "output",
-                "url",
-                lang
-              );
+              var group = this.module.inputGroupList.findByProperty("title", "");
+              group.inputList.filename.title = CnLocalization.translate("output", "filename", lang);
+              group.inputList.url.title = CnLocalization.translate("output", "url", lang);
             },
 
             setupBreadcrumbTrail: function () {
@@ -349,10 +298,7 @@ cenozoApp.defineModule({
                   "Output"
                 );
                 CnSession.breadcrumbTrail[index + 1].go = async function () {
-                  await $state.go("output.view", {
-                    identifier: parent.identifier,
-                    origin: origin,
-                  });
+                  await $state.go("output.view", { identifier: parent.identifier, origin: origin });
                 };
                 delete CnSession.breadcrumbTrail[index].go;
               }

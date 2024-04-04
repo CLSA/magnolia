@@ -39,12 +39,12 @@ cenozoApp.defineModule({
     /* ############################################################################################## */
     cenozo.providers.service("CnEthicsApprovalModalAddFactory", [
       "CnHttpFactory",
-      "CnReqnHelper",
+      "CnLocalization",
       "CnModalDatetimeFactory",
       "$uibModal",
       function (
         CnHttpFactory,
-        CnReqnHelper,
+        CnLocalization,
         CnModalDatetimeFactory,
         $uibModal
       ) {
@@ -106,11 +106,7 @@ cenozoApp.defineModule({
                       if (response) $scope.date = response.replace(/T.*/, "");
                     },
                     t: function (value) {
-                      return CnReqnHelper.translate(
-                        "application",
-                        value,
-                        self.language
-                      );
+                      return CnLocalization.translate("application", value, self.language);
                     },
                     ok: function () {
                       $uibModalInstance.close({

@@ -468,6 +468,7 @@ cenozoApp.defineModule({
     /* ############################################################################################## */
     cenozo.providers.factory("CnReqnVersionViewFactory", [
       "CnReqnHelper",
+      "CnLocalization",
       "CnModalNoticeListFactory",
       "CnModalUploadAgreementFactory",
       "CnModalRecordViewFactory",
@@ -485,6 +486,7 @@ cenozoApp.defineModule({
       "$rootScope",
       function (
         CnReqnHelper,
+        CnLocalization,
         CnModalNoticeListFactory,
         CnModalUploadAgreementFactory,
         CnModalRecordViewFactory,
@@ -845,13 +847,9 @@ cenozoApp.defineModule({
                 // determine the base cost based on country (assume the base country if none is provided)
                 var baseCountryId = CnSession.application.baseCountryId;
                 var applicantCountryId =
-                  null == this.record.applicant_country_id
-                    ? baseCountryId
-                    : this.record.applicant_country_id;
+                  null == this.record.applicant_country_id ? baseCountryId : this.record.applicant_country_id;
                 var traineeCountryId =
-                  null == this.record.trainee_country_id
-                    ? baseCountryId
-                    : this.record.trainee_country_id;
+                  null == this.record.trainee_country_id ? baseCountryId : this.record.trainee_country_id;
 
                 // cost for trainees is different to applicants
                 var international = false;
@@ -1177,7 +1175,7 @@ cenozoApp.defineModule({
                                       name:
                                         option.name.en +
                                         " [" +
-                                        CnReqnHelper.lookupData.application.misc
+                                        CnLocalization.lookupData.application.misc
                                           .studyPhase[selection.studyPhaseCode]
                                           .en +
                                         "]",
@@ -1668,14 +1666,7 @@ cenozoApp.defineModule({
                   path: basePath + "/data_selection",
                   data: {
                     select: {
-                      column: [
-                        "data_option_id",
-                        {
-                          table: "study_phase",
-                          column: "code",
-                          alias: "phase",
-                        },
-                      ],
+                      column: [ "data_option_id", { table: "study_phase", column: "code", alias: "phase" } ],
                     },
                   },
                 }).query(),
@@ -2484,13 +2475,13 @@ cenozoApp.defineModule({
 
     /* ############################################################################################## */
     cenozo.providers.factory("CnReqnVersionModelFactory", [
-      "CnReqnHelper",
+      "CnLocalization",
       "CnBaseFormModelFactory",
       "CnReqnVersionListFactory",
       "CnReqnVersionViewFactory",
       "CnHttpFactory",
       function (
-        CnReqnHelper,
+        CnLocalization,
         CnBaseFormModelFactory,
         CnReqnVersionListFactory,
         CnReqnVersionViewFactory,
@@ -2506,7 +2497,7 @@ cenozoApp.defineModule({
             module
           );
 
-          var misc = CnReqnHelper.lookupData.application.misc;
+          var misc = CnLocalization.lookupData.application.misc;
           angular.extend(this, {
             // we'll need to track which amendment type changes the reqn's owner
             newUserAmendmentTypeId: null,
@@ -2548,11 +2539,7 @@ cenozoApp.defineModule({
                         "agreement_filename",
                         { table: "reqn", column: "state" },
                         { table: "stage_type", column: "phase" },
-                        {
-                          table: "stage_type",
-                          column: "name",
-                          alias: "stage_type",
-                        },
+                        { table: "stage_type", column: "name", alias: "stage_type" },
                       ],
                     },
                   }
@@ -2573,10 +2560,7 @@ cenozoApp.defineModule({
                 return (
                   "new" == phase || (
                     "deferred" == state &&
-                    (
-                      "review" == phase ||
-                      ("lite" == this.type && "Agreement" == stageType)
-                    )
+                    ("review" == phase || ("lite" == this.type && "Agreement" == stageType))
                   )
                 );
               } else if (this.isRole("administrator", "typist")) {
@@ -2675,16 +2659,8 @@ cenozoApp.defineModule({
                           "cost_combined",
                           "unavailable_en",
                           "unavailable_fr",
-                          {
-                            table: "study_phase",
-                            column: "code",
-                            alias: "study_phase_code",
-                          },
-                          {
-                            table: "data_category",
-                            column: "id",
-                            alias: "data_category_id",
-                          },
+                          { table: "study_phase", column: "code", alias: "study_phase_code" },
+                          { table: "data_category", column: "id", alias: "data_category_id" },
                         ],
                       },
                       modifier: {
@@ -2709,24 +2685,12 @@ cenozoApp.defineModule({
                           "name_fr",
                           "note_en",
                           "note_fr",
-                          {
-                            table: "data_category",
-                            column: "id",
-                            alias: "data_category_id",
-                          },
-                          {
-                            table: "data_option",
-                            column: "id",
-                            alias: "data_option_id",
-                          },
+                          { table: "data_category", column: "id", alias: "data_category_id" },
+                          { table: "data_option", column: "id", alias: "data_option_id" },
                         ],
                       },
                       modifier: {
-                        order: [
-                          "data_option.id",
-                          "study_phase.rank",
-                          "data_detail.rank",
-                        ],
+                        order: ["data_option.id", "study_phase.rank", "data_detail.rank"],
                         limit: 1000,
                       },
                     },
@@ -2768,10 +2732,7 @@ cenozoApp.defineModule({
                   // parse out the enum values
                   columnList[column].enumList = [];
                   cenozo.parseEnumList(columnList[column]).forEach((item) => {
-                    columnList[column].enumList.push({
-                      value: item,
-                      name: item,
-                    });
+                    columnList[column].enumList.push({ value: item, name: item });
                   });
                 }
                 if (angular.isUndefined(this.metadata.columnList[column]))
@@ -2847,66 +2808,30 @@ cenozoApp.defineModule({
                 this.metadata.columnList.duration.amendment2EnumList = {
                   en: [
                     { value: "2 years", name: misc.duration2Years.en },
-                    {
-                      value: "2 years + 1 additional year",
-                      name: misc.duration2p1Years.en,
-                    },
-                    {
-                      value: "2 years + 2 additional years",
-                      name: misc.duration2p2Years.en,
-                    },
-                    {
-                      value: "2 years + 3 additional years",
-                      name: misc.duration2p3Years.en,
-                    },
+                    { value: "2 years + 1 additional year", name: misc.duration2p1Years.en },
+                    { value: "2 years + 2 additional years", name: misc.duration2p2Years.en },
+                    { value: "2 years + 3 additional years", name: misc.duration2p3Years.en },
                   ],
                   fr: [
                     { value: "2 years", name: misc.duration2Years.fr },
-                    {
-                      value: "2 years + 1 additional year",
-                      name: misc.duration2p1Years.fr,
-                    },
-                    {
-                      value: "2 years + 2 additional years",
-                      name: misc.duration2p2Years.fr,
-                    },
-                    {
-                      value: "2 years + 3 additional years",
-                      name: misc.duration2p3Years.fr,
-                    },
+                    { value: "2 years + 1 additional year", name: misc.duration2p1Years.fr },
+                    { value: "2 years + 2 additional years", name: misc.duration2p2Years.fr },
+                    { value: "2 years + 3 additional years", name: misc.duration2p3Years.fr },
                   ],
                 };
 
                 this.metadata.columnList.duration.amendment3EnumList = {
                   en: [
                     { value: "3 years", name: misc.duration3Years.en },
-                    {
-                      value: "3 years + 1 additional year",
-                      name: misc.duration3p1Years.en,
-                    },
-                    {
-                      value: "3 years + 2 additional years",
-                      name: misc.duration3p2Years.en,
-                    },
-                    {
-                      value: "3 years + 3 additional years",
-                      name: misc.duration3p3Years.en,
-                    },
+                    { value: "3 years + 1 additional year", name: misc.duration3p1Years.en },
+                    { value: "3 years + 2 additional years", name: misc.duration3p2Years.en },
+                    { value: "3 years + 3 additional years", name: misc.duration3p3Years.en },
                   ],
                   fr: [
                     { value: "3 years", name: misc.duration3Years.fr },
-                    {
-                      value: "3 years + 1 additional year",
-                      name: misc.duration3p1Years.fr,
-                    },
-                    {
-                      value: "3 years + 2 additional years",
-                      name: misc.duration3p2Years.fr,
-                    },
-                    {
-                      value: "3 years + 3 additional years",
-                      name: misc.duration3p3Years.fr,
-                    },
+                    { value: "3 years + 1 additional year", name: misc.duration3p1Years.fr },
+                    { value: "3 years + 2 additional years", name: misc.duration3p2Years.fr },
+                    { value: "3 years + 3 additional years", name: misc.duration3p3Years.fr },
                   ],
                 };
 
@@ -2915,73 +2840,41 @@ cenozoApp.defineModule({
                   en: this.metadata.columnList.funding.enumList,
                   fr: angular.copy(this.metadata.columnList.funding.enumList),
                 };
-                this.metadata.columnList.funding.enumList.fr[0].name =
-                  misc.yes.fr.toLowerCase();
-                this.metadata.columnList.funding.enumList.fr[1].name =
-                  misc.no.fr.toLowerCase();
-                this.metadata.columnList.funding.enumList.fr[2].name =
-                  misc.requested.fr.toLowerCase();
+                this.metadata.columnList.funding.enumList.fr[0].name = misc.yes.fr.toLowerCase();
+                this.metadata.columnList.funding.enumList.fr[1].name = misc.no.fr.toLowerCase();
+                this.metadata.columnList.funding.enumList.fr[2].name = misc.requested.fr.toLowerCase();
 
-                this.metadata.columnList.funding.enumList.en.unshift({
-                  value: "",
-                  name: misc.choose.en,
-                });
-                this.metadata.columnList.funding.enumList.fr.unshift({
-                  value: "",
-                  name: misc.choose.fr,
-                });
+                this.metadata.columnList.funding.enumList.en.unshift({ value: "", name: misc.choose.en });
+                this.metadata.columnList.funding.enumList.fr.unshift({ value: "", name: misc.choose.fr });
 
                 // translate ethics enum
                 this.metadata.columnList.ethics.enumList = {
                   en: this.metadata.columnList.ethics.enumList,
                   fr: angular.copy(this.metadata.columnList.ethics.enumList),
                 };
-                this.metadata.columnList.ethics.enumList.fr[0].name =
-                  misc.yes.fr.toLowerCase();
-                this.metadata.columnList.ethics.enumList.fr[1].name =
-                  misc.no.fr.toLowerCase();
-                this.metadata.columnList.ethics.enumList.fr[2].name =
-                  misc.exempt.fr.toLowerCase();
+                this.metadata.columnList.ethics.enumList.fr[0].name = misc.yes.fr.toLowerCase();
+                this.metadata.columnList.ethics.enumList.fr[1].name = misc.no.fr.toLowerCase();
+                this.metadata.columnList.ethics.enumList.fr[2].name = misc.exempt.fr.toLowerCase();
 
-                this.metadata.columnList.ethics.enumList.en.unshift({
-                  value: "",
-                  name: misc.choose.en,
-                });
-                this.metadata.columnList.ethics.enumList.fr.unshift({
-                  value: "",
-                  name: misc.choose.fr,
-                });
+                this.metadata.columnList.ethics.enumList.en.unshift({ value: "", name: misc.choose.en });
+                this.metadata.columnList.ethics.enumList.fr.unshift({ value: "", name: misc.choose.fr });
 
                 // translate waiver enum
                 this.metadata.columnList.waiver.enumList = {
                   en: this.metadata.columnList.waiver.enumList,
                   fr: angular.copy(this.metadata.columnList.waiver.enumList),
                 };
-                this.metadata.columnList.waiver.enumList.en[0].name =
-                  misc.traineeFeeWaiver.en;
-                this.metadata.columnList.waiver.enumList.en[1].name =
-                  misc.postdocFeeWaiver.en;
-                this.metadata.columnList.waiver.enumList.en[2].name =
-                  misc.clinicalFeeWaiver.en;
-                this.metadata.columnList.waiver.enumList.en[3].name =
-                  misc.none.en;
-                this.metadata.columnList.waiver.enumList.fr[0].name =
-                  misc.traineeFeeWaiver.fr;
-                this.metadata.columnList.waiver.enumList.fr[1].name =
-                  misc.postdocFeeWaiver.fr;
-                this.metadata.columnList.waiver.enumList.fr[2].name =
-                  misc.clinicalFeeWaiver.fr;
-                this.metadata.columnList.waiver.enumList.fr[3].name =
-                  misc.none.fr;
+                this.metadata.columnList.waiver.enumList.en[0].name = misc.traineeFeeWaiver.en;
+                this.metadata.columnList.waiver.enumList.en[1].name = misc.postdocFeeWaiver.en;
+                this.metadata.columnList.waiver.enumList.en[2].name = misc.clinicalFeeWaiver.en;
+                this.metadata.columnList.waiver.enumList.en[3].name = misc.none.en;
+                this.metadata.columnList.waiver.enumList.fr[0].name = misc.traineeFeeWaiver.fr;
+                this.metadata.columnList.waiver.enumList.fr[1].name = misc.postdocFeeWaiver.fr;
+                this.metadata.columnList.waiver.enumList.fr[2].name = misc.clinicalFeeWaiver.fr;
+                this.metadata.columnList.waiver.enumList.fr[3].name = misc.none.fr;
 
-                this.metadata.columnList.waiver.enumList.en.unshift({
-                  value: "",
-                  name: misc.choose.en,
-                });
-                this.metadata.columnList.waiver.enumList.fr.unshift({
-                  value: "",
-                  name: misc.choose.fr,
-                });
+                this.metadata.columnList.waiver.enumList.en.unshift({ value: "", name: misc.choose.en });
+                this.metadata.columnList.waiver.enumList.fr.unshift({ value: "", name: misc.choose.fr });
               }
 
               // only do the following for the root instance
@@ -2989,9 +2882,7 @@ cenozoApp.defineModule({
                 // build the categories
                 this.categoryList = categoryResponse.data;
                 this.categoryList.forEach((category) => {
-                  var studyPhaseList = category.study_phase_list
-                    .split(";")
-                    .map((str) => str.split("`"));
+                  var studyPhaseList = category.study_phase_list.split(";").map((str) => str.split("`"));
 
                   angular.extend(category, {
                     studyPhaseList: studyPhaseList.reduce((list, item) => {
@@ -3016,14 +2907,8 @@ cenozoApp.defineModule({
                 // add options to all categories
                 var category = null;
                 optionResponse.data.forEach((option) => {
-                  if (
-                    null == category ||
-                    option.data_category_id != category.id
-                  )
-                    category = this.categoryList.findByProperty(
-                      "id",
-                      option.data_category_id
-                    );
+                  if (null == category || option.data_category_id != category.id)
+                    category = this.categoryList.findByProperty("id", option.data_category_id);
 
                   angular.extend(option, {
                     name: { en: option.name_en, fr: option.name_fr },
@@ -3045,29 +2930,16 @@ cenozoApp.defineModule({
                 var category = null;
                 var option = null;
                 selectionResponse.data.forEach((selection) => {
-                  if (
-                    null == category ||
-                    selection.data_category_id != category.id
-                  )
-                    category = this.categoryList.findByProperty(
-                      "id",
-                      selection.data_category_id
-                    );
+                  if (null == category || selection.data_category_id != category.id)
+                    category = this.categoryList.findByProperty("id", selection.data_category_id);
                   if (null == option || selection.data_option_id != option.id)
-                    option = category.optionList.findByProperty(
-                      "id",
-                      selection.data_option_id
-                    );
+                    option = category.optionList.findByProperty("id", selection.data_option_id);
 
                   angular.extend(selection, {
                     studyPhaseCode: selection.study_phase_code,
                     unavailable: {
-                      en: angular.isDefined(selection.unavailable_en)
-                        ? selection.unavailable_en
-                        : null,
-                      fr: angular.isDefined(selection.unavailable_fr)
-                        ? selection.unavailable_fr
-                        : null,
+                      en: angular.isDefined(selection.unavailable_en) ? selection.unavailable_en : null,
+                      fr: angular.isDefined(selection.unavailable_fr) ? selection.unavailable_fr : null,
                     },
                     detailList: [],
                     cost: {
@@ -3094,27 +2966,12 @@ cenozoApp.defineModule({
                 var option = null;
                 var selection = null;
                 detailResponse.data.forEach((detail) => {
-                  if (
-                    null == category ||
-                    detail.data_category_id != category.id
-                  )
-                    category = this.categoryList.findByProperty(
-                      "id",
-                      detail.data_category_id
-                    );
+                  if (null == category || detail.data_category_id != category.id)
+                    category = this.categoryList.findByProperty("id", detail.data_category_id);
                   if (null == option || detail.data_option_id != option.id)
-                    option = category.optionList.findByProperty(
-                      "id",
-                      detail.data_option_id
-                    );
-                  if (
-                    null == selection ||
-                    detail.data_selection_id != selection.id
-                  )
-                    var selection = option.selectionList.findByProperty(
-                      "id",
-                      detail.data_selection_id
-                    );
+                    option = category.optionList.findByProperty("id", detail.data_option_id);
+                  if (null == selection || detail.data_selection_id != selection.id)
+                    var selection = option.selectionList.findByProperty("id", detail.data_selection_id);
 
                   angular.extend(detail, {
                     name: { en: detail.name_en, fr: detail.name_fr },

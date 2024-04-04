@@ -165,8 +165,8 @@ cenozoApp.defineModule({
     cenozo.providers.directive("cnOutputAdd", [
       "CnOutputModelFactory",
       "CnHttpFactory",
-      "CnReqnHelper",
-      function (CnOutputModelFactory, CnHttpFactory, CnReqnHelper) {
+      "CnLocalization",
+      function (CnOutputModelFactory, CnHttpFactory, CnLocalization) {
         return {
           templateUrl: module.getFileUrl("add.tpl.html"),
           restrict: "E",
@@ -217,11 +217,11 @@ cenozoApp.defineModule({
                 },
 
                 getCancelText: function () {
-                  return CnReqnHelper.translate("output", "cancel", lang);
+                  return CnLocalization.translate("output", "cancel", lang);
                 },
 
                 getSaveText: function () {
-                  return CnReqnHelper.translate("output", "save", lang);
+                  return CnLocalization.translate("output", "save", lang);
                 },
 
                 check: function (property) {
@@ -261,8 +261,8 @@ cenozoApp.defineModule({
     /* ############################################################################################## */
     cenozo.providers.directive("cnOutputView", [
       "CnOutputModelFactory",
-      "CnReqnHelper",
-      function (CnOutputModelFactory, CnReqnHelper) {
+      "CnLocalization",
+      function (CnOutputModelFactory, CnLocalization) {
         return {
           templateUrl: module.getFileUrl("view.tpl.html"),
           restrict: "E",
@@ -287,7 +287,7 @@ cenozoApp.defineModule({
                 },
                 getDeleteText: function () {
                   return "final_report" == origin
-                    ? CnReqnHelper.translate(
+                    ? CnLocalization.translate(
                         "output",
                         "delete",
                         $scope.model.viewModel.record.lang
@@ -296,7 +296,7 @@ cenozoApp.defineModule({
                 },
                 getViewText: function (subject) {
                   return "final_report" == subject && "final_report" == origin
-                    ? CnReqnHelper.translate(
+                    ? CnLocalization.translate(
                         "output",
                         "viewFinalReport",
                         $scope.model.viewModel.record.lang
@@ -319,12 +319,10 @@ cenozoApp.defineModule({
               var origin = $scope.model.getQueryParameter("origin", true);
               angular.extend(cnRecordListScope, {
                 getAddText: function () {
-                  return CnReqnHelper.translate(
+                  return CnLocalization.translate(
                     "output",
                     "add",
-                    "final_report" == origin
-                      ? $scope.model.viewModel.record.lang
-                      : "en"
+                    "final_report" == origin ? $scope.model.viewModel.record.lang : "en"
                   );
                 },
               });
@@ -338,8 +336,8 @@ cenozoApp.defineModule({
     cenozo.providers.factory("CnOutputAddFactory", [
       "CnBaseAddFactory",
       "CnHttpFactory",
-      "CnReqnHelper",
-      function (CnBaseAddFactory, CnHttpFactory, CnReqnHelper) {
+      "CnLocalization",
+      function (CnBaseAddFactory, CnHttpFactory, CnLocalization) {
         var object = function (parentModel) {
           CnBaseAddFactory.construct(this, parentModel);
           this.configureFileInput("filename");
@@ -368,11 +366,7 @@ cenozoApp.defineModule({
             }
 
             await this.parentModel.updateLanguage(lang);
-            this.heading = CnReqnHelper.translate(
-              "output",
-              "createOutput",
-              lang
-            );
+            this.heading = CnLocalization.translate("output", "createOutput", lang);
           };
         };
         return {
@@ -413,8 +407,8 @@ cenozoApp.defineModule({
     cenozo.providers.factory("CnOutputViewFactory", [
       "CnBaseViewFactory",
       "CnReqnModelFactory",
-      "CnReqnHelper",
-      function (CnBaseViewFactory, CnReqnModelFactory, CnReqnHelper) {
+      "CnLocalization",
+      function (CnBaseViewFactory, CnReqnModelFactory, CnLocalization) {
         var object = function (parentModel, root) {
           CnBaseViewFactory.construct(this, parentModel, root);
 
@@ -425,16 +419,8 @@ cenozoApp.defineModule({
 
             updateOutputSourceListLanguage: function (lang) {
               var columnList = cenozoApp.module("output_source").columnList;
-              columnList.filename.title = CnReqnHelper.translate(
-                "output",
-                "filename",
-                lang
-              );
-              columnList.url.title = CnReqnHelper.translate(
-                "output",
-                "url",
-                lang
-              );
+              columnList.filename.title = CnLocalization.translate("output", "filename", lang);
+              columnList.url.title = CnLocalization.translate("output", "url", lang);
             },
 
             onView: async function (force) {
@@ -443,16 +429,9 @@ cenozoApp.defineModule({
               var lang = "final_report" == origin ? this.record.lang : "en";
               await this.parentModel.updateLanguage(lang);
               this.updateOutputSourceListLanguage(lang);
-              this.outputSourceModel.listModel.heading = CnReqnHelper.translate(
-                "output",
-                "outputSourceListHeading",
-                lang
-              );
-              this.heading = CnReqnHelper.translate(
-                "output",
-                "outputDetails",
-                lang
-              );
+              this.outputSourceModel.listModel.heading =
+                CnLocalization.translate("output", "outputSourceListHeading", lang);
+              this.heading = CnLocalization.translate("output", "outputDetails", lang);
             },
           });
         };
@@ -472,7 +451,7 @@ cenozoApp.defineModule({
       "CnOutputViewFactory",
       "CnSession",
       "CnHttpFactory",
-      "CnReqnHelper",
+      "CnLocalization",
       "$state",
       function (
         CnBaseModelFactory,
@@ -481,7 +460,7 @@ cenozoApp.defineModule({
         CnOutputViewFactory,
         CnSession,
         CnHttpFactory,
-        CnReqnHelper,
+        CnLocalization,
         $state
       ) {
         var object = function (root) {
@@ -497,16 +476,17 @@ cenozoApp.defineModule({
 
             updateLanguage: async function (lang) {
               var group = this.module.inputGroupList.findByProperty( "title", "" );
-              group.inputList.output_type_id.title = CnReqnHelper.translate( "output", "output_type", lang );
-              group.inputList.detail.title = CnReqnHelper.translate( "output", "detail", lang );
+              group.inputList.output_type_id.title = CnLocalization.translate( "output", "output_type", lang );
+              group.inputList.detail.title = CnLocalization.translate( "output", "detail", lang );
 
               var group = this.module.inputGroupList.findByProperty( "title", "Sources" );
 
-              group.inputList.filename.title = CnReqnHelper.translate( "output", "filename", lang );
-              group.inputList.url.title = CnReqnHelper.translate( "output", "url", lang );
+              group.inputList.filename.title = CnLocalization.translate( "output", "filename", lang );
+              group.inputList.url.title = CnLocalization.translate( "output", "url", lang );
               for (let n=1; n<=10; n++) {
                 const columnName = "filename" + n;
-                group.inputList[columnName].title = CnReqnHelper.translate( "output", "filename", lang ) + " " + n;
+                group.inputList[columnName].title =
+                  CnLocalization.translate( "output", "filename", lang ) + " " + n;
               }
 
               await this.metadata.getPromise();
