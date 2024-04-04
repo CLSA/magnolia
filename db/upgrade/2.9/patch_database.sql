@@ -43,6 +43,26 @@ SOURCE application_type_has_report_type.sql
 SOURCE role_has_report_type.sql
 SOURCE report_restriction.sql
 
+SOURCE manuscript.sql
+SOURCE manuscript_attachment.sql
+SOURCE manuscript_deferral_note.sql
+SOURCE manuscript_stage_type.sql
+SOURCE manuscript_stage_type_has_manuscript_stage_type.sql
+SOURCE manuscript_stage.sql
+SOURCE manuscript_version.sql
+SOURCE manuscript_current_manuscript_version.sql
+SOURCE manuscript_recommendation_type.sql
+SOURCE manuscript_review_type.sql
+SOURCE manuscript_notification.sql
+SOURCE manuscript_notification_email.sql
+SOURCE manuscript_notice.sql
+SOURCE manuscript_notice_has_user.sql
+SOURCE manuscript_review.sql
+SOURCE manuscript_review_type_has_manuscript_recommendation_type.sql
+SOURCE role_has_manuscript_review_type.sql
+
+SOURCE update_manuscript_current_manuscript_version.sql
+
 SOURCE service.sql
 SOURCE role_has_service.sql
 

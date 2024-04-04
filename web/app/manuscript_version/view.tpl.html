@@ -1,0 +1,103 @@
+<div
+  class="utility-view rounded"
+  style="padding-bottom: 2em;"
+  ng-show="!isComplete || model.isLoading"
+>
+  <cn-loading></cn-loading>
+</div>
+<div class="utility-view rounded" ng-show="isComplete && !model.isLoading">
+  <div class="container-fluid bg-primary rounded-top">
+    <h4>
+      <button class="btn btn-menu btn-header btn-info pull-right"
+              style="margin-top:-4px;"
+              ng-click="model.viewModel.toggleLanguage()">
+        {{ 'en'==model.viewModel.record.lang ? 'Version française' : 'English Version' }}
+      </button>
+      <span ng-bind-html="t( 'heading' )"></span>
+    </h4>
+  </div>
+  <div class="form-footer text-right bg-info" style="height:4.6em;">
+    <div class="btn-group">
+      <button type="button"
+              class="btn btn-default dropdown-toggle"
+              id="downloadForms"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
+              ng-click="model.viewModel.downloadForm()"
+              ng-bind-html="t( 'misc.download' )"></button>
+      <div class="btn-group dropdown">
+        <button type="button"
+                class="btn btn-default dropdown-toggle"
+                id="switchForms"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+                ng-if="0 < model.viewModel.formList.length"
+                ng-bind-html="t( 'misc.switchForm' ) + ' <span class=\'caret\' ng-if=\'op.operations\'></span>'"></button>
+        <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="switchForms">
+          <li ng-repeat="form in model.viewModel.formList">
+            <a ng-click="model.viewModel.transitionTo(form.name)" ng-bind-html="t('misc.'+form.title)"></a>
+          </li>
+        </ul>
+      </div>
+      <div class="btn-group dropdown" ng-if="model.viewModel.show( 'compare' ) && 1 < model.viewModel.versionList.length">
+        <button type="button"
+                class="btn btn-info dropdown-toggle"
+                id="versionList"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false">
+          Compare {{ null == model.viewModel.compareRecord ? '' : 'Version ' + model.viewModel.compareRecord.version }}
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu full-width" aria-labelledby="versionList">
+          <li ng-repeat="version in model.viewModel.versionList">
+            <a ng-if="version.id != model.viewModel.record.id && model.viewModel.compareRecord != version"
+               ng-click="compareTo( version )">
+              {{ null == version ? 'none' : 'Version ' + version.version }}
+            </a>
+          </li>
+        </ul>
+      </div>
+      <button class="btn btn-primary"
+              ng-if="model.viewModel.show( 'view' )"
+              ng-click="model.viewModel.transitionTo('manuscript')"
+              type="button">Show Record</button>
+      <button class="btn btn-success"
+              ng-if="model.viewModel.show( 'submit' )"
+              ng-click="model.viewModel.submit()"
+              ng-bind-html="t( 'misc.submit' )"
+              type="button"></button>
+    </div>
+  </div>
+  <div class="container-fluid" style="margin-top: 1em;">
+    <h4 ng-bind-html="t( 'title' )"></h4>
+    <cn-deferral-note ng-if="model.getEditEnabled()" page="1" class="bg-info"></cn-deferral-note>
+    <div class="container-fluid" style="margin-top: 1em;">
+      <p class="text-primary" ng-bind-html="t( 'text1' )"></p>
+      <p class="text-primary" ng-bind-html="t( 'text2' )"></p>
+    </div>
+    <form name="form" class="form-horizontal" novalidate>
+      <div class="form-group">
+        <div class="form-body input-group">
+          <div
+            ng-repeat="attachment in model.viewModel.attachmentList"
+            style="padding-top: 1.5em; padding-bottom: 1.5em;"
+          >
+            <label
+              for="attachment{{ attachment.id }}"
+              class="control-label col-sm-4"
+              ng-bind-html="attachment.name"
+            ></label>
+            <div class="col-sm-8">
+              <!-- TODO: put file input here? -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="form-footer text-right rounded-bottom bg-info" style="height:4.6em;">
+  </div>
+</div>

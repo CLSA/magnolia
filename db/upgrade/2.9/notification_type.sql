@@ -68,6 +68,54 @@ Si vous avez des questions, veuillez nous contacter à access@clsa-elcv.ca. 
 L’équipe d’accès aux données de l’ÉLCV";
 
 INSERT IGNORE INTO notification_type SET
+  name = "Deferred Manuscript Reminder (first)",
+  title_en = "Manuscript Action Required Deferred",
+  title_fr = "TODO: TRANSLATE",
+  message_en = "Dear Dr. {{applicant_name}},
+
+The manuscript entitled \"{{manuscript_title}}\" for your application number {{identifier}} requires action in order to move it forward.
+
+Please log in to the CLSA online data application software, Magnolia (https://magnolia.clsa-elcv.ca/live/gl/), complete the changes and submit for further review.
+If you have any questions, please contact us at access@clsa-elcv.ca.
+
+The CLSA Data Access Team",
+
+  message_fr = "Bonjour Dr / Dre {{applicant_name}}, 
+
+TODO: TRANSLATE
+Connectez-vous à Magnolia, le logiciel de demande d’accès aux données en ligne de l’ÉLCV (https://magnolia.clsa-elcv.ca/live/gl/), veuillez effectuer toutes les modifications et soumettre la demande à nouveau. 
+Si vous avez des questions, veuillez nous contacter à access@clsa-elcv.ca. 
+
+L’équipe d’accès aux données de l’ÉLCV";
+
+INSERT IGNORE INTO notification_type SET
+  name = "Deferred Manuscript Reminder (second)",
+  title_en = "Manuscript Action Required Deferred 2nd Reminder",
+  title_fr = "TODO: TRANSLATE",
+  message_en = "Dear Dr. {{applicant_name}},
+ 
+The manuscript entitled \"{{manuscript_title}}\" for your application number {{identifier}} requires action in order to move it forward.
+ 
+As per the previous reminder on {{TODAY-6W}} your manuscript is not copmlete. If you do not complete the action by {{TODAY+2W}}, your manuscript will not be approved.
+ 
+Please log in to the CLSA online data application software, Magnolia (https://magnolia.clsa-elcv.ca/live/gl/), complete the changes and submit for further review.
+ 
+If you have any questions, please contact us at access@clsa-elcv.ca.
+ 
+The CLSA Data Access Team",
+  message_fr = "Bonjour Dr / Dre {{applicant_name}}, 
+
+TODO: TRANSLATE
+
+TODO: TRANSLATE
+
+Pour modifier votre demande et la soumettre à nouveau, connectez-vous à Magnolia, le logiciel de demande d’accès aux données en ligne de l’ÉLCV (https://magnolia.clsa-elcv.ca/live/gl/). 
+
+Si vous avez des questions, veuillez nous contacter à access@clsa-elcv.ca. 
+
+L’équipe d’accès aux données de l’ÉLCV";
+
+INSERT IGNORE INTO notification_type SET
   name = "Data Destruction Required",
   title_en = "CLSA Data Access - Data Destruction Required ({{identifier}})",
   title_fr = "Accès aux données de l’ÉLCV - Destruction des données requise",
@@ -109,6 +157,79 @@ The CLSA Data Access Team",
 Le rapport final de votre projet numéro {{identifier}}, {{if_trainee}} au nom de {{trainee_name}}, {{endif_trainee}} intitulé « {{title}} » requiert votre approbation.
 
 Veuillez vous connecter à Magnolia, le logiciel de demande d’accès en ligne de l’ÉLCV (https://magnolia.clsa-elcv.ca/live/gl/). Vous pourrez passer en revue le rapport final et, si le tout vous convient, le soumettre. Si vous avez des questions, n’hésitez pas à nous contacter à access@clsa-elcv.ca.
+
+L’équipe d’accès aux données de l’ÉLCV";
+
+INSERT IGNORE INTO notification_type SET
+  name = "Approval Required, Manuscript Report",
+  title_en = "CLSA Data Access - Manuscript Report Approval Required ({{identifier}})",
+  title_fr = "TODO: TRANSLATE",
+  message_en = "Dear Dr. {{applicant_name}},
+
+Your approval is required on the manuscript entitled \"{{manuscript_title}}\" for your application number {{identifier}}{{if_trainee}} on behalf of {{trainee_name}}{{endif_trainee}}.
+
+Please log in to the CLSA online data application software, Magnolia (https://magnolia.clsa-elcv.ca/live/gl/). Review the manuscript report and, if you are satisfied, submit it.
+
+If you have any questions, please contact us at access@clsa-elcv.ca.
+
+The CLSA Data Access Team",
+  message_fr = "Dr/Dre {{applicant_name}},
+
+TODO: TRANSLATE
+
+TODO: TRANSLATE
+
+TODO: TRANSLATE
+
+L’équipe d’accès aux données de l’ÉLCV";
+
+INSERT IGNORE INTO notification_type SET
+  name = "Notice of decision (manuscript)",
+  title_en = "CLSA Data Access - Notice of Decision ({{identifier}}, manuscript {{manuscript_title}})",
+  title_fr = "Accès aux données de l’ÉLCV - Avis de décision (TODO: TRANSLATE)",
+  message_en = "Dear Dr. {{applicant_name}},
+
+The Notice of Decision is ready for the manuscript entitled \"{{manuscript_title}}\" for your application number {{identifier}}.
+
+Please log in to the CLSA online data application software, Magnolia (https://magnolia.clsa-elcv.ca/live/gl/), where you will be able to consult the Notice.
+
+If you have any questions, please contact us at access@clsa-elcv.ca.
+
+The CLSA Data Access Team",
+  message_fr = "Bonjour Dr / Dre {{applicant_name}},
+
+TODO: TRANSLATE
+
+Pour consulter l’avis, connectez-vous à Magnolia, le logiciel de demande d’accès aux données en ligne de l’ÉLCV (https://magnolia.clsa-elcv.ca/live/gl/).
+
+Si vous avez des questions, veuillez nous contacter à access@clsa-elcv.ca.
+
+L’équipe d’accès aux données de l’ÉLCV"; 
+
+INSERT IGNORE INTO notification_type SET
+  name = "Action required (manuscript)",
+  title_en = "CLSA Data Access - ACTION REQUIRED (manuscript for {{identifier}})",
+  title_fr = "Accès aux données de l’ÉLCV - ACTION REQUISE (TODO: TRANSLATE)",
+  message_en = "Dear Dr. {{applicant_name}},
+
+An action is required on your manuscript entitled \"{{manuscript_title}}\" for application number {{identifier}}.
+
+Please log in to the CLSA online data application software, Magnolia (https://magnolia.clsa-elcv.ca/live/gl/). Look for the \"Attention\" box on the manuscript. Follow the instructions given to remedy the issue. Once you are sure you have made all the revisions, re-submit the manuscript.
+
+Your manuscript will continue through the review process and you will be contacted with the outcome at a later date.
+
+If you have any questions, please contact us at access@clsa-elcv.ca.
+
+The CLSA Data Access Team",
+  message_fr = "Bonjour Dr / Dre {{applicant_name}},
+
+TODO: TRANSLATE
+
+TODO: TRANSLATE
+
+TODO: TRANSLATE
+
+Si vous avez des questions, veuillez nous contacter à access@clsa-elcv.ca.
 
 L’équipe d’accès aux données de l’ÉLCV";
 
