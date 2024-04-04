@@ -143,6 +143,45 @@ CREATE PROCEDURE patch_role_has_service()
     EXECUTE statement;
     DEALLOCATE PREPARE statement;
 
+    -- manuscript services
+    SET @sql = CONCAT(
+      "INSERT IGNORE INTO role_has_service( role_id, service_id ) ",
+      "SELECT role.id, service.id ",
+      "FROM ", @cenozo, ".role, service ",
+      "WHERE role.name IN ('administrator', 'dao') ",
+      "AND service.subject LIKE 'manuscript%' ",
+      -- DAO can't delete or post manuscripts
+      "AND (role.name = 'administrator' OR subject != 'manuscript' OR method NOT IN ('DELETE', 'POST')) ",
+      "AND service.restricted = 1"
+    );
+    PREPARE statement FROM @sql;
+    EXECUTE statement;
+    DEALLOCATE PREPARE statement;
+
+    SET @sql = CONCAT(
+      "INSERT IGNORE INTO role_has_service( role_id, service_id ) ",
+      "SELECT role.id, service.id ",
+      "FROM ", @cenozo, ".role, service ",
+      "WHERE role.name IN ('applicant', 'designate') ",
+      "AND service.subject IN( 'manuscript', 'manuscript_version' ) ",
+      "AND service.restricted = 1"
+    );
+    PREPARE statement FROM @sql;
+    EXECUTE statement;
+    DEALLOCATE PREPARE statement;
+
+    SET @sql = CONCAT(
+      "INSERT IGNORE INTO role_has_service( role_id, service_id ) ",
+      "SELECT role.id, service.id ",
+      "FROM ", @cenozo, ".role, service ",
+      "WHERE role.name = 'readonly' ",
+      "AND service.subject IN( 'manuscript_review', 'manuscript_review_type', 'manuscript_stage_type' ) ",
+      "AND service.method = 'GET' ",
+      "AND service.restricted = 1"
+    );
+    PREPARE statement FROM @sql;
+    EXECUTE statement;
+    DEALLOCATE PREPARE statement;
 
   END //
 DELIMITER ;

@@ -446,7 +446,7 @@ class manuscript extends \cenozo\database\record
       "Manuscript Title: %s\n".
       "Applicant: %s\n".
       "%s\n", // trainee only added if one exists
-      $this->identifier,
+      $db_reqn->identifier,
       $db_manuscript_version->title,
       sprintf( '%s %s', $db_user->first_name, $db_user->last_name ),
       is_null( $db_trainee_user ) ?  '' : sprintf(

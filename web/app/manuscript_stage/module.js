@@ -52,7 +52,7 @@ cenozoApp.defineModule({
 
           // When in the stage.list state transition to the manuscript when clicking the stage record
           this.transitionToViewState = async function (record) {
-            await $state.go("manuscript.view", { identifier: record.id });
+            await $state.go("manuscript.view", record.id);
           };
         };
 

@@ -161,6 +161,9 @@
            }"
            ng-bind-html="t( 'part3.tab' )"></a>
       </li>
+      <li ng-class="{'active':'manuscripts' == model.viewModel.getTabPart()}" ng-if="model.viewModel.showManuscripts()">
+        <a ng-click="model.viewModel.setFormTab('manuscripts')" ng-bind-html="t( 'manuscripts.tab' )"></a>
+      </li>
       <li ng-class="{'active':'agreement' == model.viewModel.getTabPart()}" ng-if="model.viewModel.showAgreement()">
         <a ng-click="model.viewModel.setFormTab('agreement')">Agreement</a>
       </li>
@@ -1379,6 +1382,63 @@
       <div class="panel-body" style="padding-bottom: 0px;">
         <h4 style="margin-top: 0; margin-bottom: 1em;" ng-bind-html="t( 'part3.title' )"></h4>
         <p class="text-primary" ng-bind-html="t( 'part3.text' )"></p>
+      </div>
+    </div>
+    <div ng-show="'manuscripts'==model.viewModel.getTabPart()" class="panel panel-default">
+      <div class="panel-body" style="padding-bottom: 0px;">
+        <h4 style="margin-top: 0; margin-bottom: 1em;" ng-bind-html="t( 'manuscripts.title' )"></h4>
+        <p class="text-primary" ng-bind-html="t( 'manuscripts.text' )"></p>
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <span ng-show="0 == model.viewModel.record.manuscriptList.length"
+                  ng-bind-html="t( 'manuscripts.manuscript.noManuscripts' )"></span>
+            <table class="table table-striped"
+                   ng-class="{ 'table-hover': model.getManuscriptEditEnabled() && !isDAO() }"
+                   ng-show="0 < model.viewModel.record.manuscriptList.length">
+              <thead class="bg-info">
+                <tr>
+                  <td ng-bind-html="t( 'manuscripts.manuscript.title' )"></td>
+                  <td ng-show="model.getManuscriptEditEnabled() && !isDAO()"></td>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="manuscript in model.viewModel.record.manuscriptList"
+                    ng-click="model.getManuscriptEditEnabled() && !isDAO() && viewManuscript( manuscript.id )">
+                  <td>{{ manuscript.title }}</td>
+                  <td ng-show="model.getManuscriptEditEnabled() && !isDAO()">
+                    <button class="btn btn-xs btn-danger"
+                            ng-disabled="isDeletingManuscript.includes( manuscript.id )"
+                            ng-click="removeManuscript( manuscript.id ) && $event.stopPropagation()"
+                            uib-tooltip-html="t( 'misc.remove' )">
+                      <i class="glyphicon glyphicon-remove"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <form
+          id="project_team_form"
+          name="project_team_form"
+          ng-show="model.getManuscriptEditEnabled() && !isDAO()"
+          novalidate
+        >
+          <fieldset ng-disabled="!model.getManuscriptEditEnabled() && !isDAO()">
+            <div class="form-horizontal">
+              <cn-add-input
+                input="{ key: 'name', title: t( 'manuscripts.manuscript.title' ), type: 'string' }"
+                record="manuscriptRecord"
+                model="model.viewModel.manuscriptModel"
+                first="true">
+              </cn-add-input>
+              <button class="btn btn-primary pull-right"
+                      ng-disabled="isAddingManuscript"
+                      ng-click="addManuscript()"
+                      ng-bind-html="t( 'manuscripts.manuscript.addManuscript' )"></button>
+            </div>
+          </fieldset>
+        </form>
       </div>
     </div>
     <div ng-show="'agreement'==model.viewModel.getTabPart()" class="panel panel-default" ng-if="model.viewModel.showAgreement()">

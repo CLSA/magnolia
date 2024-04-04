@@ -182,7 +182,7 @@ class module extends \cenozo\service\module
     }
 
     if( $select->has_column( 'state_days' ) )
-      $select->add_column( 'DATEDIFF( NOW(), state_date )', 'state_days', false, 'integer' );
+      $select->add_column( 'DATEDIFF( NOW(), reqn.state_date )', 'state_days', false, 'integer' );
 
     if( $select->has_column( 'user_full_name' ) )
     {
@@ -290,8 +290,10 @@ class module extends \cenozo\service\module
         $select->add_table_column(
           'stage_type',
           'IF( '."\n".
-            '"deferred" = state, "Action Required",'."\n".
-            'IF( state IS NOT NULL, CONCAT( UPPER( SUBSTRING( state, 1, 1 ) ), SUBSTRING( state, 2 ) ),'."\n".
+            '"deferred" = reqn.state, "Action Required",'."\n".
+            'IF('."\n".
+              'reqn.state IS NOT NULL,'."\n".
+              'CONCAT( UPPER( SUBSTRING( reqn.state, 1, 1 ) ), SUBSTRING( reqn.state, 2 ) ),'."\n".
               'IF('."\n".
                 '"review" = stage_type.phase AND IFNULL( deadline.datetime, 0 ) > UTC_TIMESTAMP(),'."\n".
                 '"Waiting for Review",'."\n".

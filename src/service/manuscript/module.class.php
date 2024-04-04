@@ -43,15 +43,6 @@ class module extends \cenozo\service\module
             return;
           }
         }
-        // typist can only see legacy requisitions
-        else if( 'typist' == $db_role->name )
-        {
-          if( !$db_reqn->legacy )
-          {
-            $this->get_status()->set_code( 403 );
-            return;
-          }
-        }
       }
     }
   }
@@ -80,7 +71,7 @@ class module extends \cenozo\service\module
       'manuscript_version.id'
     );
     $modifier->join( 'reqn', 'manuscript.reqn_id', 'reqn.id' );
-    $modifier->join( 'language', 'reqn.language_id', 'languange.id' );
+    $modifier->join( 'language', 'reqn.language_id', 'language.id' );
     $modifier->join( 'user', 'reqn.user_id', 'user.id' );
     $modifier->left_join( 'user', 'reqn.trainee_user_id', 'trainee_user.id', 'trainee_user' );
     $modifier->left_join( 'user', 'reqn.designate_user_id', 'designate_user.id', 'designate_user' );
@@ -96,7 +87,7 @@ class module extends \cenozo\service\module
     );
 
     if( $select->has_column( 'state_days' ) )
-      $select->add_column( 'DATEDIFF( NOW(), state_date )', 'state_days', false, 'integer' );
+      $select->add_column( 'DATEDIFF( NOW(), manuscript.state_date )', 'state_days', false, 'integer' );
 
     if( $select->has_column( 'user_full_name' ) )
     {
@@ -126,7 +117,7 @@ class module extends \cenozo\service\module
 
     if( in_array( $db_role->name, ['applicant', 'designate'] ) )
     {
-      // only show applicants their own manuscripts which aren't abandoned
+      // only show applicants their own manuscripts
       if( 'designate' == $db_role->name )
       {
         $modifier->where( 'reqn.designate_user_id', '=', $db_user->id );
@@ -138,13 +129,6 @@ class module extends \cenozo\service\module
         $modifier->or_where( 'reqn.trainee_user_id', '=', $db_user->id );
         $modifier->where_bracket( false );
       }
-
-      $modifier->where( 'IFNULL( reqn.state, "" )', '!=', 'abandoned' );
-    }
-    else if( 'typist' == $db_role->name )
-    {
-      // typists can only see legacy reqns
-      $modifier->where( 'reqn.legacy', '=', true );
     }
 
     if( $select->has_table_columns( 'manuscript_stage_type' ) )
@@ -153,11 +137,11 @@ class module extends \cenozo\service\module
       {
         $select->add_table_column(
           'manuscript_stage_type',
-          'IF( '."\n".
-            '"deferred" = state, "Action Required",'."\n".
-            'IF'."\n".
-              'state IS NOT NULL,'."\n".
-              'CONCAT( UPPER( SUBSTRING( state, 1, 1 ) ), SUBSTRING( state, 2 ) ),'."\n".
+          'IF('."\n".
+            '"deferred" = manuscript.state, "Action Required",'."\n".
+            'IF('."\n".
+              'manuscript.state IS NOT NULL,'."\n".
+              'CONCAT( UPPER( SUBSTRING( manuscript.state, 1, 1 ) ), SUBSTRING( manuscript.state, 2 ) ),'."\n".
               'manuscript_stage_type.status'."\n".
             ')'."\n".
           ')',

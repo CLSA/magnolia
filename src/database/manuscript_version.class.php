@@ -59,7 +59,7 @@ class manuscript_version extends \cenozo\database\record
     $db_trainee_user = $db_reqn->get_trainee_user();
 
     $data = array(
-      'identifier' => $db_manuscript->identifier,
+      'identifier' => $db_reqn->identifier,
       'version' => $this->version,
       'dateofapproval' => is_null( $this->datetime ) ? 'None' : $this->datetime->format( 'Y-m-d' )
     );

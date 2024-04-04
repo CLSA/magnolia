@@ -165,6 +165,8 @@ cenozoApp.defineModule({
               isAddingReference: false,
               isDeletingReference: [],
               isDeletingEthicsApproval: [],
+              isAddingManuscript: false,
+              isDeletingManuscript: [],
               finalReportRequiredWarningShown: false,
               destructionReportRequiredWarningShown: false,
               isTitleConstant: function () {
@@ -457,6 +459,58 @@ cenozoApp.defineModule({
               }
             };
 
+            $scope.addManuscript = async function () {
+              if ($scope.model.viewModel.manuscriptModel.getAddEnabled()) {
+                var form = cenozo.getScopeByQuerySelector("#project_team_form").project_team_form;
+
+                // we need to check each add-input for errors
+                var valid = true;
+                for (var property in $scope.model.viewModel.manuscriptModel
+                  .module.inputGroupList[0].inputList) {
+                  // get the property's form element and remove any conflict errors, then see if it's invalid
+                  var currentElement = cenozo.getFormElement(property);
+                  currentElement.$error.conflict = false;
+                  cenozo.updateFormElement(currentElement);
+                  if (currentElement.$invalid) {
+                    valid = false;
+                    break;
+                  }
+                }
+                if (!valid) {
+                  // dirty all inputs so we can find the problem
+                  cenozo.forEachFormElement("project_team_form", (element) => { element.$dirty = true; });
+                } else {
+                  try {
+                    $scope.isAddingManuscript = true;
+                    await manuscriptAddModel.onAdd($scope.manuscriptRecord);
+
+                    // reset the form
+                    form.$setPristine();
+                    await manuscriptAddModel.onNew($scope.manuscriptRecord);
+                    await $scope.model.viewModel.getManuscriptList();
+                    await $scope.model.viewModel.determineManuscriptDiffs();
+                  } finally {
+                    $scope.isAddingManuscript = false;
+                  }
+                }
+              }
+            };
+
+            $scope.editManuscript = async function (id) {
+              if ($scope.model.viewModel.manuscriptModel.getEditEnabled()) {
+                await $scope.model.viewModel.editManuscript(id);
+                await $scope.model.viewModel.determineManuscriptDiffs();
+              }
+            };
+
+            $scope.removeManuscript = async function (id) {
+              if ($scope.model.viewModel.manuscriptModel.getDeleteEnabled()) {
+                if (!$scope.isDeletingManuscript.includes(id)) $scope.isDeletingManuscript.push(id);
+                var index = $scope.isDeletingManuscript.indexOf(id);
+                await $scope.model.viewModel.removeManuscript(id);
+                if (0 <= index) $scope.isDeletingManuscript.splice(index, 1);
+              }
+            };
             $scope.t = function (value) {
               return $scope.model.viewModel.translate(value);
             };
@@ -517,6 +571,10 @@ cenozoApp.defineModule({
             agreementDifferenceList: null,
             lastAmendmentVersion: null, // used to determine the addingCoapplicantWithData variable
             addingCoapplicantWithData: false, // used when an amendment is adding a new coap
+            showManuscripts: function () {
+              // TODO: implement
+              return true;
+            },
             showAgreement: function () {
               // only show the agreement tab to administrators
               return (
@@ -809,6 +867,7 @@ cenozoApp.defineModule({
               "covid_19_data",
               "mortality_data",
               "biospecimen_access",
+              "manuscripts",
               "agreement",
             ],
 
@@ -821,11 +880,13 @@ cenozoApp.defineModule({
                 "geographic_indicators", "covid_19_data", "mortality_data"
               ];
               part3Tabs = ["biospecimen_access"];
+              manuscriptTabs = ["manuscripts"];
 
               return (
                 part1Tabs.includes(tab) ? "part1" :
                 part2Tabs.includes(tab) ? "part2" :
                 part3Tabs.includes(tab) ? "part3" :
+                manuscriptTabs.includes(tab) ? "manuscripts" :
                 "agreement" == tab ? "agreement" :
                 "instructions"
               );
@@ -2586,6 +2647,11 @@ cenozoApp.defineModule({
                 angular.isDefined(this.viewModel.record) &&
                 "new" == this.viewModel.record.phase
               );
+            },
+
+            getManuscriptEditEnabled: function () {
+              // TODO: implement
+              return true;
             },
 
             getMetadata: async function () {

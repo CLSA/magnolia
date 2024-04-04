@@ -84,14 +84,11 @@ cenozoApp.defineModule({
                   },
                 },
                 {
-                  title: scope.model.viewModel.record.identifier,
+                  title: scope.model.viewModel.record.title,
                   go: async function () {
                     await manuscriptModel.transitionToViewState({
                       getIdentifier: function () {
-                        return (
-                          "identifier=" +
-                          scope.model.viewModel.record.identifier
-                        );
+                        return scope.model.viewModel.record.id;
                       },
                     });
                   },
@@ -131,7 +128,7 @@ cenozoApp.defineModule({
               }
 
               return [
-                $scope.t("heading"), "-", $scope.model.viewModel.record.identifier,
+                $scope.t("heading"), "-", $scope.model.viewModel.record.title,
                 "version", $scope.model.viewModel.record.version,
                 null != status ? "(" + status + ")" : "",
               ].join(" ");
@@ -175,7 +172,7 @@ cenozoApp.defineModule({
               this.attachmentList = [];
               try {
                 const response = await CnHttpFactory.instance({
-                  path: "manuscript/identifier=" + this.record.identifier + '/manuscript_attachment',
+                  path: "manuscript/" + this.record.id + '/manuscript_attachment',
                   data: { select: { column: ["id", "name", "datetime"] } },
                 }).query();
 

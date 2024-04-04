@@ -159,7 +159,6 @@ cenozoApp.defineModule({
 
             downloadManuscript: async function () {
               await CnManuscriptHelper.download(
-                "manuscript",
                 this.record.current_manuscript_version_id
               );
             },

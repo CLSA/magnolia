@@ -62,6 +62,7 @@ class ui extends \cenozo\ui\ui
       $module->add_child( 'ethics_approval' );
       $module->add_child( 'notification' );
       $module->add_child( 'output' );
+      $module->add_child( 'manuscript' );
       $module->add_choose( 'packaged_data' );
       $module->add_choose( 'additional_fee' );
       $module->append_action_query( 'list', '?{search}' );
@@ -75,6 +76,9 @@ class ui extends \cenozo\ui\ui
     }
 
     $module = $this->get_module( 'reqn_version' );
+    if( !is_null( $module ) ) $module->append_action_query( 'view', '?{t}&{c}' );
+
+    $module = $this->get_module( 'manuscript_version' );
     if( !is_null( $module ) ) $module->append_action_query( 'view', '?{t}&{c}' );
 
     $module = $this->get_module( 'notification_type' );

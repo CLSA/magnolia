@@ -16,6 +16,7 @@ cenozoApp.defineModule({
       },
       columnList: {
         identifier: {
+          column: "reqn.identifier",
           title: "Identifier",
         },
         language: {
@@ -138,7 +139,7 @@ cenozoApp.defineModule({
       lang: { type: "string", column: "language.code", isExcluded: true },
     });
 
-    module.addExtraOperationGroup("view", {
+    module.addExtraOperation("view", {
       title: "View Report",
       operation: async function ($state, model) {
         await $state.go(
@@ -212,7 +213,7 @@ cenozoApp.defineModule({
           // immediately view the user record after it has been created
           this.transitionOnSave = function (record) {
             CnSession.workingTransition(async function () {
-              await $state.go("manuscript_version.view", { identifier: "identifier=" + record.identifier });
+              await $state.go("manuscript_version.view", { identifier: record.current_manuscript_version_id });
             });
           };
         };
@@ -253,7 +254,6 @@ cenozoApp.defineModule({
             },
             downloadManuscriptReport: async function () {
               await CnManuscriptHelper.download(
-                "manuscript_report",
                 this.record.current_manuscript_version_id
               );
             },

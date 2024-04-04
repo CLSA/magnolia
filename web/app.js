@@ -63,13 +63,11 @@ cenozo.factory("CnBaseFormViewFactory", [
   "CnLocalization",
   "CnReqnHelper",
   "CnHttpFactory",
-  "$state",
   function (
     CnBaseViewFactory,
     CnLocalization,
     CnReqnHelper,
-    CnHttpFactory,
-    $state
+    CnHttpFactory
   ){
     return {
       construct: function (object, formType, parentModel, root) {
@@ -798,14 +796,8 @@ cenozo.service("CnReqnHelper", [
         }).show();
 
         if (response) {
-          await CnHttpFactory.instance({
-            path: "reqn/" + reqnIdentifier,
-          }).delete();
-          await $state.go(
-            ["applicant", "designate"].includes(CnSession.role.name)
-              ? "root.home"
-              : "reqn.list"
-          );
+          await CnHttpFactory.instance({ path: "reqn/" + reqnIdentifier }).delete();
+          await $state.go(["applicant", "designate"].includes(CnSession.role.name) ? "root.home" : "reqn.list");
         }
       },
 
@@ -828,6 +820,94 @@ cenozo.service("CnReqnHelper", [
   },
 ]);
 
+/* ############################################################################################## */
+cenozo.service("CnManuscriptHelper", [
+  "CnLocalization",
+  "CnSession",
+  "CnHttpFactory",
+  "CnModalConfirmFactory",
+  "$state",
+  function (CnLocalization, CnSession, CnHttpFactory, CnModalConfirmFactory, $state) {
+    var object = {
+      promise: null,
+
+      translate: function (address, language) {
+        // always use the manuscript subject
+        return CnLocalization.translate("manuscript", address, language);
+      },
+
+      showAction: function (subject, record) {
+        let role = CnSession.role.name;
+        let phase = record.phase ? record.phase : "";
+        let state = record.state ? record.state : "";
+        let stageType = record.stage_type ? record.stage_type : "";
+
+        if ("submit" == subject) {
+          return (
+            ["applicant", "designate", "administrator"].includes(role) &&
+            ("new" == phase || "deferred" == state)
+          );
+        } else if ("view" == subject) {
+          return !["applicant", "designate"].includes(role);
+        } else if ("delete" == subject) {
+          return "new" == phase;
+        } else if ("defer" == subject) {
+          return (
+            "deferred" != state && (
+              ("administrator" == role && "review" == phase) ||
+              ("dao" == role && "DAO Review" == stageType)
+            )
+          );
+        } else if ("reverse" == subject) {
+          return "new" != phase && "administrator" == role;
+        } else if ("proceed" == subject) {
+          return (
+            "complete" != phase && (
+              ("administrator" == role && "new" != phase) ||
+              ("dao" == role && "DAO Review" == stageType)
+            )
+          );
+        } else if ("compare" == subject) {
+          return !["applicant", "designate"].includes(role);
+        } else return false;
+      },
+
+      delete: async function (reqnIdentifier, language) {
+        var response = await CnModalConfirmFactory.instance({
+          title: ["applicant", "designate"].includes(CnSession.role.name)
+            ? this.translate("misc.pleaseConfirm", language)
+            : "Please Confirm",
+          noText: ["applicant", "designate"].includes(CnSession.role.name)
+            ? this.translate("misc.no", language)
+            : "No",
+          yesText: ["applicant", "designate"].includes(CnSession.role.name)
+            ? this.translate("misc.yes", language)
+            : "Yes",
+        }).show();
+
+        if (response) {
+          await CnHttpFactory.instance({ path: "reqn/" + reqnIdentifier }).delete();
+          await $state.go(
+            ["applicant", "designate"].includes(CnSession.role.name) ? "reqn_version.view" : "reqn.view",
+            { identifier: reqnIdentifier }
+          );
+        }
+      },
+
+      download: async function (id) {
+        var http = {
+          path: "manuscript_version/" + id,
+          format: "pdf"
+        };
+        await CnHttpFactory.instance(http).file();
+      },
+    };
+
+    return object;
+  },
+]);
+
+/* ############################################################################################## */
 /* ############################################################################################## */
 cenozo.service("CnLocalization", [
   "CnHttpFactory",
@@ -1294,6 +1374,31 @@ cenozo.service("CnLocalization", [
               fr: "Accès aux échantillons n’est pas encore disponible",
             },
           },
+          manuscripts: {
+            tab: { en: "Manuscripts", fr: "Manuscripts" }, // TODO: TRANSLATE
+            title: {
+              en: "Manuscript Review",
+              fr: "Manuscript Review" // TODO: TRANSLATE
+            },
+            text: {
+              en: "Next help text here.", // TODO: DEFINE COPY
+              fr: "Next help text here." // TODO: TRANSLATE
+            },
+            manuscript: {
+              noManuscripts: {
+                en: "No Manuscripts",
+                fr: "No Manuscripts", // TODO: TRANSLATE
+              },
+              addManuscript: {
+                en: "Add Manuscript",
+                fr: "Add Manuscript", // TODO: TRANSLATE
+              },
+              title: {
+                en: "Title",
+                fr: "Title" // TODO: TRANSLATE
+              },
+            },
+          },
           misc: {
             no: { en: "No", fr: "Non" },
             yes: { en: "Yes", fr: "Oui" },
@@ -1568,6 +1673,16 @@ cenozo.service("CnLocalization", [
               fr: 'Les données de cette demande ne sont plus disponibles. Veuillez envoyer une demande à <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a> afin de réactiver le lien de téléchargement.',
             },
           },
+        },
+        manuscript: {
+          misc: {
+            no: { en: "No", fr: "Non" },
+            yes: { en: "Yes", fr: "Oui" },
+            deleteWarning: {
+              en: "Are you sure you want to delete the manuscript review?\n\nThis will permanently destroy all details you have provided. Once this is done there will be no way to restore the manuscript review!",
+              fr: "Are you sure you want to delete the manuscript review?\n\nThis will permanently destroy all details you have provided. Once this is done there will be no way to restore the manuscript review!", // TODO: TRANSLATE
+            },
+          }
         },
         finalReport: {
           heading: {
