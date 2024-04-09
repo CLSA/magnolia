@@ -613,7 +613,7 @@ cenozo.service("CnReqnHelper", [
         let isECStage = stageType.includes("EC");
         let isCommunicationStage = stageType.includes("Communication");
         let isDAOStage = [
-          "Feasibility Review", "Decision Made", "Data Release", "DCC Review", "Pre Data Destruction"
+          "Feasibility Review", "Decision Made", "Agreement", "Data Release", "DCC Review", "Pre Data Destruction"
         ].includes(stageType);
 
         if ("submit" == subject) {

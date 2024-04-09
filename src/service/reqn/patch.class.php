@@ -172,6 +172,43 @@ class patch extends \cenozo\service\patch
             }
           }
         }
+        else $code = 403;
+      }
+      else if( 'next_stage' == $action )
+      {
+        if( $this->get_argument( 'stage_type', false ) )
+        {
+          // only administrators and daos, or typists with legacy applications can proceed to a specific stage type
+          if(
+            !is_null( $db_reqn->state ) || (
+              !in_array( $db_role->name, ['administrator', 'dao'] ) &&
+              ( 'typist' != $db_role->name || !$db_reqn->legacy )
+            )
+          ) $code = 403;
+        }
+        else
+        {
+          $isChairStage = false !== strpos( $db_current_stage_type->name, 'DSAC' );
+          $isECStage = false !== strpos( $db_current_stage_type->name, 'EC' );
+          $isCommunicationStage = false !== strpos( $db_current_stage_type->name, 'Communication' );
+          $isDAOStage = in_array(
+            $db_current_stage_type->name,
+            [
+              "Feasibility Review", "Decision Made", "Data Release",
+              "Agreement", "DCC Review", "Pre Data Destruction"
+            ]
+          );
+
+          if(
+            !(
+              'administrator' == $db_role->name ||
+              ( 'chair' == $db_role->name && $isChairStage ) ||
+              ( 'dao' == $db_role->name && $isDAOStage ) ||
+              ( 'ec' == $db_role->name && $isECStage ) ||
+              ( 'communication' == $db_role->name && $isCommunicationStage )
+            )
+          ) $code = 403;
+        }
       }
       else $code = 403;
     }
