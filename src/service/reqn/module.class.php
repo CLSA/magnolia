@@ -160,24 +160,66 @@ class module extends \cenozo\service\module
       $coapplicant_mod->group( 'reqn_version.id' );
 
       $stage_type_class_name::db()->execute( sprintf(
-        'CREATE TEMPORARY TABLE coapplicant_flagged %s %s',
+        'CREATE TEMPORARY TABLE coapp_country_flagged %s %s',
         $coapplicant_sel->get_sql(),
         $coapplicant_mod->get_sql()
       ) );
 
       $stage_type_class_name::db()->execute(
-        'ALTER TABLE coapplicant_flagged ADD UNIQUE KEY uq_reqn_version_id (reqn_version_id)'
+        'ALTER TABLE coapp_country_flagged ADD UNIQUE KEY uq_reqn_version_id (reqn_version_id)'
       );
 
-      $modifier->join( 'coapplicant_flagged', 'reqn_version.id', 'coapplicant_flagged.reqn_version_id' );
+      $modifier->join( 'coapp_country_flagged', 'reqn_version.id', 'coapp_country_flagged.reqn_version_id' );
       $select->add_column(
         sprintf(
-          'IF( coapplicant_flagged.flagged OR applicant_country_id IN %s OR trainee_country_id IN %s, 1, 0 )',
+          'IF( coapp_country_flagged.flagged OR applicant_country_id IN %s OR trainee_country_id IN %s, 1, 0 )',
           $flagged_country,
           $flagged_country
         ),
         'country_is_flagged',
+        false,
+        'boolean'
+      );
+    }
+
+    if( $select->has_column( 'email_is_flagged' ) )
+    {
+      // create a temporary table of reqns with coapplicants with email in the restricted country list
+      $coapplicant_sel = lib::create( 'database\select' );
+      $coapplicant_sel->from( 'reqn_version' );
+      $coapplicant_sel->add_column( 'id', 'reqn_version_id' );
+      $coapplicant_sel->add_column(
+        'IF( COUNT( IF( email RLIKE "\.(ru|cn|ir)$", 1, NULL ) ), 1, 0 )',
+        'flagged',
         false
+      );
+      $coapplicant_mod = lib::create( 'database\modifier' );
+      $coapplicant_mod->left_join( 'coapplicant', 'reqn_version.id', 'coapplicant.reqn_version_id' );
+      $coapplicant_mod->group( 'reqn_version.id' );
+
+      $stage_type_class_name::db()->execute( sprintf(
+        'CREATE TEMPORARY TABLE coapp_email_flagged %s %s',
+        $coapplicant_sel->get_sql(),
+        $coapplicant_mod->get_sql()
+      ) );
+
+      $stage_type_class_name::db()->execute(
+        'ALTER TABLE coapp_email_flagged ADD UNIQUE KEY uq_reqn_version_id (reqn_version_id)'
+      );
+
+      $modifier->join( 'coapp_email_flagged', 'reqn_version.id', 'coapp_email_flagged.reqn_version_id' );
+      $select->add_column(
+        'IF( '.
+          'coapp_email_flagged.flagged OR '.
+          'user.email RLIKE "\.(ru|cn|ir)$" OR '.
+          'trainee_user.email RLIKE "\.(ru|cn|ir)$" OR '.
+          'designate_user.email RLIKE "\.(ru|cn|ir)$", '.
+          '1, '.
+          '0 '.
+        ')',
+        'email_is_flagged',
+        false,
+        'boolean'
       );
     }
 

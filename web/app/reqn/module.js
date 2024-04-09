@@ -175,7 +175,12 @@ cenozoApp.defineModule({
         country_is_flagged: {
           type: "hidden",
           highlight: true,
-          caution: true,
+          highlightColor: "#ff99e1",
+        },
+        email_is_flagged: {
+          type: "hidden",
+          highlight: true,
+          highlightColor: "#dd99ff",
         },
         reqn_version_id: {
           column: "reqn_version.id",
