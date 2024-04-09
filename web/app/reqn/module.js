@@ -169,7 +169,8 @@ cenozoApp.defineModule({
         },
         non_payment: {
           type: "hidden",
-          caution: true, // caution any reqn flagged for non-payment
+          highlight: true, // highlight any reqn flagged for non-payment
+          highlightColor: "#ffc299",
         },
         reqn_version_id: {
           column: "reqn_version.id",
