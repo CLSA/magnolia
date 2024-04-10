@@ -1772,8 +1772,8 @@ cenozoApp.defineModule({
             getDeleteEnabled: function () {
               return (
                 this.$$getDeleteEnabled() &&
-                angular.isDefined(this.listModel.record) &&
-                "new" == this.listModel.record.phase
+                angular.isDefined(this.viewModel.record) &&
+                "new" == this.viewModel.record.phase
               );
             },
 
