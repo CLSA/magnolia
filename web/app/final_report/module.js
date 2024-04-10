@@ -223,7 +223,6 @@ cenozoApp.defineModule({
               columnList.output_source_count.title = CnLocalization.translate("output", "output_source_count", lang);
             },
 
-            // setup language and tab state parameters
             toggleLanguage: function () {
               this.record.lang = "en" == this.record.lang ? "fr" : "en";
               this.updateOutputListLanguage(this.record.lang);
@@ -439,7 +438,6 @@ cenozoApp.defineModule({
         var object = function (type) {
           CnBaseFormModelFactory.construct(
             this,
-            "finalReport",
             type,
             CnFinalReportListFactory,
             CnFinalReportViewFactory,

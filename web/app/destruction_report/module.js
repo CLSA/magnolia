@@ -284,7 +284,6 @@ cenozoApp.defineModule({
         var object = function (type) {
           CnBaseFormModelFactory.construct(
             this,
-            "destructionReport",
             type,
             CnDestructionReportListFactory,
             CnDestructionReportViewFactory,

@@ -32,6 +32,12 @@ cenozoApp.defineModule({
     });
 
     module.addInputGroup("", {
+      identifier: {
+        column: "reqn.identifier",
+        title: "Identifier",
+        type: "string",
+      },
+
       title: {
         column: "manuscript.title",
         title: "Title",
@@ -43,29 +49,49 @@ cenozoApp.defineModule({
       current_manuscript_version_id: { column: "manuscript_version.id", type: "string" },
       trainee_user_id: { column: "reqn.trainee_user_id", type: "string" },
       designate_user_id: { column: "reqn.designate_user_id", type: "string" },
-      state: { column: "manuscript.state", type: "string" },
-      stage_type: { column: "stage_type.name", type: "string" },
-      phase: { column: "stage_type.phase", type: "string" },
+      deferred: { column: "manuscript.deferred", type: "boolean" },
+      stage_type: { column: "manuscript_stage_type.name", type: "string" },
+      phase: { column: "manuscript_stage_type.phase", type: "string" },
       lang: { column: "language.code", type: "string" },
+      authors: { type: "text" },
+      datetime: { type: "text" },
+      journal: { type: "text" },
+      clsa_title: { type: "boolean" },
+      clsa_title_justification: { type: "text" },
+      clsa_keyword: { type: "boolean" },
+      clsa_keyword_justification: { type: "text" },
+      clsa_reference: { type: "boolean" },
+      clsa_reference_justification: { type: "text" },
+      genomics: { type: "boolean" },
+      genomics_justification: { type: "text" },
+      acknowledgment: { type: "text" },
+      dataset_version: { type: "boolean" },
+      seroprevalence: { type: "boolean" },
+      covid: { type: "boolean" },
+      disclaimer: { type: "boolean" },
+      statement: { type: "boolean" },
+      website: { type: "boolean" },
+      objectives: { type: "text" },
+      indigenous: { type: "boolean" },
     });
 
     /* ############################################################################################## */
     cenozo.providers.directive("cnManuscriptVersionView", [
       "CnManuscriptVersionModelFactory",
       "cnRecordViewDirective",
-      "CnReqnModelFactory",
+      "CnManuscriptModelFactory",
       "CnLocalization",
       "CnSession",
       function (
         CnManuscriptVersionModelFactory,
         cnRecordViewDirective,
-        CnReqnModelFactory,
+        CnManuscriptModelFactory,
         CnLocalization,
         CnSession
       ) {
         // used to piggy-back on the basic view controller's functionality
         var cnRecordView = cnRecordViewDirective[0];
-        var manuscriptModel = CnReqnModelFactory.instance();
+        var manuscriptModel = CnManuscriptModelFactory.instance();
 
         return {
           templateUrl: module.getFileUrl("view.tpl.html"),
@@ -104,6 +130,10 @@ cenozoApp.defineModule({
               ]);
             });
 
+            scope.$watch("model.viewModel.record.objectives", (text) => {
+              scope.model.viewModel.charCount.objectives = text ? text.length : 0;
+            });
+
             scope.model.viewModel.onView();
           },
           controller: function ($scope) {
@@ -119,12 +149,10 @@ cenozoApp.defineModule({
 
             $scope.getHeading = function () {
               var status = null;
-              if ("deferred" == $scope.model.viewModel.record.state) {
+              if ($scope.model.viewModel.record.deferred) {
                 status = $scope.model.isRole("applicant", "designate")
                   ? "Action Required"
                   : "Deferred to Applicant";
-              } else if ($scope.model.viewModel.record.state) {
-                status = $scope.model.viewModel.record.state.ucWords();
               }
 
               return [
@@ -160,11 +188,23 @@ cenozoApp.defineModule({
           CnBaseFormViewFactory.construct(this, "manuscriptReport", parentModel, root);
 
           angular.extend(this, {
+            compareRecord: null,
+            versionList: [],
+            charCount: {
+              objectives: 0,
+            },
+
             isLoading: false,
 
-            tabList: [ "manuscript_attachment" ],
+            tabList: [ "instructions", "part_1", "part_2", "part_3", "part_4" ],
 
             onView: async function (force) {
+              // reset tab value
+              this.setFormTab(this.parentModel.getQueryParameter("t"), false);
+
+              // reset compare version and differences
+              this.compareRecord = null;
+
               await this.$$onView(force);
 
               // get a list of all attachments
@@ -172,21 +212,90 @@ cenozoApp.defineModule({
               this.attachmentList = [];
               try {
                 const response = await CnHttpFactory.instance({
-                  path: "manuscript/" + this.record.id + '/manuscript_attachment',
-                  data: { select: { column: ["id", "name", "datetime"] } },
+                  path: "manuscript/" + this.record.manuscript_id + '/manuscript_attachment',
+                  data: { select: { column: ["id", "name"] } },
                 }).query();
 
-                this.attachmentList = response.data.map( row => {
-                  angular.extend(row, {
-                    // format all datetimes
-                    formattedDatetime: CnSession.formatValue(row.datetime, "datetime", true),
-                    // track when patching
-                    isPatching: false,
-                  });
-                  return row;
-                });
+                // track when patching attachments
+                this.attachmentList = response.data.map( row => angular.extend(row, { isPatching: false }) );
               } finally {
                 this.isLoading = false;
+              }
+            },
+
+            upateAttachmentListLanguage: function (lang) {
+              var columnList = cenozoApp.module("manuscript_attachment").columnList;
+              columnList.name.title = CnLocalization.translate("manuscriptReport", "name", lang);
+            },
+
+            toggleLanguage: function () {
+              this.record.lang = "en" == this.record.lang ? "fr" : "en";
+              this.updateAttachmentListLanguage(this.record.lang);
+
+              return CnHttpFactory.instance({
+                path: "reqn/identifier=" + this.record.identifier,
+                data: { language: this.record.lang },
+              }).patch();
+            },
+
+            addAttachment: function () {
+              // TODO: do we have to redirect?  Why not just a directly uploaod
+              CnManuscriptAttachmentModelFactory.root.transitionToAddState();
+            },
+
+            getDifferences: function (manReport2) {
+              var manReport2 = this.record;
+              var differences = {
+                diff: false,
+                part_2: {
+                  diff: false,
+                  authors: false,
+                  datetime: false,
+                  journal: false
+                },
+                part_3: {
+                  diff: false,
+                  clsa_title: false,
+                  clsa_title_justification: false,
+                  clsa_keyword: false,
+                  clsa_keyword_justification: false,
+                  clsa_reference: false,
+                  clsa_reference_justification: false,
+                  genomics: false,
+                  genomics_justification: false,
+                },
+                part_4: {
+                  acknowledgment: false,
+                  dataset_version: false,
+                  seroprevalence: false,
+                  covid: false,
+                  disclaimer: false,
+                  statement: false,
+                  website: false,
+                  objectives: false,
+                  indigenous: false,
+                },
+              };
+
+              if (null != manReport2) {
+                for (var part in differences) {
+                  if (!differences.hasOwnProperty(part)) continue;
+                  if ("diff" == part) continue; // used to track overall diff
+
+                  for (var property in differences[part]) {
+                    if (!differences[part].hasOwnProperty(property)) continue;
+
+                    // not an array means we have a property to directly check
+                    // note: we need to convert empty strings to null to make sure they compare correctly
+                    var value1 = "" === manReport1[property] ? null : manReport1[property];
+                    var value2 = "" === manReport2[property] ? null : manReport2[property];
+                    if (value1 != value2) {
+                      differences.diff = true;
+                      differences[part].diff = true;
+                      differences[part][property] = true;
+                    }
+                  }
+                }
               }
             },
 
@@ -244,7 +353,6 @@ cenozoApp.defineModule({
         var object = function (type) {
           CnBaseFormModelFactory.construct(
             this,
-            "manuscriptReport",
             type,
             CnManuscriptVersionListFactory,
             CnManuscriptVersionViewFactory,
@@ -253,11 +361,8 @@ cenozoApp.defineModule({
 
           angular.extend(this, {
             getEditEnabled: function () {
-              var stageType = this.viewModel.record.stage_type ? this.viewModel.record.stage_type : "";
-              var state = this.viewModel.record.state ? this.viewModel.record.state : "";
-
               if (this.isRole("applicant", "designate")) {
-                return "deferred" == state;
+                return true === this.viewModel.record.deferred;
               } else if (this.isRole("administrator", "dao")) {
                 return true;
               }

@@ -109,7 +109,6 @@ class module extends \cenozo\service\module
         'current_manuscript_version'
       );
       $select->add_column(
-        'manuscript_version.amendment = current_manuscript_version.amendment AND '.
         'manuscript_version.version = current_manuscript_version.version',
         'is_current_version',
         false,

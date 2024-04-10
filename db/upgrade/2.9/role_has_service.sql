@@ -163,7 +163,7 @@ CREATE PROCEDURE patch_role_has_service()
       "SELECT role.id, service.id ",
       "FROM ", @cenozo, ".role, service ",
       "WHERE role.name IN ('applicant', 'designate') ",
-      "AND service.subject IN( 'manuscript', 'manuscript_version' ) ",
+      "AND service.subject IN( 'manuscript', 'manuscript_attachment', 'manuscript_version' ) ",
       "AND service.restricted = 1"
     );
     PREPARE statement FROM @sql;

@@ -236,9 +236,9 @@ class manuscript extends \cenozo\database\record
     $db_last_stage = current( $stage_list );
 
     // if deferred then we need to un-defer
-    if( 'deferred' == $this->state )
+    if( $this->deferred )
     {
-      $this->state = NULL;
+      $this->deferred = false;
       $this->save();
     }
 
@@ -379,7 +379,7 @@ class manuscript extends \cenozo\database\record
     // if we're recommending a revision then automatically defer the manuscript
     else if( 'Suggested Revisions' == $db_next_stage_type->name )
     {
-      $this->state = 'deferred';
+      $this->deferred = true;
       $this->save();
 
       // create a new manuscript version
@@ -473,7 +473,7 @@ class manuscript extends \cenozo\database\record
     );
     $review_mod->join(
       'manuscript_recommendation_type',
-      'manuscript_review.recommendation_type_id',
+      'manuscript_review.manuscript_recommendation_type_id',
       'manuscript_recommendation_type.id'
     );
     $review_mod->order( 'manuscript_review.datetime' );
@@ -535,7 +535,7 @@ class manuscript extends \cenozo\database\record
     $join_mod->where( 'manuscript_notification.notification_type_id', '=', $db_notification_type->id );
     $join_mod->where( 'TIMESTAMPDIFF( DAY, UTC_TIMESTAMP(), manuscript_notification.datetime )', '=', 0 );
     $modifier->join_modifier( 'manuscript_notification', $join_mod, 'left' );
-    $modifier->where( 'TIMESTAMPDIFF( DAY, state_date, UTC_TIMESTAMP() )', '=', 2*7*$weeks );
+    $modifier->where( 'TIMESTAMPDIFF( DAY, deferral_date, UTC_TIMESTAMP() )', '=', 2*7*$weeks );
     $modifier->where( 'manuscript_notification.id', '=', NULL );
 
     $manuscript_list = static::select_objects( $modifier );
@@ -559,7 +559,7 @@ class manuscript extends \cenozo\database\record
     $join_mod->where( 'manuscript_notification.notification_type_id', '=', $db_notification_type->id );
     $join_mod->where( 'TIMESTAMPDIFF( DAY, UTC_TIMESTAMP(), manuscript_notification.datetime )', '=', 0 );
     $modifier->join_modifier( 'manuscript_notification', $join_mod, 'left' );
-    $modifier->where( 'TIMESTAMPDIFF( DAY, state_date, UTC_TIMESTAMP() )', '=', 7*$weeks );
+    $modifier->where( 'TIMESTAMPDIFF( DAY, deferral_date, UTC_TIMESTAMP() )', '=', 7*$weeks );
     $modifier->where( 'manuscript_notification.id', '=', NULL );
 
     $manuscript_list = static::select_objects( $modifier );

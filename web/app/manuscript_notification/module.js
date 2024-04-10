@@ -23,7 +23,7 @@ cenozoApp.defineModule({
           title: "Sent To",
         },
         type: {
-          column: "manuscript_notification_type.name",
+          column: "notification_type.name",
           title: "Type",
         },
         datetime: {

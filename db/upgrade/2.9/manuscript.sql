@@ -6,8 +6,8 @@ CREATE TABLE IF NOT EXISTS manuscript (
   create_timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
   reqn_id INT(10) UNSIGNED NOT NULL,
   title VARCHAR(511) NOT NULL,
-  state ENUM('deferred', 'inactive', 'abandoned') NULL DEFAULT NULL,
-  state_date DATE NULL DEFAULT NULL,
+  deferred TINYINT(1) NOT NULL DEFAULT 0,
+  deferred_date DATE NULL DEFAULT NULL,
   suggested_revisions TINYINT(1) NOT NULL DEFAULT 0,
   note TEXT NULL,
   PRIMARY KEY (id),
@@ -26,8 +26,8 @@ DELIMITER $$
 DROP TRIGGER IF EXISTS manuscript_BEFORE_UPDATE$$
 CREATE DEFINER = CURRENT_USER TRIGGER manuscript_BEFORE_UPDATE BEFORE UPDATE ON manuscript FOR EACH ROW
 BEGIN
-  IF !( NEW.state <=> OLD.state ) THEN
-    SET NEW.state_date = IF( NEW.state IS NULL, NULL, UTC_TIMESTAMP() );
+  IF !( NEW.deferred <=> OLD.deferred ) THEN
+    SET NEW.deferred_date = IF( NEW.deferred, UTC_TIMESTAMP(), NULL );
   END IF;
 END$$
 

@@ -171,8 +171,8 @@ class patch extends \cenozo\service\patch
               );
             }
           }
+          else $code = 403;
         }
-        else $code = 403;
       }
       else if( 'next_stage' == $action )
       {

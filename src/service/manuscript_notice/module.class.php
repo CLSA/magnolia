@@ -52,9 +52,10 @@ class module extends \cenozo\service\module
 
       $join_mod = lib::create( 'database\modifier' );
       $join_mod->join( 'manuscript', 'manuscript_notice.manuscript_id', 'manuscript.id' );
+      $join_mod->join( 'reqn', 'manuscript.reqn_id', 'reqn.id' );
       $sub_mod = lib::create( 'database\modifier' );
       $sub_mod->where( 'manuscript_notice.id', '=', 'manuscript_notice_has_user.manuscript_notice_id', false );
-      $sub_mod->where( 'manuscript.user_id', '=', 'manuscript_notice_has_user.user_id', false );
+      $sub_mod->where( 'reqn.user_id', '=', 'manuscript_notice_has_user.user_id', false );
       $join_mod->join_modifier( 'manuscript_notice_has_user', $sub_mod, 'left' );
       $join_mod->group( 'manuscript_notice.id' );
 
@@ -75,9 +76,10 @@ class module extends \cenozo\service\module
 
       $join_mod = lib::create( 'database\modifier' );
       $join_mod->join( 'manuscript', 'manuscript_notice.manuscript_id', 'manuscript.id' );
+      $join_mod->join( 'reqn', 'manuscript.reqn_id', 'reqn.id' );
       $sub_mod = lib::create( 'database\modifier' );
       $sub_mod->where( 'manuscript_notice.id', '=', 'manuscript_notice_has_user.manuscript_notice_id', false );
-      $sub_mod->where( 'manuscript.trainee_user_id', '=', 'manuscript_notice_has_user.user_id', false );
+      $sub_mod->where( 'reqn.trainee_user_id', '=', 'manuscript_notice_has_user.user_id', false );
       $join_mod->join_modifier( 'manuscript_notice_has_user', $sub_mod, 'left' );
       $join_mod->group( 'manuscript_notice.id' );
 
@@ -98,9 +100,10 @@ class module extends \cenozo\service\module
 
       $join_mod = lib::create( 'database\modifier' );
       $join_mod->join( 'manuscript', 'manuscript_notice.manuscript_id', 'manuscript.id' );
+      $join_mod->join( 'reqn', 'manuscript.reqn_id', 'reqn.id' );
       $sub_mod = lib::create( 'database\modifier' );
       $sub_mod->where( 'manuscript_notice.id', '=', 'manuscript_notice_has_user.manuscript_notice_id', false );
-      $sub_mod->where( 'manuscript.designate_user_id', '=', 'manuscript_notice_has_user.user_id', false );
+      $sub_mod->where( 'reqn.designate_user_id', '=', 'manuscript_notice_has_user.user_id', false );
       $join_mod->join_modifier( 'manuscript_notice_has_user', $sub_mod, 'left' );
       $join_mod->group( 'manuscript_notice.id' );
 

@@ -68,7 +68,11 @@ class manuscript_stage_type extends \cenozo\database\has_rank
     $select->add_column( 'id' );
     $modifier = lib::create( 'database\modifier' );
     $modifier->join( 'manuscript_review_type', 'manuscript_review.review_type_id', 'manuscript_review_type.id' );
-    $modifier->join( 'manuscript_stage_type', 'manuscript_review_type.stage_type_id', 'manuscript_stage_type.id' );
+    $modifier->join(
+      'manuscript_stage_type',
+      'manuscript_review_type.manuscript_stage_type_id',
+      'manuscript_stage_type.id'
+    );
     $modifier->where( 'manuscript_stage_type.id', '=', $this->id );
     $modifier->where( 'manuscript_review.manuscript_id', '=', $manuscript_id );
 

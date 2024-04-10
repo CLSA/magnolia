@@ -78,6 +78,17 @@ class ui extends \cenozo\ui\ui
     $module = $this->get_module( 'reqn_version' );
     if( !is_null( $module ) ) $module->append_action_query( 'view', '?{t}&{c}' );
 
+    $module = $this->get_module( 'manuscript' );
+    if( !is_null( $module ) )
+    {
+      $module->add_child( 'manuscript_version' );
+      $module->add_child( 'manuscript_deferral_note' );
+      $module->add_child( 'manuscript_review' );
+      $module->add_child( 'manuscript_stage' );
+      $module->add_child( 'manuscript_notice' );
+      $module->add_child( 'manuscript_notification' );
+    }
+
     $module = $this->get_module( 'manuscript_version' );
     if( !is_null( $module ) ) $module->append_action_query( 'view', '?{t}&{c}' );
 

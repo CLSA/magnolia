@@ -16,7 +16,6 @@ cenozoApp.defineModule({
       },
       columnList: {
         title: { column: "manuscript.title", title: "Requisition" },
-        amendment: { title: "Amendment" },
         manuscript_review_type: {
           column: "manuscript_review_type.name",
           title: "Type",
@@ -28,16 +27,12 @@ cenozoApp.defineModule({
           title: "Reviewer",
         },
         datetime: { title: "Created On", type: "date" },
-        answered_questions: {
-          title: "Questions (Yes/Answered)",
-          help: 'Displays the number of "Yes" Answers out of the number of Answered Questions.',
-        },
         recommendation: {
           column: "manuscript_recommendation_type.name",
           title: "Recommendation",
         },
-        full_note: {
-          title: "Full Note",
+        note: {
+          title: "Note",
           align: "left",
           isIncluded: function ($state, model) {
             return "root.home" != $state.current.name;
@@ -54,11 +49,6 @@ cenozoApp.defineModule({
       title: {
         column: "manuscript.title",
         title: "Requisition",
-        type: "string",
-        isConstant: true,
-      },
-      amendment: {
-        title: "Amendment",
         type: "string",
         isConstant: true,
       },

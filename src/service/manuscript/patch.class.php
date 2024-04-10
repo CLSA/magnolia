@@ -26,7 +26,6 @@ class patch extends \cenozo\service\patch
       $db_role = lib::create( 'business\session' )->get_role();
       $db_manuscript_version = $db_manuscript->get_current_manuscript_version();
       $db_current_stage_type = $db_manuscript->get_current_manuscript_stage_type();
-      $state = $db_manuscript->state;
       $phase = $db_current_stage_type->phase;
       $code = NULL;
       if( 'defer' == $action )
@@ -37,7 +36,7 @@ class patch extends \cenozo\service\patch
       {
         if( in_array( $db_role->name, array( 'applicant', 'designate', 'administrator' ) ) )
         {
-          if( 'new' != $phase && 'deferred' != $state ) $code = 403;
+          if( 'new' != $phase && !$db_manuscript->deferred ) $code = 403;
         }
         else $code = 403;
       }
@@ -103,7 +102,7 @@ class patch extends \cenozo\service\patch
 
     if( 'defer' == $action )
     {
-      $db_manuscript->state = 'deferred';
+      $db_manuscript->deferrad = true;
       $db_manuscript->save();
 
       // create a new document version
@@ -132,9 +131,9 @@ class patch extends \cenozo\service\patch
       }
       else
       {
-        if( 'deferred' == $db_manuscript->state )
+        if( $db_manuscript->deferred )
         {
-          $db_manuscript->state = NULL;
+          $db_manuscript->deferred = false;
           $db_manuscript->save();
 
           // when resubmitting set the version/report datetime

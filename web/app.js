@@ -71,7 +71,7 @@ cenozo.factory("CnBaseFormViewFactory", [
   ){
     return {
       construct: function (object, formType, parentModel, root) {
-        // formType: application, finalReport, destructionReport
+        // formType: application, finalReport, destructionReport, manuscriptReport
         CnBaseViewFactory.construct(object, parentModel, root);
 
         // extend the base $$onView function (see below)
@@ -191,7 +191,13 @@ cenozo.factory("CnBaseFormViewFactory", [
               angular.extend(this.record, deferralObject);
               angular.extend(this.backupRecord, deferralObject);
 
-              const response = await CnHttpFactory.instance({
+              const httpObj = "manuscriptReport" == formType ? {
+                path: "manuscript/" + this.record.manuscript_id + "/manuscript_deferral_note",
+                data: {
+                  modifier: { order: "page" },
+                  select: { column: ["page", "note"] }
+                }
+              } : {
                 path: "reqn/identifier=" + this.record.identifier + "/deferral_note",
                 data: {
                   modifier: {
@@ -200,8 +206,9 @@ cenozo.factory("CnBaseFormViewFactory", [
                   },
                   select: { column: ["page", "note"] }
                 }
-              }).query();
+              };
 
+              const response = await CnHttpFactory.instance(httpObj).query();
               response.data.forEach(item => {
                 // add the note to the record (for patching the value)
                 this.record["deferral_note_"+item.page] = item.note;
@@ -222,20 +229,16 @@ cenozo.factory("CnBaseFormViewFactory", [
               // make sure to send patches to deferral notes
               var self = this;
               const page = property.replace( /^deferral_note_/, "" );
-              const basePath = [
-                "reqn",
-                "identifier=" + this.record.identifier,
-                "deferral_note"
-              ].join( "/" );
+              const basePathParts =
+                "manuscriptReport" == formType ?
+                ["manuscript", this.record.manuscript_id, "manuscript_deferral_note"] :
+                ["reqn", "identifier=" + this.record.identifier, "deferral_note"];
 
               // re-read the deferral note before making changes to it
               let deferralNote = null;
               try {
                 const response = await CnHttpFactory.instance({
-                  path: [
-                    basePath,
-                    "form=" + formType.camelToSnake() + ";page=" + page
-                  ].join( "/" ),
+                  path: basePathParts.concat("form=" + formType.camelToSnake() + ";page=" + page).join("/"),
                   onError: function (error) {
                     // ignore 404 errors, it just means there is no deferral note
                     if (404 != error.status) self.onPatchError(error);
@@ -260,18 +263,19 @@ cenozo.factory("CnBaseFormViewFactory", [
               } else {
                 // if the note doesn't exist then we need to create it
                 if (null == deferralNote) {
+                  const data = { page: page, note: data[property] };
+                  if ("manuscriptReport" != formType) data.form = formType.camelToSnake();
+
                   await CnHttpFactory.instance({
-                    path: basePath,
-                    data: {
-                      form: formType.camelToSnake(),
-                      page: page,
-                      note: data[property],
-                    },
+                    path: basePathParts.join("/"),
+                    data: data,
                     onError: onError,
                   }).post();
                 } else { // otherwise we just need to patch the existing record
                   await CnHttpFactory.instance({
-                    path: "deferral_note/" + deferralNote.id,
+                    path:
+                      ("manuscriptReport" == formType ? "manuscript_" : "") +
+                      "deferral_note/" + deferralNote.id,
                     data: { note: data[property] },
                     onError: onError,
                   }).patch();
@@ -294,8 +298,7 @@ cenozo.factory("CnBaseFormModelFactory", [
   "$state",
   function (CnBaseModelFactory, CnSession, $state){
     return {
-      construct: function (object, formType, type, listFactory, viewFactory, module) {
-        // formType: application, finalReport, destructionReport
+      construct: function (object, type, listFactory, viewFactory, module) {
         CnBaseModelFactory.construct(object, module);
 
         object.type = type;
@@ -839,13 +842,13 @@ cenozo.service("CnManuscriptHelper", [
       showAction: function (subject, record) {
         let role = CnSession.role.name;
         let phase = record.phase ? record.phase : "";
-        let state = record.state ? record.state : "";
+        let deferred = true === record.deferred;
         let stageType = record.stage_type ? record.stage_type : "";
 
         if ("submit" == subject) {
           return (
             ["applicant", "designate", "administrator"].includes(role) &&
-            ("new" == phase || "deferred" == state)
+            ("new" == phase || deferred)
           );
         } else if ("view" == subject) {
           return !["applicant", "designate"].includes(role);
@@ -853,7 +856,7 @@ cenozo.service("CnManuscriptHelper", [
           return "new" == phase;
         } else if ("defer" == subject) {
           return (
-            "deferred" != state && (
+            !deferred && (
               ("administrator" == role && "review" == phase) ||
               ("dao" == role && "DAO Review" == stageType)
             )
@@ -920,6 +923,7 @@ cenozo.service("CnLocalization", [
         var addressParts = address.split(".");
 
         function get(array, index) {
+          if (angular.isUndefined(array)) return "ERROR";
           if (angular.isUndefined(index)) index = 0;
           var part = addressParts[index];
           return angular.isUndefined(array[part])
@@ -1397,6 +1401,10 @@ cenozo.service("CnLocalization", [
                 en: "Title",
                 fr: "Title" // TODO: TRANSLATE
               },
+              status: {
+                en: "Status",
+                fr: "Status", // TODO: TRANSLATE
+              },
             },
           },
           misc: {
@@ -1674,10 +1682,43 @@ cenozo.service("CnLocalization", [
             },
           },
         },
-        manuscript: {
+        manuscriptReport: {
+          heading: {
+            en: "CLSA Manuscript Report",
+            fr: "CLSA Manuscript Report", // TODO: TRANSLATE
+          },
+          instructions: {
+            tab: { en: "Instructions", fr: "Consignes" },
+            title: {
+              en: "Completing the CLSA Manuscript Report",
+              fr: "Completing the CLSA Manuscript Report", // TODO: TRANSLATE
+            },
+            text1: {
+              en: "Instruction text goes here.",
+              fr: "Instruction text goes here.", // TODO: TRANSLATE
+            },
+            text2: {
+              en: "More instruction text goes here.",
+              fr: "More instruction text goes here.", // TODO: TRANSLATE
+            },
+          },
+          part_1: {
+            tab: { en: "Part 1", fr: "1<sup>re</sup> partie" },
+          },
+          part_2: {
+            tab: { en: "Part 2", fr: "2<sup>e</sup> partie" },
+          },
+          part_3: {
+            tab: { en: "Part 3", fr: "3<sup>e</sup> partie" },
+          },
+          part_4: {
+            tab: { en: "Part 4", fr: "4<sup>e</sup> partie" },
+          },
           misc: {
             no: { en: "No", fr: "Non" },
             yes: { en: "Yes", fr: "Oui" },
+            download: { en: "Download", fr: "Télécharger" },
+            submit: { en: "Submit", fr: "Soumettre" },
             deleteWarning: {
               en: "Are you sure you want to delete the manuscript review?\n\nThis will permanently destroy all details you have provided. Once this is done there will be no way to restore the manuscript review!",
               fr: "Are you sure you want to delete the manuscript review?\n\nThis will permanently destroy all details you have provided. Once this is done there will be no way to restore the manuscript review!", // TODO: TRANSLATE
@@ -1953,6 +1994,9 @@ cenozo.service("CnLocalization", [
             en: "You must provide either a file or URL",
             fr: "Vous devez fournir un fichier ou une URL",
           },
+        },
+        manuscriptAttachment: {
+          name: { en: "Name", fr: "Nom" },
         },
       },
     };

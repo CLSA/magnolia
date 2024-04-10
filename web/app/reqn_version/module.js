@@ -1,9 +1,10 @@
 cenozoApp.defineModule({
   name: "reqn_version",
-  dependencies: ["coapplicant", "ethics_approval", "reference"],
+  dependencies: ["coapplicant", "ethics_approval", "manuscript", "reference"],
   models: ["list", "view"],
   create: (module) => {
     var coapplicantModule = cenozoApp.module("coapplicant");
+    var manuscriptModule = cenozoApp.module("manuscript");
     var referenceModule = cenozoApp.module("reference");
 
     angular.extend(module, {
@@ -160,6 +161,8 @@ cenozoApp.defineModule({
             cnRecordView.link(scope, element, attrs);
 
             angular.extend(scope, {
+              isAddingManuscript: false,
+              isDeletingManuscript: [],
               isAddingCoapplicant: false,
               isDeletingCoapplicant: [],
               isAddingReference: false,
@@ -256,6 +259,12 @@ cenozoApp.defineModule({
             if (angular.isUndefined($scope.model)) $scope.model = CnReqnVersionModelFactory.root;
             if (angular.isUndefined($scope.liteModel)) $scope.liteModel = CnReqnVersionModelFactory.lite;
             cnRecordView.controller[1]($scope);
+
+            // manuscript resources
+            var manuscriptAddModel = $scope.model.viewModel.manuscriptModel.addModel;
+            $scope.manuscriptRecord = {};
+            $scope.manuscriptFormattedRecord = {};
+            manuscriptAddModel.onNew($scope.manuscriptRecord);
 
             // coapplicant resources
             var coapplicantAddModel = $scope.model.viewModel.coapplicantModel.addModel;
@@ -442,9 +451,14 @@ cenozoApp.defineModule({
               // that function is usually in the cn-record-add directive we have to implement on here instead.
               var element = cenozo.getFormElement(property);
               if (element) {
-                // Both the coapplicant and reference cn-add-input directives share this method, so differentiate
-                // by checking to see which module has the property
-                if (null != coapplicantModule.getInput(property)) {
+                // The manuscript, coapplicant and reference cn-add-input directives share this method
+                // so determine which it is by checking to see which module has the property
+                if (null != manuscriptModule.getInput(property)) {
+                  element.$error.format = !$scope.model.viewModel.manuscriptModel.testFormat(
+                    property,
+                    $scope.manuscriptRecord[property]
+                  );
+                } else if (null != coapplicantModule.getInput(property)) {
                   element.$error.format = !$scope.model.viewModel.coapplicantModel.testFormat(
                     property,
                     $scope.coapplicantRecord[property]
@@ -461,34 +475,27 @@ cenozoApp.defineModule({
 
             $scope.addManuscript = async function () {
               if ($scope.model.viewModel.manuscriptModel.getAddEnabled()) {
-                var form = cenozo.getScopeByQuerySelector("#project_team_form").project_team_form;
+                var form = cenozo.getScopeByQuerySelector("#manuscript_form").manuscript_form;
 
-                // we need to check each add-input for errors
-                var valid = true;
-                for (var property in $scope.model.viewModel.manuscriptModel
-                  .module.inputGroupList[0].inputList) {
-                  // get the property's form element and remove any conflict errors, then see if it's invalid
-                  var currentElement = cenozo.getFormElement(property);
-                  currentElement.$error.conflict = false;
-                  cenozo.updateFormElement(currentElement);
-                  if (currentElement.$invalid) {
-                    valid = false;
-                    break;
-                  }
-                }
-                if (!valid) {
+                // we need to check the title input for errors
+
+                // get the title's form element and remove any conflict errors, then see if it's invalid
+                var titleEl = cenozo.getFormElement("title");
+                titleEl.$error.conflict = false;
+                cenozo.updateFormElement(titleEl);
+
+                if (titleEl.$invalid) {
                   // dirty all inputs so we can find the problem
-                  cenozo.forEachFormElement("project_team_form", (element) => { element.$dirty = true; });
+                  cenozo.forEachFormElement("manuscript_form", (element) => { element.$dirty = true; });
                 } else {
                   try {
                     $scope.isAddingManuscript = true;
-                    await manuscriptAddModel.onAdd($scope.manuscriptRecord);
+                    const response = await manuscriptAddModel.onAdd($scope.manuscriptRecord);
 
                     // reset the form
                     form.$setPristine();
                     await manuscriptAddModel.onNew($scope.manuscriptRecord);
                     await $scope.model.viewModel.getManuscriptList();
-                    await $scope.model.viewModel.determineManuscriptDiffs();
                   } finally {
                     $scope.isAddingManuscript = false;
                   }
@@ -496,11 +503,10 @@ cenozoApp.defineModule({
               }
             };
 
-            $scope.editManuscript = async function (id) {
-              if ($scope.model.viewModel.manuscriptModel.getEditEnabled()) {
-                await $scope.model.viewModel.editManuscript(id);
-                await $scope.model.viewModel.determineManuscriptDiffs();
-              }
+            $scope.viewManuscript = async function (id) {
+              await $scope.model.viewModel.manuscriptModel.transitionToViewState({
+                getIdentifier: function () { return id; }
+              });
             };
 
             $scope.removeManuscript = async function (id) {
@@ -526,6 +532,7 @@ cenozoApp.defineModule({
       "CnModalNoticeListFactory",
       "CnModalUploadAgreementFactory",
       "CnModalRecordViewFactory",
+      "CnManuscriptModelFactory",
       "CnCoapplicantModelFactory",
       "CnReferenceModelFactory",
       "CnEthicsApprovalModelFactory",
@@ -544,6 +551,7 @@ cenozoApp.defineModule({
         CnModalNoticeListFactory,
         CnModalUploadAgreementFactory,
         CnModalRecordViewFactory,
+        CnManuscriptModelFactory,
         CnCoapplicantModelFactory,
         CnReferenceModelFactory,
         CnEthicsApprovalModelFactory,
@@ -566,6 +574,7 @@ cenozoApp.defineModule({
             compareRecord: null,
             versionListLoaded: false,
             versionList: [],
+            manuscriptList: [],
             lastAgreementVersion: null,
             coapplicantAgreementList: [],
             agreementDifferenceList: null,
@@ -573,7 +582,7 @@ cenozoApp.defineModule({
             addingCoapplicantWithData: false, // used when an amendment is adding a new coap
             showManuscripts: function () {
               // TODO: implement
-              return true;
+              return this.record.is_current_version;
             },
             showAgreement: function () {
               // only show the agreement tab to administrators
@@ -654,6 +663,7 @@ cenozoApp.defineModule({
                   this.getReferenceList(),
                   this.getSelectionList(),
                 ];
+                if (this.showManuscripts()) promiseList.push(this.getManuscriptList());
                 if (this.record.has_ethics_approval_list) promiseList.push(this.getEthicsApprovalList());
                 await Promise.all(promiseList);
 
@@ -834,6 +844,7 @@ cenozoApp.defineModule({
               return this.$$onPatchError(response);
             },
 
+            manuscriptModel: CnManuscriptModelFactory.instance(),
             coapplicantModel: CnCoapplicantModelFactory.instance(),
             referenceModel: CnReferenceModelFactory.instance(),
             ethicsApprovalModel: CnEthicsApprovalModelFactory.instance(),
@@ -1582,6 +1593,26 @@ cenozoApp.defineModule({
               }
             },
 
+            getManuscriptList: async function () {
+              var response = await CnHttpFactory.instance({
+                path: "/reqn/identifier=" + this.record.identifier + "/manuscript",
+                data: {
+                  select: { column: ["id", "title", { table: "manuscript_stage_type", column: "status" }] },
+                  modifier: { order: "id", limit: 1000 },
+                },
+              }).query();
+
+              this.manuscriptList = response.data;
+            },
+
+            removeManuscript: async function (id) {
+              await CnHttpFactory.instance({
+                path: "/reqn/identifier=" + this.record.identifier + "/manuscript/" + id
+              }).delete();
+              await this.getManuscriptList();
+              this.determineManuscriptDiffs();
+            },
+
             getCoapplicantList: async function (reqnVersionId, object) {
               var basePath = angular.isDefined(reqnVersionId)
                 ? "reqn_version/" + reqnVersionId
@@ -2205,7 +2236,7 @@ cenozoApp.defineModule({
                   await this.setFormTab(errorTab);
                   return;
                 }
-                
+
                 // warn the user when no cohort is selected and don't proceed
                 if (!this.record.tracking && !this.record.comprehensive) {
                   await CnModalMessageFactory.instance({
@@ -2215,13 +2246,13 @@ cenozoApp.defineModule({
                     closeText: this.parentModel.isRole("applicant", "designate") ?
                       this.translate("misc.close") : "Close",
                   }).show();
-                  
+
                   // mark the tracking dropdown in red
                   var trackingElement = cenozo.getFormElement("tracking");
                   trackingElement.$error.required = true;
                   cenozo.updateFormElement(trackingElement, true);
                   trackingElement.$error.required = false;
-                  
+
                   // mark the comprehensive dropdown in red
                   var comprehensiveElement = cenozo.getFormElement("comprehensive");
                   comprehensiveElement.$error.required = true;
@@ -2295,7 +2326,7 @@ cenozoApp.defineModule({
                     title: 'Requisition moved to "' + stageType + '" stage',
                     message:
                       "The legacy requisition has been moved to the " +
-                      '"' + stageType + '" ' + 
+                      '"' + stageType + '" ' +
                       "stage and is now visible to the applicant.",
                     closeText: "Close",
                   }).show();
@@ -2367,7 +2398,7 @@ cenozoApp.defineModule({
                         yesText: this.translate("misc.yes"),
                         message: this.translate("misc.confirmNoCoapplicants"),
                       }).show();
-                      
+
                       if (!response) return; // don't proceed if there are no coapplicants in a new reqn
                     } else if (0 < this.record.coapplicantList.filter(c => null == c.country).length) {
                       // all co-applicants must have a country
@@ -2516,6 +2547,25 @@ cenozoApp.defineModule({
           this.configureFileInput("indigenous4_filename");
           this.configureFileInput("agreement_filename");
 
+          // handle conflict errors differently in the manuscript's add model
+          this.manuscriptModel.addModel.onAddError = function(response) {
+            if (409 == response.status) {
+              // report which inputs are included in the conflict
+              response.data.forEach((item) => {
+                const scope = cenozo.getScopeByQuerySelector("#manuscript_form [name=innerForm]");
+                if (scope) {
+                  const element = scope.innerForm.name;
+                  if (element) {
+                    element.$error.conflict = true;
+                    cenozo.updateFormElement(element, true);
+                  }
+                }
+              });
+            } else {
+              CnModalMessageFactory.httpError(response);
+            }
+          };
+
           async function init(object) {
             await object.deferred.promise;
             await object.coapplicantModel.metadata.getPromise(); // needed to get the coapplicant's metadata
@@ -2551,7 +2601,6 @@ cenozoApp.defineModule({
         var object = function (type) {
           CnBaseFormModelFactory.construct(
             this,
-            "application",
             type,
             CnReqnVersionListFactory,
             CnReqnVersionViewFactory,

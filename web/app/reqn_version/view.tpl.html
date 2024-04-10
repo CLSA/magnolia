@@ -1037,7 +1037,7 @@
               ng-class="{'active':tab == model.viewModel.formTab}">
             <a ng-click="model.viewModel.setFormTab(tab)"
                ng-class="{
-                 'text-warning flashing':model.getEditEnabled() && ( 
+                 'text-warning flashing':model.getEditEnabled() && (
                    ( 'cohort' == tab && model.viewModel.record.deferral_note_cohort ) ||
                    ( 'indigenous' == tab && model.viewModel.record.deferral_note_indigenous ) ||
                    model.viewModel.record['deferral_note_'+tab]
@@ -1390,21 +1390,23 @@
         <p class="text-primary" ng-bind-html="t( 'manuscripts.text' )"></p>
         <div class="panel panel-default">
           <div class="panel-body">
-            <span ng-show="0 == model.viewModel.record.manuscriptList.length"
+            <span ng-show="0 == model.viewModel.manuscriptList.length"
                   ng-bind-html="t( 'manuscripts.manuscript.noManuscripts' )"></span>
             <table class="table table-striped"
-                   ng-class="{ 'table-hover': model.getManuscriptEditEnabled() && !isDAO() }"
-                   ng-show="0 < model.viewModel.record.manuscriptList.length">
+                   ng-class="{ 'table-hover': model.getManuscriptEditEnabled() }"
+                   ng-show="0 < model.viewModel.manuscriptList.length">
               <thead class="bg-info">
                 <tr>
                   <td ng-bind-html="t( 'manuscripts.manuscript.title' )"></td>
+                  <td ng-bind-html="t( 'manuscripts.manuscript.status' )"></td>
                   <td ng-show="model.getManuscriptEditEnabled() && !isDAO()"></td>
                 </tr>
               </thead>
               <tbody>
-                <tr ng-repeat="manuscript in model.viewModel.record.manuscriptList"
-                    ng-click="model.getManuscriptEditEnabled() && !isDAO() && viewManuscript( manuscript.id )">
+                <tr ng-repeat="manuscript in model.viewModel.manuscriptList"
+                    ng-click="model.getManuscriptEditEnabled() && viewManuscript( manuscript.id )">
                   <td>{{ manuscript.title }}</td>
+                  <td>{{ manuscript.status }}</td>
                   <td ng-show="model.getManuscriptEditEnabled() && !isDAO()">
                     <button class="btn btn-xs btn-danger"
                             ng-disabled="isDeletingManuscript.includes( manuscript.id )"
@@ -1419,25 +1421,25 @@
           </div>
         </div>
         <form
-          id="project_team_form"
-          name="project_team_form"
+          id="manuscript_form"
+          name="manuscript_form"
           ng-show="model.getManuscriptEditEnabled() && !isDAO()"
           novalidate
         >
-          <fieldset ng-disabled="!model.getManuscriptEditEnabled() && !isDAO()">
-            <div class="form-horizontal">
-              <cn-add-input
-                input="{ key: 'name', title: t( 'manuscripts.manuscript.title' ), type: 'string' }"
-                record="manuscriptRecord"
-                model="model.viewModel.manuscriptModel"
-                first="true">
-              </cn-add-input>
-              <button class="btn btn-primary pull-right"
-                      ng-disabled="isAddingManuscript"
-                      ng-click="addManuscript()"
-                      ng-bind-html="t( 'manuscripts.manuscript.addManuscript' )"></button>
-            </div>
-          </fieldset>
+          <div class="form-horizontal">
+            <cn-add-input
+              class="col-sm-10"
+              input="{ key: 'title', title: t( 'manuscripts.manuscript.title' ), type: 'string' }"
+              record="manuscriptRecord"
+              model="model.viewModel.manuscriptModel">
+            </cn-add-input>
+            <button
+              class="btn btn-primary col-sm-2"
+              ng-disabled="isAddingManuscript"
+              ng-click="addManuscript()"
+              ng-bind-html="t( 'manuscripts.manuscript.addManuscript' )"
+            ></button>
+          </div>
         </form>
       </div>
     </div>

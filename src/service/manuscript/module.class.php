@@ -86,8 +86,8 @@ class module extends \cenozo\service\module
       'manuscript_stage_type.id'
     );
 
-    if( $select->has_column( 'state_days' ) )
-      $select->add_column( 'DATEDIFF( NOW(), manuscript.state_date )', 'state_days', false, 'integer' );
+    if( $select->has_column( 'deferred_days' ) )
+      $select->add_column( 'DATEDIFF( NOW(), manuscript.deferred_date )', 'deferred_days', false, 'integer' );
 
     if( $select->has_column( 'user_full_name' ) )
     {
@@ -137,14 +137,7 @@ class module extends \cenozo\service\module
       {
         $select->add_table_column(
           'manuscript_stage_type',
-          'IF('."\n".
-            '"deferred" = manuscript.state, "Action Required",'."\n".
-            'IF('."\n".
-              'manuscript.state IS NOT NULL,'."\n".
-              'CONCAT( UPPER( SUBSTRING( manuscript.state, 1, 1 ) ), SUBSTRING( manuscript.state, 2 ) ),'."\n".
-              'manuscript_stage_type.status'."\n".
-            ')'."\n".
-          ')',
+          'IF( manuscript.deferred, "Action Required", manuscript_stage_type.status )',
           'status',
           false
         );

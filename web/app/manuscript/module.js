@@ -33,21 +33,20 @@ cenozoApp.defineModule({
             return model.isRole("applicant", "designate");
           },
         },
-        state: {
-          title: "On Hold",
-          type: "string",
+        deferred: {
+          title: "Deferred",
+          type: "boolean",
           isIncluded: function ($state, model) {
             return !model.isRole("applicant", "designate");
           },
-          help: "The reason the manuscript is on hold (empty if the manuscript hasn't been held up)",
         },
-        state_days: {
-          title: "Days On Hold",
+        deferred_days: {
+          title: "Days Deferred",
           type: "number",
           isIncluded: function ($state, model) {
             return !model.isRole("applicant", "designate");
           },
-          help: "The number of days since the manuscript was put on hold (empty if the manuscript hasn't been held up)",
+          help: "The number of days since the manuscript was deferred (empty if the manuscript isn't deferred)",
         },
         manuscript_stage_type: {
           column: "manuscript_stage_type.name",
@@ -82,16 +81,16 @@ cenozoApp.defineModule({
           return model.isRole("administrator", "dao", "readonly") ? "add" : true;
         },
       },
-      state: {
-        title: "State",
-        type: "enum",
+      deferred: {
+        title: "Deferred",
+        type: "boolean",
         isConstant: true,
         isExcluded: function ($state, model) {
           return model.isRole("administrator", "dao", "readonly") ? "add" : true;
         },
       },
-      state_date: {
-        title: "State Set On",
+      deferred_date: {
+        title: "Deferred On",
         type: "date",
         isConstant: true,
         isExcluded: function ($state, model) {
@@ -101,10 +100,6 @@ cenozoApp.defineModule({
       title: {
         title: "Title",
         type: "string",
-        isConstant: true,
-        isExcluded: function ($state, model) {
-          return model.isRole("administrator", "dao", "readonly");
-        },
       },
       suggested_revisions: {
         title: "Suggested Revisions",
@@ -282,11 +277,10 @@ cenozoApp.defineModule({
             },
 
             enabled: function (subject) {
-              var state = this.record.state ? this.record.state : "";
               if (["defer", "reverse"].includes(subject)) {
                 return true;
               } else if ("proceed" == subject) {
-                return !state && null != this.record.next_manuscript_stage_type;
+                return false === this.record.deferred && null != this.record.next_manuscript_stage_type;
               } else return false;
             },
 
@@ -384,9 +378,9 @@ cenozoApp.defineModule({
                   path:
                     this.parentModel.getServiceResourcePath() + "?action=defer",
                 }).patch();
-                this.record.state = "deferred";
-                this.record.state_date = moment().format("YYYY-MM-DD");
-                this.updateFormattedRecord("state_date", "date");
+                this.record.deferred = true;
+                this.record.deferred_date = moment().format("YYYY-MM-DD");
+                this.updateFormattedRecord("deferred_date", "date");
                 await this.reloadAll(["manuscriptVersion", "notification"]);
               }
             },
@@ -452,97 +446,26 @@ cenozoApp.defineModule({
           this.viewModel = CnManuscriptViewFactory.instance(this, root);
 
           angular.extend(this, {
-            getAddEnabled: function () {
-              return (
-                this.$$getAddEnabled() &&
-                ("manuscript" == this.getSubjectFromState() ||
-                  ("root" == this.getSubjectFromState() &&
-                    this.isRole("applicant")))
-              );
-            },
-
             getEditEnabled: function () {
               var phase = this.viewModel.record.phase ? this.viewModel.record.phase : "";
-              var state = this.viewModel.record.state ? this.viewModel.record.state : "";
               return (
                 this.$$getEditEnabled() && (
                   this.isRole("applicant", "designate")
-                    ? "new" == phase || ("deferred" == state && "review" == phase)
+                    ? "new" == phase || (true === this.viewModel.record.deferred && "review" == phase)
                     : this.isRole("administrator", "dao")
                 )
               );
             },
 
-            getDeleteEnabled: function () {
-              return (
-                this.$$getDeleteEnabled() &&
-                angular.isDefined(this.listModel.record) &&
-                "new" == this.listModel.record.phase
-              );
-            },
-
-            // override transitionToAddState (used when applicant creates a new manuscript)
-            transitionToAddState: async function () {
-              // for applicants immediately get a new manuscript and view it (no add state required)
-              if ("applicant" != CnSession.role.name) {
-                this.$$transitionToAddState();
-              } else {
-                var response = await CnHttpFactory.instance({
-                  path: "manuscript",
-                  data: { user_id: CnSession.user.id },
-                }).post();
-                var newId = response.data;
-
-                // get the new manuscript version id
-                var response = await CnHttpFactory.instance({
-                  path: "manuscript/" + newId,
-                  data: {
-                    select: {
-                      column: {
-                        table: "manuscript_version",
-                        column: "id",
-                        alias: "manuscript_version_id",
-                      },
-                    },
-                  },
-                }).get();
-
-                await $state.go("manuscript_version.view", { identifier: response.data.manuscript_version_id });
-              }
-            },
-
             // override transitionToViewState (used when application views a manuscript)
             transitionToViewState: async function (record) {
               if (this.isRole("applicant", "designate")) {
-                let state = "manuscript_version.view";
-                let args = { identifier: record.manuscript_version_id };
-                await $state.go(state, args);
+                await $state.go("manuscript_version.view", { identifier: record.manuscript_version_id });
               } else {
                 await this.$$transitionToViewState(record);
               }
             },
 
-            getMetadata: async function () {
-              await this.$$getMetadata();
-
-              var response = await CnHttpFactory.instance({
-                path: "language",
-                data: {
-                  select: { column: ["id", "name"] },
-                  modifier: {
-                    where: { column: "active", operator: "=", value: true },
-                    order: "name",
-                    limit: 1000,
-                  },
-                },
-              }).query();
-
-              this.metadata.columnList.language_id.enumList =
-                response.data.reduce((list, item) => {
-                  list.push({ value: item.id, name: item.name });
-                  return list;
-                }, []);
-            },
           });
 
         };

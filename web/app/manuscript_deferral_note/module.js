@@ -19,7 +19,7 @@ cenozoApp.defineModule({
         page_title: { title: "Page" },
       },
       defaultOrder: {
-        column: "form",
+        column: "page",
         reverse: true,
       },
     });

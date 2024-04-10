@@ -63,7 +63,7 @@ class module extends \cenozo\service\module
     $modifier->left_join( 'user', 'manuscript_review.user_id', 'user.id' );
     $modifier->left_join(
       'recommendation_type',
-      'manuscript_review.recommendation_type_id',
+      'manuscript_review.manuscript_recommendation_type_id',
       'recommendation_type.id'
     );
     $modifier->join( 'manuscript', 'manuscript_review.manuscript_id', 'manuscript.id' );
