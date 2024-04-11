@@ -76,7 +76,7 @@
       style="border-top-left-radius: 0px;"
     >
       <div class="panel-body" style="padding-bottom: 0px;">
-        <h4 ng-bind-html="t( 'instructions.title' )"></h4>
+        <h4 class="text-primary" ng-bind-html="t( 'instructions.title' )"></h4>
         <ul class="list-group">
           <li class="list-group-item" ng-bind-html="t( 'instructions.text1' )"></li>
           <li class="list-group-item" ng-bind-html="t( 'instructions.text2' )"></li>
@@ -89,22 +89,21 @@
       style="border-top-left-radius: 0px;"
     >
       <div class="panel-body">
+        <h3 ng-bind-html="t( 'part_1.title' )"></h3>
         <cn-deferral-note ng-if="model.getEditEnabled()" page="part_1" class="bg-info"></cn-deferral-note>
-        <form name="form" class="form-horizontal" novalidate>
-          <div class="form-group">
-            <div class="form-body input-group">
-              <div
-                ng-repeat="attachment in model.viewModel.attachmentList"
-                style="padding-top: 1.5em; padding-bottom: 1.5em;"
-              >
-                <label
-                  for="attachment{{ attachment.id }}"
-                  class="control-label col-sm-4"
-                  ng-bind-html="attachment.name"
-                ></label>
-                <div class="col-sm-8">
-                  <!-- TODO: put file input here? -->
-                </div>
+        <form name="part_1Form" class="form-horizontal" novalidate>
+          <div class="container-fluid vertical-spacer">
+            <div
+              ng-repeat="attachment in model.viewModel.attachmentList"
+              style="padding-top: 1.5em; padding-bottom: 1.5em;"
+            >
+              <label
+                for="attachment{{ attachment.id }}"
+                class="control-label col-sm-4"
+                ng-bind-html="attachment.name"
+              ></label>
+              <div class="col-sm-8">
+                <!-- TODO: put file input here? -->
               </div>
             </div>
           </div>
@@ -117,11 +116,38 @@
       style="border-top-left-radius: 0px;"
     >
       <div class="panel-body">
+        <h3 ng-bind-html="t( 'part_2.title' )"></h3>
         <cn-deferral-note ng-if="model.getEditEnabled()" page="part_2" class="bg-info"></cn-deferral-note>
-        <form name="form" class="form-horizontal" novalidate>
-          <div class="form-group">
-            <div class="form-body input-group">
-            </div>
+        <form name="part_2Form" class="form-horizontal" novalidate>
+          <div class="container-fluid vertical-spacer">
+            <cn-view-input-with-differences
+              input="{
+                key: 'authors',
+                title: t( 'part_2.authors' ),
+                type: 'string',
+              }"
+              difference="model.viewModel.compareRecord.differences.part_2.authors"
+              model="model">
+            </cn-view-input-with-differences>
+            <cn-view-input-with-differences
+              input="{
+                key: 'date',
+                title: t( 'part_2.date' ),
+                type: 'date',
+                constant: true
+              }"
+              difference="model.viewModel.compareRecord.differences.part_2.date"
+              model="model">
+            </cn-view-input-with-differences>
+            <cn-view-input-with-differences
+              input="{
+                key: 'journal',
+                title: t( 'part_2.journal' ),
+                type: 'string',
+              }"
+              difference="model.viewModel.compareRecord.differences.part_2.journal"
+              model="model">
+            </cn-view-input-with-differences>
           </div>
         </form>
       </div>
@@ -132,11 +158,123 @@
       style="border-top-left-radius: 0px;"
     >
       <div class="panel-body">
+        <h3 ng-bind-html="t( 'part_3.title' )"></h3>
         <cn-deferral-note ng-if="model.getEditEnabled()" page="part_3" class="bg-info"></cn-deferral-note>
-        <form name="form" class="form-horizontal" novalidate>
-          <div class="form-group">
-            <div class="form-body input-group">
-            </div>
+        <form name="part_3Form" class="form-horizontal" novalidate>
+          <div class="container-fluid vertical-spacer">
+            <ul class="list-group">
+              <li class="list-group-item">
+                <h4 class="text-primary" ng-bind-html="t( 'part_3.clsa_title_description' )"></h4>
+                <cn-view-input-with-differences
+                  input="{
+                    key: 'clsa_title',
+                    title: t( 'part_3.clsa_title' ),
+                    type: 'boolean',
+                    enumList: model.metadata.yesNoEnumList[model.viewModel.record.lang]
+                  }"
+                  no-cols=true
+                  difference="model.viewModel.compareRecord.differences.part_3.clsa_title"
+                  model="model">
+                </cn-view-input-with-differences>
+                <cn-view-input-with-differences
+                  ng-if="false === model.viewModel.record.clsa_title"
+                  input="{
+                    key: 'clsa_title_justification',
+                    title: t( 'part_3.clsa_title_justification' ),
+                    type: 'text',
+                    maxLength: 1500
+                  }"
+                  no-cols=true
+                  difference="model.viewModel.compareRecord.differences.part_3.clsa_title_justification"
+                  model="model">
+                </cn-view-input-with-differences>
+              </li>
+              <li class="list-group-item">
+                <h4 class="text-primary" ng-bind-html="t( 'part_3.clsa_keyword_description' )"></h4>
+                <cn-view-input-with-differences
+                  input="{
+                    key: 'clsa_keyword',
+                    title: t( 'part_3.clsa_keyword' ),
+                    type: 'boolean',
+                    enumList: model.metadata.yesNoEnumList[model.viewModel.record.lang]
+                  }"
+                  no-cols=true
+                  difference="model.viewModel.compareRecord.differences.part_3.clsa_keyword"
+                  model="model">
+                </cn-view-input-with-differences>
+                <cn-view-input-with-differences
+                  ng-if="false === model.viewModel.record.clsa_keyword"
+                  input="{
+                    key: 'clsa_keyword_justification',
+                    title: t( 'part_3.clsa_keyword_justification' ),
+                    type: 'text',
+                    maxLength: 1500
+                  }"
+                  no-cols=true
+                  difference="model.viewModel.compareRecord.differences.part_3.clsa_keyword_justification"
+                  model="model">
+                </cn-view-input-with-differences>
+              </li>
+              <li class="list-group-item">
+                <h4 class="text-primary" ng-bind-html="t( 'part_3.clsa_reference_description' )"></h4>
+                <ul class="list-group container allow-select">
+                  <li class="list-group-item text-muted" ng-bind-html="t( 'part_3.clsa_reference_ref1' )"></li>
+                  <li class="list-group-item text-muted" ng-bind-html="t( 'part_3.clsa_reference_ref2' )"></li>
+                </ul>
+                <cn-view-input-with-differences
+                  input="{
+                    key: 'clsa_reference',
+                    title: t( 'part_3.clsa_reference' ),
+                    type: 'boolean',
+                    enumList: model.metadata.yesNoEnumList[model.viewModel.record.lang]
+                  }"
+                  no-cols=true
+                  difference="model.viewModel.compareRecord.differences.part_3.clsa_reference"
+                  model="model">
+                </cn-view-input-with-differences>
+                <cn-view-input-with-differences
+                  ng-if="false === model.viewModel.record.clsa_reference"
+                  input="{
+                    key: 'clsa_reference_justification',
+                    title: t( 'part_3.clsa_reference_justification' ),
+                    type: 'text',
+                    maxLength: 1500
+                  }"
+                  no-cols=true
+                  difference="model.viewModel.compareRecord.differences.part_3.clsa_reference_justification"
+                  model="model">
+                </cn-view-input-with-differences>
+              </li>
+              <li class="list-group-item" ng-if="model.viewModel.record.has_genomics_data">
+                <h4 class="text-primary" ng-bind-html="t( 'part_3.genomics_description' )"></h4>
+                <ul class="list-group container allow-select">
+                  <li class="list-group-item text-muted" ng-bind-html="t( 'part_3.genomics_ref' )"></li>
+                </ul>
+                <cn-view-input-with-differences
+                  input="{
+                    key: 'genomics',
+                    title: t( 'part_3.genomics' ),
+                    type: 'boolean',
+                    enumList: model.metadata.yesNoEnumList[model.viewModel.record.lang]
+                  }"
+                  no-cols=true
+                  difference="model.viewModel.compareRecord.differences.part_3.genomics"
+                  model="model">
+                </cn-view-input-with-differences>
+                <cn-view-input-with-differences
+                  ng-if="false === model.viewModel.record.genomics"
+                  input="{
+                    key: 'genomics_justification',
+                    title: t( 'part_3.genomics_justification' ),
+                    type: 'text',
+                    maxLength: 1500
+                  }"
+                  no-cols=true
+                  difference="model.viewModel.compareRecord.differences.part_3.genomics_justification"
+                  model="model">
+                </cn-view-input-with-differences>
+              </li>
+            </ul>
           </div>
         </form>
       </div>
@@ -147,17 +285,169 @@
       style="border-top-left-radius: 0px;"
     >
       <div class="panel-body">
+        <h3 ng-bind-html="t( 'part_4.title' )"></h3>
         <cn-deferral-note ng-if="model.getEditEnabled()" page="part_4" class="bg-info"></cn-deferral-note>
-        <form name="form" class="form-horizontal" novalidate>
-          <div class="form-group">
-            <div class="form-body input-group">
-            </div>
+        <form name="part_4Form" class="form-horizontal" novalidate>
+          <div class="container-fluid vertical-spacer">
+            <ul class="list-group">
+              <li class="list-group-item">
+                <h4 class="text-primary" ng-bind-html="t( 'part_4.acknowledgment_description' )"></h4>
+                <ul class="list-group container allow-select">
+                  <li
+                    class="list-group-item text-muted"
+                    ng-bind-html="
+                      t( 'part_4.acknowledgment_example1' ) + 
+                      model.viewModel.record.identifier +
+                      t( 'part_4.acknowledgment_example2' )
+                    "
+                  ></li>
+                </ul>
+                <cn-view-input-with-differences
+                  input="{
+                    key: 'acknowledgment',
+                    title: t( 'part_4.acknowledgment' ),
+                    type: 'boolean',
+                    enumList: model.metadata.yesNAEnumList[model.viewModel.record.lang]
+                  }"
+                  no-cols=true
+                  difference="model.viewModel.compareRecord.differences.part_4.acknowledgment"
+                  model="model">
+                </cn-view-input-with-differences>
+              </li>
+              <li class="list-group-item">
+                <h4 class="text-primary" ng-bind-html="t( 'part_4.dataset_version_description' )"></h4>
+                <cn-view-input-with-differences
+                  input="{
+                    key: 'dataset_version',
+                    title: t( 'part_4.dataset_version' ),
+                    type: 'boolean',
+                    enumList: model.metadata.yesNAEnumList[model.viewModel.record.lang]
+                  }"
+                  no-cols=true
+                  difference="model.viewModel.compareRecord.differences.part_4.dataset_version"
+                  model="model">
+                </cn-view-input-with-differences>
+              </li>
+              <li class="list-group-item" ng-if="model.viewModel.record.has_seroprevalence_data">
+                <h4 class="text-primary" ng-bind-html="t( 'part_4.dataset_version_description' )"></h4>
+                <ul class="list-group container allow-select">
+                  <li class="list-group-item text-muted" ng-bind-html="t( 'part_4.seroprevalence_example' )"></li>
+                </ul>
+                <cn-view-input-with-differences
+                  input="{
+                    key: 'seroprevalence',
+                    title: t( 'part_4.seroprevalence' ),
+                    type: 'boolean',
+                    enumList: model.metadata.yesNAEnumList[model.viewModel.record.lang]
+                  }"
+                  no-cols=true
+                  difference="model.viewModel.compareRecord.differences.part_4.seroprevalence"
+                  model="model">
+                </cn-view-input-with-differences>
+              </li>
+              <li class="list-group-item" ng-if="model.viewModel.record.has_covid_data">
+                <h4 class="text-primary" ng-bind-html="t( 'part_4.covid_description' )"></h4>
+                <ul class="list-group container allow-select">
+                  <li class="list-group-item text-muted" ng-bind-html="t( 'part_4.covid_example' )"></li>
+                </ul>
+                <cn-view-input-with-differences
+                  input="{
+                    key: 'covid',
+                    title: t( 'part_4.covid' ),
+                    type: 'boolean',
+                    enumList: model.metadata.yesNAEnumList[model.viewModel.record.lang]
+                  }"
+                  no-cols=true
+                  difference="model.viewModel.compareRecord.differences.part_4.covid"
+                  model="model">
+                </cn-view-input-with-differences>
+              </li>
+              <li class="list-group-item">
+                <h4 class="text-primary" ng-bind-html="t( 'part_4.disclaimer_description' )"></h4>
+                <cn-view-input-with-differences
+                  input="{
+                    key: 'disclaimer',
+                    title: t( 'part_4.disclaimer' ),
+                    type: 'boolean',
+                    enumList: model.metadata.yesNAEnumList[model.viewModel.record.lang]
+                  }"
+                  no-cols=true
+                  difference="model.viewModel.compareRecord.differences.part_4.disclaimer"
+                  model="model">
+                </cn-view-input-with-differences>
+              </li>
+              <li class="list-group-item">
+                <h4 class="text-primary" ng-bind-html="t( 'part_4.statement_description' )"></h4>
+                <cn-view-input-with-differences
+                  input="{
+                    key: 'statement',
+                    title: t( 'part_4.statement' ),
+                    type: 'boolean',
+                    enumList: model.metadata.yesNAEnumList[model.viewModel.record.lang]
+                  }"
+                  no-cols=true
+                  difference="model.viewModel.compareRecord.differences.part_4.statement"
+                  model="model">
+                </cn-view-input-with-differences>
+              </li>
+              <li class="list-group-item">
+                <h4 class="text-primary" ng-bind-html="t( 'part_4.website_description' )"></h4>
+                <cn-view-input-with-differences
+                  input="{
+                    key: 'website',
+                    title: t( 'part_4.website' ),
+                    type: 'boolean',
+                    enumList: model.metadata.yesNAEnumList[model.viewModel.record.lang]
+                  }"
+                  no-cols=true
+                  difference="model.viewModel.compareRecord.differences.part_4.website"
+                  model="model">
+                </cn-view-input-with-differences>
+              </li>
+              <li class="list-group-item">
+                <h4 class="text-primary" ng-bind-html="t( 'part_4.indigenous_description' )"></h4>
+                <cn-view-input-with-differences
+                  input="{
+                    key: 'indigenous',
+                    title: t( 'part_4.indigenous' ),
+                    type: 'boolean',
+                    enumList: model.metadata.yesNAEnumList[model.viewModel.record.lang]
+                  }"
+                  no-cols=true
+                  difference="model.viewModel.compareRecord.differences.part_4.indigenous"
+                  model="model">
+                </cn-view-input-with-differences>
+              </li>
+              <li class="list-group-item">
+                <h4 class="text-primary" ng-bind-html="t( 'part_4.objectivee_description' )"></h4>
+                <cn-view-input-with-differences
+                  input="{
+                    key: 'objectives',
+                    title: t( 'part_4.objectives' ),
+                    type: 'text',
+                    maxLength: 1500
+                  }"
+                  no-cols=true
+                  difference="model.viewModel.compareRecord.differences.part_4.objectives"
+                  model="model">
+                </cn-view-input-with-differences>
+              </li>
+            </ul>
           </div>
         </form>
       </div>
     </div>
   </div>
   <div class="form-footer text-right rounded-bottom bg-info" style="height:4.6em;">
-    {{ model.viewModel.formTab }}
+    <button class="btn btn-primary pull-left"
+            ng-if="'instructions' != model.viewModel.formTab"
+            ng-click="model.viewModel.nextTab( true )"
+            ng-bind-html="'<i class=\'glyphicon glyphicon-arrow-left\'></i> ' + t( 'misc.prevButton' )">
+    </button>
+    <button class="btn btn-primary"
+            ng-if="'part_4' != model.viewModel.formTab"
+            ng-click="model.viewModel.nextTab( false )"
+            ng-bind-html="t( 'misc.nextButton' ) + ' <i class=\'glyphicon glyphicon-arrow-right\'></i>'">
+    </button>
   </div>
 </div>

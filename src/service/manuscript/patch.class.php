@@ -135,10 +135,6 @@ class patch extends \cenozo\service\patch
         {
           $db_manuscript->deferred = false;
           $db_manuscript->save();
-
-          // when resubmitting set the version/report datetime
-          $db_manuscript_version->datetime = util::get_datetime_object();
-          $db_manuscript_version->save();
         }
         else
         {

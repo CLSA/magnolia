@@ -154,10 +154,10 @@ cenozo.factory("CnBaseFormViewFactory", [
             if ("application" == subject) subject = "reqn_version";
             await this.parentModel.transitionToParentViewState(
               subject,
-              // the "reqn" uses the identifier, the rest have a current_<subject>_id ID
-              "reqn" == subject ?
-                "identifier=" + this.record.identifier :
-                this.record["current_" + subject + "_id"]
+              // reqn uses the identifier, manuscript uses manuscript_id, and the rest use current_<subject>_id
+              "reqn" == subject ? "identifier=" + this.record.identifier :
+              "manuscript" == subject ? this.record["manuscript_id"] :
+              this.record["current_" + subject + "_id"]
             );
           },
 
@@ -1703,25 +1703,197 @@ cenozo.service("CnLocalization", [
             },
           },
           part_1: {
-            tab: { en: "Part 1", fr: "1<sup>re</sup> partie" },
+            tab: { en: "Part 1", fr: "1<sup>em</sup> partie" },
+            title: { en: "Manuscript Attachments", fr: "Manuscript Attachements", }, // TODO: TRANSLATE
           },
           part_2: {
             tab: { en: "Part 2", fr: "2<sup>e</sup> partie" },
+            title: { en: "Manuscript Overview", fr: "Manuscript Overview", }, // TODO: TRANSLATE
+            authors: { en: "Authors", fr: "Authors" }, // TODO: TRANSLATE
+            date: { en: "Date", fr: "Date" }, // TODO: TRANSLATE
+            journal: { en: "Target Journal", fr: "Target Journal" }, // TODO: TRANSLATE
           },
           part_3: {
             tab: { en: "Part 3", fr: "3<sup>e</sup> partie" },
+            title: {
+              en: "Requirements as per the CLSA Publication and Promotion Policy (Part 1)",
+              fr: "Requirements as per the CLSA Publication and Promotion Policy (Part 1)", // TODO: TRANSLATE
+            },
+            clsa_title_description: {
+              en: "The abbreviation ‘CLSA’ must be included in the title of the manuscript or the name of the platform, fully spelled out as ‘Canadian Longitudinal Study on Aging’ may also be used.",
+              fr: "The abbreviation ‘CLSA’ must be included in the title of the manuscript or the name of the platform, fully spelled out as ‘Canadian Longitudinal Study on Aging’ may also be used.", // TODO: TRANSLATE
+            },
+            clsa_title: {
+              en: "Has this requirement been met?",
+              fr: "Has this requirement been met?", // TODO: TRANSLATE
+            },
+            clsa_title_justification: {
+              en: "Please provide a justification for why this requirement could not be met.",
+              fr: "Please provide a justification for why this requirement could not be met.", // TODO: TRANSLATE
+            },
+            clsa_keyword_description: {
+              en: "Abbreviation ‘CLSA’ must be included as a keyword in the manuscript.",
+              fr: "Abbreviation ‘CLSA’ must be included as a keyword in the manuscript.", // TODO: TRANSLATE
+            },
+            clsa_keyword: {
+              en: "Has this requirement been met?",
+              fr: "Has this requirement been met?", //TODO: TRANSLATE
+            },
+            clsa_keyword_justification: {
+              en: "Please provide a justification for why this requirement could not be met.",
+              fr: "Please provide a justification for why this requirement could not be met.", //TODO: TRANSLATE
+            },
+            clsa_reference_description: {
+              en: "One of the articles below must be referenced:",
+              fr: "One of the articles below must be referenced:", //TODO: TRANSLATE
+            },
+            clsa_reference_ref1: {
+              en: "Raina P., Wolfson C., Kirkland S.A., Griffith L.E., Oremus M., Patterson C., Tuokko H., Hogan D., Wister A., Payette H., Brazil K., Shannon H. (2009) The Canadian Longitudinal Study on Aging (CLSA). Canadian Journal on Aging, Special Issue on the CLSA, Volume 28, Issue3, 221-229, https://doi.org/10.1017/S0714980809990055",
+              fr: "Raina P., Wolfson C., Kirkland S.A., Griffith L.E., Oremus M., Patterson C., Tuokko H., Hogan D., Wister A., Payette H., Brazil K., Shannon H. (2009) The Canadian Longitudinal Study on Aging (CLSA). Canadian Journal on Aging, Special Issue on the CLSA, Volume 28, Issue3, 221-229, https://doi.org/10.1017/S0714980809990055",
+            },
+            clsa_reference_ref2: {
+              en: " Raina P, Wolfson C., Kirkland S, Griffith L.E., Balion C., Cossette B., Dionne I., Hofer S., Hogan D., van den Heuvel E.R., Liu-Ambrose T., Menec V., Mugford G., Patterson C., Payette H., Richards B., Shannon H., Sheets D., Taler V., Thompson M., Tuokko H., Wister A., Wu C., Young L. (2019) Cohort profile: The Canadian Longitudinal Study on Aging (CLSA). International Journal of Epidemiology, Volume 48, Issue 6, 1752-1753j, https://doi.org/10.1093/ije/dyz173",
+              fr: " Raina P, Wolfson C., Kirkland S, Griffith L.E., Balion C., Cossette B., Dionne I., Hofer S., Hogan D., van den Heuvel E.R., Liu-Ambrose T., Menec V., Mugford G., Patterson C., Payette H., Richards B., Shannon H., Sheets D., Taler V., Thompson M., Tuokko H., Wister A., Wu C., Young L. (2019) Cohort profile: The Canadian Longitudinal Study on Aging (CLSA). International Journal of Epidemiology, Volume 48, Issue 6, 1752-1753j, https://doi.org/10.1093/ije/dyz173",
+            },
+            clsa_reference: {
+              en: "Has this requirement been met?",
+              fr: "Has this requirement been met?", //TODO: TRANSLATE
+            },
+            clsa_reference_justification: {
+              en: "Please provide a justification for why this requirement could not be met.",
+              fr: "Please provide a justification for why this requirement could not be met.", //TODO: TRANSLATE
+            },
+            genomics_description: {
+              en: "The article below must be referenced if the study was conducted using CLSA Genomic data.",
+              fr: "The article below must be referenced if the study was conducted using CLSA Genomic data.", //TODO: TRANSLATE
+            },
+            genomics_ref: {
+              en: "Forgetta V, Li R, Darmond-Zwaig C, et al. Cohort profile: genomic data for 26 622 individuals from the Canadian Longitudinal Study on Aging (CLSA)BMJ Open 2022;12:e059021. doi: 10.1136/bmjopen-2021-059021 https://bmjopen.bmj.com/content/12/3/e059021",
+              fr: "Forgetta V, Li R, Darmond-Zwaig C, et al. Cohort profile: genomic data for 26 622 individuals from the Canadian Longitudinal Study on Aging (CLSA)BMJ Open 2022;12:e059021. doi: 10.1136/bmjopen-2021-059021 https://bmjopen.bmj.com/content/12/3/e059021",
+            },
+            genomics: {
+              en: "Has this requirement been met?",
+              fr: "Has this requirement been met?", //TODO: TRANSLATE
+            },
+            genomics_justification: {
+              en: "Please provide a justification for why this requirement could not be met.",
+              fr: "Please provide a justification for why this requirement could not be met.", //TODO: TRANSLATE
+            },
           },
           part_4: {
             tab: { en: "Part 4", fr: "4<sup>e</sup> partie" },
+            title: {
+              en: "Requirements as per the CLSA Publication and Promotion Policy (Part 2)",
+              fr: "Requirements as per the CLSA Publication and Promotion Policy (Part 2)", // TODO: TRANSLATE
+            },
+            acknowledgment_description: {
+              en: "The approved acknowledgement statement must be included:",
+            },
+            acknowledgment_example1: {
+              en: "This research was made possible using the data/biospecimens collected by the Canadian Longitudinal Study on Aging (CLSA). Funding for the Canadian Longitudinal Study on Aging (CLSA) is provided by the Government of Canada through the Canadian Institutes of Health Research (CIHR) under grant reference: LSA 94473 and the Canada Foundation for Innovation, as well as the following provinces, Newfoundland, Nova Scotia, Quebec, Ontario, Manitoba, Alberta, and British Columbia. This research has been conducted using <b>(LIST YOUR DATA VERSIONS HERE)</b> under Application ID ",
+              fr: "This research was made possible using the data/biospecimens collected by the Canadian Longitudinal Study on Aging (CLSA). Funding for the Canadian Longitudinal Study on Aging (CLSA) is provided by the Government of Canada through the Canadian Institutes of Health Research (CIHR) under grant reference: LSA 94473 and the Canada Foundation for Innovation, as well as the following provinces, Newfoundland, Nova Scotia, Quebec, Ontario, Manitoba, Alberta, and British Columbia. This research has been conducted using <b>(LIST YOUR DATA VERSIONS HERE)</b> under Application ID ", // TODO: TRANSLATE
+            },
+            acknowledgment_example2: {
+              en: ". The CLSA is led by Drs. Parminder Raina, Christina Wolfson and Susan Kirkland.",
+              fr: ". The CLSA is led by Drs. Parminder Raina, Christina Wolfson and Susan Kirkland.", // TODO: TRANSLATE
+            },
+            acknowledgment: {
+              en: "Has this requirement been met?",
+              fr: "Has this requirement been met?", //TODO: TRANSLATE
+            },
+            dataset_version_description: {
+              en: "Please note that in any presentations and publications you should always refer to the appropriate dataset version number. If new sample weights were used with an earlier dataset version than Baseline Tracking (TRM) version 3.6 and Baseline Comprehensive (COM) version 4.2, please make sure you mention that you are using the CLSA Sample Weights Version 1.2.",
+              fr: "Please note that in any presentations and publications you should always refer to the appropriate dataset version number. If new sample weights were used with an earlier dataset version than Baseline Tracking (TRM) version 3.6 and Baseline Comprehensive (COM) version 4.2, please make sure you mention that you are using the CLSA Sample Weights Version 1.2.", // TODO: TRANSLATE
+            },
+            dataset_version_description: {
+              en: "Please note that in any presentations and publications you should always refer to the appropriate dataset version number. If new sample weights were used with an earlier dataset version than Baseline Tracking (TRM) version 3.6 and Baseline Comprehensive (COM) version 4.2, please make sure you mention that you are using the <b>CLSA Sample Weights Version 1.2</b>.",
+              fr: "Please note that in any presentations and publications you should always refer to the appropriate dataset version number. If new sample weights were used with an earlier dataset version than Baseline Tracking (TRM) version 3.6 and Baseline Comprehensive (COM) version 4.2, please make sure you mention that you are using the <b>CLSA Sample Weights Version 1.2</b>.", // TODO: TRANSLATE
+            },
+            dataset_version: {
+              en: "Has this requirement been met?",
+              fr: "Has this requirement been met?", //TODO: TRANSLATE
+            },
+            seroprevalence_description: {
+              en: "The following must be included in your acknowledgment statement:",
+              fr: "The following must be included in your acknowledgment statement:", // TODO: TRANSLATE
+            },
+            seroprevalence_example: {
+              en: "This project was supported by funding from the Government of Canada, through the COVID-19 Immunity Task Force.",
+              fr: "Ce projet a été soutenu par un financement du Gouvernement du Canada, par le biais du Secrétariat du groupe de travail sur l'immunité COVID-19.",
+            },
+            seroprevalence: {
+              en: "Has this requirement been met?",
+              fr: "Has this requirement been met?", //TODO: TRANSLATE
+            },
+            covid_description: {
+              en: "The following must be included in your acknowledgment statement:",
+              fr: "The following must be included in your acknowledgment statement:", // TODO: TRANSLATE
+            },
+            covid_example: {
+              en: "Funding for support of the CLSA COVID-19 questionnaire-based study is provided by the Juravinski Research Institute, Faculty of Health Sciences, McMaster University, the Provost Fund from McMaster University, the McMaster Institute for Research on Aging, the Public Health Agency of Canada/CIHR grant reference CMO 174125 and the government of Nova Scotia.",
+              fr: "Funding for support of the CLSA COVID-19 questionnaire-based study is provided by the Juravinski Research Institute, Faculty of Health Sciences, McMaster University, the Provost Fund from McMaster University, the McMaster Institute for Research on Aging, the Public Health Agency of Canada/CIHR grant reference CMO 174125 and the government of Nova Scotia.", // TODO: TRANSLATE
+            },
+            covid: {
+              en: "Has this requirement been met?",
+              fr: "Has this requirement been met?", //TODO: TRANSLATE
+            },
+            disclaimer_description: {
+              en: "",
+            },
+            disclaimer: {
+              en: "Has this requirement been met?",
+              fr: "Has this requirement been met?", //TODO: TRANSLATE
+            },
+            statement_description: {
+              en: "",
+            },
+            statement: {
+              en: "Has this requirement been met?",
+              fr: "Has this requirement been met?", //TODO: TRANSLATE
+            },
+            website_description: {
+              en: "",
+            },
+            website: {
+              en: "Has this requirement been met?",
+              fr: "Has this requirement been met?", //TODO: TRANSLATE
+            },
+            indigenous_description: {
+              en: "",
+            },
+            indigenous: {
+              en: "Has this requirement been met?",
+              fr: "Has this requirement been met?", //TODO: TRANSLATE
+            },
+            objectives_description: {
+              en: "",
+            },
+            objectives: {
+              en: "Has this requirement been met?",
+              fr: "Has this requirement been met?", //TODO: TRANSLATE
+            },
           },
           misc: {
+            na: {
+              en: "Not applicable to this manuscript",
+              fr: "Not applicable to this manuscript"
+            }, // TODO: TRANSLATE
             no: { en: "No", fr: "Non" },
             yes: { en: "Yes", fr: "Oui" },
+            choose: { en: "(choose)", fr: "(choisir)" },
             download: { en: "Download", fr: "Télécharger" },
             submit: { en: "Submit", fr: "Soumettre" },
             deleteWarning: {
               en: "Are you sure you want to delete the manuscript review?\n\nThis will permanently destroy all details you have provided. Once this is done there will be no way to restore the manuscript review!",
               fr: "Are you sure you want to delete the manuscript review?\n\nThis will permanently destroy all details you have provided. Once this is done there will be no way to restore the manuscript review!", // TODO: TRANSLATE
+            },
+            prevButton: {
+              en: "Return to the previous section",
+              fr: "Retourner à la section précédente",
+            },
+            nextButton: {
+              en: "Proceed to the next section",
+              fr: "Passez à la section suivante",
             },
           }
         },

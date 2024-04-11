@@ -20,9 +20,9 @@ cenozoApp.defineModule({
           title: "Version",
           type: "rank",
         },
-        datetime: {
-          title: "Date & Time",
-          type: "datetime",
+        date: {
+          title: "Date",
+          type: "date",
         },
       },
       defaultOrder: {
@@ -53,26 +53,29 @@ cenozoApp.defineModule({
       stage_type: { column: "manuscript_stage_type.name", type: "string" },
       phase: { column: "manuscript_stage_type.phase", type: "string" },
       lang: { column: "language.code", type: "string" },
-      authors: { type: "text" },
-      datetime: { type: "text" },
-      journal: { type: "text" },
+      authors: { type: "string" },
+      date: { type: "date" },
+      journal: { type: "string" },
       clsa_title: { type: "boolean" },
       clsa_title_justification: { type: "text" },
       clsa_keyword: { type: "boolean" },
       clsa_keyword_justification: { type: "text" },
       clsa_reference: { type: "boolean" },
       clsa_reference_justification: { type: "text" },
+      has_genomics_data: { type: "boolean" },
+      has_seroprevalence_data: { type: "boolean" },
+      has_covid_data: { type: "boolean" },
       genomics: { type: "boolean" },
       genomics_justification: { type: "text" },
-      acknowledgment: { type: "text" },
+      acknowledgment: { type: "boolean" },
       dataset_version: { type: "boolean" },
       seroprevalence: { type: "boolean" },
       covid: { type: "boolean" },
       disclaimer: { type: "boolean" },
       statement: { type: "boolean" },
       website: { type: "boolean" },
-      objectives: { type: "text" },
       indigenous: { type: "boolean" },
+      objectives: { type: "text" },
     });
 
     /* ############################################################################################## */
@@ -190,9 +193,7 @@ cenozoApp.defineModule({
           angular.extend(this, {
             compareRecord: null,
             versionList: [],
-            charCount: {
-              objectives: 0,
-            },
+            charCount: { objectives: 0 },
 
             isLoading: false,
 
@@ -223,6 +224,24 @@ cenozoApp.defineModule({
               }
             },
 
+            onPatch: async function (data) {
+              await this.$$onPatch(data);
+
+              // remove justifications if no longer needed
+              if (angular.isDefined(data.clsa_title) && data.clsa_title) {
+                this.record.clsa_title_justification = "";
+              }
+              if (angular.isDefined(data.clsa_keyword) && data.clsa_keyword) {
+                this.record.clsa_keyword_justification = "";
+              }
+              if (angular.isDefined(data.clsa_reference) && data.clsa_reference) {
+                this.record.clsa_reference_justification = "";
+              }
+              if (angular.isDefined(data.genomics) && data.genomics) {
+                this.record.genomics_justification = "";
+              }
+            },
+
             upateAttachmentListLanguage: function (lang) {
               var columnList = cenozoApp.module("manuscript_attachment").columnList;
               columnList.name.title = CnLocalization.translate("manuscriptReport", "name", lang);
@@ -250,8 +269,8 @@ cenozoApp.defineModule({
                 part_2: {
                   diff: false,
                   authors: false,
-                  datetime: false,
-                  journal: false
+                  date: false,
+                  journal: false,
                 },
                 part_3: {
                   diff: false,
@@ -272,8 +291,8 @@ cenozoApp.defineModule({
                   disclaimer: false,
                   statement: false,
                   website: false,
-                  objectives: false,
                   indigenous: false,
+                  objectives: false,
                 },
               };
 
@@ -311,7 +330,7 @@ cenozoApp.defineModule({
               if (response) {
                 var parent = this.parentModel.getParentIdentifier();
                 await CnHttpFactory.instance({
-                  path: parent.subject + "/" + parent.identifier + "?action=submit",
+                  path: parent.subject + "/" + parent.id + "?action=submit",
                 }).patch();
 
                 var code =
@@ -345,10 +364,12 @@ cenozoApp.defineModule({
       "CnBaseFormModelFactory",
       "CnManuscriptVersionListFactory",
       "CnManuscriptVersionViewFactory",
+      "CnLocalization",
       function (
         CnBaseFormModelFactory,
         CnManuscriptVersionListFactory,
-        CnManuscriptVersionViewFactory
+        CnManuscriptVersionViewFactory,
+        CnLocalization
       ) {
         var object = function (type) {
           CnBaseFormModelFactory.construct(
@@ -368,6 +389,40 @@ cenozoApp.defineModule({
               }
 
               return false;
+            },
+
+            getMetadata: async function () {
+              const misc = CnLocalization.lookupData.manuscriptReport.misc;
+              await this.$$getMetadata();
+
+              if ("root" == this.type) {
+                angular.extend( this.metadata, {
+                  yesNoEnumList: {
+                    en: [
+                      { value: "", name: misc.choose.en },
+                      { value: true, name: misc.yes.en },
+                      { value: false, name: misc.no.en },
+                    ],
+                    fr: [
+                      { value: "", name: misc.choose.fr },
+                      { value: true, name: misc.yes.fr },
+                      { value: false, name: misc.no.fr },
+                    ],
+                  },
+                  yesNAEnumList: {
+                    en: [
+                      { value: "", name: misc.choose.en },
+                      { value: true, name: misc.yes.en },
+                      { value: false, name: misc.na.en },
+                    ],
+                    fr: [
+                      { value: "", name: misc.choose.fr },
+                      { value: true, name: misc.yes.fr },
+                      { value: false, name: misc.na.fr },
+                    ],
+                  }
+                });
+              }
             },
           });
         };

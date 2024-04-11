@@ -55,7 +55,7 @@ class manuscript extends \cenozo\database\record
     // define some of the column values insetad of using the clone
     $db_manuscript_version->manuscript_id = $this->id;
     $db_manuscript_version->version = $version;
-    $db_manuscript_version->datetime = util::get_datetime_object();
+    $db_manuscript_version->date = util::get_datetime_object()->format( 'Y-m-d' );
     $db_manuscript_version->save();
   }
 
@@ -372,8 +372,8 @@ class manuscript extends \cenozo\database\record
 
     if( 'Admin Review' == $db_next_stage_type->name )
     {
-      // ...and mark the version datetime
-      $db_manuscript_version->datetime = util::get_datetime_object();
+      // ...and mark the version date
+      $db_manuscript_version->date = util::get_datetime_object()->format( 'Y-m-d' );
       $db_manuscript_version->save();
     }
     // if we're recommending a revision then automatically defer the manuscript

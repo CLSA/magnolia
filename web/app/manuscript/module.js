@@ -208,7 +208,7 @@ cenozoApp.defineModule({
           // immediately view the user record after it has been created
           this.transitionOnSave = function (record) {
             CnSession.workingTransition(async function () {
-              await $state.go("manuscript_version.view", { identifier: record.current_manuscript_version_id });
+              await $state.go("manuscript_version.view", { identifier: "manuscript_id=" + record.id });
             });
           };
         };

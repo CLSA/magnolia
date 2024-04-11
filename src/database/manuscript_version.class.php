@@ -15,6 +15,30 @@ use cenozo\lib, cenozo\log, magnolia\util;
 class manuscript_version extends \cenozo\database\record
 {
   /**
+   * Override parent method
+   */
+  public static function get_record_from_identifier( $identifier )
+  {
+    $util_class_name = lib::get_class_name( 'util' );
+    $manuscript_class_name = lib::get_class_name( 'database\manuscript' );
+
+    // convert manuscript id to manuscript_version_id (always using the current version)
+    if( !$util_class_name::string_matches_int( $identifier ) && false === strpos( 'manuscript_id=', $identifier ) )
+    {
+      $regex = '/manuscript_id=(.+)/';
+      $matches = array();
+      if( preg_match( $regex, $identifier, $matches ) )
+      {
+        $db_manuscript = lib::create( 'database\manuscript', $matches[1] );
+        if( !is_null( $db_manuscript ) )
+          $identifier = preg_replace( $regex, $db_manuscript->get_current_manuscript_version()->id, $identifier );
+      }
+    }
+
+    return parent::get_record_from_identifier( $identifier );
+  }
+
+  /**
    * Determines whether there is any difference between this version and the last
    */
   public function has_changed()
@@ -29,8 +53,8 @@ class manuscript_version extends \cenozo\database\record
 
     $db_last_manuscript_version = $manuscript_version_list[1];
 
-    // check all column values except for id, version, datetime and timestamps
-    $ignore_columns = array( 'id', 'version', 'datetime', 'update_timestamp', 'create_timestamp' );
+    // check all column values except for id, version, date and timestamps
+    $ignore_columns = array( 'id', 'version', 'date', 'update_timestamp', 'create_timestamp' );
     foreach( $this->get_column_names() as $column )
       if( !in_array( $column, $ignore_columns ) && $this->$column != $db_last_manuscript_version->$column )
         return true;
@@ -61,7 +85,7 @@ class manuscript_version extends \cenozo\database\record
     $data = array(
       'identifier' => $db_reqn->identifier,
       'version' => $this->version,
-      'dateofapproval' => is_null( $this->datetime ) ? 'None' : $this->datetime->format( 'Y-m-d' )
+      'date' => is_null( $this->date ) ? 'None' : $this->date->format( 'Y-m-d' )
     );
 
     $data['applicant_name'] = sprintf( '%s %s', $db_user->first_name, $db_user->last_name );
