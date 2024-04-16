@@ -1450,7 +1450,7 @@ cenozo.service("CnLocalization", [
             },
             notices: { en: "Notices", fr: "Notifications" },
             studyData: { en: "Study Data", fr: "Données d’étude" },
-            switchForm: { en: "Switch Form", fr: "Switch Form" }, // TODO: TRANSLATE
+            switchForm: { en: "Switch Form", fr: "Changer de formulaire" },
             application: { en: "Application", fr: "Soumission" },
             finalReport: { en: "Final Report", fr: "Rapport final" },
             destructionReport: { en: "Data Destruction Report", fr: "Rapport de destruction de données" },
@@ -1520,7 +1520,7 @@ cenozo.service("CnLocalization", [
             },
             missingCoapplicantCountryMessage: {
               en: "You must include the country of all co-applicants.",
-              fr: "You must include the country of all co-applicants.", // TODO: TRANSLATE
+              fr: "Vous devez indiquer le pays de tous les codemandeurs.",
             },
             submit: { en: "Submit", fr: "Soumettre" },
             submitTitle: {
@@ -2021,7 +2021,7 @@ cenozo.service("CnLocalization", [
               fr: "Passez à la section suivante",
             },
             download: { en: "Download", fr: "Télécharger" },
-            switchForm: { en: "Switch Form", fr: "Switch Form" }, // TODO: TRANSLATE
+            switchForm: { en: "Switch Form", fr: "Changer de formulaire" },
             application: { en: "Application", fr: "Soumission" },
             finalReport: { en: "Final Report", fr: "Rapport final" },
             destructionReport: { en: "Data Destruction Report", fr: "Rapport de destruction de données" },
@@ -2088,7 +2088,7 @@ cenozo.service("CnLocalization", [
           },
           misc: {
             download: { en: "Download", fr: "Télécharger" },
-            switchForm: { en: "Switch Form", fr: "Switch Form" }, // TODO: TRANSLATE
+            switchForm: { en: "Switch Form", fr: "Changer de formulaire" },
             application: { en: "Application", fr: "Soumission" },
             finalReport: { en: "Final Report", fr: "Rapport final" },
             destructionReport: { en: "Data Destruction Report", fr: "Rapport de destruction de données" },
