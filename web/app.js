@@ -911,7 +911,6 @@ cenozo.service("CnManuscriptHelper", [
 ]);
 
 /* ############################################################################################## */
-/* ############################################################################################## */
 cenozo.service("CnLocalization", [
   "CnHttpFactory",
   function (CnHttpFactory) {
@@ -926,10 +925,8 @@ cenozo.service("CnLocalization", [
           if (angular.isUndefined(array)) return "ERROR";
           if (angular.isUndefined(index)) index = 0;
           var part = addressParts[index];
-          return angular.isUndefined(array[part])
-            ? "ERROR"
-            : angular.isDefined(array[part][language])
-            ? array[part][language]
+          return angular.isUndefined(array[part]) ? "ERROR"
+            : angular.isDefined(array[part][language]) ? array[part][language]
             : get(array[part], index + 1);
         }
 
@@ -1705,6 +1702,30 @@ cenozo.service("CnLocalization", [
           part_1: {
             tab: { en: "Part 1", fr: "1<sup>em</sup> partie" },
             title: { en: "Manuscript Attachments", fr: "Manuscript Attachements", }, // TODO: TRANSLATE
+            description: {
+              en: "Please upload the manuscript along with any other relevant files.",
+              fr: "Please upload the manuscript along with any other relevant files.", // TODO: TRANSLATE
+            },
+            addAttachment: {
+              en: "Upload Attachment",
+              fr: "Upload Attachment", // TODO: TRANSLATE
+            },
+            pleaseWait: {
+              en: "Please wait...",
+              fr: "Please wait...", // TODO: TRANSLATE
+            },
+            noAttachments: {
+              en: "No attachments have been added.",
+              fr: "No attachments have been added.", // TODO: TRANSLATE
+            },
+            filename: {
+              en: "Filename",
+              fr: "Filename", // TODO: TRANSLATE
+            },
+            size: {
+              en: "Size",
+              fr: "Size", // TODO: TRANSLATE
+            },
           },
           part_2: {
             tab: { en: "Part 2", fr: "2<sup>e</sup> partie" },
@@ -1712,6 +1733,13 @@ cenozo.service("CnLocalization", [
             authors: { en: "Authors", fr: "Authors" }, // TODO: TRANSLATE
             date: { en: "Date", fr: "Date" }, // TODO: TRANSLATE
             journal: { en: "Target Journal", fr: "Target Journal" }, // TODO: TRANSLATE
+            objectives_description: {
+              en: "Results presented in the manuscript must be in accordance with the research objectives of the approved project.  CLSA design features (inclusion/exclusion criteria, sampling strategy, data collection procedures, etc.) if included in the manuscript, must be described accurately. Please refer the relevant CLSA Protocol, available for download under the Researchers section of our website.",
+            },
+            objectives: {
+              en: "Objective(s) related to this manuscript (<strong>maximum 1500 characters</strong>)",
+              fr: "Objective(s) related to this manuscript (<strong>maximum 1500 characters</strong>)", // TODO: TRANSLATE
+            },
           },
           part_3: {
             tab: { en: "Part 3", fr: "3<sup>e</sup> partie" },
@@ -1805,10 +1833,6 @@ cenozo.service("CnLocalization", [
               en: "Please note that in any presentations and publications you should always refer to the appropriate dataset version number. If new sample weights were used with an earlier dataset version than Baseline Tracking (TRM) version 3.6 and Baseline Comprehensive (COM) version 4.2, please make sure you mention that you are using the CLSA Sample Weights Version 1.2.",
               fr: "Please note that in any presentations and publications you should always refer to the appropriate dataset version number. If new sample weights were used with an earlier dataset version than Baseline Tracking (TRM) version 3.6 and Baseline Comprehensive (COM) version 4.2, please make sure you mention that you are using the CLSA Sample Weights Version 1.2.", // TODO: TRANSLATE
             },
-            dataset_version_description: {
-              en: "Please note that in any presentations and publications you should always refer to the appropriate dataset version number. If new sample weights were used with an earlier dataset version than Baseline Tracking (TRM) version 3.6 and Baseline Comprehensive (COM) version 4.2, please make sure you mention that you are using the <b>CLSA Sample Weights Version 1.2</b>.",
-              fr: "Please note that in any presentations and publications you should always refer to the appropriate dataset version number. If new sample weights were used with an earlier dataset version than Baseline Tracking (TRM) version 3.6 and Baseline Comprehensive (COM) version 4.2, please make sure you mention that you are using the <b>CLSA Sample Weights Version 1.2</b>.", // TODO: TRANSLATE
-            },
             dataset_version: {
               en: "Has this requirement been met?",
               fr: "Has this requirement been met?", //TODO: TRANSLATE
@@ -1838,51 +1862,71 @@ cenozo.service("CnLocalization", [
               fr: "Has this requirement been met?", //TODO: TRANSLATE
             },
             disclaimer_description: {
-              en: "",
+              en: "The following must be included in your acknowledgment statement:",
+              fr: "The following must be included in your acknowledgment statement:", // TODO: TRANSLATE
+            },
+            disclaimer_example: {
+              en: "The opinions expressed in this manuscript are the author's own and do not reflect the views of the Canadian Longitudinal Study on Aging.",
+              fr: "The opinions expressed in this manuscript are the author's own and do not reflect the views of the Canadian Longitudinal Study on Aging.", // TODO: TRANSLATE
             },
             disclaimer: {
               en: "Has this requirement been met?",
               fr: "Has this requirement been met?", //TODO: TRANSLATE
             },
             statement_description: {
-              en: "",
+              en: "The following must be included in your acknowledgment statement:",
+              fr: "The following must be included in your acknowledgment statement:", // TODO: TRANSLATE
+            },
+            statement_example: {
+              en: "Data are available from the Canadian Longitudinal Study on Aging (www.clsa-elcv.ca) for researchers who meet the criteria for access to de-identified CLSA data.",
+              fr: "Data are available from the Canadian Longitudinal Study on Aging (www.clsa-elcv.ca) for researchers who meet the criteria for access to de-identified CLSA data.", // TODO: TRANSLATE
             },
             statement: {
               en: "Has this requirement been met?",
               fr: "Has this requirement been met?", //TODO: TRANSLATE
             },
             website_description: {
-              en: "",
+              en: "CLSA design features (inclusion/exclusion criteria, sampling strategy, data collection procedures, etc.) if included in the manuscript, must be described accurately. Please refer the relevant CLSA Protocol, available for download under the Researchers section of our website.",
+              fr: "CLSA design features (inclusion/exclusion criteria, sampling strategy, data collection procedures, etc.) if included in the manuscript, must be described accurately. Please refer the relevant CLSA Protocol, available for download under the Researchers section of our website.", // TODO: TRANSLATE
             },
             website: {
+              en: "Have you include link to document on www.clsa-elcv.ca website.",
+              fr: "Has this requirement been met?", //TODO: TRANSLATE
+            },
+            conditions_description: {
+              en: 'Supplementary Conditions of Use (<a href="https://www.clsa-elcv.ca/doc/2579" target="conditions">found here</a>) are respected (if applicable)',
+              fr: 'Supplementary Conditions of Use (<a href="https://www.clsa-elcv.ca/fr/doc/3046" target="conditions">found here</a>) are respected (if applicable)', // TODO: TRANSLATE
+            },
+            conditions: {
               en: "Has this requirement been met?",
               fr: "Has this requirement been met?", //TODO: TRANSLATE
             },
             indigenous_description: {
-              en: "",
+              en: "Underrepresented Groups",
+              en: "Underrepresented Groups", // TODO: TRANSLATE
             },
             indigenous: {
-              en: "Has this requirement been met?",
-              fr: "Has this requirement been met?", //TODO: TRANSLATE
-            },
-            objectives_description: {
-              en: "",
-            },
-            objectives: {
-              en: "Has this requirement been met?",
-              fr: "Has this requirement been met?", //TODO: TRANSLATE
+              en: "Does the paper refer to any of the following underrepresented group: Indigenous Persons?",
+              fr: "Does the paper refer to any of the following underrepresented group: Indigenous Persons?", // TODO: TRANSLATE
             },
           },
           misc: {
             na: {
               en: "Not applicable to this manuscript",
-              fr: "Not applicable to this manuscript"
-            }, // TODO: TRANSLATE
+              fr: "Not applicable to this manuscript", // TODO: TRANSLATE
+            },
+            pleaseConfirm: { en: "Please confirm", fr: "Veuillez confirmer" },
             no: { en: "No", fr: "Non" },
             yes: { en: "Yes", fr: "Oui" },
             choose: { en: "(choose)", fr: "(choisir)" },
+            chars: { en: "characters", fr: "caractères" },
+            remove: { en: "Remove", fr: "Supprimer" },
             download: { en: "Download", fr: "Télécharger" },
             submit: { en: "Submit", fr: "Soumettre" },
+            noChangesMessage: {
+              en: "You have not made any changes to the report since your last submission.  Are you sure you wish to proceed?",
+              fr: "Vous n’avez apporté aucune modification au rapport depuis votre dernière soumission. Êtes-vous sûr de vouloir continuer?",
+            },
             deleteWarning: {
               en: "Are you sure you want to delete the manuscript review?\n\nThis will permanently destroy all details you have provided. Once this is done there will be no way to restore the manuscript review!",
               fr: "Are you sure you want to delete the manuscript review?\n\nThis will permanently destroy all details you have provided. Once this is done there will be no way to restore the manuscript review!", // TODO: TRANSLATE
@@ -1894,6 +1938,26 @@ cenozo.service("CnLocalization", [
             nextButton: {
               en: "Proceed to the next section",
               fr: "Passez à la section suivante",
+            },
+            missingAttachmentTitle: {
+              en: "Missing Attachment",
+              fr: "Missing Attachment", // TODO: TRANSLATE
+            },
+            missingAttachmentMessage: {
+              en: "There are no attachments.  You will now be redirected to where your manuscript can be attached to the report.  Please try re-sbumitted once all relevant attachments have been uploaded.",
+              fr: "There are no attachments.  You will now be redirected to where your manuscript can be attached to the report.  Please try re-sbumitted once all relevant attachments have been uploaded.", // TODO: TRANSLATE
+            },
+            submitWarning: {
+              en: "Are you sure that all changes are complete and the report is ready to be submitted?",
+              fr: "Êtes-vous sûr d’avoir apporté toutes les modifications souhaitées et de vouloir soumettre le rapport?",
+            },
+            missingFieldTitle: {
+              en: "Missing mandatory field",
+              fr: "Champ obligatoire manquant",
+            },
+            missingFieldMessage: {
+              en: "There are mandatory fields which are missing. You will now be redirected to where the incomplete fields can be found. Please try re-submitting once all mandatory fields have been filled out.",
+              fr: "Des champs obligatoires sont manquants. Vous serez redirigé vers l’endroit où se trouvent les champs incomplets. Veuillez soumettre la demande d’accès à nouveau quand tous les champs obligatoires auront été remplis.",
             },
           }
         },

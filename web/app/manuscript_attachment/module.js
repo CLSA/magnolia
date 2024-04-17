@@ -15,7 +15,6 @@ cenozoApp.defineModule({
         possessive: "attachment's",
       },
       columnList: {
-        title: { column: "manuscript.title", title: "Requisition" },
         name: { column: "manuscript_attachment.name", title: "Name" },
       },
       defaultOrder: {
@@ -25,10 +24,6 @@ cenozoApp.defineModule({
     });
 
     module.addInputGroup("", {
-      title: {
-        title: "Title",
-        type: "string",
-      },
       name: {
         title: "Name",
         type: "string",
@@ -36,9 +31,9 @@ cenozoApp.defineModule({
       data: {
         title: "File",
         type: "base64",
-        mimeType: "application/octet-stream",
         getFilename: function ($state, model) { return model.viewModel.record.name; },
       }
     });
+
   },
 });

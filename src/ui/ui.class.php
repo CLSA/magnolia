@@ -81,6 +81,7 @@ class ui extends \cenozo\ui\ui
     $module = $this->get_module( 'manuscript' );
     if( !is_null( $module ) )
     {
+      $module->add_child( 'manuscript_attachment' );
       $module->add_child( 'manuscript_version' );
       $module->add_child( 'manuscript_deferral_note' );
       $module->add_child( 'manuscript_review' );

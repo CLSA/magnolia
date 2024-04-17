@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS manuscript_attachment (
   create_timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
   manuscript_id INT(10) UNSIGNED NOT NULL,
   name VARCHAR(255) NOT NULL,
-  data MEDIUMTEXT NOT NULL,
+  data LONGTEXT NOT NULL,
   PRIMARY KEY (id),
   INDEX fk_manuscript_id (manuscript_id ASC),
   UNIQUE INDEX uq_manuscript_id_name (manuscript_id ASC, name ASC),

@@ -1393,21 +1393,21 @@
             <span ng-show="0 == model.viewModel.manuscriptList.length"
                   ng-bind-html="t( 'manuscripts.manuscript.noManuscripts' )"></span>
             <table class="table table-striped"
-                   ng-class="{ 'table-hover': model.getManuscriptEditEnabled() }"
+                   ng-class="{ 'table-hover': model.viewModel.getManuscriptEditEnabled() }"
                    ng-show="0 < model.viewModel.manuscriptList.length">
               <thead class="bg-info">
                 <tr>
                   <td ng-bind-html="t( 'manuscripts.manuscript.title' )"></td>
                   <td ng-bind-html="t( 'manuscripts.manuscript.status' )"></td>
-                  <td ng-show="model.getManuscriptEditEnabled() && !isDAO()"></td>
+                  <td ng-show="model.viewModel.getManuscriptEditEnabled() && !isDAO()"></td>
                 </tr>
               </thead>
               <tbody>
                 <tr ng-repeat="manuscript in model.viewModel.manuscriptList"
-                    ng-click="model.getManuscriptEditEnabled() && viewManuscript( manuscript.id )">
+                    ng-click="model.viewModel.getManuscriptEditEnabled() && viewManuscript( manuscript.id )">
                   <td>{{ manuscript.title }}</td>
                   <td>{{ manuscript.status }}</td>
-                  <td ng-show="model.getManuscriptEditEnabled() && !isDAO()">
+                  <td ng-show="model.viewModel.getManuscriptEditEnabled() && !isDAO()">
                     <button class="btn btn-xs btn-danger"
                             ng-disabled="isDeletingManuscript.includes( manuscript.id )"
                             ng-click="removeManuscript( manuscript.id ) && $event.stopPropagation()"
@@ -1423,7 +1423,7 @@
         <form
           id="manuscript_form"
           name="manuscript_form"
-          ng-show="model.getManuscriptEditEnabled() && !isDAO()"
+          ng-show="model.viewModel.getManuscriptEditEnabled() && !isDAO()"
           novalidate
         >
           <div class="form-horizontal">
