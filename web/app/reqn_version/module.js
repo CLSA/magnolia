@@ -612,9 +612,7 @@ cenozoApp.defineModule({
                 await $state.go( this.parentModel.isRole("applicant", "designate") ? "root.home" : "reqn.list" );
               }
             },
-            delete: async function () {
-              await CnReqnHelper.delete("identifier=" + this.record.identifier, this.record.lang);
-            },
+            delete: async function () { await CnReqnHelper.delete(this.record); },
             downloadApplication: async function () {
               await CnReqnHelper.download("application", this.record.getIdentifier());
             },
@@ -742,7 +740,7 @@ cenozoApp.defineModule({
                 this.record["comment_" + categoryId] = data[property];
               } else if (null != property.match(/^deferral_note/)) {
                 // the base form handles patching deferral notes
-                this.baseOnPatch(data);
+                await this.baseOnPatch(data);
               } else {
                 if ("new_user_id" == property) {
                   // make sure the new user isn't a trainee

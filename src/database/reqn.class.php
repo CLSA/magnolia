@@ -609,14 +609,13 @@ class reqn extends \cenozo\database\record
 
     // if moving from report required to active then delete all final report records
     $db_current_stage = $this->get_current_stage();
-    if( 'Report Required' == $db_current_stage->get_stage_type()->name )
+    $current_stage_type_name = $db_current_stage->get_stage_type()->name;
+    if( 'Report Required' == $current_stage_type_name )
     {
       foreach( $this->get_final_report_object_list() as $db_final_report ) $db_final_report->delete();
     }
-
     // if moving from data destruction to pre data destruction then delete all destruction report records
-    $db_current_stage = $this->get_current_stage();
-    if( 'Data Destruction' == $db_current_stage->get_stage_type()->name )
+    else if( 'Data Destruction' == $current_stage_type_name )
     {
       foreach( $this->get_destruction_report_object_list() as $db_destruction_report )
         $db_destruction_report->delete();

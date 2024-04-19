@@ -62,11 +62,13 @@ cenozo.factory("CnBaseFormViewFactory", [
   "CnBaseViewFactory",
   "CnLocalization",
   "CnReqnHelper",
+  "CnManuscriptHelper",
   "CnHttpFactory",
   function (
     CnBaseViewFactory,
     CnLocalization,
     CnReqnHelper,
+    CnManuscriptHelper,
     CnHttpFactory
   ){
     return {
@@ -103,7 +105,11 @@ cenozo.factory("CnBaseFormViewFactory", [
               return "destructionReport" != formType && ["Data Destruction", "Complete"].includes(stageType);
             }
 
-            return CnReqnHelper.showAction(subject, this.record);
+            return (
+              "manuscriptReport" == formType ?
+              CnManuscriptHelper.showAction(subject, this.record) :
+              CnReqnHelper.showAction(subject, this.record)
+            );
           },
 
           toggleLanguage: function () {
@@ -152,13 +158,26 @@ cenozo.factory("CnBaseFormViewFactory", [
           transitionTo: async function (subject) {
             // "application" is an alias for "reqn_version"
             if ("application" == subject) subject = "reqn_version";
-            await this.parentModel.transitionToParentViewState(
-              subject,
-              // reqn uses the identifier, manuscript uses manuscript_id, and the rest use current_<subject>_id
-              "reqn" == subject ? "identifier=" + this.record.identifier :
-              "manuscript" == subject ? this.record["manuscript_id"] :
-              this.record["current_" + subject + "_id"]
-            );
+
+            // reqn uses the identifier
+            let identifier = null;
+            if ("reqn" == subject) {
+              identifier = "identifier=" + this.record.identifier;
+            } else if ("manuscript" == subject) {
+              // manuscript uses manuscript_id
+              identifier = this.record["manuscript_id"];
+            } else if (
+              "reqn_version" == subject &&
+              "manuscript_version" == this.parentModel.module.subject.snake
+            ) {
+              // transitioning to the reqn_version from a manuscript_version requires using the identifier
+              identifier = "identifier=" + this.record.identifier;
+            } else {
+              // the rest use current_<subject>_id
+              identifier = this.record["current_" + subject + "_id"]
+            }
+
+            await this.parentModel.transitionToParentViewState(subject, identifier);
           },
 
           downloadForm: async function () {
@@ -237,8 +256,10 @@ cenozo.factory("CnBaseFormViewFactory", [
               // re-read the deferral note before making changes to it
               let deferralNote = null;
               try {
+                let params = "page=" + page;
+                if ("manuscriptReport" != formType) params = "form=" + formType.camelToSnake() + ";" + params;
                 const response = await CnHttpFactory.instance({
-                  path: basePathParts.concat("form=" + formType.camelToSnake() + ";page=" + page).join("/"),
+                  path: basePathParts.concat(params).join("/"),
                   onError: function (error) {
                     // ignore 404 errors, it just means there is no deferral note
                     if (404 != error.status) self.onPatchError(error);
@@ -255,20 +276,19 @@ cenozo.factory("CnBaseFormViewFactory", [
               // if setting the note to an empty string then delete it
               if (!data[property]) {
                 if (null != deferralNote) {
-                  await CnHttpFactory.instance({
-                    path: "deferral_note/" + deferralNote.id,
-                    onError: onError,
-                  }).delete();
+                  let path = "deferral_note/" + deferralNote.id;
+                  if ("manuscriptReport" == formType) path = "manuscript_" + path;
+                  await CnHttpFactory.instance({ path: path, onError: onError }).delete();
                 }
               } else {
                 // if the note doesn't exist then we need to create it
                 if (null == deferralNote) {
-                  const data = { page: page, note: data[property] };
-                  if ("manuscriptReport" != formType) data.form = formType.camelToSnake();
+                  const httpData = { page: page, note: data[property] };
+                  if ("manuscriptReport" != formType) httpData.form = formType.camelToSnake();
 
                   await CnHttpFactory.instance({
                     path: basePathParts.join("/"),
-                    data: data,
+                    data: httpData,
                     onError: onError,
                   }).post();
                 } else { // otherwise we just need to patch the existing record
@@ -784,22 +804,22 @@ cenozo.service("CnReqnHelper", [
         return false;
       },
 
-      delete: async function (reqnIdentifier, language) {
+      delete: async function (record) {
         var response = await CnModalConfirmFactory.instance({
           title: ["applicant", "designate"].includes(CnSession.role.name)
-            ? this.translate("misc.pleaseConfirm", language)
+            ? this.translate("misc.pleaseConfirm", record.lang)
             : "Please Confirm",
           noText: ["applicant", "designate"].includes(CnSession.role.name)
-            ? this.translate("misc.no", language)
+            ? this.translate("misc.no", record.lang)
             : "No",
           yesText: ["applicant", "designate"].includes(CnSession.role.name)
-            ? this.translate("misc.yes", language)
+            ? this.translate("misc.yes", record.lang)
             : "Yes",
-          message: this.translate("misc.deleteWarning", language),
+          message: this.translate("misc.deleteWarning", record.lang),
         }).show();
 
         if (response) {
-          await CnHttpFactory.instance({ path: "reqn/" + reqnIdentifier }).delete();
+          await CnHttpFactory.instance({ path: "reqn/identifier=" + record.identifier }).delete();
           await $state.go(["applicant", "designate"].includes(CnSession.role.name) ? "root.home" : "reqn.list");
         }
       },
@@ -836,14 +856,14 @@ cenozo.service("CnManuscriptHelper", [
 
       translate: function (address, language) {
         // always use the manuscript subject
-        return CnLocalization.translate("manuscript", address, language);
+        return CnLocalization.translate("manuscriptReport", address, language);
       },
 
       showAction: function (subject, record) {
         let role = CnSession.role.name;
         let phase = record.phase ? record.phase : "";
         let deferred = true === record.deferred;
-        let stageType = record.stage_type ? record.stage_type : "";
+        let stageType = record.manuscript_stage_type ? record.manuscript_stage_type : "";
 
         if ("submit" == subject) {
           return (
@@ -875,24 +895,25 @@ cenozo.service("CnManuscriptHelper", [
         } else return false;
       },
 
-      delete: async function (reqnIdentifier, language) {
+      delete: async function (record) {
         var response = await CnModalConfirmFactory.instance({
           title: ["applicant", "designate"].includes(CnSession.role.name)
-            ? this.translate("misc.pleaseConfirm", language)
+            ? this.translate("misc.pleaseConfirm", record.lang)
             : "Please Confirm",
           noText: ["applicant", "designate"].includes(CnSession.role.name)
-            ? this.translate("misc.no", language)
+            ? this.translate("misc.no", record.lang)
             : "No",
           yesText: ["applicant", "designate"].includes(CnSession.role.name)
-            ? this.translate("misc.yes", language)
+            ? this.translate("misc.yes", record.lang)
             : "Yes",
+          message: this.translate("misc.deleteWarning", record.lang),
         }).show();
 
         if (response) {
-          await CnHttpFactory.instance({ path: "reqn/" + reqnIdentifier }).delete();
+          await CnHttpFactory.instance({ path: "manuscript/" + record.manuscript_id }).delete();
           await $state.go(
             ["applicant", "designate"].includes(CnSession.role.name) ? "reqn_version.view" : "reqn.view",
-            { identifier: reqnIdentifier }
+            { identifier: "identifier=" + record.identifier }
           );
         }
       },
@@ -1918,11 +1939,14 @@ cenozo.service("CnLocalization", [
             pleaseConfirm: { en: "Please confirm", fr: "Veuillez confirmer" },
             no: { en: "No", fr: "Non" },
             yes: { en: "Yes", fr: "Oui" },
+            close: { en: "Close", fr: "Ferme" },
             choose: { en: "(choose)", fr: "(choisir)" },
             chars: { en: "characters", fr: "caractères" },
             remove: { en: "Remove", fr: "Supprimer" },
+            delete: { en: "Delete", fr: "Effacer" },
             download: { en: "Download", fr: "Télécharger" },
             submit: { en: "Submit", fr: "Soumettre" },
+            viewApplication: { en: "View Application", fr: "View Application" }, // TODO: TRANSLATE
             noChangesMessage: {
               en: "You have not made any changes to the report since your last submission.  Are you sure you wish to proceed?",
               fr: "Vous n’avez apporté aucune modification au rapport depuis votre dernière soumission. Êtes-vous sûr de vouloir continuer?",
@@ -1938,6 +1962,30 @@ cenozo.service("CnLocalization", [
             nextButton: {
               en: "Proceed to the next section",
               fr: "Passez à la section suivante",
+            },
+            submitTitle: {
+              en: "Manuscript Report Submitted",
+              fr: "Manuscript Report Submitted", // TODO: TRANSLATE
+            },
+            submitMessage: {
+              en: "You have successfully submitted your Manuscript Report and it will now be reviewed. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.",
+              fr: "You have successfully submitted your Manuscript Report and it will now be reviewed. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.", // TODO: TRANSLATE
+            },
+            traineeSubmitTitle: {
+              en: "Manuscript Report Submitted for Supervisor Approval",
+              fr: "Manuscript Report Submitted for Supervisor Approval", // TODO: TRANSLATE
+            },
+            traineeSubmitMessage: {
+              en: "You have successfully submitted your Manuscript Report and your supervisor will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.",
+              fr: "You have successfully submitted your Manuscript Report and your supervisor will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.", // TODO: TRANSLATE
+            },
+            designateSubmitTitle: {
+              en: "Manuscript Report Submitted for Primary Applicant Approval",
+              fr: "Manuscript Report Submitted for Primary Applicant Approval", // TODO: TRANSLATE
+            },
+            designateSubmitMessage: {
+              en: "You have successfully submitted the Manuscript Report on behalf of the primary applicant and they will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.",
+              fr: "You have successfully submitted the Manuscript Report on behalf of the primary applicant and they will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.", // TODO: TRANSLATE
             },
             missingAttachmentTitle: {
               en: "Missing Attachment",
@@ -2230,9 +2278,6 @@ cenozo.service("CnLocalization", [
             en: "You must provide either a file or URL",
             fr: "Vous devez fournir un fichier ou une URL",
           },
-        },
-        manuscriptAttachment: {
-          name: { en: "Name", fr: "Nom" },
         },
       },
     };

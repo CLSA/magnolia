@@ -19,12 +19,9 @@ cenozoApp.defineModule({
           column: "reqn.identifier",
           title: "Identifier",
         },
-        language: {
-          title: "Language",
-          column: "language.code",
-          isIncluded: function ($state, model) {
-            return !model.isRole("applicant", "designate");
-          },
+        title: {
+          column: "manuscript.title",
+          title: "Title",
         },
         status: {
           column: "manuscript_stage_type.status",
@@ -235,17 +232,11 @@ cenozoApp.defineModule({
         CnModalNoticeListFactory
       ) {
         var object = function (parentModel, root) {
-          CnBaseViewFactory.construct(this, parentModel, root, "stage");
+          CnBaseViewFactory.construct(this, parentModel, root, "manuscript_stage");
 
           angular.extend(this, {
             show: function (subject) {
               return CnManuscriptHelper.showAction(subject, this.record);
-            },
-            delete: async function () {
-              await CnManuscriptHelper.delete(
-                this.record.getIdentifier(),
-                this.record.lang
-              );
             },
             downloadManuscriptReport: async function () {
               await CnManuscriptHelper.download(
@@ -264,12 +255,12 @@ cenozoApp.defineModule({
               // update the column languages in case they were changed while viewing a report
               await this.$$onView(force);
 
-              if (angular.isDefined(this.noticeModel)) {
-                this.noticeModel.columnList.viewed_by_trainee_user.isIncluded =
+              if (angular.isDefined(this.manuscriptNoticeModel)) {
+                this.manuscriptNoticeModel.columnList.viewed_by_trainee_user.isIncluded =
                   null == this.record.trainee_user_id
                     ? function () { return false; }
                     : function () { return true; };
-                this.noticeModel.columnList.viewed_by_designate_user.isIncluded =
+                this.manuscriptNoticeModel.columnList.viewed_by_designate_user.isIncluded =
                   null == this.record.designate_user_id
                     ? function () { return false; }
                     : function () { return true; };
@@ -314,7 +305,7 @@ cenozoApp.defineModule({
                     this.parentModel.getServiceResourcePath() +
                     "?action=reverse",
                 }).patch();
-                await this.reloadAll(["review", "stage", "notification"]);
+                await this.reloadAll(["manuscriptReview", "manuscriptStage", "manuscriptNotification"]);
               }
             },
 
@@ -323,14 +314,12 @@ cenozoApp.defineModule({
                 "Are you sure you wish to move this " +
                 this.parentModel.module.name.singular +
                 ' to the "' +
-                (angular.isDefined(stageType)
-                  ? stageType
-                  : this.record.next_manuscript_stage_type) +
+                (angular.isDefined(stageType) ? stageType : this.record.next_manuscript_stage_type) +
                 '" stage?';
 
               // check to see if there are any active deferral notes for the active form
               var response = await CnHttpFactory.instance({
-                path: this.parentModel.getServiceResourcePath() + '/deferral_note'
+                path: this.parentModel.getServiceResourcePath() + '/manuscript_deferral_note'
               }).count();
               const deferralNotes = parseInt(response.headers("Total"));
 
@@ -350,14 +339,14 @@ cenozoApp.defineModule({
                 await CnHttpFactory.instance({
                   path: this.parentModel.getServiceResourcePath() + queryString,
                 }).patch();
-                await this.reloadAll(["review", "stage", "notification"]);
+                await this.reloadAll(["manuscriptReview", "manuscriptStage", "manuscriptNotification"]);
               }
             },
 
             defer: async function () {
               // check to see if there are any active deferral notes for the active form
               var response = await CnHttpFactory.instance({
-                path: this.parentModel.getServiceResourcePath() + '/deferral_note'
+                path: this.parentModel.getServiceResourcePath() + '/manuscript_deferral_note'
               }).count();
               const deferralNotes = parseInt(response.headers("Total"));
 
@@ -388,7 +377,7 @@ cenozoApp.defineModule({
             displayNotices: async function () {
               var noticeList = [];
               var response = await CnHttpFactory.instance({
-                path: this.parentModel.getServiceResourcePath() + "/notice",
+                path: this.parentModel.getServiceResourcePath() + "/manuscript_notice",
                 data: { modifier: { order: { datetime: true } } },
               }).query();
 
@@ -427,16 +416,12 @@ cenozoApp.defineModule({
       "CnManuscriptAddFactory",
       "CnManuscriptListFactory",
       "CnManuscriptViewFactory",
-      "CnHttpFactory",
-      "CnSession",
       "$state",
       function (
         CnBaseModelFactory,
         CnManuscriptAddFactory,
         CnManuscriptListFactory,
         CnManuscriptViewFactory,
-        CnHttpFactory,
-        CnSession,
         $state
       ) {
         var object = function (root) {
@@ -446,6 +431,12 @@ cenozoApp.defineModule({
           this.viewModel = CnManuscriptViewFactory.instance(this, root);
 
           angular.extend(this, {
+            // override the collection path so that applicants can view their manuscripts from the home screen
+            getServiceCollectionPath: function () {
+              // ignore the parent if it is the root state
+              return this.$$getServiceCollectionPath("root" == this.getSubjectFromState());
+            },
+
             getEditEnabled: function () {
               var phase = this.viewModel.record.phase ? this.viewModel.record.phase : "";
               return (
@@ -457,10 +448,21 @@ cenozoApp.defineModule({
               );
             },
 
+            getDeleteEnabled: function () {
+              return (
+                this.$$getDeleteEnabled() &&
+                angular.isDefined(this.viewModel.record) &&
+                "new" == this.viewModel.record.phase
+              );
+            },
+
             // override transitionToViewState (used when application views a manuscript)
             transitionToViewState: async function (record) {
               if (this.isRole("applicant", "designate")) {
-                await $state.go("manuscript_version.view", { identifier: record.manuscript_version_id });
+                await $state.go(
+                  "manuscript_version.view",
+                  { identifier: "manuscript_id=" + record.getIdentifier() }
+                );
               } else {
                 await this.$$transitionToViewState(record);
               }

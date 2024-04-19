@@ -62,7 +62,7 @@ class manuscript_stage extends \cenozo\database\record
   /**
    * Convenience method for getting this stage's review list as objects
    */
-  public function get_review_object_list()
+  public function get_manuscript_review_object_list()
   {
     return $this->get_manuscript_stage_type()->get_manuscript_review_object_list( $this->manuscript_id );
   }

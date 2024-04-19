@@ -230,6 +230,7 @@ cenozoApp.defineModule({
     /* ############################################################################################## */
     cenozo.providers.factory("CnManuscriptVersionViewFactory", [
       "CnBaseFormViewFactory",
+      "CnManuscriptHelper",
       "CnManuscriptAttachmentModelFactory",
       "CnHttpFactory",
       "CnModalMessageFactory",
@@ -239,6 +240,7 @@ cenozoApp.defineModule({
       "$state",
       function (
         CnBaseFormViewFactory,
+        CnManuscriptHelper,
         CnManuscriptAttachmentModelFactory,
         CnHttpFactory,
         CnModalMessageFactory,
@@ -249,6 +251,9 @@ cenozoApp.defineModule({
       ) {
         var object = function (parentModel, root) {
           CnBaseFormViewFactory.construct(this, "manuscriptReport", parentModel, root);
+
+          // extend the base onPatch function that is defined in CnBaseFormViewFactory
+          this.baseOnPatch = this.onPatch;
 
           angular.extend(this, {
             compareRecord: null,
@@ -275,7 +280,7 @@ cenozoApp.defineModule({
             },
 
             onPatch: async function (data) {
-              await this.$$onPatch(data);
+              await this.baseOnPatch(data);
 
               // remove justifications if no longer needed
               if (angular.isDefined(data.clsa_title) && data.clsa_title) {
@@ -477,7 +482,7 @@ cenozoApp.defineModule({
               
               var parent = this.parentModel.getParentIdentifier();
               await CnHttpFactory.instance({
-                path: parent.subject + "/" + parent.id + "?action=submit",
+                path: parent.subject + "/" + parent.identifier + "?action=submit",
               }).patch();
 
               var code =
@@ -490,11 +495,17 @@ cenozoApp.defineModule({
               }).show();
 
               if (this.parentModel.isRole("applicant", "designate")) {
-                await $state.go("root.home");
+                // go back to the reqn version's manuscript tab
+                await $state.go(
+                  'reqn_version.view',
+                  { identifier: "identifier=" + this.record.identifier, t: 'manuscripts' }
+                );
               } else {
                 await this.onView(true); // refresh
               }
             },
+
+            delete: async function () { await CnManuscriptHelper.delete(this.record); },
 
             getAttachmentList: async function () {
               var response = await CnHttpFactory.instance({

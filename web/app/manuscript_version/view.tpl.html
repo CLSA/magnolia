@@ -45,6 +45,10 @@
           </li>
         </ul>
       </div>
+      <button class="btn btn-default"
+              ng-click="model.viewModel.transitionTo('application')"
+              ng-bind-html="t( 'misc.viewApplication' )"
+              type="button"></button>
       <button class="btn btn-primary"
               ng-if="model.viewModel.show( 'view' )"
               ng-click="model.viewModel.transitionTo('manuscript')"
@@ -53,6 +57,13 @@
               ng-if="model.viewModel.show( 'submit' )"
               ng-click="model.viewModel.submit()"
               ng-bind-html="t( 'misc.submit' )"
+              type="button"></button>
+    </div>
+    <div class="btn-group pull-left">
+      <button class="btn btn-danger"
+              ng-if="model.viewModel.show( 'delete' )"
+              ng-click="model.viewModel.delete()"
+              ng-bind-html="t( 'misc.delete' )"
               type="button"></button>
     </div>
   </div>

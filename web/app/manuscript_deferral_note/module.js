@@ -29,5 +29,34 @@ cenozoApp.defineModule({
       note: { title: "Note", type: "text" },
     });
 
+    /* ############################################################################################## */
+    cenozo.providers.factory("CnManuscriptDeferralNoteModelFactory", [
+      "CnBaseModelFactory",
+      "CnManuscriptDeferralNoteListFactory",
+      "CnManuscriptDeferralNoteViewFactory",
+      "CnHttpFactory",
+      function (
+        CnBaseModelFactory,
+        CnManuscriptDeferralNoteListFactory,
+        CnManuscriptDeferralNoteViewFactory,
+        CnHttpFactory
+      ) {
+        var object = function (root) {
+          CnBaseModelFactory.construct(this, module);
+          this.listModel = CnManuscriptDeferralNoteListFactory.instance(this);
+          this.viewModel = CnManuscriptDeferralNoteViewFactory.instance(this, root);
+
+          // deferral notes can only be added in the form UI
+          this.getAddEnabled = function () { return false; }
+        };
+
+        return {
+          root: new object(true),
+          instance: function () {
+            return new object(false);
+          },
+        };
+      },
+    ]);
   },
 });

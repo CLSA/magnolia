@@ -14,10 +14,12 @@ SOURCE pdf_form.sql
 SOURCE supplemental_file.sql
 SOURCE data_agreement.sql
 SOURCE notification_type.sql
+SOURCE stage.sql
 SOURCE stage_type.sql
 SOURCE amendment_type.sql
 SOURCE additional_fee.sql
 SOURCE reqn_has_additional_fee.sql
+SOURCE data_category.sql
 SOURCE data_option.sql
 SOURCE reqn_version.sql
 SOURCE reqn_type.sql

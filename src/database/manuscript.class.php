@@ -79,7 +79,7 @@ class manuscript extends \cenozo\database\record
     $recommendation = NULL;
     foreach( $this->get_manuscript_review_list( $select, $modifier ) as $row )
     {
-      $recommendation = $row;
+      $recommendation = $row['name'];
       // if any review is not satisfactory then so is the manuscript
       if( 'Not Satisfactory' == $recommendation ) break;
     }
@@ -185,7 +185,7 @@ class manuscript extends \cenozo\database\record
           {
             // NOTE: when approved check if revisions have been suggested
             $find_stage_type_name = 'Satisfactory' == $recommendation
-                                  ? $this->suggested_revisions ? 'Suggested Revisions' : 'Complete'
+                                  ? ($this->suggested_revisions ? 'Suggested Revisions' : 'Complete')
                                   : 'Not Approved';
           }
         }
@@ -242,7 +242,7 @@ class manuscript extends \cenozo\database\record
       $this->save();
     }
 
-    $db_current_stage->delete();
+    $this->get_current_manuscript_stage()->delete();
     $db_last_stage->datetime = NULL;
     $db_last_stage->save();
   }
@@ -330,7 +330,7 @@ class manuscript extends \cenozo\database\record
 
       $db_notification_type = $db_current_stage_type->get_notification_type();
 
-      if( is_null( $db_notification_type ) )
+      if( !is_null( $db_notification_type ) )
       {
         $db_notification = lib::create( 'database\manuscript_notification' );
         $db_notification->notification_type_id = $db_notification_type->id;
@@ -358,7 +358,7 @@ class manuscript extends \cenozo\database\record
             $db_next_stage_type->name,
             $db_reqn->identifier,
             $db_manuscript_user->first_name, $db_manuscript_user->last_name,
-            $db_manuscript_version->title
+            $db_manuscript_version->get_manuscript()->title
           )
         );
       }
@@ -468,7 +468,7 @@ class manuscript extends \cenozo\database\record
     $review_mod->left_join( 'user', 'manuscript_review.user_id', 'user.id' );
     $review_mod->join(
       'manuscript_review_type',
-      'manuscript_review.review_type_id',
+      'manuscript_review.manuscript_review_type_id',
       'manuscript_review_type.id'
     );
     $review_mod->join(
@@ -597,7 +597,7 @@ class manuscript extends \cenozo\database\record
       else if( 'trainee' == $type ) $db_user = $db_reqn->get_trainee_user();
       else if( 'designate' == $type ) $db_user = $db_reqn->get_designate_user();
 
-      if( !is_null( $db_user ) ) $db_user->add_notice( $notice_id_list );
+      if( !is_null( $db_user ) ) $db_user->add_manuscript_notice( $notice_id_list );
     }
   }
 }

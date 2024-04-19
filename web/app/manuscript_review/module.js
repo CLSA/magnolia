@@ -141,7 +141,7 @@ cenozoApp.defineModule({
 
                 // determine which recommendation_type enum list to use based on the review type
                 this.parentModel.metadata.columnList.manuscript_recommendation_type_id.enumList =
-                  this.parentModel.manuscriptRecommendationList[this.record.review_type_id];
+                  this.parentModel.recommendationList[this.record.manuscript_review_type_id];
               } finally {
                 this.mayEdit = this.record.editable;
               }
@@ -202,7 +202,7 @@ cenozoApp.defineModule({
             var response = await CnHttpFactory.instance({
               path: "manuscript_recommendation_type",
               data: {
-                select: { column: ["id", "name", "review_type_id_list"] },
+                select: { column: ["id", "name", "manuscript_review_type_id_list"] },
                 modifier: { order: "manuscript_recommendation_type.name", limit: 1000 },
               },
             }).query();
@@ -212,7 +212,7 @@ cenozoApp.defineModule({
               enumList: [],
             };
             response.data.forEach((item) =>
-              item.review_type_id_list.split(",").forEach((reviewTypeId) => {
+              item.manuscript_review_type_id_list.split(",").forEach((reviewTypeId) => {
                 if (angular.isUndefined(this.recommendationList[reviewTypeId]))
                   this.recommendationList[reviewTypeId] = [];
                 this.recommendationList[reviewTypeId].push({

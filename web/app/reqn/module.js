@@ -854,8 +854,7 @@ cenozoApp.defineModule({
           restrict: "E",
           scope: { model: "=?", removeColumns: "@" },
           controller: function ($scope) {
-            if (angular.isUndefined($scope.model))
-              $scope.model = CnReqnModelFactory.root;
+            if (angular.isUndefined($scope.model)) $scope.model = CnReqnModelFactory.root;
 
             CnSession.setBreadcrumbTrail([
               {
@@ -978,12 +977,6 @@ cenozoApp.defineModule({
                 if (angular.isDefined(this.notificationModel))
                   await this.notificationModel.listModel.onList(true);
               }
-            },
-            delete: async function () {
-              await CnReqnHelper.delete(
-                this.record.getIdentifier(),
-                this.record.lang
-              );
             },
             downloadApplication: async function () {
               await CnReqnHelper.download(
@@ -1730,12 +1723,8 @@ cenozoApp.defineModule({
             getServiceCollectionPath: function () {
               // ignore the parent if it is the root state
               return (
-                this.$$getServiceCollectionPath(
-                  "root" == this.getSubjectFromState()
-                ) +
-                ("data_sharing" == this.getActionFromState()
-                  ? "?data_sharing=1"
-                  : "")
+                this.$$getServiceCollectionPath("root" == this.getSubjectFromState()) +
+                ("data_sharing" == this.getActionFromState() ? "?data_sharing=1" : "")
               );
             },
 
@@ -1824,8 +1813,7 @@ cenozoApp.defineModule({
 
               if ("root" == this.getSubjectFromState()) {
                 // chairs only see DSAC reqns from the home screen
-                if (angular.isUndefined(data.modifier.where))
-                  data.modifier.where = [];
+                if (angular.isUndefined(data.modifier.where)) data.modifier.where = [];
                 if (this.isRole("chair")) {
                   data.modifier.where.push({
                     column: "stage_type.name",

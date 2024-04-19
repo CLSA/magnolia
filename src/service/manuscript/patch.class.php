@@ -102,7 +102,7 @@ class patch extends \cenozo\service\patch
 
     if( 'defer' == $action )
     {
-      $db_manuscript->deferrad = true;
+      $db_manuscript->deferred = true;
       $db_manuscript->save();
 
       // create a new document version
@@ -139,7 +139,7 @@ class patch extends \cenozo\service\patch
         else
         {
           // this will submit the manuscript for the first time
-          $db_manuscript->proceed_to_manuscript_next_stage();
+          $db_manuscript->proceed_to_next_manuscript_stage();
         }
 
         // send a notification

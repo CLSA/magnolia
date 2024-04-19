@@ -5,7 +5,7 @@
 </span>
 <span ng-show="
   !$parent.model.isRole( 'administrator', 'communication', 'dao' ) &&
-  (true === $parent.model.viewModel.record.state || 'deferred' === $parent.model.viewModel.record.state) &&
+  (true === $parent.model.viewModel.record.deferred || 'deferred' === $parent.model.viewModel.record.state) &&
   $parent.model.viewModel.record['deferral_note_'+page]
 ">
   <div class="vertical-spacer bg-warning rounded" style="padding: 0.5em 1em 1em;">
