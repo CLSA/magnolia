@@ -2243,7 +2243,7 @@ cenozo.service("CnLocalization", [
           add: { en: "Add", fr: "Ajouter" },
           output_type: { en: "Output Type", fr: "Type de réalisation" },
           detail: { en: "Details", fr: "Informations" },
-          filename: { en: "Attachment", fr: "Pièce jointe" },
+          attachment: { en: "Attachment", fr: "Pièce jointe" },
           url: { en: "URL", fr: "URL" },
           addOutputSource: { en: "Add Source", fr: "Ajouter une source" },
           outputSourceListHeading: {

@@ -13,5 +13,5 @@ class patch extends \cenozo\service\patch
   /**
    * Extend parent property
    */
-  protected static $base64_column_list = ['data' => 'application/octet-stream'];
+  protected static $base64_column_list = ['data' => 'application/octet-stream']; // allow any file type
 }

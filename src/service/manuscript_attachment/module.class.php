@@ -24,6 +24,16 @@ class module extends \cenozo\service\module
     $modifier->join( 'manuscript', 'manuscript_attachment.manuscript_id', 'manuscript.id' );
 
     if( $select->has_column( 'size' ) )
-      $select->add_column( 'CHAR_LENGTH( manuscript_attachment.data ) / 4 * 3', 'size', false, 'int' );
+    {
+      // Size of base64 encoded file is (n * (3/4)) - y
+      // where y is 2 if base64 ends with "==" and 1 if base64 ends with "="
+      $select->add_column(
+        'CHAR_LENGTH( manuscript_attachment.data ) * (3/4) - '.
+        'IF(RIGHT(data,2) = "==", 2, IF(RIGHT(data,1) = "=", 1, 0))',
+        'size',
+        false,
+        'int'
+      );
+    }
   }
 }

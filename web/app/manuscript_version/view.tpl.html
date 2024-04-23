@@ -123,7 +123,7 @@
                       ng-repeat="attachment in model.viewModel.attachmentList"
                       ng-click="model.viewModel.downloadAttachment(attachment.id)"
                     >
-                      <td ng-bind-html="attachment.name"></td>
+                      <td ng-bind-html="attachment.filename"></td>
                       <td ng-bind-html="attachment.size | cnSize"></td>
                       <td ng-show="model.getEditEnabled()">
                         <button class="btn btn-xs btn-danger"

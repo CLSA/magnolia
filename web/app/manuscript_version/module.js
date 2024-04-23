@@ -197,7 +197,7 @@ cenozoApp.defineModule({
 
                       // automatically set the filename
                       await attachmentAddModel.onAdd({
-                        name: attachmentAddModel.fileList.findByProperty("key", "data").getFilename()
+                        filename: attachmentAddModel.fileList.findByProperty("key", "data").getFilename()
                       });
 
                       // reset the form
@@ -511,7 +511,7 @@ cenozoApp.defineModule({
               var response = await CnHttpFactory.instance({
                 path: ["manuscript", this.record.manuscript_id, 'manuscript_attachment'].join("/"),
                 data: {
-                  select: { column: ["id", "name", "size"] },
+                  select: { column: ["id", "filename", "size"] },
                   modifier: { order: "id", limit: 1000 },
                 },
               }).query();
@@ -523,7 +523,7 @@ cenozoApp.defineModule({
               const response = await CnHttpFactory.instance({
                 path: ["manuscript", this.record.manuscript_id, 'manuscript_attachment', id].join("/"),
               }).get();
-              saveAs(cenozo.convertBase64ToBlob(response.data.data), response.data.name);
+              saveAs(cenozo.convertBase64ToBlob(response.data.data), response.data.filename);
             },
 
             removeAttachment: async function (id) {
