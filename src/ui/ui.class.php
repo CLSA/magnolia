@@ -212,7 +212,7 @@ class ui extends \cenozo\ui\ui
       $this->remove_listitem( 'Requisitions' );
     }
 
-    if( !in_array($db_role->name, ['administrator', 'dao'] ) ) $this->remove_listitem( 'Users' );
+    if( !in_array( $db_role->name, ['administrator', 'dao'] ) ) $this->remove_listitem( 'Users' );
     if( in_array( $db_role->name, ['administrator', 'dao'] ) )
     {
       $this->add_listitem( 'Data Categories', 'data_category' );

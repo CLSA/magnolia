@@ -419,7 +419,7 @@ cenozoApp.defineModule({
 
             updateOutputSourceListLanguage: function (lang) {
               var columnList = cenozoApp.module("output_source").columnList;
-              columnList.filename.title = CnLocalization.translate("output", "filename", lang);
+              columnList.filename.title = CnLocalization.translate("output", "attachment", lang);
               columnList.url.title = CnLocalization.translate("output", "url", lang);
             },
 
@@ -481,7 +481,7 @@ cenozoApp.defineModule({
 
               var group = this.module.inputGroupList.findByProperty( "title", "Sources" );
 
-              group.inputList.filename.title = CnLocalization.translate( "output", "filename", lang );
+              group.inputList.filename.title = CnLocalization.translate( "output", "attachment", lang );
               group.inputList.url.title = CnLocalization.translate( "output", "url", lang );
               for (let n=1; n<=10; n++) {
                 const columnName = "filename" + n;

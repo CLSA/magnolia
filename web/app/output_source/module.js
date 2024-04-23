@@ -26,18 +26,20 @@ cenozoApp.defineModule({
     });
 
     module.addInputGroup("", {
-      filename: {
+      data: {
         title: "", // defined below
-        type: "file",
+        type: "base64",
+        mimeType: "application/pdf",
+        getFilename: function ($state, model) {
+          return model.viewModel.record.filename;
+        },
       },
       url: {
         title: "", // defined below
         type: "string",
       },
-      detail: {
-        column: "output.detail",
-        isExcluded: true,
-      },
+      filename: { type: "string", isExcluded: true },
+      detail: { column: "output.detail", isExcluded: true },
       lang: { column: "language.code", type: "string", isExcluded: true },
     });
 
@@ -77,15 +79,11 @@ cenozoApp.defineModule({
 
               cnRecordAddScope.baseSaveFn = cnRecordAddScope.save;
               angular.extend(cnRecordAddScope, {
-                getCancelText: function () {
-                  return CnLocalization.translate("output", "cancel", lang);
-                },
-                getSaveText: function () {
-                  return CnLocalization.translate("output", "save", lang);
-                },
+                getCancelText: function () { return CnLocalization.translate("output", "cancel", lang); },
+                getSaveText: function () { return CnLocalization.translate("output", "save", lang); },
                 save: function () {
                   if (
-                    !$scope.model.addModel.hasFile("filename") &&
+                    !$scope.model.addModel.hasFile("data") &&
                     angular.isUndefined(cnRecordAddScope.record.url)
                   ) {
                     CnModalMessageFactory.instance({
@@ -137,33 +135,22 @@ cenozoApp.defineModule({
                     "View " + cnRecordViewScope.parentName(subject);
                 },
                 patch: function () {
-                  if (
-                    !$scope.model.viewModel.record.filename &&
-                    !$scope.model.viewModel.record.url
-                  ) {
+                  const record = $scope.model.viewModel.record;
+                  const backupRecord = $scope.model.viewModel.backupRecord;
+                  const formattedRecord = $scope.model.viewModel.formattedRecord;
+                  if ((!record.data || 0 == record.data.size) && !record.url) {
                     CnModalMessageFactory.instance({
                       title: "Please Note",
-                      message:
-                        "You must provide either a file or web link (URL)",
+                      message: "You must provide either a file or web link (URL)",
                       error: true,
                     }).show();
 
                     // undo the change
-                    if (
-                      $scope.model.viewModel.record.filename !=
-                      $scope.model.viewModel.backupRecord.filename
-                    ) {
-                      $scope.model.viewModel.record.filename =
-                        $scope.model.viewModel.backupRecord.filename;
-                      $scope.model.viewModel.formattedRecord.filename =
-                        $scope.model.viewModel.backupRecord.formatted_filename;
+                    if (record.data != backupRecord.data) {
+                      record.data = backupRecord.data;
+                      formattedRecord.data = backupRecord.formatted_data;
                     }
-                    if (
-                      $scope.model.viewModel.record.url !=
-                      $scope.model.viewModel.backupRecord.url
-                    )
-                      $scope.model.viewModel.record.url =
-                        $scope.model.viewModel.backupRecord.url;
+                    if (record.url != backupRecord.url) record.url = backupRecord.url;
                   } else cnRecordViewScope.basePatchFn();
                 },
               });
@@ -181,26 +168,34 @@ cenozoApp.defineModule({
       function (CnBaseAddFactory, CnHttpFactory, CnLocalization) {
         var object = function (parentModel) {
           CnBaseAddFactory.construct(this, parentModel);
-          this.configureFileInput("filename");
 
-          this.onNew = async function (record) {
-            var parent = this.parentModel.getParentIdentifier();
-            var origin = this.parentModel.getQueryParameter("origin", true);
-            var lang = "en";
+          angular.extend(this, {
+            onNew: async function (record) {
+              await this.$$onNew(record);
+              var parent = this.parentModel.getParentIdentifier();
+              var origin = this.parentModel.getQueryParameter("origin", true);
+              var lang = "en";
 
-            if ("final_report" == origin) {
-              if (angular.isDefined(parent.identifier)) {
-                var response = await CnHttpFactory.instance({
-                  path: "output/" + parent.identifier,
-                  data: { select: { column: { table: "language", column: "code", alias: "lang" } } },
-                }).get();
-                lang = response.data.lang;
+              if ("final_report" == origin) {
+                if (angular.isDefined(parent.identifier)) {
+                  var response = await CnHttpFactory.instance({
+                    path: "output/" + parent.identifier,
+                    data: { select: { column: { table: "language", column: "code", alias: "lang" } } },
+                  }).get();
+                  lang = response.data.lang;
+                }
               }
-            }
 
-            this.parentModel.updateLanguage(lang);
-            this.heading = CnLocalization.translate("output", "createOutputSource", lang);
-          };
+              this.parentModel.updateLanguage(lang);
+              this.heading = CnLocalization.translate("output", "createOutputSource", lang);
+            },
+
+            // extend onAdd to automatically set the filename property
+            onAdd: async function (record) {
+              record.filename = this.fileList.findByProperty("key", "data").getFilename();
+              await this.$$onAdd(record);
+            }
+          });
         };
         return {
           instance: function (parentModel) {
@@ -214,10 +209,10 @@ cenozoApp.defineModule({
     cenozo.providers.factory("CnOutputSourceViewFactory", [
       "CnBaseViewFactory",
       "CnLocalization",
-      function (CnBaseViewFactory, CnLocalization) {
+      "CnHttpFactory",
+      function (CnBaseViewFactory, CnLocalization, CnHttpFactory) {
         var object = function (parentModel, root) {
           CnBaseViewFactory.construct(this, parentModel, root);
-          this.configureFileInput("filename");
 
           this.onView = async function (force) {
             await this.$$onView(force);
@@ -226,6 +221,16 @@ cenozoApp.defineModule({
             var lang = "final_report" == origin ? this.record.lang : "en";
             this.parentModel.updateLanguage(lang);
             this.heading = CnLocalization.translate("output", "outputSourceDetails", lang);
+          };
+
+          // always set the name of the record based on the name of the uploaded file
+          const self = this;
+          this.fileList.findByProperty("key", "data").postUpload = async function() {
+            await CnHttpFactory.instance({
+              path: self.parentModel.getServiceResourcePath(),
+              data: { filename: this.file.name },
+            }).patch();
+            await self.onView();
           };
         };
         return {
@@ -283,7 +288,7 @@ cenozoApp.defineModule({
 
             updateLanguage: function (lang) {
               var group = this.module.inputGroupList.findByProperty("title", "");
-              group.inputList.filename.title = CnLocalization.translate("output", "filename", lang);
+              group.inputList.data.title = CnLocalization.translate("output", "attachment", lang);
               group.inputList.url.title = CnLocalization.translate("output", "url", lang);
             },
 
@@ -293,10 +298,7 @@ cenozoApp.defineModule({
               var origin = this.getQueryParameter("origin", true);
               if ("final_report" == origin) {
                 var parent = this.getParentIdentifier();
-                var index = CnSession.breadcrumbTrail.findIndexByProperty(
-                  "title",
-                  "Output"
-                );
+                var index = CnSession.breadcrumbTrail.findIndexByProperty("title", "Output");
                 CnSession.breadcrumbTrail[index + 1].go = async function () {
                   await $state.go("output.view", { identifier: parent.identifier, origin: origin });
                 };
@@ -307,10 +309,10 @@ cenozoApp.defineModule({
             transitionToAddState: async function () {
               var origin = this.getQueryParameter("origin", true);
               if ("final_report" == origin) {
-                await $state.go("^.add_" + this.module.subject.snake, {
-                  parentIdentifier: $state.params.identifier,
-                  origin: origin,
-                });
+                await $state.go(
+                  "^.add_" + this.module.subject.snake,
+                  { parentIdentifier: $state.params.identifier, origin: origin }
+                );
               } else {
                 await this.$$transitionToAddState();
               }
@@ -331,9 +333,7 @@ cenozoApp.defineModule({
 
             transitionToLastState: async function () {
               // include the origin in the parent output's state
-              var stateParams = {
-                identifier: this.getParentIdentifier().identifier,
-              };
+              var stateParams = { identifier: this.getParentIdentifier().identifier, };
               var origin = this.getQueryParameter("origin", true);
               if (angular.isDefined(origin)) stateParams.origin = origin;
               await $state.go("output.view", stateParams);

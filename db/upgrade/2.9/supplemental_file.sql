@@ -22,7 +22,7 @@ CREATE PROCEDURE patch_supplemental_file()
     AND column_name = "data_en";
 
     IF @test = 0 THEN
-      ALTER TABLE supplemental_file ADD COLUMN data_en MEDIUMTEXT NOT NULL;
+      ALTER TABLE supplemental_file ADD COLUMN data_en LONGTEXT NOT NULL;
     END IF;
 
     SELECT "Replacing filename_fr with data_fr column in supplemental_file table" AS "";
@@ -44,7 +44,7 @@ CREATE PROCEDURE patch_supplemental_file()
     AND column_name = "data_fr";
 
     IF @test = 0 THEN
-      ALTER TABLE supplemental_file ADD COLUMN data_fr MEDIUMTEXT NOT NULL;
+      ALTER TABLE supplemental_file ADD COLUMN data_fr LONGTEXT NOT NULL;
     END IF;
 
   END //
