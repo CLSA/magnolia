@@ -12,4 +12,13 @@ use cenozo\lib, cenozo\log, magnolia\util;
 /**
  * Performs operations which effect how this module is used in a service
  */
-class module extends \cenozo\service\module {}
+class module extends \cenozo\service\module
+{
+  /** 
+   * Extend parent property
+   */
+  protected static $base64_column_list = [
+    'data_en' => 'application/pdf',
+    'data_fr' => 'application/pdf'
+  ];
+}
