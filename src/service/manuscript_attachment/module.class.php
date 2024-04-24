@@ -14,6 +14,8 @@ use cenozo\lib, cenozo\log, magnolia\util;
  */
 class module extends \cenozo\service\module
 {
+  protected static $base64_column_list = ['data' => 'application/octet-stream']; // allow any file type
+
   /**
    * Extend parent method
    */
