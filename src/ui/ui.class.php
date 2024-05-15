@@ -197,8 +197,6 @@ class ui extends \cenozo\ui\ui
       $this->add_listitem( 'Supplemental Files', 'supplemental_file' );
     }
 
-    $this->add_listitem( 'Requisitions', 'reqn' );
-
     $this->remove_listitem( 'Availability Types' );
     $this->remove_listitem( 'Consent Types' );
     $this->remove_listitem( 'Event Types' );
@@ -209,7 +207,11 @@ class ui extends \cenozo\ui\ui
     if( in_array( $db_role->name, ['applicant', 'designate'] ) )
     {
       $this->remove_listitem( 'Amendment Types' );
-      $this->remove_listitem( 'Requisitions' );
+    }
+    else
+    {
+      $this->add_listitem( 'Requisitions', 'reqn' );
+      $this->add_listitem( 'Manuscript Reviews', 'manuscript' );
     }
 
     if( !in_array( $db_role->name, ['administrator', 'dao'] ) ) $this->remove_listitem( 'Users' );

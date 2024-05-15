@@ -507,14 +507,6 @@ cenozoApp.defineModule({
               });
             };
 
-            $scope.removeManuscript = async function (id) {
-              if ($scope.model.viewModel.manuscriptModel.getDeleteEnabled()) {
-                if (!$scope.isDeletingManuscript.includes(id)) $scope.isDeletingManuscript.push(id);
-                var index = $scope.isDeletingManuscript.indexOf(id);
-                await $scope.model.viewModel.removeManuscript(id);
-                if (0 <= index) $scope.isDeletingManuscript.splice(index, 1);
-              }
-            };
             $scope.t = function (value) {
               return $scope.model.viewModel.translate(value);
             };
@@ -1602,14 +1594,6 @@ cenozoApp.defineModule({
               }).query();
 
               this.manuscriptList = response.data;
-            },
-
-            removeManuscript: async function (id) {
-              await CnHttpFactory.instance({
-                path: "/reqn/identifier=" + this.record.identifier + "/manuscript/" + id
-              }).delete();
-              await this.getManuscriptList();
-              this.determineManuscriptDiffs();
             },
 
             getCoapplicantList: async function (reqnVersionId, object) {

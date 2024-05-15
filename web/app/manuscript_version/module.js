@@ -523,7 +523,7 @@ cenozoApp.defineModule({
               const response = await CnHttpFactory.instance({
                 path: ["manuscript", this.record.manuscript_id, 'manuscript_attachment', id].join("/"),
               }).get();
-              saveAs(cenozo.convertBase64ToBlob(response.data.data), response.data.filename);
+              saveAs(cenozo.convertBase64ToBlob(response.data.data.data), response.data.filename);
             },
 
             removeAttachment: async function (id) {
@@ -591,8 +591,9 @@ cenozoApp.defineModule({
 
           angular.extend(this, {
             getEditEnabled: function () {
+              var phase = this.viewModel.record.phase ? this.viewModel.record.phase : "";
               if (this.isRole("applicant", "designate")) {
-                return true === this.viewModel.record.deferred;
+                return "new" == phase || true === this.viewModel.record.deferred;
               } else if (this.isRole("administrator", "dao")) {
                 return true;
               }

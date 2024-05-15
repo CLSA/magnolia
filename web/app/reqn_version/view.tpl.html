@@ -1399,7 +1399,6 @@
                 <tr>
                   <td ng-bind-html="t( 'manuscripts.manuscript.title' )"></td>
                   <td ng-bind-html="t( 'manuscripts.manuscript.status' )"></td>
-                  <td ng-show="model.viewModel.getManuscriptEditEnabled() && !isDAO()"></td>
                 </tr>
               </thead>
               <tbody>
@@ -1407,14 +1406,6 @@
                     ng-click="model.viewModel.getManuscriptEditEnabled() && viewManuscript( manuscript.id )">
                   <td>{{ manuscript.title }}</td>
                   <td>{{ manuscript.status }}</td>
-                  <td ng-show="model.viewModel.getManuscriptEditEnabled() && !isDAO()">
-                    <button class="btn btn-xs btn-danger"
-                            ng-disabled="isDeletingManuscript.includes( manuscript.id )"
-                            ng-click="removeManuscript( manuscript.id ) && $event.stopPropagation()"
-                            uib-tooltip-html="t( 'misc.remove' )">
-                      <i class="glyphicon glyphicon-remove"></i>
-                    </button>
-                  </td>
                 </tr>
               </tbody>
             </table>
