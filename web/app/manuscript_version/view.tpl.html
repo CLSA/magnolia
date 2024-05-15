@@ -375,7 +375,7 @@
                   ng-show="0 == model.viewModel.dataVersionList.length"
                   ng-bind-html="t( 'part_4.no_data_versions' )"
                 ></p>
-                <p class="container-fluid" ng-show="0 < model.viewModel.dataVersionList.length">
+                <p class="container-fluid allow-select" ng-show="0 < model.viewModel.dataVersionList.length">
                   {{ t( 'part_4.data_version_list' ) }}
                   {{ model.viewModel.dataVersionList.join(', ') }}
                 </p>
