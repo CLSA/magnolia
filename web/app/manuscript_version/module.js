@@ -70,7 +70,7 @@ cenozoApp.defineModule({
       has_covid_data: { type: "boolean" },
       genomics: { type: "boolean" },
       genomics_justification: { type: "text" },
-      acknowledgment: { type: "boolean" },
+      acknowledgment: { type: "text" },
       dataset_version: { type: "boolean" },
       seroprevalence: { type: "boolean" },
       covid: { type: "boolean" },
@@ -258,6 +258,7 @@ cenozoApp.defineModule({
           angular.extend(this, {
             compareRecord: null,
             versionList: [],
+            dataVersionList: [],
             attachmentList: [],
             charCount: { objectives: 0 },
             attachmentModel: CnManuscriptAttachmentModelFactory.instance(),
@@ -274,6 +275,9 @@ cenozoApp.defineModule({
               this.compareRecord = null;
 
               await this.$$onView(force);
+
+              // get a list of all data versions
+              await this.getDataVersionList();
 
               // get a list of all attachments
               await this.getAttachmentList();
@@ -372,10 +376,6 @@ cenozoApp.defineModule({
               }).show();
               if (!response) return;
 
-              // make sure there is at least one attachment
-              if (0 == this.attachmentList.length) {
-              }
-
               var requiredTabList = {
                 part_1: ["attachment_list"],
                 part_2: ["authors", "journal", "objectives"],
@@ -425,6 +425,7 @@ cenozoApp.defineModule({
                   return true;
                 }).forEach(property => {
                   if ("attachment_list" == property) {
+                    // make sure there is at least one attachment
                     if (0 == this.attachmentList.length) {
                       if (null == errorTab) errorTab = tab;
                       if (null == error) {
@@ -506,6 +507,19 @@ cenozoApp.defineModule({
             },
 
             delete: async function () { await CnManuscriptHelper.delete(this.record); },
+
+            getDataVersionList: async function () {
+              var response = await CnHttpFactory.instance({
+                path: ["reqn", "identifier=" + this.record.identifier, "data_release"].join("/"),
+                data: {
+                  select: { column: [{table: "data_version", column: "name"}] },
+                  modifier: { order: "data_version.name", limit: 1000 },
+                }
+              }).query();
+
+              this.dataVersionList = response.data.map(row => row.name);
+              console.log( this.dataVersionList );
+            },
 
             getAttachmentList: async function () {
               var response = await CnHttpFactory.instance({

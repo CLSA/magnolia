@@ -21,6 +21,8 @@ class module extends \cenozo\service\module
   {
     parent::prepare_read( $select, $modifier );
 
+    $modifier->join( 'data_version', 'data_release.data_version_id', 'data_version.id' );
+
     if( !is_null( $this->get_resource() ) )
     {
       // include the requisition identifier and user first/last/name as supplemental data

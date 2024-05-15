@@ -370,12 +370,20 @@
                     "
                   ></li>
                 </ul>
+                <p
+                  class="text-primary"
+                  ng-show="0 == model.viewModel.dataVersionList.length"
+                  ng-bind-html="t( 'part_4.no_data_versions' )"
+                ></p>
+                <p class="container-fluid" ng-show="0 < model.viewModel.dataVersionList.length">
+                  {{ t( 'part_4.data_version_list' ) }}
+                  {{ model.viewModel.dataVersionList.join(', ') }}
+                </p>
                 <cn-view-input-with-differences
                   input="{
                     key: 'acknowledgment',
                     title: t( 'part_4.acknowledgment' ),
-                    type: 'boolean',
-                    enumList: model.metadata.yesNAEnumList[model.viewModel.record.lang]
+                    type: 'text',
                   }"
                   no-cols=true
                   difference="model.viewModel.compareRecord.differences.part_4.acknowledgment"

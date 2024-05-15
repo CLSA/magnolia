@@ -1836,19 +1836,28 @@ cenozo.service("CnLocalization", [
               fr: "Requirements as per the CLSA Publication and Promotion Policy (Part 2)", // TODO: TRANSLATE
             },
             acknowledgment_description: {
-              en: "The approved acknowledgement statement must be included:",
+              en: "The approved acknowledgment statement must be included:",
+              fr: "The approved acknowledgment statement must be included:", // TODO: TRANSLATE
             },
             acknowledgment_example1: {
-              en: "This research was made possible using the data/biospecimens collected by the Canadian Longitudinal Study on Aging (CLSA). Funding for the Canadian Longitudinal Study on Aging (CLSA) is provided by the Government of Canada through the Canadian Institutes of Health Research (CIHR) under grant reference: LSA 94473 and the Canada Foundation for Innovation, as well as the following provinces, Newfoundland, Nova Scotia, Quebec, Ontario, Manitoba, Alberta, and British Columbia. This research has been conducted using <b>(LIST YOUR DATA VERSIONS HERE)</b> under Application ID ",
-              fr: "This research was made possible using the data/biospecimens collected by the Canadian Longitudinal Study on Aging (CLSA). Funding for the Canadian Longitudinal Study on Aging (CLSA) is provided by the Government of Canada through the Canadian Institutes of Health Research (CIHR) under grant reference: LSA 94473 and the Canada Foundation for Innovation, as well as the following provinces, Newfoundland, Nova Scotia, Quebec, Ontario, Manitoba, Alberta, and British Columbia. This research has been conducted using <b>(LIST YOUR DATA VERSIONS HERE)</b> under Application ID ", // TODO: TRANSLATE
+              en: "This research was made possible using the data/biospecimens collected by the Canadian Longitudinal Study on Aging (CLSA). Funding for the Canadian Longitudinal Study on Aging (CLSA) is provided by the Government of Canada through the Canadian Institutes of Health Research (CIHR) under grant reference: LSA 94473 and the Canada Foundation for Innovation, as well as the following provinces, Newfoundland, Nova Scotia, Quebec, Ontario, Manitoba, Alberta, and British Columbia. This research has been conducted using <b>(DETERMINE LIST OF DATA VERSIONS FROM LIST BELOW)</b> under Application ID ",
+              fr: "This research was made possible using the data/biospecimens collected by the Canadian Longitudinal Study on Aging (CLSA). Funding for the Canadian Longitudinal Study on Aging (CLSA) is provided by the Government of Canada through the Canadian Institutes of Health Research (CIHR) under grant reference: LSA 94473 and the Canada Foundation for Innovation, as well as the following provinces, Newfoundland, Nova Scotia, Quebec, Ontario, Manitoba, Alberta, and British Columbia. This research has been conducted using <b>(DETERMINE LIST OF DATA VERSIONS FROM LIST BELOW)</b> under Application ID ", // TODO: TRANSLATE
             },
             acknowledgment_example2: {
               en: ". The CLSA is led by Drs. Parminder Raina, Christina Wolfson and Susan Kirkland.",
               fr: ". The CLSA is led by Drs. Parminder Raina, Christina Wolfson and Susan Kirkland.", // TODO: TRANSLATE
             },
+            no_data_versions: {
+              en: "There are no data versions associated with your application.",
+              en: "There are no data versions associated with your application.", // TODO: TRANSLATE
+            },
+            data_version_list: {
+              en: "List of data version which may need to be included:",
+              fr: "List of data version which may need to be included:", // TODO: TRANSLATE
+            },
             acknowledgment: {
-              en: "Has this requirement been met?",
-              fr: "Has this requirement been met?", //TODO: TRANSLATE
+              en: "Please provide the manuscript's full acknowledgment:",
+              fr: "Please provide the manuscript's full acknowledgment:", // TODO: TRANSLATE
             },
             dataset_version_description: {
               en: "Please note that in any presentations and publications you should always refer to the appropriate dataset version number. If new sample weights were used with an earlier dataset version than Baseline Tracking (TRM) version 3.6 and Baseline Comprehensive (COM) version 4.2, please make sure you mention that you are using the CLSA Sample Weights Version 1.2.",

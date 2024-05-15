@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS manuscript_version (
   clsa_reference_justification TEXT NULL DEFAULT NULL,
   genomics TINYINT(1) NULL DEFAULT NULL,
   genomics_justification TEXT NULL DEFAULT NULL,
-  acknowledgment TINYINT(1) NULL DEFAULT NULL,
+  acknowledgment TEXT NULL DEFAULT NULL,
   dataset_version TINYINT(1) NULL DEFAULT NULL,
   seroprevalence TINYINT(1) NULL DEFAULT NULL,
   covid TINYINT(1) NULL DEFAULT NULL,
