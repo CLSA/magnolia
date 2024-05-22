@@ -513,12 +513,15 @@ cenozoApp.defineModule({
                 path: ["reqn", "identifier=" + this.record.identifier, "data_release"].join("/"),
                 data: {
                   select: { column: [{table: "data_version", column: "name"}] },
-                  modifier: { order: "data_version.name", limit: 1000 },
+                  modifier: {
+                    where: { column: "data_version.manuscript", operator: "=", value: true },
+                    order: "data_version.name",
+                    limit: 1000,
+                  },
                 }
               }).query();
 
               this.dataVersionList = response.data.map(row => row.name);
-              console.log( this.dataVersionList );
             },
 
             getAttachmentList: async function () {

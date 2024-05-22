@@ -437,6 +437,16 @@ cenozoApp.defineModule({
               return this.$$getServiceCollectionPath("root" == this.getSubjectFromState());
             },
 
+            getAddEnabled: function () {
+              return (
+                this.$$getAddEnabled() && (
+                  // only allow applicants/designates to add manuscripts from the reqn_version
+                  !this.isRole("applicant", "designate") ||
+                  "reqn_version" == this.getSubjectFromState()
+                )
+              );
+            },
+
             getEditEnabled: function () {
               var phase = this.viewModel.record.phase ? this.viewModel.record.phase : "";
               return (

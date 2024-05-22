@@ -11,6 +11,7 @@ cenozoApp.defineModule({
       },
       columnList: {
         name: { title: "Name" },
+        manuscript: { title: "Manuscripts" },
         reqn_count: { title: "Requisitions" },
       },
       defaultOrder: {
@@ -23,6 +24,10 @@ cenozoApp.defineModule({
       name: {
         title: "Name",
         type: "string",
+      },
+      manuscript: {
+        title: "Include in Manuscripts",
+        type: "boolean",
       },
     });
 
