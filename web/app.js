@@ -1915,14 +1915,6 @@ cenozo.service("CnLocalization", [
               en: "Has this requirement been met?",
               fr: "Has this requirement been met?", //TODO: TRANSLATE
             },
-            website_description: {
-              en: "CLSA design features (inclusion/exclusion criteria, sampling strategy, data collection procedures, etc.) if included in the manuscript, must be described accurately. Please refer the relevant CLSA Protocol, available for download under the Researchers section of our website.",
-              fr: "CLSA design features (inclusion/exclusion criteria, sampling strategy, data collection procedures, etc.) if included in the manuscript, must be described accurately. Please refer the relevant CLSA Protocol, available for download under the Researchers section of our website.", // TODO: TRANSLATE
-            },
-            website: {
-              en: "Have you include link to document on www.clsa-elcv.ca website.",
-              fr: "Has this requirement been met?", //TODO: TRANSLATE
-            },
             conditions_description: {
               en: 'Supplementary Conditions of Use (<a href="https://www.clsa-elcv.ca/doc/2579" target="conditions">found here</a>) are respected (if applicable)',
               fr: 'Supplementary Conditions of Use (<a href="https://www.clsa-elcv.ca/fr/doc/3046" target="conditions">found here</a>) are respected (if applicable)', // TODO: TRANSLATE

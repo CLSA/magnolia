@@ -119,8 +119,6 @@ class manuscript_version extends \cenozo\database\record
     if( false === $this->disclaimer ) $data['disclaimer_no'] = 'Yes';
     if( true === $this->statement ) $data['statement_yes'] = 'Yes';
     if( false === $this->statement ) $data['statement_no'] = 'Yes';
-    if( true === $this->website ) $data['website_yes'] = 'Yes';
-    if( false === $this->website ) $data['website_no'] = 'Yes';
     if( !is_null( $this->objectives ) ) $data['objectives'] = $this->objectives;
     if( true === $this->indigenous ) $data['indigenous_yes'] = 'Yes';
     if( false === $this->indigenous ) $data['indigenous_no'] = 'Yes';

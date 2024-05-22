@@ -473,20 +473,6 @@
                 </cn-view-input-with-differences>
               </li>
               <li class="list-group-item">
-                <p class="text-primary" ng-bind-html="t( 'part_4.website_description' )"></p>
-                <cn-view-input-with-differences
-                  input="{
-                    key: 'website',
-                    title: t( 'part_4.website' ),
-                    type: 'boolean',
-                    enumList: model.metadata.yesNAEnumList[model.viewModel.record.lang]
-                  }"
-                  no-cols=true
-                  difference="model.viewModel.compareRecord.differences.part_4.website"
-                  model="model">
-                </cn-view-input-with-differences>
-              </li>
-              <li class="list-group-item">
                 <p class="text-primary" ng-bind-html="t( 'part_4.indigenous_description' )"></p>
                 <cn-view-input-with-differences
                   input="{

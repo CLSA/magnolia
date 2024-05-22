@@ -76,7 +76,6 @@ cenozoApp.defineModule({
       covid: { type: "boolean" },
       disclaimer: { type: "boolean" },
       statement: { type: "boolean" },
-      website: { type: "boolean" },
       indigenous: { type: "boolean" },
     });
 
@@ -339,7 +338,6 @@ cenozoApp.defineModule({
                   covid: false,
                   disclaimer: false,
                   statement: false,
-                  website: false,
                   indigenous: false,
                 },
               };
@@ -396,7 +394,6 @@ cenozoApp.defineModule({
                   "covid",
                   "disclaimer",
                   "statement",
-                  "website",
                   "indigenous",
                 ]
               };
