@@ -1399,8 +1399,8 @@ cenozo.service("CnLocalization", [
           manuscripts: {
             tab: { en: "Manuscripts", fr: "Manuscripts" }, // TODO: TRANSLATE
             title: {
-              en: "Manuscript Review",
-              fr: "Manuscript Review" // TODO: TRANSLATE
+              en: "Manuscript Report",
+              fr: "Manuscript Report" // TODO: TRANSLATE
             },
             text: {
               en: "Next help text here.", // TODO: DEFINE COPY

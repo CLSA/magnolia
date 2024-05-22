@@ -29,7 +29,7 @@ class get extends \cenozo\service\downloadable
     $db_manuscript_version = $this->get_leaf_record();
     $db_manuscript = $db_manuscript_version->get_manuscript();
     return sprintf(
-      'Manuscript Review %s (%s) version %d.pdf',
+      'Manuscript Report %s (%s) version %d.pdf',
       $db_manuscript->get_reqn()->identifier,
       $db_manuscript->title,
       $db_manuscript_version->version

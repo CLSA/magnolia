@@ -211,7 +211,7 @@ class ui extends \cenozo\ui\ui
     else
     {
       $this->add_listitem( 'Requisitions', 'reqn' );
-      $this->add_listitem( 'Manuscript Reviews', 'manuscript' );
+      $this->add_listitem( 'Manuscript Reports', 'manuscript' );
     }
 
     if( !in_array( $db_role->name, ['administrator', 'dao'] ) ) $this->remove_listitem( 'Users' );
