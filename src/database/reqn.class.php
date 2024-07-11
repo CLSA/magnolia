@@ -21,7 +21,7 @@ class reqn extends \cenozo\database\record
   {
     parent::load();
 
-    if( !is_null( $this->id ) )
+    if( !is_null( $this->id ) && is_null( $this->deadline_id ) )
     {
       $this->assert_deadline();
       $this->save();
@@ -751,6 +751,9 @@ class reqn extends \cenozo\database\record
 
     if( !is_null( $db_current_stage ) )
     {
+      // if this is currently a new reqn then update the deadline before we proceed in case it has changed
+      if( "New" == $db_current_stage_type->name ) $this->assert_deadline();
+
       // save the user who completed the current stage
       $db_current_stage->user_id = $db_user->id;
       $db_current_stage->datetime = util::get_datetime_object();
@@ -1829,7 +1832,7 @@ class reqn extends \cenozo\database\record
         // if there are zero or one stages then this is a new requisition which needs its deadline set
         if( 2 > $number_of_stages )
         {
-          if( 0 < $this->get_deadline()->datetime->diff( util::get_datetime_object() )->days )
+          if( util::get_datetime_object() > $this->get_deadline()->datetime )
           { // deadline has expired, get the next one
             $db_deadline = $deadline_class_name::get_next();
             $change_deadline = true;
