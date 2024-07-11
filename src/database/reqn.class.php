@@ -21,7 +21,7 @@ class reqn extends \cenozo\database\record
   {
     parent::load();
 
-    if( !is_null( $this->id ) )
+    if( !is_null( $this->id ) && is_null( $this->deadline_id ) )
     {
       $this->assert_deadline();
       $this->save();
@@ -609,14 +609,13 @@ class reqn extends \cenozo\database\record
 
     // if moving from report required to active then delete all final report records
     $db_current_stage = $this->get_current_stage();
-    if( 'Report Required' == $db_current_stage->get_stage_type()->name )
+    $current_stage_type_name = $db_current_stage->get_stage_type()->name;
+    if( 'Report Required' == $current_stage_type_name )
     {
       foreach( $this->get_final_report_object_list() as $db_final_report ) $db_final_report->delete();
     }
-
     // if moving from data destruction to pre data destruction then delete all destruction report records
-    $db_current_stage = $this->get_current_stage();
-    if( 'Data Destruction' == $db_current_stage->get_stage_type()->name )
+    else if( 'Data Destruction' == $current_stage_type_name )
     {
       foreach( $this->get_destruction_report_object_list() as $db_destruction_report )
         $db_destruction_report->delete();
@@ -752,6 +751,9 @@ class reqn extends \cenozo\database\record
 
     if( !is_null( $db_current_stage ) )
     {
+      // if this is currently a new reqn then update the deadline before we proceed in case it has changed
+      if( "New" == $db_current_stage_type->name ) $this->assert_deadline();
+
       // save the user who completed the current stage
       $db_current_stage->user_id = $db_user->id;
       $db_current_stage->datetime = util::get_datetime_object();
@@ -1830,7 +1832,7 @@ class reqn extends \cenozo\database\record
         // if there are zero or one stages then this is a new requisition which needs its deadline set
         if( 2 > $number_of_stages )
         {
-          if( 0 < $this->get_deadline()->datetime->diff( util::get_datetime_object() )->days )
+          if( util::get_datetime_object() > $this->get_deadline()->datetime )
           { // deadline has expired, get the next one
             $db_deadline = $deadline_class_name::get_next();
             $change_deadline = true;
