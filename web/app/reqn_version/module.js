@@ -2009,6 +2009,12 @@ cenozoApp.defineModule({
                   "applicant_address",
                   "applicant_country_id",
                   "applicant_phone",
+                  "trainee_program",
+                  "trainee_institution",
+                  "trainee_address",
+                  "trainee_country_id",
+                  "trainee_phone",
+                  "trainee_",
                   "waiver",
                 ],
                 "project_team": ["coapplicant_agreement_filename"],
@@ -2089,7 +2095,24 @@ cenozoApp.defineModule({
                     } else if ("applicant_country_id" == property) {
                       // only check the country if show_prices is on and override price is off
                       return this.record.show_prices && null == this.record.override_price;
+                    } else if ("trainee_country_id" == property) {
+                      // same as for applicant, but only if there is a trainee
+                      return (
+                        this.record.trainee_name &&
+                        this.record.show_prices && null == this.record.override_price
+                      );
+                    } else if (property.match("trainee_")) {
+                      // ignore trainee details unless the reqn has a trainee
+                      if (this.record.trainee_name) {
+                        if ("trainee_country_id" == property) {
+                          // only check the country if show_prices is on and override price is off
+                          return this.record.show_prices && null == this.record.override_price;
+                        }
+                        return true;
+                      }
+                      return false;
                     } else {
+                      // check everything else
                       return true;
                     }
                   } else if ("project_team" == tab) {
