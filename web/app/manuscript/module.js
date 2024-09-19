@@ -132,7 +132,7 @@ cenozoApp.defineModule({
     });
 
     module.addExtraOperation("view", {
-      title: "View Report",
+      title: "View Submission",
       operation: async function ($state, model) {
         await $state.go(
           "manuscript_version.view",
@@ -175,7 +175,7 @@ cenozoApp.defineModule({
         {
           title: "Manuscript Submission",
           operation: async function ($state, model) {
-            await model.viewModel.downloadManuscriptReport();
+            await model.viewModel.downloadManuscriptSubmission();
           },
         },
         {
@@ -238,7 +238,7 @@ cenozoApp.defineModule({
             show: function (subject) {
               return CnManuscriptHelper.showAction(subject, this.record);
             },
-            downloadManuscriptReport: async function () {
+            downloadManuscriptSubmission: async function () {
               await CnManuscriptHelper.download(
                 this.record.current_manuscript_version_id
               );
@@ -252,7 +252,7 @@ cenozoApp.defineModule({
             },
 
             onView: async function (force) {
-              // update the column languages in case they were changed while viewing a report
+              // update the column languages in case they were changed while viewing a submission
               await this.$$onView(force);
 
               if (angular.isDefined(this.manuscriptNoticeModel)) {

@@ -156,7 +156,7 @@ cenozoApp.defineModule({
             angular.extend($scope, {
               t: function (value) {
                 return CnLocalization.translate(
-                  "manuscriptReport",
+                  "manuscriptSubmission",
                   value,
                   $scope.model.viewModel.record.lang
                 );
@@ -249,7 +249,7 @@ cenozoApp.defineModule({
         $state
       ) {
         var object = function (parentModel, root) {
-          CnBaseFormViewFactory.construct(this, "manuscriptReport", parentModel, root);
+          CnBaseFormViewFactory.construct(this, "manuscriptSubmission", parentModel, root);
 
           // extend the base onPatch function that is defined in CnBaseFormViewFactory
           this.baseOnPatch = this.onPatch;
@@ -308,8 +308,8 @@ cenozoApp.defineModule({
               }).patch();
             },
 
-            getDifferences: function (manReport2) {
-              var manReport2 = this.record;
+            getDifferences: function (manSub2) {
+              var manSub2 = this.record;
               var differences = {
                 diff: false,
                 part_2: {
@@ -342,7 +342,7 @@ cenozoApp.defineModule({
                 },
               };
 
-              if (null != manReport2) {
+              if (null != manSub2) {
                 for (var part in differences) {
                   if (!differences.hasOwnProperty(part)) continue;
                   if ("diff" == part) continue; // used to track overall diff
@@ -352,8 +352,8 @@ cenozoApp.defineModule({
 
                     // not an array means we have a property to directly check
                     // note: we need to convert empty strings to null to make sure they compare correctly
-                    var value1 = "" === manReport1[property] ? null : manReport1[property];
-                    var value2 = "" === manReport2[property] ? null : manReport2[property];
+                    var value1 = "" === manSub1[property] ? null : manSub1[property];
+                    var value2 = "" === manSub2[property] ? null : manSub2[property];
                     if (value1 != value2) {
                       differences.diff = true;
                       differences[part].diff = true;
@@ -616,7 +616,7 @@ cenozoApp.defineModule({
             },
 
             getMetadata: async function () {
-              const misc = CnLocalization.lookupData.manuscriptReport.misc;
+              const misc = CnLocalization.lookupData.manuscriptSubmission.misc;
               await this.$$getMetadata();
 
               if ("root" == this.type) {

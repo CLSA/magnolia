@@ -73,7 +73,7 @@ cenozo.factory("CnBaseFormViewFactory", [
   ){
     return {
       construct: function (object, formType, parentModel, root) {
-        // formType: application, finalReport, destructionReport, manuscriptReport
+        // formType: application, finalReport, destructionReport, manuscriptSubmission
         CnBaseViewFactory.construct(object, parentModel, root);
 
         // extend the base $$onView function (see below)
@@ -106,7 +106,7 @@ cenozo.factory("CnBaseFormViewFactory", [
             }
 
             return (
-              "manuscriptReport" == formType ?
+              "manuscriptSubmission" == formType ?
               CnManuscriptHelper.showAction(subject, this.record) :
               CnReqnHelper.showAction(subject, this.record)
             );
@@ -210,7 +210,7 @@ cenozo.factory("CnBaseFormViewFactory", [
               angular.extend(this.record, deferralObject);
               angular.extend(this.backupRecord, deferralObject);
 
-              const httpObj = "manuscriptReport" == formType ? {
+              const httpObj = "manuscriptSubmission" == formType ? {
                 path: "manuscript/" + this.record.manuscript_id + "/manuscript_deferral_note",
                 data: {
                   modifier: { order: "page" },
@@ -249,7 +249,7 @@ cenozo.factory("CnBaseFormViewFactory", [
               var self = this;
               const page = property.replace( /^deferral_note_/, "" );
               const basePathParts =
-                "manuscriptReport" == formType ?
+                "manuscriptSubmission" == formType ?
                 ["manuscript", this.record.manuscript_id, "manuscript_deferral_note"] :
                 ["reqn", "identifier=" + this.record.identifier, "deferral_note"];
 
@@ -257,7 +257,7 @@ cenozo.factory("CnBaseFormViewFactory", [
               let deferralNote = null;
               try {
                 let params = "page=" + page;
-                if ("manuscriptReport" != formType) params = "form=" + formType.camelToSnake() + ";" + params;
+                if ("manuscriptSubmission" != formType) params = "form=" + formType.camelToSnake() + ";" + params;
                 const response = await CnHttpFactory.instance({
                   path: basePathParts.concat(params).join("/"),
                   onError: function (error) {
@@ -277,14 +277,14 @@ cenozo.factory("CnBaseFormViewFactory", [
               if (!data[property]) {
                 if (null != deferralNote) {
                   let path = "deferral_note/" + deferralNote.id;
-                  if ("manuscriptReport" == formType) path = "manuscript_" + path;
+                  if ("manuscriptSubmission" == formType) path = "manuscript_" + path;
                   await CnHttpFactory.instance({ path: path, onError: onError }).delete();
                 }
               } else {
                 // if the note doesn't exist then we need to create it
                 if (null == deferralNote) {
                   const httpData = { page: page, note: data[property] };
-                  if ("manuscriptReport" != formType) httpData.form = formType.camelToSnake();
+                  if ("manuscriptSubmission" != formType) httpData.form = formType.camelToSnake();
 
                   await CnHttpFactory.instance({
                     path: basePathParts.join("/"),
@@ -294,7 +294,7 @@ cenozo.factory("CnBaseFormViewFactory", [
                 } else { // otherwise we just need to patch the existing record
                   await CnHttpFactory.instance({
                     path:
-                      ("manuscriptReport" == formType ? "manuscript_" : "") +
+                      ("manuscriptSubmission" == formType ? "manuscript_" : "") +
                       "deferral_note/" + deferralNote.id,
                     data: { note: data[property] },
                     onError: onError,
@@ -856,7 +856,7 @@ cenozo.service("CnManuscriptHelper", [
 
       translate: function (address, language) {
         // always use the manuscript subject
-        return CnLocalization.translate("manuscriptReport", address, language);
+        return CnLocalization.translate("manuscriptSubmission", address, language);
       },
 
       showAction: function (subject, record) {
@@ -1700,7 +1700,7 @@ cenozo.service("CnLocalization", [
             },
           },
         },
-        manuscriptReport: {
+        manuscriptSubmission: {
           heading: {
             en: "CLSA Manuscript Submission",
             fr: "CLSA Manuscript Submission", // TODO: TRANSLATE
