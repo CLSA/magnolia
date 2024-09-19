@@ -64,11 +64,13 @@ cenozoApp.defineModule({
       clsa_keyword: { type: "boolean" },
       clsa_keyword_justification: { type: "text" },
       clsa_reference: { type: "boolean" },
-      clsa_reference_justification: { type: "text" },
+      clsa_reference_number: { type: "text" },
+      clsa_reference_justification: { type: "string" },
       has_genomics_data: { type: "boolean" },
       has_seroprevalence_data: { type: "boolean" },
       has_covid_data: { type: "boolean" },
       genomics: { type: "boolean" },
+      genomics_number: { type: "string" },
       genomics_justification: { type: "text" },
       acknowledgment: { type: "text" },
       dataset_version: { type: "boolean" },
@@ -292,11 +294,19 @@ cenozoApp.defineModule({
               if (angular.isDefined(data.clsa_keyword) && data.clsa_keyword) {
                 this.record.clsa_keyword_justification = "";
               }
-              if (angular.isDefined(data.clsa_reference) && data.clsa_reference) {
-                this.record.clsa_reference_justification = "";
+              if (angular.isDefined(data.clsa_reference)) {
+                if (data.clsa_reference) {
+                  this.record.clsa_reference_justification = "";
+                } else {
+                  this.record.clsa_reference_number = "";
+                }
               }
-              if (angular.isDefined(data.genomics) && data.genomics) {
-                this.record.genomics_justification = "";
+              if (angular.isDefined(data.genomics)) {
+                if (data.genomics) {
+                  this.record.genomics_justification = "";
+                } else {
+                  this.record.genomics_number = "";
+                }
               }
             },
 
@@ -326,8 +336,10 @@ cenozoApp.defineModule({
                   clsa_keyword: false,
                   clsa_keyword_justification: false,
                   clsa_reference: false,
+                  clsa_reference_number: false,
                   clsa_reference_justification: false,
                   genomics: false,
+                  genomics_number: false,
                   genomics_justification: false,
                 },
                 part_4: {
@@ -383,8 +395,10 @@ cenozoApp.defineModule({
                   "clsa_keyword",
                   "clsa_keyword_justification",
                   "clsa_reference",
+                  "clsa_reference_number",
                   "clsa_reference_justification",
                   "genomics",
+                  "genomics_number",
                   "genomics_justification",
                 ],
                 part_4: [
@@ -409,7 +423,12 @@ cenozoApp.defineModule({
                     // only check justifications if the parent property is false
                     else if ("clsa_title_justification" == property) return false === this.record.clsa_title;
                     else if ("clsa_keyword_justification" == property) return false === this.record.clsa_keyword;
-                    else if ("clsa_reference_justification" == property) return false === this.record.clsa_reference;
+                    else if ("clsa_reference_number" == property)
+                      return true === this.record.clsa_reference;
+                    else if ("clsa_reference_justification" == property)
+                      return false === this.record.clsa_reference;
+                    else if ("genomics_number" == property)
+                      return this.record.has_genomics_data && true === this.record.genomics;
                     else if ("genomics_justification" == property)
                       return this.record.has_genomics_data && false === this.record.genomics;
                   } else if ("part_4" == tab) {

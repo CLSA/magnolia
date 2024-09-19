@@ -301,6 +301,17 @@
                   model="model">
                 </cn-view-input-with-differences>
                 <cn-view-input-with-differences
+                  ng-if="true === model.viewModel.record.clsa_reference"
+                  input="{
+                    key: 'clsa_reference_number',
+                    title: t( 'part_3.clsa_reference_number' ),
+                    type: 'string',
+                  }"
+                  no-cols=true
+                  difference="model.viewModel.compareRecord.differences.part_3.clsa_reference_number"
+                  model="model">
+                </cn-view-input-with-differences>
+                <cn-view-input-with-differences
                   ng-if="false === model.viewModel.record.clsa_reference"
                   input="{
                     key: 'clsa_reference_justification',
@@ -327,6 +338,17 @@
                   }"
                   no-cols=true
                   difference="model.viewModel.compareRecord.differences.part_3.genomics"
+                  model="model">
+                </cn-view-input-with-differences>
+                <cn-view-input-with-differences
+                  ng-if="true === model.viewModel.record.genomics"
+                  input="{
+                    key: 'genomics_number',
+                    title: t( 'part_3.genomics_number' ),
+                    type: 'string',
+                  }"
+                  no-cols=true
+                  difference="model.viewModel.compareRecord.differences.part_3.genomics_number"
                   model="model">
                 </cn-view-input-with-differences>
                 <cn-view-input-with-differences

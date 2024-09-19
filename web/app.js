@@ -1808,6 +1808,10 @@ cenozo.service("CnLocalization", [
               en: "Has this requirement been met?",
               fr: "Has this requirement been met?", //TODO: TRANSLATE
             },
+            clsa_reference_number: {
+              en: "Please indicate the page or citation number:",
+              fr: "Please indicate the page or citation number:", //TODO: TRANSLATE
+            },
             clsa_reference_justification: {
               en: "Please provide a justification for why this requirement could not be met.",
               fr: "Please provide a justification for why this requirement could not be met.", //TODO: TRANSLATE
@@ -1823,6 +1827,10 @@ cenozo.service("CnLocalization", [
             genomics: {
               en: "Has this requirement been met?",
               fr: "Has this requirement been met?", //TODO: TRANSLATE
+            },
+            genomics_number: {
+              en: "Please indicate the page or citation number:",
+              fr: "Please indicate the page or citation number:", //TODO: TRANSLATE
             },
             genomics_justification: {
               en: "Please provide a justification for why this requirement could not be met.",

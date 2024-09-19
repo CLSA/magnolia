@@ -102,10 +102,14 @@ class manuscript_version extends \cenozo\database\record
       $data['clsa_keyword_justification'] = $this->clsa_keyword_justification;
     if( true === $this->clsa_reference ) $data['clsa_reference_yes'] = 'Yes';
     if( false === $this->clsa_reference ) $data['clsa_reference_no'] = 'Yes';
+    if( !is_null( $this->clsa_reference_number ) )
+      $data['clsa_reference_number'] = $this->clsa_reference_number;
     if( !is_null( $this->clsa_reference_justification ) )
       $data['clsa_reference_justification'] = $this->clsa_reference_justification;
     if( true === $this->genomics ) $data['genomics_yes'] = 'Yes';
     if( false === $this->genomics ) $data['genomics_no'] = 'Yes';
+    if( !is_null( $this->genomics_number ) )
+      $data['genomics_number'] = $this->genomics_number;
     if( !is_null( $this->genomics_justification ) )
       $data['genomics_justification'] = $this->genomics_justification;
     if( !is_null( $this->acknowledgment ) ) $data['acknowledgment'] = $this->acknowledgment;

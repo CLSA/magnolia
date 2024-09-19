@@ -14,8 +14,10 @@ CREATE TABLE IF NOT EXISTS manuscript_version (
   clsa_keyword TINYINT(1) NULL DEFAULT NULL,
   clsa_keyword_justification TEXT NULL DEFAULT NULL,
   clsa_reference TINYINT(1) NULL DEFAULT NULL,
+  clsa_reference_number VARCHAR(45) NULL DEFAULT NULL,
   clsa_reference_justification TEXT NULL DEFAULT NULL,
   genomics TINYINT(1) NULL DEFAULT NULL,
+  genomics_number VARCHAR(45) NULL DEFAULT NULL,
   genomics_justification TEXT NULL DEFAULT NULL,
   acknowledgment TEXT NULL DEFAULT NULL,
   dataset_version TINYINT(1) NULL DEFAULT NULL,
@@ -55,8 +57,8 @@ CREATE DEFINER=CURRENT_USER TRIGGER manuscript_version_BEFORE_UPDATE BEFORE UPDA
 BEGIN
   IF( NEW.clsa_title ) THEN SET NEW.clsa_title_justification = NULL; END IF;
   IF( NEW.clsa_keyword ) THEN SET NEW.clsa_keyword_justification = NULL; END IF;
-  IF( NEW.clsa_reference ) THEN SET NEW.clsa_reference_justification = NULL; END IF;
-  IF( NEW.genomics ) THEN SET NEW.genomics_justification = NULL; END IF;
+  IF( NEW.clsa_reference ) THEN SET NEW.clsa_reference_justification = NULL; ELSE SET NEW.clsa_reference_number = NULL; END IF;
+  IF( NEW.genomics ) THEN SET NEW.genomics_justification = NULL; ELSE SET NEW.genomics_number = NULL; END IF;
 END$$
 
 DROP TRIGGER IF EXISTS manuscript_version_AFTER_DELETE$$
