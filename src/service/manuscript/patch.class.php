@@ -122,7 +122,7 @@ class patch extends \cenozo\service\patch
       {
         // send a notification to the supervisor
         $db_notification = lib::create( 'database\manuscript_notification' );
-        $name = 'Approval Required, Manuscript Report';
+        $name = 'Approval Required, Manuscript Submission';
 
         $db_notification->notification_type_id =
           $notification_type_class_name::get_unique_record( 'name', $name )->id;

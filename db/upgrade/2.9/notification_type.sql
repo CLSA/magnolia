@@ -161,8 +161,8 @@ Veuillez vous connecter à Magnolia, le logiciel de demande d’accès en ligne 
 L’équipe d’accès aux données de l’ÉLCV";
 
 INSERT IGNORE INTO notification_type SET
-  name = "Approval Required, Manuscript Report",
-  title_en = "CLSA Data Access - Manuscript Report Approval Required ({{identifier}})",
+  name = "Approval Required, Manuscript Submission",
+  title_en = "CLSA Data Access - Manuscript Submission Approval Required ({{identifier}})",
   title_fr = "TODO: TRANSLATE",
   message_en = "Dear Dr. {{applicant_name}},
 

@@ -173,7 +173,7 @@ cenozoApp.defineModule({
       title: "Download",
       operations: [
         {
-          title: "Manuscript Report",
+          title: "Manuscript Submission",
           operation: async function ($state, model) {
             await model.viewModel.downloadManuscriptReport();
           },

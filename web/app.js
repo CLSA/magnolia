@@ -1399,8 +1399,8 @@ cenozo.service("CnLocalization", [
           manuscripts: {
             tab: { en: "Manuscripts", fr: "Manuscripts" }, // TODO: TRANSLATE
             title: {
-              en: "Manuscript Report",
-              fr: "Manuscript Report" // TODO: TRANSLATE
+              en: "Manuscript Submission",
+              fr: "Manuscript Submission" // TODO: TRANSLATE
             },
             text: {
               en: "Next help text here.", // TODO: DEFINE COPY
@@ -1702,14 +1702,14 @@ cenozo.service("CnLocalization", [
         },
         manuscriptReport: {
           heading: {
-            en: "CLSA Manuscript Report",
-            fr: "CLSA Manuscript Report", // TODO: TRANSLATE
+            en: "CLSA Manuscript Submission",
+            fr: "CLSA Manuscript Submission", // TODO: TRANSLATE
           },
           instructions: {
             tab: { en: "Instructions", fr: "Consignes" },
             title: {
-              en: "Completing the CLSA Manuscript Report",
-              fr: "Completing the CLSA Manuscript Report", // TODO: TRANSLATE
+              en: "Completing the CLSA Manuscript Submission",
+              fr: "Completing the CLSA Manuscript Submission", // TODO: TRANSLATE
             },
             text1: {
               en: "Instruction text goes here.",
@@ -1755,7 +1755,7 @@ cenozo.service("CnLocalization", [
             date: { en: "Date", fr: "Date" }, // TODO: TRANSLATE
             journal: { en: "Target Journal", fr: "Target Journal" }, // TODO: TRANSLATE
             objectives_description: {
-              en: "Results presented in the manuscript must be in accordance with the research objectives of the approved project.  CLSA design features (inclusion/exclusion criteria, sampling strategy, data collection procedures, etc.) if included in the manuscript, must be described accurately. Please refer the relevant CLSA Protocol, available for download under the Researchers section of our website.",
+              en: "Results presented in the manuscript must be in accordance with the research objectives of the approved project.  CLSA design features (inclusion/exclusion criteria, sampling strategy, data collection procedures, etc.) if included in the manuscript, must be described accurately. Please refer to the relevant CLSA Protocol, available for download under the Researchers section of our website.  Authors are asked to identify and state below how the specific objectives in the approved application relate to this manuscript.",
             },
             objectives: {
               en: "Objective(s) related to this manuscript (<strong>maximum 1500 characters</strong>)",
@@ -1765,8 +1765,8 @@ cenozo.service("CnLocalization", [
           part_3: {
             tab: { en: "Part 3", fr: "3<sup>e</sup> partie" },
             title: {
-              en: "Requirements as per the CLSA Publication and Promotion Policy (Part 1)",
-              fr: "Requirements as per the CLSA Publication and Promotion Policy (Part 1)", // TODO: TRANSLATE
+              en: "Requirements as per the CLSA Publication and Promotion Policy",
+              fr: "Requirements as per the CLSA Publication and Promotion Policy", // TODO: TRANSLATE
             },
             clsa_title_description: {
               en: "The abbreviation ‘CLSA’ must be included in the title of the manuscript or the name of the platform, fully spelled out as ‘Canadian Longitudinal Study on Aging’ may also be used.",
@@ -1832,8 +1832,8 @@ cenozo.service("CnLocalization", [
           part_4: {
             tab: { en: "Part 4", fr: "4<sup>e</sup> partie" },
             title: {
-              en: "Requirements as per the CLSA Publication and Promotion Policy (Part 2)",
-              fr: "Requirements as per the CLSA Publication and Promotion Policy (Part 2)", // TODO: TRANSLATE
+              en: "Requirements as per the CLSA Publication and Promotion Policy",
+              fr: "Requirements as per the CLSA Publication and Promotion Policy", // TODO: TRANSLATE
             },
             acknowledgment_description: {
               en: "The approved acknowledgment statement must be included:",
@@ -1868,8 +1868,8 @@ cenozo.service("CnLocalization", [
               fr: "Has this requirement been met?", //TODO: TRANSLATE
             },
             seroprevalence_description: {
-              en: "The following must be included in your acknowledgment statement:",
-              fr: "The following must be included in your acknowledgment statement:", // TODO: TRANSLATE
+              en: "The following must be included in your manuscript:",
+              fr: "The following must be included in your manuscript:", // TODO: TRANSLATE
             },
             seroprevalence_example: {
               en: "This project was supported by funding from the Government of Canada, through the COVID-19 Immunity Task Force.",
@@ -1880,8 +1880,8 @@ cenozo.service("CnLocalization", [
               fr: "Has this requirement been met?", //TODO: TRANSLATE
             },
             covid_description: {
-              en: "The following must be included in your acknowledgment statement:",
-              fr: "The following must be included in your acknowledgment statement:", // TODO: TRANSLATE
+              en: "The following must be included in your manuscript:",
+              fr: "The following must be included in your manuscript:", // TODO: TRANSLATE
             },
             covid_example: {
               en: "Funding for support of the CLSA COVID-19 questionnaire-based study is provided by the Juravinski Research Institute, Faculty of Health Sciences, McMaster University, the Provost Fund from McMaster University, the McMaster Institute for Research on Aging, the Public Health Agency of Canada/CIHR grant reference CMO 174125 and the government of Nova Scotia.",
@@ -1892,8 +1892,8 @@ cenozo.service("CnLocalization", [
               fr: "Has this requirement been met?", //TODO: TRANSLATE
             },
             disclaimer_description: {
-              en: "The following must be included in your acknowledgment statement:",
-              fr: "The following must be included in your acknowledgment statement:", // TODO: TRANSLATE
+              en: "The following must be included in your manuscript:",
+              fr: "The following must be included in your manuscript:", // TODO: TRANSLATE
             },
             disclaimer_example: {
               en: "The opinions expressed in this manuscript are the author's own and do not reflect the views of the Canadian Longitudinal Study on Aging.",
@@ -1904,8 +1904,8 @@ cenozo.service("CnLocalization", [
               fr: "Has this requirement been met?", //TODO: TRANSLATE
             },
             statement_description: {
-              en: "The following must be included in your acknowledgment statement:",
-              fr: "The following must be included in your acknowledgment statement:", // TODO: TRANSLATE
+              en: "The following must be included in your manuscript:",
+              fr: "The following must be included in your manuscript:", // TODO: TRANSLATE
             },
             statement_example: {
               en: "Data are available from the Canadian Longitudinal Study on Aging (www.clsa-elcv.ca) for researchers who meet the criteria for access to de-identified CLSA data.",
@@ -1965,28 +1965,28 @@ cenozo.service("CnLocalization", [
               fr: "Passez à la section suivante",
             },
             submitTitle: {
-              en: "Manuscript Report Submitted",
-              fr: "Manuscript Report Submitted", // TODO: TRANSLATE
+              en: "Manuscript Submitted",
+              fr: "Manuscript Submitted", // TODO: TRANSLATE
             },
             submitMessage: {
-              en: "You have successfully submitted your Manuscript Report and it will now be reviewed. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.",
-              fr: "You have successfully submitted your Manuscript Report and it will now be reviewed. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.", // TODO: TRANSLATE
+              en: "You have successfully submitted your Manuscript Submission and it will now be reviewed. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.",
+              fr: "You have successfully submitted your Manuscript Submission and it will now be reviewed. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.", // TODO: TRANSLATE
             },
             traineeSubmitTitle: {
-              en: "Manuscript Report Submitted for Supervisor Approval",
-              fr: "Manuscript Report Submitted for Supervisor Approval", // TODO: TRANSLATE
+              en: "Manuscript Submitted for Supervisor Approval",
+              fr: "Manuscript Submitted for Supervisor Approval", // TODO: TRANSLATE
             },
             traineeSubmitMessage: {
-              en: "You have successfully submitted your Manuscript Report and your supervisor will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.",
-              fr: "You have successfully submitted your Manuscript Report and your supervisor will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.", // TODO: TRANSLATE
+              en: "You have successfully submitted your Manuscript Submission and your supervisor will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.",
+              fr: "You have successfully submitted your Manuscript Submission and your supervisor will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.", // TODO: TRANSLATE
             },
             designateSubmitTitle: {
-              en: "Manuscript Report Submitted for Primary Applicant Approval",
-              fr: "Manuscript Report Submitted for Primary Applicant Approval", // TODO: TRANSLATE
+              en: "Manuscript Submitted for Primary Applicant Approval",
+              fr: "Manuscript Submitted for Primary Applicant Approval", // TODO: TRANSLATE
             },
             designateSubmitMessage: {
-              en: "You have successfully submitted the Manuscript Report on behalf of the primary applicant and they will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.",
-              fr: "You have successfully submitted the Manuscript Report on behalf of the primary applicant and they will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.", // TODO: TRANSLATE
+              en: "You have successfully submitted the Manuscript Submission on behalf of the primary applicant and they will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.",
+              fr: "You have successfully submitted the Manuscript Submission on behalf of the primary applicant and they will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.", // TODO: TRANSLATE
             },
             missingAttachmentTitle: {
               en: "Missing Attachment",

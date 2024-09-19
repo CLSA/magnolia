@@ -70,11 +70,11 @@ class manuscript_version extends \cenozo\database\record
   {
     $pdf_form_type_class_name = lib::get_class_name( 'database\pdf_form_type' );
 
-    $db_pdf_form_type = $pdf_form_type_class_name::get_unique_record( 'name', 'Manuscript Report' );
+    $db_pdf_form_type = $pdf_form_type_class_name::get_unique_record( 'name', 'Manuscript Submission' );
     $db_pdf_form = $db_pdf_form_type->get_active_pdf_form();
     if( is_null( $db_pdf_form ) )
       throw lib::create( 'exception\runtime',
-        'Cannot generate PDF form since there is no active Manuscript Report PDF form.', __METHOD__ );
+        'Cannot generate PDF form since there is no active Manuscript Submission PDF form.', __METHOD__ );
     
     $db_manuscript = $this->get_manuscript();
     $db_reqn = $db_manuscript->get_reqn();
