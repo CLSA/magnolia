@@ -59,11 +59,21 @@ cenozoApp.defineModule({
         var object = function (parentModel, root) {
           CnBaseViewFactory.construct(this, parentModel, root, "notification");
 
+          angular.extend(this, {
+            getChildTitle: function (child) {
+              // differentiate between manuscript and requisition notifications
+              return (
+                "manuscript_notification" == child.subject.snake ? "Manuscript " :
+                "notification" == child.subject.snake ? "Requisition " : ""
+              ) + this.$$getChildTitle(child);
+            },
+          });
+
           async function init(object) {
             await object.deferred.promise;
-            if (angular.isDefined(object.stageTypeModel))
-              object.stageTypeModel.listModel.heading =
-                "Notified Stage Type List";
+            if (angular.isDefined(object.stageTypeModel)) {
+              object.stageTypeModel.listModel.heading = "Notified Stage Type List";
+            }
           }
 
           init(this);

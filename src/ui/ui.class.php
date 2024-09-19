@@ -97,6 +97,7 @@ class ui extends \cenozo\ui\ui
     if( !is_null( $module ) )
     {
       $module->add_child( 'notification' );
+      $module->add_child( 'manuscript_notification' );
       $module->add_child( 'notification_type_email' );
       $module->add_child( 'stage_type' );
     }
