@@ -1977,7 +1977,9 @@ cenozoApp.defineModule({
                     "last_identifier",
                   ],
                   "indigenous": [
-                    "indigenous",
+                    "indigenous_first_nation",
+                    "indigenous_metis",
+                    "indigenous_inuit",
                     "indigenous_description",
                     "indigenous1_filename",
                     // filenames 2, 3 and 4 are optional
