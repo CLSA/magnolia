@@ -11,7 +11,6 @@
  */
 define( 'ARGUMENT_MAGNOLIA_BASE_ERRNO',   190000 );
 define( 'DATABASE_MAGNOLIA_BASE_ERRNO',   290000 );
-define( 'LDAP_MAGNOLIA_BASE_ERRNO',       390000 );
 define( 'NOTICE_MAGNOLIA_BASE_ERRNO',     490000 );
 define( 'PERMISSION_MAGNOLIA_BASE_ERRNO', 590000 );
 define( 'RUNTIME_MAGNOLIA_BASE_ERRNO',    690000 );
@@ -57,12 +56,6 @@ define( 'ARGUMENT__MAGNOLIA_SERVICE_REQN_VERSION_GET__GET_DOWNLOADABLE_FILE_PATH
  * "database" error codes
  * 
  * Since database errors already have codes this list is likely to stay empty.
- */
-
-/**
- * "ldap" error codes
- * 
- * Since ldap errors already have codes this list is likely to stay empty.
  */
 
 /**
