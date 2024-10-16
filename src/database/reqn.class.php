@@ -853,6 +853,7 @@ class reqn extends \cenozo\database\record
       $review_mod->join( 'review_type', 'review.review_type_id', 'review_type.id' );
       $review_mod->where( 'review_type.name', 'LIKE', 'Reviewer %' );
       $review_mod->where( 'recommendation_type_id', '=', NULL );
+      $review_mod->where( 'user.active', '=', true );
 
       // make sure to only get reviews for the current amendment
       $review_mod->join( 'reqn_current_reqn_version', 'review.reqn_id', 'reqn_current_reqn_version.reqn_id' );
@@ -981,7 +982,7 @@ class reqn extends \cenozo\database\record
         $access_mod = lib::create( 'database\modifier' );
         $access_mod->join( 'role', 'access.role_id', 'role.id' );
         $access_mod->where( 'role.name', '=', 'administrator' );
-        if( 0 == $db_user->get_access_count( $access_mod ) )
+        if( $db_user->active && 0 == $db_user->get_access_count( $access_mod ) )
         {
           $db_notification->add_email(
             $db_user->email,
