@@ -614,10 +614,13 @@ class patch extends \cenozo\service\patch
       $db_notification->set_reqn( $db_reqn ); // this saves the record
 
       // we also want to add the old owner
-      $db_notification->add_email(
-        $this->db_old_user->email,
-        sprintf( '%s %s', $this->db_old_user->first_name, $this->db_old_user->last_name )
-      );
+      if( $this->db_old_user->active )
+      {
+        $db_notification->add_email(
+          $this->db_old_user->email,
+          sprintf( '%s %s', $this->db_old_user->first_name, $this->db_old_user->last_name )
+        );
+      }
 
       $db_notification->mail();
     }

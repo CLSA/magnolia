@@ -50,9 +50,12 @@ class notification extends \cenozo\database\record
     $this->datetime = util::get_datetime_object();
     $this->save();
 
-    $this->add_email( $db_user->email, sprintf( '%s %s', $db_user->first_name, $db_user->last_name ) );
+    if( $db_user->active )
+    {
+      $this->add_email( $db_user->email, sprintf( '%s %s', $db_user->first_name, $db_user->last_name ) );
+    }
 
-    if( !is_null( $db_trainee_user ) )
+    if( !is_null( $db_trainee_user ) && $db_trainee_user->active )
     {
       $this->add_email(
         $db_trainee_user->email,
@@ -60,7 +63,7 @@ class notification extends \cenozo\database\record
       );
     }
 
-    if( !is_null( $db_designate_user ) )
+    if( !is_null( $db_designate_user ) && $db_designate_user->active )
     {
       $this->add_email(
         $db_designate_user->email,
@@ -84,7 +87,8 @@ class notification extends \cenozo\database\record
     $select = lib::create( 'database\select' );
     $select->add_column( 'email' );
     $select->add_column( 'name' );
-    foreach( $this->get_notification_email_list() as $email ) $mail_manager->to( $email['email'], $email['name'] );
+    $email_list = $this->get_notification_email_list();
+    foreach( $email_list as $email ) $mail_manager->to( $email['email'], $email['name'] );
 
     // fill in dynamic details in the message's subject and body
     $column = sprintf( 'title_%s', $db_language->code );
@@ -113,7 +117,10 @@ class notification extends \cenozo\database\record
       else $mail_manager->set_cc( $email['email'] );
     }
 
-    $this->sent = $setting_manager->get_setting( 'mail', 'enabled' ) && !$db_reqn->disable_notification && $mail_manager->send();
+    $this->sent =
+      $setting_manager->get_setting( 'mail', 'enabled' ) &&
+      !$db_reqn->disable_notification &&
+      $mail_manager->send();
     $this->save();
   }
 
