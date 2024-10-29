@@ -1563,18 +1563,32 @@ class reqn extends \cenozo\database\record
 
     $total = 0;
 
+    $base_mod = lib::create( 'database\modifier' );
+
+    // do not include reqns in the finalization or complete phases
+    $join_mod = lib::create( 'database\modifier' );
+    $join_mod->where( 'reqn.id', '=', 'stage.reqn_id', false );
+    $join_mod->where( 'stage.datetime', '=', NULL );
+    $base_mod->join_modifier( 'stage', $join_mod );
+    $base_mod->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
+    $base_mod->where( 'stage_type.phase', 'NOT IN', ['finalization', 'complete'] );
+
+    // join to the latest reqn version that has an agreement
+    $base_mod->join(
+      'reqn_last_reqn_version_with_agreement',
+      'reqn.id',
+      'reqn_last_reqn_version_with_agreement.reqn_id'
+    );
+    $base_mod->join( 'reqn_version', 'reqn_last_reqn_version_with_agreement.reqn_version_id', 'reqn_version.id' );
+
     // create the two-month notifications
     $db_two_month_notification_type =
       $notification_type_class_name::get_unique_record( 'name', 'Agreement Expiry Notice (2 months)' );
     $interval_window = 'TIMESTAMPDIFF( DAY, DATE(NOW()) + INTERVAL 2 MONTH, agreement_end_date )';
 
-    $modifier = lib::create( 'database\modifier' );
-    $modifier->join(
-      'reqn_last_reqn_version_with_agreement',
-      'reqn.id',
-      'reqn_last_reqn_version_with_agreement.reqn_id'
-    );
-    $modifier->join( 'reqn_version', 'reqn_last_reqn_version_with_agreement.reqn_version_id', 'reqn_version.id' );
+    $modifier = clone $base_mod;
+
+    // join to reqns that haven't gotten the two-month notification
     $join_mod = lib::create( 'database\modifier' );
     $join_mod->where( 'reqn.id', '=', 'notification.reqn_id', false );
     $join_mod->where( 'notification.notification_type_id', '=', $db_two_month_notification_type->id );
@@ -1600,13 +1614,8 @@ class reqn extends \cenozo\database\record
       $notification_type_class_name::get_unique_record( 'name', 'Agreement Expiry Notice (1 month)' );
     $interval_window = 'TIMESTAMPDIFF( DAY, UTC_TIMESTAMP() + INTERVAL 1 MONTH, agreement_end_date )';
 
-    $modifier = lib::create( 'database\modifier' );
-    $modifier->join(
-      'reqn_last_reqn_version_with_agreement',
-      'reqn.id',
-      'reqn_last_reqn_version_with_agreement.reqn_id'
-    );
-    $modifier->join( 'reqn_version', 'reqn_last_reqn_version_with_agreement.reqn_version_id', 'reqn_version.id' );
+    // join to reqns that haven't gotten the one-month notification
+    $modifier = clone $base_mod;
     $join_mod = lib::create( 'database\modifier' );
     $join_mod->where( 'reqn.id', '=', 'notification.reqn_id', false );
     $join_mod->where( 'notification.notification_type_id', '=', $db_one_month_notification_type->id );
@@ -1615,7 +1624,6 @@ class reqn extends \cenozo\database\record
     $modifier->where( $interval_window, '<=', 0 );
     $modifier->where( $interval_window, '>', -$retry_days );
     $modifier->where( 'notification.id', '=', NULL );
-
 
     $reqn_list = static::select_objects( $modifier );
     $total += count( $reqn_list );
