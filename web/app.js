@@ -1402,9 +1402,17 @@ cenozo.service("CnLocalization", [
               en: "Manuscript Submission",
               fr: "Manuscript Submission" // TODO: TRANSLATE
             },
-            text: {
-              en: "Next help text here.", // TODO: DEFINE COPY
-              fr: "Next help text here." // TODO: TRANSLATE
+            text1: {
+              en: "All publications must be in accordance with the CLSA Access Agreement and the Publication and Promotion Policy.The goal of the CLSA review is to ensure that participants cannot be identified in publications, and that results are presented in a scientifically accurate manner in relation to the CLSA design and data collection methods. The manuscript will also be checked to ensure that the research presented matches the objectives of the approved project. This review is not a substitute for peer review.",
+              fr: "All publications must be in accordance with the CLSA Access Agreement and the Publication and Promotion Policy.The goal of the CLSA review is to ensure that participants cannot be identified in publications, and that results are presented in a scientifically accurate manner in relation to the CLSA design and data collection methods. The manuscript will also be checked to ensure that the research presented matches the objectives of the approved project. This review is not a substitute for peer review.", // TODO: TRANSLATE
+            },
+            text2: {
+              en: "Final drafts of all manuscripts (including submissions for pre-prints), reports, reviews, and other proposed primary publications describing research using CLSA data and/or biospecimens must be sent to the CLSA, by the Primary Applicant, for review at least 15 working days prior to the anticipated submission.",
+              fr: "Final drafts of all manuscripts (including submissions for pre-prints), reports, reviews, and other proposed primary publications describing research using CLSA data and/or biospecimens must be sent to the CLSA, by the Primary Applicant, for review at least 15 working days prior to the anticipated submission.", // TODO: TRANSLATE
+            },
+            text3: {
+              en: "Enter the title of your manuscript and press add manuscript, this will bring up a list of your manuscripts, choose the one that you are submitting and follow all instructions.",
+              fr: "Enter the title of your manuscript and press add manuscript, this will bring up a list of your manuscripts, choose the one that you are submitting and follow all instructions.", // TODO: TRANSLATE
             },
             manuscript: {
               noManuscripts: {
@@ -1712,12 +1720,16 @@ cenozo.service("CnLocalization", [
               fr: "Completing the CLSA Manuscript Submission", // TODO: TRANSLATE
             },
             text1: {
-              en: "Instruction text goes here.",
-              fr: "Instruction text goes here.", // TODO: TRANSLATE
+              en: 'Please consult the CLSA website for detailed information on the CLSA, <a href="https://www.clsa-elcv.ca/data-access" target="data_access">https://www.clsa-elcv.ca/data-access</a>. Applicants are encouraged to review the CLSA Publication and Promotion Policy available at <a href="https://www.clsa-elcv.ca/resource-types/publication-policy-for-data-users" target="publication_policy">https://www.clsa-elcv.ca/resource-types/publication-policy-for-data-users</a> to ensure you have the most updated information.  Consult us for any questions regarding your application at <a href="mailto:access@clsa-elcv.ca">access@clsa- elcv.ca</a>.',
+              fr: 'Please consult the CLSA website for detailed information on the CLSA, <a href="https://www.clsa-elcv.ca/data-access" target="data_access">https://www.clsa-elcv.ca/data-access</a>. Applicants are encouraged to review the CLSA Publication and Promotion Policy available at <a href="https://www.clsa-elcv.ca/resource-types/publication-policy-for-data-users" target="publication_policy">https://www.clsa-elcv.ca/resource-types/publication-policy-for-data-users</a> to ensure you have the most updated information.  Consult us for any questions regarding your application at <a href="mailto:access@clsa-elcv.ca">access@clsa- elcv.ca</a>.', // TODO: TRANSLATE
             },
             text2: {
-              en: "More instruction text goes here.",
-              fr: "More instruction text goes here.", // TODO: TRANSLATE
+              en: "Please be sure to complete all sections:<ol><li>Manuscript attachments</li><li>Manuscript overview</li><li>Requirements as per Publication Policy (Page 1)</li><li>Requirements as per Publication Policy (Page 2)</li></ol>",
+              fr: "Please be sure to complete all sections:<ol><li>Manuscript attachments</li><li>Manuscript overview</li><li>Requirements as per Publication Policy (Page 1)</li><li>Requirements as per Publication Policy (Page 2)</li></ol>", // TODO: TRANSLATE
+            },
+            text3: {
+              en: "Please ensure that you have completed all of the sections of the form that are relevant to your manuscript submission.  Incomplete submissions may result in processing delays.",
+              fr: "Please ensure that you have completed all of the sections of the form that are relevant to your manuscript submission.  Incomplete submissions may result in processing delays.", // TODO: TRANSLATE
             },
           },
           part_1: {
