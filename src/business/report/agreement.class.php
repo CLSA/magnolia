@@ -40,6 +40,9 @@ class agreement extends \cenozo\business\report\base_report
     $modifier->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
     $modifier->where( 'stage_type.phase', 'NOT IN', ['finalization', 'complete'] );
 
+    // join to the applicant
+    $modifier->join( 'user', 'reqn.user_id', 'user.id' );
+
     // join to the latest reqn version that has an agreement and restrict to agreements that are out of date
     $modifier->join(
       'reqn_last_reqn_version_with_agreement',
@@ -58,26 +61,37 @@ class agreement extends \cenozo\business\report\base_report
     $join_mod->where( 'reqn.id', '=', 'two_month.reqn_id', false );
     $join_mod->where( 'two_month.notification_type_id', '=', $db_two_month_notification_type->id );
     $modifier->join_modifier( 'notification', $join_mod, 'left', 'two_month' );
+
+    // group since some notifications have gone out more than once
+    $modifier->group( 'reqn.id' );
     
     // build the select
     $select = lib::create( 'database\select' );
     $select->from( 'reqn' );
     $select->add_column( 'Identifier', 'Identifier' );
+    $select->add_column( 'CONCAT_WS( " ", user.first_name, user.last_name )', 'Primary Applicant', false );
     $select->add_column( 'stage_type.name', 'Stage', false );
     $select->add_column( 'reqn_version.agreement_end_date', 'Agreement End Date', false );
     $select->add_column(
-      sprintf( 'DATE( CONVERT_TZ( one_month.datetime, "UTC", "%s" ) )', $db_application->timezone ),
+      sprintf(
+        'GROUP_CONCAT( DATE( CONVERT_TZ( one_month.datetime, "UTC", "%s" ) ) )',
+        $db_application->timezone
+      ),
       'First Notice',
       false
     );
     $select->add_column(
-      sprintf( 'DATE( CONVERT_TZ( two_month.datetime, "UTC", "%s" ) )', $db_application->timezone ),
+      sprintf(
+        'GROUP_CONCAT( DATE( CONVERT_TZ( two_month.datetime, "UTC", "%s" ) ) )',
+        $db_application->timezone
+      ),
       'Second Notice',
       false
     );
 
     $header = [];
     $rows = [];
+    \cenozo\database\database::$debug = true;
     foreach( $reqn_class_name::select( $select, $modifier ) as $row )
     {
       if( 0 == count( $header ) )
@@ -87,6 +101,7 @@ class agreement extends \cenozo\business\report\base_report
 
       $rows[] = array_values( $row );
     }
+    \cenozo\database\database::$debug = false;
 
     $this->add_table( NULL, $header, $rows );
   }
