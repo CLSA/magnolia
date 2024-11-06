@@ -18,7 +18,7 @@ DROP PROCEDURE IF EXISTS patch_application_type_has_report_type;
       "SELECT application_type.id, report_type.id ",
       "FROM ", @cenozo, ".application_type, ", @cenozo, ".report_type ",
       "WHERE application_type.name = 'magnolia' ",
-      "AND report_type.name = 'data_release_update'"
+      "AND report_type.name IN( 'agreement', 'data_release_update' )"
     );
     PREPARE statement FROM @sql;
     EXECUTE statement;
