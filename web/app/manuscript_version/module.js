@@ -56,6 +56,7 @@ cenozoApp.defineModule({
       phase: { column: "manuscript_stage_type.phase", type: "string" },
       lang: { column: "language.code", type: "string" },
       authors: { type: "string" },
+      authors_check: { type: "boolean" },
       date: { type: "date" },
       journal: { type: "string" },
       objectives: { type: "text" },
@@ -65,19 +66,21 @@ cenozoApp.defineModule({
       clsa_keyword_justification: { type: "text" },
       clsa_reference: { type: "boolean" },
       clsa_reference_number: { type: "text" },
-      clsa_reference_justification: { type: "string" },
+      clsa_reference_justification: { type: "text" },
       has_genomics_data: { type: "boolean" },
       has_seroprevalence_data: { type: "boolean" },
       has_covid_data: { type: "boolean" },
       genomics: { type: "boolean" },
       genomics_number: { type: "string" },
-      genomics_justification: { type: "text" },
       acknowledgment: { type: "text" },
       dataset_version: { type: "boolean" },
       seroprevalence: { type: "boolean" },
       covid: { type: "boolean" },
       disclaimer: { type: "boolean" },
-      statement: { type: "boolean" },
+      disclaimer_justification: { type: "text" },
+      statement: { type: "enum" },
+      statement_justification: { type: "text" },
+      conditions: { type: "boolean" },
       indigenous: { type: "boolean" },
     });
 
@@ -303,10 +306,16 @@ cenozoApp.defineModule({
               }
               if (angular.isDefined(data.genomics)) {
                 if (data.genomics) {
-                  this.record.genomics_justification = "";
+                  // do nothing
                 } else {
                   this.record.genomics_number = "";
                 }
+              }
+              if (angular.isDefined(data.disclaimer) && data.disclaimer) {
+                this.record.disclaimer_justification = "";
+              }
+              if (angular.isDefined(data.statement) && 'no' != data.statement) {
+                this.record.statement_justification = "";
               }
             },
 
@@ -325,6 +334,7 @@ cenozoApp.defineModule({
                 part_2: {
                   diff: false,
                   authors: false,
+                  authors_check: false,
                   date: false,
                   journal: false,
                   objectives: false,
@@ -340,7 +350,6 @@ cenozoApp.defineModule({
                   clsa_reference_justification: false,
                   genomics: false,
                   genomics_number: false,
-                  genomics_justification: false,
                 },
                 part_4: {
                   diff: false,
@@ -349,7 +358,10 @@ cenozoApp.defineModule({
                   seroprevalence: false,
                   covid: false,
                   disclaimer: false,
+                  disclaimer_justification: false,
                   statement: false,
+                  statement_justification: false,
+                  conditions: false,
                   indigenous: false,
                 },
               };
@@ -388,7 +400,7 @@ cenozoApp.defineModule({
 
               var requiredTabList = {
                 part_1: ["attachment_list"],
-                part_2: ["authors", "journal", "objectives"],
+                part_2: ["authors", "authors_check", "journal", "objectives"],
                 part_3: [
                   "clsa_title",
                   "clsa_title_justification",
@@ -399,7 +411,6 @@ cenozoApp.defineModule({
                   "clsa_reference_justification",
                   "genomics",
                   "genomics_number",
-                  "genomics_justification",
                 ],
                 part_4: [
                   "acknowledgment",
@@ -407,7 +418,10 @@ cenozoApp.defineModule({
                   "seroprevalence",
                   "covid",
                   "disclaimer",
+                  "disclaimer_justification",
                   "statement",
+                  "statement_justification",
+                  "conditions",
                   "indigenous",
                 ]
               };
@@ -429,8 +443,6 @@ cenozoApp.defineModule({
                       return false === this.record.clsa_reference;
                     else if ("genomics_number" == property)
                       return this.record.has_genomics_data && true === this.record.genomics;
-                    else if ("genomics_justification" == property)
-                      return this.record.has_genomics_data && false === this.record.genomics;
                   } else if ("part_4" == tab) {
                     // only check some fields if the reqn has them selected
                     if ("seroprevalence" == property) return this.record.has_seroprevalence_data;
@@ -663,7 +675,21 @@ cenozoApp.defineModule({
                       { value: true, name: misc.yes.fr },
                       { value: false, name: misc.na.fr },
                     ],
-                  }
+                  },
+                  yesNoNREnumList: {
+                    en: [
+                      { value: "", name: misc.choose.en },
+                      { value: "yes", name: misc.yes.en },
+                      { value: "no", name: misc.no.en },
+                      { value: "nr", name: misc.nr.en },
+                    ],
+                    fr: [
+                      { value: "", name: misc.choose.fr },
+                      { value: "yes", name: misc.yes.fr },
+                      { value: "no", name: misc.no.fr },
+                      { value: "nr", name: misc.nr.fr },
+                    ],
+                  },
                 });
               }
             },

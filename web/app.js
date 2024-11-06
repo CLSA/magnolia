@@ -1407,18 +1407,14 @@ cenozo.service("CnLocalization", [
               fr: "All publications must be in accordance with the CLSA Access Agreement and the Publication and Promotion Policy.The goal of the CLSA review is to ensure that participants cannot be identified in publications, and that results are presented in a scientifically accurate manner in relation to the CLSA design and data collection methods. The manuscript will also be checked to ensure that the research presented matches the objectives of the approved project. This review is not a substitute for peer review.", // TODO: TRANSLATE
             },
             text2: {
-              en: "Final drafts of all manuscripts (including submissions for pre-prints), reports, reviews, and other proposed primary publications describing research using CLSA data and/or biospecimens must be sent to the CLSA, by the Primary Applicant, for review at least 15 working days prior to the anticipated submission.",
-              fr: "Final drafts of all manuscripts (including submissions for pre-prints), reports, reviews, and other proposed primary publications describing research using CLSA data and/or biospecimens must be sent to the CLSA, by the Primary Applicant, for review at least 15 working days prior to the anticipated submission.", // TODO: TRANSLATE
+              en: "Final drafts of all manuscripts (including submissions for pre-prints), reports, reviews, and other proposed primary publications describing research using CLSA data and/or biospecimens must be submitted to the CLSA, by the Primary Applicant, for review at least 15 working days prior to the anticipated submission.",
+              fr: "Final drafts of all manuscripts (including submissions for pre-prints), reports, reviews, and other proposed primary publications describing research using CLSA data and/or biospecimens must be submitted to the CLSA, by the Primary Applicant, for review at least 15 working days prior to the anticipated submission.", // TODO: TRANSLATE
             },
             text3: {
-              en: "Enter the title of your manuscript and press add manuscript, this will bring up a list of your manuscripts, choose the one that you are submitting and follow all instructions.",
-              fr: "Enter the title of your manuscript and press add manuscript, this will bring up a list of your manuscripts, choose the one that you are submitting and follow all instructions.", // TODO: TRANSLATE
+              en: 'If starting a new submission, enter the title of your manuscript and press "Add Manuscript".  Choose the one that you are submitting from the list of manuscripts below and follow all instructions.', 
+              fr: 'If starting a new submission, enter the title of your manuscript and press "Add Manuscript".  Choose the one that you are submitting from the list of manuscripts below and follow all instructions.', // TODO: TRANSLATE
             },
             manuscript: {
-              noManuscripts: {
-                en: "No Manuscripts",
-                fr: "No Manuscripts", // TODO: TRANSLATE
-              },
               addManuscript: {
                 en: "Add Manuscript",
                 fr: "Add Manuscript", // TODO: TRANSLATE
@@ -1764,8 +1760,13 @@ cenozo.service("CnLocalization", [
             tab: { en: "Part 2", fr: "2<sup>e</sup> partie" },
             title: { en: "Manuscript Overview", fr: "Manuscript Overview", }, // TODO: TRANSLATE
             authors: { en: "Authors", fr: "Authors" }, // TODO: TRANSLATE
+            authors_check: { en: "Confirm Publication Policy", fr: "Confirm Publication Policy" }, // TODO: TRANSLATE
             date: { en: "Date", fr: "Date" }, // TODO: TRANSLATE
             journal: { en: "Target Journal", fr: "Target Journal" }, // TODO: TRANSLATE
+            authors_description: {
+              en: "The CLSA Publication Policy requires that all authors on a manuscript who have accessed the CLSA data have signed Schedule F and are listed under the Project Team in Magnolia. Please verify that this requirement has been met for this manuscript.",
+              fr: "The CLSA Publication Policy requires that all authors on a manuscript who have accessed the CLSA data have signed Schedule F and are listed under the Project Team in Magnolia. Please verify that this requirement has been met for this manuscript.", // TODO: TRANSLATE
+            },
             objectives_description: {
               en: "Results presented in the manuscript must be in accordance with the research objectives of the approved project.  CLSA design features (inclusion/exclusion criteria, sampling strategy, data collection procedures, etc.) if included in the manuscript, must be described accurately. Please refer to the relevant CLSA Protocol, available for download under the Researchers section of our website.  Authors are asked to identify and state below how the specific objectives in the approved application relate to this manuscript.",
             },
@@ -1809,8 +1810,8 @@ cenozo.service("CnLocalization", [
               fr: "One of the articles below must be referenced:", //TODO: TRANSLATE
             },
             clsa_reference_ref1: {
-              en: "Raina P., Wolfson C., Kirkland S.A., Griffith L.E., Oremus M., Patterson C., Tuokko H., Hogan D., Wister A., Payette H., Brazil K., Shannon H. (2009) The Canadian Longitudinal Study on Aging (CLSA). Canadian Journal on Aging, Special Issue on the CLSA, Volume 28, Issue3, 221-229, https://doi.org/10.1017/S0714980809990055",
-              fr: "Raina P., Wolfson C., Kirkland S.A., Griffith L.E., Oremus M., Patterson C., Tuokko H., Hogan D., Wister A., Payette H., Brazil K., Shannon H. (2009) The Canadian Longitudinal Study on Aging (CLSA). Canadian Journal on Aging, Special Issue on the CLSA, Volume 28, Issue3, 221-229, https://doi.org/10.1017/S0714980809990055",
+              en: "Raina P., Wolfson C., Kirkland S., Griffith L.E., Oremus M., Patterson C., Tuokko H., Penning M., Balion C.M., Hogan D., Wister A., Payette H., Shannon H., Brazil K. (2009) The Canadian Longitudinal Study on Aging (CLSA). Canadian Journal on Aging, Special Issue on the CLSA, Volume 28, Issue 3, 221–229. https://doi.org/10.1017/S0714980809990055",
+              fr: "Raina P., Wolfson C., Kirkland S., Griffith L.E., Oremus M., Patterson C., Tuokko H., Penning M., Balion C.M., Hogan D., Wister A., Payette H., Shannon H., Brazil K. (2009) The Canadian Longitudinal Study on Aging (CLSA). Canadian Journal on Aging, Special Issue on the CLSA, Volume 28, Issue 3, 221–229. https://doi.org/10.1017/S0714980809990055",
             },
             clsa_reference_ref2: {
               en: " Raina P, Wolfson C., Kirkland S, Griffith L.E., Balion C., Cossette B., Dionne I., Hofer S., Hogan D., van den Heuvel E.R., Liu-Ambrose T., Menec V., Mugford G., Patterson C., Payette H., Richards B., Shannon H., Sheets D., Taler V., Thompson M., Tuokko H., Wister A., Wu C., Young L. (2019) Cohort profile: The Canadian Longitudinal Study on Aging (CLSA). International Journal of Epidemiology, Volume 48, Issue 6, 1752-1753j, https://doi.org/10.1093/ije/dyz173",
@@ -1843,10 +1844,6 @@ cenozo.service("CnLocalization", [
             genomics_number: {
               en: "Please indicate the page or citation number:",
               fr: "Please indicate the page or citation number:", //TODO: TRANSLATE
-            },
-            genomics_justification: {
-              en: "Please provide a justification for why this requirement could not be met.",
-              fr: "Please provide a justification for why this requirement could not be met.", //TODO: TRANSLATE
             },
           },
           part_4: {
@@ -1923,6 +1920,10 @@ cenozo.service("CnLocalization", [
               en: "Has this requirement been met?",
               fr: "Has this requirement been met?", //TODO: TRANSLATE
             },
+            disclaimer_justification: {
+              en: "Please provide a justification for why this requirement could not be met.",
+              fr: "Please provide a justification for why this requirement could not be met.", // TODO: TRANSLATE
+            },
             statement_description: {
               en: "The following must be included in your manuscript:",
               fr: "The following must be included in your manuscript:", // TODO: TRANSLATE
@@ -1935,9 +1936,13 @@ cenozo.service("CnLocalization", [
               en: "Has this requirement been met?",
               fr: "Has this requirement been met?", //TODO: TRANSLATE
             },
+            statement_justification: {
+              en: "Please provide a justification for why this requirement could not be met.",
+              fr: "Please provide a justification for why this requirement could not be met.", // TODO: TRANSLATE
+            },
             conditions_description: {
-              en: 'Supplementary Conditions of Use (<a href="https://www.clsa-elcv.ca/doc/2579" target="conditions">found here</a>) are respected (if applicable)',
-              fr: 'Supplementary Conditions of Use (<a href="https://www.clsa-elcv.ca/fr/doc/3046" target="conditions">found here</a>) are respected (if applicable)', // TODO: TRANSLATE
+              en: 'Please ensure that the Supplementary Conditions of Use are respected (if applicable), as described in the <a href="/www.clsa-elcv.ca/doc/2579" target="conditions">CLSA Publication and Promotion Policy</a>, Appendix 2.',
+              fr: 'Please ensure that the Supplementary Conditions of Use are respected (if applicable), as described in the <a href="https://www.clsa-elcv.ca/fr/doc/3046" target="conditions">CLSA Publication and Promotion Policy</a>, Appendix 2.', // TODO: TRANSLATE
             },
             conditions: {
               en: "Has this requirement been met?",
@@ -1956,6 +1961,10 @@ cenozo.service("CnLocalization", [
             na: {
               en: "Not applicable to this manuscript",
               fr: "Not applicable to this manuscript", // TODO: TRANSLATE
+            },
+            nr: {
+              en: "Not required by the target journal",
+              fr: "Not required by the target journal", // TODO: TRANSLATE
             },
             pleaseConfirm: { en: "Please confirm", fr: "Veuillez confirmer" },
             no: { en: "No", fr: "Non" },
