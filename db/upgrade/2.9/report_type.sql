@@ -15,6 +15,17 @@ DROP PROCEDURE IF EXISTS patch_report_type;
 
     SET @sql = CONCAT(
       "INSERT IGNORE INTO ", @cenozo, ".report_type SET ",
+        "name = 'agreement', ",
+        "title = 'Expired Agreement', ",
+        "subject = 'reqn', ",
+        "description = 'Provides a list of requisitions with an agreement date that has expired.' "
+    );
+    PREPARE statement FROM @sql;
+    EXECUTE statement;
+    DEALLOCATE PREPARE statement;
+
+    SET @sql = CONCAT(
+      "INSERT IGNORE INTO ", @cenozo, ".report_type SET ",
         "name = 'data_release_update', ",
         "title = 'Data Release Update', ",
         "subject = 'reqn', ",
