@@ -180,6 +180,17 @@
                   difference="model.viewModel.compareRecord.differences.part_2.authors"
                   model="model">
                 </cn-view-input-with-differences>
+                <p class="text-primary" ng-bind-html="t( 'part_2.authors_description' )"></p>
+                <cn-view-input-with-differences
+                  input="{
+                    key: 'authors_check',
+                    title: t( 'part_2.authors_check' ),
+                    type: 'boolean',
+                    enumList: model.metadata.yesNoEnumList[model.viewModel.record.lang]
+                  }"
+                  difference="model.viewModel.compareRecord.differences.part_3.authors_check"
+                  model="model">
+                </cn-view-input-with-differences>
                 <cn-view-input-with-differences
                   input="{
                     key: 'date',
@@ -335,7 +346,7 @@
                     key: 'genomics',
                     title: t( 'part_3.genomics' ),
                     type: 'boolean',
-                    enumList: model.metadata.yesNoEnumList[model.viewModel.record.lang]
+                    enumList: model.metadata.yesNAEnumList[model.viewModel.record.lang]
                   }"
                   no-cols=true
                   difference="model.viewModel.compareRecord.differences.part_3.genomics"
@@ -350,18 +361,6 @@
                   }"
                   no-cols=true
                   difference="model.viewModel.compareRecord.differences.part_3.genomics_number"
-                  model="model">
-                </cn-view-input-with-differences>
-                <cn-view-input-with-differences
-                  ng-if="false === model.viewModel.record.genomics"
-                  input="{
-                    key: 'genomics_justification',
-                    title: t( 'part_3.genomics_justification' ),
-                    type: 'text',
-                    maxLength: 1500
-                  }"
-                  no-cols=true
-                  difference="model.viewModel.compareRecord.differences.part_3.genomics_justification"
                   model="model">
                 </cn-view-input-with-differences>
               </li>
@@ -428,7 +427,7 @@
                 </cn-view-input-with-differences>
               </li>
               <li class="list-group-item" ng-if="model.viewModel.record.has_seroprevalence_data">
-                <p class="text-primary" ng-bind-html="t( 'part_4.dataset_version_description' )"></p>
+                <p class="text-primary" ng-bind-html="t( 'part_4.seroprevalence_description' )"></p>
                 <ul class="list-group container allow-select">
                   <li class="list-group-item text-muted" ng-bind-html="t( 'part_4.seroprevalence_example' )"></li>
                 </ul>
@@ -477,6 +476,18 @@
                   difference="model.viewModel.compareRecord.differences.part_4.disclaimer"
                   model="model">
                 </cn-view-input-with-differences>
+                <cn-view-input-with-differences
+                  ng-if="false === model.viewModel.record.disclaimer"
+                  input="{
+                    key: 'disclaimer_justification',
+                    title: t( 'part_4.disclaimer_justification' ),
+                    type: 'text',
+                    maxLength: 1500
+                  }"
+                  no-cols=true
+                  difference="model.viewModel.compareRecord.differences.part_4.disclaimer_justification"
+                  model="model">
+                </cn-view-input-with-differences>
               </li>
               <li class="list-group-item">
                 <p class="text-primary" ng-bind-html="t( 'part_4.statement_description' )"></p>
@@ -488,10 +499,36 @@
                     key: 'statement',
                     title: t( 'part_4.statement' ),
                     type: 'boolean',
-                    enumList: model.metadata.yesNAEnumList[model.viewModel.record.lang]
+                    enumList: model.metadata.yesNoNREnumList[model.viewModel.record.lang]
                   }"
                   no-cols=true
                   difference="model.viewModel.compareRecord.differences.part_4.statement"
+                  model="model">
+                </cn-view-input-with-differences>
+                <cn-view-input-with-differences
+                  ng-if="'no' === model.viewModel.record.statement"
+                  input="{
+                    key: 'statement_justification',
+                    title: t( 'part_4.statement_justification' ),
+                    type: 'text',
+                    maxLength: 1500
+                  }"
+                  no-cols=true
+                  difference="model.viewModel.compareRecord.differences.part_4.statement_justification"
+                  model="model">
+                </cn-view-input-with-differences>
+              </li>
+              <li class="list-group-item">
+                <p class="text-primary" ng-bind-html="t( 'part_4.conditions_description' )"></p>
+                <cn-view-input-with-differences
+                  input="{
+                    key: 'conditions',
+                    title: t( 'part_4.conditions' ),
+                    type: 'boolean',
+                    enumList: model.metadata.yesNAEnumList[model.viewModel.record.lang]
+                  }"
+                  no-cols=true
+                  difference="model.viewModel.compareRecord.differences.part_4.conditions"
                   model="model">
                 </cn-view-input-with-differences>
               </li>
@@ -502,7 +539,7 @@
                     key: 'indigenous',
                     title: t( 'part_4.indigenous' ),
                     type: 'boolean',
-                    enumList: model.metadata.yesNAEnumList[model.viewModel.record.lang]
+                    enumList: model.metadata.yesNoEnumList[model.viewModel.record.lang]
                   }"
                   no-cols=true
                   difference="model.viewModel.compareRecord.differences.part_4.indigenous"

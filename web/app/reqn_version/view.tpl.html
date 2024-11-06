@@ -1392,8 +1392,27 @@
         <p class="text-primary" ng-bind-html="t( 'manuscripts.text3' )"></p>
         <div class="panel panel-default">
           <div class="panel-body">
-            <span ng-show="0 == model.viewModel.manuscriptList.length"
-                  ng-bind-html="t( 'manuscripts.manuscript.noManuscripts' )"></span>
+            <form
+              id="manuscript_form"
+              name="manuscript_form"
+              ng-show="model.viewModel.getManuscriptEditEnabled() && !isDAO()"
+              novalidate
+            >
+              <div class="form-horizontal">
+                <cn-add-input
+                  class="col-sm-10"
+                  input="{ key: 'title', title: t( 'manuscripts.manuscript.title' ), type: 'string' }"
+                  record="manuscriptRecord"
+                  model="model.viewModel.manuscriptModel">
+                </cn-add-input>
+                <button
+                  class="btn btn-primary col-sm-2"
+                  ng-disabled="isAddingManuscript"
+                  ng-click="addManuscript()"
+                  ng-bind-html="t( 'manuscripts.manuscript.addManuscript' )"
+                ></button>
+              </div>
+            </form>
             <table class="table table-striped"
                    ng-class="{ 'table-hover': model.viewModel.getManuscriptEditEnabled() }"
                    ng-show="0 < model.viewModel.manuscriptList.length">
@@ -1413,27 +1432,6 @@
             </table>
           </div>
         </div>
-        <form
-          id="manuscript_form"
-          name="manuscript_form"
-          ng-show="model.viewModel.getManuscriptEditEnabled() && !isDAO()"
-          novalidate
-        >
-          <div class="form-horizontal">
-            <cn-add-input
-              class="col-sm-10"
-              input="{ key: 'title', title: t( 'manuscripts.manuscript.title' ), type: 'string' }"
-              record="manuscriptRecord"
-              model="model.viewModel.manuscriptModel">
-            </cn-add-input>
-            <button
-              class="btn btn-primary col-sm-2"
-              ng-disabled="isAddingManuscript"
-              ng-click="addManuscript()"
-              ng-bind-html="t( 'manuscripts.manuscript.addManuscript' )"
-            ></button>
-          </div>
-        </form>
       </div>
     </div>
     <div ng-show="'agreement'==model.viewModel.getTabPart()" class="panel panel-default" ng-if="model.viewModel.showAgreement()">
