@@ -28,6 +28,10 @@ cenozoApp.defineModule({
           title: "Date & Time",
           type: "datetime",
         },
+        agreement_end_date: {
+          title: "Agreement End",
+          type: "date",
+        },
         has_agreement_filename: {
           title: "Has Agreement",
           type: "boolean",

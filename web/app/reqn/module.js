@@ -66,17 +66,6 @@ cenozoApp.defineModule({
             );
           },
         },
-        ethics_expiry: {
-          column: "ethics_approval.date",
-          title: "Ethics Expiry",
-          type: "date",
-          isIncluded: function ($state, model) {
-            return (
-              !model.isRole("typist") &&
-              "data_sharing" != model.getActionFromState()
-            );
-          },
-        },
         agreement_start_date: {
           column: "reqn_version.agreement_start_date",
           title: "Agreement Start",
@@ -94,8 +83,8 @@ cenozoApp.defineModule({
           type: "date",
           isIncluded: function ($state, model) {
             return (
-              model.isRole("applicant", "designate") &&
-              "data_sharing" != model.getActionFromState()
+              model.isRole("administrator") ||
+              (model.isRole("applicant", "designate") && "data_sharing" != model.getActionFromState())
             );
           },
         },
