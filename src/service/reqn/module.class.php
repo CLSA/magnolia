@@ -68,8 +68,26 @@ class module extends \cenozo\service\module
     $db_role = $session->get_role();
 
     $modifier->join( 'reqn_type', 'reqn.reqn_type_id', 'reqn_type.id' );
+
     $modifier->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
     $modifier->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
+
+    if( $select->has_table_columns( 'reqn_version_with_agreement' ) )
+    {
+      $modifier->join(
+        'reqn_last_reqn_version_with_agreement',
+        'reqn.id',
+        'reqn_last_reqn_version_with_agreement.reqn_id'
+      );
+      $modifier->join(
+        'reqn_version',
+        'reqn_last_reqn_version_with_agreement.reqn_version_id',
+        'reqn_version_with_agreement.id',
+        'left',
+        'reqn_version_with_agreement'
+      );
+    }
+
     $modifier->join( 'reqn_current_final_report', 'reqn.id', 'reqn_current_final_report.reqn_id' );
     $modifier->left_join( 'final_report', 'reqn_current_final_report.final_report_id', 'final_report.id' );
     $modifier->join( 'reqn_current_destruction_report', 'reqn.id', 'reqn_current_destruction_report.reqn_id' );
@@ -105,7 +123,7 @@ class module extends \cenozo\service\module
 
       $join_mod = lib::create( 'database\modifier' );
       $join_mod->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
-      
+
       $sub_mod = lib::create( 'database\modifier' );
       $sub_mod->where( 'reqn_current_reqn_version.reqn_version_id', '=', 'reqn_version_has_data_selection.reqn_version_id', false );
       $sub_mod->where( 'reqn_version_has_data_selection.data_selection_id', 'IN', $linked_data_sql, false );
@@ -172,7 +190,13 @@ class module extends \cenozo\service\module
       $modifier->join( 'coapp_country_flagged', 'reqn_version.id', 'coapp_country_flagged.reqn_version_id' );
       $select->add_column(
         sprintf(
-          'IF( coapp_country_flagged.flagged OR applicant_country_id IN %s OR trainee_country_id IN %s, 1, 0 )',
+          'IF( '.
+            'coapp_country_flagged.flagged OR '.
+            'reqn_version.applicant_country_id IN %s OR '.
+            'reqn_version.trainee_country_id IN %s, '.
+            '1, '.
+            '0 '.
+          ')',
           $flagged_country,
           $flagged_country
         ),

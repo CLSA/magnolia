@@ -78,7 +78,7 @@ cenozoApp.defineModule({
           },
         },
         agreement_end_date: {
-          column: "reqn_version.agreement_end_date",
+          column: "reqn_version_with_agreement.agreement_end_date",
           title: "Agreement End",
           type: "date",
           isIncluded: function ($state, model) {
