@@ -67,7 +67,7 @@ cenozoApp.defineModule({
           },
         },
         agreement_start_date: {
-          column: "reqn_version.agreement_start_date",
+          column: "reqn_version_with_agreement.agreement_start_date",
           title: "Agreement Start",
           type: "date",
           isIncluded: function ($state, model) {
@@ -83,7 +83,7 @@ cenozoApp.defineModule({
           type: "date",
           isIncluded: function ($state, model) {
             return (
-              model.isRole("administrator") ||
+              model.isRole("administrator", "dao") ||
               (model.isRole("applicant", "designate") && "data_sharing" != model.getActionFromState())
             );
           },
