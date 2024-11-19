@@ -11,8 +11,8 @@ cenozoApp.defineModule({
       },
       columnList: {
         name: { title: "Name" },
-        manuscript: { title: "Manuscripts" },
-        reqn_count: { title: "Requisitions" },
+        manuscript: { title: "Manuscripts", type: "boolean" },
+        reqn_count: { title: "Requisitions", type: "number" },
       },
       defaultOrder: {
         column: "data_version.name",
