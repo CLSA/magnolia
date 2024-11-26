@@ -7,6 +7,31 @@ cenozoApp.defineModule({
     var manuscriptModule = cenozoApp.module("manuscript");
     var referenceModule = cenozoApp.module("reference");
 
+    // Due to multiple modules being used in the reqn-version form there are name collisions that
+    // break the cenozo.getFormElement() function.  To fix this we implement a custom getFormElement
+    // function here that can be used with multiple forms in mind
+    function getFormElement(form, property) {
+      // create a query selector that is both form and property aware
+      var scope = cenozo.getScopeByQuerySelector("form[name=" + form + "] input[id=" + property + "]");
+      if (scope) {
+        // fake the innerForm name property if the element is a filename
+        if (
+          property.match("filename") &&
+          angular.isUndefined(scope.$parent.innerForm.name)
+        ) {
+          scope.$parent.innerForm.name = {
+            $dirty: false,
+            $invalid: false,
+            $error: {},
+          };
+        }
+
+        return scope.$parent.innerForm.name;
+      }
+
+      return null;
+    }
+
     angular.extend(module, {
       identifier: {
         parent: {
@@ -313,7 +338,7 @@ cenozoApp.defineModule({
                 for (var property in $scope.model.viewModel.coapplicantModel
                   .module.inputGroupList[0].inputList) {
                   // get the property's form element and remove any conflict errors, then see if it's invalid
-                  var currentElement = cenozo.getFormElement(property);
+                  var currentElement = getFormElement("project_team_form", property);
                   currentElement.$error.conflict = false;
                   cenozo.updateFormElement(currentElement);
                   if (currentElement.$invalid) {
@@ -451,28 +476,33 @@ cenozoApp.defineModule({
               // The cn-reqn-form directive makes use of cn-add-input directives.  These directives need their
               // parent to have a check() function which checks to see whether the input is valid or not.  Since
               // that function is usually in the cn-record-add directive we have to implement on here instead.
-              var element = cenozo.getFormElement(property);
-              if (element) {
-                // The manuscript, coapplicant and reference cn-add-input directives share this method
-                // so determine which it is by checking to see which module has the property
-                if (null != manuscriptModule.getInput(property)) {
-                  element.$error.format = !$scope.model.viewModel.manuscriptModel.testFormat(
-                    property,
-                    $scope.manuscriptRecord[property]
-                  );
-                } else if (null != coapplicantModule.getInput(property)) {
-                  element.$error.format = !$scope.model.viewModel.coapplicantModel.testFormat(
-                    property,
-                    $scope.coapplicantRecord[property]
-                  );
-                } else if (null != referenceModule.getInput(property)) {
-                  element.$error.format = !$scope.model.viewModel.referenceModel.testFormat(
-                    property,
-                    $scope.referenceRecord[property]
-                  );
-                }
-                cenozo.updateFormElement(element, true);
+
+              const manuscriptElement = getFormElement("manuscript_form", property);
+              if (manuscriptElement) {
+                manuscriptElement.$error.format = !$scope.model.viewModel.manuscriptModel.testFormat(
+                  property,
+                  $scope.manuscriptRecord[property]
+                );
               }
+
+              const coapplicantElement = getFormElement("project_team_form", property);
+              if (coapplicantElement) {
+                coapplicantElement.$error.format = !$scope.model.viewModel.coapplicantModel.testFormat(
+                  property,
+                  $scope.coapplicantRecord[property]
+                );
+              }
+
+              const referenceElement = getFormElement("description_form", property);
+              if (referenceElement) {
+                referenceElement.$error.format = !$scope.model.viewModel.referenceModel.testFormat(
+                  property,
+                  $scope.referenceRecord[property]
+                );
+              }
+
+              const element = cenozo.getFormElement(property);
+              if (element) cenozo.updateFormElement(element, true);
             };
 
             $scope.addManuscript = async function () {
@@ -482,7 +512,7 @@ cenozoApp.defineModule({
                 // we need to check the title input for errors
 
                 // get the title's form element and remove any conflict errors, then see if it's invalid
-                var titleEl = cenozo.getFormElement("title");
+                var titleEl = getFormElement("manuscript_form", "title");
                 titleEl.$error.conflict = false;
                 cenozo.updateFormElement(titleEl);
 
