@@ -185,7 +185,7 @@ cenozoApp.defineModule({
               addAttachment: async function () {
                 if ($scope.model.viewModel.attachmentModel.getAddEnabled()) {
                   // get the data property's form element and remove any conflict errors, then see if it's invalid
-                  var currentElement = cenozo.getFormElement('data');
+                  var currentElement = cenozo.getFormElement("data");
                   angular.extend(
                     currentElement.$error,
                     { conflict: false, required: null === currentElement.$viewValue }
@@ -314,7 +314,7 @@ cenozoApp.defineModule({
               if (angular.isDefined(data.disclaimer) && data.disclaimer) {
                 this.record.disclaimer_justification = "";
               }
-              if (angular.isDefined(data.statement) && 'no' != data.statement) {
+              if (angular.isDefined(data.statement) && "no" != data.statement) {
                 this.record.statement_justification = "";
               }
             },
@@ -447,6 +447,8 @@ cenozoApp.defineModule({
                     // only check some fields if the reqn has them selected
                     if ("seroprevalence" == property) return this.record.has_seroprevalence_data;
                     else if ("covid" == property) return this.record.has_covid_data;
+                    else if ("disclaimer_justification" == property) return false === this.record.disclaimer;
+                    else if ("statement_justification" == property) return "no" === this.record.statement;
                   }
 
                   // check everthing else
@@ -467,6 +469,7 @@ cenozoApp.defineModule({
                   } else if (null === this.record[property] || "" === this.record[property]) {
                     // check for the property's value
                     var element = cenozo.getFormElement(property);
+                    console.log(property, element);
                     element.$error.required = true;
                     cenozo.updateFormElement(element, true);
                     if (null == errorTab) errorTab = tab;
@@ -526,8 +529,8 @@ cenozoApp.defineModule({
               if (this.parentModel.isRole("applicant", "designate")) {
                 // go back to the reqn version's manuscript tab
                 await $state.go(
-                  'reqn_version.view',
-                  { identifier: "identifier=" + this.record.identifier, t: 'manuscripts' }
+                  "reqn_version.view",
+                  { identifier: "identifier=" + this.record.identifier, t: "manuscripts" }
                 );
               } else {
                 await this.onView(true); // refresh
@@ -554,7 +557,7 @@ cenozoApp.defineModule({
 
             getAttachmentList: async function () {
               var response = await CnHttpFactory.instance({
-                path: ["manuscript", this.record.manuscript_id, 'manuscript_attachment'].join("/"),
+                path: ["manuscript", this.record.manuscript_id, "manuscript_attachment"].join("/"),
                 data: {
                   select: { column: ["id", "filename", "size"] },
                   modifier: { order: "id", limit: 1000 },
@@ -566,14 +569,14 @@ cenozoApp.defineModule({
 
             downloadAttachment: async function (id) {
               const response = await CnHttpFactory.instance({
-                path: ["manuscript", this.record.manuscript_id, 'manuscript_attachment', id].join("/"),
+                path: ["manuscript", this.record.manuscript_id, "manuscript_attachment", id].join("/"),
               }).get();
               saveAs(cenozo.convertBase64ToBlob(response.data.data.data), response.data.filename);
             },
 
             removeAttachment: async function (id) {
               await CnHttpFactory.instance({
-                path: ["manuscript", this.record.manuscript_id, 'manuscript_attachment', id].join("/"),
+                path: ["manuscript", this.record.manuscript_id, "manuscript_attachment", id].join("/"),
               }).delete();
               await this.getAttachmentList();
             },
@@ -602,7 +605,7 @@ cenozoApp.defineModule({
           // setup the manuscript-attachment's service collection path based on this version's parent
           const self = this;
           this.attachmentModel.getServiceCollectionPath = function (ignoreParent) {
-            return ['manuscript', self.record.manuscript_id, 'manuscript_attachment'].join("/");
+            return ["manuscript", self.record.manuscript_id, "manuscript_attachment"].join("/");
           };
         };
         return {
