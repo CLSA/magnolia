@@ -8,17 +8,14 @@ cenozoApp.defineModule({
     var referenceModule = cenozoApp.module("reference");
 
     // Due to multiple modules being used in the reqn-version form there are name collisions that
-    // break the cenozo.getFormElement() function.  To fix this we implement a custom getFormElement
-    // function here that can be used with multiple forms in mind
+    // break the cenozo.getFormElement() function.  To fix this we implement custom getFormElement()
+    // and forEachFormElement() functions that can be used below where multiple forms is an issue.
     function getFormElement(form, property) {
       // create a query selector that is both form and property aware
       var scope = cenozo.getScopeByQuerySelector("form[name=" + form + "] input[id=" + property + "]");
       if (scope) {
         // fake the innerForm name property if the element is a filename
-        if (
-          property.match("filename") &&
-          angular.isUndefined(scope.$parent.innerForm.name)
-        ) {
+        if (property.match("filename") && angular.isUndefined(scope.$parent.innerForm.name)) {
           scope.$parent.innerForm.name = {
             $dirty: false,
             $invalid: false,
@@ -30,6 +27,15 @@ cenozoApp.defineModule({
       }
 
       return null;
+    }
+
+    function forEachFormElement(formName, fn) {
+      var elementList = document.querySelectorAll("[name=" + formName + "] [name=name]");
+      // note, we can't use array functions in the results of querySelectorAll()
+      for (var i = 0; i < elementList.length; i++) {
+        const element = getFormElement(formName, elementList[i].id);
+        if (element) fn(element);
+      }
     }
 
     angular.extend(module, {
@@ -348,7 +354,7 @@ cenozoApp.defineModule({
                 }
                 if (!valid) {
                   // dirty all inputs so we can find the problem
-                  cenozo.forEachFormElement("project_team_form", (element) => { element.$dirty = true; });
+                  forEachFormElement("project_team_form", (element) => { element.$dirty = true; });
                 } else {
                   try {
                     $scope.isAddingCoapplicant = true;
@@ -392,7 +398,7 @@ cenozoApp.defineModule({
                 var form = cenozo.getScopeByQuerySelector("#description_form").description_form;
                 if (!form.$valid) {
                   // dirty all inputs so we can find the problem
-                  cenozo.forEachFormElement("description_form", (element) => { element.$dirty = true; });
+                  forEachFormElement("description_form", (element) => { element.$dirty = true; });
                 } else {
                   try {
                     $scope.isAddingReference = true;
@@ -518,7 +524,9 @@ cenozoApp.defineModule({
 
                 if (titleEl.$invalid) {
                   // dirty all inputs so we can find the problem
-                  cenozo.forEachFormElement("manuscript_form", (element) => { element.$dirty = true; });
+                  forEachFormElement("manuscript_form", (element) => {
+                    element.$dirty = true;
+                  });
                 } else {
                   try {
                     $scope.isAddingManuscript = true;
