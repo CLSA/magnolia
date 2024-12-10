@@ -169,6 +169,14 @@ cenozoApp.defineModule({
           where: ["user.first_name", "user.last_name", "user.name"],
         },
       },
+      new_trainee_user_id: {
+        type: "lookup-typeahead",
+        typeahead: {
+          table: "user",
+          select: 'CONCAT( user.first_name, " ", user.last_name )',
+          where: ["user.first_name", "user.last_name", "user.name"],
+        },
+      },
     });
 
     /* ############################################################################################## */
@@ -735,7 +743,7 @@ cenozoApp.defineModule({
                 // now re-read the amendment_justification properties used by the view as it may have changed
                 const response = await CnHttpFactory.instance({
                   path: this.parentModel.getServiceResourcePath(),
-                  data: { select: { column: ['justification_summary_en', 'justification_summary_fr'] } },
+                  data: { select: { column: ["justification_summary_en", "justification_summary_fr"] } },
                 }).get();
 
                 this.record.justification_summary_en = response.data.justification_summary_en;
@@ -785,8 +793,8 @@ cenozoApp.defineModule({
                       onError: async (error) => {
                         if (404 == error.status) {
                           await CnModalMessageFactory.instance({
-                            title: this.translate("misc.invalidNewApplicantTitle"),
-                            message: this.translate("misc.invalidNewApplicantMessage"),
+                            title: this.translate("misc.invalidNewPrimaryTitle"),
+                            message: this.translate("misc.invalidNewPrimaryMessage"),
                             closeText: this.translate("misc.close"),
                             error: true,
                           }).show();
@@ -802,13 +810,54 @@ cenozoApp.defineModule({
                     if (angular.isObject(response.data) && null != response.data.supervisor_user_id) {
                       await CnModalMessageFactory.instance({
                         title: this.translate("misc.pleaseNote"),
-                        message: this.translate("amendment.newUserIsTraineeNotice"),
+                        message: this.translate("amendment.newPrimaryIsTraineeNotice"),
                         closeText: this.translate("misc.close"),
                         error: true,
                       }).show();
 
                       // failed to set the new user so put it back
                       this.formattedRecord.new_user_id = this.backupRecord.formatted_new_user_id;
+
+                      // do not proceed
+                      return;
+                    }
+                  }
+                }
+
+                if ("new_trainee_user_id" == property) {
+                  // make sure the new user is a trainee
+                  if (data.new_trainee_user_id) {
+                    var response = await CnHttpFactory.instance({
+                      path: "applicant/user_id=" + data[property],
+                      data: { select: { column: "supervisor_user_id" } },
+                      onError: async (error) => {
+                        if (404 == error.status) {
+                          await CnModalMessageFactory.instance({
+                            title: this.translate("misc.invalidNewTraineeTitle"),
+                            message: this.translate("misc.invalidNewTraineeMessage"),
+                            closeText: this.translate("misc.close"),
+                            error: true,
+                          }).show();
+
+                          // failed to set the new trainee user so put it back
+                          this.formattedRecord.new_trainee_user_id =
+                            this.backupRecord.formatted_new_trainee_user_id;
+                        } else {
+                          CnModalMessageFactory.httpError(error);
+                        }
+                      },
+                    }).get();
+
+                    if (angular.isObject(response.data) && null == response.data.supervisor_user_id) {
+                      await CnModalMessageFactory.instance({
+                        title: this.translate("misc.pleaseNote"),
+                        message: this.translate("amendment.newTraineeIsPrimaryNotice"),
+                        closeText: this.translate("misc.close"),
+                        error: true,
+                      }).show();
+
+                      // failed to set the new user so put it back
+                      this.formattedRecord.new_trainee_user_id = this.backupRecord.formatted_new_trainee_user_id;
 
                       // do not proceed
                       return;
@@ -863,18 +912,6 @@ cenozoApp.defineModule({
                   }
                 }
               }
-            },
-
-            onPatchError: function (response) {
-              if (
-                306 == response.status &&
-                null != response.data.match(/^"You cannot change the primary applicant/)
-              ) {
-                // failed to set the new user so put it back
-                this.formattedRecord.new_user_id = this.backupRecord.formatted_new_user_id;
-              }
-
-              return this.$$onPatchError(response);
             },
 
             manuscriptModel: CnManuscriptModelFactory.instance(),
@@ -1016,7 +1053,7 @@ cenozoApp.defineModule({
                     this.versionList.forEach(version => {
                       if (
                         null != version &&
-                        '.' != version.amendment &&
+                        "." != version.amendment &&
                         this.record.amendment >= version.amendment
                       ) {
                         if(currentAmendment == version.amendment) return;
@@ -1034,7 +1071,7 @@ cenozoApp.defineModule({
               }
 
               // add thousands separators
-              let sep = "fr" == this.record.lang ? ' ' : ',';
+              let sep = "fr" == this.record.lang ? " " : ",";
               cost = cost.toString();
               if (1000000 <= cost) cost = cost.replace( /([0-9]+)([0-9]{3})([0-9]{3})$/, "$1"+sep+"$2"+sep+"$3" );
               else if (1000 <= cost) cost = cost.replace( /([0-9]+)([0-9]{3})$/, "$1"+sep+"$2" );
@@ -1067,6 +1104,7 @@ cenozoApp.defineModule({
                   amendments: {
                     diff: false,
                     new_user_id: false,
+                    new_trainee_user_id: false,
                     amendmentJustificationList: [],
                   },
                 },
@@ -1967,6 +2005,13 @@ cenozoApp.defineModule({
                         new: this.formattedRecord.new_user_id,
                       });
                     }
+                    if (version.differences[part].diff && version.differences[part].a.new_trainee_user_id) {
+                      differenceList.push({
+                        name: "New Trainee",
+                        old: null,
+                        new: this.formattedRecord.new_trainee_user_id,
+                      });
+                    }
                   } else if (version.differences[part].diff) {
                     for (var tab in version.differences[part]) {
                       if (!version.differences[part].hasOwnProperty(tab)) continue;
@@ -2007,7 +2052,7 @@ cenozoApp.defineModule({
                                 )
                               ){
                                 differenceList.push({
-                                  name: property.replace(/_/g, " ").ucWords().replace(/ Id$/, '' ),
+                                  name: property.replace(/_/g, " ").ucWords().replace(/ Id$/, "" ),
                                   diff: !this.record[property] ? "removed" :
                                         !version[property] ? "added" : "changed"
                                 });
@@ -2237,12 +2282,28 @@ cenozoApp.defineModule({
 
                 // make sure the new user field is filled out when changing the primary applicant
                 if (
-                  this.record[
-                    "amendmentType" + this.parentModel.newUserAmendmentTypeId
-                  ] &&
+                  this.record["amendmentType" + this.parentModel.newUserAmendmentTypeId] &&
                   null == this.record.new_user_id
                 ) {
                   var element = cenozo.getFormElement("new_user_id");
+                  element.$error.required = true;
+                  cenozo.updateFormElement(element, true);
+                  if (null == errorTab) errorTab = "amendment";
+                  if (null == error) {
+                    error = {
+                      title: this.translate("misc.missingFieldTitle"),
+                      message: this.translate("misc.missingFieldMessage"),
+                      error: true,
+                    };
+                  }
+                }
+
+                // make sure the new trainee user field is filled out when changing the trainee
+                if (
+                  this.record["amendmentType" + this.parentModel.newTraineeUserAmendmentTypeId] &&
+                  null == this.record.new_trainee_user_id
+                ) {
+                  var element = cenozo.getFormElement("new_trainee_user_id");
                   element.$error.required = true;
                   cenozo.updateFormElement(element, true);
                   if (null == errorTab) errorTab = "amendment";
@@ -2439,7 +2500,7 @@ cenozoApp.defineModule({
                   }).show();
                   this.setFormTab("description");
                   return; // don't proceed if there are no references
-                } else if("." == this.record.amendment && 'New' == this.record.stage_type) {
+                } else if("." == this.record.amendment && "New" == this.record.stage_type) {
                   // When moving to the admin stage for the first time show warning if no coapplicants
                   if (0 == this.record.coapplicantList.length) {
                     var response = await CnModalConfirmFactory.instance({
@@ -2660,6 +2721,7 @@ cenozoApp.defineModule({
           angular.extend(this, {
             // we'll need to track which amendment type changes the reqn's owner
             newUserAmendmentTypeId: null,
+            newTraineeUserAmendmentTypeId: null,
             categoryList: [],
 
             getCategoryAndOption: function (optionId) {
@@ -2904,7 +2966,8 @@ cenozoApp.defineModule({
 
               this.amendmentTypeList = { en: [], fr: [] };
               amendmentTypeResponse.data.forEach((item) => {
-                if (item.new_user) this.newUserAmendmentTypeId = item.id;
+                if ("applicant" == item.new_user) this.newUserAmendmentTypeId = item.id;
+                else if ("trainee" == item.new_user) this.newTraineeUserAmendmentTypeId = item.id;
 
                 this.amendmentTypeList.en.push({
                   id: item.id,

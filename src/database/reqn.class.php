@@ -900,26 +900,43 @@ class reqn extends \cenozo\database\record
     }
     else if( 'Agreement' == $db_next_stage_type->name )
     {
-      // Check if there is an amendment to change the primary applicant, and if so change it now
+      // Check if there is an amendment to change the primary applicant or trainee, and if so change it now
       // This can happen for regular or legacy applications
-      if( '.' != $db_reqn_version->amendment &&
-          !is_null( $db_reqn_version->new_user_id ) &&
-          $this->user_id != $db_reqn_version->new_user_id &&
-          'Approved' == $this->get_recommendation() )
+      if( '.' != $db_reqn_version->amendment && 'Approved' == $this->get_recommendation() )
       {
-        $this->change_user();
+        // It's possible that we're changing both the applicant and trainee, so we must process the trainee
+        // change before the user.  Otherwise the new trainee may not have their supervisor changed to the
+        // new applicant.
+        if(
+          !is_null( $db_reqn_version->new_trainee_user_id ) &&
+          $this->trainee_user_id != $db_reqn_version->new_trainee_user_id
+        ) $this->change_trainee_user();
+
+        if(
+          !is_null( $db_reqn_version->new_user_id ) &&
+          $this->user_id != $db_reqn_version->new_user_id
+        ) $this->change_user();
       }
     }
     else if( 'Active' == $db_next_stage_type->name )
     {
       // Check if there is an amendment to change the primary applicant, and if so change it now
-      // This can only happen for legacy applications (since the agreement can be skipped)
-      if( $this->legacy &&
-          '.' != $db_reqn_version->amendment &&
-          !is_null( $db_reqn_version->new_user_id ) &&
-          $this->user_id != $db_reqn_version->new_user_id )
+      if( '.' != $db_reqn_version->amendment )
       {
-        $this->change_user();
+        // It's possible that we're changing both the applicant and trainee, so we must process the trainee
+        // change before the user.  Otherwise the new trainee may not have their supervisor changed to the
+        // new applicant.
+        if(
+          !is_null( $db_reqn_version->new_trainee_user_id ) &&
+          $this->trainee_user_id != $db_reqn_version->new_trainee_user_id
+        ) $this->change_trainee_user();
+
+        if(
+          // This can only happen for legacy applications (since the agreement can be skipped)
+          $this->legacy &&
+          !is_null( $db_reqn_version->new_user_id ) &&
+          $this->user_id != $db_reqn_version->new_user_id
+        ) $this->change_user();
       }
 
       // create the data directories now in case the data-release stage was never passed through (legacy reqns)
@@ -1131,17 +1148,18 @@ class reqn extends \cenozo\database\record
   /**
    * Updates the reqn's user with the new user defined in the current reqn version
    * 
-   * This function will also rest the new user to null in the reqn version if the new_user amendment type is
-   * not selected.
+   * This function will also reset reqn_version.new_user_id to null if the applicant
+   * amendment_type is not selected.
    */
   public function change_user()
   {
     $db_reqn_version = $this->get_current_reqn_version();
 
     // make sure a new-user amendment type was selected
-    $amendment_type_mod = lib::create( 'database\modifier' );
-    $amendment_type_mod->where( 'new_user', '=', true );
-    if( 0 < $db_reqn_version->get_amendment_type_count( $amendment_type_mod ) )
+    $at_mod = lib::create( 'database\modifier' );
+    $at_mod->where( 'new_user', '=', 'applicant' );
+
+    if( 0 < count( $db_reqn_version->get_amendment_type_count( $at_mod ) ) )
     {
       // change the trainee's supervisor if there is one
       $db_trainee_user = $this->get_trainee_user();
@@ -1158,8 +1176,42 @@ class reqn extends \cenozo\database\record
     }
     else
     {
-      // the new user isn't being used, so clear it out
+      // clear out the new user field if they aren't being used
       $db_reqn_version->new_user_id = NULL;
+      $db_reqn_version->save();
+    }
+  }
+
+  /**
+   * Updates the reqn's trainee user with the new trainee user defined in the current reqn version
+   * 
+   * This function will also reset reqn_version.new_trainee_user_id to null if the applicant
+   * amendment_type is not selected.
+   */
+  public function change_trainee_user()
+  {
+    $db_reqn_version = $this->get_current_reqn_version();
+
+    // make sure a new-user amendment type was selected
+    $at_mod = lib::create( 'database\modifier' );
+    $at_mod->where( 'new_user', '=', 'trainee' );
+
+    if( 0 < $db_reqn_version->get_amendment_type_count( $at_mod ) )
+    {
+      // change the trainee's supervisor to the reqn's owner
+      $db_trainee_user = lib::create( 'database\user', $db_reqn_version->new_trainee_user_id );
+      $db_applicant = $db_trainee_user->get_applicant();
+      $db_applicant->supervisor_user_id = $db_reqn_version->new_user_id;
+      $db_applicant->save();
+
+      // change the reqn to the new trainee
+      $this->trainee_user_id = $db_reqn_version->new_trainee_user_id;
+      $this->save();
+    }
+    else
+    {
+      // clear out the new trainee user field if they aren't being used
+      $db_reqn_version->new_trainee_user_id = NULL;
       $db_reqn_version->save();
     }
   }

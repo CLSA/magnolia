@@ -195,6 +195,7 @@
             <div ng-repeat="amendmentType in model.amendmentTypeList[model.viewModel.record.lang]">
               <div style="margin: 0;"
                    class="row"
+                   ng-if="'trainee' != amendmentType.newUser || model.viewModel.record.trainee_user_id"
                    ng-class="{
                      'bg-warning': model.viewModel.compareRecord.differences.instructions.amendments['amendmentType'+amendmentType.id]
                    }">
@@ -204,13 +205,30 @@
                        ng-change="model.viewModel.toggleAmendmentTypeValue( amendmentType.id )"></input>
                 <label for="amendmentType{{ amendmentType.id }}" class="control-label" ng-bind-html="amendmentType.name"></label>
                 <cn-view-input-with-differences
-                  ng-if="amendmentType.newUser && model.viewModel.record['amendmentType'+amendmentType.id]"
+                  ng-if="
+                    'applicant' == amendmentType.newUser &&
+                    model.viewModel.record['amendmentType'+amendmentType.id]
+                  "
                   no-cols=true
                   input="{
                     key: 'new_user_id',
                     title: t( 'amendment.newUser' ),
                     type: model.inputList.new_user_id.type,
                     typeahead: model.inputList.new_user_id.typeahead
+                  }"
+                  model="model">
+                </cn-view-input-with-differences>
+                <cn-view-input-with-differences
+                  ng-if="
+                    'trainee' == amendmentType.newUser &&
+                    model.viewModel.record['amendmentType'+amendmentType.id]
+                  "
+                  no-cols=true
+                  input="{
+                    key: 'new_trainee_user_id',
+                    title: t( 'amendment.newTraineeUser' ),
+                    type: model.inputList.new_trainee_user_id.type,
+                    typeahead: model.inputList.new_trainee_user_id.typeahead
                   }"
                   model="model">
                 </cn-view-input-with-differences>

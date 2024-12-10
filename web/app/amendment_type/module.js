@@ -11,7 +11,7 @@ cenozoApp.defineModule({
       },
       columnList: {
         rank: { title: "Rank", type: "rank" },
-        new_user: { title: "Request New User", type: "boolean" },
+        new_user: { title: "Request New User", type: "string" },
         show_in_description: { title: "Show in Description", type: "boolean" },
         reason_en: { title: "Reason (English)" },
         reason_fr: { title: "Reason (French)" },
@@ -29,7 +29,7 @@ cenozoApp.defineModule({
       },
       new_user: {
         title: "Request New User",
-        type: "boolean",
+        type: "enum",
       },
       show_in_description: {
         title: "Show in Description",

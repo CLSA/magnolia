@@ -1017,13 +1017,21 @@ cenozo.service("CnLocalization", [
               en: "Please provide the name of the new primary applicant",
               fr: "Veuillez fournir le nom du nouveau demandeur principal",
             },
+            newTraineeUser: {
+              en: "Please provide the name of the new trainee",
+              fr: "Please provide the name of the new trainee", // TODO: TRANSLATE
+            },
             newUserNotice: {
               en: "Changing the primary applicant, once approved, will remove your access to this application and transfer ownership to the new applicant.\n\nAre you sure you wish to proceed?",
               fr: "Une fois approuvé, le changement de demandeur principal supprimera votre accès à cette demande et la propriété du compte sera transférée au nouveau demandeur.\n\nÊtes-vous sûr(e) de vouloir continuer?",
             },
-            newUserIsTraineeNotice: {
+            newPrimaryIsTraineeNotice: {
               en: "The applicant you have selected is a trainee.  Please select a new applicant which does not have a supervisor.",
               fr: "Le demandeur que vous avez sélectionné est un stagiaire. Veuillez sélectionner un nouveau demandeur qui n’a pas de superviseur.",
+            },
+            newTraineeIsPrimaryNotice: {
+              en: "The trainee you have selected is not a trainee.  Please select a new trainee which has a supervisor.",
+              fr: "The trainee you have selected is not a trainee.  Please select a new trainee which has a supervisor.", // TODO: TRANSLATE
             },
             justification: {
               en: "Justification (<strong>maximum 2500 characters</strong>)",
@@ -1605,13 +1613,21 @@ cenozo.service("CnLocalization", [
               en: "There are mandatory fields which are missing. You will now be redirected to where the incomplete fields can be found. Please try re-submitting once all mandatory fields have been filled out.",
               fr: "Des champs obligatoires sont manquants. Vous serez redirigé vers l’endroit où se trouvent les champs incomplets. Veuillez soumettre la demande d’accès à nouveau quand tous les champs obligatoires auront été remplis.",
             },
-            invalidNewApplicantTitle: {
+            invalidNewPrimaryTitle: {
               en: "Invalid applicant",
               fr: "Demandeur incorrect",
             },
-            invalidNewApplicantMessage: {
+            invalidNewPrimaryMessage: {
               en: "It is not possible to change the primary applicant to the user you have selected because their role in the system is not that of an applicant.  Please try selecting a different user.",
               fr: "Il n’est pas possible de remplacer le demandeur principal par l’utilisateur que vous avez sélectionné, car cet utilisateur n’a pas le rôle de demandeur. Veuillez essayer de sélectionner un autre utilisateur.",
+            },
+            invalidNewTraineeTitle: {
+              en: "Invalid trainee",
+              fr: "Invalid trainee", // TODO: TRANSLATE
+            },
+            invalidNewTraineeMessage: {
+              en: "It is not possible to change the trainee to the user you have selected because their role in the system is not that of an applicant.  Please try selecting a different user.",
+              fr: "It is not possible to change the trainee to the user you have selected because their role in the system is not that of an applicant.  Please try selecting a different user.", // TODO: TRANSLATE
             },
             invalidStartDateTitle: {
               en: "Invalid start date",

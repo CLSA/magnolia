@@ -142,6 +142,12 @@ class module extends \cenozo\service\module
       // include supplemental data
       $modifier->left_join( 'user', 'reqn_version.new_user_id', 'new_user.id', 'new_user' );
       $select->add_column( 'CONCAT( new_user.first_name, " ", new_user.last_name )', 'formatted_new_user_id', false );
+      $modifier->left_join( 'user', 'reqn_version.new_trainee_user_id', 'new_trainee_user.id', 'new_trainee_user' );
+      $select->add_column(
+        'CONCAT( new_trainee_user.first_name, " ", new_trainee_user.last_name )',
+        'formatted_new_trainee_user_id',
+        false
+      );
       $select->add_table_column( 'applicant_country', 'name', 'formatted_applicant_country_id' );
       $select->add_table_column( 'trainee_country', 'name', 'formatted_trainee_country_id' );
 
