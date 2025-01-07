@@ -31,6 +31,14 @@ class data_release_update extends \cenozo\business\report\base_report
     $modifier->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
     $modifier->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
 
+    // join to the current stage type
+    $join_mod = lib::create( 'database\modifier' );
+    $join_mod->where( 'reqn.id', '=', 'last_stage.reqn_id', false );
+    $join_mod->where( 'last_stage.datetime', '=', NULL );
+    $modifier->join_modifier( 'stage', $join_mod, '', 'last_stage' );
+    $modifier->join( 'stage_type', 'last_stage.stage_type_id', 'last_stage_type.id', '', 'last_stage_type' );
+    $modifier->where( 'last_stage_type.name', '!=', 'New' );
+
     // only display reqns that have not reached the final report
     $db_stage_type = $stage_type_class_name::get_unique_record( 'name', 'Report Required' );
 
