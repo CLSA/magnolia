@@ -22,38 +22,78 @@ class data_release_update extends \cenozo\business\report\base_report
     $reqn_class_name = lib::get_class_name( 'database\reqn' );
     $stage_type_class_name = lib::get_class_name( 'database\stage_type' );
 
+    $agreement_stage_type_id = $stage_type_class_name::get_unique_record( 'name', 'Agreement' )->id;
+    $dm_stage_type_id = $stage_type_class_name::get_unique_record( 'name', 'Decision Made' )->id;
+
     $data = array();
 
     $select = lib::create( 'database\select' );
     $modifier = lib::create( 'database\modifier' );
 
     $select->from( 'reqn' );
+
+    // determine whether the reqn_type includes the decision made stage
+    $modifier->join( 'reqn_type', 'reqn.reqn_type_id', 'reqn_type.id' );
+    $join_mod = lib::create( 'database\modifier' );
+    $join_mod->where( 'reqn_type.id', '=', 'reqn_type_has_stage_type.reqn_type_id', false );
+    $join_mod->where( 'reqn_type_has_stage_type.stage_type_id', '=', $dm_stage_type_id );
+    $modifier->join_modifier( 'reqn_type_has_stage_type', $join_mod, 'left' );
+
     $modifier->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
     $modifier->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
 
     // join to the current stage type
     $join_mod = lib::create( 'database\modifier' );
-    $join_mod->where( 'reqn.id', '=', 'last_stage.reqn_id', false );
-    $join_mod->where( 'last_stage.datetime', '=', NULL );
-    $modifier->join_modifier( 'stage', $join_mod, '', 'last_stage' );
-    $modifier->join( 'stage_type', 'last_stage.stage_type_id', 'last_stage_type.id', '', 'last_stage_type' );
-    $modifier->where( 'last_stage_type.name', '!=', 'New' );
+    $join_mod->where( 'reqn.id', '=', 'current_stage.reqn_id', false );
+    $join_mod->where( 'current_stage.datetime', '=', NULL );
+    $modifier->join_modifier( 'stage', $join_mod, '', 'current_stage' );
+    $modifier->join(
+      'stage_type',
+      'current_stage.stage_type_id',
+      'current_stage_type.id',
+      '',
+      'current_stage_type'
+    );
 
-    // only display reqns that have not reached the final report
-    $db_stage_type = $stage_type_class_name::get_unique_record( 'name', 'Report Required' );
+    // do not include reqns not currently in the review or active phase
+    $modifier->where( 'current_stage_type.phase', 'IN', ['review', 'active'] );
 
-    $modifier->join( 'data_release', 'reqn.id', 'data_release.reqn_id' );
+    // determine whether the reqn has reached a non-amendment agreement stage type
     $join_mod = lib::create( 'database\modifier' );
-    $join_mod->where( 'reqn.id', '=', 'stage.reqn_id', false );
-    $join_mod->where( 'stage.stage_type_id', '=', $db_stage_type->id );
-    $modifier->join_modifier( 'stage', $join_mod, 'left' );
-    $modifier->where( 'stage.id', '=', NULL );
+    $join_mod->where( 'reqn.id', '=', 'agreement_stage.reqn_id', false );
+    $join_mod->where( 'agreement_stage.stage_type_id', '=', $agreement_stage_type_id );
+    $join_mod->where( 'agreement_stage.amendment', '=', '.' );
+    $modifier->join_modifier( 'stage', $join_mod, 'left', 'agreement_stage' );
+
+    // determine whether the reqn has reached a non-amendment decision made stage type
+    $join_mod = lib::create( 'database\modifier' );
+    $join_mod->where( 'reqn.id', '=', 'dm_stage.reqn_id', false );
+    $join_mod->where( 'dm_stage.stage_type_id', '=', $dm_stage_type_id );
+    $join_mod->where( 'dm_stage.amendment', '=', '.' );
+    $modifier->join_modifier( 'stage', $join_mod, 'left', 'dm_stage' );
+
+    $modifier->where_bracket( true );
+
+    // reqn types that do not have a decision made stage type must have reached the agreement stage
+    $modifier->where_bracket( true );
+    $modifier->where( 'reqn_type_has_stage_type.stage_type_id', '=', NULL );
+    $modifier->where( 'agreement_stage.id', '!=', NULL );
+    $modifier->where_bracket( false );
+    
+    // reqn types that have a decision made stage type must have reached it
+    $modifier->where_bracket( true, true );
+    $modifier->where( 'reqn_type_has_stage_type.stage_type_id', '!=', NULL );
+    $modifier->where( 'dm_stage.id', '!=', NULL );
+    $modifier->where_bracket( false );
+    
+    $modifier->where_bracket( false );
+
+    $modifier->group( 'reqn.id' );
 
     // join to tables that include columns in the report
     $modifier->join( 'user', 'reqn.user_id', 'user.id' );
     $modifier->join( 'user', 'reqn.trainee_user_id', 'trainee_user.id', 'left', 'trainee_user' );
     $modifier->join( 'user', 'reqn.designate_user_id', 'designate_user.id', 'left', 'designate_user' );
-    $modifier->group( 'reqn.id' );
     $modifier->order( 'reqn.identifier' );
 
     $select->add_column( 'Identifier', 'Identifier' );
@@ -76,6 +116,8 @@ class data_release_update extends \cenozo\business\report\base_report
     // set up requirements
     $this->apply_restrictions( $modifier );
 
+    // make sure the reqn includes the data release if interest
+    $modifier->join( 'data_release', 'reqn.id', 'data_release.reqn_id' );
     foreach( $this->get_restriction_list() as $restriction )
       if( 'data_version' == $restriction['name'] )
         $modifier->where( 'data_release.data_version_id', '=', $restriction['value'] );
