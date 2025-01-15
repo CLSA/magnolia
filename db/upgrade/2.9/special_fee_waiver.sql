@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS special_fee_waiver (
   name VARCHAR(45) NOT NULL,
   start_date DATE NOT NULL,
   end_date DATE NOT NULL,
+  description TEXT NULL DEFAULT NULL,
   PRIMARY KEY (id),
   UNIQUE INDEX uq_name (name ASC))
 ENGINE = InnoDB;

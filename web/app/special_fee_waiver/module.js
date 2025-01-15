@@ -16,6 +16,7 @@ cenozoApp.defineModule({
         start_date: { title: "Start", type: "date" },
         end_date: { title: "End", type: "date" },
         reqn_count: { title: "Requisitions" },
+        description: { title: "Description", align: "left" },
       },
       defaultOrder: {
         column: "name",
@@ -37,6 +38,10 @@ cenozoApp.defineModule({
         title: "End Date",
         type: "date",
         min: "start_date",
+      },
+      description: {
+        title: "Description",
+        type: "text",
       },
     });
   },
