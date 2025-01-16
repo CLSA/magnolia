@@ -212,12 +212,12 @@
                 </cn-view-input-with-differences>
               </li>
               <li class="list-group-item">
-                <p class="text-primary" ng-bind-html="t( 'part_2.objectives_description' )"></p>
+                <p class="text-primary" ng-bind-html="t( 'part_2.objectives_description_1' )"></p>
                 <cn-view-input-with-differences
                   input="{
                     key: 'objectives',
                     title:
-                      t( 'part_2.objectives' ) + '<br><span class=text-info>(' +
+                      t( 'part_2.objectives' ) + ' <span class=text-info>(' +
                       model.viewModel.charCount.objectives + ' ' + t( 'misc.chars' ) + ')</span>',
                     type: 'text',
                     maxLength: 1500
@@ -226,6 +226,7 @@
                   difference="model.viewModel.compareRecord.differences.part_2.objectives"
                   model="model">
                 </cn-view-input-with-differences>
+                <p class="text-primary" ng-bind-html="t( 'part_2.objectives_description_2' )"></p>
               </li>
             </ul>
           </div>
@@ -298,8 +299,7 @@
               <li class="list-group-item">
                 <p class="text-primary" ng-bind-html="t( 'part_3.clsa_reference_description' )"></p>
                 <ul class="list-group container allow-select">
-                  <li class="list-group-item text-muted" ng-bind-html="t( 'part_3.clsa_reference_ref1' )"></li>
-                  <li class="list-group-item text-muted" ng-bind-html="t( 'part_3.clsa_reference_ref2' )"></li>
+                  <li class="list-group-item text-muted" ng-bind-html="t( 'part_3.clsa_reference_ref' )"></li>
                 </ul>
                 <cn-view-input-with-differences
                   input="{

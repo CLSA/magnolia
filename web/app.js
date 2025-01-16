@@ -1786,8 +1786,13 @@ cenozo.service("CnLocalization", [
               en: "The CLSA Publication Policy requires that all authors on a manuscript who have accessed the CLSA data have signed Schedule F and are listed under the Project Team in Magnolia. Please verify that this requirement has been met for this manuscript.",
               fr: "The CLSA Publication Policy requires that all authors on a manuscript who have accessed the CLSA data have signed Schedule F and are listed under the Project Team in Magnolia. Please verify that this requirement has been met for this manuscript.", // TODO: TRANSLATE
             },
-            objectives_description: {
-              en: "Results presented in the manuscript must be in accordance with the research objectives of the approved project.  CLSA design features (inclusion/exclusion criteria, sampling strategy, data collection procedures, etc.) if included in the manuscript, must be described accurately. Please refer to the relevant CLSA Protocol, available for download under the Researchers section of our website.  Authors are asked to identify and state below how the specific objectives in the approved application relate to this manuscript.",
+            objectives_description_1: {
+              en: "Results presented in the manuscript must be in accordance with the research objectives of the approved project. Authors are asked to identify and state below which specific objectives in the approved application relate to this manuscript.",
+              fr: "Results presented in the manuscript must be in accordance with the research objectives of the approved project. Authors are asked to identify and state below which specific objectives in the approved application relate to this manuscript.", // TODO: TRANSLATE
+            },
+            objectives_description_2: {
+              en: 'CLSA design features (inclusion/exclusion, sampling strategy, data collection procedures, etc.) if included in the manuscript, must be described accurately. Please refer to the relevant CLSA Protocol, available for download under the <a href="https://www.clsa-elcv.ca/resource-types/protocols/" target="researcher_resources">Researcher Resources</a> section of our website.',
+              fr: 'CLSA design features (inclusion/exclusion, sampling strategy, data collection procedures, etc.) if included in the manuscript, must be described accurately. Please refer to the relevant CLSA Protocol, available for download under the <a href="https://www.clsa-elcv.ca/fr-ca/resource-types/protocols/" target="researcher_resources">Researcher Resources</a> section of our website.', // TODO: TRANSLATE
             },
             objectives: {
               en: "Objective(s) related to this manuscript (<strong>maximum 1500 characters</strong>)",
@@ -1801,8 +1806,8 @@ cenozo.service("CnLocalization", [
               fr: "Requirements as per the CLSA Publication and Promotion Policy", // TODO: TRANSLATE
             },
             clsa_title_description: {
-              en: "The abbreviation ‘CLSA’ must be included in the title of the manuscript or the name of the platform, fully spelled out as ‘Canadian Longitudinal Study on Aging’ may also be used.",
-              fr: "The abbreviation ‘CLSA’ must be included in the title of the manuscript or the name of the platform, fully spelled out as ‘Canadian Longitudinal Study on Aging’ may also be used.", // TODO: TRANSLATE
+              en: "The abbreviation ‘CLSA’ must be included in the title of the manuscript, or the name of the platform fully spelled out as ‘Canadian Longitudinal Study on Aging’ may also be used.",
+              fr: "The abbreviation ‘CLSA’ must be included in the title of the manuscript, or the name of the platform fully spelled out as ‘Canadian Longitudinal Study on Aging’ may also be used.", // TODO: TRANSLATE
             },
             clsa_title: {
               en: "Has this requirement been met?",
@@ -1825,14 +1830,10 @@ cenozo.service("CnLocalization", [
               fr: "Please provide a justification for why this requirement could not be met.", //TODO: TRANSLATE
             },
             clsa_reference_description: {
-              en: "One of the articles below must be referenced:",
-              fr: "One of the articles below must be referenced:", //TODO: TRANSLATE
+              en: "The following article must be referenced:",
+              fr: "The following article must be referenced:", //TODO: TRANSLATE
             },
-            clsa_reference_ref1: {
-              en: "Raina P., Wolfson C., Kirkland S., Griffith L.E., Oremus M., Patterson C., Tuokko H., Penning M., Balion C.M., Hogan D., Wister A., Payette H., Shannon H., Brazil K. (2009) The Canadian Longitudinal Study on Aging (CLSA). Canadian Journal on Aging, Special Issue on the CLSA, Volume 28, Issue 3, 221–229. https://doi.org/10.1017/S0714980809990055",
-              fr: "Raina P., Wolfson C., Kirkland S., Griffith L.E., Oremus M., Patterson C., Tuokko H., Penning M., Balion C.M., Hogan D., Wister A., Payette H., Shannon H., Brazil K. (2009) The Canadian Longitudinal Study on Aging (CLSA). Canadian Journal on Aging, Special Issue on the CLSA, Volume 28, Issue 3, 221–229. https://doi.org/10.1017/S0714980809990055",
-            },
-            clsa_reference_ref2: {
+            clsa_reference_ref: {
               en: " Raina P, Wolfson C., Kirkland S, Griffith L.E., Balion C., Cossette B., Dionne I., Hofer S., Hogan D., van den Heuvel E.R., Liu-Ambrose T., Menec V., Mugford G., Patterson C., Payette H., Richards B., Shannon H., Sheets D., Taler V., Thompson M., Tuokko H., Wister A., Wu C., Young L. (2019) Cohort profile: The Canadian Longitudinal Study on Aging (CLSA). International Journal of Epidemiology, Volume 48, Issue 6, 1752-1753j, https://doi.org/10.1093/ije/dyz173",
               fr: " Raina P, Wolfson C., Kirkland S, Griffith L.E., Balion C., Cossette B., Dionne I., Hofer S., Hogan D., van den Heuvel E.R., Liu-Ambrose T., Menec V., Mugford G., Patterson C., Payette H., Richards B., Shannon H., Sheets D., Taler V., Thompson M., Tuokko H., Wister A., Wu C., Young L. (2019) Cohort profile: The Canadian Longitudinal Study on Aging (CLSA). International Journal of Epidemiology, Volume 48, Issue 6, 1752-1753j, https://doi.org/10.1093/ije/dyz173",
             },
@@ -1888,16 +1889,16 @@ cenozo.service("CnLocalization", [
               en: "There are no data versions associated with your application.", // TODO: TRANSLATE
             },
             data_version_list: {
-              en: "List of data version which may need to be included:",
-              fr: "List of data version which may need to be included:", // TODO: TRANSLATE
+              en: "List of data versions which may need to be included:",
+              fr: "List of data versions which may need to be included:", // TODO: TRANSLATE
             },
             acknowledgment: {
               en: "Please provide the manuscript's full acknowledgment:",
               fr: "Please provide the manuscript's full acknowledgment:", // TODO: TRANSLATE
             },
             dataset_version_description: {
-              en: "Please note that in any presentations and publications you should always refer to the appropriate dataset version number. If new sample weights were used with an earlier dataset version than Baseline Tracking (TRM) version 3.6 and Baseline Comprehensive (COM) version 4.2, please make sure you mention that you are using the CLSA Sample Weights Version 1.2.",
-              fr: "Please note that in any presentations and publications you should always refer to the appropriate dataset version number. If new sample weights were used with an earlier dataset version than Baseline Tracking (TRM) version 3.6 and Baseline Comprehensive (COM) version 4.2, please make sure you mention that you are using the CLSA Sample Weights Version 1.2.", // TODO: TRANSLATE
+              en: "Please note that in any publications you should always refer to the appropriate dataset version number. If new sample weights were used with an earlier dataset version than Baseline Tracking (TRM) version 3.6 and Baseline Comprehensive (COM) version 4.2, please make sure you mention that you are using the CLSA Sample Weights Version 1.2.",
+              fr: "Please note that in any publications you should always refer to the appropriate dataset version number. If new sample weights were used with an earlier dataset version than Baseline Tracking (TRM) version 3.6 and Baseline Comprehensive (COM) version 4.2, please make sure you mention that you are using the CLSA Sample Weights Version 1.2.", // TODO: TRANSLATE
             },
             dataset_version: {
               en: "Has this requirement been met?",
@@ -1972,8 +1973,8 @@ cenozo.service("CnLocalization", [
               en: "Underrepresented Groups", // TODO: TRANSLATE
             },
             indigenous: {
-              en: "Does the paper refer to any of the following underrepresented group: Indigenous Persons?",
-              fr: "Does the paper refer to any of the following underrepresented group: Indigenous Persons?", // TODO: TRANSLATE
+              en: "Were Indigenous self-identifiers used in the analysis described in this manuscript?",
+              fr: "Were Indigenous self-identifiers used in the analysis described in this manuscript?", // TODO: TRANSLATE
             },
           },
           misc: {
