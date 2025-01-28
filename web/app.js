@@ -1888,13 +1888,17 @@ cenozo.service("CnLocalization", [
               en: "There are no data versions associated with your application.",
               en: "There are no data versions associated with your application.", // TODO: TRANSLATE
             },
-            data_version_list: {
-              en: "List of data versions which may need to be included:",
-              fr: "List of data versions which may need to be included:", // TODO: TRANSLATE
+            data_version_list_1: {
+              en: "These are the data versions that you received:",
+              fr: "These are the data versions that you received:", // TODO: TRANSLATE
+            },
+            data_version_list_2: {
+              en: "Please include the data versions that were used in the preparation of this manuscript.",
+              fr: "Please include the data versions that were used in the preparation of this manuscript.", // TODO: TRANSLATE
             },
             acknowledgment: {
-              en: "Please provide the manuscript's full acknowledgment:",
-              fr: "Please provide the manuscript's full acknowledgment:", // TODO: TRANSLATE
+              en: "Please provide the full acknowledgement statement as it appears in the manuscript:",
+              fr: "Please provide the full acknowledgement statement as it appears in the manuscript:", // TODO: TRANSLATE
             },
             dataset_version_description: {
               en: "Please note that in any publications you should always refer to the appropriate dataset version number. If new sample weights were used with an earlier dataset version than Baseline Tracking (TRM) version 3.6 and Baseline Comprehensive (COM) version 4.2, please make sure you mention that you are using the CLSA Sample Weights Version 1.2.",
@@ -1961,8 +1965,8 @@ cenozo.service("CnLocalization", [
               fr: "Please provide a justification for why this requirement could not be met.", // TODO: TRANSLATE
             },
             conditions_description: {
-              en: 'Please ensure that the Supplementary Conditions of Use are respected (if applicable), as described in the <a href="https://www.clsa-elcv.ca/resource-types/publication-policy-for-data-users/" target="conditions">CLSA Publication and Promotion Policy</a>, Appendix 2.',
-              fr: 'Please ensure that the Supplementary Conditions of Use are respected (if applicable), as described in the <a href="https://www.clsa-elcv.ca/fr-ca/resource-types/publication-policy-for-data-users/" target="conditions">CLSA Publication and Promotion Policy</a>, Appendix 2.', // TODO: TRANSLATE
+              en: 'Please ensure that the Supplementary Conditions of Use, as described in Appendix 2 (page 6) of the <a href="https://www.clsa-elcv.ca/resource-types/publication-policy-for-data-users/" target="conditions">CLSA Publication and Promotion Policy</a>, are respected for certain scales, tests and measures included in the CLSA datasets.',
+              fr: 'Please ensure that the Supplementary Conditions of Use, as described in Appendix 2 (page 6) of the <a href="https://www.clsa-elcv.ca/fr-ca/resource-types/publication-policy-for-data-users/" target="conditions">CLSA Publication and Promotion Policy</a>, are respected for certain scales, tests and measures included in the CLSA datasets.', // TODO: TRANSLATE
             },
             conditions: {
               en: "Has this requirement been met?",
@@ -1973,8 +1977,8 @@ cenozo.service("CnLocalization", [
               en: "Underrepresented Groups", // TODO: TRANSLATE
             },
             indigenous: {
-              en: "Were Indigenous self-identifiers used in the analysis described in this manuscript?",
-              fr: "Were Indigenous self-identifiers used in the analysis described in this manuscript?", // TODO: TRANSLATE
+              en: "Were Indigenous self-identifiers used in any analysis described in this manuscript?",
+              fr: "Were Indigenous self-identifiers used in any analysis described in this manuscript?", // TODO: TRANSLATE
             },
           },
           misc: {

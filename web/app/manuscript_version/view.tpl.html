@@ -180,7 +180,7 @@
                   difference="model.viewModel.compareRecord.differences.part_2.authors"
                   model="model">
                 </cn-view-input-with-differences>
-                <p class="text-primary" ng-bind-html="t( 'part_2.authors_description' )"></p>
+                <strong class="text-primary" ng-bind-html="t( 'part_2.authors_description' )"></strong>
                 <cn-view-input-with-differences
                   input="{
                     key: 'authors_check',
@@ -398,8 +398,9 @@
                   ng-bind-html="t( 'part_4.no_data_versions' )"
                 ></p>
                 <p class="container-fluid allow-select" ng-show="0 < model.viewModel.dataVersionList.length">
-                  {{ t( 'part_4.data_version_list' ) }}
-                  {{ model.viewModel.dataVersionList.join(', ') }}
+                  {{ t( 'part_4.data_version_list_1' ) }}
+                  {{ model.viewModel.dataVersionList.join(', ') }}.
+                  {{ t( 'part_4.data_version_list_2' ) }}
                 </p>
                 <cn-view-input-with-differences
                   input="{
