@@ -341,7 +341,7 @@ cenozo.factory("CnBaseFormModelFactory", [
               var self = this;
               trail = [
                 {
-                  title: this.module.name.plural.ucWords(),
+                  title: 'Requisitions',
                   go: async function () { await $state.go("reqn.list"); },
                 },
                 {
@@ -356,7 +356,7 @@ cenozo.factory("CnBaseFormModelFactory", [
                 {
                   title:
                     this.module.name.singular.ucWords() +
-                    " version " + this.viewModel.record.version_name,
+                    " " + this.viewModel.record.version_name,
                 },
               ];
             }
@@ -1007,7 +1007,7 @@ cenozo.service("CnLocalization", [
             },
             text3: {
               en: "Please indicate the purpose of your amendment request. (Check ALL that apply):",
-              fr: "Veuillez indiquer le motif de votre demande de modification (cochez toutes les cases qui s’appliquent) :",
+              fr: "Veuillez indiquer le motif de votre demande de modification (cochez toutes les cases qui s’appliquent) :",
             },
             atLeastOne: {
               en: "You must select at least one reason for your amendment request.",
@@ -1151,11 +1151,11 @@ cenozo.service("CnLocalization", [
               },
               text3: {
                 en: "Project duration: The length of time you propose to use the CLSA data for analysis. You may choose 2 or 3 years.",
-                fr: "Durée du projet : la durée pendant laquelle vous proposez d’utiliser les données de l’ÉLCV à des fins d’analyse. Vous pouvez choisir entre 2 ou 3 ans.",
+                fr: "Durée du projet : la durée pendant laquelle vous proposez d’utiliser les données de l’ÉLCV à des fins d’analyse. Vous pouvez choisir entre 2 ou 3 ans.",
               },
               text4: {
                 en: "Agreement duration: An approved project will have an additional two years beyond the project duration to complete all work, and to disseminate the results in the form of manuscripts or presentations, as noted within the CLSA Access Agreement.",
-                fr: "Durée de l’entente : un projet approuvé disposera de deux années supplémentaires au-delà de la durée du projet pour achever tous les travaux et diffuser les résultats sous la forme de manuscrits et de présentations, tel qu’indiqué dans l’entente d’accès aux données de l’ÉLCV.",
+                fr: "Durée de l’entente : un projet approuvé disposera de deux années supplémentaires au-delà de la durée du projet pour achever tous les travaux et diffuser les résultats sous la forme de manuscrits et de présentations, tel qu’indiqué dans l’entente d’accès aux données de l’ÉLCV.",
               },
               deadline: {
                 en: "Application submission deadline",
@@ -1327,7 +1327,7 @@ cenozo.service("CnLocalization", [
               },
               text1: {
                 en: 'Please select the cohort (Tracking and/or Comprehensive - YOU MUST SELECT "YES" FOR AT LEAST ONE COHORT) for which you are requesting data:',
-                fr: "Veuillez sélectionner la cohorte (surveillance et/ou globale) pour laquelle vous demandez des données (VOUS DEVEZ SÉLECTIONNER AU MOINS UNE COHORTE) :",
+                fr: "Veuillez sélectionner la cohorte (surveillance et/ou globale) pour laquelle vous demandez des données (VOUS DEVEZ SÉLECTIONNER AU MOINS UNE COHORTE) :",
               },
               text2: {
                 en: "You will be able to make your selection of the wave of data collection (Baseline and/or Follow-up 1) within the Data Checklist.",
@@ -1339,7 +1339,7 @@ cenozo.service("CnLocalization", [
               },
               trackingHelp: {
                 en: "Participants providing data through telephone interviews only. No physical assessment data, medications data or biomarker data are available for this cohort. For further information on what data are available for the Tracking Cohort, consult the CLSA Data Availability Table on our website.",
-                fr: "Cohorte de surveillance (entrevue téléphonique) : Les participants de cette cohorte fournissent des données uniquement via une entrevue téléphonique. Aucune donnée sur les tests physiques, les médicaments ou les biomarqueurs n’est disponible pour cette cohorte. Pour plus d’informations sur les données disponibles pour la cohorte de surveillance, consultez le tableau de disponibilité des données de l’ÉLCV sur notre site Web.",
+                fr: "Cohorte de surveillance (entrevue téléphonique) : Les participants de cette cohorte fournissent des données uniquement via une entrevue téléphonique. Aucune donnée sur les tests physiques, les médicaments ou les biomarqueurs n’est disponible pour cette cohorte. Pour plus d’informations sur les données disponibles pour la cohorte de surveillance, consultez le tableau de disponibilité des données de l’ÉLCV sur notre site Web.",
               },
               comprehensive: {
                 en: "Comprehensive Cohort (In-home Interview & DCS visit)",
@@ -1347,11 +1347,11 @@ cenozo.service("CnLocalization", [
               },
               comprehensiveHelp: {
                 en: "Participants providing data through an In-home interview and during a visit to a Data Collection Site. Physical assessment, medications and biomarker data are available for this cohort only. For further information on what data are available for the Tracking Cohort, consult the CLSA Data Availability Table on our website.",
-                fr: "Cohorte globale (entrevue à domicile et visite à un Site de collecte de données) : Les participants de cette cohorte fournissent des données via une entrevue à domicile et une visite à un Site de collecte de données. Les tests physiques, les médicaments et les données sur les biomarqueurs sont disponibles pour cette cohorte uniquement. Pour plus d’informations sur les données disponibles pour la cohorte globale, consultez le tableau de disponibilité des données de l’ÉLCV sur notre site Web.",
+                fr: "Cohorte globale (entrevue à domicile et visite à un Site de collecte de données) : Les participants de cette cohorte fournissent des données via une entrevue à domicile et une visite à un Site de collecte de données. Les tests physiques, les médicaments et les données sur les biomarqueurs sont disponibles pour cette cohorte uniquement. Pour plus d’informations sur les données disponibles pour la cohorte globale, consultez le tableau de disponibilité des données de l’ÉLCV sur notre site Web.",
               },
               bothCohortNotice: {
                 en: 'Please be sure to fully explain in "Part 1 - Description" section of your application, how you will use the data from both the Tracking and Comprehensive cohorts in your analyses, accounting for the differences in the data available for each cohort. For further information on what data are available for the Tracking and Comprehensive Cohort, consult the CLSA Data Availability Table on our website.',
-                fr: "À la « Partie 1 - Description » de votre demande d’accès, assurez-vous de bien expliquer comment les données des cohortes globale et de surveillance seront utilisées dans vos analyses, en tenant compte des différences entre les données disponibles pour chaque cohorte. Pour plus d’informations sur les données disponibles pour la cohorte de surveillance et la cohorte globale, consultez le tableau de disponibilité des données de l’ÉLCV sur notre site Web.",
+                fr: "À la « Partie 1 - Description » de votre demande d’accès, assurez-vous de bien expliquer comment les données des cohortes globale et de surveillance seront utilisées dans vos analyses, en tenant compte des différences entre les données disponibles pour chaque cohorte. Pour plus d’informations sur les données disponibles pour la cohorte de surveillance et la cohorte globale, consultez le tableau de disponibilité des données de l’ÉLCV sur notre site Web.",
               },
               longitudinal: {
                 en: "Is this project part of longitudinal or integrative analyses involving previously approved project using CLSA data?",
@@ -1546,7 +1546,7 @@ cenozo.service("CnLocalization", [
             },
             confirmNoCoapplicants: {
               en: "Are you sure that you wish to submit the application without including any co-applicants?\n\nIf you wish to add co-applicants to the project team, then please click \"No\" so that you may provide them before submitting your application.  Otherwise, clicking \"Yes\" will submit your application without any co-applicants.",
-              fr: "Souhaitez-vous soumettre la demande sans aucun co-demandeur ou co-demandeuse? Si vous souhaitez ajouter des co-demandeurs ou co-demandeuses à l’équipe de projet, veuillez cliquer sur « Non » afin de pouvoir les ajouter avant de soumettre la demande. Sinon, cliquez sur « Oui » pour soumettre la demande sans co-demandeur ou co-demandeuse.",
+              fr: "Souhaitez-vous soumettre la demande sans aucun co-demandeur ou co-demandeuse? Si vous souhaitez ajouter des co-demandeurs ou co-demandeuses à l’équipe de projet, veuillez cliquer sur « Non » afin de pouvoir les ajouter avant de soumettre la demande. Sinon, cliquez sur « Oui » pour soumettre la demande sans co-demandeur ou co-demandeuse.",
             },
             missingCoapplicantCountryMessage: {
               en: "You must include the country of all co-applicants.",
@@ -1901,8 +1901,8 @@ cenozo.service("CnLocalization", [
               fr: "Please provide the full acknowledgement statement as it appears in the manuscript:", // TODO: TRANSLATE
             },
             dataset_version_description: {
-              en: "Please note that in any publications you should always refer to the appropriate dataset version number. If new sample weights were used with an earlier dataset version than Baseline Tracking (TRM) version 3.6 and Baseline Comprehensive (COM) version 4.2, please make sure you mention that you are using the CLSA Sample Weights Version 1.2.",
-              fr: "Please note that in any publications you should always refer to the appropriate dataset version number. If new sample weights were used with an earlier dataset version than Baseline Tracking (TRM) version 3.6 and Baseline Comprehensive (COM) version 4.2, please make sure you mention that you are using the CLSA Sample Weights Version 1.2.", // TODO: TRANSLATE
+              en: "Please note that in any publications you should always refer to the appropriate dataset version number. If new sample weights were used with an earlier dataset version than Baseline Tracking (TRM) version 3.6 and Baseline Comprehensive (COM) version 4.2, please make sure you mention that you are using the CLSA Sample Weights Version 1.2.",
+              fr: "Please note that in any publications you should always refer to the appropriate dataset version number. If new sample weights were used with an earlier dataset version than Baseline Tracking (TRM) version 3.6 and Baseline Comprehensive (COM) version 4.2, please make sure you mention that you are using the CLSA Sample Weights Version 1.2.", // TODO: TRANSLATE
             },
             dataset_version: {
               en: "Has this requirement been met?",
@@ -2100,7 +2100,7 @@ cenozo.service("CnLocalization", [
               },
               findings: {
                 en: "Please provide a lay summary of the key findings to be posted on the CLSA website (1500 characters).",
-                fr: "Veuillez fournir un résumé non scientifique des principaux résultats qui sera publié sur le site Web de l’ÉLCV (1 500 caractères).",
+                fr: "Veuillez fournir un résumé non scientifique des principaux résultats qui sera publié sur le site Web de l’ÉLCV (1 500 caractères).",
               },
               noFindings: {
                 en: "Please provide an explanation why the objectives were not achieved (1500 characters).",

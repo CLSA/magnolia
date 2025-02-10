@@ -11,7 +11,7 @@ This is a reminder that your CLSA Access Agreement, for project number {{identif
 The CLSA Data Access Team",
   message_fr = "Bonjour Dr / Dre {{applicant_name}},
 
-La présente est un rappel que votre Entente d’accès aux données de l’ÉLCV, pour le projet numéro {{identifier}}, intitulé « {{title}} », expirera dans environ deux (2) mois. Une fois l’entente expirée, vous devrez soumettre un rapport final à l’ÉLCV, en plus de cesser l’analyse des données et de détruire tous les matériaux transférés en votre possession. À la suite de la résiliation de l’entente, le droit de publication de l’utilisateur autorisé prendra également fin, conformément à la section 8 de l’entente. Si vous avez besoin d’une prolongation de l’entente pour terminer l’analyse ou pour publier vos résultats, veuillez nous contacter immédiatement à access@clsa-elcv.ca.
+La présente est un rappel que votre Entente d’accès aux données de l’ÉLCV, pour le projet numéro {{identifier}}, intitulé « {{title}} », expirera dans environ deux (2) mois. Une fois l’entente expirée, vous devrez soumettre un rapport final à l’ÉLCV, en plus de cesser l’analyse des données et de détruire tous les matériaux transférés en votre possession. À la suite de la résiliation de l’entente, le droit de publication de l’utilisateur autorisé prendra également fin, conformément à la section 8 de l’entente. Si vous avez besoin d’une prolongation de l’entente pour terminer l’analyse ou pour publier vos résultats, veuillez nous contacter immédiatement à access@clsa-elcv.ca.
 
 L’équipe d’accès aux données de l’ÉLCV";
 
@@ -32,38 +32,38 @@ If you have any questions, please contact us at access@clsa-elcv.ca.
 
 The CLSA Data Access Team",
 
-  message_fr = "Bonjour Dr / Dre {{applicant_name}}, 
+  message_fr = "Bonjour Dr / Dre {{applicant_name}}, 
 
-Votre demande d’accès {{identifier}}, intitulée « {{title}} », requiert votre attention afin de le faire avancer. 
-Connectez-vous à Magnolia, le logiciel de demande d’accès aux données en ligne de l’ÉLCV (https://magnolia.clsa-elcv.ca/live/gl/), veuillez effectuer toutes les modifications et soumettre la demande à nouveau. 
-Si vous avez des questions, veuillez nous contacter à access@clsa-elcv.ca. 
+Votre demande d’accès {{identifier}}, intitulée « {{title}} », requiert votre attention afin de le faire avancer. 
+Connectez-vous à Magnolia, le logiciel de demande d’accès aux données en ligne de l’ÉLCV (https://magnolia.clsa-elcv.ca/live/gl/), veuillez effectuer toutes les modifications et soumettre la demande à nouveau. 
+Si vous avez des questions, veuillez nous contacter à access@clsa-elcv.ca. 
 
 L’équipe d’accès aux données de l’ÉLCV";
 
 INSERT IGNORE INTO notification_type SET
   name = "Deferred Application Reminder (second)",
   title_en = "Action Required Deferred 2nd Reminder",
-  title_fr = "Action requise différée 2e rappel",
+  title_fr = "Action requise différée 2e rappel",
   message_en = "Dear Dr. {{applicant_name}},
- 
+ 
 Your application number {{identifier}}, entitled \"{{title}}\", requires action in order to move it forward.
- 
+ 
 As per the previous reminder on {{TODAY-6W}} your application is not in an active stage. If you do not complete the action by {{TODAY+2W}}, your application will be returned to the last active stage and any changes that you were making will not be approved.
- 
+ 
 Please log in to the CLSA online data application software, Magnolia (https://magnolia.clsa-elcv.ca/live/gl/), complete the changes and submit for further review.
- 
+ 
 If you have any questions, please contact us at access@clsa-elcv.ca.
- 
+ 
 The CLSA Data Access Team",
-  message_fr = "Bonjour Dr / Dre {{applicant_name}}, 
+  message_fr = "Bonjour Dr / Dre {{applicant_name}}, 
 
-Votre demande d’accès {{identifier}}, intitulée « {{title}} », requiert votre attention avant de poursuivre son évaluation. 
+Votre demande d’accès {{identifier}}, intitulée « {{title}} », requiert votre attention avant de poursuivre son évaluation. 
 
 Comme indiqué dans le rappel du {{TODAY-6W}}, votre demande n’est pas active. Si vous ne faites pas l’action requise avant le {{TODAY+2W}}, elle retournera à la dernière étape active, ce qui rejettera les modifications apportées.
 
-Pour modifier votre demande et la soumettre à nouveau, connectez-vous à Magnolia, le logiciel de demande d’accès aux données en ligne de l’ÉLCV (https://magnolia.clsa-elcv.ca/live/gl/). 
+Pour modifier votre demande et la soumettre à nouveau, connectez-vous à Magnolia, le logiciel de demande d’accès aux données en ligne de l’ÉLCV (https://magnolia.clsa-elcv.ca/live/gl/). 
 
-Si vous avez des questions, veuillez nous contacter à access@clsa-elcv.ca. 
+Si vous avez des questions, veuillez nous contacter à access@clsa-elcv.ca. 
 
 L’équipe d’accès aux données de l’ÉLCV";
 
@@ -80,11 +80,12 @@ If you have any questions, please contact us at access@clsa-elcv.ca.
 
 The CLSA Data Access Team",
 
-  message_fr = "Bonjour Dr / Dre {{applicant_name}}, 
+  message_fr = "Bonjour Dr / Dre {{applicant_name}}, 
 
 TODO: TRANSLATE
-Connectez-vous à Magnolia, le logiciel de demande d’accès aux données en ligne de l’ÉLCV (https://magnolia.clsa-elcv.ca/live/gl/), veuillez effectuer toutes les modifications et soumettre la demande à nouveau. 
-Si vous avez des questions, veuillez nous contacter à access@clsa-elcv.ca. 
+
+Connectez-vous à Magnolia, le logiciel de demande d’accès aux données en ligne de l’ÉLCV (https://magnolia.clsa-elcv.ca/live/gl/), veuillez effectuer toutes les modifications et soumettre la demande à nouveau. 
+Si vous avez des questions, veuillez nous contacter à access@clsa-elcv.ca. 
 
 L’équipe d’accès aux données de l’ÉLCV";
 
@@ -93,25 +94,25 @@ INSERT IGNORE INTO notification_type SET
   title_en = "Manuscript Action Required Deferred 2nd Reminder",
   title_fr = "TODO: TRANSLATE",
   message_en = "Dear Dr. {{applicant_name}},
- 
+ 
 The manuscript entitled \"{{manuscript_title}}\" for your application number {{identifier}} requires action in order to move it forward.
- 
+ 
 As per the previous reminder on {{TODAY-6W}} your manuscript is not copmlete. If you do not complete the action by {{TODAY+2W}}, your manuscript will not be approved.
- 
+ 
 Please log in to the CLSA online data application software, Magnolia (https://magnolia.clsa-elcv.ca/live/gl/), complete the changes and submit for further review.
- 
+ 
 If you have any questions, please contact us at access@clsa-elcv.ca.
- 
+ 
 The CLSA Data Access Team",
-  message_fr = "Bonjour Dr / Dre {{applicant_name}}, 
+  message_fr = "Bonjour Dr / Dre {{applicant_name}}, 
 
 TODO: TRANSLATE
 
 TODO: TRANSLATE
 
-Pour modifier votre demande et la soumettre à nouveau, connectez-vous à Magnolia, le logiciel de demande d’accès aux données en ligne de l’ÉLCV (https://magnolia.clsa-elcv.ca/live/gl/). 
+Pour modifier votre demande et la soumettre à nouveau, connectez-vous à Magnolia, le logiciel de demande d’accès aux données en ligne de l’ÉLCV (https://magnolia.clsa-elcv.ca/live/gl/). 
 
-Si vous avez des questions, veuillez nous contacter à access@clsa-elcv.ca. 
+Si vous avez des questions, veuillez nous contacter à access@clsa-elcv.ca. 
 
 L’équipe d’accès aux données de l’ÉLCV";
 

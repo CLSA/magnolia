@@ -13,9 +13,9 @@ cenozoApp.defineModule({
         },
       },
       name: {
-        singular: "version",
-        plural: "versions",
-        possessive: "version's",
+        singular: "manuscript version",
+        plural: "manuscript versions",
+        possessive: "manuscript version's",
       },
       columnList: {
         version: {
@@ -280,6 +280,9 @@ cenozoApp.defineModule({
 
               await this.$$onView(force);
 
+              // used in the breadcrumb trail
+              this.record.version_name = this.record.version;
+
               // get a list of all data versions
               await this.getDataVersionList();
 
@@ -469,7 +472,6 @@ cenozoApp.defineModule({
                   } else if (null === this.record[property] || "" === this.record[property]) {
                     // check for the property's value
                     var element = cenozo.getFormElement(property);
-                    console.log(property, element);
                     element.$error.required = true;
                     cenozo.updateFormElement(element, true);
                     if (null == errorTab) errorTab = tab;

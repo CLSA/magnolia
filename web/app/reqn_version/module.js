@@ -46,9 +46,9 @@ cenozoApp.defineModule({
         },
       },
       name: {
-        singular: "version",
-        plural: "versions",
-        possessive: "version's",
+        singular: "requisition version",
+        plural: "requisition versions",
+        possessive: "requisition version's",
       },
       columnList: {
         amendment_version: {
