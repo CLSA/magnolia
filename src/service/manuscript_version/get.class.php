@@ -41,7 +41,7 @@ class get extends \cenozo\service\downloadable
    */
   protected function get_downloadable_file_path()
   {
-    return sprintf( '%s/manuscript_%d.pdf', TEMP_PATH, $db_manuscript_version->id );
+    return sprintf( '%s/manuscript_%d.pdf', TEMP_PATH, $this->get_leaf_record()->id );
   }
 
   /**
