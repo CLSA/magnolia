@@ -91,8 +91,8 @@ class manuscript_version extends \cenozo\database\record
     $data['applicant_name'] = sprintf( '%s %s', $db_user->first_name, $db_user->last_name );
     if( !is_null( $db_manuscript->title ) ) $data['title'] = $db_manuscript->title;
     if( !is_null( $this->authors ) ) $data['authors'] = $this->authors;
-    if( true === $this->authors_title ) $data['authors_title_yes'] = 'Yes';
-    if( false === $this->authors_title ) $data['authors_title_no'] = 'Yes';
+    if( true === $this->authors_check ) $data['authors_check_yes'] = 'Yes';
+    if( false === $this->authors_check ) $data['authors_check_no'] = 'Yes';
     if( !is_null( $this->journal ) ) $data['journal'] = $this->journal;
     if( true === $this->clsa_title ) $data['clsa_title_yes'] = 'Yes';
     if( false === $this->clsa_title ) $data['clsa_title_no'] = 'Yes';
