@@ -829,9 +829,10 @@ cenozo.service("CnReqnHelper", [
           path:
             "final_report" == subject ? "final_report/" + id :
             "destruction_report" == subject ? "destruction_report/" + id :
+            "manuscript_submission" == subject ? "manuscript_version/" + id :
             "reqn_version/" + id + "?file=" + subject,
           format:
-            ["final_report", "destruction_report"].includes(subject) ? "pdf" :
+            ["final_report", "destruction_report", "manuscript_submission"].includes(subject) ? "pdf" :
             "data_option_list" == subject ? "csv" :
             "unknown",
         };
