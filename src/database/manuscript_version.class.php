@@ -91,35 +91,35 @@ class manuscript_version extends \cenozo\database\record
     $data['applicant_name'] = sprintf( '%s %s', $db_user->first_name, $db_user->last_name );
     if( !is_null( $db_manuscript->title ) ) $data['title'] = $db_manuscript->title;
     if( !is_null( $this->authors ) ) $data['authors'] = $this->authors;
-    if( true === $this->authors_check ) $data['authors_check_yes'] = 'Yes';
-    if( false === $this->authors_check ) $data['authors_check_no'] = 'Yes';
+    if( $this->authors_check ) $data['authors_check_yes'] = 'Yes';
+    else $data['authors_check_no'] = 'Yes';
     if( !is_null( $this->journal ) ) $data['journal'] = $this->journal;
-    if( true === $this->clsa_title ) $data['clsa_title_yes'] = 'Yes';
-    if( false === $this->clsa_title ) $data['clsa_title_no'] = 'Yes';
+    if( $this->clsa_title ) $data['clsa_title_yes'] = 'Yes';
+    else $data['clsa_title_no'] = 'Yes';
     if( !is_null( $this->clsa_title_justification ) )
       $data['clsa_title_justification'] = $this->clsa_title_justification;
-    if( true === $this->clsa_keyword ) $data['clsa_keyword_yes'] = 'Yes';
-    if( false === $this->clsa_keyword ) $data['clsa_keyword_no'] = 'Yes';
+    if( $this->clsa_keyword ) $data['clsa_keyword_yes'] = 'Yes';
+    else $data['clsa_keyword_no'] = 'Yes';
     if( !is_null( $this->clsa_keyword_justification ) )
       $data['clsa_keyword_justification'] = $this->clsa_keyword_justification;
-    if( true === $this->clsa_reference ) $data['clsa_reference_yes'] = 'Yes';
-    if( false === $this->clsa_reference ) $data['clsa_reference_no'] = 'Yes';
+    if( $this->clsa_reference ) $data['clsa_reference_yes'] = 'Yes';
+    else $data['clsa_reference_no'] = 'Yes';
     if( !is_null( $this->clsa_reference_number ) )
       $data['clsa_reference_number'] = $this->clsa_reference_number;
     if( !is_null( $this->clsa_reference_justification ) )
       $data['clsa_reference_justification'] = $this->clsa_reference_justification;
-    if( true === $this->genomics ) $data['genomics_yes'] = 'Yes';
-    if( false === $this->genomics ) $data['genomics_no'] = 'Yes';
+    if( $this->genomics ) $data['genomics_yes'] = 'Yes';
+    else $data['genomics_no'] = 'Yes';
     if( !is_null( $this->genomics_number ) ) $data['genomics_number'] = $this->genomics_number;
     if( !is_null( $this->acknowledgment ) ) $data['acknowledgment'] = $this->acknowledgment;
-    if( true === $this->dataset_version ) $data['dataset_version_yes'] = 'Yes';
-    if( false === $this->dataset_version ) $data['dataset_version_no'] = 'Yes';
-    if( true === $this->seroprevalence ) $data['seroprevalence_yes'] = 'Yes';
-    if( false === $this->seroprevalence ) $data['seroprevalence_no'] = 'Yes';
-    if( true === $this->covid ) $data['covid_yes'] = 'Yes';
-    if( false === $this->covid ) $data['covid_no'] = 'Yes';
-    if( true === $this->disclaimer ) $data['disclaimer_yes'] = 'Yes';
-    if( false === $this->disclaimer ) $data['disclaimer_no'] = 'Yes';
+    if( $this->dataset_version ) $data['dataset_version_yes'] = 'Yes';
+    else $data['dataset_version_no'] = 'Yes';
+    if( $this->seroprevalence ) $data['seroprevalence_yes'] = 'Yes';
+    else $data['seroprevalence_no'] = 'Yes';
+    if( $this->covid ) $data['covid_yes'] = 'Yes';
+    else $data['covid_no'] = 'Yes';
+    if( $this->disclaimer ) $data['disclaimer_yes'] = 'Yes';
+    else $data['disclaimer_no'] = 'Yes';
     if( !is_null( $this->disclaimer_justification ) )
       $data['disclaimer_justification'] = $this->disclaimer_justification;
     if( 'yes' === $this->statement ) $data['statement_yes'] = 'Yes';
@@ -127,11 +127,11 @@ class manuscript_version extends \cenozo\database\record
     if( 'nr' === $this->statement ) $data['statement_nr'] = 'Yes';
     if( !is_null( $this->statement_justification ) )
       $data['statement_justification'] = $this->statement_justification;
-    if( true === $this->conditions ) $data['conditions_yes'] = 'Yes';
-    if( false === $this->conditions ) $data['conditions_no'] = 'Yes';
+    if( $this->conditions ) $data['conditions_yes'] = 'Yes';
+    else $data['conditions_no'] = 'Yes';
     if( !is_null( $this->objectives ) ) $data['objectives'] = $this->objectives;
-    if( true === $this->indigenous ) $data['indigenous_yes'] = 'Yes';
-    if( false === $this->indigenous ) $data['indigenous_no'] = 'Yes';
+    if( $this->indigenous ) $data['indigenous_yes'] = 'Yes';
+    else $data['indigenous_no'] = 'Yes';
 
     $filename = sprintf( '%s/manuscript_%s.pdf', TEMP_PATH, $this->id );
     $error = $db_pdf_form->fill_and_write_form( $data, $filename );
