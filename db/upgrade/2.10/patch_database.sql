@@ -4,6 +4,7 @@ SET AUTOCOMMIT=0;
 
 SOURCE amendment_type.sql
 SOURCE reqn_version.sql
+SOURCE manuscript_version.sql
 
 SOURCE role_has_service.sql
 
