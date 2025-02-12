@@ -29,7 +29,7 @@ CREATE PROCEDURE patch_amendment_type()
       UPDATE amendment_type SET rank = rank+101 WHERE rank > 1;
 
       INSERT IGNORE INTO amendment_type( rank, new_user, reason_en, reason_fr ) VALUES
-      ( 2, "trainee", "Changing Trainee", "TODO: TRANSLATE" );
+      ( 2, "trainee", "Changing Trainee", "Changer de stagiaire" );
 
       UPDATE amendment_type set rank = rank-100 WHERE rank > 100;
     END IF;

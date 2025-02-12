@@ -70,7 +70,7 @@ L’équipe d’accès aux données de l’ÉLCV";
 INSERT IGNORE INTO notification_type SET
   name = "Deferred Manuscript Reminder (first)",
   title_en = "Manuscript Action Required Deferred",
-  title_fr = "TODO: TRANSLATE",
+  title_fr = "Action requise reportée relativement au manuscrit",
   message_en = "Dear Dr. {{applicant_name}},
 
 The manuscript entitled \"{{manuscript_title}}\" for your application number {{identifier}} requires action in order to move it forward.
@@ -82,7 +82,7 @@ The CLSA Data Access Team",
 
   message_fr = "Bonjour Dr / Dre {{applicant_name}}, 
 
-TODO: TRANSLATE
+Le manuscrit intitulé « {{manuscript_title}} » correspondant au numéro de demande {{identifier}} doit faire l’objet d’une action pour aller de l’avant.
 
 Connectez-vous à Magnolia, le logiciel de demande d’accès aux données en ligne de l’ÉLCV (https://magnolia.clsa-elcv.ca/live/gl/), veuillez effectuer toutes les modifications et soumettre la demande à nouveau. 
 Si vous avez des questions, veuillez nous contacter à access@clsa-elcv.ca. 
@@ -92,12 +92,12 @@ L’équipe d’accès aux données de l’ÉLCV";
 INSERT IGNORE INTO notification_type SET
   name = "Deferred Manuscript Reminder (second)",
   title_en = "Manuscript Action Required Deferred 2nd Reminder",
-  title_fr = "TODO: TRANSLATE",
+  title_fr = "Action requise reportée relativement au manuscrit 2e rappel",
   message_en = "Dear Dr. {{applicant_name}},
  
 The manuscript entitled \"{{manuscript_title}}\" for your application number {{identifier}} requires action in order to move it forward.
  
-As per the previous reminder on {{TODAY-6W}} your manuscript is not copmlete. If you do not complete the action by {{TODAY+2W}}, your manuscript will not be approved.
+As per the previous reminder on {{TODAY-6W}} your manuscript is not complete. If you do not complete the action by {{TODAY+2W}}, your manuscript will not be approved.
  
 Please log in to the CLSA online data application software, Magnolia (https://magnolia.clsa-elcv.ca/live/gl/), complete the changes and submit for further review.
  
@@ -106,9 +106,9 @@ If you have any questions, please contact us at access@clsa-elcv.ca.
 The CLSA Data Access Team",
   message_fr = "Bonjour Dr / Dre {{applicant_name}}, 
 
-TODO: TRANSLATE
+Le manuscrit intitulé « {{manuscript_title}} », correspondant au numéro de demande {{identifier}}, doit faire l’objet d’une action pour aller de l’avant.
 
-TODO: TRANSLATE
+Conformément au rappel du {{TODAY-6W}}, votre manuscrit n’est pas terminé. Si vous ne terminez pas l’action d’ici le {{TODAY+2W}}, votre manuscrit ne sera pas approuvé.
 
 Pour modifier votre demande et la soumettre à nouveau, connectez-vous à Magnolia, le logiciel de demande d’accès aux données en ligne de l’ÉLCV (https://magnolia.clsa-elcv.ca/live/gl/). 
 
@@ -164,7 +164,7 @@ L’équipe d’accès aux données de l’ÉLCV";
 INSERT IGNORE INTO notification_type SET
   name = "Approval Required, Manuscript Submission",
   title_en = "CLSA Data Access - Manuscript Submission Approval Required ({{identifier}})",
-  title_fr = "TODO: TRANSLATE",
+  title_fr = "Accès aux données de l’ÉLCV – Approbation de la soumission du manuscrit requise ({{identifier}})",
   message_en = "Dear Dr. {{applicant_name}},
 
 Your approval is required on the manuscript entitled \"{{manuscript_title}}\" for your application number {{identifier}}{{if_trainee}} on behalf of {{trainee_name}}{{endif_trainee}}.
@@ -176,18 +176,18 @@ If you have any questions, please contact us at access@clsa-elcv.ca.
 The CLSA Data Access Team",
   message_fr = "Dr/Dre {{applicant_name}},
 
-TODO: TRANSLATE
+Votre approbation est requise relativement au manuscrit intitulé « {{manuscript_title}} », correspondant au numéro de demande {{identifier}}{{if_trainee}}, pour le compte de {{trainee_name}}{{endif_trainee}}.
 
-TODO: TRANSLATE
+Veuillez vous connecter à Magnolia, le logiciel de demande de données en ligne de l’ÉLCV (https://magnolia.clsa-elcv.ca/live/gl/). Révisez le rapport du manuscrit, et s’il vous satisfait, soumettez-le.
 
-TODO: TRANSLATE
+Si vous avez des questions, écrivez-nous, à access@clsa-elcv.ca.
 
 L’équipe d’accès aux données de l’ÉLCV";
 
 INSERT IGNORE INTO notification_type SET
   name = "Notice of decision (manuscript)",
   title_en = "CLSA Data Access - Notice of Decision ({{identifier}}, manuscript {{manuscript_title}})",
-  title_fr = "Accès aux données de l’ÉLCV - Avis de décision (TODO: TRANSLATE)",
+  title_fr = "Accès aux données de l’ÉLCV – Avis de décision ({{identifier}}, manuscrit {{manuscript_title}})",
   message_en = "Dear Dr. {{applicant_name}},
 
 The Notice of Decision is ready for the manuscript entitled \"{{manuscript_title}}\" for your application number {{identifier}}.
@@ -199,7 +199,7 @@ If you have any questions, please contact us at access@clsa-elcv.ca.
 The CLSA Data Access Team",
   message_fr = "Bonjour Dr / Dre {{applicant_name}},
 
-TODO: TRANSLATE
+L’avis de décision est prêt pour le manuscrit intitulé « {{manuscript_title}} », correspondant au numéro de demande {{identifier}}.
 
 Pour consulter l’avis, connectez-vous à Magnolia, le logiciel de demande d’accès aux données en ligne de l’ÉLCV (https://magnolia.clsa-elcv.ca/live/gl/).
 
@@ -210,7 +210,7 @@ L’équipe d’accès aux données de l’ÉLCV";
 INSERT IGNORE INTO notification_type SET
   name = "Action required (manuscript)",
   title_en = "CLSA Data Access - ACTION REQUIRED (manuscript for {{identifier}})",
-  title_fr = "Accès aux données de l’ÉLCV - ACTION REQUISE (TODO: TRANSLATE)",
+  title_fr = "Accès aux données de l’ÉLCV – MESURE REQUISE (manuscrit pour {{identifier}})",
   message_en = "Dear Dr. {{applicant_name}},
 
 An action is required on your manuscript entitled \"{{manuscript_title}}\" for application number {{identifier}}.
@@ -224,11 +224,11 @@ If you have any questions, please contact us at access@clsa-elcv.ca.
 The CLSA Data Access Team",
   message_fr = "Bonjour Dr / Dre {{applicant_name}},
 
-TODO: TRANSLATE
+Une action est exigée à l’égard de votre manuscrit intitulé « {{manuscript_title}} », correspondant au numéro de demande {{identifier}}.
 
-TODO: TRANSLATE
+Veuillez vous connecter à Magnolia, le logiciel de demande de données en ligne de l’ÉLCV (https://magnolia.clsa-elcv.ca/live/gl/). Cherchez la case « Attention » sur le manuscrit. Suivez les directives indiquées pour résoudre le problème. Lorsque vous serez certain d’avoir effectué toutes les révisions, soumettez le manuscrit de nouveau.
 
-TODO: TRANSLATE
+Le processus de révision de votre manuscrit se poursuivra, et le résultat vous sera transmis à une date ultérieure.
 
 Si vous avez des questions, veuillez nous contacter à access@clsa-elcv.ca.
 
