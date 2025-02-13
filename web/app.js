@@ -1832,7 +1832,7 @@ cenozo.service("CnLocalization", [
             },
             clsa_reference_description: {
               en: "The following article must be referenced:",
-              fr: "The following article must be referenced:", //TODO: TRANSLATE
+              fr: "L'article suivant doit faire partie des références :",
             },
             clsa_reference_ref: {
               en: " Raina P, Wolfson C., Kirkland S, Griffith L.E., Balion C., Cossette B., Dionne I., Hofer S., Hogan D., van den Heuvel E.R., Liu-Ambrose T., Menec V., Mugford G., Patterson C., Payette H., Richards B., Shannon H., Sheets D., Taler V., Thompson M., Tuokko H., Wister A., Wu C., Young L. (2019) Cohort profile: The Canadian Longitudinal Study on Aging (CLSA). International Journal of Epidemiology, Volume 48, Issue 6, 1752-1753j, https://doi.org/10.1093/ije/dyz173",
