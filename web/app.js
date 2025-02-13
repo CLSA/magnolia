@@ -1020,7 +1020,7 @@ cenozo.service("CnLocalization", [
             },
             newTraineeUser: {
               en: "Please provide the name of the new trainee",
-              fr: "Please provide the name of the new trainee", // TODO: TRANSLATE
+              fr: "Veuillez fournir le nom du nouveau stagiaire",
             },
             newUserNotice: {
               en: "Changing the primary applicant, once approved, will remove your access to this application and transfer ownership to the new applicant.\n\nAre you sure you wish to proceed?",
@@ -1032,7 +1032,7 @@ cenozo.service("CnLocalization", [
             },
             newTraineeIsPrimaryNotice: {
               en: "The trainee you have selected is not a trainee.  Please select a new trainee which has a supervisor.",
-              fr: "The trainee you have selected is not a trainee.  Please select a new trainee which has a supervisor.", // TODO: TRANSLATE
+              fr: "Le stagiaire que vous avez sélectionné n’est pas un stagiaire. Veuillez sélectionner un nouveau stagiaire doté d’un superviseur.",
             },
             justification: {
               en: "Justification (<strong>maximum 2500 characters</strong>)",
@@ -1406,35 +1406,35 @@ cenozo.service("CnLocalization", [
             },
           },
           manuscripts: {
-            tab: { en: "Manuscripts", fr: "Manuscripts" }, // TODO: TRANSLATE
+            tab: { en: "Manuscripts", fr: "Manuscrits" },
             title: {
               en: "Manuscript Submission",
-              fr: "Manuscript Submission" // TODO: TRANSLATE
+              fr: "Soumission du manuscrit",
             },
             text1: {
               en: "All publications must be in accordance with the CLSA Access Agreement and the Publication and Promotion Policy.  The goal of the CLSA review is to ensure that participants cannot be identified in publications, and that results are presented in a scientifically accurate manner in relation to the CLSA design and data collection methods. The manuscript will also be checked to ensure that the research presented matches the objectives of the approved project. This review is not a substitute for peer review.",
-              fr: "All publications must be in accordance with the CLSA Access Agreement and the Publication and Promotion Policy.  The goal of the CLSA review is to ensure that participants cannot be identified in publications, and that results are presented in a scientifically accurate manner in relation to the CLSA design and data collection methods. The manuscript will also be checked to ensure that the research presented matches the objectives of the approved project. This review is not a substitute for peer review.", // TODO: TRANSLATE
+              fr: "Toutes les publications doivent respecter l’Entente d’accès aux données et la Politique de publication et de promotion de l’ÉLCV. La révision de l’ÉLCV vise à s’assurer que les participants ne pourront pas être identifiés dans les publications et que la présentation des résultats respecte l’exactitude scientifique des méthodologies de conception et de collecte de données de l’ÉLCV. Le manuscrit sera également vérifié pour s’assurer que la recherche présentée correspond aux objectifs du projet approuvé. Cette révision ne remplace pas celle d’un comité de lecture.",
             },
             text2: {
               en: "Final drafts of all manuscripts (including submissions for pre-prints), reports, reviews, and other proposed primary publications describing research using CLSA data and/or biospecimens must be submitted to the CLSA, by the Primary Applicant, for review at least 15 working days prior to the anticipated submission.",
-              fr: "Final drafts of all manuscripts (including submissions for pre-prints), reports, reviews, and other proposed primary publications describing research using CLSA data and/or biospecimens must be submitted to the CLSA, by the Primary Applicant, for review at least 15 working days prior to the anticipated submission.", // TODO: TRANSLATE
+              fr: "Le demandeur principal doit soumettre à l’ÉLCV la version finale de tous les manuscrits (y compris les soumissions en vue d’une préimpression), les rapports, les analyses et les autres publications primaires proposées qui décrivent des recherches réalisées à l’aide des données ou des échantillons biologiques de l’ÉLCV, en vue de leur révision au moins 15 jours ouvrables avant la soumission anticipée.",
             },
             text3: {
               en: 'If starting a new submission, enter the title of your manuscript and press "Add Manuscript".  Choose the one that you are submitting from the list of manuscripts below and follow all instructions.', 
-              fr: 'If starting a new submission, enter the title of your manuscript and press "Add Manuscript".  Choose the one that you are submitting from the list of manuscripts below and follow all instructions.', // TODO: TRANSLATE
+              fr: 'Si vous commencez une nouvelle soumission, inscrivez le titre de votre manuscrit et appuyez sur « Ajouter un manuscrit ». Choisissez celui que vous soumettez dans la liste de manuscrits ci-dessous et respectez toutes les directives.',
             },
             manuscript: {
               addManuscript: {
                 en: "Add Manuscript",
-                fr: "Add Manuscript", // TODO: TRANSLATE
+                fr: "Ajouter un manuscrit",
               },
               title: {
                 en: "Title",
-                fr: "Title" // TODO: TRANSLATE
+                fr: "Titre"
               },
               status: {
                 en: "Status",
-                fr: "Status", // TODO: TRANSLATE
+                fr: "État",
               },
             },
           },
@@ -1624,11 +1624,11 @@ cenozo.service("CnLocalization", [
             },
             invalidNewTraineeTitle: {
               en: "Invalid trainee",
-              fr: "Invalid trainee", // TODO: TRANSLATE
+              fr: "Stagiaire invalide",
             },
             invalidNewTraineeMessage: {
               en: "It is not possible to change the trainee to the user you have selected because their role in the system is not that of an applicant.  Please try selecting a different user.",
-              fr: "It is not possible to change the trainee to the user you have selected because their role in the system is not that of an applicant.  Please try selecting a different user.", // TODO: TRANSLATE
+              fr: "Il est impossible de changer le stagiaire par l’utilisateur que vous avez sélectionné parce que son rôle dans le système n’est pas celui d’un demandeur. Veuillez tenter de sélectionner un autre utilisateur.",
             },
             invalidStartDateTitle: {
               en: "Invalid start date",
@@ -1724,111 +1724,111 @@ cenozo.service("CnLocalization", [
         manuscriptSubmission: {
           heading: {
             en: "CLSA Manuscript Submission",
-            fr: "CLSA Manuscript Submission", // TODO: TRANSLATE
+            fr: "Soumission du manuscrit de l’ÉLCV",
           },
           instructions: {
             tab: { en: "Instructions", fr: "Consignes" },
             title: {
               en: "Completing the CLSA Manuscript Submission",
-              fr: "Completing the CLSA Manuscript Submission", // TODO: TRANSLATE
+              fr: "Terminer la soumission du manuscrit de l’ÉLCV",
             },
             text1: {
               en: 'Please consult the CLSA website for detailed information on the CLSA, <a href="https://www.clsa-elcv.ca/data-access" target="data_access">https://www.clsa-elcv.ca/data-access</a>. Applicants are encouraged to review the CLSA Publication and Promotion Policy available at <a href="https://www.clsa-elcv.ca/resource-types/publication-policy-for-data-users" target="publication_policy">https://www.clsa-elcv.ca/resource-types/publication-policy-for-data-users</a> to ensure you have the most updated information.  Consult us for any questions regarding your application at <a href="mailto:access@clsa-elcv.ca">access@clsa- elcv.ca</a>.',
-              fr: 'Please consult the CLSA website for detailed information on the CLSA, <a href="https://www.clsa-elcv.ca/fr-ca/data-access" target="data_access">https://www.clsa-elcv.ca/fr-ca/data-access</a>. Applicants are encouraged to review the CLSA Publication and Promotion Policy available at <a href="https://www.clsa-elcv.ca/fr-ca/resource-types/publication-policy-for-data-users" target="publication_policy">https://www.clsa-elcv.ca/fr-ca/resource-types/publication-policy-for-data-users</a> to ensure you have the most updated information.  Consult us for any questions regarding your application at <a href="mailto:access@clsa-elcv.ca">access@clsa- elcv.ca</a>.', // TODO: TRANSLATE
+              fr: 'Veuillez consulter le site Web de l’ÉLCV pour obtenir de l’information détaillée sur l’ÉLCV, <a href="https://www.clsa-elcv.ca/fr-ca/data-access" target="data_access">https://www.clsa-elcv.ca/fr-ca/data-access</a>. Les demandeurs sont invités à réviser la Politique de publication et de promotion de l’ÉLCV, à l’adresse <a href="https://www.clsa-elcv.ca/fr-ca/resource-types/publication-policy-for-data-users" target="publication_policy">https://www.clsa-elcv.ca/fr-ca/resource-types/publication-policy-for-data-users</a> pour vous assurer de détenir l’information la plus à jour. Consultez-nous si vous avez des questions au sujet de votre demande, à <a href="mailto:access@clsa-elcv.ca">access@clsa- elcv.ca</a>.',
             },
             text2: {
               en: "Please be sure to complete all sections:<ol><li>Manuscript attachments</li><li>Manuscript overview</li><li>Requirements as per Publication Policy (Page 1)</li><li>Requirements as per Publication Policy (Page 2)</li></ol>",
-              fr: "Please be sure to complete all sections:<ol><li>Manuscript attachments</li><li>Manuscript overview</li><li>Requirements as per Publication Policy (Page 1)</li><li>Requirements as per Publication Policy (Page 2)</li></ol>", // TODO: TRANSLATE
+              fr: "Veuillez vous assurer de remplir toutes les sections :<ol><li>pièces jointes du manuscrit </li><li>aperçu du manuscrit </li><li>exigences de la Politique de publication (page 1)</li><li>exigences de la Politique de publication (page 2)</li></ol>",
             },
             text3: {
               en: "Please ensure that you have completed all of the sections of the form that are relevant to your manuscript submission.  Incomplete submissions may result in processing delays.",
-              fr: "Please ensure that you have completed all of the sections of the form that are relevant to your manuscript submission.  Incomplete submissions may result in processing delays.", // TODO: TRANSLATE
+              fr: "Veuillez vous assurer d’avoir rempli toutes les sections du formulaire relatives à la soumission du manuscrit. Les soumissions incomplètes peuvent être associées à des retards de traitement.",
             },
           },
           part_1: {
             tab: { en: "Part 1", fr: "1<sup>em</sup> partie" },
-            title: { en: "Manuscript Attachments", fr: "Manuscript Attachements", }, // TODO: TRANSLATE
+            title: { en: "Manuscript Attachments", fr: "Pièces jointes du manuscrit", },
             description: {
               en: "Please upload the manuscript along with any other relevant files.",
-              fr: "Please upload the manuscript along with any other relevant files.", // TODO: TRANSLATE
+              fr: "Veuillez télécharger le manuscrit et tous les autres fichiers pertinents.",
             },
             addAttachment: {
               en: "Upload Attachment",
-              fr: "Upload Attachment", // TODO: TRANSLATE
+              fr: "Téléverser la pièce jointe.",
             },
             pleaseWait: {
               en: "Please wait...",
-              fr: "Please wait...", // TODO: TRANSLATE
+              fr: "Veuillez attendre...",
             },
             noAttachments: {
               en: "No attachments have been added.",
-              fr: "No attachments have been added.", // TODO: TRANSLATE
+              fr: "Aucune pièce jointe n’a été ajoutée.",
             },
             filename: {
               en: "Filename",
-              fr: "Filename", // TODO: TRANSLATE
+              fr: "Nom de fichier",
             },
             size: {
               en: "Size",
-              fr: "Size", // TODO: TRANSLATE
+              fr: "Taille",
             },
           },
           part_2: {
             tab: { en: "Part 2", fr: "2<sup>e</sup> partie" },
-            title: { en: "Manuscript Overview", fr: "Manuscript Overview", }, // TODO: TRANSLATE
-            authors: { en: "Authors", fr: "Authors" }, // TODO: TRANSLATE
+            title: { en: "Manuscript Overview", fr: "Aperçu du manuscrit", },
+            authors: { en: "Authors", fr: "Auteurs" },
             authors_check: {
               en: "Confirm requirement has been met",
-              fr: "Confirm requirement has been met", // TODO: TRANSLATE
+              fr: "Confirmer que l’exigence a été satisfaite",
             },
-            date: { en: "Date", fr: "Date" }, // TODO: TRANSLATE
-            journal: { en: "Target Journal", fr: "Target Journal" }, // TODO: TRANSLATE
+            date: { en: "Date", fr: "Date" },
+            journal: { en: "Target Journal", fr: "Revue scientifique ciblée" },
             authors_description: {
               en: "The CLSA Publication Policy requires that all authors on a manuscript who have accessed the CLSA data have signed Schedule F and are listed under the Project Team in Magnolia. Please verify that this requirement has been met for this manuscript.",
-              fr: "The CLSA Publication Policy requires that all authors on a manuscript who have accessed the CLSA data have signed Schedule F and are listed under the Project Team in Magnolia. Please verify that this requirement has been met for this manuscript.", // TODO: TRANSLATE
+              fr: "Selon la Politique de publication de l’ÉLCV, tous les auteurs d’un manuscrit qui ont accès aux données de l’ÉLCV ont signé l’annexe F et figurent dans la liste de l’équipe du projet du logiciel Magnolia. Veuillez vous assurer que cette exigence est satisfaite à l’égard de ce manuscrit.",
             },
             objectives_description_1: {
               en: "Results presented in the manuscript must be in accordance with the research objectives of the approved project. Authors are asked to identify and state below which specific objectives in the approved application relate to this manuscript.",
-              fr: "Results presented in the manuscript must be in accordance with the research objectives of the approved project. Authors are asked to identify and state below which specific objectives in the approved application relate to this manuscript.", // TODO: TRANSLATE
+              fr: "Les résultats présentés dans le manuscrit doivent respecter les objectifs de recherche du projet approuvé. Les auteurs sont invités à indiquer et à déclarer ci-dessous quels objectifs particuliers de la demande approuvée correspondent à ce manuscrit.",
             },
             objectives_description_2: {
               en: 'CLSA design features (inclusion/exclusion, sampling strategy, data collection procedures, etc.) if included in the manuscript, must be described accurately. Please refer to the relevant CLSA Protocol, available for download under the <a href="https://www.clsa-elcv.ca/resource-types/protocols/" target="researcher_resources">Researcher Resources</a> section of our website.',
-              fr: 'CLSA design features (inclusion/exclusion, sampling strategy, data collection procedures, etc.) if included in the manuscript, must be described accurately. Please refer to the relevant CLSA Protocol, available for download under the <a href="https://www.clsa-elcv.ca/fr-ca/resource-types/protocols/" target="researcher_resources">Researcher Resources</a> section of our website.', // TODO: TRANSLATE
+              fr: 'Les caractéristiques de conception de l’ÉLCV (inclusion/exclusion, stratégie de prélèvements, démarches de collecte de données, etc.), si elles sont incluses dans le manuscrit, doivent être décrites avec précision. Veuillez consulter le protocole approprié de l’ÉLCV, qui peut être téléchargé à partir de la section <a href="https://www.clsa-elcv.ca/fr-ca/resource-types/protocols/" target="researcher_resources">de ressources des chercheurs </a> de notre site Web.',
             },
             objectives: {
               en: "Objective(s) related to this manuscript (<strong>maximum 1500 characters</strong>)",
-              fr: "Objective(s) related to this manuscript (<strong>maximum 1500 characters</strong>)", // TODO: TRANSLATE
+              fr: "Objectifs liés à ce manuscrit (<strong>maximum de 1 500 caractères </strong>)",
             },
           },
           part_3: {
             tab: { en: "Part 3", fr: "3<sup>e</sup> partie" },
             title: {
               en: "Requirements as per the CLSA Publication and Promotion Policy",
-              fr: "Requirements as per the CLSA Publication and Promotion Policy", // TODO: TRANSLATE
+              fr: "Exigences de la Politique de publication et de promotion de l’ÉLCV",
             },
             clsa_title_description: {
               en: "The abbreviation ‘CLSA’ must be included in the title of the manuscript, or the name of the platform fully spelled out as ‘Canadian Longitudinal Study on Aging’ may also be used.",
-              fr: "The abbreviation ‘CLSA’ must be included in the title of the manuscript, or the name of the platform fully spelled out as ‘Canadian Longitudinal Study on Aging’ may also be used.", // TODO: TRANSLATE
+              fr: "L’abréviation « ÉLCV » doit faire partie du titre du manuscrit; le nom de la plateforme écrit au long, « Étude longitudinale canadienne sur le vieillissement », peut également être utilisé.",
             },
             clsa_title: {
               en: "Has this requirement been met?",
-              fr: "Has this requirement been met?", // TODO: TRANSLATE
+              fr: "Cette exigence est-elle satisfaite?",
             },
             clsa_title_justification: {
               en: "Please provide a justification for why this requirement could not be met.",
-              fr: "Please provide a justification for why this requirement could not be met.", // TODO: TRANSLATE
+              fr: "Veuillez justifier pourquoi cette exigence n’a pas pu être satisfaite.",
             },
             clsa_keyword_description: {
               en: "Abbreviation ‘CLSA’ must be included as a keyword in the manuscript.",
-              fr: "Abbreviation ‘CLSA’ must be included as a keyword in the manuscript.", // TODO: TRANSLATE
+              fr: "L’abréviation « ÉLCV » doit être l’un des mots-clés du manuscrit.",
             },
             clsa_keyword: {
               en: "Has this requirement been met?",
-              fr: "Has this requirement been met?", //TODO: TRANSLATE
+              fr: "Cette exigence est-elle satisfaite?",
             },
             clsa_keyword_justification: {
               en: "Please provide a justification for why this requirement could not be met.",
-              fr: "Please provide a justification for why this requirement could not be met.", //TODO: TRANSLATE
+              fr: "Veuillez justifier pourquoi cette exigence n’a pas pu être satisfaite.",
             },
             clsa_reference_description: {
               en: "The following article must be referenced:",
@@ -1840,19 +1840,19 @@ cenozo.service("CnLocalization", [
             },
             clsa_reference: {
               en: "Has this requirement been met?",
-              fr: "Has this requirement been met?", //TODO: TRANSLATE
+              fr: "Cette exigence est-elle satisfaite?",
             },
             clsa_reference_number: {
               en: "Please indicate the page or citation number:",
-              fr: "Please indicate the page or citation number:", //TODO: TRANSLATE
+              fr: "Veuillez préciser la page ou le numéro de citation :",
             },
             clsa_reference_justification: {
               en: "Please provide a justification for why this requirement could not be met.",
-              fr: "Please provide a justification for why this requirement could not be met.", //TODO: TRANSLATE
+              fr: "Veuillez justifier pourquoi cette exigence n’a pas pu être satisfaite.",
             },
             genomics_description: {
               en: "The article below must be referenced if the study was conducted using CLSA Genomic data.",
-              fr: "The article below must be referenced if the study was conducted using CLSA Genomic data.", //TODO: TRANSLATE
+              fr: "L’article suivant doit faire partie des références si l’étude a été réalisée à l’aide des données génomiques de l’ÉLCV.",
             },
             genomics_ref: {
               en: "Forgetta V, Li R, Darmond-Zwaig C, et al. Cohort profile: genomic data for 26 622 individuals from the Canadian Longitudinal Study on Aging (CLSA)BMJ Open 2022;12:e059021. doi: 10.1136/bmjopen-2021-059021 https://bmjopen.bmj.com/content/12/3/e059021",
@@ -1860,58 +1860,58 @@ cenozo.service("CnLocalization", [
             },
             genomics: {
               en: "Has this requirement been met?",
-              fr: "Has this requirement been met?", //TODO: TRANSLATE
+              fr: "Cette exigence est-elle satisfaite?",
             },
             genomics_number: {
               en: "Please indicate the page or citation number:",
-              fr: "Please indicate the page or citation number:", //TODO: TRANSLATE
+              fr: "Veuillez préciser la page ou le numéro de citation :",
             },
           },
           part_4: {
             tab: { en: "Part 4", fr: "4<sup>e</sup> partie" },
             title: {
               en: "Requirements as per the CLSA Publication and Promotion Policy",
-              fr: "Requirements as per the CLSA Publication and Promotion Policy", // TODO: TRANSLATE
+              fr: "Exigences de la Politique de publication et de promotion de l’ÉLCV",
             },
             acknowledgment_description: {
               en: "The approved acknowledgment statement must be included:",
-              fr: "The approved acknowledgment statement must be included:", // TODO: TRANSLATE
+              fr: "L’énoncé d’attestation approuvé doit être inclus :",
             },
             acknowledgment_example1: {
               en: "This research was made possible using the data/biospecimens collected by the Canadian Longitudinal Study on Aging (CLSA). Funding for the Canadian Longitudinal Study on Aging (CLSA) is provided by the Government of Canada through the Canadian Institutes of Health Research (CIHR) under grant reference: LSA 94473 and the Canada Foundation for Innovation, as well as the following provinces, Newfoundland, Nova Scotia, Quebec, Ontario, Manitoba, Alberta, and British Columbia. This research has been conducted using <b>(DETERMINE LIST OF DATA VERSIONS FROM LIST BELOW)</b> under Application ID ",
-              fr: "This research was made possible using the data/biospecimens collected by the Canadian Longitudinal Study on Aging (CLSA). Funding for the Canadian Longitudinal Study on Aging (CLSA) is provided by the Government of Canada through the Canadian Institutes of Health Research (CIHR) under grant reference: LSA 94473 and the Canada Foundation for Innovation, as well as the following provinces, Newfoundland, Nova Scotia, Quebec, Ontario, Manitoba, Alberta, and British Columbia. This research has been conducted using <b>(DETERMINE LIST OF DATA VERSIONS FROM LIST BELOW)</b> under Application ID ", // TODO: TRANSLATE
+              fr: "Cette recherche est rendue possible grâce aux données ou aux échantillons biologiques recueillis par l’Étude longitudinale canadienne sur le vieillissement (ÉLCV). Le financement de l’Étude longitudinale canadienne sur le vieillissement (ÉLCV) est assuré par le gouvernement du Canada par l’entremise des Instituts de recherche en santé du Canada (IRSC), numéro de référence LSA 94473, la Fondation canadienne pour l’innovation et les provinces suivantes : Terre-Neuve, Nouvelle-Écosse, Québec, Ontario, Manitoba, Alberta et Colombie-Britannique. Cette recherche a été réalisée à l’aide de <b>(DÉTERMINER LA LISTE DES VERSIONS DE DONNÉES À PARTIR DE LA LISTE SUIVANTE)</b>, numéro de demande ",
             },
             acknowledgment_example2: {
               en: ". The CLSA is led by Drs. Parminder Raina, Christina Wolfson and Susan Kirkland.",
-              fr: ". The CLSA is led by Drs. Parminder Raina, Christina Wolfson and Susan Kirkland.", // TODO: TRANSLATE
+              fr: ". L’ÉLCV est dirigée par les professeurs Parminder Raina, Christina Wolfson et Susan Kirkland.",
             },
             no_data_versions: {
               en: "There are no data versions associated with your application.",
-              en: "There are no data versions associated with your application.", // TODO: TRANSLATE
+              en: "Aucune version de données n’est associée à votre demande.",
             },
             data_version_list_1: {
               en: "These are the data versions that you received:",
-              fr: "These are the data versions that you received:", // TODO: TRANSLATE
+              fr: "Voici les versions de données que vous avez reçues :",
             },
             data_version_list_2: {
               en: "Please include the data versions that were used in the preparation of this manuscript.",
-              fr: "Please include the data versions that were used in the preparation of this manuscript.", // TODO: TRANSLATE
+              fr: "Veuillez inclure les versions de données utilisées pour préparer ce manuscrit.",
             },
             acknowledgment: {
               en: "Please provide the full acknowledgement statement as it appears in the manuscript:",
-              fr: "Please provide the full acknowledgement statement as it appears in the manuscript:", // TODO: TRANSLATE
+              fr: "Veuillez fournir l’énoncé d’attestation complet qui figure dans le manuscrit :",
             },
             dataset_version_description: {
               en: "Please note that in any publications you should always refer to the appropriate dataset version number. If new sample weights were used with an earlier dataset version than Baseline Tracking (TRM) version 3.6 and Baseline Comprehensive (COM) version 4.2, please make sure you mention that you are using the CLSA Sample Weights Version 1.2.",
-              fr: "Please note that in any publications you should always refer to the appropriate dataset version number. If new sample weights were used with an earlier dataset version than Baseline Tracking (TRM) version 3.6 and Baseline Comprehensive (COM) version 4.2, please make sure you mention that you are using the CLSA Sample Weights Version 1.2.", // TODO: TRANSLATE
+              fr: "Nous tenons à souligner que, quelle que soit la publication, vous devez toujours vous reporter au numéro de version d’ensemble de données approprié. Si de nouveaux échantillons de poids étaient utilisés dans une version d’ensemble de données antérieure à la version de surveillance initiale (TRM) 3.6 et à la version initiale de la cohorte globale (COM) 4.2, assurez-vous de préciser que vous utilisez la version 1.2 de l’échantillon de poids de l’ÉLCV.",
             },
             dataset_version: {
               en: "Has this requirement been met?",
-              fr: "Has this requirement been met?", //TODO: TRANSLATE
+              fr: "Cette exigence est-elle satisfaite?",
             },
             seroprevalence_description: {
               en: "The following must be included in your manuscript:",
-              fr: "The following must be included in your manuscript:", // TODO: TRANSLATE
+              fr: "Ce qui suit doit être inclus dans votre manuscrit :",
             },
             seroprevalence_example: {
               en: "This project was supported by funding from the Government of Canada, through the COVID-19 Immunity Task Force.",
@@ -1919,77 +1919,77 @@ cenozo.service("CnLocalization", [
             },
             seroprevalence: {
               en: "Has this requirement been met?",
-              fr: "Has this requirement been met?", //TODO: TRANSLATE
+              fr: "Cette exigence est-elle satisfaite?",
             },
             covid_description: {
               en: "The following must be included in your manuscript:",
-              fr: "The following must be included in your manuscript:", // TODO: TRANSLATE
+              fr: "Ce qui suit doit être inclus dans votre manuscrit :",
             },
             covid_example: {
               en: "Funding for support of the CLSA COVID-19 questionnaire-based study is provided by the Juravinski Research Institute, Faculty of Health Sciences, McMaster University, the Provost Fund from McMaster University, the McMaster Institute for Research on Aging, the Public Health Agency of Canada/CIHR grant reference CMO 174125 and the government of Nova Scotia.",
-              fr: "Funding for support of the CLSA COVID-19 questionnaire-based study is provided by the Juravinski Research Institute, Faculty of Health Sciences, McMaster University, the Provost Fund from McMaster University, the McMaster Institute for Research on Aging, the Public Health Agency of Canada/CIHR grant reference CMO 174125 and the government of Nova Scotia.", // TODO: TRANSLATE
+              fr: "Le financement du questionnaire de l’ÉLCV sur la COVID-19 est assuré par l’Institut de recherche Juravinski, la Faculté des sciences de la santé de l’Université McMaster, le Fonds du doyen de l’Université McMaster, l’Institut de recherche sur le vieillissement de l’Université McMaster, la subvention CMO 174125 de l’Agence de la santé publique du Canada et des IRSC et le gouvernement de la Nouvelle-Écosse.",
             },
             covid: {
               en: "Has this requirement been met?",
-              fr: "Has this requirement been met?", //TODO: TRANSLATE
+              fr: "Cette exigence est-elle satisfaite?",
             },
             disclaimer_description: {
               en: "The following must be included in your manuscript:",
-              fr: "The following must be included in your manuscript:", // TODO: TRANSLATE
+              fr: "Ce qui suit doit être inclus dans votre manuscrit :",
             },
             disclaimer_example: {
-              en: "The opinions expressed in this manuscript are the author's own and do not reflect the views of the Canadian Longitudinal Study on Aging.",
-              fr: "The opinions expressed in this manuscript are the author's own and do not reflect the views of the Canadian Longitudinal Study on Aging.", // TODO: TRANSLATE
+              en: "The opinions expressed in this manuscript are the author's own and do not necessarily reflect the views of the Canadian Longitudinal Study on Aging.",
+              fr: "Les opinions exprimées dans ce manuscrit sont celles des auteurs et ne reflètent pas nécessairement les points de vue de l’Étude longitudinale canadienne sur le vieillissement.",
             },
             disclaimer: {
               en: "Has this requirement been met?",
-              fr: "Has this requirement been met?", //TODO: TRANSLATE
+              fr: "Cette exigence est-elle satisfaite?",
             },
             disclaimer_justification: {
               en: "Please provide a justification for why this requirement could not be met.",
-              fr: "Please provide a justification for why this requirement could not be met.", // TODO: TRANSLATE
+              fr: "Veuillez justifier pourquoi cette exigence n’a pas pu être satisfaite.",
             },
             statement_description: {
               en: "The following must be included in your manuscript:",
-              fr: "The following must be included in your manuscript:", // TODO: TRANSLATE
+              fr: "Ce qui suit doit être inclus dans votre manuscrit :",
             },
             statement_example: {
               en: "Data are available from the Canadian Longitudinal Study on Aging (www.clsa-elcv.ca) for researchers who meet the criteria for access to de-identified CLSA data.",
-              fr: "Data are available from the Canadian Longitudinal Study on Aging (www.clsa-elcv.ca) for researchers who meet the criteria for access to de-identified CLSA data.", // TODO: TRANSLATE
+              fr: "Les données de l’Étude longitudinale canadienne sur le vieillissement (www.clsa-elcv.ca) sont mises à la disposition des chercheurs qui respectent les critères d’accès aux données anonymisées de l’ÉLCV.",
             },
             statement: {
               en: "Has this requirement been met?",
-              fr: "Has this requirement been met?", //TODO: TRANSLATE
+              fr: "Cette exigence est-elle satisfaite?",
             },
             statement_justification: {
               en: "Please provide a justification for why this requirement could not be met.",
-              fr: "Please provide a justification for why this requirement could not be met.", // TODO: TRANSLATE
+              fr: "Veuillez justifier pourquoi cette exigence n’a pas pu être satisfaite.",
             },
             conditions_description: {
               en: 'Please ensure that the Supplementary Conditions of Use, as described in Appendix 2 (page 6) of the <a href="https://www.clsa-elcv.ca/resource-types/publication-policy-for-data-users/" target="conditions">CLSA Publication and Promotion Policy</a>, are respected for certain scales, tests and measures included in the CLSA datasets.',
-              fr: 'Please ensure that the Supplementary Conditions of Use, as described in Appendix 2 (page 6) of the <a href="https://www.clsa-elcv.ca/fr-ca/resource-types/publication-policy-for-data-users/" target="conditions">CLSA Publication and Promotion Policy</a>, are respected for certain scales, tests and measures included in the CLSA datasets.', // TODO: TRANSLATE
+              fr: 'Veuillez vous assurer que les conditions supplémentaires d’utilisation, décrites à l’annexe 2 (page 6) de la <a href="https://www.clsa-elcv.ca/fr-ca/resource-types/publication-policy-for-data-users/" target="conditions">Politique de publication et de promotion de l’ÉLCV</a>, sont respectées à l’égard de certaines échelles, de certains tests et de certaines mesures inclus dans l’ensemble de données de l’ÉLCV.',
             },
             conditions: {
               en: "Has this requirement been met?",
-              fr: "Has this requirement been met?", //TODO: TRANSLATE
+              fr: "Cette exigence est-elle satisfaite?",
             },
             indigenous_description: {
               en: "Underrepresented Groups",
-              en: "Underrepresented Groups", // TODO: TRANSLATE
+              en: "Groupes sous-représentés",
             },
             indigenous: {
               en: "Were Indigenous self-identifiers used in any analysis described in this manuscript?",
-              fr: "Were Indigenous self-identifiers used in any analysis described in this manuscript?", // TODO: TRANSLATE
+              fr: "Les numéros d’auto-identification des Autochtones ont-ils été utilisés dans une analyse décrite dans ce manuscrit?",
             },
           },
           misc: {
             na: {
               en: "Not applicable to this manuscript",
-              fr: "Not applicable to this manuscript", // TODO: TRANSLATE
+              fr: "Non applicable à ce manuscrit",
             },
             nr: {
               en: "Not required by the target journal",
-              fr: "Not required by the target journal", // TODO: TRANSLATE
+              fr: "Non requis pas la revue scientifique ciblée",
             },
             pleaseConfirm: { en: "Please confirm", fr: "Veuillez confirmer" },
             no: { en: "No", fr: "Non" },
@@ -2001,14 +2001,14 @@ cenozo.service("CnLocalization", [
             delete: { en: "Delete", fr: "Effacer" },
             download: { en: "Download", fr: "Télécharger" },
             submit: { en: "Submit", fr: "Soumettre" },
-            viewApplication: { en: "View Application", fr: "View Application" }, // TODO: TRANSLATE
+            viewApplication: { en: "View Application", fr: "Voir la demande" },
             noChangesMessage: {
               en: "You have not made any changes to the report since your last submission.  Are you sure you wish to proceed?",
               fr: "Vous n’avez apporté aucune modification au rapport depuis votre dernière soumission. Êtes-vous sûr de vouloir continuer?",
             },
             deleteWarning: {
               en: "Are you sure you want to delete the manuscript review?\n\nThis will permanently destroy all details you have provided. Once this is done there will be no way to restore the manuscript review!",
-              fr: "Are you sure you want to delete the manuscript review?\n\nThis will permanently destroy all details you have provided. Once this is done there will be no way to restore the manuscript review!", // TODO: TRANSLATE
+              fr: "Êtes-vous certain de vouloir supprimer la révision du manuscrit?\n\nCette mesure détruira toute l’information que vous avez fournie. Une fois cette mesure prise, il ne sera plus possible de rétablir la révision du manuscrit!",
             },
             prevButton: {
               en: "Return to the previous section",
@@ -2020,35 +2020,35 @@ cenozo.service("CnLocalization", [
             },
             submitTitle: {
               en: "Manuscript Submitted",
-              fr: "Manuscript Submitted", // TODO: TRANSLATE
+              fr: "Manuscrit soumis",
             },
             submitMessage: {
               en: "You have successfully submitted your Manuscript Submission and it will now be reviewed. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.",
-              fr: "You have successfully submitted your Manuscript Submission and it will now be reviewed. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.", // TODO: TRANSLATE
+              fr: "Vous avez soumis votre manuscrit, qui sera maintenant révisé. Vous recevrez un courriel contenant des directives supplémentaires si nous avons besoin de votre attention ou après avoir terminé le processus. Vous pouvez aller dans le logiciel Magnolia en ligne en tout temps pour visualiser l’état de votre rapport.",
             },
             traineeSubmitTitle: {
               en: "Manuscript Submitted for Supervisor Approval",
-              fr: "Manuscript Submitted for Supervisor Approval", // TODO: TRANSLATE
+              fr: "Manuscrit soumis en vue de son approbation par le superviseur",
             },
             traineeSubmitMessage: {
               en: "You have successfully submitted your Manuscript Submission and your supervisor will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.",
-              fr: "You have successfully submitted your Manuscript Submission and your supervisor will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.", // TODO: TRANSLATE
+              fr: "Vous avez bien soumis votre manuscrit, et votre superviseur recevra un courriel lui demandant son approbation. Vous recevrez un courriel contenant des directives supplémentaires si nous avons besoin de votre attention ou après avoir terminé le processus. Vous pouvez aller dans le logiciel Magnolia en ligne en tout temps pour visualiser l’état de votre rapport.",
             },
             designateSubmitTitle: {
               en: "Manuscript Submitted for Primary Applicant Approval",
-              fr: "Manuscript Submitted for Primary Applicant Approval", // TODO: TRANSLATE
+              fr: "Manuscrit soumis en vue de l’approbation du demandeur principal",
             },
             designateSubmitMessage: {
               en: "You have successfully submitted the Manuscript Submission on behalf of the primary applicant and they will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.",
-              fr: "You have successfully submitted the Manuscript Submission on behalf of the primary applicant and they will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.", // TODO: TRANSLATE
+              fr: "Vous avez soumis votre manuscrit pour le compte du demandeur principal, qui recevra un courriel lui demandant son approbation. Vous recevrez un courriel contenant des directives supplémentaires si nous avons besoin de votre attention ou après avoir terminé le processus. Vous pouvez aller dans le logiciel Magnolia en ligne en tout temps pour visualiser l’état de votre rapport.",
             },
             missingAttachmentTitle: {
               en: "Missing Attachment",
-              fr: "Missing Attachment", // TODO: TRANSLATE
+              fr: "Pièce jointe manquante",
             },
             missingAttachmentMessage: {
-              en: "There are no attachments.  You will now be redirected to where your manuscript can be attached to the report.  Please try re-sbumitted once all relevant attachments have been uploaded.",
-              fr: "There are no attachments.  You will now be redirected to where your manuscript can be attached to the report.  Please try re-sbumitted once all relevant attachments have been uploaded.", // TODO: TRANSLATE
+              en: "There are no attachments.  You will now be redirected to where your manuscript can be attached to the report.  Please try re-submitted once all relevant attachments have been uploaded.",
+              fr: "Il n’y a pas de pièce jointe. Vous serez dirigé vers la page où vous pourrez joindre le manuscrit au rapport. Veuillez tenter de le soumettre de nouveau lorsque toutes les pièces jointes appropriées auront été téléversées.",
             },
             submitWarning: {
               en: "Are you sure that all changes are complete and the report is ready to be submitted?",
