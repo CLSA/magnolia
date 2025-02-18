@@ -12,7 +12,10 @@ cenozoApp.defineModule({
     // and forEachFormElement() functions that can be used below where multiple forms is an issue.
     function getFormElement(form, property) {
       // create a query selector that is both form and property aware
-      var scope = cenozo.getScopeByQuerySelector("form[name=" + form + "] input[id=" + property + "]");
+      var scope = cenozo.getScopeByQuerySelector(
+        "form[name=" + form + "] input[id=" + property + "], select[id=" + property + "]"
+      );
+      console.log(form, property, angular.isDefined(scope));
       if (scope) {
         // fake the innerForm name property if the element is a filename
         if (property.match("filename") && angular.isUndefined(scope.$parent.innerForm.name)) {
