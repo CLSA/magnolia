@@ -341,7 +341,7 @@ cenozo.factory("CnBaseFormModelFactory", [
               var self = this;
               trail = [
                 {
-                  title: 'Requisitions',
+                  title: "Requisitions",
                   go: async function () { await $state.go("reqn.list"); },
                 },
                 {
@@ -1875,7 +1875,7 @@ cenozo.service("CnLocalization", [
             },
             acknowledgment_description: {
               en: "The approved acknowledgment statement must be included:",
-              fr: "L’énoncé d’attestation approuvé doit être inclus :",
+              fr: "La mention approuvée doit être incluse :",
             },
             acknowledgment_example1: {
               en: "This research was made possible using the data/biospecimens collected by the Canadian Longitudinal Study on Aging (CLSA). Funding for the Canadian Longitudinal Study on Aging (CLSA) is provided by the Government of Canada through the Canadian Institutes of Health Research (CIHR) under grant reference: LSA 94473 and the Canada Foundation for Innovation, as well as the following provinces, Newfoundland, Nova Scotia, Quebec, Ontario, Manitoba, Alberta, and British Columbia. This research has been conducted using <b>(DETERMINE LIST OF DATA VERSIONS FROM LIST BELOW)</b> under Application ID ",
@@ -1899,11 +1899,11 @@ cenozo.service("CnLocalization", [
             },
             acknowledgment: {
               en: "Please provide the full acknowledgement statement as it appears in the manuscript:",
-              fr: "Veuillez fournir l’énoncé d’attestation complet qui figure dans le manuscrit :",
+              fr: "Veuillez fournir la mention complète qui figure dans le manuscrit :",
             },
             dataset_version_description: {
               en: "Please note that in any publications you should always refer to the appropriate dataset version number. If new sample weights were used with an earlier dataset version than Baseline Tracking (TRM) version 3.6 and Baseline Comprehensive (COM) version 4.2, please make sure you mention that you are using the CLSA Sample Weights Version 1.2.",
-              fr: "Nous tenons à souligner que, quelle que soit la publication, vous devez toujours vous reporter au numéro de version d’ensemble de données approprié. Si de nouveaux échantillons de poids étaient utilisés dans une version d’ensemble de données antérieure à la version de surveillance initiale (TRM) 3.6 et à la version initiale de la cohorte globale (COM) 4.2, assurez-vous de préciser que vous utilisez la version 1.2 de l’échantillon de poids de l’ÉLCV.",
+              fr: "Nous tenons à souligner que, quelle que soit la publication, vous devez toujours vous reporter au numéro de version d’ensemble de données approprié. Si de nouveaux poids d’échantillonnage étaient utilisés dans une version d’ensemble de données antérieure à la version de surveillance initiale (TRM) 3.6 et à la version initiale de la cohorte globale (COM) 4.2, assurez-vous de préciser que vous utilisez la version 1.2 du poids d’échantillonnage de l’ÉLCV.",
             },
             dataset_version: {
               en: "Has this requirement been met?",
@@ -1979,7 +1979,7 @@ cenozo.service("CnLocalization", [
             },
             indigenous: {
               en: "Were Indigenous self-identifiers used in any analysis described in this manuscript?",
-              fr: "Les numéros d’auto-identification des Autochtones ont-ils été utilisés dans une analyse décrite dans ce manuscrit?",
+              fr: "Les auto-identificateurs de l’identité autochtone ont-ils été utilisés dans une analyse du manuscrit?",
             },
           },
           misc: {
