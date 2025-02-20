@@ -1989,7 +1989,7 @@ cenozo.service("CnLocalization", [
             },
             nr: {
               en: "Not required by the target journal",
-              fr: "Non requis pas la revue scientifique ciblée",
+              fr: "Non requis par la revue scientifique ciblée",
             },
             pleaseConfirm: { en: "Please confirm", fr: "Veuillez confirmer" },
             no: { en: "No", fr: "Non" },
