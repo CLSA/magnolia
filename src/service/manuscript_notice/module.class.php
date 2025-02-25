@@ -29,6 +29,9 @@ class module extends \cenozo\service\module
   {
     parent::prepare_read( $select, $modifier );
 
+    $modifier->join( 'manuscript', 'manuscript_notice.manuscript_id', 'manuscript.id' );
+    $modifier->join( 'reqn', 'manuscript.reqn_id', 'reqn.id' );
+
     if( 'manuscript' == $this->get_parent_subject() )
     {
       $db_user = lib::create( 'business\session' )->get_user();
