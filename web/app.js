@@ -731,7 +731,7 @@ cenozo.service("CnReqnHelper", [
             ["administrator", "chair"].includes(role)
           );
         } else if ("compare" == subject) {
-          return !["applicant", "designate"].includes(role);
+          return true;
         } else if ("amendment proceed" == subject) {
           return (
             "." != record.amendment &&
@@ -892,7 +892,7 @@ cenozo.service("CnManuscriptHelper", [
             )
           );
         } else if ("compare" == subject) {
-          return !["applicant", "designate"].includes(role);
+          return true;
         } else return false;
       },
 
@@ -1467,6 +1467,8 @@ cenozo.service("CnLocalization", [
             coapplicant: { en: "Co-Applicant", fr: "Codemandeur" },
             delete: { en: "Delete", fr: "Effacer" },
             download: { en: "Download", fr: "Télécharger" },
+            compare: { en: "Compare", fr: "Comparer" },
+            comparingWithVersion: { en: "Comparing with Version", fr: "Compare avec Version" },
             dataChecklist: {
               en: "Data Checklist",
               fr: "Sélection des données",

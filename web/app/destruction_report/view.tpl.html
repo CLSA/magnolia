@@ -48,14 +48,18 @@
                 data-toggle="dropdown"
                 aria-haspopup="true"
                 aria-expanded="false">
-          Compare {{ null == model.viewModel.compareRecord ? '' : 'Version ' + model.viewModel.compareRecord.version }}
+          {{
+            null == model.viewModel.compareRecord ?
+              t('misc.compare') :
+              t('misc.comparingWithVersion') + " " + model.viewModel.compareRecord.version
+          }}
           <span class="caret"></span>
         </button>
         <ul class="dropdown-menu full-width" aria-labelledby="versionList">
           <li ng-repeat="version in model.viewModel.versionList">
             <a ng-if="version.id != model.viewModel.record.id && model.viewModel.compareRecord != version"
                ng-click="compareTo( version )">
-              {{ null == version ? 'none' : 'Version ' + version.version }}
+              {{ null == version ? t('misc.none') : 'Version ' + version.version }}
             </a>
           </li>
         </ul>
