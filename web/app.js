@@ -1034,6 +1034,14 @@ cenozo.service("CnLocalization", [
               en: "The trainee you have selected is not a trainee.  Please select a new trainee which has a supervisor.",
               fr: "Le stagiaire que vous avez sélectionné n’est pas un stagiaire. Veuillez sélectionner un nouveau stagiaire doté d’un superviseur.",
             },
+            additionalFee1: {
+              en: "An additional cost of ",
+              fr: "Un coût supplémentaire de ",
+            },
+            additionalFee2: {
+              en: " will be applied to this amendment.\n\nDo you acknowledge and wish to proceed with this amendment?",
+              fr: " sera appliqué à cette modification.\n\nAcceptez-vous et souhaitez-vous procéder à cette modification?",
+            },
             justification: {
               en: "Justification (<strong>maximum 2500 characters</strong>)",
               fr: "Justification (<strong>maximum 2500 caractères</strong>)",

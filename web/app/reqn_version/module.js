@@ -975,6 +975,19 @@ cenozoApp.defineModule({
               );
             },
 
+            isInternational: function() {
+              var baseCountryId = CnSession.application.baseCountryId;
+              var applicantCountryId =
+                null == this.record.applicant_country_id ? baseCountryId : this.record.applicant_country_id;
+              var traineeCountryId =
+                null == this.record.trainee_country_id ? baseCountryId : this.record.trainee_country_id;
+
+              return (
+                baseCountryId != applicantCountryId ||
+                (this.record.trainee_user_id && baseCountryId != traineeCountryId)
+              );
+            },
+
             // NOTE: This process mirrors database\reqn_version::calculate_cost() on the server side
             calculateCost: function () {
               // only calculate the cost if we have to
@@ -996,25 +1009,18 @@ cenozoApp.defineModule({
                   null == this.record.trainee_country_id ? baseCountryId : this.record.trainee_country_id;
 
                 // cost for trainees is different to applicants
-                var international = false;
                 if (this.record.trainee_user_id) {
                   if (baseCountryId != traineeCountryId || baseCountryId != applicantCountryId) {
                     // if either the trainee or applicant isn't Canadian then the base fee is 5000
                     cost = 5000;
-                    international = true;
-                  } else if (
-                    baseCountryId == traineeCountryId &&
-                    baseCountryId == applicantCountryId &&
-                    waiveFee
-                  ) {
-                    // if both are canadian and there is a fee waiver means the base cost is 0
+                  } else if (waiveFee) {
+                    // both are canadian, so check for a fee waiver
                     cost = 0;
                   }
                 } else {
                   // if the applicant is not Canadian then the base fee is 5000
                   if (baseCountryId != applicantCountryId) {
                     cost = 5000;
-                    international = true;
                   }
                 }
 
@@ -1061,7 +1067,7 @@ cenozoApp.defineModule({
                         if(currentAmendment == version.amendment) return;
 
                         // add the cost of any amendment that this version has selected
-                        let c = international ? "feeInternational" : "feeCanada";
+                        let c = this.isInternational() ? "feeInternational" : "feeCanada";
                         this.parentModel.amendmentTypeList.en
                           .filter(aType => 0 < aType[c] && version["amendmentType"+aType.id])
                           .forEach(aType => { cost += aType[c]; });
@@ -1612,26 +1618,44 @@ cenozoApp.defineModule({
               var amendmentType = this.parentModel.amendmentTypeList.en.findByProperty("id", amendmentTypeId);
               var justificationColumn = "amendment_justification_" + amendmentTypeId;
 
-              var property = "amendmentType" + amendmentTypeId;
-              if (this.record[property]) {
-                var proceed = true;
+              try {
+                var property = "amendmentType" + amendmentTypeId;
+                if (this.record[property]) {
+                  var proceed = true;
 
-                if (amendmentTypeId == this.parentModel.newUserAmendmentTypeId) {
-                  proceed = false;
+                  if (amendmentTypeId == this.parentModel.newUserAmendmentTypeId) {
+                    proceed = false;
 
-                  // show a warning if changing primary applicants
-                  var response = await CnModalConfirmFactory.instance({
-                    title: this.translate("misc.pleaseNote"),
-                    noText: this.translate("misc.no"),
-                    yesText: this.translate("misc.yes"),
-                    message: this.translate("amendment.newUserNotice"),
-                  }).show();
-                  proceed = response;
-                }
+                    // show a warning if changing primary applicants
+                    var response = await CnModalConfirmFactory.instance({
+                      title: this.translate("misc.pleaseNote"),
+                      noText: this.translate("misc.no"),
+                      yesText: this.translate("misc.yes"),
+                      message: this.translate("amendment.newUserNotice"),
+                    }).show();
+                    proceed = response;
+                  }
 
-                // add the amendment type
-                if (proceed) {
-                  try {
+                  let fee = amendmentType[this.isInternational() ? "feeInternational" : "feeCanada"];
+                  if (0 < fee) {
+                    fee = "fr" == this.record.lang ? fee + " $" : "$" + fee;
+                    proceed = false;
+
+                    // show a warning if the amendment has a fee
+                    var response = await CnModalConfirmFactory.instance({
+                      title: this.translate("misc.pleaseNote"),
+                      noText: this.translate("misc.no"),
+                      yesText: this.translate("misc.yes"),
+                      message: (
+                        this.translate("amendment.additionalFee1") + fee +
+                        this.translate("amendment.additionalFee2")
+                      ),
+                    }).show();
+                    proceed = response;
+                  }
+
+                  // add the amendment type
+                  if (proceed) {
                     await CnHttpFactory.instance({
                       path: path,
                       data: amendmentTypeId,
@@ -1645,24 +1669,24 @@ cenozoApp.defineModule({
                     ) {
                       this.record[justificationColumn] = "";
                     }
-                  } catch (error) {
-                    // handled by onError above
+                  } else {
+                    // we're not making the change so un-select the option
+                    this.record[property] = !this.record[property];
                   }
                 } else {
-                  // we're not making the change so un-select the option
-                  this.record[property] = !this.record[property];
-                }
-              } else {
-                // delete the amendment type
-                try {
+                  // delete the amendment type
                   await CnHttpFactory.instance({
                     path: path + "/" + amendmentTypeId,
                     onError: onErrorFn
                   }).delete();
                   delete this.record[justificationColumn];
-                } catch (error) {
-                  // handled by onError above
                 }
+              } catch (error) {
+                // handled by onError above
+              } finally {
+                // update the amendment property in the version list
+                var version = this.versionList.filter(v => null != v).findByProperty("id", this.record.id);
+                version[property] = this.record[property];
               }
             },
 
