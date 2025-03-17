@@ -1097,6 +1097,30 @@ class reqn extends \cenozo\database\record
   }
 
   /**
+   * Returns this reqn's latest reqn_version record
+   * 
+   * @access public
+   */
+  public function get_last_reqn_version_with_agreement()
+  {
+    // check the primary key value
+    if( is_null( $this->id ) )
+    {
+      log::warning( 'Tried to query reqn with no primary key.' );
+      return NULL;
+    }
+
+    $select = lib::create( 'database\select' );
+    $select->from( 'reqn_last_reqn_version_with_agreement' );
+    $select->add_column( 'reqn_version_id' );
+    $modifier = lib::create( 'database\modifier' );
+    $modifier->where( 'reqn_id', '=', $this->id );
+
+    $reqn_version_id = static::db()->get_one( sprintf( '%s %s', $select->get_sql(), $modifier->get_sql() ) );
+    return $reqn_version_id ? lib::create( 'database\reqn_version', $reqn_version_id ) : NULL;
+  }
+
+  /**
    * Returns this reqn's latest final_report record
    * 
    * @access public

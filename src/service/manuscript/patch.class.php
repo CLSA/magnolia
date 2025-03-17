@@ -37,6 +37,17 @@ class patch extends \cenozo\service\patch
         if( in_array( $db_role->name, array( 'applicant', 'designate', 'administrator' ) ) )
         {
           if( 'new' != $phase && !$db_manuscript->deferred ) $code = 403;
+          else
+          {
+            // make sure the agreement hasn't expired
+            $db_reqn_version = $db_manuscript->get_reqn()->get_last_reqn_version_with_agreement();
+            if( is_null( $db_reqn_version ) ) $code = 409;
+            else
+            {
+              $diff = util::get_interval( $db_reqn_version->agreement_end_date );
+              if( 0 == $diff->invert && 0 < $diff->days ) $code = 409;
+            }
+          }
         }
         else $code = 403;
       }

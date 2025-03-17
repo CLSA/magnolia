@@ -47,6 +47,7 @@ cenozoApp.defineModule({
       },
 
       // the following are for the form and will not appear in the view
+      agreement_end_date: { column: "reqn_version_with_agreement.agreement_end_date", type: "date" },
       version: { type: "string" },
       current_manuscript_version_id: { column: "manuscript_version.id", type: "string" },
       trainee_user_id: { column: "reqn.trainee_user_id", type: "string" },
@@ -393,6 +394,21 @@ cenozoApp.defineModule({
 
             submit: async function () {
               var record = this.record;
+
+              if (
+                null == record.agreement_end_date || 
+                moment(record.agreement_end_date).isBefore(moment(), "day")
+              ){
+                await CnModalMessageFactory.instance({
+                  title: this.translate("misc.agreementExpiredTitle"),
+                  message: this.translate("misc.agreementExpiredMessage"),
+                  closeText: this.translate("misc.close"),
+                  error: true,
+                }).show();
+
+                return;
+              }
+
               var response = await CnModalConfirmFactory.instance({
                 title: this.translate("misc.pleaseConfirm"),
                 noText: this.parentModel.isRole("applicant", "designate") ? this.translate("misc.no") : "No",
@@ -514,28 +530,44 @@ cenozoApp.defineModule({
                 if (!response) return;
               }
               
-              var parent = this.parentModel.getParentIdentifier();
-              await CnHttpFactory.instance({
-                path: parent.subject + "/" + parent.identifier + "?action=submit",
-              }).patch();
+              try {
+                var parent = this.parentModel.getParentIdentifier();
+                await CnHttpFactory.instance({
+                  path: parent.subject + "/" + parent.identifier + "?action=submit",
+                  onError: (error) => {
+                    if (409 == error.status) {
+                      CnModalMessageFactory.instance({
+                        title: this.translate("misc.agreementExpiredTitle"),
+                        message: this.translate("misc.agreementExpiredMessage"),
+                        closeText: this.translate("misc.close"),
+                        error: true,
+                      }).show();
+                    } else {
+                      CnModalMessageFactory.httpError(error);
+                    }
+                  },
+                }).patch();
 
-              var code =
-                CnSession.user.id == this.record.trainee_user_id ? "traineeSubmit" :
-                CnSession.user.id == this.record.designate_user_id ? "designateSubmit" : "submit";
-              await CnModalMessageFactory.instance({
-                title: this.translate("misc." + code + "Title"),
-                message: this.translate("misc." + code + "Message"),
-                closeText: this.translate("misc.close"),
-              }).show();
+                var code =
+                  CnSession.user.id == this.record.trainee_user_id ? "traineeSubmit" :
+                  CnSession.user.id == this.record.designate_user_id ? "designateSubmit" : "submit";
+                await CnModalMessageFactory.instance({
+                  title: this.translate("misc." + code + "Title"),
+                  message: this.translate("misc." + code + "Message"),
+                  closeText: this.translate("misc.close"),
+                }).show();
 
-              if (this.parentModel.isRole("applicant", "designate")) {
-                // go back to the reqn version's manuscript tab
-                await $state.go(
-                  "reqn_version.view",
-                  { identifier: "identifier=" + this.record.identifier, t: "manuscripts" }
-                );
-              } else {
-                await this.onView(true); // refresh
+                if (this.parentModel.isRole("applicant", "designate")) {
+                  // go back to the reqn version's manuscript tab
+                  await $state.go(
+                    "reqn_version.view",
+                    { identifier: "identifier=" + this.record.identifier, t: "manuscripts" }
+                  );
+                } else {
+                  await this.onView(true); // refresh
+                }
+              } catch (error) {
+                // handled by onError function above
               }
             },
 

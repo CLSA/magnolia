@@ -1624,6 +1624,14 @@ cenozo.service("CnLocalization", [
               en: "There are mandatory fields which are missing. You will now be redirected to where the incomplete fields can be found. Please try re-submitting once all mandatory fields have been filled out.",
               fr: "Des champs obligatoires sont manquants. Vous serez redirigé vers l’endroit où se trouvent les champs incomplets. Veuillez soumettre la demande d’accès à nouveau quand tous les champs obligatoires auront été remplis.",
             },
+            agreementExpiredTitle: {
+              en: "Agreement Expired",
+              fr: "Entente expirée",
+            },
+            agreementExpiredMessage: {
+              en: "Your CLSA Access Agreement for this application has expired. The Approved User’s right to publish pursuant to Section 8 of the agreement has ended. If you require an extension to the agreement to complete analysis or to publish your results please request an extension by creating an amendment.",
+              fr: "Votre Entente d'accès aux données de l’ÉLCV pour cette demande est expirée. Le droit de publication de l’utilisatrice ou l'utilisateur autorisé conformément à l'article 8 de l'Entente a pris fin. Si vous avez besoin d'une prolongation pour terminer l'analyse ou la publication de vos résultats, veuillez créer une demande de modification.",
+            },
             invalidNewPrimaryTitle: {
               en: "Invalid applicant",
               fr: "Demandeur incorrect",
@@ -2051,6 +2059,14 @@ cenozo.service("CnLocalization", [
             designateSubmitMessage: {
               en: "You have successfully submitted the Manuscript Submission on behalf of the primary applicant and they will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your report.",
               fr: "Vous avez soumis votre manuscrit pour le compte du demandeur principal, qui recevra un courriel lui demandant son approbation. Vous recevrez un courriel contenant des directives supplémentaires si nous avons besoin de votre attention ou après avoir terminé le processus. Vous pouvez aller dans le logiciel Magnolia en ligne en tout temps pour visualiser l’état de votre rapport.",
+            },
+            agreementExpiredTitle: {
+              en: "Agreement Expired",
+              fr: "Entente expirée",
+            },
+            agreementExpiredMessage: {
+              en: "Your CLSA Access Agreement for this application has expired. The Approved User’s right to publish pursuant to Section 8 of the agreement has ended. If you require an extension to the agreement to complete analysis or to publish your results please request an extension by creating an amendment.",
+              fr: "Votre Entente d'accès aux données de l’ÉLCV pour cette demande est expirée. Le droit de publication de l’utilisatrice ou l'utilisateur autorisé conformément à l'article 8 de l'Entente a pris fin. Si vous avez besoin d'une prolongation pour terminer l'analyse ou la publication de vos résultats, veuillez créer une demande de modification.",
             },
             missingAttachmentTitle: {
               en: "Missing Attachment",

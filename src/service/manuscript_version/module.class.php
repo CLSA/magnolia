@@ -76,6 +76,17 @@ class module extends \cenozo\service\module
 
     $modifier->join( 'manuscript', 'manuscript_version.manuscript_id', 'manuscript.id' );
     $modifier->join( 'reqn', 'manuscript.reqn_id', 'reqn.id' );
+    $modifier->join(
+      'reqn_last_reqn_version_with_agreement',
+      'reqn.id',
+      'reqn_last_reqn_version_with_agreement.reqn_id'
+    );
+    $modifier->left_join(
+      'reqn_version',
+      'reqn_last_reqn_version_with_agreement.reqn_version_id',
+      'reqn_version_with_agreement.id',
+      'reqn_version_with_agreement',
+    );
     $modifier->join( 'user', 'reqn.user_id', 'user.id' );
     $modifier->left_join( 'user', 'reqn.trainee_user_id', 'trainee_user.id', 'trainee_user' );
     $modifier->left_join( 'user', 'reqn.designate_user_id', 'designate_user.id', 'designate_user' );
@@ -119,10 +130,12 @@ class module extends \cenozo\service\module
     $db_manuscript_version = $this->get_resource();
     if( !is_null( $db_manuscript_version ) )
     {
+      $db_manuscript = $db_manuscript_version->get_manuscript();
+      $db_reqn_version = $db_manuscript->get_reqn()->get_current_reqn_version();
+
       if( $select->has_column( 'has_genomics_data' ) )
       {
         // determine if the current reqn_version has selected any genomics data
-        $db_reqn_version = $db_manuscript_version->get_manuscript()->get_reqn()->get_current_reqn_version();
         $data_mod = lib::create( 'database\modifier' );
         $data_mod->join( 'data_option', 'data_selection.data_option_id', 'data_option.id' );
         $data_mod->where( 'data_option.name_en', 'LIKE', '%Genomics%' );
@@ -137,7 +150,6 @@ class module extends \cenozo\service\module
       if( $select->has_column( 'has_seroprevalence_data' ) )
       {
         // determine if the current reqn_version has selected any seroprevalence data
-        $db_reqn_version = $db_manuscript_version->get_manuscript()->get_reqn()->get_current_reqn_version();
         $data_mod = lib::create( 'database\modifier' );
         $data_mod->join( 'data_option', 'data_selection.data_option_id', 'data_option.id' );
         $data_mod->where( 'data_option.name_en', 'LIKE', '%Seroprevalence%' );
@@ -152,7 +164,6 @@ class module extends \cenozo\service\module
       if( $select->has_column( 'has_covid_data' ) )
       {
         // determine if the current reqn_version has selected any covid data
-        $db_reqn_version = $db_manuscript_version->get_manuscript()->get_reqn()->get_current_reqn_version();
         $data_mod = lib::create( 'database\modifier' );
         $data_mod->join( 'data_option', 'data_selection.data_option_id', 'data_option.id' );
         $data_mod->where( 'data_option.name_en', 'LIKE', '%COVID%' );
@@ -170,7 +181,7 @@ class module extends \cenozo\service\module
         $notice_mod = lib::create( 'database\modifier' );
         $notice_mod->order_desc( 'datetime' );
         $notice_mod->limit( 1 );
-        $notice_list = $db_manuscript_version->get_manuscript()->get_manuscript_notice_object_list( $notice_mod );
+        $notice_list = $db_manuscript->get_manuscript_notice_object_list( $notice_mod );
 
         $unread = false;
         if( 0 < count( $notice_list ) )

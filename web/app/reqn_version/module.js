@@ -186,12 +186,14 @@ cenozoApp.defineModule({
       "CnReqnVersionModelFactory",
       "cnRecordViewDirective",
       "CnEthicsApprovalModalAddFactory",
+      "CnModalMessageFactory",
       "CnHttpFactory",
       "CnSession",
       function (
         CnReqnVersionModelFactory,
         cnRecordViewDirective,
         CnEthicsApprovalModalAddFactory,
+        CnModalMessageFactory,
         CnHttpFactory,
         CnSession
       ) {
@@ -523,9 +525,23 @@ cenozoApp.defineModule({
 
             $scope.addManuscript = async function () {
               if ($scope.model.viewModel.manuscriptModel.getAddEnabled()) {
-                var form = cenozo.getScopeByQuerySelector("#manuscript_form").manuscript_form;
+                // first make sure the agreement hasn't expired
+                if (
+                  null == this.model.viewModel.record.agreement_end_date || 
+                  moment(this.model.viewModel.record.agreement_end_date).isBefore(moment(), "day")
+                ){
+                  await CnModalMessageFactory.instance({
+                    title: $scope.t("misc.agreementExpiredTitle"),
+                    message: $scope.t("misc.agreementExpiredMessage"),
+                    closeText: $scope.t("misc.close"),
+                    error: true,
+                  }).show();
+                  
+                  return;
+                }
 
-                // we need to check the title input for errors
+                // now we need to check the title input for errors
+                var form = cenozo.getScopeByQuerySelector("#manuscript_form").manuscript_form;
 
                 // get the title's form element and remove any conflict errors, then see if it's invalid
                 var titleEl = getFormElement("manuscript_form", "title");
@@ -2684,19 +2700,29 @@ cenozoApp.defineModule({
           this.configureFileInput("agreement_filename");
 
           // handle conflict errors differently in the manuscript's add model
+          const self = this;
           this.manuscriptModel.addModel.onAddError = function(response) {
             if (409 == response.status) {
-              // report which inputs are included in the conflict
-              response.data.forEach((item) => {
-                const scope = cenozo.getScopeByQuerySelector("#manuscript_form [name=innerForm]");
-                if (scope) {
-                  const element = scope.innerForm.name;
-                  if (element) {
-                    element.$error.conflict = true;
-                    cenozo.updateFormElement(element, true);
+              if (angular.isArray(response.data)) {
+                // report which inputs are included in the conflict
+                response.data.forEach((item) => {
+                  const scope = cenozo.getScopeByQuerySelector("#manuscript_form [name=innerForm]");
+                  if (scope) {
+                    const element = scope.innerForm.name;
+                    if (element) {
+                      element.$error.conflict = true;
+                      cenozo.updateFormElement(element, true);
+                    }
                   }
-                }
-              });
+                });
+              } else {
+                CnModalMessageFactory.instance({
+                  title: self.translate("misc.agreementExpiredTitle"),
+                  message: self.translate("misc.agreementExpiredMessage"),
+                  closeText: self.translate("misc.close"),
+                  error: true,
+                }).show();
+              }
             } else {
               CnModalMessageFactory.httpError(response);
             }
