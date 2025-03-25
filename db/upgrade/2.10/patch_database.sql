@@ -3,6 +3,7 @@
 SET AUTOCOMMIT=0;
 
 SOURCE amendment_type.sql
+SOURCE reqn.sql
 SOURCE reqn_version.sql
 SOURCE manuscript_version.sql
 

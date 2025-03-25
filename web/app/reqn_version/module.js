@@ -145,6 +145,7 @@ cenozoApp.defineModule({
       state: { column: "reqn.state", type: "string" },
       data_directory: { column: "reqn.data_directory", type: "string" },
       data_expiry_date: { column: "reqn.data_expiry_date", type: "date" },
+      cross_institution_data_access: { column: "reqn.cross_institution_data_access", type: "string" },
       status: { column: "stage_type.status", type: "string" },
       has_unread_notice: { type: "boolean" },
       has_ethics_approval_list: { type: "boolean" },
@@ -187,6 +188,7 @@ cenozoApp.defineModule({
       "cnRecordViewDirective",
       "CnEthicsApprovalModalAddFactory",
       "CnModalMessageFactory",
+      "CnModalConfirmFactory",
       "CnHttpFactory",
       "CnSession",
       function (
@@ -194,6 +196,7 @@ cenozoApp.defineModule({
         cnRecordViewDirective,
         CnEthicsApprovalModalAddFactory,
         CnModalMessageFactory,
+        CnModalConfirmFactory,
         CnHttpFactory,
         CnSession
       ) {
@@ -368,6 +371,29 @@ cenozoApp.defineModule({
                   // dirty all inputs so we can find the problem
                   forEachFormElement("project_team_form", (element) => { element.$dirty = true; });
                 } else {
+                  // warn if this reqn does not allow cross institutional data access
+                  console.log(
+                    $scope.coapplicantRecord.access,
+                    !$scope.model.viewModel.record.cross_institution_data_access,
+                    $scope.coapplicantRecord.affiliation,
+                    $scope.model.viewModel.record.applicant_affiliation
+                  );
+                  if (
+                    $scope.coapplicantRecord.access &&
+                    !$scope.model.viewModel.record.cross_institution_data_access &&
+                    $scope.coapplicantRecord.affiliation != $scope.model.viewModel.record.applicant_affiliation
+                  ) {
+                    const response = await CnModalConfirmFactory.instance({
+                      title: $scope.t("misc.pleaseNote"),
+                      noText: $scope.t("misc.no"),
+                      yesText: $scope.t("misc.yes"),
+                      message: $scope.t("part1.project_team.crossInstitutionWarning"),
+                    }).show();
+                    if (!response) return;
+                  }
+                  console.log("ADDING");
+                  return;
+
                   try {
                     $scope.isAddingCoapplicant = true;
                     await coapplicantAddModel.onAdd($scope.coapplicantRecord);

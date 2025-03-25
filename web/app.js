@@ -1147,6 +1147,10 @@ cenozo.service("CnLocalization", [
                 en: "Changes to co-applicants agreement",
                 fr: "Modifications à apporter à l’entente de codemandeur",
               },
+              crossInstitutionWarning: {
+                en: "Please note that the primary applicant's institution does not allow sharing data with co-applicants belonging to other institutions.\n\nIf you choose to proceed then you are confirming that the new co-applicant's institution is not excluded by this restriction.  Please note that this does not apply to co-applicants that do not require access to the application's data.\n\nDo you acknowledge and wish to proceed?",
+                fr: "Please note that the primary applicant's institution does not allow sharing data with co-applicants belonging to other institutions.\n\nIf you choose to proceed then you are confirming that the new co-applicant's institution is not excluded by this restriction.  Please note that this does not apply to co-applicants that do not require access to the application's data.\n\nDo you acknowledge and wish to proceed?", // TODO: translate
+              },
             },
             timeline: {
               tab: { en: "Timeline", fr: "Échéancier" },
