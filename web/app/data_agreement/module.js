@@ -13,8 +13,12 @@ cenozoApp.defineModule({
         institution: {
           title: "Institution",
         },
-        version: {
-          title: "Version",
+        start_date: {
+          title: "Start Date",
+          type: "date",
+        },
+        end_date: {
+          title: "End Date",
           type: "date",
         },
         reqn_count: {
@@ -33,8 +37,12 @@ cenozoApp.defineModule({
         title: "Institution",
         type: "string",
       },
-      version: {
-        title: "Version",
+      start_date: {
+        title: "Start Date",
+        type: "date",
+      },
+      end_date: {
+        title: "End Date",
         type: "date",
       },
       data: {
@@ -42,7 +50,7 @@ cenozoApp.defineModule({
         type: "base64",
         mimeType: "application/pdf",
         getFilename: function ($state, model) {
-          return model.viewModel.record.institution + " (" + model.viewModel.record.version + ")";
+          return model.viewModel.record.institution + " (" + model.viewModel.record.start_date + ")";
         }
       },
     });

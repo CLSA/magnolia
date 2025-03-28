@@ -6,6 +6,7 @@ SOURCE amendment_type.sql
 SOURCE reqn.sql
 SOURCE reqn_version.sql
 SOURCE manuscript_version.sql
+SOURCE data_agreement.sql
 
 SOURCE service.sql
 SOURCE role_has_service.sql
