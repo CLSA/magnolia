@@ -1149,7 +1149,7 @@ cenozo.service("CnLocalization", [
               },
               crossInstitutionWarning: {
                 en: "Please note that the primary applicant's institution does not allow sharing data with co-applicants belonging to other institutions.\n\nIf you choose to proceed then you are confirming that the new co-applicant's institution is not excluded by this restriction.  Please note that this does not apply to co-applicants that do not require access to the application's data.\n\nDo you acknowledge and wish to proceed?",
-                fr: "Please note that the primary applicant's institution does not allow sharing data with co-applicants belonging to other institutions.\n\nIf you choose to proceed then you are confirming that the new co-applicant's institution is not excluded by this restriction.  Please note that this does not apply to co-applicants that do not require access to the application's data.\n\nDo you acknowledge and wish to proceed?", // TODO: translate
+                fr: "Veuillez noter que l'institution du demandeur principal ou de la demandeuse principale n'autorise pas le partage de données avec les co-demandeur·ses travaillant dans d'autres institutions.\n\nSi vous choisissez de continuer, vous confirmez que l'institution du/de la co-demandeur·se à ajouter n'est pas exclue par cette restriction. Veuillez noter que cela ne s'applique pas aux co-demandeur·ses qui n'ont pas besoin d'accéder aux données visées par la demande.\n\nAcceptez-vous et souhaitez-vous procéder?",
               },
             },
             timeline: {
