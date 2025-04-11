@@ -53,6 +53,7 @@ cenozoApp.defineModule({
       trainee_user_id: { column: "reqn.trainee_user_id", type: "string" },
       designate_user_id: { column: "reqn.designate_user_id", type: "string" },
       deferred: { column: "manuscript.deferred", type: "boolean" },
+      has_unread_notice: { type: "boolean" },
       stage_type: { column: "manuscript_stage_type.name", type: "string" },
       phase: { column: "manuscript_stage_type.phase", type: "string" },
       lang: { column: "language.code", type: "string" },
@@ -116,7 +117,14 @@ cenozoApp.defineModule({
               isDAO: function () { return scope.model.isRole("dao"); },
             });
 
-            scope.model.viewModel.afterView(function () {
+            scope.model.viewModel.afterView(async function () {
+              let record = scope.model.viewModel.record;
+
+              // display notices to the applicant if they've never seen it
+              if (scope.model.isRole("applicant", "designate") && record.has_unread_notice) {
+                await scope.model.viewModel.displayNotices();
+              }
+
               // setup the breadcrumbtrail
               CnSession.setBreadcrumbTrail([
                 {
@@ -149,8 +157,6 @@ cenozoApp.defineModule({
             scope.$watch("model.viewModel.record.objectives", (text) => {
               scope.model.viewModel.charCount.objectives = text ? text.length : 0;
             });
-
-            scope.model.viewModel.onView();
           },
           controller: function ($scope) {
             if (angular.isUndefined($scope.model)) $scope.model = CnManuscriptVersionModelFactory.root;
@@ -236,6 +242,7 @@ cenozoApp.defineModule({
     cenozo.providers.factory("CnManuscriptVersionViewFactory", [
       "CnBaseFormViewFactory",
       "CnManuscriptHelper",
+      "CnModalNoticeListFactory",
       "CnManuscriptAttachmentModelFactory",
       "CnHttpFactory",
       "CnModalMessageFactory",
@@ -246,6 +253,7 @@ cenozoApp.defineModule({
       function (
         CnBaseFormViewFactory,
         CnManuscriptHelper,
+        CnModalNoticeListFactory,
         CnManuscriptAttachmentModelFactory,
         CnHttpFactory,
         CnModalMessageFactory,
@@ -396,7 +404,7 @@ cenozoApp.defineModule({
               var record = this.record;
 
               if (
-                null == record.agreement_end_date || 
+                null == record.agreement_end_date ||
                 moment(record.agreement_end_date).isBefore(moment(), "day")
               ){
                 await CnModalMessageFactory.instance({
@@ -529,7 +537,7 @@ cenozoApp.defineModule({
                 // don't proceed if they user has changed their mind
                 if (!response) return;
               }
-              
+
               try {
                 var parent = this.parentModel.getParentIdentifier();
                 await CnHttpFactory.instance({
@@ -613,6 +621,19 @@ cenozoApp.defineModule({
                 path: ["manuscript", this.record.manuscript_id, "manuscript_attachment", id].join("/"),
               }).delete();
               await this.getAttachmentList();
+            },
+
+            displayNotices: async function () {
+              var response = await CnHttpFactory.instance({
+                path: ["manuscript", this.record.manuscript_id, "manuscript_notice"].join("/"),
+                data: { modifier: { order: { datetime: true } } },
+              }).query();
+
+              await CnModalNoticeListFactory.instance({
+                title: "Notice List",
+                closeText: this.translate("misc.close"),
+                noticeList: response.data,
+              }).show();
             },
 
           });

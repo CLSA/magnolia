@@ -2023,6 +2023,11 @@ cenozo.service("CnLocalization", [
             delete: { en: "Delete", fr: "Effacer" },
             download: { en: "Download", fr: "Télécharger" },
             submit: { en: "Submit", fr: "Soumettre" },
+            manuscriptSubmission: {
+              en: "Manuscript Submission",
+              fr: "Soumission du manuscrit",
+            },
+            notices: { en: "Notices", fr: "Notifications" },
             viewApplication: { en: "View Application", fr: "Voir la demande" },
             noChangesMessage: {
               en: "You have not made any changes to the report since your last submission.  Are you sure you wish to proceed?",
