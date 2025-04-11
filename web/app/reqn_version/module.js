@@ -3000,10 +3000,10 @@ cenozoApp.defineModule({
                       path: "data_agreement",
                       data: {
                         select: {
-                          column: ["id", "institution", "version"],
+                          column: ["id", "institution", "start_date"],
                         },
                         modifier: {
-                          order: ["institution", {"version":true} ],
+                          order: ["institution", {"start_date":true} ],
                           limit: 1000,
                         },
                       },
@@ -3292,7 +3292,7 @@ cenozoApp.defineModule({
                 this.metadata.columnList.data_agreement_id.enumList = null == dataAgreementResponse ?
                   [] :
                   dataAgreementResponse.data.reduce((list, item) => {
-                    list.push({ value: item.id, name: item.institution + " (" + item.version + ")" });
+                    list.push({ value: item.id, name: item.institution + " (" + item.start_date + ")" });
                     return list;
                   }, []);
                 this.metadata.columnList.data_agreement_id.enumList.unshift({ value: "", name: "(empty)" });
