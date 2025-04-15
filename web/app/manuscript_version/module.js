@@ -189,6 +189,12 @@ cenozoApp.defineModule({
                 ].join(" ");
               },
 
+              compareTo: async function (version) {
+                $scope.model.viewModel.compareRecord = version;
+                $scope.model.setQueryParameter("c", null == version ? undefined : version.version);
+                await $scope.model.reloadState(false, false, "replace");
+              },
+
               addAttachment: async function () {
                 if ($scope.model.viewModel.attachmentModel.getAddEnabled()) {
                   // get the data property's form element and remove any conflict errors, then see if it's invalid
@@ -270,6 +276,7 @@ cenozoApp.defineModule({
 
           angular.extend(this, {
             compareRecord: null,
+            versionListLoaded: false,
             versionList: [],
             dataVersionList: [],
             attachmentList: [],
@@ -297,6 +304,9 @@ cenozoApp.defineModule({
 
               // get a list of all attachments
               await this.getAttachmentList();
+
+              // the version list might get long, so don't wait for it (diffs will show once it is loaded)
+              this.getVersionList().finally(() => { this.versionListLoaded = true; });
             },
 
             onPatch: async function (data) {
@@ -340,7 +350,7 @@ cenozoApp.defineModule({
             },
 
             getDifferences: function (manSub2) {
-              var manSub2 = this.record;
+              var manSub1 = this.record;
               var differences = {
                 diff: false,
                 part_2: {
@@ -398,7 +408,42 @@ cenozoApp.defineModule({
                   }
                 }
               }
+
+              return differences;
             },
+
+            getVersionList: async function () {
+              var parent = this.parentModel.getParentIdentifier();
+              this.versionList = [];
+              var response = await CnHttpFactory.instance({
+                path: parent.subject + "/" + parent.identifier + "/manuscript_version",
+                data: { modifier: { order: [{"version": true}] } },
+              }).query();
+
+              response.data.forEach((version) => this.versionList.push(version));
+
+              var compareVersion = this.parentModel.getQueryParameter("c");
+              if (angular.isDefined(compareVersion))
+                this.compareRecord = this.versionList.findByProperty("version", compareVersion);
+
+              if (1 < this.versionList.length) {
+                // add a null object to the version list so we can turn off comparisons
+                this.versionList.unshift(null);
+              }
+
+              this.lastVersion = null;
+              this.versionList.some((version) => {
+                if (null != version) {
+                  this.lastVersion = version.version;
+                  return true;
+                }
+              });
+
+              this.versionList.forEach((version) => {
+                if (null != version) version.differences = this.getDifferences(version);
+              });
+            },
+
 
             submit: async function () {
               var record = this.record;

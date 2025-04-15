@@ -1432,7 +1432,7 @@ cenozo.service("CnLocalization", [
               fr: "Le demandeur principal doit soumettre à l’ÉLCV la version finale de tous les manuscrits (y compris les soumissions en vue d’une préimpression), les rapports, les analyses et les autres publications primaires proposées qui décrivent des recherches réalisées à l’aide des données ou des échantillons biologiques de l’ÉLCV, en vue de leur révision au moins 15 jours ouvrables avant la soumission anticipée.",
             },
             text3: {
-              en: 'If starting a new submission, enter the title of your manuscript and press "Add Manuscript".  Choose the one that you are submitting from the list of manuscripts below and follow all instructions.', 
+              en: 'If starting a new submission, enter the title of your manuscript and press "Add Manuscript".  Choose the one that you are submitting from the list of manuscripts below and follow all instructions.',
               fr: 'Si vous commencez une nouvelle soumission, inscrivez le titre de votre manuscrit et appuyez sur « Ajouter un manuscrit ». Choisissez celui que vous soumettez dans la liste de manuscrits ci-dessous et respectez toutes les directives.',
             },
             manuscript: {
@@ -2014,6 +2014,7 @@ cenozo.service("CnLocalization", [
               fr: "Non requis par la revue scientifique ciblée",
             },
             pleaseConfirm: { en: "Please confirm", fr: "Veuillez confirmer" },
+            none: { en: "none", fr: "aucun" },
             no: { en: "No", fr: "Non" },
             yes: { en: "Yes", fr: "Oui" },
             close: { en: "Close", fr: "Ferme" },
@@ -2022,6 +2023,8 @@ cenozo.service("CnLocalization", [
             remove: { en: "Remove", fr: "Supprimer" },
             delete: { en: "Delete", fr: "Effacer" },
             download: { en: "Download", fr: "Télécharger" },
+            compare: { en: "Compare", fr: "Comparer" },
+            comparingWithVersion: { en: "Comparing with Version", fr: "Compare avec Version" },
             submit: { en: "Submit", fr: "Soumettre" },
             manuscriptSubmission: {
               en: "Manuscript Submission",
