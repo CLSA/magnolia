@@ -544,10 +544,15 @@ cenozoApp.defineModule({
             $scope.addManuscript = async function () {
               if ($scope.model.viewModel.manuscriptModel.getAddEnabled()) {
                 // first make sure the agreement hasn't expired
-                if (
-                  null == this.model.viewModel.record.agreement_end_date || 
-                  moment(this.model.viewModel.record.agreement_end_date).isBefore(moment(), "day")
-                ){
+                const response = await CnHttpFactory.instance({
+                  path: "/reqn/identifier=" + $scope.model.viewModel.record.identifier,
+                  data: {
+                    select: { column: { table: "reqn_version_with_agreement", column: "agreement_end_date" } },
+                  },
+                }).get();
+                const agreement_end_date = response.data.agreement_end_date;
+
+                if (null == agreement_end_date || moment(agreement_end_date).isBefore(moment(), "day")) {
                   await CnModalMessageFactory.instance({
                     title: $scope.t("misc.agreementExpiredTitle"),
                     message: $scope.t("misc.agreementExpiredMessage"),
