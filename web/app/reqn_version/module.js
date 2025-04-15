@@ -372,12 +372,6 @@ cenozoApp.defineModule({
                   forEachFormElement("project_team_form", (element) => { element.$dirty = true; });
                 } else {
                   // warn if this reqn does not allow cross institutional data access
-                  console.log(
-                    $scope.coapplicantRecord.access,
-                    !$scope.model.viewModel.record.cross_institution_data_access,
-                    $scope.coapplicantRecord.affiliation,
-                    $scope.model.viewModel.record.applicant_affiliation
-                  );
                   if (
                     $scope.coapplicantRecord.access &&
                     !$scope.model.viewModel.record.cross_institution_data_access &&
@@ -391,8 +385,6 @@ cenozoApp.defineModule({
                     }).show();
                     if (!response) return;
                   }
-                  console.log("ADDING");
-                  return;
 
                   try {
                     $scope.isAddingCoapplicant = true;
