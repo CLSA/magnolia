@@ -1909,7 +1909,7 @@ cenozo.service("CnLocalization", [
             },
             no_data_versions: {
               en: "There are no data versions associated with your application.",
-              en: "Aucune version de données n’est associée à votre demande.",
+              fr: "Aucune version de données n’est associée à votre demande.",
             },
             data_version_list_1: {
               en: "These are the data versions that you received:",
@@ -1997,7 +1997,7 @@ cenozo.service("CnLocalization", [
             },
             indigenous_description: {
               en: "Underrepresented Groups",
-              en: "Groupes sous-représentés",
+              fr: "Groupes sous-représentés",
             },
             indigenous: {
               en: "Were Indigenous self-identifiers used in any analysis described in this manuscript?",
