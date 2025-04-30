@@ -19,6 +19,12 @@ cenozoApp.defineModule({
           column: "reqn.identifier",
           title: "Identifier",
         },
+        user_full_name: {
+          title: "Owner",
+          isIncluded: function ($state, model) {
+            return !model.isRole("applicant", "designate");
+          },
+        },
         title: {
           column: "manuscript.title",
           title: "Title",
