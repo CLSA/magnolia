@@ -2,7 +2,7 @@ cenozoApp.extendModule({
   name: "user",
   create: (module) => {
     // we don't need the site column since this is a one-site application
-    delete module.columnList.sites;
+    delete module.columnList.site_list;
 
     // add the suspended column to the column list
     cenozo.insertPropertyAfter(module.columnList, "active", "suspended", {
