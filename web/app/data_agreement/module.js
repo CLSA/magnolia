@@ -13,6 +13,10 @@ cenozoApp.defineModule({
         institution: {
           title: "Institution",
         },
+        cross_institution_data_access: {
+          title: "Cross-Institution Data Access",
+          type: "boolean",
+        },
         start_date: {
           title: "Start Date",
           type: "date",
@@ -36,6 +40,11 @@ cenozoApp.defineModule({
       institution: {
         title: "Institution",
         type: "string",
+      },
+      cross_institution_data_access: {
+        title: "Cross-Institution Data Access",
+        type: "boolean",
+        help: "Defines whether the agreement allows sharing data with co-applicants in other institutions.",
       },
       start_date: {
         title: "Start Date",

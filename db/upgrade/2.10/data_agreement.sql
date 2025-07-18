@@ -29,6 +29,19 @@ CREATE PROCEDURE patch_data_agreement()
       ALTER TABLE data_agreement ADD COLUMN end_date DATE NULL DEFAULT NULL AFTER start_date;
     END IF;
 
+    SELECT "Adding new cross_institution_data_access column to data_agreement table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "data_agreement"
+    AND column_name = "cross_institution_data_access";
+
+    IF @test = 0 THEN
+      ALTER TABLE data_agreement
+      ADD COLUMN cross_institution_data_access TINYINT(1) NOT NULL DEFAULT 1 AFTER institution;
+    END IF;
+
   END //
 DELIMITER ;
 
