@@ -1383,7 +1383,7 @@ cenozoApp.defineModule({
                 path: this.parentModel.getServiceResourcePath() + '/deferral_note',
                 data: { modifier: { where: { column: "form", operator: '=', value: this.getActiveForm() } } }
               }).count();
-              const deferralNotes = parseInt(response.headers("Total"));
+              const deferralNotes = parseInt(response.headers("X-Total"));
 
               if (this.parentModel.isRole("administrator", "communication", "dao") && 0 < deferralNotes ) {
                 message +=
@@ -1438,7 +1438,7 @@ cenozoApp.defineModule({
                   data: { modifier: { where: { column: "data_destroy.datetime", operator: "=", value: null } } },
                 }).count();
 
-                const count = parseInt(response.headers("Total"));
+                const count = parseInt(response.headers("X-Total"));
                 if(0 < count) {
                   message +=
                     "\n\nWARNING: There are " + count + " data versions that do not have a date of destruction.";
@@ -1485,7 +1485,7 @@ cenozoApp.defineModule({
                 path: this.parentModel.getServiceResourcePath() + '/deferral_note',
                 data: { modifier: { where: { column: "form", operator: '=', value: this.getActiveForm() } } }
               }).count();
-              const deferralNotes = parseInt(response.headers("Total"));
+              const deferralNotes = parseInt(response.headers("X-Total"));
 
               var message =
                 "Are you sure you wish to defer to the applicant?  " +

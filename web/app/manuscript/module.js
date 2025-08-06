@@ -327,7 +327,7 @@ cenozoApp.defineModule({
               var response = await CnHttpFactory.instance({
                 path: this.parentModel.getServiceResourcePath() + '/manuscript_deferral_note'
               }).count();
-              const deferralNotes = parseInt(response.headers("Total"));
+              const deferralNotes = parseInt(response.headers("X-Total"));
 
               if (this.parentModel.isRole("administrator", "dao") && 0 < deferralNotes ) {
                 message +=
@@ -354,7 +354,7 @@ cenozoApp.defineModule({
               var response = await CnHttpFactory.instance({
                 path: this.parentModel.getServiceResourcePath() + '/manuscript_deferral_note'
               }).count();
-              const deferralNotes = parseInt(response.headers("Total"));
+              const deferralNotes = parseInt(response.headers("X-Total"));
 
               var message =
                 "Are you sure you wish to defer to the applicant?  " +

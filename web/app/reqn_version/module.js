@@ -3019,7 +3019,7 @@ cenozoApp.defineModule({
               ] = await Promise.all(promiseList);
 
               var columnList = angular.fromJson(
-                reqnVersionResponse.headers("Columns")
+                reqnVersionResponse.headers("X-Columns")
               );
               for (var column in columnList) {
                 columnList[column].required =

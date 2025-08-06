@@ -65,7 +65,7 @@ cenozoApp.extendModule({
                 path: "applicant",
               }).head();
               var columnMetadata = angular.fromJson(
-                response.headers("Columns")
+                response.headers("X-Columns")
               ).supervisor_user_id;
               columnMetadata.required = "1" == columnMetadata.required;
               object.metadata.columnList.supervisor_user_id = columnMetadata;
