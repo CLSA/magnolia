@@ -1904,8 +1904,8 @@ cenozo.service("CnLocalization", [
               fr: "Cette recherche est rendue possible grâce aux données ou aux échantillons biologiques recueillis par l’Étude longitudinale canadienne sur le vieillissement (ÉLCV). Le financement de l’Étude longitudinale canadienne sur le vieillissement (ÉLCV) est assuré par le gouvernement du Canada par l’entremise des Instituts de recherche en santé du Canada (IRSC), numéro de référence LSA 94473, la Fondation canadienne pour l’innovation et les provinces suivantes : Terre-Neuve, Nouvelle-Écosse, Québec, Ontario, Manitoba, Alberta et Colombie-Britannique. Cette recherche a été réalisée à l’aide de <b>(DÉTERMINER LA LISTE DES VERSIONS DE DONNÉES À PARTIR DE LA LISTE SUIVANTE)</b>, numéro de demande ",
             },
             acknowledgment_example2: {
-              en: ". The CLSA is led by Drs. Parminder Raina, Christina Wolfson and Susan Kirkland.",
-              fr: ". L’ÉLCV est dirigée par les professeurs Parminder Raina, Christina Wolfson et Susan Kirkland.",
+              en: ". The CLSA is led by Drs. Parminder Raina, Christina Wolfson and Susan Kirkland.  The time and commitment of the participants to the CLSA study platform is gratefully acknowledged, without whom this research would not be possible.",
+              fr: ". L’ÉLCV est dirigée par les professeurs Parminder Raina, Christina Wolfson et Susan Kirkland.  Nous remercions chaleureusement les participants et participantes, sans qui cette recherche ne serait pas possible, pour leur temps et leur engagement envers la plateforme de l’ÉLCV.",
             },
             no_data_versions: {
               en: "There are no data versions associated with your application.",

@@ -8,6 +8,8 @@ SOURCE reqn_version.sql
 SOURCE manuscript_version.sql
 SOURCE data_agreement.sql
 
+SOURCE report_restriction.sql
+
 SOURCE service.sql
 SOURCE role_has_service.sql
 

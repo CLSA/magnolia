@@ -20,29 +20,109 @@ class requisition extends \cenozo\business\report\base_report
   protected function build()
   {
     $reqn_class_name = lib::get_class_name( 'database\reqn' );
-    $today = util::get_datetime_object();
+    $db_application = lib::create( 'business\session' )->get_application();
 
     $data = array();
 
     // apply the custom restriction to the stage type (must be in or have been in)
     $stage_type_id = NULL;
+    $date_span_type = NULL;
+    $start_date = NULL;
+    $end_date = NULL;
     foreach( $this->get_restriction_list() as $restriction )
     {
       if( 'stage_type' == $restriction['name'] && !is_null( $restriction['value'] ) )
       {
         $stage_type_id = $restriction['value'];
       }
+      else if( 'date_span_type' == $restriction['name'] && !is_null( $restriction['value'] ) )
+      {
+        $date_span_type = $restriction['value'];
+      }
+      else if( 'start_date' == $restriction['name'] && !is_null( $restriction['value'] ) )
+      {
+        $start_date = $restriction['value'];
+      }
+      else if( 'end_date' == $restriction['name'] && !is_null( $restriction['value'] ) )
+      {
+        $end_date = $restriction['value'];
+      }
     }
 
     // build the modifier
     $modifier = lib::create( 'database\modifier' );
 
-    // join to the current stage's type
-    $join_mod = lib::create( 'database\modifier' );
-    $join_mod->where( 'reqn.id', '=', 'stage.reqn_id', false );
-    $join_mod->where( 'stage.datetime', '=', NULL );
-    $modifier->join_modifier( 'stage', $join_mod );
-    $modifier->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
+    // join to the current stage
+    if( is_null( $stage_type_id ) )
+    {
+      // the current stage is the one that hasn't finished (has no datetime)
+      $join_mod = lib::create( 'database\modifier' );
+      $join_mod->where( 'reqn.id', '=', 'current_stage.reqn_id', false );
+      $join_mod->where( 'current_stage.datetime', '=', NULL );
+      $modifier->join_modifier( 'stage', $join_mod, '', 'current_stage' );
+      $modifier->join(
+        'stage_type',
+        'current_stage.stage_type_id',
+        'current_stage_type.id',
+        '',
+        'current_stage_type'
+      );
+    }
+    else
+    {
+      // create a temp table with the start/end datetimes of all stages
+      $reqn_class_name::db()->execute( sprintf(
+        'CREATE TEMPORARY TABLE temp_stage_sort '.
+        'SELECT '.
+          'reqn_id, amendment, stage_type_id, '.
+          'DATE( IFNULL( CONVERT_TZ( datetime, "UTC", "%s" ), create_timestamp ) ) as date '.
+        'FROM stage '.
+        'ORDER BY reqn_id, datetime IS NULL, datetime', // sort by datetime, putting NULL values at the end
+        $db_application->timezone
+      ) );
+      $reqn_class_name::db()->execute( 'SET @d = NULL' );
+      $reqn_class_name::db()->execute(
+        'CREATE TEMPORARY TABLE temp_stage '.
+        'SELECT '.
+          'reqn_id, '.
+          'stage_type_id, '.
+          'CAST( IF(stage_type_id=1, NULL, @d) AS date ) AS start_date, '.
+          'CAST( @d := date AS date ) AS end_date '.
+        'FROM temp_stage_sort'
+      );
+      $reqn_class_name::db()->execute(
+        'ALTER TABLE temp_stage '.
+        'ADD INDEX dk_reqn_id (reqn_id), '.
+        'ADD INDEX dk_start_date (start_date), '.
+        'ADD INDEX dk_end_date (end_date)'
+      );
+
+      // now join to the current stage by type and date-span
+      $join_mod = lib::create( 'database\modifier' );
+      $join_mod->where( 'reqn.id', '=', 'temp_stage.reqn_id', false );
+      $join_mod->where( 'temp_stage.stage_type_id', '=', $stage_type_id );
+
+      // restrict by date-span, if required
+      if( !is_null( $date_span_type ) )
+      {
+        $date_column = 'Start' == $date_span_type ? 'start_date' : 'end_date';
+        if( !is_null( $start_date ) )
+        {
+          // the stage finish date may be NULL if it hasn't been finished yet
+          $join_mod->where(
+            sprintf( 'IFNULL( temp_stage.%s, "%s")', $date_column, $start_date ),
+            '>=',
+            $start_date
+          );
+        }
+        if( !is_null( $end_date ) )
+        {
+          $join_mod->where( sprintf( 'temp_stage.%s', $date_column ), '>=', $end_date );
+        }
+      }
+
+      $modifier->join_modifier( 'temp_stage', $join_mod );
+    }
 
     // join to the current version
     $modifier->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
@@ -60,14 +140,21 @@ class requisition extends \cenozo\business\report\base_report
     $modifier->group( 'reqn.id' );
     $modifier->order( 'reqn.identifier' );
 
-    if( !is_null( $stage_type_id ) ) $modifier->where( 'stage_type.id', '=', $stage_type_id );
-
     // build the select
     $select = lib::create( 'database\select' );
     $select->from( 'reqn' );
     $select->add_column( 'Identifier', 'Identifier' );
 
-    if( is_null( $stage_type_id ) ) $select->add_column( 'stage_type.name', 'Stage', false );
+    if( is_null( $stage_type_id ) )
+    {
+      $select->add_column( 'current_stage_type.name', 'Stage', false );
+    }
+    else
+    {
+      $select->add_column( 'temp_stage.start_date', 'Stage Start', false );
+      $select->add_column( 'temp_stage.end_date', 'Stage End', false );
+    }
+
     $select->add_column( 'CONCAT_WS( " ", user.first_name, user.last_name )', 'Primary Applicant', false );
     $select->add_column( 'reqn_version.applicant_affiliation', 'Institution', false );
     $select->add_column( 'country.name', 'Country', false );
