@@ -21,16 +21,20 @@ class patch extends \cenozo\service\patch
     $file = $this->get_argument( 'file', NULL );
     if( false !== strpos( util::get_header( 'Content-Type' ), 'application/octet-stream' ) && !is_null( $file ) )
     {
-      if( 'filename' == $file ) $file = 'filename1';
-      if( !preg_match( '/filename[0-9]+/', $file ) )
+      // determine which file number we're uploading
+      $file = 'filename' == $file ? 'filename1' : $file;
+      $matches = NULL;
+      if( !preg_match( '/filename([0-9]+)/', $file, $matches ) )
         throw lib::create( 'exception\argument', 'file', $file, __METHOD__ );
+      $file_number = $matches[1];
 
+      $output_source_mod = lib::create( 'database\modifier' );
+      $output_source_mod->limit( 1 );
+      $output_source_mod->offset( $file_number-1 );
       $db_output = $this->get_leaf_record();
-      $filename = current( $db_output->get_output_source_object_list() )->get_filename();
-      if( false === file_put_contents( $filename, $this->get_file_as_raw() ) )
-        throw lib::create( 'exception\runtime',
-          sprintf( 'Unable to write file "%s"', $filename ),
-          __METHOD__ );
+      $db_output_source = current( $db_output->get_output_source_object_list( $output_source_mod ) );
+      $db_output_source->data = base64_encode( $this->get_file_as_raw() );
+      $db_output_source->save();
     }
   }
 }
