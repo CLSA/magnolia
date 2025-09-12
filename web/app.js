@@ -1043,8 +1043,8 @@ cenozo.service("CnLocalization", [
               fr: " sera appliqué à cette modification.\n\nAcceptez-vous et souhaitez-vous procéder à cette modification?",
             },
             justification: {
-              en: "Justification (<strong>maximum 2500 characters</strong>)",
-              fr: "Justification (<strong>maximum 2500 caractères</strong>)",
+              en: "Justification (<strong>maximum 5000 characters</strong>)",
+              fr: "Justification (<strong>maximum 5000 caractères</strong>)",
             },
           },
           part1: {
