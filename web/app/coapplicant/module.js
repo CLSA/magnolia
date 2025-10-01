@@ -23,7 +23,8 @@ cenozoApp.defineModule({
       country_id: { title: "Country", type: "lookup-typeahead", typeahead: { table: "country" } },
       email: { title: "E-mail", type: "string", format: "email" },
       role: { title: "Role", type: "string" },
-      access: { title: "Access", type: "boolean", type: "boolean" },
+      trainee: { title: "Trainee", type: "boolean" },
+      access: { title: "Access", type: "boolean" },
     });
   },
 });

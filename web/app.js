@@ -1128,6 +1128,7 @@ cenozo.service("CnLocalization", [
               country: { en: "Country", fr: "Pays" },
               email: { en: "E-mail", fr: "Courriel" },
               role: { en: "Role", fr: "Rôle" },
+              trainee: { en: "Trainee", fr: "Stagiaire" },
               access: {
                 en: "Requires Access to Data",
                 fr: "Doit avoir accès aux données",

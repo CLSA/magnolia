@@ -224,6 +224,7 @@ class reference extends \cenozo\business\report\base_report
       $coapplicant_sel->add_column( 'affiliation' );
       $coapplicant_sel->add_column( 'email' );
       $coapplicant_sel->add_column( 'role' );
+      $coapplicant_sel->add_column( 'trainee' );
       $coapplicant_sel->add_column( 'access' );
       $coapplicant_mod = lib::create( 'database\modifier' );
       $coapplicant_mod->where( 'reqn_version_id', '=', $reqn_version_id );
@@ -237,6 +238,7 @@ class reference extends \cenozo\business\report\base_report
         $reqn_list[$index][sprintf( 'Institution %d', $c )] = $coapplicant['affiliation'];
         $reqn_list[$index][sprintf( 'Email %d', $c )] = $coapplicant['email'];
         $reqn_list[$index][sprintf( 'Role %d', $c )] = $coapplicant['role'];
+        $reqn_list[$index][sprintf( 'Trainee %d', $c )] = $coapplicant['trainee'] ? 'Yes' : 'No';
         $reqn_list[$index][sprintf( 'Data Access %d', $c )] = $coapplicant['access'] ? 'Yes' : 'No';
         $c++;
       }

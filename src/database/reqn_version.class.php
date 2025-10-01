@@ -778,6 +778,7 @@ class reqn_version extends \cenozo\database\record
       $data[sprintf( 'coapplicant%d_position', $index+1 )] =
         sprintf( "%s\n%s\n%s", $coapplicant['position'], $coapplicant['affiliation'], $coapplicant['email'] );
       $data[sprintf( 'coapplicant%d_role', $index+1 )] = $coapplicant['role'];
+      $data[sprintf( 'coapplicant%d_trainee_%s', $index+1, $coapplicant['trainee'] ? 'yes' : 'no' )] = 'Yes';
       $data[sprintf( 'coapplicant%d_%s', $index+1, $coapplicant['access'] ? 'yes' : 'no' )] = 'Yes';
     }
 

@@ -485,6 +485,7 @@
                       <td ng-bind-html="t( 'part1.project_team.country' )"></td>
                       <td ng-bind-html="t( 'part1.project_team.email' )"></td>
                       <td ng-bind-html="t( 'part1.project_team.role' )"></td>
+                      <td ng-bind-html="t( 'part1.project_team.trainee' )"></td>
                       <td ng-bind-html="t( 'part1.project_team.access' )"></td>
                       <td ng-show="model.getEditEnabled() && !isDAO()"></td>
                     </tr>
@@ -498,6 +499,7 @@
                       <td>{{ coapplicant.country }}</td>
                       <td>{{ coapplicant.email }}</td>
                       <td>{{ coapplicant.role }}</td>
+                      <td>{{ coapplicant.trainee ? 'Yes' : 'No' }}</td>
                       <td>{{ coapplicant.access ? 'Yes' : 'No' }}</td>
                       <td ng-show="model.getEditEnabled() && !isDAO()">
                         <button class="btn btn-xs btn-danger"
@@ -524,6 +526,7 @@
                         <td ng-bind-html="t( 'part1.project_team.country' )"></td>
                         <td ng-bind-html="t( 'part1.project_team.email' )"></td>
                         <td ng-bind-html="t( 'part1.project_team.role' )"></td>
+                        <td ng-bind-html="t( 'part1.project_team.trainee' )"></td>
                         <td ng-bind-html="t( 'part1.project_team.access' )"></td>
                       </tr>
                     </thead>
@@ -535,6 +538,7 @@
                         <td>{{ coapplicant.country }}</td>
                         <td>{{ coapplicant.email }}</td>
                         <td>{{ coapplicant.role }}</td>
+                        <td>{{ coapplicant.trainee ? 'Yes' : 'No' }}</td>
                         <td>{{ coapplicant.access ? 'Yes' : 'No' }}</td>
                       </tr>
                     </tbody>
@@ -599,10 +603,21 @@
                   </cn-add-input>
                   <cn-add-input
                     input="{
+                      key: 'trainee',
+                      title: t( 'part1.project_team.trainee' ),
+                      type: 'boolean',
+                      enumList: model.metadata.traineeAndAccessEnumList[model.viewModel.record.lang]
+                    }"
+                    record="coapplicantRecord"
+                    model="model.viewModel.coapplicantModel"
+                    first="false">
+                  </cn-add-input>
+                  <cn-add-input
+                    input="{
                       key: 'access',
                       title: t( 'part1.project_team.access' ),
                       type: 'boolean',
-                      enumList: model.metadata.accessEnumList[model.viewModel.record.lang]
+                      enumList: model.metadata.traineeAndAccessEnumList[model.viewModel.record.lang]
                     }"
                     record="coapplicantRecord"
                     model="model.viewModel.coapplicantModel"
