@@ -34,6 +34,26 @@ CREATE PROCEDURE patch_reqn_version()
       DEALLOCATE PREPARE statement;
     END IF;
 
+    SELECT "Adding new applicant_early_career column to reqn_version table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn_version"
+    AND column_name = "applicant_early_career";
+
+    IF @test = 0 THEN
+      ALTER TABLE reqn_version
+      ADD COLUMN applicant_early_career TINYINT(1) NULL DEFAULT NULL AFTER applicant_position;
+
+      -- assume all previously submitted reqns selected false
+      UPDATE reqn_version
+      JOIN stage ON reqn_version.reqn_id = stage.reqn_id AND stage.datetime IS NULL
+      JOIN stage_type ON stage.stage_type_id = stage_type.id
+      SET reqn_version.applicant_early_career = false
+      WHERE stage_type.name != "New";
+    END IF;
+
   END //
 DELIMITER ;
 

@@ -84,6 +84,7 @@ cenozoApp.defineModule({
       is_current_version: { type: "boolean" },
       applicant_name: { type: "string" },
       applicant_position: { type: "string" },
+      applicant_early_career: { type: "boolean" },
       applicant_affiliation: { type: "string" },
       applicant_address: { type: "string" },
       applicant_country_id: {
@@ -1161,6 +1162,7 @@ cenozoApp.defineModule({
                     // applicant
                     diff: false,
                     applicant_position: false,
+                    applicant_early_career: false,
                     applicant_affiliation: false,
                     applicant_address: false,
                     applicant_country_id: false,
@@ -1300,9 +1302,15 @@ cenozoApp.defineModule({
                               differences[part][tab].diff = true;
                               differences[part][tab][property].push({ name: c1.name, diff: "added" });
                             } else {
-                              if (
-                                ["position", "affiliation", "country", "email", "role", "access"].some((p) => c1[p] != c2[p])
-                              ) {
+                              if ([
+                                "position",
+                                "affiliation",
+                                "country",
+                                "email",
+                                "role",
+                                "trainee",
+                                "access"
+                              ].some((p) => c1[p] != c2[p])) {
                                 // reqnVersion1 has coapplicant which is different than compared reqnVersion2
                                 differences.diff = true;
                                 differences[part].diff = true;
@@ -1587,7 +1595,7 @@ cenozoApp.defineModule({
             setCoapplicantDiff: function (version) {
               if (null != version) {
                 // see if there is a difference between this list and the view's list
-                let columns = ["name", "position", "affiliation", "country", "email", "role", "access"];
+                let columns = ["name", "position", "affiliation", "country", "email", "role", "trainee", "access"];
                 version.coapplicantDiff =
                   version.coapplicantList.length != this.record.coapplicantList.length ||
                   version.coapplicantList.some(
@@ -1754,7 +1762,7 @@ cenozoApp.defineModule({
                   select: { column: [
                     "id", "name", "position", "affiliation",
                     { table: "country", column: "name", alias: "country" },
-                    "email", "role", "access"
+                    "email", "role", "trainee", "access"
                   ] },
                   modifier: { order: "id", limit: 1000 },
                 },
@@ -2157,6 +2165,7 @@ cenozoApp.defineModule({
               var requiredTabList = {
                 "applicant": [
                   "applicant_position",
+                  "applicant_early_career",
                   "applicant_affiliation",
                   "applicant_address",
                   "applicant_country_id",
@@ -3062,8 +3071,8 @@ cenozoApp.defineModule({
 
               // only do the following for the root instance
               if ("root" == this.type) {
-                // create coapplicant access enum
-                this.metadata.accessEnumList = {
+                // create coapplicant trainee and access enum
+                this.metadata.traineeAndAccessEnumList = {
                   en: [
                     { value: true, name: misc.yes.en },
                     { value: false, name: misc.no.en },

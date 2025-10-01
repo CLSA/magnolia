@@ -1065,6 +1065,7 @@ cenozo.service("CnLocalization", [
               },
               applicant_name: { en: "Name", fr: "Nom" },
               applicant_position: { en: "Position", fr: "Poste" },
+              applicant_early_career: { en: "Are you an early career researcher?", fr: "TODO: TRANSLATE" },
               applicant_affiliation: {
                 en: "Institution (department, research institute or hospital)",
                 fr: "Établissement (département, institut de recherche ou hôpital)",
@@ -1127,6 +1128,7 @@ cenozo.service("CnLocalization", [
               country: { en: "Country", fr: "Pays" },
               email: { en: "E-mail", fr: "Courriel" },
               role: { en: "Role", fr: "Rôle" },
+              trainee: { en: "Trainee", fr: "Stagiaire" },
               access: {
                 en: "Requires Access to Data",
                 fr: "Doit avoir accès aux données",

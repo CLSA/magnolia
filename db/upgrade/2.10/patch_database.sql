@@ -7,6 +7,7 @@ SOURCE reqn.sql
 SOURCE reqn_version.sql
 SOURCE manuscript_version.sql
 SOURCE data_agreement.sql
+SOURCE coapplicant.sql
 
 SOURCE report_restriction.sql
 
