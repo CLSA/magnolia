@@ -312,6 +312,16 @@
                 </cn-view-input-with-differences>
                 <cn-view-input-with-differences
                   input="{
+                    key: 'applicant_early_career',
+                    title: t( 'part1.applicant.applicant_early_career' ),
+                    type: model.inputList.applicant_early_career.type,
+                    enumList: model.metadata.yesNoEnumList[model.viewModel.record.lang]
+                  }"
+                  difference="model.viewModel.compareRecord.differences.part1.applicant.applicant_early_career"
+                  model="model">
+                </cn-view-input-with-differences>
+                <cn-view-input-with-differences
+                  input="{
                     key: 'applicant_affiliation',
                     title: t( 'part1.applicant.applicant_affiliation' ),
                     type: model.inputList.applicant_affiliation.type

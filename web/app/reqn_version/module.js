@@ -84,6 +84,7 @@ cenozoApp.defineModule({
       is_current_version: { type: "boolean" },
       applicant_name: { type: "string" },
       applicant_position: { type: "string" },
+      applicant_early_career: { type: "boolean" },
       applicant_affiliation: { type: "string" },
       applicant_address: { type: "string" },
       applicant_country_id: {
@@ -1161,6 +1162,7 @@ cenozoApp.defineModule({
                     // applicant
                     diff: false,
                     applicant_position: false,
+                    applicant_early_career: false,
                     applicant_affiliation: false,
                     applicant_address: false,
                     applicant_country_id: false,
@@ -2157,6 +2159,7 @@ cenozoApp.defineModule({
               var requiredTabList = {
                 "applicant": [
                   "applicant_position",
+                  "applicant_early_career",
                   "applicant_affiliation",
                   "applicant_address",
                   "applicant_country_id",

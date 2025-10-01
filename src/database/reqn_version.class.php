@@ -720,6 +720,11 @@ class reqn_version extends \cenozo\database\record
     $application_filename = sprintf( '%s/application_%s.pdf', TEMP_PATH, $this->id );
 
     if( !is_null( $this->applicant_position ) ) $data['applicant_position'] = $this->applicant_position;
+    if( !is_null( $this->applicant_early_career ) )
+    {
+      if( $this->applicant_early_career ) $data['applicant_early_career_yes'] = 'Yes';
+      else $data['applicant_early_career_no'] = 'Yes';
+    }
     if( !is_null( $this->applicant_affiliation ) ) $data['applicant_affiliation'] = $this->applicant_affiliation;
     if( !is_null( $this->applicant_address ) ) $data['applicant_address'] = $this->applicant_address;
     if( !is_null( $this->applicant_phone ) ) $data['applicant_phone'] = $this->applicant_phone;
