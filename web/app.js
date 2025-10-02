@@ -1227,8 +1227,8 @@ cenozo.service("CnLocalization", [
                 fr: "Résumé de la justification de la modification",
               },
               methodology_text: {
-                en: "The study design and methodology including an overview of the variables and/or biospecimens requested for the project. In no more than half a page, describe the inclusion and exclusion criteria for participants to be included in your study (e.g., age, sex, etc.).",
-                fr: "Modèle d’étude et méthodologie comprenant un survol de la liste de variables et/ou échantillons demandés. Sans dépasser une demi-page, décrivez les critères d’inclusion et d’exclusion des participants qui seront inclus dans votre étude (p. ex. âge, sexe, etc.).",
+                en: "The study design and methodology including an overview of the variables requested for the project. In no more than half a page, describe the inclusion and exclusion criteria for participants to be included in your study (e.g., age, sex, etc.).",
+                fr: "Modèle d’étude et méthodologie comprenant un survol de la liste de variables demandés. Sans dépasser une demi-page, décrivez les critères d’inclusion et d’exclusion des participants qui seront inclus dans votre étude (p. ex. âge, sexe, etc.).",
               },
               analysis: { en: "Data Analysis", fr: "Analyse de données" },
               analysis_text: {
@@ -1285,8 +1285,8 @@ cenozo.service("CnLocalization", [
             ethics: {
               tab: { en: "Ethics", fr: "Éthique" },
               text: {
-                en: "Please note that ethics approval is NOT required at the time of this application, but <strong>no data or biospecimens will be released until proof of ethics approval has been received by the CLSA.</strong>",
-                fr: "Notez que l’approbation éthique n’est PAS requise à cette étape de la demande, mais <strong>aucune donnée ou aucun échantillon ne seront transmis avant que l’ÉLCV ait reçu une preuve d’approbation éthique.</strong>",
+                en: "Please note that ethics approval is NOT required at the time of this application, but <strong>no data will be released until proof of ethics approval has been received by the CLSA.</strong>",
+                fr: "Notez que l’approbation éthique n’est PAS requise à cette étape de la demande, mais <strong>aucune donnée ne seront transmis avant que l’ÉLCV ait reçu une preuve d’approbation éthique.</strong>",
               },
               approvalListNote: {
                 en: "Updated ethics approval documents can be added to your requisition <strong>without the need to create a new amendment</strong>.  Simply click the Add button below to upload the document.",
