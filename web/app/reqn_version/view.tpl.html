@@ -1437,7 +1437,13 @@
         <p class="text-primary" ng-bind-html="t( 'manuscripts.text1' )"></p>
         <p class="text-primary" ng-bind-html="t( 'manuscripts.text2' )"></p>
         <p class="text-primary" ng-bind-html="t( 'manuscripts.text3' )"></p>
-        <div class="panel panel-default">
+        <div
+          class="panel panel-default"
+          ng-show="
+            (model.viewModel.getManuscriptEditEnabled() && !isDAO()) ||
+            0 < model.viewModel.manuscriptList.length
+          "
+        >
           <div class="panel-body">
             <form
               id="manuscript_form"
