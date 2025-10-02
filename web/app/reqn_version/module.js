@@ -989,7 +989,6 @@ cenozoApp.defineModule({
               "geographic_indicators",
               "covid_19_data",
               "mortality_data",
-              "biospecimen_access",
               "manuscripts",
               "agreement",
             ],
@@ -1002,13 +1001,11 @@ cenozoApp.defineModule({
                 "notes", "cohort", "indigenous", "core_clsa_data", "linked_data", "images_and_raw_data",
                 "geographic_indicators", "covid_19_data", "mortality_data"
               ];
-              part3Tabs = ["biospecimen_access"];
               manuscriptTabs = ["manuscripts"];
 
               return (
                 part1Tabs.includes(tab) ? "part1" :
                 part2Tabs.includes(tab) ? "part2" :
-                part3Tabs.includes(tab) ? "part3" :
                 manuscriptTabs.includes(tab) ? "manuscripts" :
                 "agreement" == tab ? "agreement" :
                 "instructions"

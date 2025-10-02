@@ -156,15 +156,6 @@
            }"
            ng-bind-html="t( 'part2.tab' )"></a>
       </li>
-      <li ng-class="{'active':'part3' == model.viewModel.getTabPart()}">
-        <a ng-click="model.viewModel.setFormTab('biospecimen_access')"
-           ng-class="{
-             'text-warning flashing':
-               model.getEditEnabled() && model.viewModel.record.deferral_note_biospecimen_access,
-             'bg-warning': model.viewModel.compareRecord.differences.part3.diff
-           }"
-           ng-bind-html="t( 'part3.tab' )"></a>
-      </li>
       <li ng-class="{'active':'manuscripts' == model.viewModel.getTabPart()}" ng-if="model.viewModel.showManuscripts()">
         <a ng-click="model.viewModel.setFormTab('manuscripts')" ng-bind-html="t( 'manuscripts.tab' )"></a>
       </li>
@@ -1425,12 +1416,6 @@
         </div>
       </div>
     </div>
-    <div ng-show="'part3'==model.viewModel.getTabPart()" class="panel panel-default">
-      <div class="panel-body" style="padding-bottom: 0px;">
-        <h4 style="margin-top: 0; margin-bottom: 1em;" ng-bind-html="t( 'part3.title' )"></h4>
-        <p class="text-primary" ng-bind-html="t( 'part3.text' )"></p>
-      </div>
-    </div>
     <div ng-show="'manuscripts'==model.viewModel.getTabPart()" class="panel panel-default">
       <div class="panel-body" style="padding-bottom: 0px;">
         <h4 style="margin-top: 0; margin-bottom: 1em;" ng-bind-html="t( 'manuscripts.title' )"></h4>
@@ -1567,7 +1552,7 @@
             ng-bind-html="'<i class=\'glyphicon glyphicon-arrow-left\'></i> ' + t( 'misc.prevButton' )">
     </button>
     <button class="btn btn-primary"
-            ng-if="'part3' != model.viewModel.getTabPart()"
+            ng-if="'part2' != model.viewModel.getTabPart()"
             ng-click="model.viewModel.nextTab( false )"
             ng-bind-html="t( 'misc.nextButton' ) + ' <i class=\'glyphicon glyphicon-arrow-right\'></i>'">
     </button>
