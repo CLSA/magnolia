@@ -958,8 +958,8 @@ cenozo.service("CnLocalization", [
       lookupData: {
         application: {
           heading: {
-            en: "Data and Biospecimen Request Application",
-            fr: "Demande d’accès aux données et aux échantillons",
+            en: "Data Request Application",
+            fr: "Demande d’accès aux données",
           },
           instructions: {
             tab: { en: "Instructions", fr: "Consignes" },
@@ -972,16 +972,16 @@ cenozo.service("CnLocalization", [
               fr: 'Veuillez noter que l’ÉLCV <strong>accepte les demandes uniquement pour les données disponibles au moment de la soumission</strong>. Pour connaître les données disponibles actuellement, consultez le <a href="https://www.clsa-elcv.ca/fr-ca/resource-types/data-availability-table/" target="data_availability">tableau de disponibilité des données de l’ÉLCV</a>, qui est mis à jour régulièrement à mesure que de nouvelles données deviennent disponibles. Les demandes proposant l’utilisation de données qui ne sont pas disponibles au moment de la soumission ne seront pas examinées, et il faudra présenter une nouvelle demande dès que ces données seront disponibles.',
             },
             text2: {
-              en: 'Please consult the CLSA website for instructions, policies, and procedures for CLSA data and biospecimen access: <a href="https://www.clsa-elcv.ca/data-access" target="clsa">www.clsa-elcv.ca/data-access</a> and get informed about the Tips for preparing a CLSA Data Access Application. Applicants are also encouraged to review the pertinent sections of the relevant CLSA protocol(s), Data Collection Tools and Physical Assessments in advance of completing the application. Additional information on the variables in the CLSA dataset is on the <a href="https://datapreview.clsa-elcv.ca/" target="dpp">CLSA Data Preview Portal</a>.',
-              fr: 'Veuillez consulter les consignes, les politiques et la procédure de demande d’accès aux données et aux échantillons sur le site Web de l’ÉLCV : <a href="https://www.clsa-elcv.ca/fr-ca/data-access/" target="clsa">www.clsa-elcv.ca/fr-ca/data-access</a> et informez-vous sur les conseils pour préparer une demande d’accès aux données de l’ÉLCV. Nous encourageons les demandeurs à consulter les sections pertinentes du protocole de l’ÉLCV (en anglais seulement), les outils de collecte de données et les tests physiques avant de remplir une demande d’accès. Des informations supplémentaires sur les variables contenues dans l’ensemble de données de l’ÉLCV sont disponibles sur le <a href="https://datapreview.clsa-elcv.ca/" target="dpp">Portail de données de l’ÉLCV</a>.',
+              en: 'Please consult the CLSA website for instructions, policies, and procedures for CLSA data access: <a href="https://www.clsa-elcv.ca/data-access" target="clsa">www.clsa-elcv.ca/data-access</a> and get informed about the Tips for preparing a CLSA Data Access Application. Applicants are also encouraged to review the pertinent sections of the relevant CLSA protocol(s), Data Collection Tools and Physical Assessments in advance of completing the application. Additional information on the variables in the CLSA dataset is on the <a href="https://datapreview.clsa-elcv.ca/" target="dpp">CLSA Data Preview Portal</a>.',
+              fr: 'Veuillez consulter les consignes, les politiques et la procédure de demande d’accès aux données sur le site Web de l’ÉLCV : <a href="https://www.clsa-elcv.ca/fr-ca/data-access/" target="clsa">www.clsa-elcv.ca/fr-ca/data-access</a> et informez-vous sur les conseils pour préparer une demande d’accès aux données de l’ÉLCV. Nous encourageons les demandeurs à consulter les sections pertinentes du protocole de l’ÉLCV (en anglais seulement), les outils de collecte de données et les tests physiques avant de remplir une demande d’accès. Des informations supplémentaires sur les variables contenues dans l’ensemble de données de l’ÉLCV sont disponibles sur le <a href="https://datapreview.clsa-elcv.ca/" target="dpp">Portail de données de l’ÉLCV</a>.',
             },
             text3: {
               en: 'Consult us for any questions regarding your application at <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.',
               fr: 'Veuillez nous transmettre toute question relative aux demandes d’accès aux données de l’ÉLCV en écrivant à <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.',
             },
             text4: {
-              en: "The application is composed of 3 parts:<ul><li>Part 1: General Project Information</li><li>Part 2: Data Checklist</li><li>Part 3: Biospecimen Checklist (forthcoming)</li></ul>",
-              fr: "La demande est séparée en trois parties :<ul><li>1<sup>re</sup> partie : Renseignements généraux</li><li>2<sup>e</sup> partie : Sélection des données</li><li>3<sup>e</sup> partie : Sélection des échantillons biologiques (à venir)</li></ul>",
+              en: "The application is composed of 2 parts:<ul><li>Part 1: General Project Information</li><li>Part 2: Data Checklist</li></ul>",
+              fr: "La demande est séparée en duex parties :<ul><li>1<sup>re</sup> partie : Renseignements généraux</li><li>2<sup>e</sup> partie : Sélection des données</li></ul>",
             },
             text5: {
               en: 'Additional information or instructions are available anywhere that the <b class="invert">ⓘ</b> symbol appears. Hover your mouse cursor over the text to see the additional details.',
@@ -1408,17 +1408,6 @@ cenozo.service("CnLocalization", [
               },
             },
           },
-          part3: {
-            tab: { en: "Part 3", fr: "3<sup>e</sup> partie" },
-            title: {
-              en: "Part 3 of 3: Biospecimen Access",
-              fr: "Partie 3 de 3 : Accès aux échantillons",
-            },
-            text: {
-              en: "Biospecimen Access is not yet available",
-              fr: "Accès aux échantillons n’est pas encore disponible",
-            },
-          },
           manuscripts: {
             tab: { en: "Manuscripts", fr: "Manuscrits" },
             title: {
@@ -1575,15 +1564,15 @@ cenozo.service("CnLocalization", [
               fr: "Demande soumise",
             },
             submitMessage: {
-              en: "You have successfully submitted your CLSA Data and Biospecimen Request Application and it will now be reviewed. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your application. For timelines of the anticipated notice of decision, please check the Data Access Application Process page of our website.",
-              fr: "Votre demande d’accès aux données et aux échantillons biologiques de l’ÉLCV a bien été soumise. Elle sera maintenant évaluée. Vous recevrez un courriel avec des instructions supplémentaires si nous avons besoin d’autre information et lorsque le processus d’évaluation sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour consulter le statut de votre demande. Pour connaître les dates approximatives d’envoi de l’avis de décision, veuillez consulter la page Processus de demande d’accès aux données de notre site Web.",
+              en: "You have successfully submitted your CLSA Data Request Application and it will now be reviewed. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your application. For timelines of the anticipated notice of decision, please check the Data Access Application Process page of our website.",
+              fr: "Votre demande d’accès aux données de l’ÉLCV a bien été soumise. Elle sera maintenant évaluée. Vous recevrez un courriel avec des instructions supplémentaires si nous avons besoin d’autre information et lorsque le processus d’évaluation sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour consulter le statut de votre demande. Pour connaître les dates approximatives d’envoi de l’avis de décision, veuillez consulter la page Processus de demande d’accès aux données de notre site Web.",
             },
             traineeSubmitTitle: {
               en: "Application Submitted for Supervisor Approval",
               fr: "Demande envoyée au superviseur pour approbation",
             },
             traineeSubmitMessage: {
-              en: "You have successfully submitted your CLSA Data and Biospecimen Request Application and your supervisor will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your application. For timelines of the anticipated notice of decision, please check the Data Access Application Process page of our website.",
+              en: "You have successfully submitted your CLSA Data Request Application and your supervisor will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your application. For timelines of the anticipated notice of decision, please check the Data Access Application Process page of our website.",
               fr: "Votre demande d’accès aux données et aux échantillons de l’ÉLCV a été soumise avec succès. Votre superviseur recevra une demande d’approbation par courriel. Elle sera maintenant évaluée. Vous recevrez un courriel avec des instructions supplémentaires si nous avons besoin d’autre information et lorsque le processus d’évaluation sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour consulter le statut de votre demande. Pour connaître les dates approximatives d’envoi de l’avis de décision, veuillez consulter la page Processus de demande d’accès aux données de notre site Web.",
             },
             designateSubmitTitle: {
@@ -1591,23 +1580,23 @@ cenozo.service("CnLocalization", [
               fr: "Soumission de la demande pour approbation par le demandeur principal",
             },
             designateSubmitMessage: {
-              en: "You have successfully submitted the CLSA Data and Biospecimen Request Application on behalf of the primary applicant and they will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your application. For timelines of the anticipated notice of decision, please check the Data Access Application Process page of our website.",
-              fr: "Votre demande d’accès aux données et aux échantillons biologiques de l’ÉLCV a été soumise avec succès au nom du demandeur principal. Celui-ci recevra une demande d’approbation par courriel. Vous recevrez un courriel avec des instructions supplémentaires en cas de besoin, puis lorsque le processus d’examen sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour voir l’état de votre demande. Pour connaître les délais prévus pour la réception de l’avis de décision, veuillez consulter la page Processus de demande d’accès aux données de notre site Web.",
+              en: "You have successfully submitted the CLSA Data Request Application on behalf of the primary applicant and they will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your application. For timelines of the anticipated notice of decision, please check the Data Access Application Process page of our website.",
+              fr: "Votre demande d’accès aux données de l’ÉLCV a été soumise avec succès au nom du demandeur principal. Celui-ci recevra une demande d’approbation par courriel. Vous recevrez un courriel avec des instructions supplémentaires en cas de besoin, puis lorsque le processus d’examen sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour voir l’état de votre demande. Pour connaître les délais prévus pour la réception de l’avis de décision, veuillez consulter la page Processus de demande d’accès aux données de notre site Web.",
             },
             resubmitTitle: {
               en: "Application Resubmitted",
               fr: "Demande resoumise",
             },
             resubmitMessage: {
-              en: "You have successfully resubmitted your CLSA Data and Biospecimen Request Application. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your application. For timelines of the anticipated notice of decision, please check the Data Access Application Process page of our website.",
-              fr: "Votre demande d’accès aux données et aux échantillons biologiques de l’ÉLCV a bien été resoumise. Vous recevrez un courriel avec des instructions supplémentaires si nous avons besoin d’autre information et lorsque le processus d’évaluation sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour consulter le statut de votre demande. Pour connaître les dates approximatives d’envoi de l’avis de décision, veuillez consulter la page Processus de demande d’accès aux données de notre site Web.",
+              en: "You have successfully resubmitted your CLSA Data Request Application. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your application. For timelines of the anticipated notice of decision, please check the Data Access Application Process page of our website.",
+              fr: "Votre demande d’accès aux données de l’ÉLCV a bien été resoumise. Vous recevrez un courriel avec des instructions supplémentaires si nous avons besoin d’autre information et lorsque le processus d’évaluation sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour consulter le statut de votre demande. Pour connaître les dates approximatives d’envoi de l’avis de décision, veuillez consulter la page Processus de demande d’accès aux données de notre site Web.",
             },
             traineeResubmitTitle: {
               en: "Application Resubmitted for Supervisor Approval",
               fr: "Demande envoyée à nouveau au superviseur pour approbation",
             },
             traineeResubmitMessage: {
-              en: "You have successfully resubmitted your CLSA Data and Biospecimen Request Application and your supervisor will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your application. For timelines of the anticipated notice of decision, please check the Data Access Application Process page of our website.",
+              en: "You have successfully resubmitted your CLSA Data Request Application and your supervisor will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your application. For timelines of the anticipated notice of decision, please check the Data Access Application Process page of our website.",
               fr: "Votre demande d’accès aux données et aux échantillons de l’ÉLCV a été resoumise avec succès. Votre superviseur recevra une demande d’approbation par courriel. Vous recevrez un courriel avec des instructions supplémentaires si nous avons besoin d’autre information et lorsque le processus d’évaluation sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour consulter le statut de votre demande. Pour connaître les dates approximatives d’envoi de l’avis de décision, veuillez consulter la page Processus de demande d’accès aux données de notre site Web.",
             },
             designateResubmitTitle: {
@@ -1615,8 +1604,8 @@ cenozo.service("CnLocalization", [
               fr: "Nouvelle soumission de la demande pour approbation par le demandeur principal",
             },
             designateResubmitMessage: {
-              en: "You have successfully resubmitted the CLSA Data and Biospecimen Request Application on behalf of the primary applicant and they will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your application. For timelines of the anticipated notice of decision, please check the Data Access Application Process page of our website.",
-              fr: "Votre demande d’accès aux données et aux échantillons biologiques de l’ÉLCV a été resoumise avec succès au nom du demandeur principal. Celui-ci recevra une demande d’approbation par courriel. Vous recevrez un courriel avec des instructions supplémentaires en cas de besoin, puis lorsque le processus d’examen sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour voir l’état de votre demande. Pour connaître les délais prévus pour la réception de l’avis de décision, veuillez consulter la page Processus de demande d’accès aux données de notre site Web.",
+              en: "You have successfully resubmitted the CLSA Data Request Application on behalf of the primary applicant and they will receive an email to request approval. You will receive an email with further instructions if your attention is required and/or when the review process is complete. You can go online to Magnolia any time to view the status of your application. For timelines of the anticipated notice of decision, please check the Data Access Application Process page of our website.",
+              fr: "Votre demande d’accès aux données de l’ÉLCV a été resoumise avec succès au nom du demandeur principal. Celui-ci recevra une demande d’approbation par courriel. Vous recevrez un courriel avec des instructions supplémentaires en cas de besoin, puis lorsque le processus d’examen sera terminé. Vous pouvez vous connecter à Magnolia à tout moment pour voir l’état de votre demande. Pour connaître les délais prévus pour la réception de l’avis de décision, veuillez consulter la page Processus de demande d’accès aux données de notre site Web.",
             },
             submitWarning: {
               en: "Are you sure that all changes are complete and the application is ready to be submitted?",
