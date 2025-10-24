@@ -19,6 +19,8 @@ class reqn_version extends \cenozo\database\record
    */
   public function save()
   {
+    $base_country_id = lib::create( 'business\session' )->get_application()->country_id;
+
     // delete files if peer-review or funding are not selected
     if( !$this->peer_review ) $this->peer_review_filename = NULL;
 
@@ -30,6 +32,17 @@ class reqn_version extends \cenozo\database\record
         $this->grant_number = NULL;
       }
       $this->funding_filename = NULL;
+    }
+
+    if(
+      ( !is_null( $this->applicant_country_id ) && $base_country_id != $this->applicant_country_id ) ||
+      ( !is_null( $this->trainee_country_id ) && $base_country_id != $this->trainee_country_id )
+    ) {
+      $this->trainee_project = NULL;
+    }
+
+    if( !$this->trainee_project ) {
+      $this->waiver = NULL;
     }
 
     if( !$this->indigenous_first_nation && !$this->indigenous_metis && !$this->indigenous_inuit )
@@ -738,6 +751,11 @@ class reqn_version extends \cenozo\database\record
       if( !is_null( $this->trainee_address ) ) $data['graduate_address'] = $this->trainee_address;
       if( !is_null( $this->trainee_phone ) ) $data['graduate_phone'] = $this->trainee_phone;
       if( !is_null( $db_trainee_user ) ) $data['graduate_email'] = $db_trainee_user->email;
+      if( !is_null( $this->trainee_project ) )
+      {
+        if( $this->trainee_project ) $data['trainee_project_yes'] = 'Yes';
+        else $data['trainee_project_no'] = 'Yes';
+      }
       if( !is_null( $this->waiver ) )
       {
         if( 'graduate' == $this->waiver ) $data['waiver_graduate'] = 'Yes';

@@ -120,6 +120,7 @@ cenozoApp.defineModule({
       grant_number: { type: "string" },
       ethics: { type: "enum" },
       ethics_date: { type: "date" },
+      trainee_project: { type: "enum" },
       waiver: { type: "enum" },
       comprehensive: { type: "boolean" },
       tracking: { type: "boolean" },
@@ -909,10 +910,17 @@ cenozoApp.defineModule({
 
                 await this.$$onPatch(data);
 
-                if (angular.isDefined(data.applicant_country_id) || angular.isDefined(data.trainee_country_id)) {
-                  // We may have to set the fee waiver type to (empty) if either the
-                  // applicant or trainee is not Canadian
-                  if (this.record.waiver && !this.isWaiverAllowed()) this.record.waiver = "";
+                if (angular.isDefined(data.trainee_project)) {
+                  if (!data.trainee_project) this.record.waiver = "";
+                } else if (
+                  angular.isDefined(data.applicant_country_id) ||
+                  angular.isDefined(data.trainee_country_id)
+                ) {
+                  // Set the trainee_project and waiver type to empty if the waiver isn't allowed
+                  if (!this.isWaiverAllowed()) {
+                    this.record.trainee_project = "";
+                    this.record.waiver = "";
+                  }
                 } else if (angular.isDefined(data.comprehensive) || angular.isDefined(data.tracking) ) {
                   if (this.record.comprehensive && this.record.tracking) {
                     // show the cohort warning to the applicant
@@ -1169,6 +1177,7 @@ cenozoApp.defineModule({
                     trainee_address: false,
                     trainee_country_id: false,
                     trainee_phone: false,
+                    trainee_project: false,
                     waiver: false,
                   },
                   project_team: {
@@ -2172,7 +2181,7 @@ cenozoApp.defineModule({
                   "trainee_address",
                   "trainee_country_id",
                   "trainee_phone",
-                  "trainee_",
+                  "trainee_project",
                   "waiver",
                 ],
                 "project_team": ["coapplicant_agreement_filename"],
@@ -2249,9 +2258,12 @@ cenozoApp.defineModule({
                 var firstProperty = null;
                 requiredTabList[tab].filter((property) => {
                   if ("applicant" == tab) {
-                    if ("waiver" == property) {
-                      // only check the waiver if a waiver is allowed
+                    if ("trainee_project" == property) {
+                      // only check trainee_project if a waiver is allowed
                       return this.isWaiverAllowed();
+                    } else if ("waiver" == property) {
+                      // only check waiver if a waiver is allowed and this is a trainee project
+                      return this.isWaiverAllowed() && this.record.trainee_project;
                     } else if ("applicant_country_id" == property) {
                       // only check the country if show_prices is on and override price is off
                       return this.record.show_prices && null == this.record.override_price;

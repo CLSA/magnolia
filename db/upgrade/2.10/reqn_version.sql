@@ -46,12 +46,37 @@ CREATE PROCEDURE patch_reqn_version()
       ALTER TABLE reqn_version
       ADD COLUMN applicant_early_career TINYINT(1) NULL DEFAULT NULL AFTER applicant_position;
 
-      -- assume all previously submitted reqns selected false
+      -- backfill existing records
       UPDATE reqn_version
       JOIN stage ON reqn_version.reqn_id = stage.reqn_id AND stage.datetime IS NULL
       JOIN stage_type ON stage.stage_type_id = stage_type.id
       SET reqn_version.applicant_early_career = false
       WHERE stage_type.name != "New";
+    END IF;
+
+    SELECT "Adding new trainee_project column to reqn_version table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn_version"
+    AND column_name = "trainee_project";
+
+    IF @test = 0 THEN
+      ALTER TABLE reqn_version
+      ADD COLUMN trainee_project TINYINT(1) NULL DEFAULT NULL AFTER ethics_filename;
+
+      -- backfill existing records
+      UPDATE reqn_version
+      SET trainee_project = true
+      WHERE IFNULL(waiver, "none") != "none";
+
+      UPDATE reqn_version
+      JOIN stage ON reqn_version.reqn_id = stage.reqn_id AND stage.datetime IS NULL
+      JOIN stage_type ON stage.stage_type_id = stage_type.id
+      SET trainee_project = false
+      WHERE IFNULL(waiver, "none") = "none"
+      AND stage_type.name != "New";
     END IF;
 
   END //

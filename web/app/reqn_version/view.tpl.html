@@ -441,11 +441,26 @@
               <div class="form-horizontal">
                 <cn-view-input-with-differences
                   input="{
+                    key: 'trainee_project',
+                    title: t( 'part1.applicant.trainee_project' ),
+                    type: 'enum',
+                    enumList: model.metadata.yesNoEnumList[model.viewModel.record.lang],
+                    constant: !model.viewModel.isWaiverAllowed() || !model.viewModel.isWaiverMutable()
+                  }"
+                  difference="model.viewModel.compareRecord.differences.part1.applicant.trainee_project"
+                  model="model">
+                </cn-view-input-with-differences>
+              </div>
+              <div ng-show="model.viewModel.record.trainee_project">
+              <p class="text-primary" ng-bind-html="t( 'part1.applicant.text5' )"></p>
+              <div class="form-horizontal">
+                <cn-view-input-with-differences
+                  input="{
                     key: 'waiver',
                     title: t( 'part1.applicant.waiver' ),
                     type: 'enum',
                     enumList: model.metadata.columnList.waiver.enumList[model.viewModel.record.lang],
-                    constant: !model.viewModel.isWaiverAllowed() || !model.viewModel.isWaiverMutable()
+                    constant: !model.viewModel.isWaiverAllowed() || !model.viewModel.isWaiverMutable(),
                   }"
                   difference="model.viewModel.compareRecord.differences.part1.applicant.waiver"
                   model="model">

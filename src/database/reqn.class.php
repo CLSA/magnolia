@@ -57,6 +57,7 @@ class reqn extends \cenozo\database\record
       $db_current_reqn_version->trainee_institution = NULL;
       $db_current_reqn_version->trainee_address = NULL;
       $db_current_reqn_version->trainee_phone = NULL;
+      $db_current_reqn_version->trainee_project = NULL;
       $db_current_reqn_version->waiver = NULL;
       $db_current_reqn_version->save();
     }

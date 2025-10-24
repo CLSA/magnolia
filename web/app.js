@@ -1056,8 +1056,8 @@ cenozo.service("CnLocalization", [
             applicant: {
               tab: { en: "Applicant", fr: "Demandeur" },
               text1: {
-                en: "<strong>Primary Applicant</strong>: The primary applicant will be the contact person for the CLSA Access Agreement as well as for the data release and any relevant updates.  The primary applicant must hold an eligible appointment (continuing or term appointment) at an eligible institution (that is able to uphold the conditions of the data access agreement, administer grant funds, and provide Research Ethics Board approval).",
-                fr: "<strong>Demandeur principal</strong> : Le demandeur principal sera la personne-ressource pour l’Entente d’accès de l’ÉLCV, ainsi que pour la transmission des données et toute mise à jour pertinente.  Le demandeur principal doit occuper un poste admissible (à titre continu ou pour une durée déterminée) dans un établissement admissible qui est en mesure de respecter les conditions de l’Entente d’accès aux données, d’administrer les fonds de la subvention et de fournir l’approbation du comité d’éthique de la recherche.",
+                en: '<strong>Primary Applicant</strong>: The primary applicant will be the contact person for the CLSA Access Agreement as well as for the data release and any relevant updates.  The primary applicant must hold an eligible appointment (continuing or term appointment) at an eligible institution (that is able to uphold the conditions of the data access agreement, administer grant funds, and provide Research Ethics Board approval).  Please indicate whether you are an early career researcher, based on CIHR’s definition (<a href="https://cihr-irsc.gc.ca/e/34190.html#r14" target="early_career">https://cihr-irsc.gc.ca/e/34190.html#r14</a>). We are collecting this information for the CLSA’s reporting purposes.',
+                fr: '<strong>Demandeur principal</strong> : Le demandeur principal sera la personne-ressource pour l’Entente d’accès de l’ÉLCV, ainsi que pour la transmission des données et toute mise à jour pertinente.  Le demandeur principal doit occuper un poste admissible (à titre continu ou pour une durée déterminée) dans un établissement admissible qui est en mesure de respecter les conditions de l’Entente d’accès aux données, d’administrer les fonds de la subvention et de fournir l’approbation du comité d’éthique de la recherche. TODO: TRANSLATE',
               },
               text2: {
                 en: "<strong>Fee Waivers</strong>: Please see below to select the fee waiver.",
@@ -1104,8 +1104,16 @@ cenozo.service("CnLocalization", [
               trainee_phone: { en: "Phone", fr: "Téléphone" },
               trainee_email: { en: "E-mail", fr: "Courriel" },
               text4: {
-                en: "Graduate students (Master’s or PhD) who wish to obtain the CLSA data for the sole purpose of their thesis, and postdoctoral fellows (limit 1 waiver per postdoc) who wish to obtain the CLSA data for the sole purpose of their postdoctoral project who are enrolled at Canadian institutions for their graduate degree or postdoc, can apply for a fee waiver. Canadian trainees working outside Canada but funded through a Canadian source are also eligible for a fee waiver. The CIHR Catalyst Grants for the use of CLSA Data are not eligible for Trainee Fee Waivers.",
-                fr: "Les étudiants de deuxième et troisième cycle (Maîtrise ou Ph. D.) et les chercheurs postdoctoraux (limite d’une exonération par post doctorat) qui désirent utiliser les données de l’ÉLCV uniquement pour leur recherche et qui sont inscrits à un établissement canadien peuvent demander une exonération des frais. Les stagiaires canadiens qui travaillent à l’extérieur du Canada, mais qui sont financés par un organisme canadien peuvent également demander une exonération des frais. Les subventions catalyseur pour l’analyse des données de l’ÉLCV ne sont pas admissibles à l’exonération des frais pour les stagiaires.",
+                en: "Confirm whether the CLSA dataset requested will be for the sole use of the trainee project, i.e., the graduate student’s thesis research or the postdoctoral or clinical fellow’s research project.",
+                fr: "TODO: TRANSLATE",
+              },
+              trainee_project: {
+                en: "Trainee Project Only",
+                fr: "TODO: TRANSLATE",
+              },
+              text5: {
+                en: "Graduate students (Masters or PhD) who wish to obtain the CLSA data for the sole purpose of their thesis, and postdoctoral or clinical fellows (limit 1 waiver per fellowship) who wish to obtain the CLSA data for the sole purpose of their postdoctoral or clinical fellowship project, who are enrolled at Canadian institutions for their graduate degree, postdoc, or clinical fellowship, can apply for a fee waiver. Canadian trainees working outside Canada but funded through a Canadian source are also eligible for a fee waiver. Research conducted as part of a CIHR Catalyst Grant is not eligible for a CLSA Data Access Trainee Fee Waiver.",
+                fr: "TODO: TRANSLATE",
               },
               waiver: {
                 en: "Fee Waiver Type",
@@ -1115,8 +1123,8 @@ cenozo.service("CnLocalization", [
             project_team: {
               tab: { en: "Project Team", fr: "Équipe de projet" },
               text: {
-                en: "All Co-Applicants and Other Personnel must be listed below. You must inform your collaborators that you have included them on this application. Please note that changes to the project team, including change of Primary Applicant and addition or removal of Co-Applicants and Support Personnel <strong>require an amendment</strong>. To submit an Amendment request, please click on “Create Amendment” in the upper-right corner of your screen and follow the instructions.",
-                fr: "Tous les codemandeurs et les membres du personnel de soutien doivent être identifiés ci-dessous. Vous devez informer vos collaborateurs que vous les avez inclus dans cette demande. Veuillez noter que tout changement à l’équipe de projet y compris un changement de demandeur principal et l’ajout ou le retrait d’un codemandeur ou d’un membre du personnel de soutien <strong>nécessite une modification</strong>. Pour soumettre une demande de modification, veuillez cliquer sur « Créer une modification » dans le coin supérieur droit de votre écran et suivre les instructions.",
+                en: "All Co-Applicants and Other Personnel must be listed below. Please indicate whether the person is a trainee for the CLSA’s reporting purposes. You must inform your collaborators that you have included them on this application. Please note that changes to the project team, including change of Primary Applicant and addition or removal of Co-Applicants and Support Personnel <strong>require an amendment</strong>. To submit an Amendment request, please click on \"Create Amendment\" in the upper-right corner of your screen and follow the instructions.",
+                fr: "Tous les codemandeurs et les membres du personnel de soutien doivent être identifiés ci-dessous. TODO: TRANSLATE. Vous devez informer vos collaborateurs que vous les avez inclus dans cette demande. Veuillez noter que tout changement à l’équipe de projet y compris un changement de demandeur principal et l’ajout ou le retrait d’un codemandeur ou d’un membre du personnel de soutien <strong>nécessite une modification</strong>. Pour soumettre une demande de modification, veuillez cliquer sur « Créer une modification » dans le coin supérieur droit de votre écran et suivre les instructions.",
               },
               noCoapplicants: {
                 en: "No co-applicants have been added.",
@@ -1227,8 +1235,8 @@ cenozo.service("CnLocalization", [
                 fr: "Résumé de la justification de la modification",
               },
               methodology_text: {
-                en: "The study design and methodology including an overview of the variables and/or biospecimens requested for the project. In no more than half a page, describe the inclusion and exclusion criteria for participants to be included in your study (e.g., age, sex, etc.).",
-                fr: "Modèle d’étude et méthodologie comprenant un survol de la liste de variables et/ou échantillons demandés. Sans dépasser une demi-page, décrivez les critères d’inclusion et d’exclusion des participants qui seront inclus dans votre étude (p. ex. âge, sexe, etc.).",
+                en: "The study design and methodology including an overview of the variables requested for the project. In no more than half a page, describe the inclusion and exclusion criteria for participants to be included in your study (e.g., age, sex, etc.).",
+                fr: "Modèle d’étude et méthodologie comprenant un survol de la liste de variables demandés. Sans dépasser une demi-page, décrivez les critères d’inclusion et d’exclusion des participants qui seront inclus dans votre étude (p. ex. âge, sexe, etc.).",
               },
               analysis: { en: "Data Analysis", fr: "Analyse de données" },
               analysis_text: {
@@ -1285,8 +1293,8 @@ cenozo.service("CnLocalization", [
             ethics: {
               tab: { en: "Ethics", fr: "Éthique" },
               text: {
-                en: "Please note that ethics approval is NOT required at the time of this application, but <strong>no data or biospecimens will be released until proof of ethics approval has been received by the CLSA.</strong>",
-                fr: "Notez que l’approbation éthique n’est PAS requise à cette étape de la demande, mais <strong>aucune donnée ou aucun échantillon ne seront transmis avant que l’ÉLCV ait reçu une preuve d’approbation éthique.</strong>",
+                en: "Please note that ethics approval is NOT required at the time of this application, but <strong>no data will be released until proof of ethics approval has been received by the CLSA.</strong>",
+                fr: "Notez que l’approbation éthique n’est PAS requise à cette étape de la demande, mais <strong>aucune donnée ne seront transmis avant que l’ÉLCV ait reçu une preuve d’approbation éthique.</strong>",
               },
               approvalListNote: {
                 en: "Updated ethics approval documents can be added to your requisition <strong>without the need to create a new amendment</strong>.  Simply click the Add button below to upload the document.",
