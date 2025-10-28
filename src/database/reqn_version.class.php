@@ -546,15 +546,16 @@ class reqn_version extends \cenozo\database\record
       $fee_sel->add_column( 'cost' );
       foreach( $db_reqn->get_additional_fee_list( $fee_sel ) as $fee ) $cost += $fee['cost'];
 
-      // now add amendment costs (including all past amendments)
+      // now add amendment costs of the most recent version (including all past amendments)
       $reqn_version_sel = lib::create( 'database\select' );
       $reqn_version_sel->add_column( 'amendment' );
       $reqn_version_sel->add_column( 'version' );
-      $reqn_version_sel->add_table_column(
-        'amendment_type',
-        $international ? 'fee_international' : 'fee_canada',
-        'fee'
-      );
+      $reqn_version_sel->add_column(
+        sprintf( 'SUM( %s )', $international ? 'fee_international' : 'fee_canada' ),
+        'fee',
+        false
+       );
+
       $reqn_version_mod = lib::create( 'database\modifier' );
       $reqn_version_mod->join(
         'reqn_version_has_amendment_type',
@@ -568,11 +569,7 @@ class reqn_version extends \cenozo\database\record
       );
       $reqn_version_mod->where( 'amendment', '!=', '.' );
       $reqn_version_mod->where( 'amendment', '<=', $this->amendment );
-      $reqn_version_mod->where(
-        sprintf( 'amendment_type.%s', $international ? 'fee_international' : 'fee_canada' ),
-        '>',
-        0
-      );
+      $reqn_version_mod->group( 'reqn_version.id' );
       $reqn_version_mod->order( 'amendment' );
       $reqn_version_mod->order_desc( 'version' );
       $reqn_version_list = $db_reqn->get_reqn_version_object_list( $reqn_version_mod );
