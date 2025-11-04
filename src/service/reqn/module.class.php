@@ -71,6 +71,7 @@ class module extends \cenozo\service\module
 
     $modifier->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
     $modifier->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
+    $modifier->join( 'amendment', 'reqn_version.amendment_id', 'amendment.id' );
 
     if( $select->has_table_columns( 'reqn_version_with_agreement' ) )
     {
@@ -279,7 +280,7 @@ class module extends \cenozo\service\module
     if( $select->has_column( 'amendment_version' ) )
     {
       $select->add_column(
-        'CONCAT( REPLACE( reqn_version.amendment, ".", "" ), reqn_version.version )',
+        'CONCAT( REPLACE( amendment.name, ".", "" ), reqn_version.version )',
         'amendment_version',
         false
       );

@@ -185,7 +185,24 @@ class reqn extends \cenozo\database\record
 
     // first get the current reqn version to determine the next version number
     $db_current_reqn_version = $this->get_current_reqn_version();
-    $version = is_null( $db_current_reqn_version ) || $new_amendment ? 1 : $db_current_reqn_version->version + 1;
+    $db_amendment = NULL;
+    if( is_null( $db_current_reqn_version ) || $new_amendment )
+    {
+      $db_amendment = lib::create( 'database\amendment' );
+      $db_amendment->reqn_id = $this->id;
+      $db_amendment->name = (
+        $new_amendment ?
+        $db_current_reqn_version->get_amendment()->get_next_amendment_name() :
+        '.'
+      );
+      $db_amendment->save();
+      $version = 1;
+    }
+    else
+    {
+      $db_amendment = $db_current_reqn_version->get_amendment();
+      $version = $db_current_reqn_version->version + 1;
+    }
 
     // now set the clone version (use the current if none is provided)
     if( is_null( $db_clone_reqn_version ) ) $db_clone_reqn_version = $db_current_reqn_version;
@@ -197,18 +214,11 @@ class reqn extends \cenozo\database\record
     // define some of the column values insetad of using the clone
     $db_reqn_version->reqn_id = $this->id;
     $db_reqn_version->datetime = util::get_datetime_object();
+    $db_reqn_version->amendment_id = $db_amendment->id;
     $db_reqn_version->version = $version;
     $db_reqn_version->agreement_filename = NULL;
     $db_reqn_version->agreement_start_date = NULL;
     $db_reqn_version->agreement_end_date = NULL;
-
-    // determine the amendment
-    if( $new_amendment )
-    {
-      // go to the next amendment (starting with A)
-      if( '.' == $db_reqn_version->amendment ) $db_reqn_version->amendment = 'A';
-      else $db_reqn_version->amendment++;
-    }
     $db_reqn_version->save();
 
     if( !is_null( $db_clone_reqn_version ) )
@@ -394,7 +404,7 @@ class reqn extends \cenozo\database\record
     // make sure to only get reviews for the current amendment
     $review_mod->join( 'reqn_current_reqn_version', 'review.reqn_id', 'reqn_current_reqn_version.reqn_id' );
     $review_mod->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
-    $review_mod->where( 'review.amendment', '=', 'reqn_version.amendment', false );
+    $review_mod->where( 'review.amendment_id', '=', 'reqn_version.amendment_id', false );
 
     $review_list = array();
     foreach( $this->get_review_list( $review_sel, $review_mod ) as $review )
@@ -530,7 +540,13 @@ class reqn extends \cenozo\database\record
           {
             $db_recommendation_type = $db_review->get_recommendation_type();
             if( !is_null( $db_recommendation_type ) )
-              $find_stage_type_name = 'Approved' == $db_recommendation_type->name ? 'Decision Made' : 'Second EC Decision';
+            {
+              $find_stage_type_name = (
+                'Approved' == $db_recommendation_type->name ?
+                'Decision Made' :
+                'Second EC Decision'
+              );
+            }
           }
         }
         else if( 'Decision Made' == $db_current_stage_type->name )
@@ -539,10 +555,12 @@ class reqn extends \cenozo\database\record
           if( !is_null( $recommendation ) )
           {
             // NOTE: when approved check if this is not an amendment and revisions have been suggested
-            $amendment = $this->get_current_reqn_version()->amendment;
-            $find_stage_type_name = 'Approved' == $recommendation
-                                  ? ( '.' == $amendment && $this->suggested_revisions ? 'Suggested Revisions' : 'Agreement' )
-                                  : 'Not Approved';
+            $amendment = $this->get_current_reqn_version()->get_amendment()->name;
+            $find_stage_type_name = (
+              'Approved' == $recommendation
+              ? ( '.' == $amendment && $this->suggested_revisions ? 'Suggested Revisions' : 'Agreement' )
+              : 'Not Approved'
+            );
           }
         }
         else if( 'Pre Data Destruction' == $db_current_stage_type->name )
@@ -657,6 +675,7 @@ class reqn extends \cenozo\database\record
     $db_current_stage_type = is_null( $db_current_stage ) ? NULL : $db_current_stage->get_stage_type();
     $db_reqn_type = $this->get_reqn_type();
     $db_reqn_version = $this->get_current_reqn_version();
+    $db_amendment = $db_reqn_version->get_amendment();
 
     $db_next_stage_type = NULL;
     if( is_null( $stage_type ) )
@@ -734,7 +753,7 @@ class reqn extends \cenozo\database\record
     }
     else
     {
-      if( $incomplete && '.' != $db_reqn_version->amendment )
+      if( $incomplete && '.' != $db_amendment->name )
       {
         throw lib::create( 'exception\runtime',
           sprintf( 'Tried to move amendment into "%s" stage.', $db_next_stage_type->name ),
@@ -780,7 +799,7 @@ class reqn extends \cenozo\database\record
       else
       {
         $db_reqn_user = $this->get_user();
-        if( $start_amendment ) $subject = sprintf( 'Amendment %s started', $db_reqn_version->amendment );
+        if( $start_amendment ) $subject = sprintf( 'Amendment %s started', $db_amendment->name );
         else if( $incomplete ) $subject = $db_next_stage_type->name;
         else $subject = sprintf( '%s complete', $db_current_stage_type->name );
         $notification_class_name::mail_admin(
@@ -801,7 +820,7 @@ class reqn extends \cenozo\database\record
             $db_next_stage_type->name,
             $db_reqn_type->name,
             $this->identifier,
-            str_replace( '.', 'no', $db_reqn_version->amendment ),
+            str_replace( '.', 'no', $db_amendment->name ),
             $db_reqn_user->first_name, $db_reqn_user->last_name,
             $db_reqn_version->title
           )
@@ -812,7 +831,7 @@ class reqn extends \cenozo\database\record
     // create the new stage
     $db_next_stage = lib::create( 'database\stage' );
     $db_next_stage->reqn_id = $this->id;
-    $db_next_stage->amendment = $db_reqn_version->amendment;
+    $db_next_stage->amendment_id = $db_reqn_version->amendment_id;
     $db_next_stage->stage_type_id = $db_next_stage_type->id;
     $db_next_stage->save();
 
@@ -859,7 +878,7 @@ class reqn extends \cenozo\database\record
       // make sure to only get reviews for the current amendment
       $review_mod->join( 'reqn_current_reqn_version', 'review.reqn_id', 'reqn_current_reqn_version.reqn_id' );
       $review_mod->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
-      $review_mod->where( 'review.amendment', '=', 'reqn_version.amendment', false );
+      $review_mod->where( 'review.amendment_id', '=', 'reqn_version.amendment_id', false );
 
       $review_list = $this->get_review_list( $review_sel, $review_mod );
 
@@ -903,7 +922,7 @@ class reqn extends \cenozo\database\record
     {
       // Check if there is an amendment to change the primary applicant or trainee, and if so change it now
       // This can happen for regular or legacy applications
-      if( '.' != $db_reqn_version->amendment && 'Approved' == $this->get_recommendation() )
+      if( '.' != $db_amendment->name && 'Approved' == $this->get_recommendation() )
       {
         // It's possible that we're changing both the applicant and trainee, so we must process the trainee
         // change before the user.  Otherwise the new trainee may not have their supervisor changed to the
@@ -922,7 +941,7 @@ class reqn extends \cenozo\database\record
     else if( 'Active' == $db_next_stage_type->name )
     {
       // Check if there is an amendment to change the primary applicant, and if so change it now
-      if( '.' != $db_reqn_version->amendment )
+      if( '.' != $db_amendment->name )
       {
         // It's possible that we're changing both the applicant and trainee, so we must process the trainee
         // change before the user.  Otherwise the new trainee may not have their supervisor changed to the
@@ -948,7 +967,7 @@ class reqn extends \cenozo\database\record
 
       // if ethics is "yes" then copy ethics file to the ethics_approval list
       // however, only do this the first time we get to active, do not repeat when going through an amendment
-      if( '.' == $db_reqn_version->amendment &&
+      if( '.' == $db_amendment->name &&
           'yes' == $db_reqn_version->ethics &&
           !is_null( $db_reqn_version->ethics_filename ) )
       {
@@ -1303,7 +1322,7 @@ class reqn extends \cenozo\database\record
       "Lay Summary:\n".
       "%s\n",
       $this->identifier,
-      str_replace( '.', 'no', $db_reqn_version->amendment ),
+      str_replace( '.', 'no', $db_reqn_version->get_amendment()->name ),
       $db_reqn_version->title,
       sprintf( '%s %s', $db_user->first_name, $db_user->last_name ),
       is_null( $db_trainee_user ) ?  '' : sprintf( "Trainee: %s %s\n", $db_trainee_user->first_name, $db_trainee_user->last_name ),
@@ -1311,7 +1330,7 @@ class reqn extends \cenozo\database\record
     );
 
     $review_sel = lib::create( 'database\select' );
-    $review_sel->add_column( 'amendment' );
+    $review_sel->add_table_column( 'amendment', 'name', 'amendment' );
     $review_sel->add_table_column( 'user', 'first_name' );
     $review_sel->add_table_column( 'user', 'last_name' );
     $review_sel->add_column( 'DATE( review.datetime )', 'date', false );
@@ -1320,6 +1339,7 @@ class reqn extends \cenozo\database\record
     $review_sel->add_column( 'note' );
 
     $review_mod = lib::create( 'database\modifier' );
+    $review_mod->join( 'amendment', 'review.amendment_id', 'amendment.id' );
     $review_mod->left_join( 'user', 'review.user_id', 'user.id' );
     $review_mod->join( 'review_type', 'review.review_type_id', 'review_type.id' );
     $review_mod->join( 'recommendation_type', 'review.recommendation_type_id', 'recommendation_type.id' );
@@ -1329,7 +1349,7 @@ class reqn extends \cenozo\database\record
     // make sure to only get reviews for the current amendment
     $review_mod->join( 'reqn_current_reqn_version', 'review.reqn_id', 'reqn_current_reqn_version.reqn_id' );
     $review_mod->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
-    $review_mod->where( 'review.amendment', '=', 'reqn_version.amendment', false );
+    $review_mod->where( 'review.amendment_id', '=', 'reqn_version.amendment_id', false );
 
     foreach( $this->get_review_list( $review_sel, $review_mod ) as $review )
     {

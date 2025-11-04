@@ -29,6 +29,7 @@ class get extends \cenozo\service\downloadable
   {
     $file = $this->get_argument( 'file', NULL );
     $db_reqn_version = $this->get_leaf_record();
+    $amendment_version = $db_reqn_version->get_amendment_version();
     $db_reqn = $db_reqn_version->get_reqn();
     if( 'coapplicant_agreement_filename' == $file ) return $db_reqn_version->coapplicant_agreement_filename;
     else if( 'peer_review_filename' == $file ) return $db_reqn_version->peer_review_filename;
@@ -43,46 +44,41 @@ class get extends \cenozo\service\downloadable
     else if( 'coapplicant_agreement_template' == $file )
     {
       return sprintf(
-        'Co-Applicant Agreement %s version %s%d.pdf',
+        'Co-Applicant Agreement %s version %s.pdf',
         $db_reqn->identifier,
-        '.' == $db_reqn_version->amendment ? '' : $db_reqn_version->amendment,
-        $db_reqn_version->version
+        $amendment_version
       );
     }
     else if( 'checklist' == $file )
     {
       return sprintf(
-        'Data Checklist %s version %s%d.pdf',
+        'Data Checklist %s version %s.pdf',
         $db_reqn->identifier,
-        '.' == $db_reqn_version->amendment ? '' : $db_reqn_version->amendment,
-        $db_reqn_version->version
+        $amendment_version
       );
     }
     else if( 'application' == $file )
     {
       return sprintf(
-        'Data Application %s version %s%d.pdf',
+        'Data Application %s version %s.pdf',
         $db_reqn->identifier,
-        '.' == $db_reqn_version->amendment ? '' : $db_reqn_version->amendment,
-        $db_reqn_version->version
+        $amendment_version
       );
     }
     else if( 'application_and_checklist' == $file )
     {
       return sprintf(
-        'Data Application and Checklist %s version %s%d.pdf',
+        'Data Application and Checklist %s version %s.pdf',
         $db_reqn->identifier,
-        '.' == $db_reqn_version->amendment ? '' : $db_reqn_version->amendment,
-        $db_reqn_version->version
+        $amendment_version
       );
     }
     else if( 'data_option_list' == $file )
     {
       return sprintf(
-        'Data Options %s version %s%d.csv',
+        'Data Options %s version %s.csv',
         $db_reqn->identifier,
-        '.' == $db_reqn_version->amendment ? '' : $db_reqn_version->amendment,
-        $db_reqn_version->version
+        $amendment_version
       );
     }
 

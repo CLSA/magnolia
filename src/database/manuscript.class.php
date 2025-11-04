@@ -489,7 +489,6 @@ class manuscript extends \cenozo\database\record
         "Notes:\n".
         "%s\n",
         $review['type'],
-        str_replace( '.', 'no', $review['amendment'] ),
         is_null( $review['first_name'] ) ? '(none)' : $review['first_name'].' '.$review['last_name'],
         $review['date'],
         is_null( $review['recommendation'] ) ? '(none)' : $review['recommendation'],

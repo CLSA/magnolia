@@ -79,6 +79,33 @@ CREATE PROCEDURE patch_reqn_version()
       AND stage_type.name != "New";
     END IF;
 
+    SELECT "Replacing amendment with amendment_id column in reqn_version table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn_version"
+    AND column_name = "amendment_id";
+
+    IF @test = 0 THEN
+      ALTER TABLE reqn_version ADD COLUMN amendment_id INT UNSIGNED NOT NULL AFTER amendment;
+
+      UPDATE reqn_version
+      JOIN amendment ON reqn_version.reqn_id = amendment.reqn_id AND reqn_version.amendment = amendment.name
+      SET reqn_version.amendment_id = amendment.id;
+
+      ALTER TABLE reqn_version ADD INDEX fk_amendment_id (amendment_id ASC);
+      ALTER TABLE reqn_version ADD CONSTRAINT fk_reqn_version_amendment_id
+        FOREIGN KEY (amendment_id)
+        REFERENCES amendment (id)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION;
+
+      ALTER TABLE reqn_version
+        DROP INDEX uq_reqn_id_amendment_version,
+        DROP COLUMN amendment;
+    END IF;
+
   END //
 DELIMITER ;
 

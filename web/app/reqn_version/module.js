@@ -80,7 +80,7 @@ cenozoApp.defineModule({
       reqn_id: { column: "reqn.id", type: "string" },
       reqn_type: { column: "reqn_type.name", type: "string" },
       amendment_version: { type: "string" },
-      amendment: { type: "string" },
+      amendment: { column: "amendment.name", type: "string" },
       is_current_version: { type: "boolean" },
       applicant_name: { type: "string" },
       applicant_position: { type: "string" },
@@ -142,7 +142,6 @@ cenozoApp.defineModule({
       identifier: { column: "reqn.identifier", type: "string" },
       legacy: { column: "reqn.legacy", type: "string" },
       show_prices: { column: "reqn.show_prices", type: "string" },
-      override_price: { column: "reqn.override_price", type: "integer" },
       special_fee_waiver_id: { column: "reqn.special_fee_waiver_id", type: "integer" },
       state: { column: "reqn.state", type: "string" },
       data_directory: { column: "reqn.data_directory", type: "string" },
@@ -561,7 +560,7 @@ cenozoApp.defineModule({
                     closeText: $scope.t("misc.close"),
                     error: true,
                   }).show();
-                  
+
                   return;
                 }
 
@@ -1033,39 +1032,65 @@ cenozoApp.defineModule({
               );
             },
 
-            // NOTE: This process mirrors database\reqn_version::calculate_cost() on the server side
-            calculateCost: function () {
-              // only calculate the cost if we have to
+            // NOTE: This process mirrors database\reqn_version::get_total_fee() on the server side
+            getTotalFee: async function () {
+              // only calculate the fee if we have to
               if (!this.record.show_prices) return null;
 
-              let cost = 3000;
-              if (null != this.record.override_price) {
-                cost = this.record.override_price;
-              } else if (this.record.special_fee_waiver_id) {
-                cost = 0;
+              let fee = null;
+              if ("new" != this.record.phase) {
+                // the fee is equal to the sum of all amendment fees
+                const response = await CnHttpFactory.instance({
+                  path: ["reqn", this.record.reqn_id, "amendment"].join("/"),
+                  data: { select: { column: {
+                    column: "IFNULL( override_fee, fee )", alias: "fee", table_prefix: false
+                  } } },
+                }).query();
+
+                fee = response.data.reduce((total, amendment) => {
+                  total += amendment['fee'];
+                  return total;
+                }, 0);
+              } else {
+                fee = this.calculateFee();
+              }
+
+              // add thousands separators
+              let sep = "fr" == this.record.lang ? " " : ",";
+              fee = fee.toString();
+              if (1000000 <= fee) fee = fee.replace( /([0-9]+)([0-9]{3})([0-9]{3})$/, "$1"+sep+"$2"+sep+"$3" );
+              else if (1000 <= fee) fee = fee.replace( /([0-9]+)([0-9]{3})$/, "$1"+sep+"$2" );
+              return "fr" == this.record.lang ? fee + " $" : "$" + fee;
+            },
+
+            // NOTE: This process mirrors database\reqn_version::calculate_fee() on the server side
+            calculateFee: function () {
+              let fee = 3000;
+              if (this.record.special_fee_waiver_id) {
+                fee = 0;
               } else {
                 const waiveFee = this.record.waiver && "none" != this.record.waiver;
 
-                // determine the base cost based on country (assume the base country if none is provided)
+                // determine the base fee based on country (assume the base country if none is provided)
                 var baseCountryId = CnSession.application.baseCountryId;
                 var applicantCountryId =
                   null == this.record.applicant_country_id ? baseCountryId : this.record.applicant_country_id;
                 var traineeCountryId =
                   null == this.record.trainee_country_id ? baseCountryId : this.record.trainee_country_id;
 
-                // cost for trainees is different to applicants
+                // fee for trainees is different to applicants
                 if (this.record.trainee_user_id) {
                   if (baseCountryId != traineeCountryId || baseCountryId != applicantCountryId) {
                     // if either the trainee or applicant isn't Canadian then the base fee is 5000
-                    cost = 5000;
+                    fee = 5000;
                   } else if (waiveFee) {
                     // both are canadian, so check for a fee waiver
-                    cost = 0;
+                    fee = 0;
                   }
                 } else {
                   // if the applicant is not Canadian then the base fee is 5000
                   if (baseCountryId != applicantCountryId) {
-                    cost = 5000;
+                    fee = 5000;
                   }
                 }
 
@@ -1084,20 +1109,20 @@ cenozoApp.defineModule({
                             if (selection.cost.value > maxCost) maxCost = selection.cost.value;
                           } else {
                             // add the selection's cost
-                            cost += selection.cost.value;
+                            fee += selection.cost.value;
                           }
                         }
                       });
 
                     // when there is a combined cost then maxCost will be > 0, otherwise it is 0
-                    cost += maxCost;
+                    fee += maxCost;
                   })
                 );
 
                 // now add any additional fees
-                cost += this.record.additional_fee_total;
+                fee += this.record.additional_fee_total;
 
-                // now add amendment costs (including all past amendments) if there is no fee waiver
+                // now add amendment fees (including all past amendments) if there is no fee waiver
                 if( !waiveFee ) {
                   if(!this.versionListLoaded || angular.isUndefined(this.parentModel.amendmentTypeList)) {
                     return this.translate("misc.calculating") + "...";
@@ -1111,11 +1136,11 @@ cenozoApp.defineModule({
                       ) {
                         if(currentAmendment == version.amendment) return;
 
-                        // add the cost of any amendment that this version has selected
+                        // add the fee of any amendment that this version has selected
                         let c = this.isInternational() ? "feeInternational" : "feeCanada";
                         this.parentModel.amendmentTypeList.en
                           .filter(aType => 0 < aType[c] && version["amendmentType"+aType.id])
-                          .forEach(aType => { cost += aType[c]; });
+                          .forEach(aType => { fee += aType[c]; });
                         currentAmendment = version.amendment;
                       }
                     });
@@ -1123,12 +1148,7 @@ cenozoApp.defineModule({
                 }
               }
 
-              // add thousands separators
-              let sep = "fr" == this.record.lang ? " " : ",";
-              cost = cost.toString();
-              if (1000000 <= cost) cost = cost.replace( /([0-9]+)([0-9]{3})([0-9]{3})$/, "$1"+sep+"$2"+sep+"$3" );
-              else if (1000 <= cost) cost = cost.replace( /([0-9]+)([0-9]{3})$/, "$1"+sep+"$2" );
-              return "fr" == this.record.lang ? cost + " $" : "$" + cost;
+              return fee;
             },
 
             isWaiverMutable: function () {
@@ -2265,22 +2285,16 @@ cenozoApp.defineModule({
                       // only check waiver if a waiver is allowed and this is a trainee project
                       return this.isWaiverAllowed() && this.record.trainee_project;
                     } else if ("applicant_country_id" == property) {
-                      // only check the country if show_prices is on and override price is off
-                      return this.record.show_prices && null == this.record.override_price;
+                      // only check the country if show_prices is on
+                      return this.record.show_prices;
                     } else if ("trainee_country_id" == property) {
                       // same as for applicant, but only if there is a trainee
-                      return (
-                        this.record.trainee_name &&
-                        this.record.show_prices && null == this.record.override_price
-                      );
+                      return this.record.trainee_name && this.record.show_prices;
                     } else if (property.match("trainee_")) {
                       // ignore trainee details unless the reqn has a trainee
                       if (this.record.trainee_name) {
-                        if ("trainee_country_id" == property) {
-                          // only check the country if show_prices is on and override price is off
-                          return this.record.show_prices && null == this.record.override_price;
-                        }
-                        return true;
+                        // only check the country if show_prices is on and override price is off
+                        return "trainee_country_id" == property ?  this.record.show_prices : true;
                       }
                       return false;
                     } else {

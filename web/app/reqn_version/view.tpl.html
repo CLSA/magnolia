@@ -110,7 +110,7 @@
   <div class="container-fluid" style="padding-top: 1em;">
     <div ng-if="model.viewModel.record.show_prices"
          class="spacer pull-right text-info"
-         ng-bind-html="t( 'misc.totalCost' ) + ': ' + model.viewModel.calculateCost()">
+         ng-bind-html="t( 'misc.totalFee' ) + ': ' + model.viewModel.getTotalFee()">
     </div>
     <ul class="nav nav-tabs">
       <li ng-class="{'active':'instructions'==model.viewModel.formTab}">
