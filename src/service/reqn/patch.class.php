@@ -68,6 +68,7 @@ class patch extends \cenozo\service\patch
     // define whether the action is allowed
     $db_role = lib::create( 'business\session' )->get_role();
     $db_reqn_version = $db_reqn->get_current_reqn_version();
+    $is_amendment = '.' != $db_reqn_version->get_amendment()->name;
     $db_current_stage_type = $db_reqn->get_current_stage_type();
     $state = $db_reqn->state;
     $phase = $db_current_stage_type->phase;
@@ -94,7 +95,7 @@ class patch extends \cenozo\service\patch
     else if( 'abandon' == $action )
     {
       if( !in_array( $db_role->name, array( 'applicant', 'designate', 'administrator' ) ) ) $code = 403;
-      else if( '.' != $db_reqn_version->amendment )
+      else if( $is_amendment )
       {
         // do not allow an amendment to be abandoned once it has gone past the admin review
         if( 'Admin Review' != $db_current_stage_type->name ) $code = 400;
@@ -117,9 +118,11 @@ class patch extends \cenozo\service\patch
     }
     else if( 'incomplete' == $action )
     {
-      if( 'administrator' != $db_role->name ||
-          '.' != $db_reqn_version->amendment ||
-          ( 'review' != $phase && !in_array( $db_current_stage_type->name, array( 'Agreement', 'Data Release' ) ) ) ) $code = 403;
+      if(
+        'administrator' != $db_role->name ||
+        $is_amendment ||
+        ( 'review' != $phase && !in_array( $db_current_stage_type->name, array( 'Agreement', 'Data Release' ) ) )
+      ) $code = 403;
     }
     else if( 'withdraw' == $action )
     {
@@ -163,7 +166,7 @@ class patch extends \cenozo\service\patch
               $code = 403;
             }
             // only legacy amendment reviews can be skipped
-            else if( '.' == $db_reqn_version->amendment || !$db_reqn->legacy )
+            else if( !$is_amendment || !$db_reqn->legacy )
             {
               throw lib::create( 'exception\notice',
                 'Only legacy amendments can skip the review process.',
@@ -254,7 +257,7 @@ class patch extends \cenozo\service\patch
         // don't allow if new (there's no stage to reverse to)
         'new' == $phase ||
         // use abandon for this instead
-        ( '.' == $db_reqn_version->amendment && 'Admin Review' == $db_current_stage_type->name )
+        ( !$is_amendment && 'Admin Review' == $db_current_stage_type->name )
       ) $code = 400;
     }
     else if( 'reject' == $action )
@@ -313,6 +316,7 @@ class patch extends \cenozo\service\patch
         )
       );
     $db_reqn_version = $db_reqn->get_current_reqn_version();
+    $is_amendment = '.' != $db_reqn_version->get_amendment()->name;
     $file = $this->get_argument( 'file', NULL );
     if( false !== strpos( util::get_header( 'Content-Type' ), 'application/octet-stream' ) && !is_null( $file ) )
     {
@@ -345,7 +349,7 @@ class patch extends \cenozo\service\patch
     }
     else if( 'abandon' == $action )
     {
-      if( '.' == $db_reqn_version->amendment )
+      if( !$is_amendment )
       {
         // abandon the requisition
         $db_reqn->state = 'abandoned';
@@ -355,12 +359,12 @@ class patch extends \cenozo\service\patch
       {
         // remove all of the amendment's versions and reviews
         $reqn_version_mod = lib::create( 'database\modifier' );
-        $reqn_version_mod->where( 'amendment', '=', $db_reqn_version->amendment );
+        $reqn_version_mod->where( 'amendment_id', '=', $db_reqn_version->amendment_id );
         $reqn_version_mod->order_desc( 'version' );
         foreach( $db_reqn->get_reqn_version_object_list( $reqn_version_mod ) as $db_amendment_reqn_version )
         {
           $review_mod = lib::create( 'database\modifier' );
-          $review_mod->where( 'amendment', '=', $db_amendment_reqn_version->amendment );
+          $review_mod->where( 'amendment_id', '=', $db_amendment_reqn_version->amendment_id );
           foreach( $db_reqn->get_review_object_list( $review_mod ) as $db_review ) $db_review->delete();
           $db_amendment_reqn_version->delete();
         }
@@ -456,10 +460,10 @@ class patch extends \cenozo\service\patch
 
         // first fill in the admin review
         $db_review = $review_class_name::get_unique_record(
-          array( 'reqn_id', 'amendment', 'review_type_id' ),
+          array( 'reqn_id', 'amendment_id', 'review_type_id' ),
           array(
             $db_reqn->id,
-            $db_reqn_version->amendment,
+            $db_reqn_version->amendment_id,
             $review_type_class_name::get_unique_record( 'name', 'Admin' )->id
           )
         );
@@ -481,7 +485,7 @@ class patch extends \cenozo\service\patch
         $db_reqn->proceed_to_next_stage( 'Active' );
       }
       // Do not proceed if this is a legacy reqn not in an amendment or finalization
-      else if( !( $db_reqn->legacy && '.' == $db_reqn_version->amendment && 'finalization' != $phase ) )
+      else if( !( $db_reqn->legacy && !$is_amendment && 'finalization' != $phase ) )
       {
         // trainees and proxies must be get approval from their supervisor
         if( $approval_required )

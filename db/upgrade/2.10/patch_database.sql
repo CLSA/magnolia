@@ -2,9 +2,17 @@
 
 SET AUTOCOMMIT=0;
 
-SOURCE amendment_type.sql
-SOURCE reqn.sql
+SOURCE additional_fee.sql
+SOURCE amendment.sql
 SOURCE reqn_version.sql
+SOURCE review.sql
+SOURCE stage.sql
+SOURCE calculate_amendment_fees.sql
+SOURCE update_reqn_current_reqn_version.sql
+SOURCE update_reqn_last_reqn_version_with_agreement.sql
+SOURCE reqn.sql
+
+SOURCE amendment_type.sql
 SOURCE manuscript_version.sql
 SOURCE data_agreement.sql
 SOURCE coapplicant.sql

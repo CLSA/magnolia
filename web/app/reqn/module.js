@@ -238,20 +238,6 @@ cenozoApp.defineModule({
           "Determines whether the fee for the application is calculated. " +
           "This also makes the applicant and trainee country a mandatory field.",
       },
-      override_price: {
-        title: "Override Fee ($)",
-        type: "string",
-        format: "integer",
-        isConstant: function ($state, model) {
-          return !model.isRole("administrator");
-        },
-        isExcluded: function ($state, model) {
-          return "view" != model.getActionFromState();
-        },
-        help:
-          "Overrides the fee calculation by the provided value. " +
-          "If set then the applicant and trainee country will not be a mandatory field."
-      },
       non_payment: {
         title: "Flag for Non-Payment",
         type: "boolean",
@@ -534,7 +520,7 @@ cenozoApp.defineModule({
       },
       next_stage_type: { type: "string", isExcluded: true },
       amendment: {
-        column: "reqn_version.amendment",
+        column: "amendment.name",
         type: "string",
         isExcluded: true,
       },

@@ -11,7 +11,7 @@ cenozoApp.defineModule({
       },
       columnList: {
         name: { title: "Name", },
-        cost: { title: "Cost", },
+        fee: { title: "Fee", },
         reqn_count: { title: "Requisitions" },
       },
       defaultOrder: {
@@ -26,8 +26,8 @@ cenozoApp.defineModule({
         type: "string",
         format: "identifier",
       },
-      cost: {
-        title: "Cost ($)",
+      fee: {
+        title: "Fee ($)",
         type: "string",
         format: "integer",
       },

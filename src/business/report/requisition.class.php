@@ -74,7 +74,7 @@ class requisition extends \cenozo\business\report\base_report
       $reqn_class_name::db()->execute( sprintf(
         'CREATE TEMPORARY TABLE temp_stage_sort '.
         'SELECT '.
-          'reqn_id, amendment, stage_type_id, '.
+          'reqn_id, stage_type_id, '.
           'DATE( IFNULL( CONVERT_TZ( datetime, "UTC", "%s" ), create_timestamp ) ) as date '.
         'FROM stage '.
         'ORDER BY reqn_id, datetime IS NULL, datetime', // sort by datetime, putting NULL values at the end
@@ -190,11 +190,11 @@ class requisition extends \cenozo\business\report\base_report
         foreach( $row as $column => $value ) $header[] = ucwords( str_replace( '_', ' ', $column ) );
       }
 
-      // determine the cost
+      // determine the fee
       if( 'N/A' != $row['Cost'] )
       {
         $db_reqn = $reqn_class_name::get_unique_record( 'identifier', $row['Identifier'] );
-        $row['Cost'] = $db_reqn->get_current_reqn_version()->calculate_cost();
+        $row['Cost'] = $db_reqn->get_current_reqn_version()->get_total_fee();
       }
 
       $rows[] = array_values( $row );

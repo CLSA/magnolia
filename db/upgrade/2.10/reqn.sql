@@ -31,6 +31,16 @@ CREATE PROCEDURE patch_reqn()
       AFTER data_sharing_approved;
     END IF;
 
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "reqn"
+    AND column_name = "override_price";
+
+    IF @test = 1 THEN
+      ALTER TABLE reqn DROP COLUMN override_price;
+    END IF;
+
   END //
 DELIMITER ;
 

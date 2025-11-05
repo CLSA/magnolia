@@ -84,12 +84,14 @@ class stage extends \cenozo\database\record
       // make sure all reviews associated with this stage are complete
       foreach( $review_list as $db_review )
       {
+        $db_amendment = $db_review->get_amendment();
+        $amendment = '.' == $db_amendment->name ? '' : sprintf( ' (Amendment %s)', $db_amendment->name );
         if( is_null( $db_review->recommendation_type_id ) )
         {
           return sprintf(
             'The recommendation for the %s Review%s must be chosen before proceeding to the next stage.',
             $db_review->get_review_type()->name,
-            '.' == $db_review->amendment ? '' : sprintf( ' (Amendment %s)', $db_review->amendment )
+            $amendment
           );
         }
 
@@ -102,7 +104,7 @@ class stage extends \cenozo\database\record
             'There %s questions for the %s review%s which must be answered before proceeding to the next stage.',
             1 == $missing ? 'is one' : 'are '.$missing,
             $db_review->get_review_type()->name,
-            '.' == $db_review->amendment ? '' : sprintf( ' (Amendment %s)', $db_review->amendment )
+            $amendment
           );
         }
       }

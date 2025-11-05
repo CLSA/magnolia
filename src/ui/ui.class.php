@@ -21,6 +21,14 @@ class ui extends \cenozo\ui\ui
   {
     parent::build_module_list();
 
+    $module = $this->get_module( 'amendment' );
+    if( !is_null( $module ) )
+    {
+      $module->add_child( 'reqn_version' );
+      $module->add_child( 'review' );
+      $module->add_child( 'stage' );
+    }
+
     $module = $this->get_module( 'data_agreement' );
     if( !is_null( $module ) ) $module->add_child( 'reqn' );
 
@@ -50,6 +58,7 @@ class ui extends \cenozo\ui\ui
     $module = $this->get_module( 'reqn' );
     if( !is_null( $module ) )
     {
+      $module->add_child( 'amendment' );
       $module->add_child( 'final_report' );
       $module->add_child( 'destruction_report' );
       $module->add_child( 'reqn_version' );

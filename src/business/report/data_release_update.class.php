@@ -32,6 +32,12 @@ class data_release_update extends \cenozo\business\report\base_report
 
     $select->from( 'reqn' );
 
+    // join to the base "." amendment
+    $join_mod = lib::create( 'database\modifier' );
+    $join_mod->where( 'reqn.id', '=', 'amendment.reqn_id', false );
+    $join_mod->where( 'amendment.name', '=', '.' );
+    $modifier->join_modifier( 'amendment', $join_mod );
+
     // determine whether the reqn_type includes the decision made stage
     $modifier->join( 'reqn_type', 'reqn.reqn_type_id', 'reqn_type.id' );
     $join_mod = lib::create( 'database\modifier' );
@@ -62,14 +68,14 @@ class data_release_update extends \cenozo\business\report\base_report
     $join_mod = lib::create( 'database\modifier' );
     $join_mod->where( 'reqn.id', '=', 'agreement_stage.reqn_id', false );
     $join_mod->where( 'agreement_stage.stage_type_id', '=', $agreement_stage_type_id );
-    $join_mod->where( 'agreement_stage.amendment', '=', '.' );
+    $join_mod->where( 'agreement_stage.amendment_id', '=', 'amendment.id', false );
     $modifier->join_modifier( 'stage', $join_mod, 'left', 'agreement_stage' );
 
     // determine whether the reqn has reached a non-amendment decision made stage type
     $join_mod = lib::create( 'database\modifier' );
     $join_mod->where( 'reqn.id', '=', 'dm_stage.reqn_id', false );
     $join_mod->where( 'dm_stage.stage_type_id', '=', $dm_stage_type_id );
-    $join_mod->where( 'dm_stage.amendment', '=', '.' );
+    $join_mod->where( 'dm_stage.amendment_id', '=', 'amendment.id', false );
     $modifier->join_modifier( 'stage', $join_mod, 'left', 'dm_stage' );
 
     $modifier->where_bracket( true );

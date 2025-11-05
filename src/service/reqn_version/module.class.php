@@ -74,6 +74,7 @@ class module extends \cenozo\service\module
 
     parent::prepare_read( $select, $modifier );
 
+    $modifier->join( 'amendment', 'reqn_version.amendment_id', 'amendment.id' );
     $modifier->join( 'reqn', 'reqn_version.reqn_id', 'reqn.id' );
     $modifier->join( 'reqn_current_final_report', 'reqn.id', 'reqn_current_final_report.reqn_id' );
     $modifier->left_join( 'final_report', 'reqn_current_final_report.final_report_id', 'final_report.id' );
@@ -91,8 +92,9 @@ class module extends \cenozo\service\module
     $modifier->left_join( 'country', 'reqn_version.applicant_country_id', 'applicant_country.id', 'applicant_country' );
     $modifier->left_join( 'country', 'reqn_version.trainee_country_id', 'trainee_country.id', 'trainee_country' );
 
+    $select->add_table_column( 'amendment', 'name', 'amendment' );
     $select->add_column(
-      'CONCAT( REPLACE( reqn_version.amendment, ".", "" ), reqn_version.version )',
+      'CONCAT( REPLACE( amendment.name, ".", "" ), reqn_version.version )',
       'amendment_version',
       false
     );
@@ -129,7 +131,8 @@ class module extends \cenozo\service\module
         'current_reqn_version'
       );
       $select->add_column(
-        'reqn_version.amendment = current_reqn_version.amendment AND reqn_version.version = current_reqn_version.version',
+        'reqn_version.amendment_id = current_reqn_version.amendment_id AND '.
+        'reqn_version.version = current_reqn_version.version',
         'is_current_version',
         false,
         'boolean'
@@ -205,7 +208,7 @@ class module extends \cenozo\service\module
       if( $select->has_column( 'additional_fee_total' ) )
       {
         $fee_sel = lib::create( 'database\select' );
-        $fee_sel->add_column( 'SUM( cost )', 'fee_total', false );
+        $fee_sel->add_column( 'SUM( fee )', 'fee_total', false );
         $fee_mod = lib::create( 'database\modifier' );
         $fee_mod->group( 'reqn.id' );
         $row = current( $db_reqn_version->get_reqn()->get_additional_fee_list( $fee_sel, $fee_mod ) );

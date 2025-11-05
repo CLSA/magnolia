@@ -711,7 +711,7 @@ cenozo.service("CnReqnHelper", [
             // don't allow if inactive or abandoned
             !["inactive","abandoned"].includes(state) &&
             "new" != phase && // don't allow if new (there's no stage to reverse to)
-            !( "." != record.amendment && "Admin Review" == stageType ) && // use abandon for this instead
+            !("." != record.amendment && "Admin Review" == stageType) && // use abandon for this instead
             "administrator" == role // only admins can reverse stages
           );
         } else if ("proceed" == subject) {
@@ -1471,7 +1471,7 @@ cenozo.service("CnLocalization", [
             },
             pleaseConfirm: { en: "Please confirm", fr: "Veuillez confirmer" },
             pleaseNote: { en: "Please Note", fr: "Notez bien" },
-            totalCost: { en: "Total fees", fr: "Total des frais" },
+            totalFee: { en: "Total fees", fr: "Total des frais" },
             remove: { en: "Remove", fr: "Supprimer" },
             chars: { en: "characters", fr: "caractères" },
             comments: { en: "Comments", fr: "Commentaires" },
