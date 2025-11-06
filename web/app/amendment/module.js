@@ -19,6 +19,9 @@ cenozoApp.defineModule({
         formatted_name: { title: "Name" },
         fee: { title: "Fee Change", type: "currency:$:0" },
         override_fee: { title: "Override Fee Change", type: "currency:$:0" },
+        has_agreement: { title: "Has Agreement", type: "boolean" },
+        datetime: { column: "first_reqn_version.datetime", title: "Datetime", type: "datetime" },
+        note: { title: "Note", type: "text", limit: 200 },
       },
       defaultOrder: {
         column: "name",
@@ -30,6 +33,14 @@ cenozoApp.defineModule({
       formatted_name: { title: "Name", type: "string", isConstant: true },
       fee: { title: "Fee Change ($)", type: "string", format: "integer", isConstant: true },
       override_fee: { title: "Override Fee Change ($)", type: "string", format: "integer" },
+      has_agreement: { title: "Has Agreement", type: "boolean", isConstant: true },
+      datetime: {
+        column: "first_reqn_version.datetime",
+        title: "Datetime",
+        type: "datetime",
+        isConstant: true,
+      },
+      note: { title: "Note", type: "text" },
     });
   },
 });

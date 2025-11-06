@@ -6,6 +6,8 @@ SOURCE setting.sql
 SOURCE additional_fee.sql
 SOURCE amendment.sql
 SOURCE reqn_version.sql
+SOURCE amendment_current_reqn_version.sql
+SOURCE update_amendment_current_reqn_version.sql
 SOURCE review.sql
 SOURCE stage.sql
 SOURCE calculate_amendment_fees.sql

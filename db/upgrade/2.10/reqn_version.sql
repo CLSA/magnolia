@@ -113,3 +113,29 @@ DELIMITER ;
 
 CALL patch_reqn_version();
 DROP PROCEDURE IF EXISTS patch_reqn_version;
+
+
+DELIMITER $$
+
+DROP TRIGGER IF EXISTS reqn_version_AFTER_INSERT$$
+CREATE DEFINER=CURRENT_USER TRIGGER reqn_version_AFTER_INSERT AFTER INSERT ON reqn_version FOR EACH ROW
+BEGIN
+  CALL update_reqn_current_reqn_version( NEW.reqn_id );
+  CALL update_reqn_last_reqn_version_with_agreement( NEW.reqn_id );
+  CALL update_amendment_current_reqn_version( NEW.amendment_id );
+
+  INSERT INTO reqn_version_comment( reqn_version_id, data_category_id )
+  SELECT NEW.id, data_category.id
+  FROM data_category
+  WHERE comment = true;
+END$$
+
+DROP TRIGGER IF EXISTS reqn_version_AFTER_DELETE$$
+CREATE DEFINER=CURRENT_USER TRIGGER reqn_version_AFTER_DELETE AFTER DELETE ON reqn_version FOR EACH ROW
+BEGIN
+  CALL update_reqn_current_reqn_version( OLD.reqn_id );
+  CALL update_reqn_last_reqn_version_with_agreement( OLD.reqn_id );
+  CALL update_amendment_current_reqn_version( OLD.amendment_id );
+END$$
+
+DELIMITER ;

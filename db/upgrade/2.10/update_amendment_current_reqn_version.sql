@@ -1,0 +1,22 @@
+SELECT "Creating new update_amendment_current_reqn_version procedure" AS "";
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS update_amendment_current_reqn_version;
+CREATE DEFINER=CURRENT_USER PROCEDURE update_amendment_current_reqn_version(IN proc_amendment_id INT(10) UNSIGNED)
+BEGIN
+  REPLACE INTO amendment_current_reqn_version( amendment_id, reqn_version_id )
+  SELECT amendment.id, reqn_version.id
+  FROM amendment
+  LEFT JOIN reqn_version ON amendment.id = reqn_version.amendment_id
+  AND reqn_version.version <=> (
+    SELECT MAX( version )
+    FROM reqn_version
+    WHERE amendment.id = reqn_version.amendment_id
+    GROUP BY reqn_version.amendment_id
+    LIMIT 1
+  )
+  WHERE amendment.id = proc_amendment_id;
+END$$
+
+DELIMITER ;

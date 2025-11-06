@@ -61,10 +61,7 @@ class ui extends \cenozo\ui\ui
       $module->add_child( 'amendment' );
       $module->add_child( 'final_report' );
       $module->add_child( 'destruction_report' );
-      $module->add_child( 'reqn_version' );
       $module->add_child( 'deferral_note' );
-      $module->add_child( 'review' );
-      $module->add_child( 'stage' );
       $module->add_child( 'data_release' );
       $module->add_child( 'data_destroy' );
       $module->add_child( 'notice' );

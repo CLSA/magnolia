@@ -945,7 +945,7 @@ cenozoApp.defineModule({
         $state
       ) {
         var object = function (parentModel, root) {
-          CnBaseViewFactory.construct(this, parentModel, root, "stage");
+          CnBaseViewFactory.construct(this, parentModel, root, "amendment");
 
           angular.extend(this, {
             show: function (subject) {

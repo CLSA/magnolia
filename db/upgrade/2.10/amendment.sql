@@ -19,6 +19,7 @@ CREATE PROCEDURE patch_amendment()
         name CHAR(1) NOT NULL,
         fee INT(10) NULL DEFAULT NULL,
         override_fee INT(10) NULL DEFAULT NULL,
+        note TEXT NULL DEFAULT NULL,
         PRIMARY KEY (id),
         INDEX fk_reqn_id (reqn_id ASC),
         UNIQUE INDEX uq_reqn_id_name (reqn_id ASC, name ASC),
@@ -32,7 +33,8 @@ CREATE PROCEDURE patch_amendment()
 
       SELECT "Creating all new amendment records" AS "";
 
-      INSERT INTO amendment (reqn_id, name) SELECT DISTINCT reqn_id, amendment FROM reqn_version;
+      INSERT INTO amendment (reqn_id, name)
+      SELECT reqn_id, amendment FROM reqn_version GROUP BY reqn_id, amendment;
     END IF;
 
   END //
