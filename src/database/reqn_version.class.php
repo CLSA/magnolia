@@ -569,6 +569,7 @@ class reqn_version extends \cenozo\database\record
    */
   public function calculate_fee()
   {
+    $db_setting = lib::create( 'business\session' )->get_site()->get_setting();
     $db_reqn = $this->get_reqn();
 
     // There's no fee if the reqn has a special fee waiver
@@ -576,7 +577,11 @@ class reqn_version extends \cenozo\database\record
 
     $waive_fee = !is_null( $this->waiver ) && 'none' != $this->waiver;
     $international = $this->is_international();
-    $fee = $international ? 5000 : ($db_reqn->trainee_user_id && $waive_fee ? 0 : 3000);
+    $fee = (
+      $international ?
+      $db_setting->fee_international :
+      ($db_reqn->trainee_user_id && $waive_fee ? 0 : $db_setting->fee_national)
+    );
 
     // add amendment fees (including all past amendments) if there is no fee waiver
     if( !$waive_fee )
@@ -585,7 +590,7 @@ class reqn_version extends \cenozo\database\record
       $reqn_version_sel->add_table_column( 'amendment', 'name', 'amendment' );
       $reqn_version_sel->add_column( 'version' );
       $reqn_version_sel->add_column(
-        sprintf( 'SUM( %s )', $international ? 'fee_international' : 'fee_canada' ),
+        sprintf( 'SUM( %s )', $international ? 'fee_international' : 'fee_national' ),
         'fee',
         false
        );

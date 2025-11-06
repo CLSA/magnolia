@@ -2,6 +2,7 @@
 
 SET AUTOCOMMIT=0;
 
+SOURCE setting.sql
 SOURCE additional_fee.sql
 SOURCE amendment.sql
 SOURCE reqn_version.sql

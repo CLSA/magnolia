@@ -20,6 +20,7 @@ class get extends \cenozo\service\self\get
   {
     $stage_type_class_name = lib::get_class_name( 'database\stage_type' );
     $setting_manager = lib::create( 'business\setting_manager' );
+    $session = lib::create( 'business\session' );
 
     $db_user = lib::create( 'business\session' )->get_user();
     $db_role = lib::create( 'business\session' )->get_role();
@@ -33,6 +34,11 @@ class get extends \cenozo\service\self\get
     $resource['application']['base_country_id'] = $db_application->country_id;
     $resource['user']['suspended'] = $db_user->get_suspended();
     $resource['user']['newsletter'] = $db_user->get_newsletter();
+
+    $setting_sel = lib::create( 'database\select' );
+    $setting_sel->from( 'setting' );
+    $setting_sel->add_all_table_columns();
+    $resource['setting'] = $session->get_setting()->get_column_values( $setting_sel );
 
     // always include the rank of the revision required stage as it is needed when editing reqns
     $resource['application']['revision_required_rank'] =

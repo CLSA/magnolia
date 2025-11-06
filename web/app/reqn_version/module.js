@@ -1089,9 +1089,9 @@ cenozoApp.defineModule({
               // calculate the base fee
               const international = this.isInternational();
               let fee = (
-                international ? 5000 :
+                international ? CnSession.setting.feeInternational :
                 this.record.trainee_user_id && waiveFee ? 0 :
-                3000
+                CnSession.setting.feeNational
               );
 
               // add amendment fees (including all past amendments) if there is no fee waiver
@@ -1106,7 +1106,7 @@ cenozoApp.defineModule({
                     if(currentAmendment == version.amendment) return;
 
                     // add the fee of any amendment that this version has selected
-                    let c = international ? "feeInternational" : "feeCanada";
+                    let c = international ? "feeInternational" : "feeNational";
                     this.parentModel.amendmentTypeList.en
                       .filter(aType => 0 < aType[c] && version["amendmentType"+aType.id])
                       .forEach(aType => { fee += aType[c]; });
@@ -1718,7 +1718,7 @@ cenozoApp.defineModule({
                     proceed = response;
                   }
 
-                  let fee = amendmentType[this.isInternational() ? "feeInternational" : "feeCanada"];
+                  let fee = amendmentType[this.isInternational() ? "feeInternational" : "feeNational"];
                   if (0 < fee) {
                     fee = "fr" == this.record.lang ? fee + " $" : "$" + fee;
                     proceed = false;
@@ -3093,7 +3093,7 @@ cenozoApp.defineModule({
                 this.amendmentTypeList.en.push({
                   id: item.id,
                   newUser: item.new_user,
-                  feeCanada: item.fee_canada,
+                  feeNational: item.fee_national,
                   feeInternational: item.fee_international,
                   name: item.reason_en,
                   justificationPrompt: item.justification_prompt_en,

@@ -34,6 +34,18 @@ CREATE PROCEDURE patch_amendment_type()
       UPDATE amendment_type set rank = rank-100 WHERE rank > 100;
     END IF;
 
+    SELECT "Renaming fee_canada to fee_national column in amendment_type table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "amendment_type"
+    AND column_name = "fee_canada";
+
+    IF @test = 1 THEN
+      ALTER TABLE amendment_type RENAME COLUMN fee_canada TO fee_national;
+    END IF;
+
   END //
 DELIMITER ;
 

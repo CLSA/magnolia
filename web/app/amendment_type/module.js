@@ -35,8 +35,8 @@ cenozoApp.defineModule({
         title: "Show in Description",
         type: "boolean",
       },
-      fee_canada: {
-        title: "Canadian Fee ($)",
+      fee_national: {
+        title: "National Fee ($)",
         type: "string",
         format: "integer",
       },
