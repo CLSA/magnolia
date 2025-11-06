@@ -18,7 +18,9 @@ CREATE PROCEDURE patch_stage()
       JOIN amendment ON stage.reqn_id = amendment.reqn_id AND stage.amendment = amendment.name
       SET stage.amendment_id = amendment.id;
 
-      ALTER TABLE stage ADD INDEX fk_amendment_id (amendment_id ASC);
+      ALTER TABLE stage
+        ADD INDEX fk_amendment_id (amendment_id ASC),
+        ADD UNIQUE INDEX uq_amendment_id_stage_type_id (amendment_id ASC, stage_type_id ASC);
       ALTER TABLE stage ADD CONSTRAINT fk_stage_amendment_id
         FOREIGN KEY (amendment_id)
         REFERENCES amendment (id)

@@ -10,11 +10,11 @@ BEGIN
   SELECT reqn.id, reqn_version.id
   FROM reqn
   LEFT JOIN reqn_version ON reqn.id = reqn_version.reqn_id
-  LEFT JOIN amendment ON reqn_version.id = amendment.reqn_version_id
+  LEFT JOIN amendment ON reqn_version.amendment_id = amendment.id
   AND CONCAT( amendment.name, reqn_version.version ) <=> (
     SELECT MAX( CONCAT( amendment.name, version ) )
     FROM reqn_version
-    JOIN amendment ON reqn_version.id = amendment.reqn_version_id
+    JOIN amendment ON reqn_version.amendment_id = amendment.id
     WHERE reqn.id = reqn_version.reqn_id
     GROUP BY reqn_version.reqn_id
     LIMIT 1

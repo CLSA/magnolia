@@ -460,12 +460,8 @@ class patch extends \cenozo\service\patch
 
         // first fill in the admin review
         $db_review = $review_class_name::get_unique_record(
-          array( 'reqn_id', 'amendment_id', 'review_type_id' ),
-          array(
-            $db_reqn->id,
-            $db_reqn_version->amendment_id,
-            $review_type_class_name::get_unique_record( 'name', 'Admin' )->id
-          )
+          ['amendment_id', 'review_type_id'],
+          [$db_reqn_version->amendment_id, $review_type_class_name::get_unique_record( 'name', 'Admin' )->id]
         );
         $db_review->user_id = $db_user->id;
         $db_review->recommendation_type_id =

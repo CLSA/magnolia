@@ -91,7 +91,6 @@ class agreement extends \cenozo\business\report\base_report
 
     $header = [];
     $rows = [];
-    \cenozo\database\database::$debug = true;
     foreach( $reqn_class_name::select( $select, $modifier ) as $row )
     {
       if( 0 == count( $header ) )
@@ -101,7 +100,6 @@ class agreement extends \cenozo\business\report\base_report
 
       $rows[] = array_values( $row );
     }
-    \cenozo\database\database::$debug = false;
 
     $this->add_table( NULL, $header, $rows );
   }

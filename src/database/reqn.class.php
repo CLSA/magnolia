@@ -771,8 +771,14 @@ class reqn extends \cenozo\database\record
 
     if( !is_null( $db_current_stage ) )
     {
-      // if this is currently a new reqn then update the deadline before we proceed in case it has changed
-      if( "New" == $db_current_stage_type->name ) $this->assert_deadline();
+      if( "New" == $db_current_stage_type->name )
+      {
+        // update the deadline
+        $this->assert_deadline();
+
+        // calculate and store the amendment's fee
+        $db_amendment->update_fee();
+      }
 
       // save the user who completed the current stage
       $db_current_stage->user_id = $db_user->id;

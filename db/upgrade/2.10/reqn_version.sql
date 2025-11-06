@@ -94,7 +94,9 @@ CREATE PROCEDURE patch_reqn_version()
       JOIN amendment ON reqn_version.reqn_id = amendment.reqn_id AND reqn_version.amendment = amendment.name
       SET reqn_version.amendment_id = amendment.id;
 
-      ALTER TABLE reqn_version ADD INDEX fk_amendment_id (amendment_id ASC);
+      ALTER TABLE reqn_version
+        ADD INDEX fk_amendment_id (amendment_id ASC),
+        ADD UNIQUE INDEX uq_amendment_id_version (amendment_id ASC, version ASC);
       ALTER TABLE reqn_version ADD CONSTRAINT fk_reqn_version_amendment_id
         FOREIGN KEY (amendment_id)
         REFERENCES amendment (id)

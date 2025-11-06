@@ -24,6 +24,6 @@ class module extends \cenozo\service\module
     $modifier->join( 'reqn', 'amendment.reqn_id', 'reqn.id' );
 
     if( $select->has_column( 'formatted_name' ) )
-      $select->add_column( 'IF("." = amendment.name, "Initial", amendment.name)', 'formatted_name', false );
+      $select->add_column( 'IF("." = amendment.name, "(N/A)", amendment.name)', 'formatted_name', false );
   }
 }

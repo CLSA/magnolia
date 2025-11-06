@@ -17,8 +17,8 @@ cenozoApp.defineModule({
       },
       columnList: {
         formatted_name: { title: "Name" },
-        fee: { title: "Fee", type: "currency:$:0" },
-        override_fee: { title: "Override Fee", type: "currency:$:0" },
+        fee: { title: "Fee Change", type: "currency:$:0" },
+        override_fee: { title: "Override Fee Change", type: "currency:$:0" },
       },
       defaultOrder: {
         column: "name",
@@ -28,8 +28,8 @@ cenozoApp.defineModule({
 
     module.addInputGroup("", {
       formatted_name: { title: "Name", type: "string", isConstant: true },
-      fee: { title: "Fee ($)", type: "string", format: "integer", isConstant: true },
-      override_fee: { title: "Override Fee ($)", type: "string", format: "integer" },
+      fee: { title: "Fee Change ($)", type: "string", format: "integer", isConstant: true },
+      override_fee: { title: "Override Fee Change ($)", type: "string", format: "integer" },
     });
   },
 });

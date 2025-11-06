@@ -120,7 +120,7 @@ class module extends \cenozo\service\module
     }
 
     if( $select->has_column( 'amendment' ) )
-      $select->add_column( 'REPLACE( amendment.name, ".", "no" )', 'amendment', false );
+      $select->add_column( 'REPLACE( amendment.name, ".", "(N/A)" )', 'amendment', false );
 
     if( $select->has_column( 'user_full_name' ) )
       $select->add_column( 'CONCAT( user.first_name, " ", user.last_name )', 'user_full_name', false );
