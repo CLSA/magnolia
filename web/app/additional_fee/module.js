@@ -3,7 +3,7 @@ cenozoApp.defineModule({
   models: ["add", "list", "view"],
   create: (module) => {
     angular.extend(module, {
-      identifier: {},
+      identifier: { column: "name" },
       name: {
         singular: "additional fee",
         plural: "additional fees",
@@ -11,7 +11,6 @@ cenozoApp.defineModule({
       },
       columnList: {
         name: { title: "Name", },
-        fee: { title: "Fee", },
         reqn_count: { title: "Requisitions" },
       },
       defaultOrder: {
@@ -25,11 +24,6 @@ cenozoApp.defineModule({
         title: "Name",
         type: "string",
         format: "identifier",
-      },
-      fee: {
-        title: "Fee ($)",
-        type: "string",
-        format: "integer",
       },
     });
   },

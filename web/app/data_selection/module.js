@@ -26,7 +26,6 @@ cenozoApp.defineModule({
         },
         study: { column: "study.name", title: "Study" },
         study_phase: { column: "study_phase.name", title: "Phase" },
-        cost: { title: "Fee", type: "currency:$:0" },
         cost_combined: { title: "Fee Combined", type: "boolean" },
         is_unavailable: { title: "Unavailable", type: "boolean" },
       },
@@ -44,11 +43,6 @@ cenozoApp.defineModule({
         title: "Study-Phase",
         type: "enum",
         isConstant: "view",
-      },
-      cost: {
-        title: "Fee ($)",
-        type: "string",
-        format: "integer",
       },
       cost_combined: {
         title: "Fee Combined",

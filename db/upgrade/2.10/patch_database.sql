@@ -2,8 +2,11 @@
 
 SET AUTOCOMMIT=0;
 
-SOURCE setting.sql
-SOURCE additional_fee.sql
+SOURCE fee_schedule.sql
+SOURCE additional_fee_fee_schedule.sql
+SOURCE amendment_type_fee_schedule.sql
+SOURCE data_selection_fee_schedule.sql
+
 SOURCE amendment.sql
 SOURCE reqn_version.sql
 SOURCE amendment_current_reqn_version.sql
@@ -15,7 +18,9 @@ SOURCE update_reqn_current_reqn_version.sql
 SOURCE update_reqn_last_reqn_version_with_agreement.sql
 SOURCE reqn.sql
 
+SOURCE additional_fee.sql
 SOURCE amendment_type.sql
+SOURCE data_selection.sql
 SOURCE manuscript_version.sql
 SOURCE data_agreement.sql
 SOURCE coapplicant.sql

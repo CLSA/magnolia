@@ -1,8 +1,22 @@
 SELECT 'Adding new services' AS '';
 
 INSERT IGNORE INTO service ( subject, method, resource, restricted ) VALUES
+( 'additional_fee_fee_schedule', 'GET', 0, 1 ),
+( 'additional_fee_fee_schedule', 'GET', 1, 1 ),
+( 'additional_fee_fee_schedule', 'PATCH', 1, 1 ),
 ( 'amendment', 'GET', 0, 0 ),
 ( 'amendment', 'GET', 1, 0 ),
 ( 'amendment', 'PATCH', 1, 1 ),
+( 'amendment_type_fee_schedule', 'GET', 0, 1 ),
+( 'amendment_type_fee_schedule', 'GET', 1, 1 ),
+( 'amendment_type_fee_schedule', 'PATCH', 1, 1 ),
+( 'data_selection_fee_schedule', 'GET', 0, 1 ),
+( 'data_selection_fee_schedule', 'GET', 1, 1 ),
+( 'data_selection_fee_schedule', 'PATCH', 1, 1 ),
+( 'fee_schedule', 'DELETE', 1, 0 ),
+( 'fee_schedule', 'GET', 0, 0 ),
+( 'fee_schedule', 'GET', 1, 0 ),
+( 'fee_schedule', 'PATCH', 1, 1 ),
+( 'fee_schedule', 'POST', 0, 1 ),
 ( 'user_ip_address', 'GET', 0, 0 ),
 ( 'user_ip_address', 'GET', 1, 0 );

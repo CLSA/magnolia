@@ -532,22 +532,12 @@ class reqn_version extends \cenozo\database\record
 
     if( !$db_reqn->show_prices ) return NULL;
 
-    $fee = NULL;
-    $db_stage_type = $db_reqn->get_current_stage_type();
-    if( 'new' == $db_stage_type->phase )
-    {
-      // the fee is still dynamic, so calculate it
-      $fee = $this->calculate_fee();
-    }
-    else
-    {
-      // the fee is equal to the sum of all amendment fees
-      $amendment_sel = lib::create( 'database\select' );
-      $amendment_sel->add_column( 'IFNULL( override_fee, fee )', 'fee', false );
+    // the fee is equal to the sum of all amendment fees
+    $amendment_sel = lib::create( 'database\select' );
+    $amendment_sel->add_column( 'IFNULL( override_fee, fee )', 'fee', false );
 
-      $fee = 0;
-      foreach( $db_reqn->get_amendment_list( $amendment_sel ) as $amendment ) $fee += $amendment['fee'];
-    }
+    $fee = 0;
+    foreach( $db_reqn->get_amendment_list( $amendment_sel ) as $amendment ) $fee += $amendment['fee'];
 
     $db_language = $db_reqn->get_language();
     return sprintf(
@@ -559,112 +549,6 @@ class reqn_version extends \cenozo\database\record
         'fr' == $db_language->code ? ' ' : ','
       )
     );
-  }
-
-  /**
-   * Calculate the fee of the reqn
-   * 
-   * Note: this process mirrors CnReqnVersionViewFactory::calculateFee() on the client-side
-   * @return integer
-   */
-  public function calculate_fee()
-  {
-    $db_setting = lib::create( 'business\session' )->get_site()->get_setting();
-    $db_reqn = $this->get_reqn();
-
-    // There's no fee if the reqn has a special fee waiver
-    if( !is_null( $db_reqn->special_fee_waiver_id ) ) return 0;
-
-    $waive_fee = !is_null( $this->waiver ) && 'none' != $this->waiver;
-    $international = $this->is_international();
-    $fee = (
-      $international ?
-      $db_setting->fee_international :
-      ($db_reqn->trainee_user_id && $waive_fee ? 0 : $db_setting->fee_national)
-    );
-
-    // add amendment fees (including all past amendments) if there is no fee waiver
-    if( !$waive_fee )
-    {
-      $reqn_version_sel = lib::create( 'database\select' );
-      $reqn_version_sel->add_table_column( 'amendment', 'name', 'amendment' );
-      $reqn_version_sel->add_column( 'version' );
-      $reqn_version_sel->add_column(
-        sprintf( 'SUM( %s )', $international ? 'fee_international' : 'fee_national' ),
-        'fee',
-        false
-       );
-
-      $reqn_version_mod = lib::create( 'database\modifier' );
-      $reqn_version_mod->join( 'amendment', 'reqn_version.amendment_id', 'amendment.id' );
-      $reqn_version_mod->join(
-        'reqn_version_has_amendment_type',
-        'reqn_version.id',
-        'reqn_version_has_amendment_type.reqn_version_id'
-      );
-      $reqn_version_mod->join(
-        'amendment_type',
-        'reqn_version_has_amendment_type.amendment_type_id',
-        'amendment_type.id'
-      );
-      $reqn_version_mod->where( 'amendment.name', '!=', '.' );
-      $reqn_version_mod->where( 'amendment.id', '<=', $this->amendment_id );
-      $reqn_version_mod->group( 'reqn_version.id' );
-      $reqn_version_mod->order( 'amendment.name' );
-      $reqn_version_mod->order_desc( 'version' );
-      $reqn_version_list = $db_reqn->get_reqn_version_object_list( $reqn_version_mod );
-
-      $current_amendment = NULL;
-      foreach( $db_reqn->get_reqn_version_list( $reqn_version_sel, $reqn_version_mod ) as $reqn_version )
-      {
-        // only process the highest version of each amendment
-        if( $current_amendment == $reqn_version['amendment'] ) continue;
-
-        $fee += $reqn_version['fee'];
-        $current_amendment = $reqn_version['amendment'];
-      }
-    }
-
-    // add the cost of all data selections
-    $selection_sel = lib::create( 'database\select' );
-    $selection_sel->add_column( 'data_option_id' );
-    $selection_sel->add_column( 'cost' );
-    $selection_sel->add_column( 'cost_combined' );
-    $selection_mod = lib::create( 'database\modifier' );
-    $selection_mod->join( 'data_option', 'data_selection.data_option_id', 'data_option.id' );
-    $selection_mod->join( 'data_category', 'data_option.data_category_id', 'data_category.id' );
-    $selection_mod->where( 'data_selection.cost', '>', 0 );
-    $selection_mod->order( 'data_category.rank' );
-    $selection_mod->order( 'data_option.rank' );
-    $current_data_option_id = NULL;
-    $max_cost = 0;
-    foreach( $this->get_data_selection_list( $selection_sel, $selection_mod ) as $selection )
-    {
-      if( $selection['data_option_id'] != $current_data_option_id )
-      {
-        // store the most expensive selection (if there is one)
-        if( 0 < $max_cost ) $fee += $max_cost;
-        $max_cost = 0;
-      }
-
-      if( $selection['cost_combined'] )
-      {
-        // track the most expensive selection
-        if( $max_cost < $selection['cost'] ) $max_cost = $selection['cost'];
-      }
-      else $fee += $selection['cost'];
-
-      $current_data_option_id = $selection['data_option_id'];
-    }
-
-    if( 0 < $max_cost ) $fee += $max_cost;
-
-    // add any additional fees
-    $fee_sel = lib::create( 'database\select' );
-    $fee_sel->add_column( 'fee' );
-    foreach( $db_reqn->get_additional_fee_list( $fee_sel ) as $additional_fee ) $fee += $additional_fee['fee'];
-
-    return $fee;
   }
 
   /**

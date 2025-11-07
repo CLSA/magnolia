@@ -3,7 +3,7 @@ cenozoApp.defineModule({
   models: ["add", "list", "view"],
   create: (module) => {
     angular.extend(module, {
-      identifier: {},
+      identifier: { column: "reason_en" },
       name: {
         singular: "amendment type",
         plural: "amendment types",
@@ -34,16 +34,6 @@ cenozoApp.defineModule({
       show_in_description: {
         title: "Show in Description",
         type: "boolean",
-      },
-      fee_national: {
-        title: "National Fee ($)",
-        type: "string",
-        format: "integer",
-      },
-      fee_international: {
-        title: "International Fee ($)",
-        type: "string",
-        format: "integer",
       },
       reason_en: {
         title: "Reason (English)",
