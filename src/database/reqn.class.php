@@ -40,7 +40,10 @@ class reqn extends \cenozo\database\record
     if( $is_new ) $this->assert_deadline();
 
     // track whether the trainee_id has changed to NULL
-    $remove_trainee_details = $this->has_column_changed( 'trainee_user_id' ) && !is_null( $this->trainee_user_id );
+    $remove_trainee_details =
+      $this->has_column_changed( 'trainee_user_id' ) && !is_null( $this->trainee_user_id );
+
+    $update_amendments = $this->has_column_changed( 'special_fee_waiver_id' );
 
     parent::save();
 
@@ -67,6 +70,14 @@ class reqn extends \cenozo\database\record
     {
       $filename = $this->get_filename( 'instruction' );
       if( file_exists( $filename ) ) unlink( $filename );
+    }
+
+    if( $update_amendments )
+    {
+      $amendment_mod = lib::create( 'database\modifier' );
+      $amendment_mod->order( 'amendment.reqn_id' );
+      $amendment_mod->order( 'amendment.name' );
+      foreach( $this->get_amendment_object_list( $amendment_mod ) as $db_amendment ) $db_amendment->update_fee();
     }
   }
 

@@ -1223,8 +1223,9 @@ cenozoApp.defineModule({
             },
 
             onPatch: async function (data) {
-              var changingUser = angular.isDefined(data.user_id);
-              var changingTrainee = angular.isDefined(data.trainee_user_id);
+              const changingUser = angular.isDefined(data.user_id);
+              const changingTrainee = angular.isDefined(data.trainee_user_id);
+              const changingSpecialFeeWaiver = angular.isDefined(data.special_fee_waiver_id);
 
               // don't allow the user and trainee to be the same person
               if (
@@ -1250,20 +1251,17 @@ cenozoApp.defineModule({
                     this.backupRecord.formatted_trainee_user_id;
                 }
               } else {
-                var proceed = true;
+                let proceed = true;
 
                 // show a warning when changing the primary applicant
                 if (changingUser) {
-                  var response = await CnModalConfirmFactory.instance({
+                  const response = await CnModalConfirmFactory.instance({
                     title: "Change Owner",
                     message:
-                      "Changing the " +
-                      this.parentModel.module.name.possessive +
-                      " primary applicant will immediately remove " +
-                      "it from the old owner's " +
-                      this.parentModel.module.name.singular +
-                      " list and add it to the new " +
-                      "owner's list.  Also, a notification will be sent to both the old and new applicants explaining the " +
+                      "Changing the " + this.parentModel.module.name.possessive +
+                      " primary applicant will immediately remove it from the old owner's " +
+                      this.parentModel.module.name.singular + " list and add it to the new owner's list.  " +
+                      "Also, a notification will be sent to both the old and new applicants explaining the " +
                       "transfer of ownership.\n\nAre you sure you wish to proceed?",
                   }).show();
                   proceed = response;
@@ -1274,20 +1272,24 @@ cenozoApp.defineModule({
 
                   // Reload the view if we're changing the suggested revisions (the next stage will change)
                   // or reqn type (the deadline might change)
-                  if (
-                    angular.isDefined(data.suggested_revisions) ||
-                    angular.isDefined(data.reqn_type_id)
-                  )
+                  if (angular.isDefined(data.suggested_revisions) || angular.isDefined(data.reqn_type_id)) {
                     await this.onView();
+                  }
 
                   // Reload the notification list if we're changing the user
-                  if (changingUser && angular.isDefined(this.notificationModel))
+                  if (changingUser && angular.isDefined(this.notificationModel)) {
                     await this.notificationModel.listModel.onList(true);
+                  }
+
+                  // Refresh the amendment list if the special fee waiver changed
+                  if (changingSpecialFeeWaiver && angular.isDefined(this.amendmentModel)) {
+                    await this.amendmentModel.listModel.onList(true);
+                  }
+
                 } else if (changingUser) {
                   // we're not making the change so put back the old user
                   this.record.user_id = this.backupRecord.user_id;
-                  this.formattedRecord.user_id =
-                    this.backupRecord.formatted_user_id;
+                  this.formattedRecord.user_id = this.backupRecord.formatted_user_id;
                 }
               }
             },
