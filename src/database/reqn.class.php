@@ -166,6 +166,34 @@ class reqn extends \cenozo\database\record
   }
 
   /**
+   * Override the parent method
+   */
+  public function add_additional_fee( $ids )
+  {
+    parent::add_additional_fee( $ids );
+
+    // update all amendment fees anytime a additional fee changes
+    $amendment_mod = lib::create( 'database\modifier' );
+    $amendment_mod->order( 'amendment.reqn_id' );
+    $amendment_mod->order( 'amendment.name' );
+    foreach( $this->get_amendment_object_list( $amendment_mod ) as $db_amendment ) $db_amendment->update_fee();
+  }
+
+  /**
+   * Override the parent method
+   */
+  public function remove_additional_fee( $ids )
+  {
+    parent::remove_additional_fee( $ids );
+
+    // update the amendment fee anytime a additional fee changes
+    $amendment_mod = lib::create( 'database\modifier' );
+    $amendment_mod->order( 'amendment.reqn_id' );
+    $amendment_mod->order( 'amendment.name' );
+    foreach( $this->get_amendment_object_list( $amendment_mod ) as $db_amendment ) $db_amendment->update_fee();
+  }
+
+  /**
    * Returns whether the reqn is using a full ethics approval list or a single-file ethics system
    * 
    * All reqns start with a simple one-file ethics system.  Once they've reached the active stage and if

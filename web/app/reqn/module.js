@@ -1672,6 +1672,15 @@ cenozoApp.defineModule({
             await object.deferred.promise;
             if (angular.isDefined(object.stageModel))
               object.stageModel.listModel.heading = "Stage History";
+            if (angular.isDefined(object.additionalFeeModel)) {
+              // Refresh the amendment list if the additional fee list changes
+              object.additionalFeeModel.listModel.onApplyChosen = async function() {
+                await object.additionalFeeModel.listModel.$$onApplyChosen();
+                if (angular.isDefined(object.amendmentModel)) {
+                  await object.amendmentModel.listModel.onList(true);
+                }
+              };
+            }
           }
 
           init(this);
