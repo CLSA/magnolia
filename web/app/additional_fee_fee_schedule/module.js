@@ -23,7 +23,7 @@ cenozoApp.defineModule({
       columnList: {
         additional_fee: { title: "Additional Fee", column: "additional_fee.name" },
         fee_schedule: { title: "Fee Schedule", column: "fee_schedule.name" },
-        fee: { title: "Fee", type: "currency:$:0" },
+        fee: { title: "Fee", type: "number", filter: "currency:$:0" },
       },
       defaultOrder: {
         column: "additional_fee_fee_schedule.id",

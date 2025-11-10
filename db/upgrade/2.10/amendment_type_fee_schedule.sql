@@ -32,7 +32,7 @@ CREATE PROCEDURE patch_amendment_type_fee_schedule()
     SELECT COUNT(*) INTO @test FROM amendment_type_fee_schedule;
     IF @test = 0 THEN
       INSERT INTO amendment_type_fee_schedule(amendment_type_id, fee_schedule_id, fee_national, fee_international)
-      SELECT amendment_type.id, fee_schedule.id, fee_canada, fee_international
+      SELECT amendment_type.id, fee_schedule.id, amendment_type.fee_canada, amendment_type.fee_international
       FROM amendment_type, fee_schedule;
     END IF;
 

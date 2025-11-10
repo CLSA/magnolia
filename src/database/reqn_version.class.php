@@ -121,10 +121,7 @@ class reqn_version extends \cenozo\database\record
       $db_reqn->save();
     }
 
-    if( $update_amendment && 'new' != $db_reqn->get_current_stage_type()->phase )
-    {
-      $this->get_amendment()->update_fee();
-    }
+    if( $update_amendment ) $this->get_amendment()->update_fee();
   }
 
   /**
@@ -157,7 +154,7 @@ class reqn_version extends \cenozo\database\record
     parent::add_data_selection( $ids );
 
     // update the amendment fee anytime a data selection changes
-    if( 'new' != $this->get_reqn()->get_current_stage_type()->phase ) $this->get_amendment()->update_fee();
+    $this->get_amendment()->update_fee();
   }
 
   /**
@@ -168,7 +165,29 @@ class reqn_version extends \cenozo\database\record
     parent::remove_data_selection( $ids );
 
     // update the amendment fee anytime a data selection changes
-    if( 'new' != $this->get_reqn()->get_current_stage_type()->phase ) $this->get_amendment()->update_fee();
+    $this->get_amendment()->update_fee();
+  }
+
+  /**
+   * Override the parent method
+   */
+  public function add_amendment_type( $ids )
+  {
+    parent::add_amendment_type( $ids );
+
+    // update the amendment fee anytime a amendment type changes
+    $this->get_amendment()->update_fee();
+  }
+
+  /**
+   * Override the parent method
+   */
+  public function remove_amendment_type( $ids )
+  {
+    parent::remove_amendment_type( $ids );
+
+    // update the amendment fee anytime a amendment type changes
+    $this->get_amendment()->update_fee();
   }
 
   /**
@@ -347,7 +366,8 @@ class reqn_version extends \cenozo\database\record
       if( preg_match( $regex, $identifier, $matches ) )
       {
         $db_reqn = $reqn_class_name::get_unique_record( 'identifier', $matches[1] );
-        if( !is_null( $db_reqn ) ) $identifier = preg_replace( $regex, $db_reqn->get_current_reqn_version()->id, $identifier );
+        if( !is_null( $db_reqn ) )
+          $identifier = preg_replace( $regex, $db_reqn->get_current_reqn_version()->id, $identifier );
       }
     }
 

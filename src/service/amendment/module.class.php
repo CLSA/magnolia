@@ -28,6 +28,7 @@ class module extends \cenozo\service\module
       'amendment_current_reqn_version.amendment_id'
     );
     $modifier->join( 'reqn_version', 'amendment_current_reqn_version.reqn_version_id', 'reqn_version.id' );
+    $modifier->join( 'fee_schedule', 'amendment.fee_schedule_id', 'fee_schedule.id' );
 
     $join_mod = lib::create( 'database\modifier' );
     $join_mod->where( 'amendment.id', '=', 'first_reqn_version.amendment_id', false );

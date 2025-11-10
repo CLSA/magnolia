@@ -403,7 +403,7 @@ cenozoApp.defineModule({
           return model.isRole("administrator", "communication") ? "add" : true;
         },
         help:
-          "Defines whether the applicant's institution allows sharing data with co-applicants in other " + 
+          "Defines whether the applicant's institution allows sharing data with co-applicants in other " +
           "institutions.  Note that this must be manually defined and is not automatically determined.",
       },
       data_sharing_approved: {

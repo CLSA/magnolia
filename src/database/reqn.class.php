@@ -179,6 +179,7 @@ class reqn extends \cenozo\database\record
    */
   public function create_version( $new_amendment = false, $db_clone_reqn_version = NULL )
   {
+    $fee_schedule_class_name = lib::get_class_name( 'database\fee_schedule' );
     $reqn_version_comment_class_name = lib::get_class_name( 'database\reqn_version_comment' );
     $data_justification_class_name = lib::get_class_name( 'database\data_justification' );
     $amendment_justification_class_name = lib::get_class_name( 'database\amendment_justification' );
@@ -195,6 +196,7 @@ class reqn extends \cenozo\database\record
         $db_current_reqn_version->get_amendment()->get_next_amendment_name() :
         '.'
       );
+      $db_amendment->fee_schedule_id = $fee_schedule_class_name::get_current()->id;
       $db_amendment->save();
       $version = 1;
     }
@@ -649,7 +651,8 @@ class reqn extends \cenozo\database\record
    * Proceeds to the reqn to the next stage
    * 
    * The next stage is based on the current stage as well as the reqn's reviews
-   * @param mixed $stage_type The next stage (a stage_type record, rank or name or NULL will automatically pick the next stage)
+   * @param mixed $stage_type The next stage (a stage_type record, rank or name or NULL will automatically
+   *   pick the next stage)
    * @param boolean $start_amendment Whether the next stage is to start a new amendment
    * @access public
    */
@@ -662,12 +665,12 @@ class reqn extends \cenozo\database\record
       return;
     }
 
+    $fee_schedule_class_name = lib::get_class_name( 'database\fee_schedule' );
     $user_class_name = lib::get_class_name( 'database\user' );
     $notification_class_name = lib::get_class_name( 'database\notification' );
-    $review_class_name = lib::get_class_name( 'database\review' );
-    $stage_type_class_name = lib::get_class_name( 'database\stage_type' );
     $notification_type_class_name = lib::get_class_name( 'database\notification_type' );
-    $setting_manager = lib::create( 'business\setting_manager' );
+    $stage_type_class_name = lib::get_class_name( 'database\stage_type' );
+
     $session = lib::create( 'business\session' );
     $db_user = $session->get_user();
     $db_application = $session->get_application();
@@ -692,8 +695,10 @@ class reqn extends \cenozo\database\record
     {
       if( is_a( $stage_type, lib::get_class_name( 'database\stage_type' ) ) ) $db_next_stage_type = $stage_type;
     }
-    else if( is_integer( $stage_type ) || ( is_string( $stage_type ) && util::string_matches_int( $stage_type ) ) )
-    {
+    else if(
+      is_integer( $stage_type ) ||
+      ( is_string( $stage_type ) && util::string_matches_int( $stage_type ) )
+    ) {
       $db_next_stage_type = $stage_type_class_name::get_unique_record( 'rank', $stage_type );
     }
     else if( is_string( $stage_type ) )
@@ -734,7 +739,8 @@ class reqn extends \cenozo\database\record
       }
     }
 
-    // Note: there is a special circumstance where a reqn is being rejected during the DSAC selection stage (make note here)
+    // Note: there is a special circumstance where a reqn is being rejected during the DSAC selection stage
+    // (make note here)
     $reject_selection = !is_null( $db_current_stage_type ) &&
                         'DSAC Selection' == $db_current_stage_type->name &&
                         'Decision Made' == $db_next_stage_type->name;
@@ -760,8 +766,8 @@ class reqn extends \cenozo\database\record
           __METHOD__ );
       }
 
-      // Determine whether we can safely proceed to the next stage (ignoring if the DSAC selection stage has been rejected or
-      // if we're moving the reqn to the permanently incomplete stage
+      // Determine whether we can safely proceed to the next stage (ignoring if the DSAC selection stage has
+      // been rejected or if we're moving the reqn to the permanently incomplete stage
       if( !( $reject_selection || $start_amendment || $incomplete || $withdrawn ) )
       {
         $result = $db_current_stage->check_if_complete();
@@ -776,8 +782,9 @@ class reqn extends \cenozo\database\record
         // update the deadline
         $this->assert_deadline();
 
-        // calculate and store the amendment's fee
-        $db_amendment->update_fee();
+        // update to the current amendment fee (this will also re-calulate the amendment fee
+        $db_amendment->fee_schedule_id = $fee_schedule_class_name::get_current()->id;
+        $db_amendment->save();
       }
 
       // save the user who completed the current stage
@@ -785,11 +792,14 @@ class reqn extends \cenozo\database\record
       $db_current_stage->datetime = util::get_datetime_object();
       $db_current_stage->save();
 
-      // send any notifications associated with the current stage (incomplete and withdrawn have their own special notifications)
-      $db_notification_type = NULL;
-      if( $incomplete ) $db_notification_type = $notification_type_class_name::get_unique_record( 'name', 'Incomplete' );
-      else if( $withdrawn ) $db_notification_type = $notification_type_class_name::get_unique_record( 'name', 'Withdrawn' );
-      else $db_notification_type = $db_current_stage_type->get_notification_type();
+      // send any notifications associated with the current stage
+      // (incomplete and withdrawn have their own special notifications)
+      $db_notification_type = (
+        $incomplete ? $notification_type_class_name::get_unique_record( 'name', 'Incomplete' ) : (
+          $withdrawn ? $notification_type_class_name::get_unique_record( 'name', 'Withdrawn' ) :
+          $db_current_stage_type->get_notification_type()
+        )
+      );
 
       // don't notify of data destruction if there is no data to destroy
       if( 'Pre Data Destruction' == $db_current_stage_type->name && 'Complete' == $db_next_stage_type->name )

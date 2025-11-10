@@ -3,7 +3,7 @@ cenozoApp.defineModule({
   models: ["add", "list", "view"],
   create: (module) => {
     angular.extend(module, {
-      identifier: { column: "reason_en" },
+      identifier: {},
       name: {
         singular: "amendment type",
         plural: "amendment types",

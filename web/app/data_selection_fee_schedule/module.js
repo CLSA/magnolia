@@ -24,7 +24,7 @@ cenozoApp.defineModule({
         study_phase: { title: "Study Phase", column: "study_phase.name" },
         data_option: { title: "Data Option", column: "data_option.name_en" },
         fee_schedule: { title: "Fee Schedule", column: "fee_schedule.name" },
-        fee: { title: "Fee", type: "currency:$:0" },
+        fee: { title: "Fee", type: "number", filter: "currency:$:0" },
       },
       defaultOrder: {
         column: "data_selection_fee_schedule.id",

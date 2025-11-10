@@ -23,8 +23,8 @@ cenozoApp.defineModule({
       columnList: {
         amendment_type: { title: "Amendment Type", column: "amendment_type.reason_en" },
         fee_schedule: { title: "Fee Schedule", column: "fee_schedule.name" },
-        fee_national: { title: "National Fee", type: "currency:$:0" },
-        fee_international: { title: "International Fee", type: "currency:$:0" },
+        fee_national: { title: "National Fee", type: "number", filter: "currency:$:0" },
+        fee_international: { title: "International Fee", type: "number", filter: "currency:$:0" },
       },
       defaultOrder: {
         column: "amendment_type_fee_schedule.id",

@@ -13,8 +13,8 @@ cenozoApp.defineModule({
       columnList: {
         name: { title: "Name" },
         datetime: { title: "Date & Time", type: "datetime" },
-        fee_national: { title: "National Fee", type: "currency:$:0" },
-        fee_international: { title: "International Fee", type: "currency:$:0" },
+        fee_national: { title: "National Fee", type: "number", filter: "currency:$:0" },
+        fee_international: { title: "International Fee", type: "number", filter: "currency:$:0" },
       },
       defaultOrder: {
         column: "datetime",

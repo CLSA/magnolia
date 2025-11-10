@@ -208,12 +208,22 @@ class module extends \cenozo\service\module
       if( $select->has_column( 'additional_fee_total' ) )
       {
         $fee_sel = lib::create( 'database\select' );
-        $fee_sel->add_column( 'SUM( fee )', 'fee_total', false );
+        $fee_sel->add_column( 'SUM( fee )', 'total', false );
         $fee_mod = lib::create( 'database\modifier' );
+        $fee_mod->join(
+          'additional_fee_fee_schedule',
+          'additional_fee.id',
+          'additional_fee_fee_schedule.additional_fee_id'
+        );
+        $fee_mod->where(
+          'additional_fee_fee_schedule.fee_schedule_id',
+          '=',
+          $db_reqn_version->get_amendment()->fee_schedule_id
+        );
         $fee_mod->group( 'reqn.id' );
         $row = current( $db_reqn_version->get_reqn()->get_additional_fee_list( $fee_sel, $fee_mod ) );
         $select->add_constant(
-          $row ? $row['fee_total'] : 0,
+          $row ? $row['total'] : 0,
           'additional_fee_total',
           'integer'
         );

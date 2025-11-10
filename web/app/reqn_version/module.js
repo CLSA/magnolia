@@ -1050,16 +1050,13 @@ cenozoApp.defineModule({
               );
             },
 
-            // NOTE: This process mirrors database\reqn_version::get_total_fee() on the server side
             getTotalFee: function () {
               // only calculate the fee if we have to
               if (!this.record.show_prices) return null;
 
               if (null == this.totalFee) {
                 this.totalFee = (
-                  // we must calculate the fee of new reqns or amendments
-                  "new" == this.record.phase ? this.calculateFee() :
-                  // otherwise, sum the fees from all amendments (null if they haven't loaded yet)
+                  // sum the fees from all amendments (null if they haven't loaded yet)
                   0 == this.amendmentList.length ? null :
                   this.amendmentList.reduce((total, a) => total += parseInt(a.fee), 0)
                 );
@@ -1074,77 +1071,6 @@ cenozoApp.defineModule({
               if (1000000 <= fee) fee = fee.replace( /([0-9]+)([0-9]{3})([0-9]{3})$/, "$1"+sep+"$2"+sep+"$3" );
               else if (1000 <= fee) fee = fee.replace( /([0-9]+)([0-9]{3})$/, "$1"+sep+"$2" );
               return "fr" == this.record.lang ? fee + " $" : "$" + fee;
-            },
-
-            // NOTE: This process mirrors database\reqn_version::calculate_fee() on the server side
-            calculateFee: function () {
-              // There's no fee if the reqn has a special fee waiver
-              if (this.record.special_fee_waiver_id) return 0;
-
-              // Stop calculating if we need to wait for the version list to finish loading
-              const waiveFee = this.record.waiver && "none" != this.record.waiver;
-              const loading = !this.versionListLoaded || angular.isUndefined(this.parentModel.amendmentTypeList);
-              if (!waiveFee && loading) return null;
-
-              // calculate the base fee
-              const international = this.isInternational();
-              let fee = (
-                international ? CnSession.setting.feeInternational :
-                this.record.trainee_user_id && waiveFee ? 0 :
-                CnSession.setting.feeNational
-              );
-
-              // add amendment fees (including all past amendments) if there is no fee waiver
-              if (!waiveFee) {
-                var currentAmendment = null;
-                this.versionList.forEach(version => {
-                  if (
-                    null != version &&
-                    "." != version.amendment &&
-                    this.record.amendment >= version.amendment
-                  ) {
-                    if(currentAmendment == version.amendment) return;
-
-                    // add the fee of any amendment that this version has selected
-                    let c = international ? "feeInternational" : "feeNational";
-                    this.parentModel.amendmentTypeList.en
-                      .filter(aType => 0 < aType[c] && version["amendmentType"+aType.id])
-                      .forEach(aType => { fee += aType[c]; });
-                    currentAmendment = version.amendment;
-                  }
-                });
-              }
-
-              // add the cost of all data selections
-              this.parentModel.categoryList.forEach((category) =>
-                category.optionList.forEach((option) => {
-                  var maxCost = 0;
-                  option.selectionList
-                    .filter((selection) => 0 < selection.cost.value)
-                    .forEach((selection) => {
-                      if (
-                        angular.isArray(this.record.selectionList) &&
-                        this.record.selectionList[selection.id]
-                      ) {
-                        if (selection.costCombined) {
-                          // track the most expensive selection
-                          if (selection.cost.value > maxCost) maxCost = selection.cost.value;
-                        } else {
-                          // add the selection's cost
-                          fee += selection.cost.value;
-                        }
-                      }
-                    });
-
-                  // when there is a combined cost then maxCost will be > 0, otherwise it is 0
-                  fee += maxCost;
-                })
-              );
-
-              // add any additional fees
-              fee += this.record.additional_fee_total;
-
-              return fee;
             },
 
             isWaiverMutable: function () {
@@ -1770,6 +1696,10 @@ cenozoApp.defineModule({
                 var version = this.versionList.filter(v => null != v).findByProperty("id", this.record.id);
                 version[property] = this.record[property];
               }
+
+              // reset the total fee as it may have changed
+              await this.getAmendmentList();
+              this.totalFee = null;
             },
 
             getManuscriptList: async function () {
@@ -2997,8 +2927,6 @@ cenozoApp.defineModule({
                         column: [
                           "id",
                           "data_option_id",
-                          "cost",
-                          "cost_combined",
                           "unavailable_en",
                           "unavailable_fr",
                           { table: "study_phase", column: "code", alias: "study_phase_code" },
@@ -3285,12 +3213,6 @@ cenozoApp.defineModule({
                       fr: angular.isDefined(selection.unavailable_fr) ? selection.unavailable_fr : null,
                     },
                     detailList: [],
-                    cost: {
-                      value: selection.cost,
-                      en: 0 < selection.cost ? "$" + selection.cost : "",
-                      fr: 0 < selection.cost ? selection.cost + " $" : "",
-                    },
-                    costCombined: selection.cost_combined,
                   });
 
                   option.selectionList.push(selection);
@@ -3299,7 +3221,6 @@ cenozoApp.defineModule({
                   delete selection.study_phase_code;
                   delete selection.data_category_id;
                   delete selection.data_option_id;
-                  delete option.cost_combined;
                   delete selection.unavailable_en;
                   delete selection.unavailable_fr;
                 });

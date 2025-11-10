@@ -13,7 +13,7 @@ CREATE PROCEDURE patch_amendment_current_reqn_version()
     IF @test = 0 THEN
       CREATE TABLE IF NOT EXISTS amendment_current_reqn_version (
         amendment_id INT(10) UNSIGNED NOT NULL,
-        reqn_version_id INT(10) UNSIGNED NOT NULL,
+        reqn_version_id INT(10) UNSIGNED NULL DEFAULT NULL,
         update_timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP(),
         create_timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
         PRIMARY KEY (amendment_id),
@@ -26,7 +26,7 @@ CREATE PROCEDURE patch_amendment_current_reqn_version()
         CONSTRAINT fk_amendment_current_reqn_version_reqn_version_id
           FOREIGN KEY (reqn_version_id)
           REFERENCES reqn_version (id)
-          ON DELETE CASCADE
+          ON DELETE SET NULL
           ON UPDATE CASCADE)
       ENGINE = InnoDB;
 

@@ -15,6 +15,21 @@ use cenozo\lib, cenozo\log, magnolia\util;
 class amendment extends \cenozo\database\record
 {
   /**
+   * Override the parent method
+   */
+  public function save()
+  {
+    $fees_changed = $this->has_column_changed( 'fee_schedule_id' );
+
+    parent::save();
+
+    if( $fees_changed )
+    {
+      $this->update_fee();
+    }
+  }
+
+  /**
    * Returns this reqn's latest reqn_version record
    * 
    * @access public
@@ -53,13 +68,20 @@ class amendment extends \cenozo\database\record
     // only calculate if there isn't a special waiver
     if( is_null( $db_reqn->special_fee_waiver_id ) )
     {
-      $waive_fee = !is_null( $db_reqn_version->waiver ) && 'none' != $db_reqn_version->waiver;
-      $international = $db_reqn_version->is_international();
-      $fee = (
-        $international ?
-        $db_base_fee_schedule->fee_international :
-        ($db_reqn->trainee_user_id && $waive_fee ? 0 : $db_base_fee_schedule->fee_national)
-      );
+      // if the version hasn't been created yet then just assume a national fee
+      $waive_fee = false;
+      $international = false;
+      $fee = $db_base_fee_schedule->fee_national;
+      if( !is_null( $db_reqn_version ) )
+      {
+        $waive_fee = !is_null( $db_reqn_version->waiver ) && 'none' != $db_reqn_version->waiver;
+        $international = $db_reqn_version->is_international();
+        $fee = (
+          $international ?
+          $db_base_fee_schedule->fee_international :
+          ($db_reqn->trainee_user_id && $waive_fee ? 0 : $db_base_fee_schedule->fee_national)
+        );
+      }
 
       // add amendment fees (including all past amendments) if there is no fee waiver
       if( !$waive_fee )
@@ -90,7 +112,12 @@ class amendment extends \cenozo\database\record
           'amendment_type_fee_schedule.amendment_type_id',
           false
         );
-        $join_mod->where( 'amendment.fee_schedule_id', '=', 'amendment_type_fee_schedule.fee_schedule_id', false );
+        $join_mod->where(
+          'amendment.fee_schedule_id',
+          '=',
+          'amendment_type_fee_schedule.fee_schedule_id',
+          false
+        );
         $reqn_mod->join_modifier( 'amendment_type_fee_schedule', $join_mod );
         $reqn_mod->where( 'amendment.name', '<=', $this->name );
         $reqn_mod->where( 'reqn.id', '=', $this->reqn_id );
@@ -105,7 +132,11 @@ class amendment extends \cenozo\database\record
       // add the cost of all data selections for the amendment's current reqn_version
       $data_selection_sel = lib::create( 'database\select' );
       $data_selection_sel->from( 'amendment' );
-      $data_selection_sel->add_column( 'IF( cost_combined, MAX(fee), SUM(fee) )', 'total_fee', false );
+      $data_selection_sel->add_column(
+        'IF( cost_combined, MAX(data_selection_fee_schedule.fee), SUM(data_selection_fee_schedule.fee) )',
+        'total_fee',
+        false
+      );
       $data_selection_mod = lib::create( 'database\modifier' );
       $data_selection_mod->join(
         'amendment_current_reqn_version',
@@ -161,7 +192,7 @@ class amendment extends \cenozo\database\record
         false
       );
       $join_mod->where( 'additional_fee_fee_schedule.fee_schedule_id', '=', 'amendment.fee_schedule_id', false );
-      $additional_fee_mod->join_modifier( 'additional_fee_fee_modifier', $join_mod );
+      $additional_fee_mod->join_modifier( 'additional_fee_fee_schedule', $join_mod );
       $additional_fee_mod->where( 'amendment.id', '=', $this->id );
 
       $fee += static::db()->get_one( sprintf(
