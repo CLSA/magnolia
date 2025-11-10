@@ -25,6 +25,7 @@ cenozoApp.defineModule({
           title: "Category Name",
         },
         rank: { title: "Rank", type: "rank" },
+        cost_combined: { title: "Fee Combined", type: "boolean" },
         justification: { title: "Justification", type: "boolean" },
         name_en: { title: "Name" },
         has_condition: { title: "Has Condition", type: "boolean" },
@@ -44,6 +45,11 @@ cenozoApp.defineModule({
         title: "Rank",
         type: "rank",
         isConstant: true,
+      },
+      cost_combined: {
+        title: "Fee Combined",
+        type: "boolean",
+        help: "Determines whether the fee for this option's selections are combined (only counted once).",
       },
       justification: {
         title: "Justification",

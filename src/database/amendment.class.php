@@ -158,6 +158,7 @@ class amendment extends \cenozo\database\record
         'reqn_version_has_data_selection.data_selection_id',
         'data_selection.id'
       );
+      $data_selection_mod->join( 'data_option', 'data_selection.data_option_id', 'data_option.id' );
       $join_mod = lib::create( 'database\modifier' );
       $join_mod->where( 'data_selection.id', '=', 'data_selection_fee_schedule.data_selection_id', false );
       $join_mod->where( 'data_selection_fee_schedule.fee_schedule_id', '=', 'amendment.fee_schedule_id', false );

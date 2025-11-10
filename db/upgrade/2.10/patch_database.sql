@@ -20,6 +20,7 @@ SOURCE reqn.sql
 
 SOURCE additional_fee.sql
 SOURCE amendment_type.sql
+SOURCE data_option.sql
 SOURCE data_selection.sql
 SOURCE manuscript_version.sql
 SOURCE data_agreement.sql

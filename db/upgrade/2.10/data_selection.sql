@@ -15,6 +15,18 @@ CREATE PROCEDURE patch_data_selection()
       ALTER TABLE data_selection DROP COLUMN cost;
     END IF;
 
+    SELECT "Removing cost_combined column from data_selection table" AS "";
+
+    SELECT COUNT(*) INTO @test
+    FROM information_schema.COLUMNS
+    WHERE table_schema = DATABASE()
+    AND table_name = "data_selection"
+    AND column_name = "cost_combined";
+
+    IF @test = 1 THEN
+      ALTER TABLE data_selection DROP COLUMN cost_combined;
+    END IF;
+
   END //
 DELIMITER ;
 
