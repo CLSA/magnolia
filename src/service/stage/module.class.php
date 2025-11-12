@@ -22,7 +22,7 @@ class module extends \cenozo\service\module
     parent::prepare_read( $select, $modifier );
 
     $modifier->join( 'amendment', 'stage.amendment_id', 'amendment.id' );
-    $modifier->join( 'reqn', 'stage.reqn_id', 'reqn.id' );
+    $modifier->join( 'reqn', 'amendment.reqn_id', 'reqn.id' );
     $modifier->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
     $modifier->left_join( 'user', 'stage.user_id', 'user.id' );
 

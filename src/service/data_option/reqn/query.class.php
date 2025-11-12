@@ -33,11 +33,7 @@ class query extends \cenozo\service\query
     $db_data_option = $this->get_parent_record();
 
     $modifier = clone $this->modifier;
-    if( !$modifier->has_join( 'reqn_version' ) )
-    {
-      $modifier->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
-      $modifier->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
-    }
+    if( !$modifier->has_join( 'reqn_version' ) ) $modifier->join_current_reqn_version();
     $modifier->join( 'reqn_version_has_data_selection', 'reqn_version.id', 'reqn_version_has_data_selection.reqn_version_id' );
     $modifier->join( 'data_selection', 'reqn_version_has_data_selection.data_selection_id', 'data_selection.id' );
     $modifier->where( 'data_selection.data_option_id', '=', $db_data_option->id );
@@ -54,11 +50,7 @@ class query extends \cenozo\service\query
     $db_data_option = $this->get_parent_record();
 
     $modifier = clone $this->modifier;
-    if( !$modifier->has_join( 'reqn_version' ) )
-    {
-      $modifier->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
-      $modifier->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
-    }
+    if( !$modifier->has_join( 'reqn_version' ) ) $modifier->join_current_reqn_version();
     $modifier->join( 'reqn_version_has_data_selection', 'reqn_version.id', 'reqn_version_has_data_selection.reqn_version_id' );
     $modifier->join( 'data_selection', 'reqn_version_has_data_selection.data_selection_id', 'data_selection.id' );
     $modifier->where( 'data_selection.data_option_id', '=', $db_data_option->id );

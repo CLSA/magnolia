@@ -51,15 +51,13 @@ class requisition extends \cenozo\business\report\base_report
 
     // build the modifier
     $modifier = lib::create( 'database\modifier' );
+    $modifier->join_current_reqn_version();
 
     // join to the current stage
     if( is_null( $stage_type_id ) )
     {
       // the current stage is the one that hasn't finished (has no datetime)
-      $join_mod = lib::create( 'database\modifier' );
-      $join_mod->where( 'reqn.id', '=', 'current_stage.reqn_id', false );
-      $join_mod->where( 'current_stage.datetime', '=', NULL );
-      $modifier->join_modifier( 'stage', $join_mod, '', 'current_stage' );
+      $modifier->join_current_stage( 'reqn.id', 'current_stage' );
       $modifier->join(
         'stage_type',
         'current_stage.stage_type_id',
@@ -99,7 +97,7 @@ class requisition extends \cenozo\business\report\base_report
 
       // now join to the current stage by type and date-span
       $join_mod = lib::create( 'database\modifier' );
-      $join_mod->where( 'reqn.id', '=', 'temp_stage.reqn_id', false );
+      $join_mod->where( 'reqn_current_amendment.amendment_id', '=', 'temp_stage.amendment_id', false );
       $join_mod->where( 'temp_stage.stage_type_id', '=', $stage_type_id );
 
       // restrict by date-span, if required
@@ -124,20 +122,46 @@ class requisition extends \cenozo\business\report\base_report
       $modifier->join_modifier( 'temp_stage', $join_mod );
     }
 
-    // join to the current version
-    $modifier->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
-    $modifier->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
-
     // join to the applicant and trainee users and contries
     $modifier->join( 'user', 'reqn.user_id', 'user.id' );
     $modifier->left_join( 'country', 'reqn_version.applicant_country_id', 'country.id' );
     $modifier->left_join( 'user', 'reqn.trainee_user_id', 'trainee_user.id', 'trainee_user' );
     $modifier->left_join( 'country', 'reqn_version.trainee_country_id', 'trainee_country.id', 'trainee_country' );
 
-    // join to all coapplicants
-    $modifier->left_join( 'coapplicant', 'reqn_version.id', 'coapplicant.reqn_version_id' );
+    // join to a temp table containing the total fee
+    $fee_sel = lib::create( 'database\select' );
+    $fee_sel->from( 'amendment' );
+    $fee_sel->add_column( 'reqn_id' );
+    $fee_sel->add_column(
+      'CONCAT( "$", SUM( IFNULL( amendment.override_fee, amendment.fee ) ) )',
+      'total_fee',
+      false
+    );
+    $fee_mod = lib::create( 'database\modifier' );
+    $fee_mod->group( 'reqn_id' );
+    $modifier->left_join(
+      sprintf( '( %s %s ) AS fees', $fee_sel->get_sql(), $fee_mod->get_sql() ),
+      'reqn.id',
+      'fees.reqn_id'
+    );
 
-    $modifier->group( 'reqn.id' );
+    // join to a temp table containing all coapplicants
+    $coapplicant_sel = lib::create( 'database\select' );
+    $coapplicant_sel->from( 'coapplicant' );
+    $coapplicant_sel->add_column( 'reqn_version_id' );
+    $coapplicant_sel->add_column(
+      'GROUP_CONCAT( DISTINCT coapplicant.affiliation ORDER BY coapplicant.affiliation SEPARATOR "; " )',
+      'list',
+      false
+    );
+    $coapplicant_mod = lib::create( 'database\modifier' );
+    $coapplicant_mod->group( 'coapplicant.reqn_version_id' );
+    $modifier->left_join(
+      sprintf( '( %s %s ) AS coapplicants', $coapplicant_sel->get_sql(), $coapplicant_mod->get_sql() ),
+      'reqn_version.id',
+      'coapplicants.reqn_version_id'
+    );
+
     $modifier->order( 'reqn.identifier' );
 
     // build the select
@@ -169,35 +193,24 @@ class requisition extends \cenozo\business\report\base_report
     $select->add_column( 'reqn_version.trainee_institution', 'Trainee Institution', false );
     $select->add_column( 'trainee_country.name', 'Trainee Country', false );
     $select->add_column( 'trainee_user.email', 'Trainee Email', false );
-
-    $select->add_column( 'IF( reqn.show_prices, "", "N/A" )', 'Cost', false );
-    $select->add_column( 'reqn_version.title', 'Title', false );
-    $select->add_column( 'reqn_version.ethics', 'Ethics', false );
-
-    $select->add_column( 'keywords', 'Keywords', false );
     $select->add_column(
-      'GROUP_CONCAT( DISTINCT coapplicant.affiliation ORDER BY coapplicant.affiliation SEPARATOR "; " )',
-      'Project Team Institutions',
+      'IF( reqn.show_prices, fees.total_fee, "N/A" )',
+      'Total Fee',
       false
     );
+
+    $select->add_column( 'reqn_version.title', 'Title', false );
+    $select->add_column( 'reqn_version.ethics', 'Ethics', false );
+    $select->add_column( 'keywords', 'Keywords', false );
+    $select->add_column( 'coapplicants.list', 'Project Team Institutions', false );
 
     $header = [];
     $rows = [];
     foreach( $reqn_class_name::select( $select, $modifier ) as $row )
     {
-      if( 0 == count( $header ) )
-      {
-        foreach( $row as $column => $value ) $header[] = ucwords( str_replace( '_', ' ', $column ) );
-      }
-
-      // determine the fee
-      if( 'N/A' != $row['Cost'] )
-      {
-        $db_reqn = $reqn_class_name::get_unique_record( 'identifier', $row['Identifier'] );
-        $row['Cost'] = $db_reqn->get_current_reqn_version()->get_total_fee();
-      }
-
       $rows[] = array_values( $row );
+      if( 0 == count( $header ) )
+        foreach( $row as $column => $value ) $header[] = ucwords( str_replace( '_', ' ', $column ) );
     }
 
     $this->add_table( NULL, $header, $rows );

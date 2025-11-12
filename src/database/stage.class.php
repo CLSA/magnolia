@@ -41,7 +41,7 @@ class stage extends \cenozo\database\record
       $stage_sel->add_column( 'datetime' );
 
       $db_reqn = $this->get_reqn();
-      $last_stage = current( $db_reqn->get_stage_list( $stage_sel, $stage_mod ) );
+      $last_stage = current( $db_reqn->get_current_amendment()->get_stage_list( $stage_sel, $stage_mod ) );
 
       $notice_mod = lib::create( 'database\modifier' );
       $notice_mod->where( 'datetime', '>', $last_stage['datetime'] );
@@ -78,7 +78,10 @@ class stage extends \cenozo\database\record
       {
         // make sure that all DSAC Selection reviews are complete
         $db_dsac_selection_stage_type = $stage_type_class_name::get_unique_record( 'name', 'DSAC Selection' );
-        $review_list = array_merge( $review_list, $db_dsac_selection_stage_type->get_review_object_list( $this->reqn_id ) );
+        $review_list = array_merge(
+          $review_list,
+          $db_dsac_selection_stage_type->get_review_object_list( $this->get_amendment()->reqn_id )
+        );
       }
 
       // make sure all reviews associated with this stage are complete
@@ -118,6 +121,6 @@ class stage extends \cenozo\database\record
    */
   public function get_review_object_list()
   {
-    return $this->get_stage_type()->get_review_object_list( $this->reqn_id );
+    return $this->get_stage_type()->get_review_object_list( $this->get_amendment()->reqn_id );
   }
 }

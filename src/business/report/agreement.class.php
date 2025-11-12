@@ -33,10 +33,7 @@ class agreement extends \cenozo\business\report\base_report
     $modifier = lib::create( 'database\modifier' );
 
     // do not include reqns in the finalization or complete phases
-    $join_mod = lib::create( 'database\modifier' );
-    $join_mod->where( 'reqn.id', '=', 'stage.reqn_id', false );
-    $join_mod->where( 'stage.datetime', '=', NULL );
-    $modifier->join_modifier( 'stage', $join_mod );
+    $modifier->join_current_stage();
     $modifier->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
     $modifier->where( 'stage_type.phase', 'NOT IN', ['finalization', 'complete'] );
 
@@ -44,12 +41,7 @@ class agreement extends \cenozo\business\report\base_report
     $modifier->join( 'user', 'reqn.user_id', 'user.id' );
 
     // join to the latest reqn version that has an agreement and restrict to agreements that are out of date
-    $modifier->join(
-      'reqn_last_reqn_version_with_agreement',
-      'reqn.id',
-      'reqn_last_reqn_version_with_agreement.reqn_id'
-    );   
-    $modifier->join( 'reqn_version', 'reqn_last_reqn_version_with_agreement.reqn_version_id', 'reqn_version.id' );
+    $modifier->join_last_reqn_version_with_agreement();
     $modifier->where( 'reqn_version.agreement_end_date', '<=', 'DATE( NOW() )', false );
 
     // join to the one month and two month notifications

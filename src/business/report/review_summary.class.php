@@ -87,9 +87,8 @@ class review_summary extends \cenozo\business\report\base_report
     $modifier = lib::create( 'database\modifier' );
     $modifier->join( 'user', 'reqn.user_id', 'user.id' );
     $modifier->left_join( 'user', 'reqn.trainee_user_id', 'trainee_user.id', 'trainee_user' );
-    $modifier->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
-    $modifier->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
-    $modifier->join( 'review', 'reqn.id', 'review.reqn_id' );
+    $modifier->join_current_reqn_version();
+    $modifier->join( 'review', 'reqn_current_amendment.amendment_id', 'review.amendment_id' );
     $modifier->join( 'review_details', 'review.id', 'review_details.review_id' );
     $modifier->group( 'reqn.id' );
     $modifier->order( 'reqn.identifier' );
@@ -98,10 +97,7 @@ class review_summary extends \cenozo\business\report\base_report
     {
       if( 'stage_type' == $restriction['name'] && !is_null( $restriction['value'] ) )
       {
-        $join_mod = lib::create( 'database\modifier' );
-        $join_mod->where( 'reqn.id', '=', 'stage.reqn_id', false );
-        $join_mod->where( 'stage.datetime', '=', NULL );
-        $modifier->join_modifier( 'stage', $join_mod );
+        $modifier->join_current_stage();
         $modifier->where( 'stage.stage_type_id', '=', $restriction['value'] );
       }
     }

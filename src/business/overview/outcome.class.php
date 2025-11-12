@@ -57,14 +57,12 @@ class outcome extends \cenozo\business\overview\base_overview
 
     $approved_mod->join( 'deadline', 'reqn.deadline_id', 'deadline.id' );
     $join_mod = lib::create( 'database\modifier' );
-    $join_mod->where( 'reqn.id', '=', 'stage.reqn_id', false );
     $join_mod->where( 'stage.amendment_id', '=', 'amendment.id', false );
     $join_mod->where( 'stage.stage_type_id', '=', $approved_id );
     $approved_mod->join_modifier( 'stage', $join_mod );
 
     // join to any minor recommendatation by a Chair or EC
     $join_mod = lib::create( 'database\modifier' );
-    $join_mod->where( 'reqn.id', '=', 'minor.reqn_id', false );
     $join_mod->where( 'minor.amendment_id', '=', 'amendment.id', false );
     $join_mod->where( 'minor.recommendation_type_id', '=', $minor_id );
     $join_mod->where( 'minor.review_type_id', 'IN', $review_type_list );
@@ -72,7 +70,6 @@ class outcome extends \cenozo\business\overview\base_overview
 
     // join to any major recommendatation by a Chair or EC
     $join_mod = lib::create( 'database\modifier' );
-    $join_mod->where( 'reqn.id', '=', 'major.reqn_id', false );
     $join_mod->where( 'major.amendment_id', '=', 'amendment.id', false );
     $join_mod->where( 'major.recommendation_type_id', '=', $major_id );
     $join_mod->where( 'major.review_type_id', 'IN', $review_type_list );
@@ -80,7 +77,6 @@ class outcome extends \cenozo\business\overview\base_overview
 
     // make sure none are in the not-approved stage
     $join_mod = lib::create( 'database\modifier' );
-    $join_mod->where( 'reqn.id', '=', 'not_approved.reqn_id', false );
     $join_mod->where( 'not_approved.amendment_id', '=', 'amendment.id', false );
     $join_mod->where( 'not_approved.stage_type_id', '=', $not_approved_id );
     $approved_mod->join_modifier( 'stage', $join_mod, 'left', 'not_approved' );
@@ -139,14 +135,12 @@ class outcome extends \cenozo\business\overview\base_overview
 
     $not_approved_mod->join( 'deadline', 'reqn.deadline_id', 'deadline.id' );
     $join_mod = lib::create( 'database\modifier' );
-    $join_mod->where( 'reqn.id', '=', 'stage.reqn_id', false );
     $join_mod->where( 'stage.amendment_id', '=', 'amendment.id', false );
     $join_mod->where( 'stage.stage_type_id', '=', $not_approved_id );
     $not_approved_mod->join_modifier( 'stage', $join_mod );
     
     // join to any minor recommendatation by a Chair or EC
     $join_mod = lib::create( 'database\modifier' );
-    $join_mod->where( 'reqn.id', '=', 'minor.reqn_id', false );
     $join_mod->where( 'minor.amendment_id', '=', 'amendment.id', false );
     $join_mod->where( 'minor.recommendation_type_id', '=', $minor_id );
     $join_mod->where( 'minor.review_type_id', 'IN', $review_type_list );
@@ -154,7 +148,6 @@ class outcome extends \cenozo\business\overview\base_overview
 
     // join to any major recommendatation by a Chair or EC
     $join_mod = lib::create( 'database\modifier' );
-    $join_mod->where( 'reqn.id', '=', 'major.reqn_id', false );
     $join_mod->where( 'major.amendment_id', '=', 'amendment.id', false );
     $join_mod->where( 'major.recommendation_type_id', '=', $major_id );
     $join_mod->where( 'major.review_type_id', 'IN', $review_type_list );

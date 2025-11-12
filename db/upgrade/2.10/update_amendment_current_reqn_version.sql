@@ -13,8 +13,6 @@ BEGIN
     SELECT MAX( version )
     FROM reqn_version
     WHERE amendment.id = reqn_version.amendment_id
-    GROUP BY reqn_version.amendment_id
-    LIMIT 1
   )
   WHERE amendment.id = proc_amendment_id;
 END$$

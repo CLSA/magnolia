@@ -76,17 +76,7 @@ class module extends \cenozo\service\module
 
     $modifier->join( 'manuscript', 'manuscript_version.manuscript_id', 'manuscript.id' );
     $modifier->join( 'reqn', 'manuscript.reqn_id', 'reqn.id' );
-    $modifier->join(
-      'reqn_last_reqn_version_with_agreement',
-      'reqn.id',
-      'reqn_last_reqn_version_with_agreement.reqn_id'
-    );
-    $modifier->left_join(
-      'reqn_version',
-      'reqn_last_reqn_version_with_agreement.reqn_version_id',
-      'reqn_version_with_agreement.id',
-      'reqn_version_with_agreement',
-    );
+    $modifier->join_last_reqn_version_with_agreement( 'reqn.id', 'reqn_version_with_agreement', 'left' );
     $modifier->join( 'user', 'reqn.user_id', 'user.id' );
     $modifier->left_join( 'user', 'reqn.trainee_user_id', 'trainee_user.id', 'trainee_user' );
     $modifier->left_join( 'user', 'reqn.designate_user_id', 'designate_user.id', 'designate_user' );

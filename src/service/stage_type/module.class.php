@@ -30,10 +30,11 @@ class module extends \cenozo\service\module
       $join_sel = lib::create( 'database\select' );
       $join_sel->from( 'stage_type' );
       $join_sel->add_column( 'id', 'stage_type_id' );
-      $join_sel->add_column( 'IF( stage.reqn_id IS NOT NULL, COUNT(*), 0 )', 'reqn_count', false );
+      $join_sel->add_column( 'IF( amendment.reqn_id IS NOT NULL, COUNT(*), 0 )', 'reqn_count', false );
 
       $join_mod = lib::create( 'database\modifier' );
       $join_mod->left_join( 'stage', 'stage_type.id', 'stage.stage_type_id' );
+      $join_mod->left_join( 'amendment', 'stage.amendment_id', 'amendment.id' );
       $join_mod->group( 'stage_type.id' );
       $join_mod->where( 'stage.datetime', '=', NULL ); // only include open stages
 

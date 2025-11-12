@@ -204,7 +204,10 @@ class reqn extends \cenozo\database\record
     $modifier = lib::create( 'database\modifier' );
     $modifier->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
     $modifier->where( 'stage_type.name', '=', 'Active' );
-    return 'yes' == $this->get_current_reqn_version()->ethics && 0 < $this->get_stage_count( $modifier );
+    return (
+      'yes' == $this->get_current_reqn_version()->ethics &&
+      0 < $this->get_current_amendment()->get_stage_count( $modifier )
+    );
   }
 
   /**
@@ -252,8 +255,7 @@ class reqn extends \cenozo\database\record
     $db_reqn_version = lib::create( 'database\reqn_version' );
     if( !is_null( $db_current_reqn_version ) ) $db_reqn_version->copy( $db_clone_reqn_version );
 
-    // define some of the column values insetad of using the clone
-    $db_reqn_version->reqn_id = $this->id;
+    // define some of the column values instead of using the clone
     $db_reqn_version->datetime = util::get_datetime_object();
     $db_reqn_version->amendment_id = $db_amendment->id;
     $db_reqn_version->version = $version;
@@ -411,6 +413,35 @@ class reqn extends \cenozo\database\record
     $db_destruction_report->save();
   }
 
+  /**  
+   * Get the reqn's total fee (NULL if show_prices is false)
+   * 
+   * Note: this process mirrors CnReqnVersionViewFactory::getTotalFee() on the client-side
+   * @return string
+   */
+  public function get_total_fee()
+  {
+    if( !$this->show_prices ) return NULL;
+
+    // the fee is equal to the sum of all amendment fees
+    $amendment_sel = lib::create( 'database\select' );
+    $amendment_sel->add_column( 'IFNULL( override_fee, fee )', 'fee', false );
+
+    $fee = 0; 
+    foreach( $this->get_amendment_list( $amendment_sel ) as $amendment ) $fee += $amendment['fee'];
+
+    $db_language = $this->get_language();
+    return sprintf(
+      'fr' == $db_language->code ? '%s $' : '$%s',
+      number_format(
+        $fee,
+        0,
+        'fr' == $db_language->code ? ',' : '.', 
+        'fr' == $db_language->code ? ' ' : ','
+      )    
+    );   
+  }
+  
   /**
    * Returns the path to various files associated with the reqn
    * 
@@ -441,14 +472,8 @@ class reqn extends \cenozo\database\record
     $review_mod = lib::create( 'database\modifier' );
     $review_mod->join( 'review_type', 'review.review_type_id', 'review_type.id' );
     $review_mod->join( 'recommendation_type', 'review.recommendation_type_id', 'recommendation_type.id' );
-
-    // make sure to only get reviews for the current amendment
-    $review_mod->join( 'reqn_current_reqn_version', 'review.reqn_id', 'reqn_current_reqn_version.reqn_id' );
-    $review_mod->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
-    $review_mod->where( 'review.amendment_id', '=', 'reqn_version.amendment_id', false );
-
     $review_list = array();
-    foreach( $this->get_review_list( $review_sel, $review_mod ) as $review )
+    foreach( $this->get_current_amendment()->get_review_list( $review_sel, $review_mod ) as $review )
       $review_list[$review['name']] = $review['recommendation'];
 
     $recommendation = NULL;
@@ -488,7 +513,7 @@ class reqn extends \cenozo\database\record
     $select->from( 'stage' );
     $select->add_column( 'id' );
     $modifier = lib::create( 'database\modifier' );
-    $modifier->where( 'reqn_id', '=', $this->id );
+    $modifier->where( 'amendment_id', '=', $this->get_current_amendment()->id );
     $modifier->where( 'datetime', '=', NULL );
 
     $stage_id = static::db()->get_one( sprintf( '%s %s', $select->get_sql(), $modifier->get_sql() ) );
@@ -512,7 +537,7 @@ class reqn extends \cenozo\database\record
     $select->from( 'stage' );
     $select->add_column( 'stage_type_id' );
     $modifier = lib::create( 'database\modifier' );
-    $modifier->where( 'reqn_id', '=', $this->id );
+    $modifier->where( 'amendment_id', '=', $this->get_current_amendment()->id );
     $modifier->where( 'datetime', '=', NULL );
 
     $stage_type_id = static::db()->get_one( sprintf( '%s %s', $select->get_sql(), $modifier->get_sql() ) );
@@ -647,7 +672,7 @@ class reqn extends \cenozo\database\record
     $stage_mod->where( 'stage.datetime', '!=', NULL );
     $stage_mod->order_desc( 'stage.datetime' );
     $stage_mod->limit( 1 );
-    $stage_list = $this->get_stage_object_list( $stage_mod );
+    $stage_list = $this->get_current_amendment()->get_stage_object_list( $stage_mod );
     if( 0 == count( $stage_list ) )
     {
       throw lib::create( 'exception\runtime',
@@ -885,7 +910,6 @@ class reqn extends \cenozo\database\record
 
     // create the new stage
     $db_next_stage = lib::create( 'database\stage' );
-    $db_next_stage->reqn_id = $this->id;
     $db_next_stage->amendment_id = $db_reqn_version->amendment_id;
     $db_next_stage->stage_type_id = $db_next_stage_type->id;
     $db_next_stage->save();
@@ -929,13 +953,7 @@ class reqn extends \cenozo\database\record
       $review_mod->where( 'review_type.name', 'LIKE', 'Reviewer %' );
       $review_mod->where( 'recommendation_type_id', '=', NULL );
       $review_mod->where( 'user.active', '=', true );
-
-      // make sure to only get reviews for the current amendment
-      $review_mod->join( 'reqn_current_reqn_version', 'review.reqn_id', 'reqn_current_reqn_version.reqn_id' );
-      $review_mod->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
-      $review_mod->where( 'review.amendment_id', '=', 'reqn_version.amendment_id', false );
-
-      $review_list = $this->get_review_list( $review_sel, $review_mod );
+      $review_list = $this->get_current_amendment()->get_review_list( $review_sel, $review_mod );
 
       if( 0 < count( $review_list ) )
       {
@@ -1148,8 +1166,32 @@ class reqn extends \cenozo\database\record
   }
 
   /**
+   * Returns this reqn's current amendment record
+   * @return database\amendment
+   * @access public
+   */
+  public function get_current_amendment()
+  {
+    // check the primary key value
+    if( is_null( $this->id ) )
+    {
+      log::warning( 'Tried to query reqn with no primary key.' );
+      return NULL;
+    }
+
+    $select = lib::create( 'database\select' );
+    $select->from( 'reqn_current_amendment' );
+    $select->add_column( 'amendment_id' );
+    $modifier = lib::create( 'database\modifier' );
+    $modifier->where( 'reqn_id', '=', $this->id );
+
+    $amendment_id = static::db()->get_one( sprintf( '%s %s', $select->get_sql(), $modifier->get_sql() ) );
+    return $amendment_id ? lib::create( 'database\amendment', $amendment_id ) : NULL;
+  }
+
+  /**
    * Returns this reqn's latest reqn_version record
-   * 
+   * @return database\reqn_version
    * @access public
    */
   public function get_current_reqn_version()
@@ -1162,10 +1204,15 @@ class reqn extends \cenozo\database\record
     }
 
     $select = lib::create( 'database\select' );
-    $select->from( 'reqn_current_reqn_version' );
+    $select->from( 'amendment_current_reqn_version' );
     $select->add_column( 'reqn_version_id' );
     $modifier = lib::create( 'database\modifier' );
-    $modifier->where( 'reqn_id', '=', $this->id );
+    $modifier->join(
+      'reqn_current_amendment',
+      'amendment_current_reqn_version.amendment_id',
+      'reqn_current_amendment.amendment_id'
+    );
+    $modifier->where( 'reqn_current_amendment.reqn_id', '=', $this->id );
 
     $reqn_version_id = static::db()->get_one( sprintf( '%s %s', $select->get_sql(), $modifier->get_sql() ) );
     return $reqn_version_id ? lib::create( 'database\reqn_version', $reqn_version_id ) : NULL;
@@ -1186,10 +1233,15 @@ class reqn extends \cenozo\database\record
     }
 
     $select = lib::create( 'database\select' );
-    $select->from( 'reqn_last_reqn_version_with_agreement' );
+    $select->from( 'amendment_current_reqn_version' );
     $select->add_column( 'reqn_version_id' );
     $modifier = lib::create( 'database\modifier' );
-    $modifier->where( 'reqn_id', '=', $this->id );
+    $modifier->join(
+      'reqn_last_amendment_with_agreement',
+      'amendment_current_reqn_version.amendment_id',
+      'reqn_last_amendment_with_agreement.amendment_id'
+    );
+    $modifier->where( 'reqn_last_amendment_with_agreement.reqn_id', '=', $this->id );
 
     $reqn_version_id = static::db()->get_one( sprintf( '%s %s', $select->get_sql(), $modifier->get_sql() ) );
     return $reqn_version_id ? lib::create( 'database\reqn_version', $reqn_version_id ) : NULL;
@@ -1325,14 +1377,32 @@ class reqn extends \cenozo\database\record
     $zip_filename = sprintf( '%s/agreements_%d.zip', TEMP_PATH, $this->id );
 
     $file_list = array();
-    foreach( $this->get_reqn_version_object_list() as $db_reqn_version )
+    $select = lib::create( 'database\select' );
+    $select->add_table_column( 'amendment', 'name' );
+    $select->add_table_column( 'reqn_version', 'id', 'reqn_version_id' );
+    $modifier = lib::create( 'database\modifier' );
+    $modifier->join( 'amendment', 'reqn.id', 'amendment.reqn_id' );
+    $modifier->join(
+      'amendment_current_reqn_version',
+      'amendment.id',
+      'amendment_current_reqn_version.amendment_id'
+    );
+    $modifier->join(
+      'reqn_version',
+      'amendment_current_reqn_version.reqn_version_id',
+      'reqn_version.id'
+    );
+    $modifier->where( 'reqn_version.agreement_filename', '!=', NULL );
+    $modifier->order( 'amendment.name' );
+    foreach( $this->select( $select, $modifier ) as $row )
     {
+      $db_reqn_version = lib::create( 'database\reqn_version', $row['reqn_version_id'] );
       $agreement_filename = $db_reqn_version->get_filename( 'agreement' );
       if( file_exists( $agreement_filename ) )
       {
         $file_list[] = array(
           'path' => $agreement_filename,
-          'name' => sprintf( '%s version %s.pdf', $this->identifier, $db_reqn_version->get_amendment_version() )
+          'name' => sprintf( '%s version %s%d.pdf', $this->identifier, $row['name'], $db_reqn_version->version )
         );
       }
     }
@@ -1392,7 +1462,6 @@ class reqn extends \cenozo\database\record
     $review_sel->add_table_column( 'review_type', 'name', 'type' );
     $review_sel->add_table_column( 'recommendation_type', 'name', 'recommendation' );
     $review_sel->add_column( 'note' );
-
     $review_mod = lib::create( 'database\modifier' );
     $review_mod->join( 'amendment', 'review.amendment_id', 'amendment.id' );
     $review_mod->left_join( 'user', 'review.user_id', 'user.id' );
@@ -1400,13 +1469,7 @@ class reqn extends \cenozo\database\record
     $review_mod->join( 'recommendation_type', 'review.recommendation_type_id', 'recommendation_type.id' );
     $review_mod->order( 'review.datetime' );
     $review_mod->order( 'stage_type_id' );
-
-    // make sure to only get reviews for the current amendment
-    $review_mod->join( 'reqn_current_reqn_version', 'review.reqn_id', 'reqn_current_reqn_version.reqn_id' );
-    $review_mod->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
-    $review_mod->where( 'review.amendment_id', '=', 'reqn_version.amendment_id', false );
-
-    foreach( $this->get_review_list( $review_sel, $review_mod ) as $review )
+    foreach( $this->get_current_amendment()->get_review_list( $review_sel, $review_mod ) as $review )
     {
       $text .= sprintf(
         "\n\nType: %s\n".
@@ -1718,20 +1781,12 @@ class reqn extends \cenozo\database\record
     $base_mod = lib::create( 'database\modifier' );
 
     // do not include reqns in the finalization or complete phases
-    $join_mod = lib::create( 'database\modifier' );
-    $join_mod->where( 'reqn.id', '=', 'stage.reqn_id', false );
-    $join_mod->where( 'stage.datetime', '=', NULL );
-    $base_mod->join_modifier( 'stage', $join_mod );
+    $base_mod->join_current_stage();
     $base_mod->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
     $base_mod->where( 'stage_type.phase', 'NOT IN', ['finalization', 'complete'] );
 
     // join to the latest reqn version that has an agreement
-    $base_mod->join(
-      'reqn_last_reqn_version_with_agreement',
-      'reqn.id',
-      'reqn_last_reqn_version_with_agreement.reqn_id'
-    );
-    $base_mod->join( 'reqn_version', 'reqn_last_reqn_version_with_agreement.reqn_version_id', 'reqn_version.id' );
+    $base_mod->join_last_reqn_version_with_agreement();
 
     // create the two-month notifications
     $db_two_month_notification_type =
@@ -1804,13 +1859,9 @@ class reqn extends \cenozo\database\record
     // first delete expired reqns
     $modifier = lib::create( 'database\modifier' );
     $modifier->join( 'reqn_type', 'reqn.reqn_type_id', 'reqn_type.id' );
-    $join_mod = lib::create( 'database\modifier' );
-    $join_mod->where( 'reqn.id', '=', 'stage.reqn_id', false );
-    $join_mod->where( 'stage.datetime', '=', NULL );
-    $modifier->join_modifier( 'stage', $join_mod );
+    $modifier->join_current_stage();
     $modifier->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
-    $modifier->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
-    $modifier->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
+    $modifier->join_current_reqn_version();
     $modifier->where( 'stage_type.name', '=', 'New' );
     $modifier->where( 'reqn.legacy', '=', false );
     $modifier->where( 'reqn_type.name', '=', 'Standard' );
@@ -1834,13 +1885,9 @@ class reqn extends \cenozo\database\record
     // next send a notification for reqns with an expiry one month away
     $modifier = lib::create( 'database\modifier' );
     $modifier->join( 'reqn_type', 'reqn.reqn_type_id', 'reqn_type.id' );
-    $join_mod = lib::create( 'database\modifier' );
-    $join_mod->where( 'reqn.id', '=', 'stage.reqn_id', false );
-    $join_mod->where( 'stage.datetime', '=', NULL );
-    $modifier->join_modifier( 'stage', $join_mod );
+    $modifier->join_current_stage();
     $modifier->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
-    $modifier->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
-    $modifier->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
+    $modifier->join_current_reqn_version();
     $join_mod = lib::create( 'database\modifier' );
     $join_mod->where( 'reqn.id', '=', 'notification.reqn_id', false );
     $join_mod->where( 'notification.notification_type_id', '=', $db_notification_type->id );
@@ -1987,7 +2034,7 @@ class reqn extends \cenozo\database\record
         {
           $stage_mod = lib::create( 'database\modifier' );
           $stage_mod->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
-          $number_of_stages = $this->get_stage_count( $stage_mod );
+          $number_of_stages = $this->get_current_amendment()->get_stage_count( $stage_mod );
         }
 
         // if there are zero or one stages then this is a new requisition which needs its deadline set
@@ -2027,19 +2074,34 @@ class reqn extends \cenozo\database\record
       $modifier->left_join( 'user', 'reqn.trainee_user_id', 'trainee_user.id', 'trainee_user' );
     if( !$modifier->has_join( 'designate_user' ) )
       $modifier->left_join( 'user', 'reqn.designate_user_id', 'designate_user.id', 'designate_user' );
-    if( !$modifier->has_join( 'reqn_version' ) )
-    {
-      $modifier->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
-      $modifier->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
-    }
+    if( !$modifier->has_join( 'reqn_version' ) ) $modifier->join_current_reqn_version();
     if( !$modifier->has_join( 'applicant_country' ) )
-      $modifier->left_join( 'country', 'reqn_version.applicant_country_id', 'applicant_country.id', 'applicant_country' );
+    {
+      $modifier->left_join(
+        'country',
+        'reqn_version.applicant_country_id',
+        'applicant_country.id',
+        'applicant_country'
+      );
+    }
     if( !$modifier->has_join( 'trainee_country' ) )
-      $modifier->left_join( 'country', 'reqn_version.trainee_country_id', 'trainee_country.id', 'trainee_country' );
+    {
+      $modifier->left_join(
+        'country',
+        'reqn_version.trainee_country_id',
+        'trainee_country.id',
+        'trainee_country'
+      );
+    }
     if( !$modifier->has_join( 'coapplicant' ) )
     {
       $modifier->left_join( 'coapplicant', 'reqn_version.id', 'coapplicant.reqn_version_id' );
-      $modifier->left_join( 'country', 'coapplicant.country_id', 'coapplicant_country.id', 'coapplicant_country' );
+      $modifier->left_join(
+        'country',
+        'coapplicant.country_id',
+        'coapplicant_country.id',
+        'coapplicant_country'
+      );
       $modifier->group( 'reqn.id' );
     }
 

@@ -38,8 +38,6 @@ CREATE PROCEDURE patch_amendment_current_reqn_version()
         SELECT MAX( version )
         FROM reqn_version
         WHERE amendment.id = reqn_version.amendment_id
-        GROUP BY reqn_version.amendment_id
-        LIMIT 1
       );
     END IF;
 
@@ -48,8 +46,3 @@ DELIMITER ;
 
 CALL patch_amendment_current_reqn_version();
 DROP PROCEDURE IF EXISTS patch_amendment_current_reqn_version;
-
-
-
-
-

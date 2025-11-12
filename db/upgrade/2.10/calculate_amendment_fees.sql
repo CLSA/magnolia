@@ -41,9 +41,7 @@ CREATE PROCEDURE calculate_amendment_fees()
 
       -- Start with the base cost
       UPDATE reqn
-      JOIN stage ON reqn.id = stage.reqn_id
-      JOIN stage_type ON stage.stage_type_id = stage_type.id
-      JOIN amendment AS first_amendment ON stage.amendment_id = first_amendment.id
+      JOIN amendment AS first_amendment ON reqn.id = first_amendment.reqn_id AND first_amendment.name = "."
       JOIN fee_schedule ON first_amendment.fee_schedule_id = fee_schedule.id
       JOIN amendment ON reqn.id = amendment.reqn_id
       JOIN amendment_current_reqn_version ON amendment.id = amendment_current_reqn_version.amendment_id
@@ -64,8 +62,7 @@ CREATE PROCEDURE calculate_amendment_fees()
           fee_schedule.fee_national,
           fee_schedule.fee_international
         )
-      )
-      WHERE first_amendment.name = ".";
+      );
 
       -- Now add any additional fees
       DROP TABLE IF EXISTS temp_additional_fee;
@@ -204,4 +201,3 @@ DELIMITER ;
 
 CALL calculate_amendment_fees();
 DROP PROCEDURE IF EXISTS calculate_amendment_fees;
-

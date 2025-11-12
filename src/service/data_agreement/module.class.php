@@ -35,7 +35,7 @@ class module extends \cenozo\service\module
       $join_sel->from( 'data_agreement' );
       $join_sel->add_column( 'id', 'data_agreement_id' );
       $join_sel->add_column(
-        'IF( reqn_current_reqn_version.reqn_id IS NOT NULL, COUNT(*), 0 )',
+        'IF( reqn_current_amendment.reqn_id IS NOT NULL, COUNT(*), 0 )',
         'reqn_count',
         false
       );
@@ -43,9 +43,14 @@ class module extends \cenozo\service\module
       $join_mod = lib::create( 'database\modifier' );
       $join_mod->left_join( 'reqn_version', 'data_agreement.id', 'reqn_version.data_agreement_id' );
       $join_mod->left_join(
-        'reqn_current_reqn_version',
+        'amendment_current_reqn_version',
         'reqn_version.id',
-        'reqn_current_reqn_version.reqn_version_id'
+        'amendment_current_reqn_version.reqn_version_id'
+      );
+      $join_mod->left_join(
+        'reqn_current_amendment',
+        'amendment_current_reqn_version.amendment_id',
+        'reqn_current_amendment.amendment_id'
       );
       $join_mod->group( 'data_agreement.id' );
 

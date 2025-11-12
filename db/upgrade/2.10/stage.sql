@@ -24,12 +24,11 @@ CREATE PROCEDURE patch_stage()
       ALTER TABLE stage ADD CONSTRAINT fk_stage_amendment_id
         FOREIGN KEY (amendment_id)
         REFERENCES amendment (id)
-        ON DELETE NO ACTION
-        ON UPDATE NO ACTION;
+        ON DELETE CASCADE
+        ON UPDATE CASCADE;
 
-      ALTER TABLE stage
-        DROP INDEX uq_reqn_id_amendment_stage_type_id,
-        DROP COLUMN amendment;
+      ALTER TABLE stage DROP INDEX uq_reqn_id_amendment_stage_type_id, DROP COLUMN amendment;
+      ALTER TABLE stage DROP CONSTRAINT fk_stage_reqn_id, DROP INDEX fk_reqn_id, DROP COLUMN reqn_id;
     END IF;
 
   END //
@@ -44,12 +43,10 @@ DELIMITER $$
 DROP TRIGGER IF EXISTS stage_AFTER_INSERT$$
 CREATE DEFINER=CURRENT_USER TRIGGER stage_AFTER_INSERT AFTER INSERT ON stage FOR EACH ROW
 BEGIN
-  INSERT IGNORE INTO review( reqn_id, amendment_id, review_type_id )
-  SELECT NEW.reqn_id, reqn_version.amendment_id, review_type.id
+  INSERT IGNORE INTO review( amendment_id, review_type_id )
+  SELECT NEW.amendment_id, review_type.id
   FROM review_type
   JOIN stage_type ON review_type.stage_type_id = stage_type.id
-  JOIN reqn_current_reqn_version ON NEW.reqn_id = reqn_current_reqn_version.reqn_id
-  JOIN reqn_version ON reqn_current_reqn_version.reqn_version_id = reqn_version.id
   WHERE stage_type.id = NEW.stage_type_id;
 END$$
 
@@ -62,13 +59,8 @@ BEGIN
     FROM review_type
     JOIN stage_type ON review_type.stage_type_id = stage_type.id
     WHERE stage_type.id = OLD.stage_type_id
-  ) AND amendment_id = (
-    SELECT amendment_id
-    FROM reqn_current_reqn_version
-    JOIN reqn_version ON reqn_current_reqn_version.reqn_version_id = reqn_version.id
-    WHERE reqn_current_reqn_version.reqn_id = OLD.reqn_id
   )
-  AND reqn_id = OLD.reqn_id;
+  AND amendment_id = OLD.amendment_id;
 END$$
 
 DELIMITER ;

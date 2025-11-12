@@ -3,7 +3,12 @@ cenozoApp.defineModule({
   models: "list",
   create: (module) => {
     angular.extend(module, {
-      identifier: {}, // standard
+      identifier: {
+        parent: {
+          subject: "amendment",
+          column: "amendment_id",
+        },
+      },
       name: {
         singular: "stage",
         plural: "stages",

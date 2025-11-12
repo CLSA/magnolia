@@ -75,7 +75,7 @@ class module extends \cenozo\service\module
     parent::prepare_read( $select, $modifier );
 
     $modifier->join( 'amendment', 'reqn_version.amendment_id', 'amendment.id' );
-    $modifier->join( 'reqn', 'reqn_version.reqn_id', 'reqn.id' );
+    $modifier->join( 'reqn', 'amendment.reqn_id', 'reqn.id' );
     $modifier->join( 'reqn_current_final_report', 'reqn.id', 'reqn_current_final_report.reqn_id' );
     $modifier->left_join( 'final_report', 'reqn_current_final_report.final_report_id', 'final_report.id' );
     $modifier->join( 'reqn_current_destruction_report', 'reqn.id', 'reqn_current_destruction_report.reqn_id' );
@@ -114,7 +114,7 @@ class module extends \cenozo\service\module
     if( $select->has_table_columns( 'stage' ) || $select->has_table_columns( 'stage_type' ) )
     {
       $join_mod = lib::create( 'database\modifier' );
-      $join_mod->where( 'reqn.id', '=', 'stage.reqn_id', false );
+      $join_mod->where( 'amendment.id', '=', 'stage.amendment_id', false );
       $join_mod->where( 'stage.datetime', '=', NULL );
       $modifier->join_modifier( 'stage', $join_mod );
       $modifier->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
@@ -122,14 +122,7 @@ class module extends \cenozo\service\module
 
     if( $select->has_column( 'is_current_version' ) )
     {
-      $modifier->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
-      $modifier->join(
-        'reqn_version',
-        'reqn_current_reqn_version.reqn_version_id',
-        'current_reqn_version.id',
-        '',
-        'current_reqn_version'
-      );
+      $modifier->join_current_reqn_version( 'reqn.id', 'current_reqn_version' );
       $select->add_column(
         'reqn_version.amendment_id = current_reqn_version.amendment_id AND '.
         'reqn_version.version = current_reqn_version.version',

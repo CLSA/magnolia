@@ -43,8 +43,8 @@ cenozoApp.defineModule({
     angular.extend(module, {
       identifier: {
         parent: {
-          subject: "reqn",
-          column: "reqn.identifier",
+          subject: "amendment",
+          column: "amendment_id",
         },
       },
       name: {
@@ -1464,11 +1464,14 @@ cenozoApp.defineModule({
               var parent = this.parentModel.getParentIdentifier();
               this.versionList = [];
               var response = await CnHttpFactory.instance({
-                path: parent.subject + "/" + parent.identifier + "/reqn_version",
-                data: { modifier: { order: [{"amendment": true}, {"version": true}] } },
+                path: "reqn_version",
+                data: { modifier: {
+                  where: { column: "reqn.id", operator: "=", value: this.record.reqn_id },
+                  order: [{"amendment.name": true}, {"reqn_version.version": true}] },
+                },
               }).query();
 
-              // we're going to use .then calls below to maximize overall asynchronous processing time
+              // we're going to use ".then" calls below to maximize overall asynchronous processing time
               var promiseList = [];
               response.data.forEach((version) => {
                 promiseList = promiseList.concat([
@@ -1504,8 +1507,8 @@ cenozoApp.defineModule({
               this.lastAmendmentVersion = null;
               if ("." != this.record.amendment) {
                 this.versionList.some((version) => {
-                  // Note that the amendments we're comparing are letters, and since . is considered less than A it works
-                  // whether we're comparing lettered versions or the initial "." version:
+                  // Note that the amendments we're comparing are letters, and since . is considered less
+                  // than A it works whether we're comparing lettered versions or the initial "." version:
                   if (null != version && this.record.amendment > version.amendment) {
                     this.lastAmendmentVersion = version.amendment_version;
                     return true;
@@ -1543,7 +1546,16 @@ cenozoApp.defineModule({
             setCoapplicantDiff: function (version) {
               if (null != version) {
                 // see if there is a difference between this list and the view's list
-                let columns = ["name", "position", "affiliation", "country", "email", "role", "trainee", "access"];
+                let columns = [
+                  "name",
+                  "position",
+                  "affiliation",
+                  "country",
+                  "email",
+                  "role",
+                  "trainee",
+                  "access",
+                ];
                 version.coapplicantDiff =
                   version.coapplicantList.length != this.record.coapplicantList.length ||
                   version.coapplicantList.some(

@@ -191,6 +191,15 @@ class reqn_version extends \cenozo\database\record
   }
 
   /**
+   * Returns the reqn_version's parent reqn
+   * @return database\reqn
+   */
+  public function get_reqn()
+  {
+    return $this->get_amendment()->get_reqn();
+  }
+
+  /**
    * Returns the amendment and version number of the reqn version (1, 2, 3, A1, A2, A3, B1, B2, B3, etc)
    * @return string
    */
@@ -212,7 +221,7 @@ class reqn_version extends \cenozo\database\record
     // get the two newest versions
     $version_mod = lib::create( 'database\modifier' );
     $version_mod->join( 'amendment', 'reqn_version.amendment_id', 'amendment.id' );
-    $version_mod->where( 'reqn_version.reqn_id', '=', $this->reqn_id );
+    $version_mod->where( 'amendment.reqn_id', '=', $this->get_amendment()->reqn_id );
     $version_mod->order( 'amendment.name', true );
     $version_mod->order( 'reqn_version.version', true );
     $version_mod->limit( 2 );
@@ -412,12 +421,8 @@ class reqn_version extends \cenozo\database\record
     // first see if this is a catalyst grant
     if( 'Catalyst Grant' != $db_reqn->get_reqn_type()->name )
     {
-      // get the date of the most recent reqn-version which is of the same amendment as the current reqn-version
-      $reqn_version_mod = lib::create( 'database\modifier' );
-      $reqn_version_mod->where( 'amendment_id', '=', $this->amendment_id );
-      $reqn_version_mod->order_desc( 'version' );
-      $reqn_version_mod->limit( 1 );
-      $db_reqn_version = current( $db_reqn->get_reqn_version_object_list( $reqn_version_mod ) );
+      // get the most recent reqn-version which is of the same amendment as the current reqn-version
+      $db_reqn_version = $this->get_amendment()->get_current_reqn_version();
 
       // now find the most recent decision-made stage that comes after the reqn-version's datetime
       $stage_mod = lib::create( 'database\modifier' );
@@ -427,7 +432,7 @@ class reqn_version extends \cenozo\database\record
       $stage_mod->order( 'datetime' );
       $stage_mod->limit( 1 );
 
-      $stage_list = $db_reqn->get_stage_object_list( $stage_mod );
+      $stage_list = $db_reqn->get_current_amendment()->get_stage_object_list( $stage_mod );
       if( 0 < count( $stage_list ) ) $date_of_approval = current( $stage_list )->datetime;
     }
 
@@ -447,14 +452,6 @@ class reqn_version extends \cenozo\database\record
   {
     if( is_null( $db_language ) ) $db_language = $this->get_reqn()->get_language();
     $lang = $db_language->code;
-
-    // create the query necessary to find the highest ranking version of all amendments
-    $version_sel = lib::create( 'database\select' );
-    $version_sel->from( 'reqn_version', 'latest_reqn_version' );
-    $version_sel->add_column( 'MAX( version )', 'max_version', false );
-    $version_mod = lib::create( 'database\modifier' );
-    $version_mod->where( 'latest_reqn_version.reqn_id', '=', 'reqn_version.reqn_id', false );
-    $version_mod->where( 'latest_reqn_version.amendment_id', '=', 'reqn_version.amendment_id', false );
 
     // create a temporary table with the final version of visible justifications for every amendment
     $select = lib::create( 'database\select' );
@@ -487,13 +484,21 @@ class reqn_version extends \cenozo\database\record
       'amendment_type.id'
     );
     $modifier->where( 'amendment_type.show_in_description', '=', true );
+
+    // create the query necessary to find the highest ranking version of all amendments
+    $version_sel = lib::create( 'database\select' );
+    $version_sel->from( 'reqn_version', 'latest_reqn_version' );
+    $version_sel->add_column( 'MAX( version )', 'max_version', false );
+    $version_mod = lib::create( 'database\modifier' );
+    $version_mod->where( 'latest_reqn_version.amendment_id', '=', 'reqn_version.amendment_id', false );
     $modifier->where(
       'reqn_version.version',
       '=',
-      sprintf( '( %s%s )', $version_sel->get_sql(), $version_mod->get_sql() ),
+      sprintf( '( %s %s )', $version_sel->get_sql(), $version_mod->get_sql() ),
       false
     );
-    $modifier->where( 'reqn_version.reqn_id', '=', $this->reqn_id );
+
+    $modifier->where( 'amendment.reqn_id', '=', $this->get_amendment()->reqn_id );
     $modifier->where( 'reqn_version.amendment_id', '<=', $this->amendment_id );
     $modifier->group( 'reqn_version.amendment_id' );
 
@@ -541,37 +546,6 @@ class reqn_version extends \cenozo\database\record
   }
 
   /**
-   * Get the reqn's total fee (NULL if show_prices is false)
-   * 
-   * Note: this process mirrors CnReqnVersionViewFactory::getTotalFee() on the client-side
-   * @return string
-   */
-  public function get_total_fee()
-  {
-    $db_reqn = $this->get_reqn();
-
-    if( !$db_reqn->show_prices ) return NULL;
-
-    // the fee is equal to the sum of all amendment fees
-    $amendment_sel = lib::create( 'database\select' );
-    $amendment_sel->add_column( 'IFNULL( override_fee, fee )', 'fee', false );
-
-    $fee = 0;
-    foreach( $db_reqn->get_amendment_list( $amendment_sel ) as $amendment ) $fee += $amendment['fee'];
-
-    $db_language = $db_reqn->get_language();
-    return sprintf(
-      'fr' == $db_language->code ? '%s $' : '$%s',
-      number_format(
-        $fee,
-        0,
-        'fr' == $db_language->code ? ',' : '.',
-        'fr' == $db_language->code ? ' ' : ','
-      )
-    );
-  }
-
-  /**
    * Generates the coapplicant agreement PDF form template
    */
   public function generate_coapplicant_agreement_template_form()
@@ -590,18 +564,16 @@ class reqn_version extends \cenozo\database\record
     );
 
     // get a list of all new coapplicants who have access to the data by first finding the last amendment-version
-    $reqn_version_mod = lib::create( 'database\modifier' );
-    $reqn_version_mod->join( 'amendment', 'reqn_version.amendment_id', 'amendment.id' );
-    $reqn_version_mod->where( 'amendment.name', '<', $this->get_amendment()->name );
-    $reqn_version_mod->order_desc( 'amendment.name' );
-    $reqn_version_mod->order_desc( 'version' );
-    $reqn_version_mod->limit( 1 );
-    $reqn_version_list = $db_reqn->get_reqn_version_object_list( $reqn_version_mod );
+    $db_amendment = $this->get_amendment();
+    $prev_amendment_name = $db_amendment->get_previous_amendment_name();
 
-    $last_coapplicant_list = array();
-    if( 0 < count( $reqn_version_list ) )
+    if( !is_null( $prev_amendment_name ) )
     {
-      $db_last_reqn_version = current( $reqn_version_list );
+      $db_prev_amendment = $amendment_class_name::get_unique_record(
+        ['reqn_id', 'name'],
+        [$db_amendment->reqn_id, $prev_amendment_name]
+      );
+      $db_last_reqn_version = $db_prev_amendment->get_current_reqn_version();
       $coapplicant_sel = lib::create( 'database\select' );
       $coapplicant_sel->add_column( 'name' );
       $coapplicant_sel->add_column( 'access' );
@@ -670,7 +642,7 @@ class reqn_version extends \cenozo\database\record
     $db_user = $db_reqn->get_user();
     $db_trainee_user = $db_reqn->get_trainee_user();
     $date_of_approval = $this->get_date_of_approval();
-    $fee = $this->get_total_fee();
+    $fee = $db_reqn->get_total_fee();
 
     // generate the application form
     $data = array(
@@ -929,7 +901,7 @@ class reqn_version extends \cenozo\database\record
 
     $modifier = lib::create( 'database\modifier' );
     $modifier->join( 'amendment', 'reqn_version.amendment_id', 'amendment.id' );
-    $modifier->join( 'reqn', 'reqn_version.reqn_id', 'reqn.id' );
+    $modifier->join( 'reqn', 'amendment.reqn_id', 'reqn.id' );
     $modifier->join( 'user', 'reqn.user_id', 'user.id' );
     $modifier->where( 'reqn_version.id', '=', $this->id );
 

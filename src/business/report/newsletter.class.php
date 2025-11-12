@@ -30,11 +30,7 @@ class newsletter extends \cenozo\business\report\base_report
     $join_mod->where( 'user.id', '=', 'reqn.user_id', false );
     $join_mod->or_where( 'user.id', '=', 'reqn.trainee_user_id', false );
     $modifier->join_modifier( 'reqn', $join_mod, 'left' );
-    $join_mod = lib::create( 'database\modifier' );
-    $join_mod->where( 'reqn.id', '=', 'stage.reqn_id', false );
-    $join_mod->where( 'stage.stage_type_id', '!=', $db_new_stage_type->id );
-    $join_mod->where( 'stage.datetime', '=', NULL );
-    $modifier->join_modifier( 'stage', $join_mod, 'left' );
+    $modifier->join_current_stage( 'reqn.id', NULL, 'left' );
     $modifier->group( 'user.id' );
     $modifier->order( 'user.last_name' );
     $modifier->order( 'user.first_name' );

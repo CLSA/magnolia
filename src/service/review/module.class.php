@@ -90,15 +90,23 @@ class module extends \cenozo\service\module
     $db_role = $session->get_role();
 
     $modifier->join( 'amendment', 'review.amendment_id', 'amendment.id' );
+    $modifier->join( 'reqn', 'amendment.reqn_id', 'reqn.id' );
+    $modifier->join(
+      'amendment_current_reqn_version',
+      'amendment.id',
+      'amendment_current_reqn_version.amendment_id'
+    );
+    $modifier->join(
+      'reqn_version',
+      'amendment_current_reqn_version.reqn_version_id',
+      'reqn_version.id'
+    );
     $modifier->join( 'review_type', 'review.review_type_id', 'review_type.id' );
     $modifier->left_join( 'user', 'review.user_id', 'user.id' );
     $modifier->left_join( 'recommendation_type', 'review.recommendation_type_id', 'recommendation_type.id' );
-    $modifier->join( 'reqn', 'review.reqn_id', 'reqn.id' );
-    $modifier->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
-    $modifier->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
 
     $join_mod = lib::create( 'database\modifier' );
-    $join_mod->where( 'reqn.id', '=', 'stage.reqn_id', false );
+    $join_mod->where( 'amendment.id', '=', 'stage.amendment_id', false );
     $join_mod->where( 'stage.datetime', '=', NULL );
     $modifier->join_modifier( 'stage', $join_mod );
     $modifier->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );

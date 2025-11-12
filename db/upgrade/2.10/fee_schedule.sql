@@ -3,7 +3,7 @@ DELIMITER //
 CREATE PROCEDURE patch_fee_schedule()
   BEGIN
 
-    SELECT "CREATING NEW fee_schedule table" AS "";
+    SELECT "Creating new fee_schedule table" AS "";
 
     CREATE TABLE IF NOT EXISTS fee_schedule (
       id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,

@@ -51,3 +51,14 @@ DELIMITER ;
 
 CALL patch_amendment();
 DROP PROCEDURE IF EXISTS patch_amendment;
+
+
+DELIMITER $$
+
+DROP TRIGGER IF EXISTS amendment_AFTER_INSERT$$
+CREATE DEFINER=CURRENT_USER TRIGGER amendment_AFTER_INSERT AFTER INSERT ON amendment FOR EACH ROW
+BEGIN
+  CALL update_reqn_current_amendment( NEW.reqn_id );
+END$$
+
+DELIMITER ;

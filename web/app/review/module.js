@@ -5,8 +5,8 @@ cenozoApp.defineModule({
     angular.extend(module, {
       identifier: {
         parent: {
-          subject: "reqn",
-          column: "reqn.identifier",
+          subject: "amendment",
+          column: "amendment_id",
         },
       },
       name: {

@@ -68,8 +68,7 @@ class stage_type extends \cenozo\database\has_rank
     $modifier->where( 'review.reqn_id', '=', $reqn_id );
 
     // make sure to only get reviews for the current amendment
-    $modifier->join( 'reqn_current_reqn_version', 'review.reqn_id', 'reqn_current_reqn_version.reqn_id' );
-    $modifier->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
+    $modifier->join_current_reqn_version( 'review.reqn_id' );
     $modifier->where( 'review.amendment_id', '=', 'reqn_version.amendment_id', false );
 
     $review_list = array();

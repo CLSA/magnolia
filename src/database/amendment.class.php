@@ -216,6 +216,18 @@ class amendment extends \cenozo\database\record
   }
 
   /**
+   * Determines the previous amendment name
+   */
+  public function get_previous_amendment_name()
+  {
+    $name = $this->name;
+    return (
+      '.' == $name ? NULL :
+      ( 'A' == $name ? '.' : --$name )
+    );
+  }
+
+  /**
    * Determines the next amendment name
    */
   public function get_next_amendment_name()
