@@ -59,6 +59,13 @@ cenozoApp.defineModule({
               if (angular.isDefined(data.fee_schedule_id)) await this.onView();
             },
           });
+
+          async function init(object) {
+            await object.deferred.promise;
+            if (angular.isDefined(object.stageModel)) object.stageModel.listModel.heading = "Stage History";
+          }
+
+          init(this);
         };
 
         return {

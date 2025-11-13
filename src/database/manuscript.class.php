@@ -212,17 +212,12 @@ class manuscript extends \cenozo\database\record
    * Reverses the current stage, returning to the previous one
    * @access public
    */
-  public function reverse_to_last_manuscript_stage()
+  public function reverse_to_last_completed_manuscript_stage()
   {
-    $identifier = $this->get_reqn()->identifier;
-
-    // get the previous stage
-    $stage_mod = lib::create( 'database\modifier' );
-    $stage_mod->where( 'manuscript_stage.datetime', '!=', NULL );
-    $stage_mod->order_desc( 'manuscript_stage.datetime' );
-    $stage_mod->limit( 1 );
-    $stage_list = $this->get_manuscript_stage_object_list( $stage_mod );
-    if( 0 == count( $stage_list ) )
+    $db_reqn = $this->get_reqn();
+    $identifier = $db_reqn->identifier;
+    $db_last_completed_stage = $db_reqn->get_last_completed_manuscript_stage();
+    if( is_null( $db_last_completed_stage ) )
     {
       throw lib::create( 'exception\runtime',
         sprintf(
@@ -233,7 +228,6 @@ class manuscript extends \cenozo\database\record
         __METHOD__
       );
     }
-    $db_last_stage = current( $stage_list );
 
     // if deferred then we need to un-defer
     if( $this->deferred )
@@ -243,8 +237,8 @@ class manuscript extends \cenozo\database\record
     }
 
     $this->get_current_manuscript_stage()->delete();
-    $db_last_stage->datetime = NULL;
-    $db_last_stage->save();
+    $db_last_completed_stage->datetime = NULL;
+    $db_last_completed_stage->save();
   }
 
   /**

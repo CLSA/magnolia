@@ -34,18 +34,11 @@ class stage extends \cenozo\database\record
     else if( 'Decision Made' == $db_stage_type->name || 'Data Release' == $db_stage_type->name )
     {
       // make sure that there is a recent notice (test against the datetime of the last stage)
-      $stage_mod = lib::create( 'database\modifier' );
-      $stage_mod->order_desc( 'datetime' );
-      $stage_mod->limit( 1 );
-      $stage_sel = lib::create( 'database\select' );
-      $stage_sel->add_column( 'datetime' );
-
-      $db_reqn = $this->get_reqn();
-      $last_stage = current( $db_reqn->get_current_amendment()->get_stage_list( $stage_sel, $stage_mod ) );
-
+      $db_amendment = $this->get_amendment();
+      $db_last_completed_stage = $db_amendment->get_reqn()->get_last_completed_stage();
       $notice_mod = lib::create( 'database\modifier' );
-      $notice_mod->where( 'datetime', '>', $last_stage['datetime'] );
-      if( 0 == $db_reqn->get_notice_count( $notice_mod ) )
+      $notice_mod->where( 'datetime', '>', $db_last_completed_stage->datetime );
+      if( 0 == $db_amendment->get_reqn()->get_notice_count( $notice_mod ) )
         return 'Decision Made' == $db_stage_type->name ?
           'A new notice outlining the decision must be created before proceeding to the next stage.' :
           'A new notice outlining the released data must be created before proceeding to the next stage.';
@@ -53,8 +46,8 @@ class stage extends \cenozo\database\record
     else if( 'Agreement' == $db_stage_type->name )
     {
       // make sure all mandatory fields are filled and files are attached
-      $db_reqn = $this->get_reqn();
-      $db_reqn_version = $db_reqn->get_current_reqn_version();
+      $db_amendment = $this->get_amendment();
+      $db_reqn_version = $db_amendment->get_current_reqn_version();
 
       if( is_null( $db_reqn_version->ethics_filename ) )
       {
@@ -80,7 +73,7 @@ class stage extends \cenozo\database\record
         $db_dsac_selection_stage_type = $stage_type_class_name::get_unique_record( 'name', 'DSAC Selection' );
         $review_list = array_merge(
           $review_list,
-          $db_dsac_selection_stage_type->get_review_object_list( $this->get_amendment()->reqn_id )
+          $db_dsac_selection_stage_type->get_review_object_list( $this->amendment_id )
         );
       }
 
@@ -121,6 +114,6 @@ class stage extends \cenozo\database\record
    */
   public function get_review_object_list()
   {
-    return $this->get_stage_type()->get_review_object_list( $this->get_amendment()->reqn_id );
+    return $this->get_stage_type()->get_review_object_list( $this->amendment_id );
   }
 }

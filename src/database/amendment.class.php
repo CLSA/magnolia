@@ -217,6 +217,7 @@ class amendment extends \cenozo\database\record
 
   /**
    * Determines the previous amendment name
+   * @return string
    */
   public function get_previous_amendment_name()
   {
@@ -229,10 +230,37 @@ class amendment extends \cenozo\database\record
 
   /**
    * Determines the next amendment name
+   * @return string
    */
   public function get_next_amendment_name()
   {
     $name = $this->name;
     return '.' == $name ? 'A' : ++$name;
+  }
+
+  /**
+   * Get the previous amendment
+   * @return database\amendment
+   */
+  public function get_previous_amendment()
+  {
+    $prev_amendment_name = $this->get_previous_amendment_name();
+    return is_null( $prev_amendment_name ) ? NULL : static::get_unique_record(
+      ['reqn_id', 'name'],
+      [$this->reqn_id, $prev_amendment_name]
+    );
+  }
+
+  /**
+   * Get the next amendment
+   * @return database\amendment
+   */
+  public function get_next_amendment()
+  {
+    $prev_amendment_name = $this->get_next_amendment_name();
+    return is_null( $prev_amendment_name ) ? NULL : static::get_unique_record(
+      ['reqn_id', 'name'],
+      [$this->reqn_id, $prev_amendment_name]
+    );
   }
 }

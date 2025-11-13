@@ -78,7 +78,11 @@ class module extends \cenozo\service\module
     $modifier->join( 'reqn_current_final_report', 'reqn.id', 'reqn_current_final_report.reqn_id' );
     $modifier->left_join( 'final_report', 'reqn_current_final_report.final_report_id', 'final_report.id' );
     $modifier->join( 'reqn_current_destruction_report', 'reqn.id', 'reqn_current_destruction_report.reqn_id' );
-    $modifier->left_join( 'destruction_report', 'reqn_current_destruction_report.destruction_report_id', 'destruction_report.id' );
+    $modifier->left_join(
+      'destruction_report',
+      'reqn_current_destruction_report.destruction_report_id',
+      'destruction_report.id'
+    );
     $modifier->left_join( 'deadline', 'reqn.deadline_id', 'deadline.id' );
     $modifier->join( 'user', 'reqn.user_id', 'user.id' );
     $modifier->left_join( 'user', 'reqn.trainee_user_id', 'trainee_user.id', 'trainee_user' );
@@ -142,7 +146,14 @@ class module extends \cenozo\service\module
     }
 
     if( $select->has_column( 'has_data_sharing_filename' ) )
-      $select->add_column( '( reqn_version.data_sharing_filename IS NOT NULL )', 'has_data_sharing_filename', false, 'boolean' );
+    {
+      $select->add_column(
+        '( reqn_version.data_sharing_filename IS NOT NULL )',
+        'has_data_sharing_filename',
+        false,
+        'boolean'
+      );
+    }
 
     if( $select->has_column( 'country_is_flagged' ) )
     {
@@ -297,29 +308,36 @@ class module extends \cenozo\service\module
 
     if( $select->has_column( 'reviewers_completed' ) )
     {
-      $join_sel = lib::create( 'database\select' );
-      $join_sel->from( 'amendment' );
-      $join_sel->add_column( 'id', 'amendment_id' );
-      $join_sel->add_column( 'IF( review.id IS NULL, 0, COUNT(*) )', 'total', false );
+      // create a temporary table of completed reviewers
+      $reviewers_sel = lib::create( 'database\select' );
+      $reviewers_sel->from( 'amendment' );
+      $reviewers_sel->add_column( 'id', 'amendment_id' );
+      $reviewers_sel->add_column( 'IF( review.id IS NULL, 0, COUNT(*) )', 'total', false );
 
+      $reviewers_mod = lib::create( 'database\modifier' );
       $join_mod = lib::create( 'database\modifier' );
-      $sub_mod = lib::create( 'database\modifier' );
-      $sub_mod->where( 'amendment.id', '=', 'review.amendment_id', false );
-      $sub_mod->where(
+      $join_mod->where( 'amendment.id', '=', 'review.amendment_id', false );
+      $join_mod->where(
         'review.review_type_id',
         'IN',
         '( SELECT id FROM review_type WHERE name LIKE "Reviewer %" )',
         false
       );
-      $sub_mod->where( 'review.recommendation_type_id', '!=', NULL );
-      $join_mod->join_modifier( 'review', $sub_mod, 'left' );
-      $join_mod->group( 'amendment.id' );
+      $join_mod->where( 'review.recommendation_type_id', '!=', NULL );
+      $reviewers_mod->join_modifier( 'review', $join_mod, 'left' );
+      $reviewers_mod->group( 'amendment.id' );
 
-      $modifier->join(
-        sprintf( '( %s %s ) AS reviewers_completed', $join_sel->get_sql(), $join_mod->get_sql() ),
-        'amendment.id',
-        'reviewers_completed.amendment_id'
+      $stage_type_class_name::db()->execute( sprintf(
+        'CREATE TEMPORARY TABLE reviewers_completed %s %s',
+        $reviewers_sel->get_sql(),
+        $reviewers_mod->get_sql()
+      ) );
+
+      $stage_type_class_name::db()->execute(
+        'ALTER TABLE reviewers_completed ADD UNIQUE KEY uq_amendment_id (amendment_id)'
       );
+
+      $modifier->join( 'reviewers_completed', 'amendment.id', 'reviewers_completed.amendment_id' );
       $select->add_column( 'reviewers_completed.total', 'reviewers_completed', false );
     }
 

@@ -546,7 +546,7 @@ cenozoApp.defineModule({
               if ($scope.model.viewModel.manuscriptModel.getAddEnabled()) {
                 // first make sure the agreement hasn't expired
                 const response = await CnHttpFactory.instance({
-                  path: "/reqn/identifier=" + $scope.model.viewModel.record.identifier,
+                  path: "reqn/identifier=" + $scope.model.viewModel.record.identifier,
                   data: {
                     select: { column: { table: "reqn_version_with_agreement", column: "agreement_end_date" } },
                   },
@@ -1013,7 +1013,7 @@ cenozoApp.defineModule({
             ],
 
             // returns which part of the form a tab belongs to (leave empty to use the current tab)
-            getTabPart: (tab) => {
+            getTabPart: function (tab) {
               if (angular.isUndefined(tab)) tab = this.formTab;
               part1Tabs = ["applicant", "project_team", "timeline", "description", "scientific_review", "ethics"];
               part2Tabs = [
@@ -1029,6 +1029,14 @@ cenozoApp.defineModule({
                 "agreement" == tab ? "agreement" :
                 "instructions"
               );
+            },
+
+            canMovePreviousTab: function() {
+              return this.tabList[0] != this.formTab;
+            },
+
+            canMoveNextTab: function() {
+              return "mortality_data" != this.formTab;
             },
 
             isInternational: function() {
@@ -1716,7 +1724,7 @@ cenozoApp.defineModule({
 
             getManuscriptList: async function () {
               var response = await CnHttpFactory.instance({
-                path: "/reqn/identifier=" + this.record.identifier + "/manuscript",
+                path: "reqn/" + this.record.reqn_id + "/manuscript",
                 data: {
                   select: { column: ["id", "title", { table: "manuscript_stage_type", column: "status" }] },
                   modifier: { order: "id", limit: 1000 },
@@ -2298,7 +2306,6 @@ cenozoApp.defineModule({
                   }
 
                   if (missing) {
-                    console.log(property);
                     var element = cenozo.getFormElement(property);
                     element.$error.required = true;
                     cenozo.updateFormElement(element, true);
@@ -2479,10 +2486,10 @@ cenozoApp.defineModule({
 
                 // finally, we can move to the next requested stage
                 await CnHttpFactory.instance({
-                  path:
-                    parent.subject + "/" + parent.identifier +
-                    "?action=next_stage&stage_type=" +
-                    stageType,
+                  path: (
+                    "reqn/" + this.record.reqn_id +
+                    "?action=next_stage&stage_type=" + stageType
+                  ),
                 }).patch();
 
                 await this.onView();
@@ -2582,7 +2589,7 @@ cenozoApp.defineModule({
               try {
                 await CnHttpFactory.instance({
                   path:
-                    parent.subject + "/" + parent.identifier +
+                    "reqn/" + this.record.reqn_id +
                     "?action=submit" + (noReview ? "&review=0" : ""),
                   onError: async (error) => {
                     if (409 == error.status) {
@@ -2619,7 +2626,19 @@ cenozoApp.defineModule({
                 if (this.parentModel.isRole("applicant", "designate")) {
                   await $state.go("root.home");
                 } else {
-                  await this.onView(true); // refresh
+                  // If this is the first time the reqn is submitted then get the identifier in case it changed
+                  if (1 == this.record.stage_type_rank) {
+                    const response = await CnHttpFactory.instance({
+                      path: 'reqn/' + this.record.reqn_id,
+                      data: { select: { column: "identifier" } },
+                    }).get();
+                    await $state.go(
+                      "reqn_version.view",
+                      { identifier: "identifier=" + response.data.identifier }
+                    );
+                  } else {
+                    await this.onView(true); // refresh
+                  }
                 }
               } catch (error) {
                 // handled by onError above
@@ -2637,13 +2656,12 @@ cenozoApp.defineModule({
               if (response) {
                 var parent = this.parentModel.getParentIdentifier();
                 await CnHttpFactory.instance({
-                  path:
-                    parent.subject + "/" + parent.identifier + "?action=amend",
+                  path: "reqn/" + this.record.reqn_id + "?action=amend",
                 }).patch();
 
                 // get the new version and transition to viewing it
                 var response = await CnHttpFactory.instance({
-                  path: parent.subject + "/" + parent.identifier,
+                  path: "reqn/" + this.record.reqn_id,
                   data: {
                     select: {
                       column: {
@@ -2687,7 +2705,7 @@ cenozoApp.defineModule({
 
             displayNotices: async function () {
               var response = await CnHttpFactory.instance({
-                path: "/reqn/identifier=" + this.record.identifier + "/notice",
+                path: "reqn/" + this.record.reqn_id + "/notice",
                 data: { modifier: { order: { datetime: true } } },
               }).query();
 
@@ -2743,8 +2761,6 @@ cenozoApp.defineModule({
             await object.deferred.promise;
             await object.coapplicantModel.metadata.getPromise(); // needed to get the coapplicant's metadata
             await object.referenceModel.metadata.getPromise(); // needed to get the reference's metadata
-            if (angular.isDefined(object.stageModel))
-              object.stageModel.listModel.heading = "Stage History";
           }
 
           init(this);

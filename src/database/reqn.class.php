@@ -496,6 +496,99 @@ class reqn extends \cenozo\database\record
   }
 
   /**
+   * Returns the reqns most recent completed stage
+   * @return database\stage
+   * @access public
+   */
+  public function get_last_completed_stage()
+  {
+    // check the primary key value
+    if( is_null( $this->id ) )
+    {
+      log::warning( 'Tried to query reqn with no primary key.' );
+      return NULL;
+    }
+
+    $select = lib::create( 'database\select' );
+    $select->from( 'stage' );
+    $select->add_column( 'id' );
+    $modifier = lib::create( 'database\modifier' );
+    $modifier->join( 'amendment', 'stage.amendment_id', 'amendment.id' );
+    $modifier->where( 'amendment.reqn_id', '=', $this->id );
+    $modifier->where( 'datetime', '!=', NULL );
+    $modifier->order_desc( 'datetime' );
+    $modifier->limit( 1 );
+
+    $stage_id = static::db()->get_one( sprintf( '%s %s', $select->get_sql(), $modifier->get_sql() ) );
+    return $stage_id ? lib::create( 'database\stage', $stage_id ) : NULL;
+  }
+
+  /**
+   * Returns the reqn's most recent completed stage type
+   * @return database\stage_type
+   * @access public
+   */
+  public function get_last_completed_stage_type()
+  {
+    if( is_null( $this->id ) )
+    {
+      log::warning( 'Tried to query reqn with no primary key.' );
+      return NULL;
+    }
+
+    $db_last_completed_stage = $this->get_last_completed_stage();
+    return is_null( $db_last_completed_stage ) ? NULL : $db_last_completed_stage->get_stage_type();
+  }
+
+  /**
+   * Returns the reqns most recent completed manuscript_stage
+   * @return database\manuscript_stage
+   * @access public
+   */
+  public function get_last_completed_manuscript_stage()
+  {
+    // check the primary key value
+    if( is_null( $this->id ) )
+    {
+      log::warning( 'Tried to query reqn with no primary key.' );
+      return NULL;
+    }
+
+    $select = lib::create( 'database\select' );
+    $select->from( 'manuscript_stage' );
+    $select->add_column( 'id' );
+    $modifier = lib::create( 'database\modifier' );
+    $modifier->where( 'reqn_id', '=', $this->id );
+    $modifier->where( 'datetime', '!=', NULL );
+    $modifier->order_desc( 'datetime' );
+    $modifier->limit( 1 );
+
+    $manuscript_stage_id = static::db()->get_one( sprintf( '%s %s', $select->get_sql(), $modifier->get_sql() ) );
+    return $manuscript_stage_id ? lib::create( 'database\manuscript_stage', $manuscript_stage_id ) : NULL;
+  }
+
+  /**
+   * Returns the reqn's most recent completed manuscript_stage type
+   * @return database\manuscript_stage_type
+   * @access public
+   */
+  public function get_last_completed_manuscript_stage_type()
+  {
+    if( is_null( $this->id ) )
+    {
+      log::warning( 'Tried to query reqn with no primary key.' );
+      return NULL;
+    }
+
+    $db_last_completed_manuscript_stage = $this->get_last_completed_manuscript_stage();
+    return (
+      is_null( $db_last_completed_manuscript_stage ) ?
+      NULL :
+      $db_last_completed_manuscript_stage->get_manuscript_stage_type()
+    );
+  }
+
+  /**
    * Returns the reqns current stage
    * @return database\stage
    * @access public
@@ -513,7 +606,8 @@ class reqn extends \cenozo\database\record
     $select->from( 'stage' );
     $select->add_column( 'id' );
     $modifier = lib::create( 'database\modifier' );
-    $modifier->where( 'amendment_id', '=', $this->get_current_amendment()->id );
+    $modifier->join( 'amendment', 'stage.amendment_id', 'amendment.id' );
+    $modifier->where( 'amendment.reqn_id', '=', $this->id );
     $modifier->where( 'datetime', '=', NULL );
 
     $stage_id = static::db()->get_one( sprintf( '%s %s', $select->get_sql(), $modifier->get_sql() ) );
@@ -533,15 +627,54 @@ class reqn extends \cenozo\database\record
       return NULL;
     }
 
+    $db_current_stage = $this->get_current_stage();
+    return is_null( $db_current_stage ) ? NULL : $db_current_stage->get_stage_type();
+  }
+
+  /**
+   * Returns the reqns current manuscript_stage
+   * @return database\manuscript_stage
+   * @access public
+   */
+  public function get_current_manuscript_stage()
+  {
+    // check the primary key value
+    if( is_null( $this->id ) )
+    {
+      log::warning( 'Tried to query reqn with no primary key.' );
+      return NULL;
+    }
+
     $select = lib::create( 'database\select' );
-    $select->from( 'stage' );
-    $select->add_column( 'stage_type_id' );
+    $select->from( 'manuscript_stage' );
+    $select->add_column( 'id' );
     $modifier = lib::create( 'database\modifier' );
-    $modifier->where( 'amendment_id', '=', $this->get_current_amendment()->id );
+    $modifier->where( 'reqn_id', '=', $this->id );
     $modifier->where( 'datetime', '=', NULL );
 
-    $stage_type_id = static::db()->get_one( sprintf( '%s %s', $select->get_sql(), $modifier->get_sql() ) );
-    return $stage_type_id ? lib::create( 'database\stage_type', $stage_type_id ) : NULL;
+    $manuscript_stage_id = static::db()->get_one( sprintf( '%s %s', $select->get_sql(), $modifier->get_sql() ) );
+    return $manuscript_stage_id ? lib::create( 'database\manuscript_stage', $manuscript_stage_id ) : NULL;
+  }
+
+  /**
+   * Returns the reqn's current manuscript_stage type
+   * @return database\manuscript_stage_type
+   * @access public
+   */
+  public function get_current_manuscript_stage_type()
+  {
+    if( is_null( $this->id ) )
+    {
+      log::warning( 'Tried to query reqn with no primary key.' );
+      return NULL;
+    }
+
+    $db_current_manuscript_stage = $this->get_current_manuscript_stage();
+    return (
+      is_null( $db_current_manuscript_stage ) ?
+      NULL :
+      $db_current_manuscript_stage->get_manuscript_stage_type()
+    );
   }
 
   /**
@@ -665,15 +798,10 @@ class reqn extends \cenozo\database\record
    * Reverses the current stage, returning to the previous one
    * @access public
    */
-  public function reverse_to_last_stage()
+  public function reverse_to_last_completed_stage()
   {
-    // get the previous stage
-    $stage_mod = lib::create( 'database\modifier' );
-    $stage_mod->where( 'stage.datetime', '!=', NULL );
-    $stage_mod->order_desc( 'stage.datetime' );
-    $stage_mod->limit( 1 );
-    $stage_list = $this->get_current_amendment()->get_stage_object_list( $stage_mod );
-    if( 0 == count( $stage_list ) )
+    $db_last_completed_stage = $this->get_last_completed_stage();
+    if( is_null( $db_last_completed_stage ) )
     {
       throw lib::create( 'exception\runtime',
         sprintf(
@@ -683,7 +811,6 @@ class reqn extends \cenozo\database\record
         __METHOD__
       );
     }
-    $db_last_stage = current( $stage_list );
 
     // if deferred then we need to un-defer
     if( 'deferred' == $this->state )
@@ -707,8 +834,8 @@ class reqn extends \cenozo\database\record
     }
 
     $db_current_stage->delete();
-    $db_last_stage->datetime = NULL;
-    $db_last_stage->save();
+    $db_last_completed_stage->datetime = NULL;
+    $db_last_completed_stage->save();
   }
 
   /**
@@ -1145,7 +1272,7 @@ class reqn extends \cenozo\database\record
     // manage any reviews associated with the current stage
     if( !is_null( $db_current_stage_type ) )
     {
-      foreach( $db_current_stage_type->get_review_object_list( $this ) as $db_review )
+      foreach( $db_current_stage_type->get_review_object_list( $db_amendment ) as $db_review )
       {
         if( $reject_selection )
         {

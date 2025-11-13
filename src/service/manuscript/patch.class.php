@@ -178,8 +178,8 @@ class patch extends \cenozo\service\patch
     }
     else if( 'reverse' == $action )
     {
-      // reverse to the previous stage
-      $db_manuscript->reverse_to_last_manuscript_stage();
+      // reverse to the last completed stage
+      $db_manuscript->reverse_to_last_completed_manuscript_stage();
     }
     else
     {

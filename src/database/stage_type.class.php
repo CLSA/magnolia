@@ -53,10 +53,10 @@ class stage_type extends \cenozo\database\has_rank
   /**
    * Convenience method
    */
-  public function get_review_object_list( $reqn )
+  public function get_review_object_list( $amendment )
   {
-    // accept either a database\reqn object or a reqn ID
-    $reqn_id = is_a( $reqn, lib::get_class_name( 'database\reqn' ) ) ? $reqn->id : $reqn;
+    // accept either a database\amendment object or a amendment ID
+    $amendment_id = is_a( $amendment, lib::get_class_name( 'database\amendment' ) ) ? $amendment->id : $amendment;
 
     $select = lib::create( 'database\select' );
     $select->from( 'review' );
@@ -65,11 +65,7 @@ class stage_type extends \cenozo\database\has_rank
     $modifier->join( 'review_type', 'review.review_type_id', 'review_type.id' );
     $modifier->join( 'stage_type', 'review_type.stage_type_id', 'stage_type.id' );
     $modifier->where( 'stage_type.id', '=', $this->id );
-    $modifier->where( 'review.reqn_id', '=', $reqn_id );
-
-    // make sure to only get reviews for the current amendment
-    $modifier->join_current_reqn_version( 'review.reqn_id' );
-    $modifier->where( 'review.amendment_id', '=', 'reqn_version.amendment_id', false );
+    $modifier->where( 'review.amendment_id', '=', $amendment_id );
 
     $review_list = array();
     foreach( static::db()->get_col( sprintf( '%s %s', $select->get_sql(), $modifier->get_sql() ) ) as $review_id )

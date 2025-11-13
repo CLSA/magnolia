@@ -565,14 +565,9 @@ class reqn_version extends \cenozo\database\record
 
     // get a list of all new coapplicants who have access to the data by first finding the last amendment-version
     $db_amendment = $this->get_amendment();
-    $prev_amendment_name = $db_amendment->get_previous_amendment_name();
-
-    if( !is_null( $prev_amendment_name ) )
+    $db_prev_amendment = $db_amendment->get_previous_amendment();
+    if( !is_null( $db_prev_amendment ) )
     {
-      $db_prev_amendment = $amendment_class_name::get_unique_record(
-        ['reqn_id', 'name'],
-        [$db_amendment->reqn_id, $prev_amendment_name]
-      );
       $db_last_reqn_version = $db_prev_amendment->get_current_reqn_version();
       $coapplicant_sel = lib::create( 'database\select' );
       $coapplicant_sel->add_column( 'name' );

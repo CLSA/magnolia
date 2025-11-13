@@ -27,17 +27,10 @@ class manuscript_stage extends \cenozo\database\record
     if( 'Decision Made' == $db_stage_type->name )
     {
       // make sure that there is a recent notice (test against the datetime of the last stage)
-      $stage_mod = lib::create( 'database\modifier' );
-      $stage_mod->order_desc( 'datetime' );
-      $stage_mod->limit( 1 );
-      $stage_sel = lib::create( 'database\select' );
-      $stage_sel->add_column( 'datetime' );
-
       $db_manuscript = $this->get_manuscript();
-      $last_stage = current( $db_manuscript->get_manuscript_stage_list( $stage_sel, $stage_mod ) );
-
+      $db_last_completed_stage = $db_manuscript->get_reqn()->get_last_completed_manuscript_stage();
       $notice_mod = lib::create( 'database\modifier' );
-      $notice_mod->where( 'datetime', '>', $last_stage['datetime'] );
+      $notice_mod->where( 'datetime', '>', $db_last_completed_stage->datetime );
       if( 0 == $db_manuscript->get_manuscript_notice_count( $notice_mod ) )
         return 'A new notice outlining the decision must be created before proceeding to the next stage.';
     }
