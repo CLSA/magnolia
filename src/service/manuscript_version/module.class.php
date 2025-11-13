@@ -121,7 +121,8 @@ class module extends \cenozo\service\module
     if( !is_null( $db_manuscript_version ) )
     {
       $db_manuscript = $db_manuscript_version->get_manuscript();
-      $db_reqn_version = $db_manuscript->get_reqn()->get_current_reqn_version();
+      $db_reqn = $db_manuscript->get_reqn();
+      $db_reqn_version = $db_reqn->get_current_reqn_version();
 
       if( $select->has_column( 'has_genomics_data' ) )
       {
@@ -133,6 +134,27 @@ class module extends \cenozo\service\module
         $select->add_constant(
           0 < $db_reqn_version->get_data_selection_count( $data_mod ),
           'has_genomics_data',
+          'boolean'
+        );
+      }
+
+      if( $select->has_column( 'trainee_name' ) )
+      {
+        $select->add_column(
+          'CONCAT_WS( " ", trainee_user.first_name, trainee_user.last_name )',
+          'trainee_name',
+          false
+        );
+      }
+
+      if( $select->has_column( 'has_trainee_with_waiver' ) )
+      {
+        // determine if the current reqn_version has a trainee with a waiver
+        $select->add_constant(
+          !is_null( $db_reqn->trainee_user_id ) &&
+          !is_null( $db_reqn_version->waiver ) &&
+          'none' != $db_reqn_version->waiver,
+          'has_trainee_with_waiver',
           'boolean'
         );
       }

@@ -25,6 +25,16 @@ CREATE PROCEDURE patch_manuscript_version()
       ALTER TABLE manuscript_version MODIFY COLUMN journal varchar(511) DEFAULT NULL;
     END IF;
 
+   SELECT COUNT(*) INTO @test
+   FROM information_schema.COLUMNS
+   WHERE table_schema = DATABASE()
+   AND table_name = "manuscript_version"
+   AND column_name = "trainee";
+
+   IF @test = 0 THEN
+     ALTER TABLE manuscript_version ADD COLUMN trainee TINYINT(1) NULL DEFAULT NULL AFTER dataset_version;
+   END IF;
+
   END //
 DELIMITER ;
 

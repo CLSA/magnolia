@@ -1930,6 +1930,18 @@ cenozo.service("CnLocalization", [
               en: "Has this requirement been met?",
               fr: "Cette exigence est-elle satisfaite?",
             },
+            trainee_description: {
+              en: "The following must be included in your manuscript:",
+              fr: "Ce qui suit doit être inclus dans votre manuscrit :",
+            },
+            trainee_example: {
+              en: "was the recipient of a CLSA Data Access Trainee Fee Waiver",
+              fr: "TODO: TRANSLATE",
+            },
+            trainee: {
+              en: "Has this requirement been met?",
+              fr: "Cette exigence est-elle satisfaite?",
+            },
             seroprevalence_description: {
               en: "The following must be included in your manuscript:",
               fr: "Ce qui suit doit être inclus dans votre manuscrit :",
