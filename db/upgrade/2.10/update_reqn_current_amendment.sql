@@ -2,8 +2,8 @@ SELECT "Creating new update_reqn_current_amendment procedure" AS "";
 
 DELIMITER $$
 
-DROP PROCEDURE IF EXISTS update_reqn_current_amendment;
-CREATE DEFINER=patrick@localhost PROCEDURE update_reqn_current_amendment(IN proc_reqn_id INT(10) UNSIGNED)
+DROP PROCEDURE IF EXISTS update_reqn_current_amendment$$
+CREATE DEFINER=CURRENT_USER PROCEDURE update_reqn_current_amendment(IN proc_reqn_id INT(10) UNSIGNED)
 BEGIN
   REPLACE INTO reqn_current_amendment( reqn_id, amendment_id )
   SELECT reqn.id, amendment.id

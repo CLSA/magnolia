@@ -2,7 +2,7 @@ SELECT "Creating new update_amendment_current_reqn_version procedure" AS "";
 
 DELIMITER $$
 
-DROP PROCEDURE IF EXISTS update_amendment_current_reqn_version;
+DROP PROCEDURE IF EXISTS update_amendment_current_reqn_version$$
 CREATE DEFINER=CURRENT_USER PROCEDURE update_amendment_current_reqn_version(IN proc_amendment_id INT(10) UNSIGNED)
 BEGIN
   REPLACE INTO amendment_current_reqn_version( amendment_id, reqn_version_id )

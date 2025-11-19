@@ -2,7 +2,7 @@ SELECT "Creating new update_reqn_last_amendment_with_agreement procedure" AS "";
 
 DELIMITER $$
 
-DROP PROCEDURE IF EXISTS update_reqn_last_amendment_with_agreement;
+DROP PROCEDURE IF EXISTS update_reqn_last_amendment_with_agreement$$
 CREATE PROCEDURE update_reqn_last_amendment_with_agreement (IN proc_reqn_id INT(10) UNSIGNED)
 BEGIN
   REPLACE INTO reqn_last_amendment_with_agreement( reqn_id, amendment_id )
