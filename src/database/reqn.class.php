@@ -1183,7 +1183,7 @@ class reqn extends \cenozo\database\record
     $at_mod = lib::create( 'database\modifier' );
     $at_mod->where( 'new_user', '=', 'applicant' );
 
-    if( 0 < count( $db_reqn_version->get_amendment_type_count( $at_mod ) ) )
+    if( 0 < $db_reqn_version->get_amendment_type_count( $at_mod ) )
     {
       // change the trainee's supervisor if there is one
       $db_trainee_user = $this->get_trainee_user();
