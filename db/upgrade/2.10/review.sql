@@ -3,7 +3,7 @@ DELIMITER //
 CREATE PROCEDURE patch_review()
   BEGIN
 
-    SELECT "Replacing amendment with amendment_id column in review table" AS "";
+    SELECT "Replacing reqn_id and amendment columns with amendment_id column in review table" AS "";
 
     SELECT COUNT(*) INTO @test
     FROM information_schema.COLUMNS
@@ -18,16 +18,17 @@ CREATE PROCEDURE patch_review()
       JOIN amendment ON review.reqn_id = amendment.reqn_id AND review.amendment = amendment.name
       SET review.amendment_id = amendment.id;
 
-      ALTER TABLE review ADD INDEX fk_amendment_id (amendment_id ASC);
+      ALTER TABLE review
+        ADD INDEX fk_amendment_id (amendment_id ASC),
+        ADD UNIQUE INDEX uq_amendment_id_review_type_id (amendment_id ASC, review_type_id ASC);
       ALTER TABLE review ADD CONSTRAINT fk_review_amendment_id
         FOREIGN KEY (amendment_id)
         REFERENCES amendment (id)
-        ON DELETE NO ACTION
-        ON UPDATE NO ACTION;
+        ON DELETE CASCADE
+        ON UPDATE CASCADE;
 
-      ALTER TABLE review
-        DROP INDEX uq_reqn_id_amendment_review_type_id,
-        DROP COLUMN amendment;
+      ALTER TABLE review DROP INDEX uq_reqn_id_amendment_review_type_id, DROP COLUMN amendment;
+      ALTER TABLE review DROP CONSTRAINT fk_review_reqn_id, DROP INDEX fk_reqn_id, DROP COLUMN reqn_id;
     END IF;
 
   END //

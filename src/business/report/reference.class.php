@@ -43,65 +43,61 @@ class reference extends \cenozo\business\report\base_report
 
     $modifier = lib::create( 'database\modifier' );
     $modifier->join( 'reqn_type', 'reqn.reqn_type_id', 'reqn_type.id' );
-    $modifier->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
-    $modifier->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
+    $modifier->join_current_reqn_version();
     $modifier->join( 'user', 'reqn.user_id', 'user.id' );
     $modifier->left_join( 'user', 'reqn.trainee_user_id', 'trainee_user.id', 'trainee_user' );
     $modifier->order( 'reqn.identifier' );
 
     // join to the second EC review
     $join_mod = lib::create( 'database\modifier' );
-    $join_mod->where( 'reqn.id', '=', 'second_ec_review.reqn_id', false );
+    $join_mod->where( 'reqn_current_amendment.amendment_id', '=', 'second_ec_review.amendment_id', false );
     $join_mod->where( 'second_ec_review.review_type_id', '=', $db_second_ec_review_type->id );
     $modifier->join_modifier( 'review', $join_mod, 'left', 'second_ec_review' );
 
     // join to the second chair review
     $join_mod = lib::create( 'database\modifier' );
-    $join_mod->where( 'reqn.id', '=', 'second_chair_review.reqn_id', false );
+    $join_mod->where( 'reqn_current_amendment.amendment_id', '=', 'second_chair_review.amendment_id', false );
     $join_mod->where( 'second_chair_review.review_type_id', '=', $db_second_chair_review_type->id );
     $modifier->join_modifier( 'review', $join_mod, 'left', 'second_chair_review' );
 
     // join to the EC review
     $join_mod = lib::create( 'database\modifier' );
-    $join_mod->where( 'reqn.id', '=', 'ec_review.reqn_id', false );
+    $join_mod->where( 'reqn_current_amendment.amendment_id', '=', 'ec_review.amendment_id', false );
     $join_mod->where( 'ec_review.review_type_id', '=', $db_ec_review_type->id );
     $modifier->join_modifier( 'review', $join_mod, 'left', 'ec_review' );
 
     // join to the chair review
     $join_mod = lib::create( 'database\modifier' );
-    $join_mod->where( 'reqn.id', '=', 'chair_review.reqn_id', false );
+    $join_mod->where( 'reqn_current_amendment.amendment_id', '=', 'chair_review.amendment_id', false );
     $join_mod->where( 'chair_review.review_type_id', '=', $db_chair_review_type->id );
     $modifier->join_modifier( 'review', $join_mod, 'left', 'chair_review' );
 
     // join to the admin review stage
     $join_mod = lib::create( 'database\modifier' );
-    $join_mod->where( 'reqn.id', '=', 'admin_review_stage.reqn_id', false );
+    $join_mod->where( 'reqn_current_amendment.amendment_id', '=', 'admin_review_stage.amendment_id', false );
     $join_mod->where( 'admin_review_stage.stage_type_id', '=', $db_admin_review_stage_type->id );
     $modifier->join_modifier( 'stage', $join_mod, 'left', 'admin_review_stage' );
 
     // join to the decision made stage
     $join_mod = lib::create( 'database\modifier' );
-    $join_mod->where( 'reqn.id', '=', 'decision_made_stage.reqn_id', false );
+    $join_mod->where( 'reqn_current_amendment.amendment_id', '=', 'decision_made_stage.amendment_id', false );
     $join_mod->where( 'decision_made_stage.stage_type_id', '=', $db_decision_made_stage_type->id );
     $modifier->join_modifier( 'stage', $join_mod, 'left', 'decision_made_stage' );
 
     // join to the data release stage
     $join_mod = lib::create( 'database\modifier' );
-    $join_mod->where( 'reqn.id', '=', 'data_release_stage.reqn_id', false );
+    $join_mod->where( 'reqn_current_amendment.amendment_id', '=', 'data_release_stage.amendment_id', false );
     $join_mod->where( 'data_release_stage.stage_type_id', '=', $db_data_release_stage_type->id );
     $modifier->join_modifier( 'stage', $join_mod, 'left', 'data_release_stage' );
 
     // join to the active stage
     $join_mod = lib::create( 'database\modifier' );
-    $join_mod->where( 'reqn.id', '=', 'active_stage.reqn_id', false );
+    $join_mod->where( 'reqn_current_amendment.amendment_id', '=', 'active_stage.amendment_id', false );
     $join_mod->where( 'active_stage.stage_type_id', '=', $db_active_stage_type->id );
     $modifier->join_modifier( 'stage', $join_mod, 'left', 'active_stage' );
 
     // join to the current stage
-    $join_mod = lib::create( 'database\modifier' );
-    $join_mod->where( 'reqn.id', '=', 'stage.reqn_id', false );
-    $join_mod->where( 'stage.datetime', '=', NULL );
-    $modifier->join_modifier( 'stage', $join_mod );
+    $modifier->join_current_stage();
     $modifier->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
 
     // join to the recommendation_type

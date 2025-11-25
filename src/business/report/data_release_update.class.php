@@ -44,15 +44,10 @@ class data_release_update extends \cenozo\business\report\base_report
     $join_mod->where( 'reqn_type.id', '=', 'reqn_type_has_stage_type.reqn_type_id', false );
     $join_mod->where( 'reqn_type_has_stage_type.stage_type_id', '=', $dm_stage_type_id );
     $modifier->join_modifier( 'reqn_type_has_stage_type', $join_mod, 'left' );
-
-    $modifier->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
-    $modifier->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
+    $modifier->join_current_reqn_version();
 
     // join to the current stage type
-    $join_mod = lib::create( 'database\modifier' );
-    $join_mod->where( 'reqn.id', '=', 'current_stage.reqn_id', false );
-    $join_mod->where( 'current_stage.datetime', '=', NULL );
-    $modifier->join_modifier( 'stage', $join_mod, '', 'current_stage' );
+    $modifier->join_current_stage( 'reqn.id', 'current_stage' );
     $modifier->join(
       'stage_type',
       'current_stage.stage_type_id',
@@ -66,14 +61,14 @@ class data_release_update extends \cenozo\business\report\base_report
 
     // determine whether the reqn has reached a non-amendment agreement stage type
     $join_mod = lib::create( 'database\modifier' );
-    $join_mod->where( 'reqn.id', '=', 'agreement_stage.reqn_id', false );
+    $join_mod->where( 'amendment.id', '=', 'agreement_stage.amendment_id', false );
     $join_mod->where( 'agreement_stage.stage_type_id', '=', $agreement_stage_type_id );
     $join_mod->where( 'agreement_stage.amendment_id', '=', 'amendment.id', false );
     $modifier->join_modifier( 'stage', $join_mod, 'left', 'agreement_stage' );
 
     // determine whether the reqn has reached a non-amendment decision made stage type
     $join_mod = lib::create( 'database\modifier' );
-    $join_mod->where( 'reqn.id', '=', 'dm_stage.reqn_id', false );
+    $join_mod->where( 'amendment.id', '=', 'dm_stage.amendment_id', false );
     $join_mod->where( 'dm_stage.stage_type_id', '=', $dm_stage_type_id );
     $join_mod->where( 'dm_stage.amendment_id', '=', 'amendment.id', false );
     $modifier->join_modifier( 'stage', $join_mod, 'left', 'dm_stage' );

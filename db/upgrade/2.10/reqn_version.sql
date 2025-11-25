@@ -79,7 +79,7 @@ CREATE PROCEDURE patch_reqn_version()
       AND stage_type.name != "New";
     END IF;
 
-    SELECT "Replacing amendment with amendment_id column in reqn_version table" AS "";
+    SELECT "Replacing reqn_id and amendment columns with amendment_id column in reqn_version table" AS "";
 
     SELECT COUNT(*) INTO @test
     FROM information_schema.COLUMNS
@@ -94,16 +94,17 @@ CREATE PROCEDURE patch_reqn_version()
       JOIN amendment ON reqn_version.reqn_id = amendment.reqn_id AND reqn_version.amendment = amendment.name
       SET reqn_version.amendment_id = amendment.id;
 
-      ALTER TABLE reqn_version ADD INDEX fk_amendment_id (amendment_id ASC);
+      ALTER TABLE reqn_version
+        ADD INDEX fk_amendment_id (amendment_id ASC),
+        ADD UNIQUE INDEX uq_amendment_id_version (amendment_id ASC, version ASC);
       ALTER TABLE reqn_version ADD CONSTRAINT fk_reqn_version_amendment_id
         FOREIGN KEY (amendment_id)
         REFERENCES amendment (id)
-        ON DELETE NO ACTION
-        ON UPDATE NO ACTION;
+        ON DELETE CASCADE
+        ON UPDATE CASCADE;
 
-      ALTER TABLE reqn_version
-        DROP INDEX uq_reqn_id_amendment_version,
-        DROP COLUMN amendment;
+      ALTER TABLE reqn_version DROP INDEX uq_reqn_id_amendment_version, DROP COLUMN amendment;
+      ALTER TABLE reqn_version DROP CONSTRAINT fk_reqn_version_reqn_id, DROP INDEX fk_reqn_id, DROP COLUMN reqn_id;
     END IF;
 
   END //
@@ -111,3 +112,51 @@ DELIMITER ;
 
 CALL patch_reqn_version();
 DROP PROCEDURE IF EXISTS patch_reqn_version;
+
+
+DELIMITER $$
+
+DROP TRIGGER IF EXISTS reqn_version_AFTER_INSERT$$
+CREATE DEFINER=CURRENT_USER TRIGGER reqn_version_AFTER_INSERT AFTER INSERT ON reqn_version FOR EACH ROW
+BEGIN
+  SELECT reqn_id INTO @reqn_id
+  FROM amendment
+  JOIN reqn_version ON amendment.id = reqn_version.amendment_id
+  WHERE reqn_version.id = NEW.id;
+
+  CALL update_reqn_last_amendment_with_agreement( @reqn_id );
+  CALL update_amendment_current_reqn_version( NEW.amendment_id );
+
+  INSERT INTO reqn_version_comment( reqn_version_id, data_category_id )
+  SELECT NEW.id, data_category.id
+  FROM data_category
+  WHERE comment = true;
+END$$
+
+DROP TRIGGER IF EXISTS reqn_version_AFTER_UPDATE$$
+CREATE DEFINER=CURRENT_USER TRIGGER reqn_version_AFTER_UPDATE AFTER UPDATE ON reqn_version FOR EACH ROW
+BEGIN
+  IF NOT NEW.agreement_filename <=> OLD.agreement_filename THEN
+    SELECT reqn_id INTO @reqn_id
+    FROM amendment
+    JOIN reqn_version ON amendment.id = reqn_version.amendment_id
+    WHERE reqn_version.id = NEW.id;
+
+    CALL update_reqn_last_amendment_with_agreement( @reqn_id );
+  END IF;
+END$$
+
+
+DROP TRIGGER IF EXISTS reqn_version_AFTER_DELETE$$
+CREATE DEFINER=CURRENT_USER TRIGGER reqn_version_AFTER_DELETE AFTER DELETE ON reqn_version FOR EACH ROW
+BEGIN
+  SELECT reqn_id INTO @reqn_id
+  FROM amendment
+  JOIN reqn_version ON amendment.id = reqn_version.amendment_id
+  WHERE reqn_version.id = OLD.id;
+
+  CALL update_reqn_last_amendment_with_agreement( @reqn_id );
+  CALL update_amendment_current_reqn_version( OLD.amendment_id );
+END$$
+
+DELIMITER ;

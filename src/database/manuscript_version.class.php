@@ -114,6 +114,8 @@ class manuscript_version extends \cenozo\database\record
     if( !is_null( $this->acknowledgment ) ) $data['acknowledgment'] = $this->acknowledgment;
     if( $this->dataset_version ) $data['dataset_version_yes'] = 'Yes';
     else $data['dataset_version_no'] = 'Yes';
+    if( $this->trainee ) $data['trainee_yes'] = 'Yes';
+    else $data['trainee_no'] = 'Yes';
     if( $this->seroprevalence ) $data['seroprevalence_yes'] = 'Yes';
     else $data['seroprevalence_no'] = 'Yes';
     if( $this->covid ) $data['covid_yes'] = 'Yes';

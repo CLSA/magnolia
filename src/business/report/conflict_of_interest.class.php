@@ -32,18 +32,18 @@ class conflict_of_interest extends \cenozo\business\report\base_report
     $base_mod->join( 'deadline', 'reqn.deadline_id', 'deadline.id' );
     $base_mod->where( 'deadline.datetime', '<', util::get_datetime_object() );
 
-    // current stage must be admin, feasibility or dsac
-    $join_mod = lib::create( 'database\modifier' );
-    $join_mod->where( 'reqn.id', '=', 'stage.reqn_id', false );
-    $join_mod->where( 'stage.datetime', '=', NULL );
-    $base_mod->join_modifier( 'stage', $join_mod );
-    $base_mod->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
-    $base_mod->where( 'stage_type.name', 'IN', array( 'Admin Review', 'Feasibility Review', 'DSAC Selection', 'DSAC Review' ) );
-
     // join to the current version and order by the identifier
-    $base_mod->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
-    $base_mod->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
+    $base_mod->join_current_reqn_version();
     $base_mod->order( 'reqn.identifier' );
+
+    // current stage must be admin, feasibility or dsac
+    $base_mod->join_current_stage();
+    $base_mod->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
+    $base_mod->where(
+      'stage_type.name',
+      'IN',
+      ['Admin Review', 'Feasibility Review', 'DSAC Selection', 'DSAC Review']
+    );
 
     // add the applicant
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -74,7 +74,7 @@ class conflict_of_interest extends \cenozo\business\report\base_report
     $select->add_column( 'coapplicant.affiliation', 'Institution', false );
 
     $modifier = clone( $base_mod );
-    $modifier->join( 'coapplicant', 'reqn_current_reqn_version.reqn_version_id', 'coapplicant.reqn_version_id' );
+    $modifier->join( 'coapplicant', 'reqn_version.id', 'coapplicant.reqn_version_id' );
       
     $data = array_merge( $data, $reqn_class_name::select( $select, $modifier ) );
 

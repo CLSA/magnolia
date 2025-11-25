@@ -27,16 +27,15 @@ class communications extends \cenozo\business\report\base_report
     $modifier = lib::create( 'database\modifier' );
 
     $select->from( 'reqn' );
+    $modifier->join( 'user', 'reqn.user_id', 'user.id' );
+    $modifier->join_current_reqn_version();
 
     // only display reqns in the Communications Review stage
-    $modifier->join( 'stage', 'reqn.id', 'stage.reqn_id' );
+    $modifier->join_current_stage();
     $modifier->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
     $modifier->where( 'stage_type.name', '=', 'Communications Review' );
 
     // join to tables that include columns in the report
-    $modifier->join( 'user', 'reqn.user_id', 'user.id' );
-    $modifier->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
-    $modifier->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
     $modifier->join( 'reqn_current_final_report', 'reqn.id', 'reqn_current_final_report.reqn_id' );
     $modifier->join( 'final_report', 'reqn_current_final_report.final_report_id', 'final_report.id' );
     $modifier->left_join( 'output', 'reqn.id', 'output.reqn_id' );

@@ -43,8 +43,8 @@ cenozoApp.defineModule({
     angular.extend(module, {
       identifier: {
         parent: {
-          subject: "reqn",
-          column: "reqn.identifier",
+          subject: "amendment",
+          column: "amendment_id",
         },
       },
       name: {
@@ -546,7 +546,7 @@ cenozoApp.defineModule({
               if ($scope.model.viewModel.manuscriptModel.getAddEnabled()) {
                 // first make sure the agreement hasn't expired
                 const response = await CnHttpFactory.instance({
-                  path: "/reqn/identifier=" + $scope.model.viewModel.record.identifier,
+                  path: "reqn/identifier=" + $scope.model.viewModel.record.identifier,
                   data: {
                     select: { column: { table: "reqn_version_with_agreement", column: "agreement_end_date" } },
                   },
@@ -653,9 +653,11 @@ cenozoApp.defineModule({
           // extend the base onPatch function that is defined in CnBaseFormViewFactory
           this.baseOnPatch = this.onPatch;
           angular.extend(this, {
+            totalFee: null,
             compareRecord: null,
             versionListLoaded: false,
             versionList: [],
+            amendmentList: [],
             manuscriptList: [],
             lastAgreementVersion: null,
             coapplicantAgreementList: [],
@@ -741,6 +743,7 @@ cenozoApp.defineModule({
                 cenozoApp.setLang(this.record.lang);
 
                 var promiseList = [
+                  this.getAmendmentList(),
                   this.getAmendmentTypeList(),
                   this.getCoapplicantList(),
                   this.getReferenceList(),
@@ -749,6 +752,9 @@ cenozoApp.defineModule({
                 if (this.showManuscripts()) promiseList.push(this.getManuscriptList());
                 if (this.record.has_ethics_approval_list) promiseList.push(this.getEthicsApprovalList());
                 await Promise.all(promiseList);
+
+                // reset the total fee so it will be updated the next time getTotalFee() is called
+                this.totalFee = null;
 
                 // the version list might get long, so don't wait for it (diffs will show once it is loaded)
                 this.getVersionList().finally(() => {this.versionListLoaded = true;});
@@ -763,7 +769,11 @@ cenozoApp.defineModule({
                 throw new Error("Calling onPatch() but edit is not enabled.");
               }
 
-              var property = Object.keys(data)[0];
+              const properties = Object.keys(data);
+              if (1 < properties.length) {
+                throw new Error("Customized onPatch() method cannot handle more than one property at a time.");
+              }
+              var property = properties[0];
 
               if (null != property.match(/^amendment_justification_/)) {
                 // justifications have their own service
@@ -909,18 +919,22 @@ cenozoApp.defineModule({
 
                 await this.$$onPatch(data);
 
-                if (angular.isDefined(data.trainee_project)) {
+                if (["applicant_country_id", "trainee_country_id", "waiver"].includes(property)) {
+                  // The total fee may have changed so reload the amendment list and reset totalFee
+                  // so it will be updated the next time getTotalFee() is called
+                  await this.getAmendmentList();
+                  this.totalFee = null;
+                }
+
+                if ("trainee_project" == property) {
                   if (!data.trainee_project) this.record.waiver = "";
-                } else if (
-                  angular.isDefined(data.applicant_country_id) ||
-                  angular.isDefined(data.trainee_country_id)
-                ) {
-                  // Set the trainee_project and waiver type to empty if the waiver isn't allowed
+                } else if (["applicant_country_id", "trainee_country_id"].includes(property)) {
+                  // set the trainee_project and waiver type to empty if the waiver isn't allowed
                   if (!this.isWaiverAllowed()) {
                     this.record.trainee_project = "";
                     this.record.waiver = "";
                   }
-                } else if (angular.isDefined(data.comprehensive) || angular.isDefined(data.tracking) ) {
+                } else if (["comprehensive", "tracking"].includes(property)) {
                   if (this.record.comprehensive && this.record.tracking) {
                     // show the cohort warning to the applicant
                     CnModalMessageFactory.instance({
@@ -929,10 +943,10 @@ cenozoApp.defineModule({
                       closeText: this.translate("misc.close"),
                     }).show();
                   }
-                } else if (angular.isDefined(data.peer_review)) {
+                } else if ("peer_review" == property) {
                   // use the root scope to get the view directive to remove the lite model's file
                   $rootScope.$broadcast("file removed", "peer_review_filename");
-                } else if (angular.isDefined(data.funding)) {
+                } else if ("funding" == property) {
                   if ("yes" != data.funding) {
                     if ("requested" != data.funding) {
                       this.record.funding_agency = null;
@@ -942,9 +956,7 @@ cenozoApp.defineModule({
                     $rootScope.$broadcast("file removed", "funding_filename");
                   }
                 } else if (
-                  angular.isDefined(data.indigenous_first_nation) &&
-                  angular.isDefined(data.indigenous_metis) &&
-                  angular.isDefined(data.indigenous_inuit)
+                  ["indigenous_first_nation", "indigenous_metis", "indigenous_inuit"].includes(property)
                 ) {
                   // set the indigenous description and filename properties to null if all indigenous
                   // options are false
@@ -1001,7 +1013,7 @@ cenozoApp.defineModule({
             ],
 
             // returns which part of the form a tab belongs to (leave empty to use the current tab)
-            getTabPart: (tab) => {
+            getTabPart: function (tab) {
               if (angular.isUndefined(tab)) tab = this.formTab;
               part1Tabs = ["applicant", "project_team", "timeline", "description", "scientific_review", "ethics"];
               part2Tabs = [
@@ -1019,12 +1031,26 @@ cenozoApp.defineModule({
               );
             },
 
+            canMovePreviousTab: function() {
+              return this.tabList[0] != this.formTab;
+            },
+
+            canMoveNextTab: function() {
+              return "mortality_data" != this.formTab;
+            },
+
             isInternational: function() {
-              var baseCountryId = CnSession.application.baseCountryId;
-              var applicantCountryId =
-                null == this.record.applicant_country_id ? baseCountryId : this.record.applicant_country_id;
-              var traineeCountryId =
-                null == this.record.trainee_country_id ? baseCountryId : this.record.trainee_country_id;
+              const baseCountryId = CnSession.application.baseCountryId;
+              const applicantCountryId = (
+                null == this.record.applicant_country_id ?
+                baseCountryId :
+                this.record.applicant_country_id
+              );
+              const traineeCountryId = (
+                null == this.record.trainee_country_id ?
+                baseCountryId :
+                this.record.trainee_country_id
+              );
 
               return (
                 baseCountryId != applicantCountryId ||
@@ -1032,123 +1058,27 @@ cenozoApp.defineModule({
               );
             },
 
-            // NOTE: This process mirrors database\reqn_version::get_total_fee() on the server side
-            getTotalFee: async function () {
+            getTotalFee: function () {
               // only calculate the fee if we have to
               if (!this.record.show_prices) return null;
 
-              let fee = null;
-              if ("new" != this.record.phase) {
-                // the fee is equal to the sum of all amendment fees
-                const response = await CnHttpFactory.instance({
-                  path: ["reqn", this.record.reqn_id, "amendment"].join("/"),
-                  data: { select: { column: {
-                    column: "IFNULL( override_fee, fee )", alias: "fee", table_prefix: false
-                  } } },
-                }).query();
-
-                fee = response.data.reduce((total, amendment) => {
-                  total += amendment['fee'];
-                  return total;
-                }, 0);
-              } else {
-                fee = this.calculateFee();
+              if (null == this.totalFee) {
+                this.totalFee = (
+                  // sum the fees from all amendments (null if they haven't loaded yet)
+                  0 == this.amendmentList.length ? null :
+                  this.amendmentList.reduce((total, a) => total += parseInt(a.fee), 0)
+                );
               }
+
+              // if we still don't have the fee then it isn't finished calculating
+              if (null == this.totalFee) return this.translate("misc.calculating") + "...";
 
               // add thousands separators
               let sep = "fr" == this.record.lang ? " " : ",";
-              fee = fee.toString();
+              let fee = this.totalFee.toString();
               if (1000000 <= fee) fee = fee.replace( /([0-9]+)([0-9]{3})([0-9]{3})$/, "$1"+sep+"$2"+sep+"$3" );
               else if (1000 <= fee) fee = fee.replace( /([0-9]+)([0-9]{3})$/, "$1"+sep+"$2" );
               return "fr" == this.record.lang ? fee + " $" : "$" + fee;
-            },
-
-            // NOTE: This process mirrors database\reqn_version::calculate_fee() on the server side
-            calculateFee: function () {
-              let fee = 3000;
-              if (this.record.special_fee_waiver_id) {
-                fee = 0;
-              } else {
-                const waiveFee = this.record.waiver && "none" != this.record.waiver;
-
-                // determine the base fee based on country (assume the base country if none is provided)
-                var baseCountryId = CnSession.application.baseCountryId;
-                var applicantCountryId =
-                  null == this.record.applicant_country_id ? baseCountryId : this.record.applicant_country_id;
-                var traineeCountryId =
-                  null == this.record.trainee_country_id ? baseCountryId : this.record.trainee_country_id;
-
-                // fee for trainees is different to applicants
-                if (this.record.trainee_user_id) {
-                  if (baseCountryId != traineeCountryId || baseCountryId != applicantCountryId) {
-                    // if either the trainee or applicant isn't Canadian then the base fee is 5000
-                    fee = 5000;
-                  } else if (waiveFee) {
-                    // both are canadian, so check for a fee waiver
-                    fee = 0;
-                  }
-                } else {
-                  // if the applicant is not Canadian then the base fee is 5000
-                  if (baseCountryId != applicantCountryId) {
-                    fee = 5000;
-                  }
-                }
-
-                this.parentModel.categoryList.forEach((category) =>
-                  category.optionList.forEach((option) => {
-                    var maxCost = 0;
-                    option.selectionList
-                      .filter((selection) => 0 < selection.cost.value)
-                      .forEach((selection) => {
-                        if (
-                          angular.isArray(this.record.selectionList) &&
-                          this.record.selectionList[selection.id]
-                        ) {
-                          if (selection.costCombined) {
-                            // track the most expensive selection
-                            if (selection.cost.value > maxCost) maxCost = selection.cost.value;
-                          } else {
-                            // add the selection's cost
-                            fee += selection.cost.value;
-                          }
-                        }
-                      });
-
-                    // when there is a combined cost then maxCost will be > 0, otherwise it is 0
-                    fee += maxCost;
-                  })
-                );
-
-                // now add any additional fees
-                fee += this.record.additional_fee_total;
-
-                // now add amendment fees (including all past amendments) if there is no fee waiver
-                if( !waiveFee ) {
-                  if(!this.versionListLoaded || angular.isUndefined(this.parentModel.amendmentTypeList)) {
-                    return this.translate("misc.calculating") + "...";
-                  } else {
-                    var currentAmendment = null;
-                    this.versionList.forEach(version => {
-                      if (
-                        null != version &&
-                        "." != version.amendment &&
-                        this.record.amendment >= version.amendment
-                      ) {
-                        if(currentAmendment == version.amendment) return;
-
-                        // add the fee of any amendment that this version has selected
-                        let c = this.isInternational() ? "feeInternational" : "feeCanada";
-                        this.parentModel.amendmentTypeList.en
-                          .filter(aType => 0 < aType[c] && version["amendmentType"+aType.id])
-                          .forEach(aType => { fee += aType[c]; });
-                        currentAmendment = version.amendment;
-                      }
-                    });
-                  }
-                }
-              }
-
-              return fee;
             },
 
             isWaiverMutable: function () {
@@ -1542,11 +1472,14 @@ cenozoApp.defineModule({
               var parent = this.parentModel.getParentIdentifier();
               this.versionList = [];
               var response = await CnHttpFactory.instance({
-                path: parent.subject + "/" + parent.identifier + "/reqn_version",
-                data: { modifier: { order: [{"amendment": true}, {"version": true}] } },
+                path: "reqn_version",
+                data: { modifier: {
+                  where: { column: "reqn.id", operator: "=", value: this.record.reqn_id },
+                  order: [{"amendment.name": true}, {"reqn_version.version": true}] },
+                },
               }).query();
 
-              // we're going to use .then calls below to maximize overall asynchronous processing time
+              // we're going to use ".then" calls below to maximize overall asynchronous processing time
               var promiseList = [];
               response.data.forEach((version) => {
                 promiseList = promiseList.concat([
@@ -1582,8 +1515,8 @@ cenozoApp.defineModule({
               this.lastAmendmentVersion = null;
               if ("." != this.record.amendment) {
                 this.versionList.some((version) => {
-                  // Note that the amendments we're comparing are letters, and since . is considered less than A it works
-                  // whether we're comparing lettered versions or the initial "." version:
+                  // Note that the amendments we're comparing are letters, and since . is considered less
+                  // than A it works whether we're comparing lettered versions or the initial "." version:
                   if (null != version && this.record.amendment > version.amendment) {
                     this.lastAmendmentVersion = version.amendment_version;
                     return true;
@@ -1621,7 +1554,16 @@ cenozoApp.defineModule({
             setCoapplicantDiff: function (version) {
               if (null != version) {
                 // see if there is a difference between this list and the view's list
-                let columns = ["name", "position", "affiliation", "country", "email", "role", "trainee", "access"];
+                let columns = [
+                  "name",
+                  "position",
+                  "affiliation",
+                  "country",
+                  "email",
+                  "role",
+                  "trainee",
+                  "access",
+                ];
                 version.coapplicantDiff =
                   version.coapplicantList.length != this.record.coapplicantList.length ||
                   version.coapplicantList.some(
@@ -1659,6 +1601,19 @@ cenozoApp.defineModule({
                   }
                 }
               }
+            },
+
+            getAmendmentList: async function () {
+              const response = await CnHttpFactory.instance({
+                path: ["reqn", this.record.reqn_id, "amendment"].join("/"),
+                data: { select: { column: [
+                  "id",
+                  "name",
+                  { column: "IFNULL( override_fee, fee )", alias: "fee", table_prefix: false },
+                ] } },
+              }).query();
+
+              this.amendmentList = response.data;
             },
 
             getAmendmentTypeList: async function (reqnVersionId, object) {
@@ -1709,7 +1664,7 @@ cenozoApp.defineModule({
                     proceed = response;
                   }
 
-                  let fee = amendmentType[this.isInternational() ? "feeInternational" : "feeCanada"];
+                  let fee = amendmentType[this.isInternational() ? "feeInternational" : "feeNational"];
                   if (0 < fee) {
                     fee = "fr" == this.record.lang ? fee + " $" : "$" + fee;
                     proceed = false;
@@ -1761,11 +1716,15 @@ cenozoApp.defineModule({
                 var version = this.versionList.filter(v => null != v).findByProperty("id", this.record.id);
                 version[property] = this.record[property];
               }
+
+              // reset the total fee as it may have changed
+              await this.getAmendmentList();
+              this.totalFee = null;
             },
 
             getManuscriptList: async function () {
               var response = await CnHttpFactory.instance({
-                path: "/reqn/identifier=" + this.record.identifier + "/manuscript",
+                path: "reqn/" + this.record.reqn_id + "/manuscript",
                 data: {
                   select: { column: ["id", "title", { table: "manuscript_stage_type", column: "status" }] },
                   modifier: { order: "id", limit: 1000 },
@@ -2056,6 +2015,10 @@ cenozoApp.defineModule({
               } catch (error) {
                 // handled by onError above
               }
+
+              // reset the total fee as it may have changed
+              await this.getAmendmentList();
+              this.totalFee = null;
             },
 
             viewData: function () {
@@ -2523,10 +2486,10 @@ cenozoApp.defineModule({
 
                 // finally, we can move to the next requested stage
                 await CnHttpFactory.instance({
-                  path:
-                    parent.subject + "/" + parent.identifier +
-                    "?action=next_stage&stage_type=" +
-                    stageType,
+                  path: (
+                    "reqn/" + this.record.reqn_id +
+                    "?action=next_stage&stage_type=" + stageType
+                  ),
                 }).patch();
 
                 await this.onView();
@@ -2626,7 +2589,7 @@ cenozoApp.defineModule({
               try {
                 await CnHttpFactory.instance({
                   path:
-                    parent.subject + "/" + parent.identifier +
+                    "reqn/" + this.record.reqn_id +
                     "?action=submit" + (noReview ? "&review=0" : ""),
                   onError: async (error) => {
                     if (409 == error.status) {
@@ -2663,7 +2626,19 @@ cenozoApp.defineModule({
                 if (this.parentModel.isRole("applicant", "designate")) {
                   await $state.go("root.home");
                 } else {
-                  await this.onView(true); // refresh
+                  // If this is the first time the reqn is submitted then get the identifier in case it changed
+                  if (1 == this.record.stage_type_rank) {
+                    const response = await CnHttpFactory.instance({
+                      path: 'reqn/' + this.record.reqn_id,
+                      data: { select: { column: "identifier" } },
+                    }).get();
+                    await $state.go(
+                      "reqn_version.view",
+                      { identifier: "identifier=" + response.data.identifier }
+                    );
+                  } else {
+                    await this.onView(true); // refresh
+                  }
                 }
               } catch (error) {
                 // handled by onError above
@@ -2681,13 +2656,12 @@ cenozoApp.defineModule({
               if (response) {
                 var parent = this.parentModel.getParentIdentifier();
                 await CnHttpFactory.instance({
-                  path:
-                    parent.subject + "/" + parent.identifier + "?action=amend",
+                  path: "reqn/" + this.record.reqn_id + "?action=amend",
                 }).patch();
 
                 // get the new version and transition to viewing it
                 var response = await CnHttpFactory.instance({
-                  path: parent.subject + "/" + parent.identifier,
+                  path: "reqn/" + this.record.reqn_id,
                   data: {
                     select: {
                       column: {
@@ -2731,7 +2705,7 @@ cenozoApp.defineModule({
 
             displayNotices: async function () {
               var response = await CnHttpFactory.instance({
-                path: "/reqn/identifier=" + this.record.identifier + "/notice",
+                path: "reqn/" + this.record.reqn_id + "/notice",
                 data: { modifier: { order: { datetime: true } } },
               }).query();
 
@@ -2787,8 +2761,6 @@ cenozoApp.defineModule({
             await object.deferred.promise;
             await object.coapplicantModel.metadata.getPromise(); // needed to get the coapplicant's metadata
             await object.referenceModel.metadata.getPromise(); // needed to get the reference's metadata
-            if (angular.isDefined(object.stageModel))
-              object.stageModel.listModel.heading = "Stage History";
           }
 
           init(this);
@@ -2983,8 +2955,6 @@ cenozoApp.defineModule({
                         column: [
                           "id",
                           "data_option_id",
-                          "cost",
-                          "cost_combined",
                           "unavailable_en",
                           "unavailable_fr",
                           { table: "study_phase", column: "code", alias: "study_phase_code" },
@@ -3079,7 +3049,7 @@ cenozoApp.defineModule({
                 this.amendmentTypeList.en.push({
                   id: item.id,
                   newUser: item.new_user,
-                  feeCanada: item.fee_canada,
+                  feeNational: item.fee_national,
                   feeInternational: item.fee_international,
                   name: item.reason_en,
                   justificationPrompt: item.justification_prompt_en,
@@ -3271,12 +3241,6 @@ cenozoApp.defineModule({
                       fr: angular.isDefined(selection.unavailable_fr) ? selection.unavailable_fr : null,
                     },
                     detailList: [],
-                    cost: {
-                      value: selection.cost,
-                      en: 0 < selection.cost ? "$" + selection.cost : "",
-                      fr: 0 < selection.cost ? selection.cost + " $" : "",
-                    },
-                    costCombined: selection.cost_combined,
                   });
 
                   option.selectionList.push(selection);
@@ -3285,7 +3249,6 @@ cenozoApp.defineModule({
                   delete selection.study_phase_code;
                   delete selection.data_category_id;
                   delete selection.data_option_id;
-                  delete option.cost_combined;
                   delete selection.unavailable_en;
                   delete selection.unavailable_fr;
                 });

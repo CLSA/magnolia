@@ -76,17 +76,7 @@ class module extends \cenozo\service\module
 
     $modifier->join( 'manuscript', 'manuscript_version.manuscript_id', 'manuscript.id' );
     $modifier->join( 'reqn', 'manuscript.reqn_id', 'reqn.id' );
-    $modifier->join(
-      'reqn_last_reqn_version_with_agreement',
-      'reqn.id',
-      'reqn_last_reqn_version_with_agreement.reqn_id'
-    );
-    $modifier->left_join(
-      'reqn_version',
-      'reqn_last_reqn_version_with_agreement.reqn_version_id',
-      'reqn_version_with_agreement.id',
-      'reqn_version_with_agreement',
-    );
+    $modifier->join_last_reqn_version_with_agreement( 'reqn.id', 'reqn_version_with_agreement', 'left' );
     $modifier->join( 'user', 'reqn.user_id', 'user.id' );
     $modifier->left_join( 'user', 'reqn.trainee_user_id', 'trainee_user.id', 'trainee_user' );
     $modifier->left_join( 'user', 'reqn.designate_user_id', 'designate_user.id', 'designate_user' );
@@ -131,7 +121,8 @@ class module extends \cenozo\service\module
     if( !is_null( $db_manuscript_version ) )
     {
       $db_manuscript = $db_manuscript_version->get_manuscript();
-      $db_reqn_version = $db_manuscript->get_reqn()->get_current_reqn_version();
+      $db_reqn = $db_manuscript->get_reqn();
+      $db_reqn_version = $db_reqn->get_current_reqn_version();
 
       if( $select->has_column( 'has_genomics_data' ) )
       {
@@ -143,6 +134,27 @@ class module extends \cenozo\service\module
         $select->add_constant(
           0 < $db_reqn_version->get_data_selection_count( $data_mod ),
           'has_genomics_data',
+          'boolean'
+        );
+      }
+
+      if( $select->has_column( 'trainee_name' ) )
+      {
+        $select->add_column(
+          'CONCAT_WS( " ", trainee_user.first_name, trainee_user.last_name )',
+          'trainee_name',
+          false
+        );
+      }
+
+      if( $select->has_column( 'has_trainee_with_waiver' ) )
+      {
+        // determine if the current reqn_version has a trainee with a waiver
+        $select->add_constant(
+          !is_null( $db_reqn->trainee_user_id ) &&
+          !is_null( $db_reqn_version->waiver ) &&
+          'none' != $db_reqn_version->waiver,
+          'has_trainee_with_waiver',
           'boolean'
         );
       }

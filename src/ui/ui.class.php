@@ -21,12 +21,25 @@ class ui extends \cenozo\ui\ui
   {
     parent::build_module_list();
 
+    $module = $this->get_module( "additional_fee" );
+    if( !is_null( $module ) )
+    {
+      $module->add_child( 'additional_fee_fee_schedule' );
+      $module->add_choose( 'reqn' );
+    }
+
     $module = $this->get_module( 'amendment' );
     if( !is_null( $module ) )
     {
       $module->add_child( 'reqn_version' );
       $module->add_child( 'review' );
       $module->add_child( 'stage' );
+    }
+
+    $module = $this->get_module( "amendment_type" );
+    if( !is_null( $module ) )
+    {
+      $module->add_child( 'amendment_type_fee_schedule' );
     }
 
     $module = $this->get_module( 'data_agreement' );
@@ -47,7 +60,11 @@ class ui extends \cenozo\ui\ui
     }
 
     $module = $this->get_module( 'data_selection' );
-    if( !is_null( $module ) ) $module->add_child( 'data_detail' );
+    if( !is_null( $module ) )
+    {
+      $module->add_child( 'data_selection_fee_schedule' );
+      $module->add_child( 'data_detail' );
+    }
 
     $module = $this->get_module( 'data_version' );
     if( !is_null( $module ) ) $module->add_child( 'data_release' );
@@ -55,16 +72,21 @@ class ui extends \cenozo\ui\ui
     $module = $this->get_module( 'deadline' );
     if( !is_null( $module ) ) $module->add_child( 'reqn' );
 
+    $module = $this->get_module( 'fee_schedule' );
+    if( !is_null( $module ) )
+    {
+      $module->add_child( 'additional_fee_fee_schedule' );
+      $module->add_child( 'amendment_type_fee_schedule' );
+      $module->add_child( 'data_selection_fee_schedule' );
+    }
+
     $module = $this->get_module( 'reqn' );
     if( !is_null( $module ) )
     {
       $module->add_child( 'amendment' );
       $module->add_child( 'final_report' );
       $module->add_child( 'destruction_report' );
-      $module->add_child( 'reqn_version' );
       $module->add_child( 'deferral_note' );
-      $module->add_child( 'review' );
-      $module->add_child( 'stage' );
       $module->add_child( 'data_release' );
       $module->add_child( 'data_destroy' );
       $module->add_child( 'notice' );
@@ -166,12 +188,6 @@ class ui extends \cenozo\ui\ui
       $module->add_child( 'applicant', 'access' );
     }
 
-    $module = $this->get_module( "additional_fee" );
-    if( !is_null( $module ) )
-    {
-      $module->add_choose( 'reqn' );
-    }
-
     $module = $this->get_module( "special_fee_waiver" );
     if( !is_null( $module ) )
     {
@@ -228,6 +244,7 @@ class ui extends \cenozo\ui\ui
     if( in_array( $db_role->name, ['administrator', 'dao'] ) )
     {
       $this->add_listitem( 'Data Categories', 'data_category' );
+      $this->add_listitem( 'Fee Schedule', 'fee_schedule' );
       $this->add_listitem( 'Output Types', 'output_type' );
       $this->add_listitem( 'Special Fee Waivers', 'special_fee_waiver' );
     }

@@ -39,21 +39,13 @@ CREATE PROCEDURE calculate_amendment_fees()
       WHERE reqn.override_price IS NOT NULL
       OR reqn.special_fee_waiver_id IS NOT NULL;
 
-      -- Now determine the fee for all reqns which are not in the "new" phase
-
-      -- Start with the base cost for all base "." amendments
+      -- Start with the base cost
       UPDATE reqn
-      JOIN stage ON reqn.id = stage.reqn_id AND stage.datetime IS NULL
-      JOIN stage_type ON stage.stage_type_id = stage_type.id
+      JOIN amendment AS first_amendment ON reqn.id = first_amendment.reqn_id AND first_amendment.name = "."
+      JOIN fee_schedule ON first_amendment.fee_schedule_id = fee_schedule.id
       JOIN amendment ON reqn.id = amendment.reqn_id
-      JOIN reqn_version ON amendment.id = reqn_version.amendment_id
-      AND version <=> (
-        SELECT MAX(version)
-        FROM reqn_version
-        WHERE reqn_version.amendment_id = amendment.id
-        GROUP BY reqn_version.reqn_id
-        LIMIT 1
-      )
+      JOIN amendment_current_reqn_version ON amendment.id = amendment_current_reqn_version.amendment_id
+      JOIN reqn_version ON amendment_current_reqn_version.reqn_version_id = reqn_version.id
       SET amendment.fee = IF(
         reqn.trainee_user_id IS NOT NULL,
         -- when there is a trainee...
@@ -61,173 +53,146 @@ CREATE PROCEDURE calculate_amendment_fees()
           @base_country_id = IFNULL( reqn_version.trainee_country_id, @base_country_id ) AND
           @base_country_id = IFNULL( reqn_version.applicant_country_id, @base_country_id ),
           -- either 0 for waivers, or local price if not
-          IF( IFNULL( reqn_version.waiver, "none" ) != "none", 0, 3000 ),
+          IF( IFNULL( reqn_version.waiver, "none" ) != "none", 0, fee_schedule.fee_national ),
           5000 -- international price
         ),
         -- when there is no trainee then just check if the applicant is local or international
-        IF( @base_country_id = IFNULL( reqn_version.applicant_country_id, @base_country_id ), 3000, 5000 )
-      )
-      WHERE stage_type.phase != "new"
-      AND amendment.name = ".";
+        IF(
+          @base_country_id = IFNULL( reqn_version.applicant_country_id, @base_country_id ),
+          fee_schedule.fee_national,
+          fee_schedule.fee_international
+        )
+      );
 
-      -- Now add any additional fees (base amendment only)
-      CREATE TEMPORARY TABLE additional_fee
-      SELECT amendment.id AS amendment_id, SUM(additional_fee.fee) AS fee
+      -- Now add any additional fees
+      DROP TABLE IF EXISTS temp_additional_fee;
+      CREATE TEMPORARY TABLE temp_additional_fee
+      SELECT amendment.id AS amendment_id, SUM(additional_fee_fee_schedule.fee) AS fee
       FROM amendment
       JOIN reqn_has_additional_fee USING (reqn_id)
       JOIN additional_fee ON reqn_has_additional_fee.additional_fee_id = additional_fee.id
-      WHERE amendment.name = "."
+      JOIN additional_fee_fee_schedule
+        ON additional_fee.id = additional_fee_fee_schedule.additional_fee_id
+        AND amendment.fee_schedule_id = additional_fee_fee_schedule.fee_schedule_id
       GROUP BY amendment.id;
-      ALTER TABLE additional_fee ADD INDEX dk_amendment_id (amendment_id);
+      ALTER TABLE temp_additional_fee ADD INDEX dk_amendment_id (amendment_id);
 
       UPDATE amendment
-      JOIN additional_fee ON amendment.id = additional_fee.amendment_id
-      SET amendment.fee = amendment.fee + additional_fee.fee;
+      JOIN temp_additional_fee ON amendment.id = temp_additional_fee.amendment_id
+      SET amendment.fee = amendment.fee + temp_additional_fee.fee;
 
-      -- Now determine which amendments use the amendment type that has a cost
-      -- Since there is only one such amendment type at the time of the upgrade we can simply refer to this one type
-      CREATE TEMPORARY TABLE amendment_fee
-      SELECT
-        amendment.id AS amendment_id,
-        IFNULL( amendment_type.fee_canada, 0 ) AS fee_canada,
-        IFNULL( amendment_type.fee_international, 0 ) AS fee_international
+      -- Next, add the cost of all non-combined data selections
+      DROP TABLE IF EXISTS temp_selection_fee;
+      CREATE TEMPORARY TABLE temp_selection_fee
+      SELECT amendment.id AS amendment_id, SUM(IFNULL(data_selection_fee_schedule.fee,0)) AS fee
       FROM amendment
-      JOIN reqn_version ON amendment.id = reqn_version.amendment_id AND version <=> (
-        SELECT MAX(version)
-        FROM reqn_version
-        WHERE reqn_version.amendment_id = amendment.id
-        GROUP BY reqn_version.reqn_id
-        LIMIT 1
-      )
-      JOIN reqn_version_has_amendment_type ON reqn_version.id = reqn_version_has_amendment_type.reqn_version_id
-      JOIN amendment_type
-        ON reqn_version_has_amendment_type.amendment_type_id = amendment_type.id
-        AND amendment_type.fee_canada > 0
-      WHERE amendment.name != ".";
-      ALTER TABLE amendment_fee ADD INDEX dk_amendment_id (amendment_id);
-
-      -- Now determine the base cost for all non-base amendments
-      UPDATE reqn
-      JOIN stage ON reqn.id = stage.reqn_id AND stage.datetime IS NULL
-      JOIN stage_type ON stage.stage_type_id = stage_type.id
-      JOIN amendment ON reqn.id = amendment.reqn_id
-      LEFT JOIN amendment_fee ON amendment.id = amendment_fee.amendment_id
-      JOIN reqn_version ON amendment.id = reqn_version.amendment_id AND version <=> (
-        SELECT MAX(version)
-        FROM reqn_version
-        WHERE reqn_version.amendment_id = amendment.id
-        GROUP BY reqn_version.reqn_id
-        LIMIT 1
-      )
-      SET amendment.fee = IF(
-        reqn.trainee_user_id IS NOT NULL,
-        -- when there is a trainee...
-        IF(
-          @base_country_id = IFNULL( reqn_version.trainee_country_id, @base_country_id ) AND
-          @base_country_id = IFNULL( reqn_version.applicant_country_id, @base_country_id ),
-          IF( IFNULL( reqn_version.waiver, "none" ) != "none", 0, IFNULL( amendment_fee.fee_canada, 0 ) ),
-          IFNULL( amendment_fee.fee_international, 0 )
-        ),
-        -- when there is no trainee then just check if the applicant is local or international
-        IF(
-          @base_country_id = IFNULL( reqn_version.applicant_country_id, @base_country_id ),
-          IFNULL( amendment_fee.fee_canada, 0 ),
-          IFNULL( amendment_fee.fee_international, 0 )
-        )
-      )
-      WHERE stage_type.phase != "new"
-      AND amendment.name != ".";
-
-      -- Finally, add the cost of all data selections
-
-      -- Get the total non-combined selection cost for all amendments
-      CREATE TEMPORARY TABLE selection_fee_total
-      SELECT
-        amendment.id AS amendment_id,
-        amendment.reqn_id,
-        amendment.name,
-        SUM(IFNULL(data_selection.cost,0)) AS cost,
-        GROUP_CONCAT(data_selection.id)
-      FROM amendment
-      JOIN reqn_version ON amendment.id = reqn_version.amendment_id AND version <=> (
-        SELECT MAX(version)
-        FROM reqn_version
-        WHERE reqn_version.amendment_id = amendment.id
-        GROUP BY reqn_version.reqn_id
-        LIMIT 1
-      )
+      JOIN amendment_current_reqn_version ON amendment.id = amendment_current_reqn_version.amendment_id
+      JOIN reqn_version ON amendment_current_reqn_version.reqn_version_id = reqn_version.id
       LEFT JOIN reqn_version_has_data_selection
         ON reqn_version.id = reqn_version_has_data_selection.reqn_version_id
         AND reqn_version_has_data_selection.data_selection_id NOT IN (
           SELECT id FROM data_selection WHERE cost_combined
         )
       LEFT JOIN data_selection ON reqn_version_has_data_selection.data_selection_id = data_selection.id
+      LEFT JOIN data_selection_fee_schedule
+        ON data_selection.id = data_selection_fee_schedule.data_selection_id
+        AND amendment.fee_schedule_id = data_selection_fee_schedule.fee_schedule_id
+      WHERE amendment.fee IS NOT NULL
       GROUP BY amendment.id
       ORDER BY amendment.reqn_id, amendment.name;
-      ALTER TABLE selection_fee_total ADD INDEX dk_amendment_id (amendment_id);
-
-      -- Now find the change in selection cost across amendments
-      SET @prev_cost = 0;
-      CREATE TEMPORARY TABLE selection_fee_change
-      SELECT
-        amendment_id,
-        @prev_cost := IF(name=".", 0, @prev_cost) AS prev_cost_check, -- start prev_cost to 0 when new amendment
-        cost - @prev_cost AS cost, -- calculate the change in cost, not the total cost
-        @prev_cost := cost AS prev_cost -- update the prev_cost for the next amendment
-      FROM selection_fee_total;
-      ALTER TABLE selection_fee_change ADD INDEX dk_amendment_id (amendment_id);
+      ALTER TABLE temp_selection_fee ADD INDEX dk_amendment_id (amendment_id);
 
       UPDATE amendment
-      JOIN selection_fee_change ON amendment.id = selection_fee_change.amendment_id
-      SET amendment.fee = amendment.fee + selection_fee_change.cost;
+      JOIN temp_selection_fee ON amendment.id = temp_selection_fee.amendment_id
+      SET amendment.fee = amendment.fee + temp_selection_fee.fee;
 
-      DROP TABLE selection_fee_total;
-      DROP TABLE selection_fee_change;
-
-      -- Get the total combined selection cost for all amendments
+      -- Next, add the cost of all combined data selections
       -- Note: this only works because there is only one data option with combined fees at the time of the upgrade
-      CREATE TEMPORARY TABLE selection_fee_total
-      SELECT
-        amendment.id AS amendment_id,
-        amendment.reqn_id,
-        amendment.name,
-        MAX(IFNULL(data_selection.cost,0)) AS cost,
-        GROUP_CONCAT(data_selection.id)
+      DROP TABLE IF EXISTS temp_selection_fee;
+      CREATE TEMPORARY TABLE temp_selection_fee
+      SELECT amendment.id AS amendment_id, MAX(IFNULL(data_selection_fee_schedule.fee,0)) AS fee
       FROM amendment
-      JOIN reqn_version ON amendment.id = reqn_version.amendment_id AND version <=> (
-        SELECT MAX(version)
-        FROM reqn_version
-        WHERE reqn_version.amendment_id = amendment.id
-        GROUP BY reqn_version.reqn_id
-        LIMIT 1
-      )
+      JOIN amendment_current_reqn_version ON amendment.id = amendment_current_reqn_version.amendment_id
+      JOIN reqn_version ON amendment_current_reqn_version.reqn_version_id = reqn_version.id
       LEFT JOIN reqn_version_has_data_selection
         ON reqn_version.id = reqn_version_has_data_selection.reqn_version_id
         AND reqn_version_has_data_selection.data_selection_id IN (
           SELECT id FROM data_selection WHERE cost_combined
         )
       LEFT JOIN data_selection ON reqn_version_has_data_selection.data_selection_id = data_selection.id
+      LEFT JOIN data_selection_fee_schedule
+        ON data_selection.id = data_selection_fee_schedule.data_selection_id
+        AND amendment.fee_schedule_id = data_selection_fee_schedule.fee_schedule_id
+      WHERE amendment.fee IS NOT NULL
       GROUP BY amendment.id
       ORDER BY amendment.reqn_id, amendment.name;
-      ALTER TABLE selection_fee_total ADD INDEX dk_amendment_id (amendment_id);
-
-      -- Now find the change in selection cost across amendments
-      SET @prev_cost = 0;
-      CREATE TEMPORARY TABLE selection_fee_change
-      SELECT
-        amendment_id,
-        @prev_cost := IF(name=".", 0, @prev_cost) AS prev_cost_check, -- start prev_cost to 0 when new amendment
-        cost - @prev_cost AS cost, -- calculate the change in cost, not the total cost
-        @prev_cost := cost AS prev_cost -- update the prev_cost for the next amendment
-      FROM selection_fee_total;
-      ALTER TABLE selection_fee_change ADD INDEX dk_amendment_id (amendment_id);
+      ALTER TABLE temp_selection_fee ADD INDEX dk_amendment_id (amendment_id);
 
       UPDATE amendment
-      JOIN selection_fee_change ON amendment.id = selection_fee_change.amendment_id
-      SET amendment.fee = amendment.fee + selection_fee_change.cost;
+      JOIN temp_selection_fee ON amendment.id = temp_selection_fee.amendment_id
+      SET amendment.fee = amendment.fee + temp_selection_fee.fee;
 
-      DROP TABLE selection_fee_total;
-      DROP TABLE selection_fee_change;
+      -- At this point we've calculated the total fee for each amendment, but we need to convert to how the
+      -- amendment changed the fee, so we'll need to subtract the previous amendment's fee from every amendment
+      SET @prev_fee = 0;
+      CREATE TEMPORARY TABLE temp_amendment
+      SELECT
+        amendment.id,
+        reqn_id,
+        name,
+        @prev_fee := IF(name=".", 0, @prev_fee) AS prev_fee_check, -- restart prev_fee for each reqn
+        fee - @prev_fee AS fee, -- calculate the change in fee, not the total fee
+        @prev_fee := fee AS prev_fee -- update the prev_fee for the next amendment
+      FROM amendment
+      ORDER BY amendment.reqn_id, amendment.name;
+      ALTER TABLE temp_amendment ADD INDEX dk_id (id);
+
+      UPDATE amendment
+      JOIN temp_amendment USING (id)
+      SET amendment.fee = temp_amendment.fee;
+
+      -- Finally, determine which amendments use the amendment type that has a cost
+      DROP TABLE IF EXISTS temp_amendment_fee;
+      CREATE TEMPORARY TABLE temp_amendment_fee
+      SELECT
+        amendment.id AS amendment_id,
+        SUM(amendment_type_fee_schedule.fee_national) AS fee_national,
+        SUM(amendment_type_fee_schedule.fee_international) AS fee_international
+      FROM amendment
+      JOIN amendment_current_reqn_version ON amendment.id = amendment_current_reqn_version.amendment_id
+      JOIN reqn_version ON amendment_current_reqn_version.reqn_version_id = reqn_version.id
+      JOIN reqn_version_has_amendment_type ON reqn_version.id = reqn_version_has_amendment_type.reqn_version_id
+      JOIN amendment_type ON reqn_version_has_amendment_type.amendment_type_id = amendment_type.id
+      JOIN amendment_type_fee_schedule
+        ON amendment_type.id = amendment_type_fee_schedule.amendment_type_id
+        AND amendment.fee_schedule_id = amendment_type_fee_schedule.fee_schedule_id
+      WHERE amendment.name != "."
+      GROUP BY amendment.id;
+      ALTER TABLE temp_amendment_fee ADD INDEX dk_amendment_id (amendment_id);
+
+      -- Now add the base cost to all non-base amendments
+      UPDATE reqn
+      JOIN amendment ON reqn.id = amendment.reqn_id
+      JOIN temp_amendment_fee ON amendment.id = temp_amendment_fee.amendment_id
+      JOIN amendment_current_reqn_version ON amendment.id = amendment_current_reqn_version.amendment_id
+      JOIN reqn_version ON amendment_current_reqn_version.reqn_version_id = reqn_version.id
+      SET amendment.fee = amendment.fee + IF(
+        reqn.trainee_user_id IS NOT NULL,
+        -- when there is a trainee...
+        IF(
+          @base_country_id = IFNULL( reqn_version.trainee_country_id, @base_country_id ) AND
+          @base_country_id = IFNULL( reqn_version.applicant_country_id, @base_country_id ),
+          IF( IFNULL( reqn_version.waiver, "none" ) != "none", 0, temp_amendment_fee.fee_national ),
+          temp_amendment_fee.fee_international
+        ),
+        -- when there is no trainee then just check if the applicant is local or international
+        IF(
+          @base_country_id = IFNULL( reqn_version.applicant_country_id, @base_country_id ),
+          temp_amendment_fee.fee_national,
+          temp_amendment_fee.fee_international
+        )
+      )
+      WHERE amendment.name != ".";
 
     END IF;
 
@@ -236,4 +201,3 @@ DELIMITER ;
 
 CALL calculate_amendment_fees();
 DROP PROCEDURE IF EXISTS calculate_amendment_fees;
-

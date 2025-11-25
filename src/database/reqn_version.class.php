@@ -54,6 +54,8 @@ class reqn_version extends \cenozo\database\record
       $this->indigenous4_filename = NULL;
     }
 
+    $update_amendment = $this->has_column_changed( ['applicant_country_id', 'trainee_country_id', 'waiver'] );
+
     parent::save();
 
     // delete files if they are being set to null
@@ -118,6 +120,8 @@ class reqn_version extends \cenozo\database\record
       else if( is_null( $db_reqn->data_sharing_approved ) ) $db_reqn->data_sharing_approved = false;
       $db_reqn->save();
     }
+
+    if( $update_amendment ) $this->get_amendment()->update_fee();
   }
 
   /**
@@ -143,6 +147,59 @@ class reqn_version extends \cenozo\database\record
   }
 
   /**
+   * Override the parent method
+   */
+  public function add_data_selection( $ids )
+  {
+    parent::add_data_selection( $ids );
+
+    // update the amendment fee anytime a data selection changes
+    $this->get_amendment()->update_fee();
+  }
+
+  /**
+   * Override the parent method
+   */
+  public function remove_data_selection( $ids )
+  {
+    parent::remove_data_selection( $ids );
+
+    // update the amendment fee anytime a data selection changes
+    $this->get_amendment()->update_fee();
+  }
+
+  /**
+   * Override the parent method
+   */
+  public function add_amendment_type( $ids )
+  {
+    parent::add_amendment_type( $ids );
+
+    // update the amendment fee anytime a amendment type changes
+    $this->get_amendment()->update_fee();
+  }
+
+  /**
+   * Override the parent method
+   */
+  public function remove_amendment_type( $ids )
+  {
+    parent::remove_amendment_type( $ids );
+
+    // update the amendment fee anytime a amendment type changes
+    $this->get_amendment()->update_fee();
+  }
+
+  /**
+   * Returns the reqn_version's parent reqn
+   * @return database\reqn
+   */
+  public function get_reqn()
+  {
+    return $this->get_amendment()->get_reqn();
+  }
+
+  /**
    * Returns the amendment and version number of the reqn version (1, 2, 3, A1, A2, A3, B1, B2, B3, etc)
    * @return string
    */
@@ -164,7 +221,7 @@ class reqn_version extends \cenozo\database\record
     // get the two newest versions
     $version_mod = lib::create( 'database\modifier' );
     $version_mod->join( 'amendment', 'reqn_version.amendment_id', 'amendment.id' );
-    $version_mod->where( 'reqn_version.reqn_id', '=', $this->reqn_id );
+    $version_mod->where( 'amendment.reqn_id', '=', $this->get_amendment()->reqn_id );
     $version_mod->order( 'amendment.name', true );
     $version_mod->order( 'reqn_version.version', true );
     $version_mod->limit( 2 );
@@ -318,7 +375,8 @@ class reqn_version extends \cenozo\database\record
       if( preg_match( $regex, $identifier, $matches ) )
       {
         $db_reqn = $reqn_class_name::get_unique_record( 'identifier', $matches[1] );
-        if( !is_null( $db_reqn ) ) $identifier = preg_replace( $regex, $db_reqn->get_current_reqn_version()->id, $identifier );
+        if( !is_null( $db_reqn ) )
+          $identifier = preg_replace( $regex, $db_reqn->get_current_reqn_version()->id, $identifier );
       }
     }
 
@@ -363,12 +421,8 @@ class reqn_version extends \cenozo\database\record
     // first see if this is a catalyst grant
     if( 'Catalyst Grant' != $db_reqn->get_reqn_type()->name )
     {
-      // get the date of the most recent reqn-version which is of the same amendment as the current reqn-version
-      $reqn_version_mod = lib::create( 'database\modifier' );
-      $reqn_version_mod->where( 'amendment_id', '=', $this->amendment_id );
-      $reqn_version_mod->order_desc( 'version' );
-      $reqn_version_mod->limit( 1 );
-      $db_reqn_version = current( $db_reqn->get_reqn_version_object_list( $reqn_version_mod ) );
+      // get the most recent reqn-version which is of the same amendment as the current reqn-version
+      $db_reqn_version = $this->get_amendment()->get_current_reqn_version();
 
       // now find the most recent decision-made stage that comes after the reqn-version's datetime
       $stage_mod = lib::create( 'database\modifier' );
@@ -378,7 +432,7 @@ class reqn_version extends \cenozo\database\record
       $stage_mod->order( 'datetime' );
       $stage_mod->limit( 1 );
 
-      $stage_list = $db_reqn->get_stage_object_list( $stage_mod );
+      $stage_list = $db_reqn->get_current_amendment()->get_stage_object_list( $stage_mod );
       if( 0 < count( $stage_list ) ) $date_of_approval = current( $stage_list )->datetime;
     }
 
@@ -398,14 +452,6 @@ class reqn_version extends \cenozo\database\record
   {
     if( is_null( $db_language ) ) $db_language = $this->get_reqn()->get_language();
     $lang = $db_language->code;
-
-    // create the query necessary to find the highest ranking version of all amendments
-    $version_sel = lib::create( 'database\select' );
-    $version_sel->from( 'reqn_version', 'latest_reqn_version' );
-    $version_sel->add_column( 'MAX( version )', 'max_version', false );
-    $version_mod = lib::create( 'database\modifier' );
-    $version_mod->where( 'latest_reqn_version.reqn_id', '=', 'reqn_version.reqn_id', false );
-    $version_mod->where( 'latest_reqn_version.amendment_id', '=', 'reqn_version.amendment_id', false );
 
     // create a temporary table with the final version of visible justifications for every amendment
     $select = lib::create( 'database\select' );
@@ -438,13 +484,21 @@ class reqn_version extends \cenozo\database\record
       'amendment_type.id'
     );
     $modifier->where( 'amendment_type.show_in_description', '=', true );
+
+    // create the query necessary to find the highest ranking version of all amendments
+    $version_sel = lib::create( 'database\select' );
+    $version_sel->from( 'reqn_version', 'latest_reqn_version' );
+    $version_sel->add_column( 'MAX( version )', 'max_version', false );
+    $version_mod = lib::create( 'database\modifier' );
+    $version_mod->where( 'latest_reqn_version.amendment_id', '=', 'reqn_version.amendment_id', false );
     $modifier->where(
       'reqn_version.version',
       '=',
-      sprintf( '( %s%s )', $version_sel->get_sql(), $version_mod->get_sql() ),
+      sprintf( '( %s %s )', $version_sel->get_sql(), $version_mod->get_sql() ),
       false
     );
-    $modifier->where( 'reqn_version.reqn_id', '=', $this->reqn_id );
+
+    $modifier->where( 'amendment.reqn_id', '=', $this->get_amendment()->reqn_id );
     $modifier->where( 'reqn_version.amendment_id', '<=', $this->amendment_id );
     $modifier->group( 'reqn_version.amendment_id' );
 
@@ -468,55 +522,11 @@ class reqn_version extends \cenozo\database\record
   }
 
   /**
-   * Get the reqn's total fee (NULL if show_prices is false)
-   * 
-   * Note: this process mirrors CnReqnVersionViewFactory::getTotalFee() on the client-side
-   * @return string
+   * Determine whether the reqn is international or not
+   * @return boolean
    */
-  public function get_total_fee()
+  public function is_international()
   {
-    $db_reqn = $this->get_reqn();
-    $db_stage_type = $db_reqn->get_current_stage_type();
-
-    if( !$db_reqn->show_prices ) return NULL;
-
-    $fee = NULL;
-    if( 'new' != $db_stage_type->phase )
-    {
-      // the fee is equal to the sum of all amendment fees
-      $amendment_sel = lib::create( 'database\select' );
-      $amendment_sel->add_column( 'IFNULL( override_fee, fee )', 'fee', false );
-
-      $fee = 0;
-      foreach( $db_reqn->get_amendment_list( $amendment_sel ) as $amendment ) $fee += $amendment['fee'];
-    }
-    else
-    {
-      // the fee is still dynamic, so calculate it
-      $fee = $this->calculate_fee();
-    }
-
-    $db_language = $db_reqn->get_language();
-    return sprintf(
-      'fr' == $db_language->code ? '%s $' : '$%s',
-      number_format(
-        $fee,
-        0,
-        'fr' == $db_language->code ? ',' : '.',
-        'fr' == $db_language->code ? ' ' : ','
-      )
-    );
-  }
-
-  /**
-   * Calculate the fee of the reqn
-   * 
-   * Note: this process mirrors CnReqnVersionViewFactory::calculateFee() on the client-side
-   * @return integer
-   */
-  private function calculate_fee()
-  {
-    $db_reqn = $this->get_reqn();
     $base_country_id = lib::create( 'business\session' )->get_application()->country_id;
     $applicant_country_id = (
       is_null( $this->applicant_country_id ) ?
@@ -529,122 +539,10 @@ class reqn_version extends \cenozo\database\record
       $this->trainee_country_id
     );
 
-    $fee = 3000;
-    if( !is_null( $db_reqn->special_fee_waiver_id ) )
-    {
-      $fee = 0;
-    }
-    else
-    {
-      $waiveFee = !is_null( $this->waiver ) && 'none' != $this->waiver;
-
-      // fee for trainees is different to applicants
-      $international = false;
-      if( $db_reqn->trainee_user_id ) {
-        if( $base_country_id != $trainee_country_id || $base_country_id != $applicant_country_id ) {
-          // if either the trainee or applicant isn't Canadian then the base fee is 5000
-          $fee = 5000;
-          $international = true;
-        }
-        else if(
-          $base_country_id == $trainee_country_id &&
-          $base_country_id == $applicant_country_id &&
-          $waiveFee
-        ) {
-          // if both are canadian and there is a fee waiver means the base fee is 0
-          $fee = 0;
-        }
-      } else {
-        // if the applicant is not Canadian then the base fee is 5000
-        if( $base_country_id != $applicant_country_id )
-        {
-          $fee = 5000;
-          $international = true;
-        }
-      }
-
-      $selection_sel = lib::create( 'database\select' );
-      $selection_sel->add_column( 'data_option_id' );
-      $selection_sel->add_column( 'cost' );
-      $selection_sel->add_column( 'cost_combined' );
-      $selection_mod = lib::create( 'database\modifier' );
-      $selection_mod->join( 'data_option', 'data_selection.data_option_id', 'data_option.id' );
-      $selection_mod->join( 'data_category', 'data_option.data_category_id', 'data_category.id' );
-      $selection_mod->where( 'data_selection.cost', '>', 0 );
-      $selection_mod->order( 'data_category.rank' );
-      $selection_mod->order( 'data_option.rank' );
-      $current_data_option_id = NULL;
-      $max_cost = 0;
-      foreach( $this->get_data_selection_list( $selection_sel, $selection_mod ) as $selection )
-      {
-        if( $selection['data_option_id'] != $current_data_option_id )
-        {
-          // store the most expensive selection (if there is one)
-          if( 0 < $max_cost ) $fee += $max_cost;
-          $max_cost = 0;
-        }
-
-        if( $selection['cost_combined'] )
-        {
-          // track the most expensive selection
-          if( $max_cost < $selection['cost'] ) $max_cost = $selection['cost'];
-        }
-        else $fee += $selection['cost'];
-
-        $current_data_option_id = $selection['data_option_id'];
-      }
-
-      if( 0 < $max_cost ) $fee += $max_cost;
-
-      // now add any additional fees
-      $fee_sel = lib::create( 'database\select' );
-      $fee_sel->add_column( 'fee' );
-      foreach( $db_reqn->get_additional_fee_list( $fee_sel ) as $additional_fee ) $fee += $additional_fee['fee'];
-
-      // now add amendment fees of the most recent version (including all past amendments)
-      $reqn_version_sel = lib::create( 'database\select' );
-      $reqn_version_sel->add_table_column( 'amendment', 'name', 'amendment' );
-      $reqn_version_sel->add_column( 'version' );
-      $reqn_version_sel->add_column(
-        sprintf( 'SUM( %s )', $international ? 'fee_international' : 'fee_canada' ),
-        'fee',
-        false
-       );
-
-      $reqn_version_mod = lib::create( 'database\modifier' );
-      $reqn_version_mod->join( 'amendment', 'reqn_version.amendment_id', 'amendment.id' );
-      $reqn_version_mod->join(
-        'reqn_version_has_amendment_type',
-        'reqn_version.id',
-        'reqn_version_has_amendment_type.reqn_version_id'
-      );
-      $reqn_version_mod->join(
-        'amendment_type',
-        'reqn_version_has_amendment_type.amendment_type_id',
-        'amendment_type.id'
-      );
-      $reqn_version_mod->where( 'amendment.name', '!=', '.' );
-      $reqn_version_mod->where( 'amendment.id', '<=', $this->amendment_id );
-      $reqn_version_mod->group( 'reqn_version.id' );
-      $reqn_version_mod->order( 'amendment.name' );
-      $reqn_version_mod->order_desc( 'version' );
-      $reqn_version_list = $db_reqn->get_reqn_version_object_list( $reqn_version_mod );
-
-      if( !$waiveFee )
-      {
-        $current_amendment = NULL;
-        foreach( $db_reqn->get_reqn_version_list( $reqn_version_sel, $reqn_version_mod ) as $reqn_version )
-        {
-          // only process the highest version of each amendment
-          if( $current_amendment == $reqn_version['amendment'] ) continue;
-
-          $fee += $reqn_version['fee'];
-          $current_amendment = $reqn_version['amendment'];
-        }
-      }
-    }
-
-    return $fee;
+    return (
+      $base_country_id != $applicant_country_id ||
+      ( !is_null( $this->get_reqn()->trainee_user_id ) && $base_country_id != $trainee_country_id )
+    );
   }
 
   /**
@@ -666,18 +564,11 @@ class reqn_version extends \cenozo\database\record
     );
 
     // get a list of all new coapplicants who have access to the data by first finding the last amendment-version
-    $reqn_version_mod = lib::create( 'database\modifier' );
-    $reqn_version_mod->join( 'amendment', 'reqn_version.amendment_id', 'amendment.id' );
-    $reqn_version_mod->where( 'amendment.name', '<', $this->get_amendment()->name );
-    $reqn_version_mod->order_desc( 'amendment.name' );
-    $reqn_version_mod->order_desc( 'version' );
-    $reqn_version_mod->limit( 1 );
-    $reqn_version_list = $db_reqn->get_reqn_version_object_list( $reqn_version_mod );
-
-    $last_coapplicant_list = array();
-    if( 0 < count( $reqn_version_list ) )
+    $db_amendment = $this->get_amendment();
+    $db_prev_amendment = $db_amendment->get_previous_amendment();
+    if( !is_null( $db_prev_amendment ) )
     {
-      $db_last_reqn_version = current( $reqn_version_list );
+      $db_last_reqn_version = $db_prev_amendment->get_current_reqn_version();
       $coapplicant_sel = lib::create( 'database\select' );
       $coapplicant_sel->add_column( 'name' );
       $coapplicant_sel->add_column( 'access' );
@@ -746,7 +637,7 @@ class reqn_version extends \cenozo\database\record
     $db_user = $db_reqn->get_user();
     $db_trainee_user = $db_reqn->get_trainee_user();
     $date_of_approval = $this->get_date_of_approval();
-    $fee = $this->get_total_fee();
+    $fee = $db_reqn->get_total_fee();
 
     // generate the application form
     $data = array(
@@ -1005,7 +896,7 @@ class reqn_version extends \cenozo\database\record
 
     $modifier = lib::create( 'database\modifier' );
     $modifier->join( 'amendment', 'reqn_version.amendment_id', 'amendment.id' );
-    $modifier->join( 'reqn', 'reqn_version.reqn_id', 'reqn.id' );
+    $modifier->join( 'reqn', 'amendment.reqn_id', 'reqn.id' );
     $modifier->join( 'user', 'reqn.user_id', 'user.id' );
     $modifier->where( 'reqn_version.id', '=', $this->id );
 

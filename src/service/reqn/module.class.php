@@ -69,37 +69,27 @@ class module extends \cenozo\service\module
 
     $modifier->join( 'reqn_type', 'reqn.reqn_type_id', 'reqn_type.id' );
 
-    $modifier->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
-    $modifier->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
+    $modifier->join_current_reqn_version();
     $modifier->join( 'amendment', 'reqn_version.amendment_id', 'amendment.id' );
 
     if( $select->has_table_columns( 'reqn_version_with_agreement' ) )
-    {
-      $modifier->join(
-        'reqn_last_reqn_version_with_agreement',
-        'reqn.id',
-        'reqn_last_reqn_version_with_agreement.reqn_id'
-      );
-      $modifier->join(
-        'reqn_version',
-        'reqn_last_reqn_version_with_agreement.reqn_version_id',
-        'reqn_version_with_agreement.id',
-        'left',
-        'reqn_version_with_agreement'
-      );
-    }
+      $modifier->join_last_reqn_version_with_agreement( 'reqn.id', 'reqn_version_with_agreement', 'left' );
 
     $modifier->join( 'reqn_current_final_report', 'reqn.id', 'reqn_current_final_report.reqn_id' );
     $modifier->left_join( 'final_report', 'reqn_current_final_report.final_report_id', 'final_report.id' );
     $modifier->join( 'reqn_current_destruction_report', 'reqn.id', 'reqn_current_destruction_report.reqn_id' );
-    $modifier->left_join( 'destruction_report', 'reqn_current_destruction_report.destruction_report_id', 'destruction_report.id' );
+    $modifier->left_join(
+      'destruction_report',
+      'reqn_current_destruction_report.destruction_report_id',
+      'destruction_report.id'
+    );
     $modifier->left_join( 'deadline', 'reqn.deadline_id', 'deadline.id' );
     $modifier->join( 'user', 'reqn.user_id', 'user.id' );
     $modifier->left_join( 'user', 'reqn.trainee_user_id', 'trainee_user.id', 'trainee_user' );
     $modifier->left_join( 'user', 'reqn.designate_user_id', 'designate_user.id', 'designate_user' );
 
     $join_mod = lib::create( 'database\modifier' );
-    $join_mod->where( 'reqn.id', '=', 'stage.reqn_id', false );
+    $join_mod->where( 'amendment.id', '=', 'stage.amendment_id', false );
     $join_mod->where( 'stage.datetime', '=', NULL );
     $modifier->join_modifier( 'stage', $join_mod );
     $modifier->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
@@ -118,23 +108,32 @@ class module extends \cenozo\service\module
       $linked_data_sql = sprintf( '( %s %s )', $category_sel->get_sql(), $category_mod->get_sql() );
 
       $join_sel = lib::create( 'database\select' );
-      $join_sel->from( 'reqn' );
-      $join_sel->add_column( 'id', 'reqn_id' );
+      $join_sel->from( 'amendment' );
+      $join_sel->add_column( 'id', 'amendment_id' );
       $join_sel->add_column( 'reqn_version_has_data_selection.reqn_version_id IS NOT NULL', 'selected', false );
 
       $join_mod = lib::create( 'database\modifier' );
-      $join_mod->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
+      $join_mod->join(
+        'amendment_current_reqn_version',
+        'amendment.id',
+        'amendment_current_reqn_version.amendment_id'
+      );
+      $join_mod->join(
+        'reqn_version',
+        'amendment_current_reqn_version.reqn_version_id',
+        'reqn_version.id'
+      );
 
       $sub_mod = lib::create( 'database\modifier' );
-      $sub_mod->where( 'reqn_current_reqn_version.reqn_version_id', '=', 'reqn_version_has_data_selection.reqn_version_id', false );
+      $sub_mod->where( 'reqn_version.id', '=', 'reqn_version_has_data_selection.reqn_version_id', false );
       $sub_mod->where( 'reqn_version_has_data_selection.data_selection_id', 'IN', $linked_data_sql, false );
       $join_mod->join_modifier( 'reqn_version_has_data_selection', $sub_mod, 'left' );
-      $join_mod->group( 'reqn.id' );
+      $join_mod->group( 'amendment.id' );
 
       $modifier->join(
         sprintf( '( %s %s ) AS linked_data', $join_sel->get_sql(), $join_mod->get_sql() ),
-        'reqn.id',
-        'linked_data.reqn_id'
+        'amendment.id',
+        'linked_data.amendment_id'
       );
       $select->add_column( 'linked_data.selected', 'has_linked_data', false, 'boolean' );
 
@@ -147,7 +146,14 @@ class module extends \cenozo\service\module
     }
 
     if( $select->has_column( 'has_data_sharing_filename' ) )
-      $select->add_column( '( reqn_version.data_sharing_filename IS NOT NULL )', 'has_data_sharing_filename', false, 'boolean' );
+    {
+      $select->add_column(
+        '( reqn_version.data_sharing_filename IS NOT NULL )',
+        'has_data_sharing_filename',
+        false,
+        'boolean'
+      );
+    }
 
     if( $select->has_column( 'country_is_flagged' ) )
     {
@@ -271,7 +277,11 @@ class module extends \cenozo\service\module
     {
       $select->add_table_column(
         'designate_user',
-        'IF( designate_user.id IS NULL, NULL, CONCAT_WS( " ", designate_user.first_name, designate_user.last_name ) )',
+        'IF( '.
+          'designate_user.id IS NULL, '.
+          'NULL, '.
+          'CONCAT_WS( " ", designate_user.first_name, designate_user.last_name ) '.
+        ')',
         'designate_full_name',
         false
       );
@@ -289,29 +299,45 @@ class module extends \cenozo\service\module
     if( $select->has_table_columns( 'ethics_approval' ) )
     {
       $modifier->join( 'reqn_last_ethics_approval', 'reqn.id', 'reqn_last_ethics_approval.reqn_id' );
-      $modifier->left_join( 'ethics_approval', 'reqn_last_ethics_approval.ethics_approval_id', 'ethics_approval.id' );
+      $modifier->left_join(
+        'ethics_approval',
+        'reqn_last_ethics_approval.ethics_approval_id',
+        'ethics_approval.id'
+      );
     }
 
     if( $select->has_column( 'reviewers_completed' ) )
     {
-      $join_sel = lib::create( 'database\select' );
-      $join_sel->from( 'reqn' );
-      $join_sel->add_column( 'id', 'reqn_id' );
-      $join_sel->add_column( 'IF( review.id IS NULL, 0, COUNT(*) )', 'total', false );
+      // create a temporary table of completed reviewers
+      $reviewers_sel = lib::create( 'database\select' );
+      $reviewers_sel->from( 'amendment' );
+      $reviewers_sel->add_column( 'id', 'amendment_id' );
+      $reviewers_sel->add_column( 'IF( review.id IS NULL, 0, COUNT(*) )', 'total', false );
 
+      $reviewers_mod = lib::create( 'database\modifier' );
       $join_mod = lib::create( 'database\modifier' );
-      $sub_mod = lib::create( 'database\modifier' );
-      $sub_mod->where( 'reqn.id', '=', 'review.reqn_id', false );
-      $sub_mod->where( 'review.review_type_id', 'IN', 'SELECT id FROM review_type WHERE name LIKE "Reviewer %"', false );
-      $sub_mod->where( 'review.recommendation_type_id', '!=', NULL );
-      $join_mod->join_modifier( 'review', $sub_mod, 'left' );
-      $join_mod->group( 'reqn.id' );
-
-      $modifier->join(
-        sprintf( '( %s %s ) AS reviewers_completed', $join_sel->get_sql(), $join_mod->get_sql() ),
-        'reqn.id',
-        'reviewers_completed.reqn_id'
+      $join_mod->where( 'amendment.id', '=', 'review.amendment_id', false );
+      $join_mod->where(
+        'review.review_type_id',
+        'IN',
+        '( SELECT id FROM review_type WHERE name LIKE "Reviewer %" )',
+        false
       );
+      $join_mod->where( 'review.recommendation_type_id', '!=', NULL );
+      $reviewers_mod->join_modifier( 'review', $join_mod, 'left' );
+      $reviewers_mod->group( 'amendment.id' );
+
+      $stage_type_class_name::db()->execute( sprintf(
+        'CREATE TEMPORARY TABLE reviewers_completed %s %s',
+        $reviewers_sel->get_sql(),
+        $reviewers_mod->get_sql()
+      ) );
+
+      $stage_type_class_name::db()->execute(
+        'ALTER TABLE reviewers_completed ADD UNIQUE KEY uq_amendment_id (amendment_id)'
+      );
+
+      $modifier->join( 'reviewers_completed', 'amendment.id', 'reviewers_completed.amendment_id' );
       $select->add_column( 'reviewers_completed.total', 'reviewers_completed', false );
     }
 
@@ -416,9 +442,19 @@ class module extends \cenozo\service\module
 
       if( $select->has_column( 'has_agreements' ) )
       {
-        $reqn_version_mod = lib::create( 'database\modifier' );
-        $reqn_version_mod->where( 'agreement_filename', '!=', NULL );
-        $select->add_constant( 0 < $db_reqn->get_reqn_version_count( $reqn_version_mod ), 'has_agreements' );
+        $amendment_mod = lib::create( 'database\modifier' );
+        $amendment_mod->join(
+          'amendment_current_reqn_version',
+          'amendment.id',
+          'amendment_current_reqn_version.amendment_id'
+        );
+        $amendment_mod->join(
+          'reqn_version',
+          'amendment_current_reqn_version.reqn_version_id',
+          'reqn_version.id',
+        );
+        $amendment_mod->where( 'reqn_version.agreement_filename', '!=', NULL );
+        $select->add_constant( 0 < $db_reqn->get_amendment_count( $amendment_mod ), 'has_agreements' );
       }
     }
   }

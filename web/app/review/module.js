@@ -5,8 +5,8 @@ cenozoApp.defineModule({
     angular.extend(module, {
       identifier: {
         parent: {
-          subject: "reqn",
-          column: "reqn.identifier",
+          subject: "amendment",
+          column: "amendment_id",
         },
       },
       name: {
@@ -15,8 +15,6 @@ cenozoApp.defineModule({
         possessive: "review's",
       },
       columnList: {
-        identifier: { column: "reqn.identifier", title: "Requisition" },
-        amendment: { title: "Amendment" },
         review_type: {
           column: "review_type.name",
           title: "Type",
@@ -57,12 +55,7 @@ cenozoApp.defineModule({
       identifier: {
         column: "reqn.identifier",
         title: "Requisition",
-        type: "lookup-typeahead",
-        typeahead: {
-          table: "reqn",
-          select: "reqn.identifier",
-          where: "reqn.identifier",
-        },
+        type: "string",
         isConstant: true,
       },
       amendment: {
@@ -105,7 +98,7 @@ cenozoApp.defineModule({
         title: "Note",
         type: "text",
       },
-      reqn_id: { type: "hidden" },
+      reqn_id: { column: "reqn.id", type: "hidden" },
       review_type_id: { type: "hidden" },
       current_reqn_version_id: { column: "reqn_version.id", type: "hidden" },
       peer_review_filename: {

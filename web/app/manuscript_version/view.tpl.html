@@ -438,6 +438,25 @@
                   model="model">
                 </cn-view-input-with-differences>
               </li>
+              <li class="list-group-item" ng-if="model.viewModel.record.has_trainee_with_waiver">
+                <p class="text-primary" ng-bind-html="t( 'part_4.trainee_description' )"></p>
+                <ul class="list-group container allow-select">
+                  <li class="list-group-item text-muted" ng-bind-html="
+                    model.viewModel.record.trainee_name + ' ' + t( 'part_4.trainee_example' )
+                  "></li>
+                </ul>
+                <cn-view-input-with-differences
+                  input="{
+                    key: 'trainee',
+                    title: t( 'part_4.trainee' ),
+                    type: 'boolean',
+                    enumList: model.metadata.yesNAEnumList[model.viewModel.record.lang]
+                  }"
+                  no-cols=true
+                  difference="model.viewModel.compareRecord.differences.part_4.trainee"
+                  model="model">
+                </cn-view-input-with-differences>
+              </li>
               <li class="list-group-item" ng-if="model.viewModel.record.has_seroprevalence_data">
                 <p class="text-primary" ng-bind-html="t( 'part_4.seroprevalence_description' )"></p>
                 <ul class="list-group container allow-select">

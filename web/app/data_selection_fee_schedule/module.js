@@ -1,0 +1,57 @@
+cenozoApp.defineModule({
+  name: "data_selection_fee_schedule",
+  models: ["list", "view"],
+  create: (module) => {
+    angular.extend(module, {
+      identifier: {
+        parent: [
+          {
+            subject: "fee_schedule",
+            column: "fee_schedule.name",
+          },
+          {
+            subject: "data_selection",
+            column: "data_selection_id",
+          },
+        ],
+      },
+      name: {
+        singular: "data selection fee schedule",
+        plural: "data selection fee schedules",
+        possessive: "data selection fee schedule's",
+      },
+      columnList: {
+        study_phase: { title: "Study Phase", column: "study_phase.name" },
+        data_option: { title: "Data Option", column: "data_option.name_en" },
+        fee_schedule: { title: "Fee Schedule", column: "fee_schedule.name" },
+        fee: { title: "Fee", type: "number", filter: "currency:$:0" },
+      },
+      defaultOrder: {
+        column: "data_selection_fee_schedule.id",
+        reverse: false,
+      },
+    });
+
+    module.addInputGroup("", {
+      study_phase: {
+        title: "Study Phase",
+        column: "study_phase.name",
+        type: "string",
+        isConstant: true,
+      },
+      data_option: {
+        title: "Data Option",
+        column: "data_option.name_en",
+        type: "string",
+        isConstant: true,
+      },
+      fee_schedule: {
+        title: "Fee Schedule",
+        column: "fee_schedule.name",
+        type: "string",
+        isConstant: true,
+      },
+      fee: { title: "Fee ($)", type: "string", format: "integer" },
+    });
+  },
+});

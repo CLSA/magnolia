@@ -1112,7 +1112,7 @@ cenozo.service("CnLocalization", [
                 fr: "TODO: TRANSLATE",
               },
               text5: {
-                en: "Graduate students (Masters or PhD) who wish to obtain the CLSA data for the sole purpose of their thesis, and postdoctoral or clinical fellows (limit 1 waiver per fellowship) who wish to obtain the CLSA data for the sole purpose of their postdoctoral or clinical fellowship project, who are enrolled at Canadian institutions for their graduate degree, postdoc, or clinical fellowship, can apply for a fee waiver. Canadian trainees working outside Canada but funded through a Canadian source are also eligible for a fee waiver. Research conducted as part of a CIHR Catalyst Grant is not eligible for a CLSA Data Access Trainee Fee Waiver.",
+                en: 'Graduate students (Masters or PhD) who wish to obtain the CLSA data for the sole purpose of their thesis, and postdoctoral or clinical fellows (limit 1 waiver per fellowship) who wish to obtain the CLSA data for the sole purpose of their postdoctoral or clinical fellowship project, who are enrolled at Canadian institutions for their graduate degree, postdoc, or clinical fellowship, can apply for a fee waiver. Canadian trainees working outside Canada but funded through a Canadian source are also eligible for a fee waiver (if applicable, please e-mail <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>). Research conducted as part of a CIHR Catalyst Grant is not eligible for a CLSA Data Access Trainee Fee Waiver.',
                 fr: "TODO: TRANSLATE",
               },
               waiver: {
@@ -1754,8 +1754,8 @@ cenozo.service("CnLocalization", [
               fr: "Terminer la soumission du manuscrit de l’ÉLCV",
             },
             text1: {
-              en: 'Please consult the CLSA website for detailed information on the CLSA, <a href="https://www.clsa-elcv.ca/data-access" target="data_access">https://www.clsa-elcv.ca/data-access</a>. Applicants are encouraged to review the CLSA Publication and Promotion Policy available at <a href="https://www.clsa-elcv.ca/resource-types/publication-policy-for-data-users" target="publication_policy">https://www.clsa-elcv.ca/resource-types/publication-policy-for-data-users</a> to ensure you have the most updated information.  Consult us for any questions regarding your application at <a href="mailto:access@clsa-elcv.ca">access@clsa- elcv.ca</a>.',
-              fr: 'Veuillez consulter le site Web de l’ÉLCV pour obtenir de l’information détaillée sur l’ÉLCV, <a href="https://www.clsa-elcv.ca/fr-ca/data-access" target="data_access">https://www.clsa-elcv.ca/fr-ca/data-access</a>. Les demandeurs sont invités à réviser la Politique de publication et de promotion de l’ÉLCV, à l’adresse <a href="https://www.clsa-elcv.ca/fr-ca/resource-types/publication-policy-for-data-users" target="publication_policy">https://www.clsa-elcv.ca/fr-ca/resource-types/publication-policy-for-data-users</a> pour vous assurer de détenir l’information la plus à jour. Consultez-nous si vous avez des questions au sujet de votre demande, à <a href="mailto:access@clsa-elcv.ca">access@clsa- elcv.ca</a>.',
+              en: 'Please consult the CLSA website for detailed information on the CLSA, <a href="https://www.clsa-elcv.ca/data-access" target="data_access">https://www.clsa-elcv.ca/data-access</a>. Applicants are encouraged to review the CLSA Publication and Promotion Policy available at <a href="https://www.clsa-elcv.ca/resource-types/publication-policy-for-data-users" target="publication_policy">https://www.clsa-elcv.ca/resource-types/publication-policy-for-data-users</a> to ensure you have the most updated information.  Consult us for any questions regarding your application at <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.',
+              fr: 'Veuillez consulter le site Web de l’ÉLCV pour obtenir de l’information détaillée sur l’ÉLCV, <a href="https://www.clsa-elcv.ca/fr-ca/data-access" target="data_access">https://www.clsa-elcv.ca/fr-ca/data-access</a>. Les demandeurs sont invités à réviser la Politique de publication et de promotion de l’ÉLCV, à l’adresse <a href="https://www.clsa-elcv.ca/fr-ca/resource-types/publication-policy-for-data-users" target="publication_policy">https://www.clsa-elcv.ca/fr-ca/resource-types/publication-policy-for-data-users</a> pour vous assurer de détenir l’information la plus à jour. Consultez-nous si vous avez des questions au sujet de votre demande, à <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>.',
             },
             text2: {
               en: "Please be sure to complete all sections:<ol><li>Manuscript attachments</li><li>Manuscript overview</li><li>Requirements as per Publication Policy (Page 1)</li><li>Requirements as per Publication Policy (Page 2)</li></ol>",
@@ -1927,6 +1927,18 @@ cenozo.service("CnLocalization", [
               fr: "Nous tenons à souligner que, quelle que soit la publication, vous devez toujours vous reporter au numéro de version d’ensemble de données approprié. Si de nouveaux poids d’échantillonnage étaient utilisés dans une version d’ensemble de données antérieure à la version de surveillance initiale (TRM) 3.6 et à la version initiale de la cohorte globale (COM) 4.2, assurez-vous de préciser que vous utilisez la version 1.2 du poids d’échantillonnage de l’ÉLCV.",
             },
             dataset_version: {
+              en: "Has this requirement been met?",
+              fr: "Cette exigence est-elle satisfaite?",
+            },
+            trainee_description: {
+              en: "The following must be included in your manuscript:",
+              fr: "Ce qui suit doit être inclus dans votre manuscrit :",
+            },
+            trainee_example: {
+              en: "was the recipient of a CLSA Data Access Trainee Fee Waiver",
+              fr: "TODO: TRANSLATE",
+            },
+            trainee: {
               en: "Has this requirement been met?",
               fr: "Cette exigence est-elle satisfaite?",
             },

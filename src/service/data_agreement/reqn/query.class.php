@@ -34,22 +34,7 @@ class query extends \cenozo\service\query
 
     // prepend-join to the reqn_version table
     $modifier = clone $this->modifier;
-    $modifier->join(
-      'reqn_version',
-      'reqn_current_reqn_version.reqn_version_id',
-      'reqn_version.id',
-      '', // default
-      NULL, // default
-      true // prepend
-    );
-    $modifier->join(
-      'reqn_current_reqn_version',
-      'reqn.id',
-      'reqn_current_reqn_version.reqn_id',
-      '', // default
-      NULL, // default
-      true // prepend
-    );
+    $modifier->join_current_reqn_version( 'reqn.id', 'reqn_version', true );
     $modifier->where( 'reqn_version.data_agreement_id', '=', $db_data_agreement->id );
     $modifier->group( 'reqn.id' );
 
@@ -66,22 +51,7 @@ class query extends \cenozo\service\query
 
     // prepend-join to the reqn_version table
     $modifier = clone $this->modifier;
-    $modifier->join(
-      'reqn_version',
-      'reqn_current_reqn_version.reqn_version_id',
-      'reqn_version.id',
-      '', // default
-      NULL, // default
-      true // prepend
-    );
-    $modifier->join(
-      'reqn_current_reqn_version',
-      'reqn.id',
-      'reqn_current_reqn_version.reqn_id',
-      '', // default
-      NULL, // default
-      true // prepend
-    );
+    $modifier->join_current_reqn_version( 'reqn.id', 'reqn_version', true );
     $modifier->where( 'reqn_version.data_agreement_id', '=', $db_data_agreement->id );
     $modifier->group( 'reqn.id' );
 

@@ -35,16 +35,6 @@ cenozoApp.defineModule({
         title: "Show in Description",
         type: "boolean",
       },
-      fee_canada: {
-        title: "Canadian Fee ($)",
-        type: "string",
-        format: "integer",
-      },
-      fee_international: {
-        title: "International Fee ($)",
-        type: "string",
-        format: "integer",
-      },
       reason_en: {
         title: "Reason (English)",
         type: "string",

@@ -67,8 +67,8 @@ class patch extends \cenozo\service\patch
 
     // define whether the action is allowed
     $db_role = lib::create( 'business\session' )->get_role();
-    $db_reqn_version = $db_reqn->get_current_reqn_version();
-    $is_amendment = '.' != $db_reqn_version->get_amendment()->name;
+    $db_amendment = $db_reqn->get_current_amendment();
+    $is_amendment = '.' != $db_amendment->name;
     $db_current_stage_type = $db_reqn->get_current_stage_type();
     $state = $db_reqn->state;
     $phase = $db_current_stage_type->phase;
@@ -154,7 +154,7 @@ class patch extends \cenozo\service\patch
               {
                 $deadline = util::get_datetime_object( $db_reqn->get_deadline()->datetime );
                 $deadline->add( new \DateInterval( sprintf( 'P%dM', $delay ) ) );
-                if( $db_reqn_version->start_date < $deadline ) $code = 409;
+                if( $db_amendment->get_current_reqn_version()->start_date < $deadline ) $code = 409;
               }
             }
           }
@@ -315,8 +315,9 @@ class patch extends \cenozo\service\patch
           $db_reqn->trainee_user_id == $db_user->id || $db_reqn->designate_user_id == $db_user->id
         )
       );
-    $db_reqn_version = $db_reqn->get_current_reqn_version();
-    $is_amendment = '.' != $db_reqn_version->get_amendment()->name;
+    $db_amendment = $db_reqn->get_current_amendment();
+    $db_reqn_version = $db_amendment->get_current_reqn_version();
+    $is_amendment = '.' != $db_amendment->name;
     $file = $this->get_argument( 'file', NULL );
     if( false !== strpos( util::get_header( 'Content-Type' ), 'application/octet-stream' ) && !is_null( $file ) )
     {
@@ -357,27 +358,11 @@ class patch extends \cenozo\service\patch
       }
       else
       {
-        // remove all of the amendment's versions and reviews
-        $reqn_version_mod = lib::create( 'database\modifier' );
-        $reqn_version_mod->where( 'amendment_id', '=', $db_reqn_version->amendment_id );
-        $reqn_version_mod->order_desc( 'version' );
-        foreach( $db_reqn->get_reqn_version_object_list( $reqn_version_mod ) as $db_amendment_reqn_version )
-        {
-          $review_mod = lib::create( 'database\modifier' );
-          $review_mod->where( 'amendment_id', '=', $db_amendment_reqn_version->amendment_id );
-          foreach( $db_reqn->get_review_object_list( $review_mod ) as $db_review ) $db_review->delete();
-          $db_amendment_reqn_version->delete();
-        }
-
-        // remove the current stage and re-activate the previous one
-        $db_current_stage = $db_reqn->get_current_stage();
-        $db_current_stage->delete();
-        $stage_mod = lib::create( 'database\modifier' );
-        $stage_mod->order_desc( 'datetime' );
-        $stage_mod->limit( 1 );
-        $db_last_stage = current( $db_reqn->get_stage_object_list( $stage_mod ) );
-        $db_last_stage->datetime = NULL;
-        $db_last_stage->save();
+        // remove the current amendment and re-activate the previous one
+        $db_amendment->delete();
+        $db_last_completed_stage = $db_reqn->get_last_completed_stage();
+        $db_last_completed_stage->datetime = NULL;
+        $db_last_completed_stage->save();
 
         // and finally, make sure the reqn is no longer deferred
         if( 'deferred' == $db_reqn->state )
@@ -460,12 +445,8 @@ class patch extends \cenozo\service\patch
 
         // first fill in the admin review
         $db_review = $review_class_name::get_unique_record(
-          array( 'reqn_id', 'amendment_id', 'review_type_id' ),
-          array(
-            $db_reqn->id,
-            $db_reqn_version->amendment_id,
-            $review_type_class_name::get_unique_record( 'name', 'Admin' )->id
-          )
+          ['amendment_id', 'review_type_id'],
+          [$db_amendment->id, $review_type_class_name::get_unique_record( 'name', 'Admin' )->id]
         );
         $db_review->user_id = $db_user->id;
         $db_review->recommendation_type_id =
@@ -567,8 +548,8 @@ class patch extends \cenozo\service\patch
     }
     else if( 'reverse' == $action )
     {
-      // reverse to the previous stage
-      $db_reqn->reverse_to_last_stage();
+      // reverse to the last completed stage
+      $db_reqn->reverse_to_last_completed_stage();
     }
     else if( 'reject' == $action )
     {

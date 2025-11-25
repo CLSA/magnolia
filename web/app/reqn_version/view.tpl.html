@@ -1358,23 +1358,23 @@
                     <tr ng-repeat-end style="background: white">
                       <td colspan="100" style="padding: 0;">
                         <div id="accordion{{ option.id }}" class="collapse text-primary text-left">
-                          <div ng-repeat="selection in option.selectionList"
-                               ng-if="0 < selection.detailList.length ||
-                                      ( null == selection.unavailable[model.viewModel.record.lang] && 0 < selection.cost.value )">
-                            <div class="col-sm-2 vertical-spacer"
-                                 ng-bind-html="t( 'misc.studyPhase.' + selection.studyPhaseCode )"></div>
-                            <div class="col-sm-2 vertical-spacer" ng-if="selection.cost[model.viewModel.record.lang]">
-                              <span uib-tooltip-html="selection.costCombined ? t( 'misc.costCombined' ) : ''"
-                                    tooltip-popup-delay="100">
-                                <b class="invert" ng-if="selection.costCombined">ⓘ</b>
-                                {{ selection.cost[model.viewModel.record.lang] }}
-                              </span>
-                            </div>
-                            <div class="vertical-spacer"
-                                 ng-class="selection.cost[model.viewModel.record.lang] ? 'col-sm-8' : 'col-sm-10'">
-                              <span ng-repeat="detail in selection.detailList"
-                                    uib-tooltip-html="detail.note[model.viewModel.record.lang] | cnNewlines"
-                                    tooltip-popup-delay="100">
+                          <div
+                            ng-repeat="selection in option.selectionList"
+                            ng-if="
+                              0 < selection.detailList.length ||
+                              null == selection.unavailable[model.viewModel.record.lang]
+                            "
+                          >
+                            <div
+                              class="col-sm-2 vertical-spacer"
+                              ng-bind-html="t( 'misc.studyPhase.' + selection.studyPhaseCode )"
+                            ></div>
+                            <div class="vertical-spacer col-sm-10">
+                              <span
+                                ng-repeat="detail in selection.detailList"
+                                uib-tooltip-html="detail.note[model.viewModel.record.lang] | cnNewlines"
+                                tooltip-popup-delay="100"
+                              >
                                 <b class="invert" ng-if="detail.note[model.viewModel.record.lang]">ⓘ</b>
                                 {{ detail.name[model.viewModel.record.lang] }}{{ $last ? '' : ';' }}
                               </span>
@@ -1562,12 +1562,12 @@
   </div>
   <div class="form-footer text-right rounded-bottom bg-info" style="height:4.6em;">
     <button class="btn btn-primary pull-left"
-            ng-if="'instructions' != model.viewModel.getTabPart()"
+            ng-if="model.viewModel.canMovePreviousTab()"
             ng-click="model.viewModel.nextTab( true )"
             ng-bind-html="'<i class=\'glyphicon glyphicon-arrow-left\'></i> ' + t( 'misc.prevButton' )">
     </button>
     <button class="btn btn-primary"
-            ng-if="'part2' != model.viewModel.getTabPart()"
+            ng-if="model.viewModel.canMoveNextTab()"
             ng-click="model.viewModel.nextTab( false )"
             ng-bind-html="t( 'misc.nextButton' ) + ' <i class=\'glyphicon glyphicon-arrow-right\'></i>'">
     </button>

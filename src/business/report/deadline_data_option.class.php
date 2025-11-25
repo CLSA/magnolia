@@ -57,18 +57,14 @@ class deadline_data_option extends \cenozo\business\report\base_report
     $join_mod->where( 'data_option.id', '=', 'data_selection.data_option_id', false );
     $join_mod->where( 'study_phase.id', '=', 'data_selection.study_phase_id', false );
     $modifier->join_modifier( 'data_selection', $join_mod );
-    $modifier->join( 'reqn_current_reqn_version', 'reqn.id', 'reqn_current_reqn_version.reqn_id' );
-    $modifier->join( 'reqn_version', 'reqn_current_reqn_version.reqn_version_id', 'reqn_version.id' );
+    $modifier->join_current_reqn_version();
     $join_mod = lib::create( 'database\modifier' );
     $join_mod->where( 'reqn_version.id', '=', 'reqn_version_has_data_selection.reqn_version_id', false );
     $join_mod->where( 'data_selection.id', '=', 'reqn_version_has_data_selection.data_selection_id', false );
     $modifier->join_modifier( 'reqn_version_has_data_selection', $join_mod, 'left' );
 
     // only include reqns which aren't in certain stages
-    $join_mod = lib::create( 'database\modifier' );
-    $join_mod->where( 'reqn.id', '=', 'stage.reqn_id', false );
-    $join_mod->where( 'stage.datetime', '=', NULL );
-    $modifier->join_modifier( 'stage', $join_mod );
+    $modifier->join_current_stage();
     $modifier->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
     $modifier->where( 'stage_type.name', 'NOT IN', array( 'New', 'Not Approved', 'Incomplete', 'Withdrawn' ) );
 

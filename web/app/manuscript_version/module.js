@@ -51,6 +51,7 @@ cenozoApp.defineModule({
       version: { type: "string" },
       current_manuscript_version_id: { column: "manuscript_version.id", type: "string" },
       trainee_user_id: { column: "reqn.trainee_user_id", type: "string" },
+      trainee_name: { type: "string" },
       designate_user_id: { column: "reqn.designate_user_id", type: "string" },
       deferred: { column: "manuscript.deferred", type: "boolean" },
       has_unread_notice: { type: "boolean" },
@@ -70,12 +71,14 @@ cenozoApp.defineModule({
       clsa_reference_number: { type: "text" },
       clsa_reference_justification: { type: "text" },
       has_genomics_data: { type: "boolean" },
+      has_trainee_with_waiver: { type: "boolean" },
       has_seroprevalence_data: { type: "boolean" },
       has_covid_data: { type: "boolean" },
       genomics: { type: "boolean" },
       genomics_number: { type: "string" },
       acknowledgment: { type: "text" },
       dataset_version: { type: "boolean" },
+      trainee: { type: "boolean" },
       seroprevalence: { type: "boolean" },
       covid: { type: "boolean" },
       disclaimer: { type: "boolean" },
@@ -377,6 +380,7 @@ cenozoApp.defineModule({
                   diff: false,
                   acknowledgment: false,
                   dataset_version: false,
+                  trainee: false,
                   seroprevalence: false,
                   covid: false,
                   disclaimer: false,
@@ -487,6 +491,7 @@ cenozoApp.defineModule({
                 part_4: [
                   "acknowledgment",
                   "dataset_version",
+                  "trainee",
                   "seroprevalence",
                   "covid",
                   "disclaimer",
@@ -517,6 +522,7 @@ cenozoApp.defineModule({
                       return this.record.has_genomics_data && true === this.record.genomics;
                   } else if ("part_4" == tab) {
                     // only check some fields if the reqn has them selected
+                    if ("trainee" == property) return this.record.has_trainee_with_waiver;
                     if ("seroprevalence" == property) return this.record.has_seroprevalence_data;
                     else if ("covid" == property) return this.record.has_covid_data;
                     else if ("disclaimer_justification" == property) return false === this.record.disclaimer;
