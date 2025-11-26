@@ -1057,7 +1057,7 @@ cenozo.service("CnLocalization", [
               tab: { en: "Applicant", fr: "Demandeur" },
               text1: {
                 en: '<strong>Primary Applicant</strong>: The primary applicant will be the contact person for the CLSA Access Agreement as well as for the data release and any relevant updates.  The primary applicant must hold an eligible appointment (continuing or term appointment) at an eligible institution (that is able to uphold the conditions of the data access agreement, administer grant funds, and provide Research Ethics Board approval).  Please indicate whether you are an early career researcher, based on CIHR’s definition (<a href="https://cihr-irsc.gc.ca/e/34190.html#r14" target="early_career">https://cihr-irsc.gc.ca/e/34190.html#r14</a>). We are collecting this information for the CLSA’s reporting purposes.',
-                fr: '<strong>Demandeur principal</strong> : Le demandeur principal sera la personne-ressource pour l’Entente d’accès de l’ÉLCV, ainsi que pour la transmission des données et toute mise à jour pertinente.  Le demandeur principal doit occuper un poste admissible (à titre continu ou pour une durée déterminée) dans un établissement admissible qui est en mesure de respecter les conditions de l’Entente d’accès aux données, d’administrer les fonds de la subvention et de fournir l’approbation du comité d’éthique de la recherche. TODO: TRANSLATE',
+                fr: '<strong>Demandeur principal</strong> : Le demandeur principal sera la personne-ressource pour l’Entente d’accès de l’ÉLCV, ainsi que pour la transmission des données et toute mise à jour pertinente.  Le demandeur principal doit occuper un poste admissible (à titre continu ou pour une durée déterminée) dans un établissement admissible qui est en mesure de respecter les conditions de l’Entente d’accès aux données, d’administrer les fonds de la subvention et de fournir l’approbation du comité d’éthique de la recherche. Veuillez préciser si vous êtes chercheuse ou chercheur en début de carrière conformément à la définition des IRSC (<a href="https://cihr-irsc.gc.ca/f/34190.html#c11" target="early_career">https://cihr-irsc.gc.ca/f/34190.html#c11</a>). Nous recueillons cette information en vue de la production des rapports de l’ÉLCV.',
               },
               text2: {
                 en: "<strong>Fee Waivers</strong>: Please see below to select the fee waiver.",
@@ -1065,7 +1065,7 @@ cenozo.service("CnLocalization", [
               },
               applicant_name: { en: "Name", fr: "Nom" },
               applicant_position: { en: "Position", fr: "Poste" },
-              applicant_early_career: { en: "Are you an early career researcher?", fr: "TODO: TRANSLATE" },
+              applicant_early_career: { en: "Are you an early career researcher?", fr: "Êtes-vous chercheuse ou chercheur en début de carrière?" },
               applicant_affiliation: {
                 en: "Institution (department, research institute or hospital)",
                 fr: "Établissement (département, institut de recherche ou hôpital)",
@@ -1105,15 +1105,15 @@ cenozo.service("CnLocalization", [
               trainee_email: { en: "E-mail", fr: "Courriel" },
               text4: {
                 en: "Confirm whether the CLSA dataset requested will be for the sole use of the trainee project, i.e., the graduate student’s thesis research or the postdoctoral or clinical fellow’s research project.",
-                fr: "TODO: TRANSLATE",
+                fr: "Veuillez confirmer si l’ensemble de données de l’ÉLCV réclamé est destiné à l’usage exclusif de la thèse, du mémoire ou du projet de recherche postdoctoral ou clinique du stagiaire.",
               },
               trainee_project: {
                 en: "Trainee Project Only",
-                fr: "TODO: TRANSLATE",
+                fr: "Projet réservé aux stagiaires",
               },
               text5: {
                 en: 'Graduate students (Masters or PhD) who wish to obtain the CLSA data for the sole purpose of their thesis, and postdoctoral or clinical fellows (limit 1 waiver per fellowship) who wish to obtain the CLSA data for the sole purpose of their postdoctoral or clinical fellowship project, who are enrolled at Canadian institutions for their graduate degree, postdoc, or clinical fellowship, can apply for a fee waiver. Canadian trainees working outside Canada but funded through a Canadian source are also eligible for a fee waiver (if applicable, please e-mail <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>). Research conducted as part of a CIHR Catalyst Grant is not eligible for a CLSA Data Access Trainee Fee Waiver.',
-                fr: "TODO: TRANSLATE",
+                fr: 'Les étudiantes et étudiants aux deuxième et troisième cycles (maîtrise ou doctorat) inscrits dans un établissement canadien qui destinent les données de l’ÉLCV à l’usage exclusif de leur thèse, de leur mémoire ou de leur projet de recherche postdoctoral ou clinique peuvent demander une exonération des droits (limite d’une par stage de perfectionnement). Les stagiaires canadiens qui travaillent hors du Canada, mais qui sont financés par une source canadienne, sont également admissibles à une exonération des droits (ils doivent alors écrire à <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>). Les recherches réalisées dans le cadre d’une subvention Catalyseur des IRSC ne sont pas admissibles à l’exonération des droits d’accès aux données de l’ÉLCV.',
               },
               waiver: {
                 en: "Fee Waiver Type",
@@ -1124,7 +1124,7 @@ cenozo.service("CnLocalization", [
               tab: { en: "Project Team", fr: "Équipe de projet" },
               text: {
                 en: "All Co-Applicants and Other Personnel must be listed below. Please indicate whether the person is a trainee for the CLSA’s reporting purposes. You must inform your collaborators that you have included them on this application. Please note that changes to the project team, including change of Primary Applicant and addition or removal of Co-Applicants and Support Personnel <strong>require an amendment</strong>. To submit an Amendment request, please click on \"Create Amendment\" in the upper-right corner of your screen and follow the instructions.",
-                fr: "Tous les codemandeurs et les membres du personnel de soutien doivent être identifiés ci-dessous. TODO: TRANSLATE. Vous devez informer vos collaborateurs que vous les avez inclus dans cette demande. Veuillez noter que tout changement à l’équipe de projet y compris un changement de demandeur principal et l’ajout ou le retrait d’un codemandeur ou d’un membre du personnel de soutien <strong>nécessite une modification</strong>. Pour soumettre une demande de modification, veuillez cliquer sur « Créer une modification » dans le coin supérieur droit de votre écran et suivre les instructions.",
+                fr: "Tous les codemandeurs et les membres du personnel de soutien doivent être identifiés ci-dessous. Veuillez préciser si la personne est stagiaire afin que l’information puisse être incluse dans les rapports de l’ÉLCV. Vous devez informer vos collaborateurs que vous les avez inclus dans cette demande. Veuillez noter que tout changement à l’équipe de projet y compris un changement de demandeur principal et l’ajout ou le retrait d’un codemandeur ou d’un membre du personnel de soutien <strong>nécessite une modification</strong>. Pour soumettre une demande de modification, veuillez cliquer sur « Créer une modification » dans le coin supérieur droit de votre écran et suivre les instructions.",
               },
               noCoapplicants: {
                 en: "No co-applicants have been added.",
@@ -1932,11 +1932,11 @@ cenozo.service("CnLocalization", [
             },
             trainee_description: {
               en: "The following must be included in your manuscript:",
-              fr: "Ce qui suit doit être inclus dans votre manuscrit :",
+              fr: "L’information suivante doit être intégrée à votre manuscrit : ",
             },
             trainee_example: {
               en: "was the recipient of a CLSA Data Access Trainee Fee Waiver",
-              fr: "TODO: TRANSLATE",
+              fr: "a reçu une exonération des droits d’accès aux données de l’ÉLCV.",
             },
             trainee: {
               en: "Has this requirement been met?",
