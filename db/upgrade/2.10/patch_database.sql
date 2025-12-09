@@ -12,6 +12,7 @@ SOURCE additional_fee_fee_schedule.sql
 SOURCE amendment_type_fee_schedule.sql
 SOURCE data_selection_fee_schedule.sql
 
+SOURCE data_category.sql
 SOURCE amendment.sql
 SOURCE reqn_current_amendment.sql
 SOURCE update_reqn_current_amendment.sql

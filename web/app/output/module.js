@@ -1,6 +1,6 @@
 cenozoApp.defineModule({
   name: "output",
-  dependencies: ["reqn"],
+  dependencies: ["reqn", "final_report"],
   models: ["add", "list", "view"],
   create: (module) => {
     angular.extend(module, {

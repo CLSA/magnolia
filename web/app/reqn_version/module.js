@@ -81,6 +81,7 @@ cenozoApp.defineModule({
       reqn_type: { column: "reqn_type.name", type: "string" },
       amendment_version: { type: "string" },
       amendment: { column: "amendment.name", type: "string" },
+      fee_schedule_id: { column: "amendment.fee_schedule_id", type: "string" },
       is_current_version: { type: "boolean" },
       applicant_name: { type: "string" },
       applicant_position: { type: "string" },
@@ -393,6 +394,7 @@ cenozoApp.defineModule({
 
                     // reset the form
                     form.$setPristine();
+                    $scope.coapplicantFormattedRecord = {};
                     await coapplicantAddModel.onNew($scope.coapplicantRecord);
                     await $scope.model.viewModel.getCoapplicantList();
                     await $scope.model.viewModel.determineCoapplicantDiffs();
@@ -584,6 +586,7 @@ cenozoApp.defineModule({
 
                     // reset the form
                     form.$setPristine();
+                    $scope.manuscriptFormattedRecord = {};
                     await manuscriptAddModel.onNew($scope.manuscriptRecord);
                     await $scope.model.viewModel.getManuscriptList();
                   } finally {
@@ -3241,6 +3244,13 @@ cenozoApp.defineModule({
                       fr: angular.isDefined(selection.unavailable_fr) ? selection.unavailable_fr : null,
                     },
                     detailList: [],
+                    // TODO add fee
+                    fee: {
+                      value: selection.fee,
+                      en: 0 < 0 < selection.fee ? "$" + selection.fee : "",
+                      fr: 0 < selection.fee ? selection.fee + " $" : "",
+                    },
+                    costCombined: selection.cost_combined,
                   });
 
                   option.selectionList.push(selection);

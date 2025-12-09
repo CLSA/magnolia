@@ -1,5 +1,6 @@
 cenozoApp.defineModule({
   name: "additional_fee_fee_schedule",
+  dependencies: ["fee_schedule", "additional_fee"],
   models: ["list", "view"],
   create: (module) => {
     angular.extend(module, {

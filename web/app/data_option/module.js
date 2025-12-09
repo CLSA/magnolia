@@ -6,7 +6,7 @@ cenozoApp.defineModule({
       identifier: {
         parent: {
           subject: "data_category",
-          column: "data_category.name_en",
+          column: "data_category.id",
         },
       },
       name: {

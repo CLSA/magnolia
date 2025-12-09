@@ -45,12 +45,10 @@ cenozoApp.defineModule({
 
             if (angular.isDefined(object.dataReleaseModel)) {
               object.dataReleaseModel.listModel.heading = "Requisition List";
-              object.dataReleaseModel.listModel.parentModel.transitionToViewState =
-                async function (record) {
-                  await $state.go("reqn.view", {
-                    identifier: "identifier=" + record.identifier,
-                  });
-                };
+              object.dataReleaseModel.listModel.parentModel.transitionToViewState = async function (record) {
+                await $state.go("reqn.view", { identifier: "identifier=" + record.identifier });
+              };
+              object.dataReleaseModel.getAddEnabled = function () { return false; }
             }
           }
 
