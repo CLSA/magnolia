@@ -486,7 +486,7 @@ cenozoApp.defineModule({
               for (let n=1; n<=10; n++) {
                 const columnName = "filename" + n;
                 group.inputList[columnName].title =
-                  CnLocalization.translate( "output", "filename", lang ) + " " + n;
+                  CnLocalization.translate( "output", "attachment", lang ) + " " + n;
               }
 
               await this.metadata.getPromise();

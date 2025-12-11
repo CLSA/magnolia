@@ -84,32 +84,6 @@ cenozoApp.defineModule({
             cnRecordView.link(scope, element, attrs);
             scope.isDAO = function () { return scope.model.isRole("dao"); };
             scope.liteModel.viewModel.onView();
-            scope.model.viewModel.afterView(function () {
-              // setup the breadcrumbtrail
-              CnSession.setBreadcrumbTrail([
-                {
-                  title: reqnModel.module.name.plural.ucWords(),
-                  go: async function () { await reqnModel.transitionToListState(); },
-                },
-                {
-                  title: scope.model.viewModel.record.identifier,
-                  go: async function () {
-                    await reqnModel.transitionToViewState({
-                      getIdentifier: function () {
-                        return ("identifier=" + scope.model.viewModel.record.identifier);
-                      },
-                    });
-                  },
-                },
-                {
-                  title: scope.model.module.name.singular.ucWords(),
-                  go: async function () {
-                    await scope.model.transitionToViewState(scope.model.viewModel.record);
-                  },
-                },
-              ]);
-            });
-
             scope.$watch("model.viewModel.record.findings", (text) => {
               scope.model.viewModel.charCount.findings = text ? text.length : 0;
             });
