@@ -1353,8 +1353,8 @@ cenozo.service("CnLocalization", [
                 fr: "Veuillez sélectionner la cohorte (surveillance et/ou globale) pour laquelle vous demandez des données (VOUS DEVEZ SÉLECTIONNER AU MOINS UNE COHORTE) :",
               },
               text2: {
-                en: "You will be able to make your selection of the wave of data collection (Baseline and/or Follow-up 1) within the Data Checklist.",
-                fr: "Vous pourrez sélectionner la vague de collecte de données (départ et/ou 1er suivi) dans le tableau de sélection de données.",
+                en: "You will be able to make your selection of the wave of data collection within the Data Checklist.",
+                fr: "Vous pourrez sélectionner la vague de collecte de données dans le tableau de sélection de données.",
               },
               tracking: {
                 en: "Tracking Cohort (Telephone Interview)",
@@ -2225,6 +2225,7 @@ cenozo.service("CnLocalization", [
             no: { en: "No", fr: "Non" },
             yes: { en: "Yes", fr: "Oui" },
             close: { en: "Close", fr: "Ferme" },
+            none: { en: "none", fr: "aucun" },
             choose: { en: "(choose)", fr: "(choisir)" },
             remove: { en: "Remove", fr: "Supprimer" },
             chars: { en: "characters", fr: "caractères" },
