@@ -1,6 +1,7 @@
 cenozoApp.defineModule({
   name: "data_selection",
   models: ["add", "list", "view"],
+  defaultTab: 'data_detail',
   create: (module) => {
     angular.extend(module, {
       identifier: {

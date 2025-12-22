@@ -2241,6 +2241,8 @@ cenozo.service("CnLocalization", [
             application: { en: "Application", fr: "Soumission" },
             finalReport: { en: "Final Report", fr: "Rapport final" },
             destructionReport: { en: "Data Destruction Report", fr: "Rapport de destruction de données" },
+            compare: { en: "Compare", fr: "Comparer" },
+            comparingWithVersion: { en: "Comparing with Version", fr: "Compare avec Version" },
             submit: { en: "Submit", fr: "Soumettre" },
             pleaseConfirm: { en: "Please confirm", fr: "Veuillez confirmer" },
             submitTitle: {
