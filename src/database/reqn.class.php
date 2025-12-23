@@ -558,7 +558,8 @@ class reqn extends \cenozo\database\record
     $select->from( 'manuscript_stage' );
     $select->add_column( 'id' );
     $modifier = lib::create( 'database\modifier' );
-    $modifier->where( 'reqn_id', '=', $this->id );
+    $modifier->join( 'manuscript', 'manuscript_stage.manuscript_id', 'manuscript.id' );
+    $modifier->where( 'manuscript.reqn_id', '=', $this->id );
     $modifier->where( 'datetime', '!=', NULL );
     $modifier->order_desc( 'datetime' );
     $modifier->limit( 1 );
@@ -1128,7 +1129,7 @@ class reqn extends \cenozo\database\record
         // change before the user.  Otherwise the new trainee may not have their supervisor changed to the
         // new applicant.
         if(
-          !is_null( $db_reqn_version->new_trainee_user_id ) &&
+         !is_null( $db_reqn_version->new_trainee_user_id ) &&
           $this->trainee_user_id != $db_reqn_version->new_trainee_user_id
         ) $this->change_trainee_user();
 

@@ -1,6 +1,7 @@
 cenozoApp.defineModule({
   name: "amendment_type",
   models: ["add", "list", "view"],
+  defaultTab: 'amendment_type_fee_schedule',
   create: (module) => {
     angular.extend(module, {
       identifier: {},

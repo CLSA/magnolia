@@ -41,11 +41,17 @@ class requisition extends \cenozo\business\report\base_report
       }
       else if( 'start_date' == $restriction['name'] && !is_null( $restriction['value'] ) )
       {
-        $start_date = $restriction['value'];
+        $start_date = util::get_datetime_object(
+          $restriction['value'],
+          $db_application->timezone
+        )->format( 'Y-m-d' );
       }
       else if( 'end_date' == $restriction['name'] && !is_null( $restriction['value'] ) )
       {
-        $end_date = $restriction['value'];
+        $end_date = util::get_datetime_object(
+          $restriction['value'],
+          $db_application->timezone
+        )->format( 'Y-m-d' );
       }
     }
 
@@ -72,17 +78,17 @@ class requisition extends \cenozo\business\report\base_report
       $reqn_class_name::db()->execute( sprintf(
         'CREATE TEMPORARY TABLE temp_stage_sort '.
         'SELECT '.
-          'reqn_id, stage_type_id, '.
+          'amendment_id, stage_type_id, '.
           'DATE( IFNULL( CONVERT_TZ( datetime, "UTC", "%s" ), create_timestamp ) ) as date '.
         'FROM stage '.
-        'ORDER BY reqn_id, datetime IS NULL, datetime', // sort by datetime, putting NULL values at the end
+        'ORDER BY amendment_id, datetime IS NULL, datetime', // sort by datetime, putting NULL values at the end
         $db_application->timezone
       ) );
       $reqn_class_name::db()->execute( 'SET @d = NULL' );
       $reqn_class_name::db()->execute(
         'CREATE TEMPORARY TABLE temp_stage '.
         'SELECT '.
-          'reqn_id, '.
+          'amendment_id, '.
           'stage_type_id, '.
           'CAST( IF(stage_type_id=1, NULL, @d) AS date ) AS start_date, '.
           'CAST( @d := date AS date ) AS end_date '.
@@ -90,7 +96,7 @@ class requisition extends \cenozo\business\report\base_report
       );
       $reqn_class_name::db()->execute(
         'ALTER TABLE temp_stage '.
-        'ADD INDEX dk_reqn_id (reqn_id), '.
+        'ADD INDEX dk_amendment_id (amendment_id), '.
         'ADD INDEX dk_start_date (start_date), '.
         'ADD INDEX dk_end_date (end_date)'
       );
@@ -115,7 +121,7 @@ class requisition extends \cenozo\business\report\base_report
         }
         if( !is_null( $end_date ) )
         {
-          $join_mod->where( sprintf( 'temp_stage.%s', $date_column ), '>=', $end_date );
+          $join_mod->where( sprintf( 'temp_stage.%s', $date_column ), '<=', $end_date );
         }
       }
 

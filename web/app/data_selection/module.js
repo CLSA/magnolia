@@ -1,12 +1,13 @@
 cenozoApp.defineModule({
   name: "data_selection",
   models: ["add", "list", "view"],
+  defaultTab: 'data_detail',
   create: (module) => {
     angular.extend(module, {
       identifier: {
         parent: {
           subject: "data_option",
-          column: "data_option.name_en",
+          column: "data_option.id",
         },
       },
       name: {

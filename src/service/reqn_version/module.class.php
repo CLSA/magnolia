@@ -116,8 +116,8 @@ class module extends \cenozo\service\module
       $join_mod = lib::create( 'database\modifier' );
       $join_mod->where( 'amendment.id', '=', 'stage.amendment_id', false );
       $join_mod->where( 'stage.datetime', '=', NULL );
-      $modifier->join_modifier( 'stage', $join_mod );
-      $modifier->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
+      $modifier->join_modifier( 'stage', $join_mod, 'left' );
+      $modifier->left_join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
     }
 
     if( $select->has_column( 'is_current_version' ) )

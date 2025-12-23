@@ -127,34 +127,6 @@ cenozoApp.defineModule({
               if (scope.model.isRole("applicant", "designate") && record.has_unread_notice) {
                 await scope.model.viewModel.displayNotices();
               }
-
-              // setup the breadcrumbtrail
-              CnSession.setBreadcrumbTrail([
-                {
-                  title: manuscriptModel.module.name.plural.ucWords(),
-                  go: async function () {
-                    await manuscriptModel.transitionToListState();
-                  },
-                },
-                {
-                  title: scope.model.viewModel.record.title,
-                  go: async function () {
-                    await manuscriptModel.transitionToViewState({
-                      getIdentifier: function () {
-                        return scope.model.viewModel.record.id;
-                      },
-                    });
-                  },
-                },
-                {
-                  title: scope.model.module.name.singular.ucWords(),
-                  go: async function () {
-                    await scope.model.transitionToViewState(
-                      scope.model.viewModel.record
-                    );
-                  },
-                },
-              ]);
             });
 
             scope.$watch("model.viewModel.record.objectives", (text) => {

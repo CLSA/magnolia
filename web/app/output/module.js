@@ -1,6 +1,6 @@
 cenozoApp.defineModule({
   name: "output",
-  dependencies: ["reqn"],
+  dependencies: ["reqn", "final_report"],
   models: ["add", "list", "view"],
   create: (module) => {
     angular.extend(module, {
@@ -486,7 +486,7 @@ cenozoApp.defineModule({
               for (let n=1; n<=10; n++) {
                 const columnName = "filename" + n;
                 group.inputList[columnName].title =
-                  CnLocalization.translate( "output", "filename", lang ) + " " + n;
+                  CnLocalization.translate( "output", "attachment", lang ) + " " + n;
               }
 
               await this.metadata.getPromise();

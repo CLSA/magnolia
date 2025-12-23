@@ -393,6 +393,7 @@ cenozoApp.defineModule({
 
                     // reset the form
                     form.$setPristine();
+                    $scope.coapplicantFormattedRecord = {};
                     await coapplicantAddModel.onNew($scope.coapplicantRecord);
                     await $scope.model.viewModel.getCoapplicantList();
                     await $scope.model.viewModel.determineCoapplicantDiffs();
@@ -584,6 +585,7 @@ cenozoApp.defineModule({
 
                     // reset the form
                     form.$setPristine();
+                    $scope.manuscriptFormattedRecord = {};
                     await manuscriptAddModel.onNew($scope.manuscriptRecord);
                     await $scope.model.viewModel.getManuscriptList();
                   } finally {
@@ -1058,6 +1060,26 @@ cenozoApp.defineModule({
               );
             },
 
+            feeToString: function (fee) {
+              const obj = { en: "", fr: "" };
+              if (0 < fee) {
+                const feeString = fee.toString();
+                angular.extend(obj, {
+                  en: "$" + (
+                    1000 <= fee ?
+                    feeString.replace(/([0-9]+)([0-9]{3})$/, "$1,$2") :
+                    feeString
+                  ),
+                  fr: (
+                    1000 <= fee ?
+                    feeString.replace(/([0-9]+)([0-9]{3})$/, "$1 $2") :
+                    feeString
+                  ) + " $",
+                });
+              }
+              return obj;
+            },
+
             getTotalFee: function () {
               // only calculate the fee if we have to
               if (!this.record.show_prices) return null;
@@ -1074,11 +1096,7 @@ cenozoApp.defineModule({
               if (null == this.totalFee) return this.translate("misc.calculating") + "...";
 
               // add thousands separators
-              let sep = "fr" == this.record.lang ? " " : ",";
-              let fee = this.totalFee.toString();
-              if (1000000 <= fee) fee = fee.replace( /([0-9]+)([0-9]{3})([0-9]{3})$/, "$1"+sep+"$2"+sep+"$3" );
-              else if (1000 <= fee) fee = fee.replace( /([0-9]+)([0-9]{3})$/, "$1"+sep+"$2" );
-              return "fr" == this.record.lang ? fee + " $" : "$" + fee;
+              return this.feeToString(this.totalFee)[this.record.lang];
             },
 
             isWaiverMutable: function () {
@@ -1318,8 +1336,8 @@ cenozoApp.defineModule({
                               category.optionList.forEach((option) => {
                                 option.selectionList.forEach((selection) => {
                                   if (
-                                    reqnVersion1.selectionList[selection.id] !=
-                                    reqnVersion2.selectionList[selection.id]
+                                    reqnVersion1.selectionList[selection.id].selected !=
+                                    reqnVersion2.selectionList[selection.id].selected
                                   ) {
                                     differences.diff = true;
                                     differences[part].diff = true;
@@ -1333,7 +1351,11 @@ cenozoApp.defineModule({
                                           .studyPhase[selection.studyPhaseCode]
                                           .en +
                                         "]",
-                                      diff: reqnVersion1.selectionList[selection.id] ? "added" : "removed",
+                                      diff: (
+                                        reqnVersion1.selectionList[selection.id].selected ?
+                                        "added" :
+                                        "removed"
+                                      ),
                                     });
                                   }
                                 });
@@ -1484,7 +1506,6 @@ cenozoApp.defineModule({
               response.data.forEach((version) => {
                 promiseList = promiseList.concat([
                   this.getAmendmentTypeList(version.id, version),
-
                   // see if there is a difference between this list and the view's list
                   this.getCoapplicantList(version.id, version).then(() => this.setCoapplicantDiff(version)),
                   // see if there is a difference between this list and the view's list
@@ -1666,7 +1687,7 @@ cenozoApp.defineModule({
 
                   let fee = amendmentType[this.isInternational() ? "feeInternational" : "feeNational"];
                   if (0 < fee) {
-                    fee = "fr" == this.record.lang ? fee + " $" : "$" + fee;
+                    fee = this.feeToString(fee)[this.record.lang];
                     proceed = false;
 
                     // show a warning if the amendment has a fee
@@ -1855,10 +1876,7 @@ cenozoApp.defineModule({
             },
 
             getSelectionList: async function (reqnVersionId, object) {
-              var basePath = angular.isDefined(reqnVersionId)
-                ? "reqn_version/" + reqnVersionId
-                : this.parentModel.getServiceResourcePath();
-
+              const basePath = this.parentModel.getServiceResourcePath(reqnVersionId);
               if (angular.isUndefined(object)) object = this.record;
 
               // set all selections to false
@@ -1869,19 +1887,15 @@ cenozoApp.defineModule({
                 )
               );
 
-              var [
+              const [
                 selectionResponse,
                 commentResponse,
                 optionJustificationResponse,
                 amendmentJustificationResponse,
               ] = await Promise.all([
                 CnHttpFactory.instance({
-                  path: basePath + "/data_selection",
-                  data: {
-                    select: {
-                      column: [ "data_option_id", { table: "study_phase", column: "code", alias: "phase" } ],
-                    },
-                  },
+                  path: basePath + "/data_selection?full=true",
+                  data: { select: { column: "id" } },
                 }).query(),
 
                 CnHttpFactory.instance({
@@ -1901,7 +1915,12 @@ cenozoApp.defineModule({
               ]);
 
               // set all reqn-version selections
-              selectionResponse.data.forEach((selection) => { object.selectionList[selection.id] = true; });
+              selectionResponse.data.forEach(selection => {
+                const selection_id = selection.id;
+                delete selection.id;
+                selection.feeString = this.feeToString(selection.fee);
+                object.selectionList[selection_id] = selection;
+              });
 
               // define all reqn-version comments
               commentResponse.data.forEach((comment) => {
@@ -1928,7 +1947,7 @@ cenozoApp.defineModule({
             isOptionSelected: function (option) {
               return (
                 angular.isArray(this.record.selectionList) &&
-                option.selectionList.some((selection) => this.record.selectionList[selection.id])
+                option.selectionList.some((selection) => this.record.selectionList[selection.id].selected)
               );
             },
 
@@ -1937,8 +1956,10 @@ cenozoApp.defineModule({
             },
 
             toggleSelection: async function (category, option, selection) {
+              const selectObj = this.record.selectionList[selection.id];
+
               // when selecting the data-option first check to see if the category or data option have a condition
-              if (!this.record.selectionList[selection.id]) {
+              if (!selectObj.selected) {
                 var column = "condition_" + this.record.lang;
 
                 // create a modal for the category condition, if required
@@ -1983,21 +2004,21 @@ cenozoApp.defineModule({
               var justificationColumn = "data_justification_" + option.id;
 
               // toggle the option
-              this.record.selectionList[selection.id] = !this.record.selectionList[selection.id];
+              selectObj.selected = !selectObj.selected;
 
               try {
                 var data = {};
-                if (this.record.selectionList[selection.id]) data.add = selection.id;
+                if (selectObj.selected) data.add = selection.id;
                 else data.remove = selection.id;
                 await CnHttpFactory.instance({
                   path: this.parentModel.getServiceResourcePath() + "/data_selection",
                   data: data,
                   onError: (error) => {
-                    this.record.selectionList[selection.id] = !this.record.selectionList[selection.id];
+                    selectObj.selected = !selectObj.selected;
                   },
                 }).post();
 
-                if (this.record.selectionList[selection.id]) {
+                if (selectObj.selected) {
                   // add the local copy of the justification if it doesn't already exist
                   if (option.justification && angular.isUndefined(this.record[justificationColumn])) {
                     this.record[justificationColumn] = "";
@@ -2006,7 +2027,7 @@ cenozoApp.defineModule({
                   // delete the local copy of the justification if there are no data options left
                   if (option.justification && angular.isDefined(this.record[justificationColumn])) {
                     var stillSelected = category.optionList.some((option) =>
-                      option.selectionList.some((selection) => this.record.selectionList[selection.id])
+                      option.selectionList.some((selection) => selectObj.selected)
                     );
 
                     if (!stillSelected) delete this.record[justificationColumn];
@@ -2932,6 +2953,7 @@ cenozoApp.defineModule({
                         column: [
                           "id",
                           "data_category_id",
+                          "cost_combined",
                           "justification",
                           "name_en",
                           "name_fr",

@@ -1338,20 +1338,34 @@
                         </a>
                       </td>
                       <td
-                          ng-repeat="selection in option.selectionList"
-                          ng-style="{ 'width': 50/detailList.length + '%' }"
-                          ng-class="{ 'bg-warning': model.viewModel.compareRecord.differences.part2[category.tabName].selectionList.findByProperty( 'id', selection.id ) }">
-                        <span ng-if="null != selection.unavailable[model.viewModel.record.lang]"
-                              ng-bind-html="selection.unavailable[model.viewModel.record.lang]"></span>
-                        <button ng-if="null == selection.unavailable[model.viewModel.record.lang]"
-                                class="btn full-width"
-                                ng-class="model.viewModel.record.selectionList[selection.id] ? 'btn-success' : 'btn-default'"
-                                ng-disabled="!model.getEditEnabled() || isDAO()"
-                                ng-click="model.viewModel.toggleSelection( category, option, selection )">
-                          <i class="glyphicon glyphicon-ok" ng-if="model.viewModel.record.selectionList[selection.id]"></i>
-                          <span style="font-weight: normal"
-                                ng-if="!model.viewModel.record.selectionList[selection.id]"
-                                ng-bind-html="t( 'misc.clickToSelect' )"></span>
+                        ng-repeat="selection in option.selectionList"
+                        ng-style="{ 'width': 50/detailList.length + '%' }"
+                        ng-class="{ 'bg-warning': model.viewModel.compareRecord.differences.part2[category.tabName].selectionList.findByProperty( 'id', selection.id ) }"
+                      >
+                        <span
+                          ng-if="null != selection.unavailable[model.viewModel.record.lang]"
+                          ng-bind-html="selection.unavailable[model.viewModel.record.lang]"
+                        ></span>
+                        <button
+                          ng-if="null == selection.unavailable[model.viewModel.record.lang]"
+                          class="btn full-width"
+                          ng-class="
+                            model.viewModel.record.selectionList[selection.id].selected ?
+                            'btn-success' :
+                            'btn-default'
+                          "
+                          ng-disabled="!model.getEditEnabled() || isDAO()"
+                          ng-click="model.viewModel.toggleSelection( category, option, selection )"
+                        >
+                          <i
+                            class="glyphicon glyphicon-ok"
+                            ng-if="model.viewModel.record.selectionList[selection.id].selected"
+                          ></i>
+                          <span
+                            style="font-weight: normal"
+                            ng-if="!model.viewModel.record.selectionList[selection.id].selected"
+                            ng-bind-html="t( 'misc.clickToSelect' )"
+                          ></span>
                         </button>
                       </td>
                     </tr>
@@ -1361,15 +1375,36 @@
                           <div
                             ng-repeat="selection in option.selectionList"
                             ng-if="
-                              0 < selection.detailList.length ||
-                              null == selection.unavailable[model.viewModel.record.lang]
+                              0 < selection.detailList.length || (
+                                null == selection.unavailable[model.viewModel.record.lang] &&
+                                0 < model.viewModel.record.selectionList[selection.id].fee
+                              )
                             "
                           >
                             <div
                               class="col-sm-2 vertical-spacer"
                               ng-bind-html="t( 'misc.studyPhase.' + selection.studyPhaseCode )"
                             ></div>
-                            <div class="vertical-spacer col-sm-10">
+                            <div
+                              class="col-sm-2 vertical-spacer"
+                              ng-if="model.viewModel.record.selectionList[selection.id].fee"
+                            >
+                              <span
+                                uib-tooltip-html="option.cost_combined ? t( 'misc.costCombined' ) : ''"
+                                tooltip-popup-delay="100"
+                              >
+                                <b class="invert" ng-if="option.cost_combined">ⓘ</b>
+                                {{ model.viewModel.record.selectionList[selection.id].feeString[model.viewModel.record.lang] }}
+                              </span>
+                            </div>
+                            <div
+                              class="vertical-spacer"
+                              ng-class="
+                                model.viewModel.record.selectionList[selection.id].fee ?
+                                'col-sm-8' :
+                                'col-sm-10'
+                              "
+                            >
                               <span
                                 ng-repeat="detail in selection.detailList"
                                 uib-tooltip-html="detail.note[model.viewModel.record.lang] | cnNewlines"

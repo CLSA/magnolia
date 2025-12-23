@@ -1050,8 +1050,8 @@ cenozo.service("CnLocalization", [
           part1: {
             tab: { en: "Part 1", fr: "1<sup>re</sup> partie" },
             title: {
-              en: "Part 1 of 3: General Project Information",
-              fr: "Partie 1 de 3 : Renseignements généraux",
+              en: "Part 1 of 2: General Project Information",
+              fr: "Partie 1 de 2 : Renseignements généraux",
             },
             applicant: {
               tab: { en: "Applicant", fr: "Demandeur" },
@@ -1321,8 +1321,8 @@ cenozo.service("CnLocalization", [
           part2: {
             tab: { en: "Part 2", fr: "2<sup>e</sup> partie" },
             title: {
-              en: "Part 2 of 3: Data Checklist",
-              fr: "Partie 2 de 3 : Sélection des données",
+              en: "Part 2 of 2: Data Checklist",
+              fr: "Partie 2 de 2 : Sélection des données",
             },
             notes: {
               tab: { en: "Notes", fr: "Remarques" },
@@ -1353,8 +1353,8 @@ cenozo.service("CnLocalization", [
                 fr: "Veuillez sélectionner la cohorte (surveillance et/ou globale) pour laquelle vous demandez des données (VOUS DEVEZ SÉLECTIONNER AU MOINS UNE COHORTE) :",
               },
               text2: {
-                en: "You will be able to make your selection of the wave of data collection (Baseline and/or Follow-up 1) within the Data Checklist.",
-                fr: "Vous pourrez sélectionner la vague de collecte de données (départ et/ou 1er suivi) dans le tableau de sélection de données.",
+                en: "You will be able to make your selection of the wave of data collection within the Data Checklist.",
+                fr: "Vous pourrez sélectionner la vague de collecte de données dans le tableau de sélection de données.",
               },
               tracking: {
                 en: "Tracking Cohort (Telephone Interview)",
@@ -2225,6 +2225,7 @@ cenozo.service("CnLocalization", [
             no: { en: "No", fr: "Non" },
             yes: { en: "Yes", fr: "Oui" },
             close: { en: "Close", fr: "Ferme" },
+            none: { en: "none", fr: "aucun" },
             choose: { en: "(choose)", fr: "(choisir)" },
             remove: { en: "Remove", fr: "Supprimer" },
             chars: { en: "characters", fr: "caractères" },
@@ -2241,6 +2242,8 @@ cenozo.service("CnLocalization", [
             application: { en: "Application", fr: "Soumission" },
             finalReport: { en: "Final Report", fr: "Rapport final" },
             destructionReport: { en: "Data Destruction Report", fr: "Rapport de destruction de données" },
+            compare: { en: "Compare", fr: "Comparer" },
+            comparingWithVersion: { en: "Comparing with Version", fr: "Compare avec Version" },
             submit: { en: "Submit", fr: "Soumettre" },
             pleaseConfirm: { en: "Please confirm", fr: "Veuillez confirmer" },
             submitTitle: {

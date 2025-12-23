@@ -29,5 +29,31 @@ class module extends \cenozo\service\module
 
     if( $select->has_column( 'is_unavailable' ) )
       $select->add_column( 'unavailable_en IS NOT NULL AND unavailable_fr IS NOT NULL', 'is_unavailable', false );
+
+    $reqn_version_id = $this->get_argument( 'reqn_version_id', NULL );
+    if( !is_null( $reqn_version_id ) )
+    {
+      // add the fee for the selected reqn_version
+      $db_amendment = lib::create( 'database\reqn_version', $reqn_version_id )->get_amendment();
+      $modifier->join(
+        'data_selection_fee_schedule',
+        'data_selection.id',
+        'data_selection_fee_schedule.data_selection_id'
+      );
+      $modifier->where( 'data_selection_fee_schedule.fee_schedule_id', '=', $db_amendment->fee_schedule_id );
+      $select->add_table_column( 'data_selection_fee_schedule', 'fee' );
+
+      // add the fee and whether the reqn_version has selected each record
+      $join_mod = lib::create( 'database\modifier' );
+      $join_mod->where( 'data_selection.id', '=', 'reqn_version_has_data_selection.data_selection_id', false );
+      $join_mod->where( 'reqn_version_has_data_selection.reqn_version_id', '=', $reqn_version_id );
+      $modifier->join_modifier( 'reqn_version_has_data_selection', $join_mod, 'left' );
+      $select->add_column(
+        'reqn_version_has_data_selection.reqn_version_id IS NOT NULL',
+        'selected',
+        false,
+        'boolean'
+      );
+    }
   }
 }

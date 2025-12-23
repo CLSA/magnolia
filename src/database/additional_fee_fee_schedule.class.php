@@ -34,7 +34,7 @@ class additional_fee_fee_schedule extends \cenozo\database\record
       $modifier->order( 'amendment.name' );
       foreach( $this->get_additional_fee()->get_reqn_list( $select, $modifier ) as $row )
       {
-        $db_amendment = $row['amendment_id'];
+        $db_amendment = lib::create( 'database\amendment', $row['amendment_id'] );
         $db_amendment->update_fee();
       }
     }

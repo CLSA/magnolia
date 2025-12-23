@@ -45,7 +45,7 @@ cenozoApp.defineModule({
       data: {
         title: "File",
         type: "base64",
-        isConstant: true
+        isConstant: "view",
       },
     });
   },
