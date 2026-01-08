@@ -129,65 +129,68 @@ class amendment extends \cenozo\database\record
         ) );
       }
 
-      // go through each data selection and determine its fee based on the amendment when it was first added
-      $data_selection_sel = lib::create( 'database\select' );
-      $data_selection_sel->add_column( 'id' );
-      foreach( $db_reqn_version->get_data_selection_list( $data_selection_sel ) as $data_selection )
+      if( !is_null( $db_reqn_version ) )
       {
-        $first_sel = lib::create( 'database\select' );
-        $first_sel->from( 'amendment' );
-        $first_sel->add_column( 'MIN( amendment.name )', 'name', false );
-        $first_mod = lib::create( 'database\modifier' );
-        $first_mod->join(
-          'amendment_current_reqn_version',
-          'amendment.id',
-          'amendment_current_reqn_version.amendment_id'
-        );
-        $first_mod->join(
-          'reqn_version',
-          'amendment_current_reqn_version.reqn_version_id',
-          'reqn_version.id'
-        );
-        $first_mod->join(
-          'reqn_version_has_data_selection',
-          'reqn_version.id',
-          'reqn_version_has_data_selection.reqn_version_id'
-        );
-        $first_mod->where( 'amendment.reqn_id', '=', $db_reqn->id );
-        $first_mod->where( 'reqn_version_has_data_selection.data_selection_id', '=', $data_selection['id'] );
-
-        $name = static::db()->get_one( sprintf(
-          '%s %s',
-          $first_sel->get_sql(),
-          $first_mod->get_sql()
-        ) );
-        $db_first_amendment = static::get_unique_record( ['reqn_id', 'name'], [$db_reqn->id, $name] );
-
+        // go through each data selection and determine its fee based on the amendment when it was first added
         $data_selection_sel = lib::create( 'database\select' );
-        $data_selection_sel->from( 'data_selection_fee_schedule' );
-        $data_selection_sel->add_column(
-          'IF( cost_combined, MAX(data_selection_fee_schedule.fee), SUM(data_selection_fee_schedule.fee) )',
-          'total_fee',
-          false
-        );
-        $data_selection_mod = lib::create( 'database\modifier' );
-        $data_selection_mod->join(
-          'data_selection',
-          'data_selection_fee_schedule.data_selection_id',
-          'data_selection.id'
-        );
-        $data_selection_mod->join( 'data_option', 'data_selection.data_option_id', 'data_option.id' );
-        $data_selection_mod->where(
-          'data_selection_fee_schedule.fee_schedule_id',
-          '=',
-          $db_first_amendment->fee_schedule_id
-        );
-        $data_selection_mod->where( 'data_selection.id', '=', $data_selection['id'] );
-        $fee += static::db()->get_one( sprintf(
-          '%s %s',
-          $data_selection_sel->get_sql(),
-          $data_selection_mod->get_sql()
-        ) );
+        $data_selection_sel->add_column( 'id' );
+        foreach( $db_reqn_version->get_data_selection_list( $data_selection_sel ) as $data_selection )
+        {
+          $first_sel = lib::create( 'database\select' );
+          $first_sel->from( 'amendment' );
+          $first_sel->add_column( 'MIN( amendment.name )', 'name', false );
+          $first_mod = lib::create( 'database\modifier' );
+          $first_mod->join(
+            'amendment_current_reqn_version',
+            'amendment.id',
+            'amendment_current_reqn_version.amendment_id'
+          );
+          $first_mod->join(
+            'reqn_version',
+            'amendment_current_reqn_version.reqn_version_id',
+            'reqn_version.id'
+          );
+          $first_mod->join(
+            'reqn_version_has_data_selection',
+            'reqn_version.id',
+            'reqn_version_has_data_selection.reqn_version_id'
+          );
+          $first_mod->where( 'amendment.reqn_id', '=', $db_reqn->id );
+          $first_mod->where( 'reqn_version_has_data_selection.data_selection_id', '=', $data_selection['id'] );
+
+          $name = static::db()->get_one( sprintf(
+            '%s %s',
+            $first_sel->get_sql(),
+            $first_mod->get_sql()
+          ) );
+          $db_first_amendment = static::get_unique_record( ['reqn_id', 'name'], [$db_reqn->id, $name] );
+
+          $data_selection_sel = lib::create( 'database\select' );
+          $data_selection_sel->from( 'data_selection_fee_schedule' );
+          $data_selection_sel->add_column(
+            'IF( cost_combined, MAX(data_selection_fee_schedule.fee), SUM(data_selection_fee_schedule.fee) )',
+            'total_fee',
+            false
+          );
+          $data_selection_mod = lib::create( 'database\modifier' );
+          $data_selection_mod->join(
+            'data_selection',
+            'data_selection_fee_schedule.data_selection_id',
+            'data_selection.id'
+          );
+          $data_selection_mod->join( 'data_option', 'data_selection.data_option_id', 'data_option.id' );
+          $data_selection_mod->where(
+            'data_selection_fee_schedule.fee_schedule_id',
+            '=',
+            $db_first_amendment->fee_schedule_id
+          );
+          $data_selection_mod->where( 'data_selection.id', '=', $data_selection['id'] );
+          $fee += static::db()->get_one( sprintf(
+            '%s %s',
+            $data_selection_sel->get_sql(),
+            $data_selection_mod->get_sql()
+          ) );
+        }
       }
 
       // add any additional fees
