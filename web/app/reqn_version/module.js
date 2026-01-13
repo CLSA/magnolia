@@ -1068,7 +1068,7 @@ cenozoApp.defineModule({
 
             feeToString: function (fee) {
               const obj = { en: "", fr: "" };
-              if (0 < fee) {
+              if (0 <= fee) {
                 const feeString = fee.toString();
                 angular.extend(obj, {
                   en: "$" + (
