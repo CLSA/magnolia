@@ -15,6 +15,13 @@ cenozoApp.defineModule({
         possessive: "review's",
       },
       columnList: {
+        identifier: {
+          column: "reqn.identifier",
+          title: "Requisition",
+          isIncluded: function ($state, model) {
+            return "review.list" == $state.current.name;
+          },
+        },
         review_type: {
           column: "review_type.name",
           title: "Type",
