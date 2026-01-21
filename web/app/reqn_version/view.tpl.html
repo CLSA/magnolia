@@ -156,14 +156,30 @@
            }"
            ng-bind-html="t( 'part2.tab' )"></a>
       </li>
-      <li ng-class="{'active':'manuscripts' == model.viewModel.getTabPart()}" ng-if="model.viewModel.showManuscripts()">
+      <li
+        ng-class="{'active':'amendments' == model.viewModel.getTabPart()}"
+        ng-if="model.viewModel.showAmendments()"
+      >
+        <a ng-click="model.viewModel.setFormTab('amendments')" ng-bind-html="t( 'amendments.tab' )"></a>
+      </li>
+      <li
+        ng-class="{'active':'manuscripts' == model.viewModel.getTabPart()}"
+        ng-if="model.viewModel.showManuscripts()"
+      >
         <a ng-click="model.viewModel.setFormTab('manuscripts')" ng-bind-html="t( 'manuscripts.tab' )"></a>
       </li>
-      <li ng-class="{'active':'agreement' == model.viewModel.getTabPart()}" ng-if="model.viewModel.showAgreement()">
+      <li
+        ng-class="{'active':'agreement' == model.viewModel.getTabPart()}"
+        ng-if="model.viewModel.showAgreement()"
+      >
         <a ng-click="model.viewModel.setFormTab('agreement')">Agreement</a>
       </li>
     </ul>
-    <div ng-show="'instructions'==model.viewModel.formTab" class="panel panel-default" style="border-top-left-radius: 0px;">
+    <div
+      ng-show="'instructions'==model.viewModel.formTab"
+      class="panel panel-default"
+      style="border-top-left-radius: 0px;"
+    >
       <div class="panel-body" style="padding-bottom: 0px;" ng-if="'.' == model.viewModel.record.amendment">
         <h4 ng-bind-html="t( 'instructions.title' )"></h4>
         <ul class="list-group">
@@ -1462,6 +1478,39 @@
                 </cn-view-input-with-differences>
               </div>
             </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div ng-show="'amendments'==model.viewModel.getTabPart()" class="panel panel-default">
+      <div class="panel-body" style="padding-bottom: 0px;">
+        <h4 style="margin-top: 0; margin-bottom: 1em;" ng-bind-html="t( 'amendments.title' )"></h4>
+        <div ng-show="!model.viewModel.versionListLoaded">
+          <cn-loading></cn-loading>
+        </div>
+        <div
+          ng-show="model.viewModel.versionListLoaded"
+          ng-repeat="version in model.viewModel.versionList.slice().reverse()"
+          ng-if="version && '.' != version.amendment"
+          class="panel panel-default"
+        >
+          <div class="panel-heading">
+            <strong>{{
+              t( 'amendments.amendment' ) + " " +
+              version.amendment +
+              " (" + (version.datetime | cnDatetime:'date') + ")"
+            }}</strong>
+          </div>
+          <div class="panel-body">
+            <ul style="padding-left: 1em;">
+              <li
+                ng-repeat="amendmentType in model.amendmentTypeList[model.viewModel.record.lang]"
+                ng-if="version['amendmentType'+amendmentType.id]"
+              >
+                <label class="control-label">{{ amendmentType.name }}</label>
+                <div class="container-fluid">{{ version['amendment_justification_'+amendmentType.id] }}</div>
+              </li>
+            </ul>
           </div>
         </div>
       </div>

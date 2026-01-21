@@ -1449,6 +1449,14 @@ cenozo.service("CnLocalization", [
               },
             },
           },
+          amendments: {
+            tab: { en: "Amendments", fr: "Modifications" },
+            title: {
+              en: "Summary of Amendments",
+              fr: "Résumé des modification",
+            },
+            amendment: { en: "Amendment", fr: "Modification" },
+          },
           misc: {
             no: { en: "No", fr: "Non" },
             yes: { en: "Yes", fr: "Oui" },

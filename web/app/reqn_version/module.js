@@ -666,6 +666,9 @@ cenozoApp.defineModule({
             agreementDifferenceList: null,
             lastAmendmentVersion: null, // used to determine the addingCoapplicantWithData variable
             addingCoapplicantWithData: false, // used when an amendment is adding a new coap
+            showAmendments: function () {
+              return "." != this.record.amendment;
+            },
             showManuscripts: function () {
               return (
                 this.record.is_current_version &&
@@ -1010,6 +1013,7 @@ cenozoApp.defineModule({
               "geographic_indicators",
               "covid_19_data",
               "mortality_data",
+              "amendments",
               "manuscripts",
               "agreement",
             ],
@@ -1022,12 +1026,14 @@ cenozoApp.defineModule({
                 "notes", "cohort", "indigenous", "core_clsa_data", "linked_data", "images_and_raw_data",
                 "geographic_indicators", "covid_19_data", "mortality_data"
               ];
-              manuscriptTabs = ["manuscripts"];
+              amendmentsTabs = ["amendments"];
+              manuscriptsTabs = ["manuscripts"];
 
               return (
                 part1Tabs.includes(tab) ? "part1" :
                 part2Tabs.includes(tab) ? "part2" :
-                manuscriptTabs.includes(tab) ? "manuscripts" :
+                amendmentsTabs.includes(tab) ? "amendments" :
+                manuscriptsTabs.includes(tab) ? "manuscripts" :
                 "agreement" == tab ? "agreement" :
                 "instructions"
               );
@@ -1062,7 +1068,7 @@ cenozoApp.defineModule({
 
             feeToString: function (fee) {
               const obj = { en: "", fr: "" };
-              if (0 < fee) {
+              if (0 <= fee) {
                 const feeString = fee.toString();
                 angular.extend(obj, {
                   en: "$" + (

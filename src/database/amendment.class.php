@@ -131,7 +131,11 @@ class amendment extends \cenozo\database\record
 
       if( !is_null( $db_reqn_version ) )
       {
-        // go through each data selection and determine its fee based on the amendment when it was first added
+        // Go through each data selection and create a list of the following for each:
+        // - which amendment first added it
+        // - is the option's cost combined
+        // - the fee for the selection
+        $amendment_list = [];
         $data_selection_sel = lib::create( 'database\select' );
         $data_selection_sel->add_column( 'id' );
         foreach( $db_reqn_version->get_data_selection_list( $data_selection_sel ) as $data_selection )
@@ -164,14 +168,15 @@ class amendment extends \cenozo\database\record
             $first_mod->get_sql()
           ) );
           $db_first_amendment = static::get_unique_record( ['reqn_id', 'name'], [$db_reqn->id, $name] );
+          if( !array_key_exists( $db_first_amendment->id, $amendment_list ) )
+            $amendment_list[$db_first_amendment->id] = [];
 
           $data_selection_sel = lib::create( 'database\select' );
           $data_selection_sel->from( 'data_selection_fee_schedule' );
-          $data_selection_sel->add_column(
-            'IF( cost_combined, MAX(data_selection_fee_schedule.fee), SUM(data_selection_fee_schedule.fee) )',
-            'total_fee',
-            false
-          );
+          $data_selection_sel->add_table_column( 'data_option', 'id', 'data_option_id' );
+          $data_selection_sel->add_table_column( 'data_option', 'name_en' );
+          $data_selection_sel->add_table_column( 'data_option', 'cost_combined' );
+          $data_selection_sel->add_table_column( 'data_selection_fee_schedule', 'fee' );
           $data_selection_mod = lib::create( 'database\modifier' );
           $data_selection_mod->join(
             'data_selection',
@@ -185,12 +190,36 @@ class amendment extends \cenozo\database\record
             $db_first_amendment->fee_schedule_id
           );
           $data_selection_mod->where( 'data_selection.id', '=', $data_selection['id'] );
-          $fee += static::db()->get_one( sprintf(
+          $row = static::db()->get_row( sprintf(
             '%s %s',
             $data_selection_sel->get_sql(),
             $data_selection_mod->get_sql()
           ) );
+
+          if( 0 != $row['fee'] )
+          {
+            if( !array_key_exists( $row['data_option_id'], $amendment_list[$db_first_amendment->id] ) )
+              $amendment_list[$db_first_amendment->id][$row['data_option_id']] = 0;
+
+            if( 1 == $row['cost_combined'] )
+            {
+              // use the max fee
+              $amendment_list[$db_first_amendment->id][$row['data_option_id']] = max(
+                $row['fee'],
+                $amendment_list[$db_first_amendment->id][$row['data_option_id']]
+              );
+            }
+            else
+            {
+              // sum all of the fees
+              $amendment_list[$db_first_amendment->id][$row['data_option_id']] += $row['fee'];
+
+            }
+          }
         }
+
+        // Now add the fee for each amendment
+        foreach( $amendment_list as $data_option ) foreach( $data_option as $combined_fee ) $fee += $combined_fee;
       }
 
       // add any additional fees
