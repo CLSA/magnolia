@@ -18,7 +18,7 @@ CREATE PROCEDURE patch_role_has_service()
       "WHERE role.name IN ('administrator', 'dao') ",
       "AND service.subject IN ( ",
         "'amendment', 'additional_fee_fee_schedule', 'amendment_type_fee_schedule', ",
-        "'data_selection_fee_schedule', 'fee_schedule' ",
+        "'data_selection_fee_schedule', 'fee_schedule', 'reqn_document' ",
       ") ",
       "AND service.restricted = 1"
     );
@@ -26,13 +26,18 @@ CREATE PROCEDURE patch_role_has_service()
     EXECUTE statement;
     DEALLOCATE PREPARE statement;
 
-    -- determine the cenozo database name
-    SET @cenozo = (
-      SELECT unique_constraint_schema
-      FROM information_schema.referential_constraints
-      WHERE constraint_schema = DATABASE()
-      AND constraint_name = "fk_access_site_id"
+    SET @sql = CONCAT(
+      "INSERT IGNORE INTO role_has_service( role_id, service_id ) ",
+      "SELECT role.id, service.id ",
+      "FROM ", @cenozo, ".role, service ",
+      "WHERE role.name IN ('administrator', 'chair', 'communication', 'dao', 'ec', 'readonly', 'typist') ",
+      "AND service.subject = 'reqn_document' ",
+      "AND service.method = 'GET' ",
+      "AND service.restricted = 1"
     );
+    PREPARE statement FROM @sql;
+    EXECUTE statement;
+    DEALLOCATE PREPARE statement;
 
     SET @sql = CONCAT(
       "INSERT IGNORE INTO role_has_service( role_id, service_id ) ",

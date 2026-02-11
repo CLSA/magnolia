@@ -18,5 +18,10 @@ INSERT IGNORE INTO service ( subject, method, resource, restricted ) VALUES
 ( 'fee_schedule', 'GET', 1, 0 ),
 ( 'fee_schedule', 'PATCH', 1, 1 ),
 ( 'fee_schedule', 'POST', 0, 1 ),
+( 'reqn_document', 'DELETE', 1, 1 ),
+( 'reqn_document', 'GET', 0, 1 ),
+( 'reqn_document', 'GET', 1, 1 ),
+( 'reqn_document', 'PATCH', 1, 1 ),
+( 'reqn_document', 'POST', 0, 1 ),
 ( 'user_ip_address', 'GET', 0, 0 ),
 ( 'user_ip_address', 'GET', 1, 0 );

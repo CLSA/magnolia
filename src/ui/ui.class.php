@@ -94,6 +94,7 @@ class ui extends \cenozo\ui\ui
       $module->add_child( 'notification' );
       $module->add_child( 'output' );
       $module->add_child( 'manuscript' );
+      $module->add_child( 'reqn_document' );
       $module->add_choose( 'packaged_data' );
       $module->add_choose( 'additional_fee' );
       $module->append_action_query( 'list', '?{search}' );

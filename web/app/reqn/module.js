@@ -458,22 +458,6 @@ cenozoApp.defineModule({
           return model.isRole("administrator", "dao", "readonly", "typist");
         },
       },
-      instruction_filename: {
-        column: "instruction_filename",
-        title: "Additional Documentation",
-        type: "file",
-        isConstant: function ($state, model) {
-          return !model.isRole("administrator");
-        },
-        isExcluded: function ($state, model) {
-          // show the agreement and instruction files if we're past the review stage
-          return (
-            "add" == model.getActionFromState() ||
-            angular.isUndefined(model.viewModel.record.phase) ||
-            !["active", "finalization", "complete"].includes(model.viewModel.record.phase)
-          );
-        },
-      },
       suggested_revisions: {
         title: "Suggested Revisions",
         type: "boolean",
@@ -1665,8 +1649,6 @@ cenozoApp.defineModule({
               return list;
             },
           });
-
-          this.configureFileInput("instruction_filename");
 
           async function init(object) {
             await object.deferred.promise;

@@ -65,13 +65,6 @@ class reqn extends \cenozo\database\record
       $db_current_reqn_version->save();
     }
 
-    // delete files if they are being set to null
-    if( is_null( $this->instruction_filename ) )
-    {
-      $filename = $this->get_filename( 'instruction' );
-      if( file_exists( $filename ) ) unlink( $filename );
-    }
-
     if( $update_amendments )
     {
       $amendment_mod = lib::create( 'database\modifier' );
@@ -93,19 +86,6 @@ class reqn extends \cenozo\database\record
       if( $this->legacy || !$this->get_reqn_type()->is_deadline_required() ) $this->deadline_id = NULL;
       $this->assert_deadline();
     }
-  }
-
-  /**
-   * Override the parent method
-   */
-  public function delete()
-  {
-    $file_list = array();
-    if( !is_null( $this->instruction_filename ) ) $file_list[] = $this->get_filename( 'instruction' );
-
-    parent::delete();
-
-    foreach( $file_list as $file ) if( file_exists( $file ) ) unlink( $file );
   }
 
   /**
@@ -1737,22 +1717,6 @@ class reqn extends \cenozo\database\record
       }
 
       $this->save();
-
-      // add the instructions
-      $filename = $this->get_filename( 'instruction' );
-      $link = sprintf( '%s/%s', $web_path, $this->instruction_filename );
-      if( is_file( $filename ) && !is_file( $link ) )
-      {
-        $result = symlink( $filename, $link );
-        if( !$result )
-        {
-          throw lib::create( 'exception\runtime', sprintf(
-            'Unable to create link to "%s" named "%s".',
-            $link,
-            $filename
-          ), __METHOD__ );
-        }
-      }
 
       // add all supplemental files
       $lang = $this->get_language()->code;
