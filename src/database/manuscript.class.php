@@ -75,7 +75,7 @@ class manuscript extends \cenozo\database\record
       'manuscript_review.manuscript_recommendation_type_id',
       'manuscript_recommendation_type.id'
     );
-    
+
     $recommendation = NULL;
     foreach( $this->get_manuscript_review_list( $select, $modifier ) as $row )
     {

@@ -31,7 +31,7 @@ class outcome extends \cenozo\business\overview\base_overview
       $review_type_class_name::get_unique_record( 'name', 'EC' )->id,
       $review_type_class_name::get_unique_record( 'name', 'Chair' )->id
     ];
-    
+
     $deadline_list = [];
 
     // count all reqns which reached the agreement stage, but aren't "not approved"
@@ -138,7 +138,7 @@ class outcome extends \cenozo\business\overview\base_overview
     $join_mod->where( 'stage.amendment_id', '=', 'amendment.id', false );
     $join_mod->where( 'stage.stage_type_id', '=', $not_approved_id );
     $not_approved_mod->join_modifier( 'stage', $join_mod );
-    
+
     // join to any minor recommendatation by a Chair or EC
     $join_mod = lib::create( 'database\modifier' );
     $join_mod->where( 'minor.amendment_id', '=', 'amendment.id', false );
@@ -188,7 +188,7 @@ class outcome extends \cenozo\business\overview\base_overview
 
       $node = $this->add_item( $root_node, 'Initial Review' );
       foreach( $data['initial'] as $type => $total ) $this->add_item( $node, $type, $total );
-      
+
       $node = $this->add_item( $root_node, 'Final Outcome' );
       foreach( $data['final'] as $type => $total ) $this->add_item( $node, $type, $total );
     }

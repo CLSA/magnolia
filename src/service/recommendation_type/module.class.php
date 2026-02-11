@@ -23,7 +23,7 @@ class module extends \cenozo\service\module
     parent::prepare_read( $select, $modifier );
 
     if( $select->has_column( 'review_type_id_list' ) )
-    {   
+    {
       $join_sel = lib::create( 'database\select' );
       $join_sel->from( 'review_type_has_recommendation_type' );
       $join_sel->add_column( 'recommendation_type_id' );
@@ -37,6 +37,6 @@ class module extends \cenozo\service\module
         'recommendation_type.id',
         'recommendation_type_join_review_type.recommendation_type_id' );
       $select->add_column( 'IFNULL( review_type_id_list, "" )', 'review_type_id_list', false );
-    }   
+    }
   }
 }

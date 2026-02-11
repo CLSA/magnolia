@@ -92,7 +92,7 @@ class review_summary extends \cenozo\business\report\base_report
     $modifier->join( 'review_details', 'review.id', 'review_details.review_id' );
     $modifier->group( 'reqn.id' );
     $modifier->order( 'reqn.identifier' );
-      
+
     foreach( $this->get_restriction_list() as $restriction )
     {
       if( 'stage_type' == $restriction['name'] && !is_null( $restriction['value'] ) )
@@ -101,7 +101,7 @@ class review_summary extends \cenozo\business\report\base_report
         $modifier->where( 'stage.stage_type_id', '=', $restriction['value'] );
       }
     }
-    
+
     $this->add_table_from_select( NULL, $reqn_class_name::select( $select, $modifier ) );
   }
 }

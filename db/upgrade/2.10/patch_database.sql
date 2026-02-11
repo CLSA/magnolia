@@ -25,6 +25,7 @@ SOURCE review.sql
 SOURCE stage.sql
 SOURCE calculate_amendment_fees.sql
 SOURCE update_reqn_last_reqn_version_with_agreement.sql
+SOURCE reqn_document.sql
 SOURCE reqn.sql
 
 SOURCE additional_fee.sql
@@ -41,5 +42,7 @@ SOURCE service.sql
 SOURCE role_has_service.sql
 
 SOURCE update_version_number.sql
+
+SELECT "TO COMPLETE THE INSTALLATION: you must now run the 'move_data_instruction.php' script" AS "";
 
 COMMIT;

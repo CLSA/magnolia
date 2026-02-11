@@ -55,7 +55,7 @@ class communications extends \cenozo\business\report\base_report
     $select->add_column( 'final_report.thesis_title', 'Thesis Title', false );
     $select->add_column( 'final_report.thesis_status', 'Thesis Status', false );
     $select->add_column( 'final_report.findings', 'Findings', false );
-      
+
     $this->add_table_from_select( NULL, $reqn_class_name::select( $select, $modifier ) );
   }
 }

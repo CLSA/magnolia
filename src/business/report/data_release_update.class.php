@@ -80,13 +80,13 @@ class data_release_update extends \cenozo\business\report\base_report
     $modifier->where( 'reqn_type_has_stage_type.stage_type_id', '=', NULL );
     $modifier->where( 'agreement_stage.id', '!=', NULL );
     $modifier->where_bracket( false );
-    
+
     // reqn types that have a decision made stage type must have reached it
     $modifier->where_bracket( true, true );
     $modifier->where( 'reqn_type_has_stage_type.stage_type_id', '!=', NULL );
     $modifier->where( 'dm_stage.id', '!=', NULL );
     $modifier->where_bracket( false );
-    
+
     $modifier->where_bracket( false );
 
     $modifier->group( 'reqn.id' );
@@ -113,7 +113,7 @@ class data_release_update extends \cenozo\business\report\base_report
       false
     );
     $select->add_column( 'designate_user.email', 'Designate Email', false );
-      
+
     // set up requirements
     $this->apply_restrictions( $modifier );
 

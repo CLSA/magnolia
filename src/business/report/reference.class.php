@@ -197,7 +197,7 @@ class reference extends \cenozo\business\report\base_report
       $max_sel->get_sql(),
       $max_mod->get_sql()
     ) );
-    
+
     // now add the coapplicant data
     $reqn_list = $reqn_class_name::select( $select, $modifier );
     foreach( $reqn_list as $index => $reqn )
@@ -213,7 +213,7 @@ class reference extends \cenozo\business\report\base_report
         $reqn_list[$index][sprintf( 'Role %d', $c )] = '';
         $reqn_list[$index][sprintf( 'Data Access %d', $c )] = '';
       }
-      
+
       $coapplicant_sel = lib::create( 'database\select' );
       $coapplicant_sel->add_column( 'name' );
       $coapplicant_sel->add_column( 'position' );
@@ -225,7 +225,7 @@ class reference extends \cenozo\business\report\base_report
       $coapplicant_mod = lib::create( 'database\modifier' );
       $coapplicant_mod->where( 'reqn_version_id', '=', $reqn_version_id );
       $coapplicant_mod->order( 'id' );
-      
+
       $c = 1;
       foreach( $coapplicant_class_name::select( $coapplicant_sel, $coapplicant_mod ) as $coapplicant )
       {
