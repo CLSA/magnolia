@@ -23,7 +23,7 @@ class module extends \cenozo\service\module
     parent::prepare_read( $select, $modifier );
 
     if( $select->has_column( 'manuscript_review_type_id_list' ) )
-    {   
+    {
       $join_sel = lib::create( 'database\select' );
       $join_sel->from( 'manuscript_review_type_has_manuscript_recommendation_type' );
       $join_sel->add_column( 'manuscript_recommendation_type_id' );
@@ -50,6 +50,6 @@ class module extends \cenozo\service\module
         'manuscript_review_type_id_list',
         false
       );
-    }   
+    }
   }
 }

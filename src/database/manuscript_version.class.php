@@ -75,7 +75,7 @@ class manuscript_version extends \cenozo\database\record
     if( is_null( $db_pdf_form ) )
       throw lib::create( 'exception\runtime',
         'Cannot generate PDF form since there is no active Manuscript Submission PDF form.', __METHOD__ );
-    
+
     $db_manuscript = $this->get_manuscript();
     $db_reqn = $db_manuscript->get_reqn();
     $db_language = $db_reqn->get_language();

@@ -56,7 +56,7 @@ class agreement extends \cenozo\business\report\base_report
 
     // group since some notifications have gone out more than once
     $modifier->group( 'reqn.id' );
-    
+
     // build the select
     $select = lib::create( 'database\select' );
     $select->from( 'reqn' );

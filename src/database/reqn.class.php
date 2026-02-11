@@ -393,7 +393,7 @@ class reqn extends \cenozo\database\record
     $db_destruction_report->save();
   }
 
-  /**  
+  /**
    * Get the reqn's total fee (NULL if show_prices is false)
    * 
    * Note: this process mirrors CnReqnVersionViewFactory::getTotalFee() on the client-side
@@ -418,10 +418,10 @@ class reqn extends \cenozo\database\record
         0,
         'fr' == $db_language->code ? ',' : '.', 
         'fr' == $db_language->code ? ' ' : ','
-      )    
-    );   
+      )
+    );
   }
-  
+
   /**
    * Returns the path to various files associated with the reqn
    * 

@@ -55,7 +55,7 @@ class conflict_of_interest extends \cenozo\business\report\base_report
     $modifier->join( 'user', 'reqn.user_id', 'user.id' );
 
     $data = array_merge( $data, $reqn_class_name::select( $select, $modifier ) );
-      
+
     // add the trainee (if there is one)
     ////////////////////////////////////////////////////////////////////////////////////////////////
     $select = clone( $base_sel );
@@ -64,7 +64,7 @@ class conflict_of_interest extends \cenozo\business\report\base_report
 
     $modifier = clone( $base_mod );
     $modifier->join( 'user', 'reqn.trainee_user_id', 'trainee_user.id', '', 'trainee_user' );
-      
+
     $data = array_merge( $data, $reqn_class_name::select( $select, $modifier ) );
 
     // add all coapplicants
@@ -75,7 +75,7 @@ class conflict_of_interest extends \cenozo\business\report\base_report
 
     $modifier = clone( $base_mod );
     $modifier->join( 'coapplicant', 'reqn_version.id', 'coapplicant.reqn_version_id' );
-      
+
     $data = array_merge( $data, $reqn_class_name::select( $select, $modifier ) );
 
     // Now organize the results
