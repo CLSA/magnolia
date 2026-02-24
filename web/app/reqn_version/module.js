@@ -554,7 +554,10 @@ cenozoApp.defineModule({
                 }).get();
                 const agreement_end_date = response.data.agreement_end_date;
 
-                if (null == agreement_end_date || moment(agreement_end_date).isBefore(moment(), "day")) {
+                if (
+                  !$scope.model.viewModel.record.legacy &&
+                  (null == agreement_end_date || moment(agreement_end_date).isBefore(moment(), "day"))
+                ) {
                   await CnModalMessageFactory.instance({
                     title: $scope.t("misc.agreementExpiredTitle"),
                     message: $scope.t("misc.agreementExpiredMessage"),

@@ -47,6 +47,7 @@ cenozoApp.defineModule({
       },
 
       // the following are for the form and will not appear in the view
+      legacy: { column: "reqn.legacy", type: "boolean" },
       agreement_end_date: { column: "reqn_version_with_agreement.agreement_end_date", type: "date" },
       version: { type: "string" },
       current_manuscript_version_id: { column: "manuscript_version.id", type: "string" },
@@ -425,8 +426,8 @@ cenozoApp.defineModule({
               var record = this.record;
 
               if (
-                null == record.agreement_end_date ||
-                moment(record.agreement_end_date).isBefore(moment(), "day")
+                !record.legacy &&
+                (null == record.agreement_end_date || moment(record.agreement_end_date).isBefore(moment(), "day"))
               ){
                 await CnModalMessageFactory.instance({
                   title: this.translate("misc.agreementExpiredTitle"),

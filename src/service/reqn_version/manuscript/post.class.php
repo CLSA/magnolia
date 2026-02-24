@@ -17,9 +17,14 @@ class post extends \cenozo\service\post
   {
     parent::validate();
 
-    // make sure the agreement hasn't expired
-    $diff = util::get_interval( $this->get_parent_record()->agreement_end_date );
-    if( 0 == $diff->invert && 0 < $diff->days ) $this->status->set_code( 409 );
+    $db_reqn_version = $this->get_parent_record();
+
+    if( !$db_reqn_version->get_reqn()->legacy )
+    {
+      // make sure the agreement hasn't expired
+      $diff = util::get_interval( $db_reqn_version->agreement_end_date );
+      if( 0 == $diff->invert && 0 < $diff->days ) $this->status->set_code( 409 );
+    }
   }
 
   /**
