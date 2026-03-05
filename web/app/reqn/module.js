@@ -503,6 +503,11 @@ cenozoApp.defineModule({
         isExcluded: true,
       },
       next_stage_type: { type: "string", isExcluded: true },
+      amendment_id: {
+        column: "amendment.id",
+        type: "string",
+        isExcluded: true,
+      },
       amendment: {
         column: "amendment.name",
         type: "string",
@@ -1077,10 +1082,14 @@ cenozoApp.defineModule({
               // update the output list language
               this.updateOutputListLanguage();
 
+              // update the column languages in case they were changed while viewing a report
+              await this.$$onView(force);
+
               if (this.parentModel.isRole("reviewer")) {
-                // If we are a reviewer assigned to this reqn and haven't completed our review then show a reminder
+                // If we are a reviewer assigned to this reqn and haven't completed
+                // our review then show a reminder
                 var response = await CnHttpFactory.instance({
-                  path: this.parentModel.getServiceResourcePath() + "/review",
+                  path: ["amendment", this.record.amendment_id, "/review"].join("/"),
                   data: {
                     select: {
                       column: [
@@ -1151,9 +1160,6 @@ cenozoApp.defineModule({
                   }).show();
                 }
               }
-
-              // update the column languages in case they were changed while viewing a report
-              await this.$$onView(force);
 
               // update whether we can edit the data destroy list
               if (angular.isDefined(this.dataDestroyModel)) {
