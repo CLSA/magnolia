@@ -1,6 +1,6 @@
 CREATE TRIGGER review_type_question_AFTER_INSERT
 AFTER INSERT ON magnolia.review_type_question FOR EACH ROW
-BEING
+BEGIN
   INSERT INTO review_answer( review_id, review_type_question_id )
   SELECT review.id, NEW.id
   FROM review_type

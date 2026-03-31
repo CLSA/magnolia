@@ -14,4 +14,5 @@ CREATE TABLE amendment_type (
   UNIQUE INDEX uq_reason_fr (reason_fr ASC),
   UNIQUE INDEX uq_rank (rank ASC))
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4;
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;

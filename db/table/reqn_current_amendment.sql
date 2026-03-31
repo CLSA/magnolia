@@ -15,4 +15,6 @@ CREATE TABLE reqn_current_amendment (
     REFERENCES magnolia.amendment (id)
     ON DELETE SET NULL
     ON UPDATE CASCADE)
-ENGINE = InnoDB;
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;

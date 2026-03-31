@@ -9,4 +9,6 @@ CREATE TABLE data_agreement (
   filename VARCHAR(255) NOT NULL,
   PRIMARY KEY (id),
   UNIQUE INDEX uq_institution_start_date (institution ASC, start_date ASC))
-ENGINE = InnoDB;
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;

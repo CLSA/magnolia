@@ -16,4 +16,6 @@ CREATE TABLE manuscript_stage_type (
     REFERENCES magnolia.notification_type (id)
     ON DELETE SET NULL
     ON UPDATE NO ACTION)
-ENGINE = InnoDB;
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;

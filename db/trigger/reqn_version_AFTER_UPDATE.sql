@@ -6,3 +6,7 @@ BEGIN
     FROM amendment
     JOIN reqn_version ON amendment.id = reqn_version.amendment_id
     WHERE reqn_version.id = NEW.id;
+
+    CALL update_reqn_last_amendment_with_agreement( @reqn_id );
+  END IF;
+END$$

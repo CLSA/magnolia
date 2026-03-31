@@ -4,3 +4,9 @@ BEGIN
   SELECT justification_prompt_en IS NOT NULL OR justification_prompt_fr IS NOT NULL INTO @justification
   FROM amendment_type
   WHERE id = NEW.amendment_type_id;
+
+  IF @justification THEN
+    INSERT IGNORE INTO amendment_justification
+    SET reqn_version_id = NEW.reqn_version_id, amendment_type_id = NEW.amendment_type_id;
+  END IF;
+END$$

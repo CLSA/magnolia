@@ -17,4 +17,5 @@ CREATE TABLE manuscript_review_type_has_manuscript_recommendation_type (
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4;
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;

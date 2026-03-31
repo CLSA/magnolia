@@ -15,4 +15,5 @@ CREATE TABLE data_category (
   UNIQUE INDEX uq_name_en (name_en ASC),
   UNIQUE INDEX uq_name_fr (name_fr ASC))
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4;
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;

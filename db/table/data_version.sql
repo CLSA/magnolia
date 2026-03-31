@@ -7,4 +7,5 @@ CREATE TABLE data_version (
   PRIMARY KEY (id),
   UNIQUE INDEX uq_name (name ASC))
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4;
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;

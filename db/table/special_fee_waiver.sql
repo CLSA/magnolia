@@ -8,4 +8,6 @@ CREATE TABLE special_fee_waiver (
   description TEXT NULL DEFAULT NULL,
   PRIMARY KEY (id),
   UNIQUE INDEX uq_name (name ASC))
-ENGINE = InnoDB;
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;

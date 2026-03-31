@@ -11,7 +11,7 @@ BEGIN
       ON amendment.id = amendment_current_reqn_version.amendment_id
     JOIN reqn_version ON amendment_current_reqn_version.reqn_version_id = reqn_version.id
     WHERE reqn.id = amendment.reqn_id
-    AND reqn_version.agreement_filename IS NOT NULL 
+    AND reqn_version.agreement_filename IS NOT NULL
   )
   WHERE reqn.id = proc_reqn_id;
 END$$

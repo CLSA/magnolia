@@ -39,7 +39,7 @@ BEGIN
   LEFT JOIN application_has_participant ON application.id = application_has_participant.application_id
   AND application_has_participant.participant_id = participant.id
   WHERE participant.id = proc_participant_id
-  
+
   AND jurisdiction.site_id <=> jurisdiction_site.id
   AND region_site.site_id <=> region_site_site.id;
 END$$

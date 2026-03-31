@@ -15,4 +15,6 @@ CREATE TABLE reqn_current_destruction_report (
     REFERENCES magnolia.destruction_report (id)
     ON DELETE SET NULL
     ON UPDATE NO ACTION)
-ENGINE = InnoDB;
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
