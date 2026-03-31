@@ -1,0 +1,7 @@
+CREATE TRIGGER reqn_BEFORE_UPDATE
+BEFORE UPDATE ON magnolia.reqn FOR EACH ROW
+BEGIN
+  IF !( NEW.state <=> OLD.state ) THEN
+    SET NEW.state_date = IF( NEW.state IS NULL, NULL, UTC_TIMESTAMP() );
+  END IF;
+END$$

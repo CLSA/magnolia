@@ -1,0 +1,16 @@
+CREATE TABLE data_destroy (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  update_timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP(),
+  create_timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+  reqn_id INT(10) UNSIGNED NOT NULL,
+  name VARCHAR(127) NOT NULL,
+  datetime DATETIME NULL DEFAULT NULL,
+  PRIMARY KEY (id),
+  INDEX fk_reqn_id (reqn_id ASC),
+  UNIQUE INDEX uq_reqn_id_name (reqn_id ASC, name ASC),
+  CONSTRAINT fk_data_destry_reqn_id
+    FOREIGN KEY (reqn_id)
+    REFERENCES magnolia.reqn (id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
