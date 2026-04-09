@@ -48,8 +48,16 @@ class post extends \cenozo\service\write
     }
     catch( \cenozo\exception\database $e )
     {
-      $this->status->set_code( $e->is_missing_data() ? 400 : 500 );
-      throw $e;
+      if( $e->is_duplicate_entry() )
+      {
+        $this->set_data( $e->get_duplicate_columns( 'data_release' ) );
+        $this->status->set_code( 409 );
+      }
+      else
+      {
+        $this->status->set_code( $e->is_missing_data() ? 400 : 500 );
+        throw $e;
+      }
     }
   }
 }
