@@ -158,7 +158,7 @@ cenozoApp.defineModule({
         },
         non_payment: {
           type: "hidden",
-          highlight: true, // highlight any reqn flagged for non-payment
+          highlight: true, // highlight any reqn flagged for non-compliance
           highlightColor: "#ffc299",
         },
         country_is_flagged: {
@@ -239,7 +239,7 @@ cenozoApp.defineModule({
           "This also makes the applicant and trainee country a mandatory field.",
       },
       non_payment: {
-        title: "Flag for Non-Payment",
+        title: "Flag for Non-Compliance",
         type: "boolean",
         isConstant: function ($state, model) {
           return !model.isRole("administrator");
@@ -247,7 +247,7 @@ cenozoApp.defineModule({
         isExcluded: function ($state, model) {
           return "view" != model.getActionFromState();
         },
-        help: "Flags a requisition for non-payment.",
+        help: "Flags a requisition for non-compliance.",
       },
       reqn_type_id: {
         title: "Requisition Type",
