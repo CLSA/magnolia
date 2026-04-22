@@ -35,10 +35,10 @@ cenozoApp.extendModule({
     });
 
     module.addInput("", "suspended", {
-      title: "Suspended for Non-payment",
+      title: "Suspended for Non-compliance",
       type: "boolean",
       isExcluded: "add",
-      help: "Whether the user's account is suspended due to non-payment of fees.",
+      help: "Whether the user's account is suspended due to non-compliance of fees.",
     }, 'active' );
 
     module.addInput("", "newsletter", {
