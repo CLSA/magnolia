@@ -204,6 +204,7 @@ class reference extends \cenozo\business\report\base_report
     {
       $reqn_version_id = $reqn['reqn_version_id'];
       unset( $reqn_list[$index]['reqn_version_id'] );
+      $reqn_list[$index]['Coapplicants'] = '';
       for( $c = 1; $c <= $max_coapplicants; $c++ )
       {
         $reqn_list[$index][sprintf( 'Coapplicant %d', $c )] = '';
@@ -227,7 +228,9 @@ class reference extends \cenozo\business\report\base_report
       $coapplicant_mod->order( 'id' );
 
       $c = 1;
-      foreach( $coapplicant_class_name::select( $coapplicant_sel, $coapplicant_mod ) as $coapplicant )
+      $coapplicant_list = $coapplicant_class_name::select( $coapplicant_sel, $coapplicant_mod );
+      $reqn_list[$index]['Coapplicants'] = count( $coapplicant_list );
+      foreach( $coapplicant_list as $coapplicant )
       {
         $reqn_list[$index][sprintf( 'Coapplicant %d', $c )] = $coapplicant['name'];
         $reqn_list[$index][sprintf( 'Position %d', $c )] = $coapplicant['position'];
