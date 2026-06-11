@@ -1,20 +1,19 @@
 CREATE TABLE amendment_current_reqn_version (
-  amendment_id INT(10) UNSIGNED NOT NULL,
-  reqn_version_id INT(10) UNSIGNED NULL DEFAULT NULL,
-  update_timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP(),
-  create_timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+  amendment_id int(10) unsigned NOT NULL,
+  reqn_version_id int(10) unsigned DEFAULT NULL,
+  update_timestamp timestamp NOT NULL DEFAULT current_timestamp()
+    ON UPDATE current_timestamp(),
+  create_timestamp timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (amendment_id),
-  INDEX fk_reqn_version_id (reqn_version_id ASC),
+  KEY fk_reqn_version_id (reqn_version_id),
   CONSTRAINT fk_amendment_current_reqn_version_amendment_id
     FOREIGN KEY (amendment_id)
-    REFERENCES magnolia.amendment (id)
+    REFERENCES amendment (id)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
   CONSTRAINT fk_amendment_current_reqn_version_reqn_version_id
     FOREIGN KEY (reqn_version_id)
-    REFERENCES magnolia.reqn_version (id)
+    REFERENCES reqn_version (id)
     ON DELETE SET NULL
-    ON UPDATE CASCADE)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_general_ci;
+    ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

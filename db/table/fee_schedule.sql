@@ -1,14 +1,13 @@
 CREATE TABLE fee_schedule (
-  id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-  update_timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP(),
-  create_timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
-  name VARCHAR(45) NOT NULL,
-  datetime DATETIME NOT NULL,
-  fee_national INT(10) UNSIGNED NOT NULL DEFAULT 0,
-  fee_international INT(10) UNSIGNED NOT NULL DEFAULT 0,
+  id int(10) unsigned NOT NULL AUTO_INCREMENT,
+  update_timestamp timestamp NOT NULL DEFAULT current_timestamp()
+    ON UPDATE current_timestamp(),
+  create_timestamp timestamp NOT NULL DEFAULT current_timestamp(),
+  name varchar(45) NOT NULL,
+  datetime datetime NOT NULL,
+  fee_national int(10) unsigned NOT NULL DEFAULT 0,
+  fee_international int(10) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (id),
-  UNIQUE INDEX uq_name (name ASC),
-  UNIQUE INDEX uq_datetime (datetime ASC))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_general_ci;
+  UNIQUE KEY uq_name (name),
+  UNIQUE KEY uq_datetime (datetime)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

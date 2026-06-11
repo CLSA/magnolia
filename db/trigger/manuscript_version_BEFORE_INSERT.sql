@@ -1,7 +1,6 @@
-CREATE TRIGGER manuscript_version_BEFORE_INSERT
-BEFORE INSERT ON manuscript_version FOR EACH ROW
+CREATE TRIGGER manuscript_version_BEFORE_INSERT BEFORE INSERT ON manuscript_version FOR EACH ROW
 BEGIN
   IF( NEW.date IS NULL ) THEN
     SET NEW.date = DATE(UTC_TIMESTAMP());
   END IF;
-END$$
+END ;;

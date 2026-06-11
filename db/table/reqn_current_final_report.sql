@@ -1,20 +1,19 @@
 CREATE TABLE reqn_current_final_report (
-  reqn_id INT(10) UNSIGNED NOT NULL,
-  final_report_id INT(10) UNSIGNED NULL DEFAULT NULL,
-  update_timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP(),
-  create_timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+  reqn_id int(10) unsigned NOT NULL,
+  final_report_id int(10) unsigned DEFAULT NULL,
+  update_timestamp timestamp NOT NULL DEFAULT current_timestamp()
+    ON UPDATE current_timestamp(),
+  create_timestamp timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (reqn_id),
-  INDEX fk_final_report_id (final_report_id ASC),
+  KEY fk_final_report_id (final_report_id),
   CONSTRAINT fk_reqn_current_final_report_final_report_id
     FOREIGN KEY (final_report_id)
-    REFERENCES magnolia.final_report (id)
+    REFERENCES final_report (id)
     ON DELETE SET NULL
     ON UPDATE NO ACTION,
   CONSTRAINT fk_reqn_current_final_report_reqn_id
     FOREIGN KEY (reqn_id)
-    REFERENCES magnolia.reqn (id)
+    REFERENCES reqn (id)
     ON DELETE CASCADE
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_general_ci;
+    ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

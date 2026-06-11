@@ -1,14 +1,13 @@
 CREATE TABLE supplemental_file (
-  id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-  update_timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP(),
-  create_timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
-  name_en VARCHAR(127) NOT NULL,
-  name_fr VARCHAR(127) NOT NULL,
-  data_en LONGTEXT NULL DEFAULT NULL,
-  data_fr LONGTEXT NULL DEFAULT NULL,
+  id int(10) unsigned NOT NULL AUTO_INCREMENT,
+  update_timestamp timestamp NOT NULL DEFAULT current_timestamp()
+    ON UPDATE current_timestamp(),
+  create_timestamp timestamp NOT NULL DEFAULT current_timestamp(),
+  name_en varchar(127) NOT NULL,
+  name_fr varchar(127) NOT NULL,
+  data_en longtext NOT NULL,
+  data_fr longtext NOT NULL,
   PRIMARY KEY (id),
-  UNIQUE INDEX uq_name_en (name_en ASC),
-  UNIQUE INDEX uq_name_fr (name_fr ASC))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_general_ci;
+  UNIQUE KEY uq_name_en (name_en),
+  UNIQUE KEY uq_name_fr (name_fr)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

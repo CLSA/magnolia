@@ -1,5 +1,4 @@
-CREATE TRIGGER stage_AFTER_DELETE
-AFTER DELETE ON magnolia.stage FOR EACH ROW
+CREATE TRIGGER stage_AFTER_DELETE AFTER DELETE ON stage FOR EACH ROW
 BEGIN
   DELETE FROM review
   WHERE review_type_id IN (
@@ -9,4 +8,4 @@ BEGIN
     WHERE stage_type.id = OLD.stage_type_id
   )
   AND amendment_id = OLD.amendment_id;
-END$$
+END ;;

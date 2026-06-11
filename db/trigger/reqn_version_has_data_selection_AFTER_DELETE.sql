@@ -1,5 +1,4 @@
-CREATE TRIGGER reqn_version_has_data_selection_AFTER_DELETE
-AFTER DELETE ON magnolia.reqn_version_has_data_selection FOR EACH ROW
+CREATE TRIGGER reqn_version_has_data_selection_AFTER_DELETE AFTER DELETE ON reqn_version_has_data_selection FOR EACH ROW
 BEGIN
   SELECT data_option_id INTO @data_option_id FROM data_selection WHERE id = OLD.data_selection_id;
 
@@ -16,4 +15,4 @@ BEGIN
       SELECT data_option_id FROM data_selection WHERE id = OLD.data_selection_id
     );
   END IF;
-END$$
+END ;;

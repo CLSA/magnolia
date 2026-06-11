@@ -1,5 +1,4 @@
-CREATE TRIGGER reqn_version_AFTER_INSERT
-AFTER INSERT ON magnolia.reqn_version FOR EACH ROW
+CREATE TRIGGER reqn_version_AFTER_INSERT AFTER INSERT ON reqn_version FOR EACH ROW
 BEGIN
   SELECT reqn_id INTO @reqn_id
   FROM amendment
@@ -13,4 +12,4 @@ BEGIN
   SELECT NEW.id, data_category.id
   FROM data_category
   WHERE comment = true;
-END$$
+END ;;

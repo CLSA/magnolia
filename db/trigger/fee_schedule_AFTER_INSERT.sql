@@ -1,10 +1,9 @@
-CREATE TRIGGER fee_schedule_AFTER_INSERT
-AFTER INSERT ON fee_schedule FOR EACH ROW
+CREATE TRIGGER fee_schedule_AFTER_INSERT AFTER INSERT ON fee_schedule FOR EACH ROW
 BEGIN
   SELECT MAX(datetime) INTO @max_datetime FROM fee_schedule WHERE datetime < NEW.datetime;
 
   IF @max_datetime IS NOT NULL THEN
-    SELECT id INTO @last_fee_schedule_id FROM fee_schedule WHERE datetime = @datetime;
+    SELECT id INTO @last_fee_schedule_id FROM fee_schedule WHERE datetime = @max_datetime;
 
     INSERT INTO additional_fee_fee_schedule(additional_fee_id, fee_schedule_id, fee)
     SELECT * FROM (
@@ -36,4 +35,4 @@ BEGIN
     INSERT INTO data_selection_fee_schedule(data_selection_id, fee_schedule_id)
     SELECT id, NEW.id FROM data_selection;
   END IF;
-END$$
+END ;;

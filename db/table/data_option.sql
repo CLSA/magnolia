@@ -1,27 +1,26 @@
 CREATE TABLE data_option (
-  id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-  update_timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP(),
-  create_timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
-  data_category_id INT(10) UNSIGNED NOT NULL,
-  rank INT(10) UNSIGNED NOT NULL,
-  cost_combined TINYINT(1) NOT NULL DEFAULT 0,
-  justification TINYINT(1) NOT NULL DEFAULT 0,
-  name_en VARCHAR(127) NOT NULL,
-  name_fr VARCHAR(127) NOT NULL,
-  condition_en TEXT NULL DEFAULT NULL,
-  condition_fr TEXT NULL DEFAULT NULL,
-  note_en TEXT NULL DEFAULT NULL,
-  note_fr TEXT NULL DEFAULT NULL,
+  id int(10) unsigned NOT NULL AUTO_INCREMENT,
+  update_timestamp timestamp NOT NULL DEFAULT current_timestamp()
+    ON UPDATE current_timestamp(),
+  create_timestamp timestamp NOT NULL DEFAULT current_timestamp(),
+  data_category_id int(10) unsigned NOT NULL,
+  rank int(10) unsigned NOT NULL,
+  cost_combined tinyint(1) NOT NULL DEFAULT 0,
+  justification tinyint(1) NOT NULL DEFAULT 0,
+  name_en varchar(127) NOT NULL,
+  name_fr varchar(127) NOT NULL,
+  condition_en text DEFAULT NULL,
+  condition_fr text DEFAULT NULL,
+  note_en text DEFAULT NULL,
+  note_fr text DEFAULT NULL,
   PRIMARY KEY (id),
-  UNIQUE INDEX uq_name_en (name_en ASC),
-  UNIQUE INDEX uq_name_fr (name_fr ASC),
-  UNIQUE INDEX uq_data_category_id_rank (data_category_id ASC, rank ASC),
-  INDEX fk_data_category_id (data_category_id ASC),
+  UNIQUE KEY uq_name_en (name_en),
+  UNIQUE KEY uq_name_fr (name_fr),
+  UNIQUE KEY uq_data_category_id_rank (data_category_id,rank),
+  KEY fk_data_category_id (data_category_id),
   CONSTRAINT fk_data_option_data_category_id
     FOREIGN KEY (data_category_id)
-    REFERENCES magnolia.data_category (id)
+    REFERENCES data_category (id)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_general_ci;
+    ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

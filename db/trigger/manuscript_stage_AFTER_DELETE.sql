@@ -1,5 +1,4 @@
-CREATE TRIGGER manuscript_stage_AFTER_DELETE
-AFTER DELETE ON manuscript_stage FOR EACH ROW
+CREATE TRIGGER manuscript_stage_AFTER_DELETE AFTER DELETE ON manuscript_stage FOR EACH ROW
 BEGIN
   DELETE FROM manuscript_review
   WHERE manuscript_review_type_id IN (
@@ -9,4 +8,4 @@ BEGIN
     WHERE manuscript_stage_type.id = OLD.manuscript_stage_type_id
   )
   AND manuscript_id = OLD.manuscript_id;
-END$$
+END ;;

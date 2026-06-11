@@ -1,5 +1,4 @@
-CREATE TRIGGER data_category_BEFORE_UPDATE
-BEFORE UPDATE ON magnolia.data_category FOR EACH ROW
+CREATE TRIGGER data_category_BEFORE_UPDATE BEFORE UPDATE ON data_category FOR EACH ROW
 BEGIN
   IF NEW.comment != OLD.comment THEN
     IF NEW.comment THEN
@@ -10,4 +9,4 @@ BEGIN
       DELETE FROM reqn_version_comment WHERE data_category_id = NEW.id;
     END IF;
   END IF;
-END$$
+END ;;

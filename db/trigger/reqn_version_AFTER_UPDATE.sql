@@ -1,5 +1,4 @@
-CREATE TRIGGER reqn_version_AFTER_UPDATE
-AFTER UPDATE ON magnolia.reqn_version FOR EACH ROW
+CREATE TRIGGER reqn_version_AFTER_UPDATE AFTER UPDATE ON reqn_version FOR EACH ROW
 BEGIN
   IF NOT NEW.agreement_filename <=> OLD.agreement_filename THEN
     SELECT reqn_id INTO @reqn_id
@@ -9,4 +8,4 @@ BEGIN
 
     CALL update_reqn_last_amendment_with_agreement( @reqn_id );
   END IF;
-END$$
+END ;;

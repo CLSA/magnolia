@@ -1,18 +1,17 @@
 CREATE TABLE manuscript_notification_email (
-  id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-  update_timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP(),
-  create_timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
-  manuscript_notification_id INT(10) UNSIGNED NOT NULL,
-  email VARCHAR(127) NOT NULL,
-  name VARCHAR(127) NULL DEFAULT NULL,
+  id int(10) unsigned NOT NULL AUTO_INCREMENT,
+  update_timestamp timestamp NOT NULL DEFAULT current_timestamp()
+    ON UPDATE current_timestamp(),
+  create_timestamp timestamp NOT NULL DEFAULT current_timestamp(),
+  manuscript_notification_id int(10) unsigned NOT NULL,
+  email varchar(127) NOT NULL,
+  name varchar(127) DEFAULT NULL,
   PRIMARY KEY (id),
-  INDEX fk_manuscript_notification_id (manuscript_notification_id ASC),
-  UNIQUE INDEX uq_manuscript_notification_id_email (manuscript_notification_id ASC, email ASC),
+  UNIQUE KEY uq_manuscript_notification_id_email (manuscript_notification_id,email),
+  KEY fk_manuscript_notification_id (manuscript_notification_id),
   CONSTRAINT fk_manuscript_notification_email_manuscript_notification_id
     FOREIGN KEY (manuscript_notification_id)
-    REFERENCES magnolia.manuscript_notification (id)
+    REFERENCES manuscript_notification (id)
     ON DELETE CASCADE
-    ON UPDATE CASCADE)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_general_ci;
+    ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

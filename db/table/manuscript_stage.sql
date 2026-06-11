@@ -1,30 +1,29 @@
 CREATE TABLE manuscript_stage (
-  id INT(10) UNSIGNED NOT NULL,
-  update_timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP(),
-  create_timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
-  manuscript_id INT(10) UNSIGNED NOT NULL,
-  manuscript_stage_type_id INT(10) UNSIGNED NOT NULL,
-  user_id INT(10) UNSIGNED NULL DEFAULT NULL,
-  datetime DATETIME NULL DEFAULT NULL,
+  id int(10) unsigned NOT NULL AUTO_INCREMENT,
+  update_timestamp timestamp NOT NULL DEFAULT current_timestamp()
+    ON UPDATE current_timestamp(),
+  create_timestamp timestamp NOT NULL DEFAULT current_timestamp(),
+  manuscript_id int(10) unsigned NOT NULL,
+  manuscript_stage_type_id int(10) unsigned NOT NULL,
+  user_id int(10) unsigned DEFAULT NULL,
+  datetime datetime DEFAULT NULL,
   PRIMARY KEY (id),
-  INDEX fk_manuscript_stage_manuscript_id (manuscript_id ASC),
-  INDEX fk_manuscript_stage_manuscript_stage_type_id (manuscript_stage_type_id ASC),
-  INDEX fk_manuscript_stage_user_id (user_id ASC),
+  KEY fk_manuscript_stage_manuscript_id (manuscript_id),
+  KEY fk_manuscript_stage_manuscript_stage_type_id (manuscript_stage_type_id),
+  KEY fk_manuscript_stage_user_id (user_id),
   CONSTRAINT fk_manuscript_stage_manuscript_id
     FOREIGN KEY (manuscript_id)
-    REFERENCES magnolia.manuscript (id)
+    REFERENCES manuscript (id)
     ON DELETE CASCADE
     ON UPDATE NO ACTION,
   CONSTRAINT fk_manuscript_stage_manuscript_stage_type_id
     FOREIGN KEY (manuscript_stage_type_id)
-    REFERENCES magnolia.manuscript_stage_type (id)
+    REFERENCES manuscript_stage_type (id)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT fk_manuscript_stage_user_id
     FOREIGN KEY (user_id)
-    REFERENCES cenozo.user (id)
+    REFERENCES cenozo_mg.user (id)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_general_ci;
+    ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

@@ -1,18 +1,17 @@
 CREATE TABLE data_destroy (
-  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  update_timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP(),
-  create_timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
-  reqn_id INT(10) UNSIGNED NOT NULL,
-  name VARCHAR(127) NOT NULL,
-  datetime DATETIME NULL DEFAULT NULL,
+  id int(10) unsigned NOT NULL AUTO_INCREMENT,
+  update_timestamp timestamp NOT NULL DEFAULT current_timestamp()
+    ON UPDATE current_timestamp(),
+  create_timestamp timestamp NOT NULL DEFAULT current_timestamp(),
+  reqn_id int(10) unsigned NOT NULL,
+  name varchar(127) NOT NULL,
+  datetime datetime DEFAULT NULL,
   PRIMARY KEY (id),
-  INDEX fk_reqn_id (reqn_id ASC),
-  UNIQUE INDEX uq_reqn_id_name (reqn_id ASC, name ASC),
+  UNIQUE KEY uq_reqn_id_name (reqn_id,name),
+  KEY fk_reqn_id (reqn_id),
   CONSTRAINT fk_data_destry_reqn_id
     FOREIGN KEY (reqn_id)
-    REFERENCES magnolia.reqn (id)
+    REFERENCES reqn (id)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_general_ci;
+    ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
