@@ -20,6 +20,7 @@ cenozoApp.defineModule({
         fee: { title: "Fee Change", type: "number", filter: "currency:$:0" },
         override_fee: { title: "Override Fee Change", type: "number", filter: "currency:$:0" },
         has_agreement: { title: "Has Agreement", type: "boolean" },
+        agreement_end_date: { column: "reqn_version.agreement_end_date", title: "Agreement End", type: "date" },
         datetime: { column: "first_reqn_version.datetime", title: "Datetime", type: "datetime" },
         note: { title: "Note", type: "text", limit: 200 },
       },
