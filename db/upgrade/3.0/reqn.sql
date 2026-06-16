@@ -14,7 +14,12 @@ CREATE PROCEDURE patch_reqn()
     IF @test = 0 THEN
       ALTER TABLE reqn
       ADD COLUMN catalyst TINYINT(1) NOT NULL DEFAULT 0
-      AFTER instruction_filename;
+      AFTER data_expiry_date;
+
+      UPDATE reqn
+      JOIN reqn_type ON reqn.reqn_type_id = reqn_type.id
+      SET catalyst = 1
+      WHERE reqn_type.name = "Catalyst Grant";
     END IF;
 
   END //

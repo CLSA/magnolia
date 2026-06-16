@@ -174,6 +174,7 @@ class reference extends \cenozo\business\report\base_report
     $select->add_column( 'identifier', 'Identifier' );
     $select->add_column( 'stage_type.name', 'Current Stage', false );
     $select->add_column( 'IFNULL( recommendation_type.name, "N/A" )', 'Approval', false );
+    $select->add_column( 'IF( reqn.catalyst, "Y", "N" )', 'Catalyst Funded', false );
     $select->add_column( 'IF( reqn.website, "Y", "N" )', 'Website', false );
     $select->add_column( 'reqn_type.name', 'Type', false );
     $select->add_column( 'IF( legacy, "Yes", "No" )', 'Legacy', false );

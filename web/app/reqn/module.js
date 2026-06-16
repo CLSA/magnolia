@@ -383,6 +383,16 @@ cenozoApp.defineModule({
           return model.isRole("administrator", "communication", "dao", "readonly", "typist") ? "add" : true;
         },
       },
+      catalyst: {
+        title: "Catalyst Funded",
+        type: "boolean",
+        isConstant: function ($state, model) {
+          return !model.isRole("administrator");
+        },
+        isExcluded: function ($state, model) {
+          return model.isRole("administrator") ? "add" : true;
+        },
+      },
       website: {
         title: "Published on Website",
         type: "boolean",

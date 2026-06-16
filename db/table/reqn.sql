@@ -15,6 +15,7 @@ CREATE TABLE reqn (
   state_date date DEFAULT NULL,
   data_directory varchar(45) DEFAULT NULL,
   data_expiry_date date DEFAULT NULL,
+  catalyst tinyint(1) NOT NULL DEFAULT 0,
   website tinyint(1) NOT NULL DEFAULT 0,
   legacy tinyint(1) NOT NULL DEFAULT 0,
   suggested_revisions tinyint(1) NOT NULL DEFAULT 0,
