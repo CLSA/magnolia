@@ -181,12 +181,14 @@ class reqn extends \cenozo\database\record
    */
   public function has_ethics_approval_list()
   {
+    $stage_class_name = lib::get_class_name( 'database\stage' );
+
     $modifier = lib::create( 'database\modifier' );
     $modifier->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
     $modifier->where( 'stage_type.name', '=', 'Active' );
     return (
       'yes' == $this->get_current_reqn_version()->ethics &&
-      0 < $this->get_current_amendment()->get_stage_count( $modifier )
+      0 < $stage_class_name::count( $modifier )
     );
   }
 
