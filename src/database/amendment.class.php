@@ -21,6 +21,16 @@ class amendment extends \cenozo\database\record
   {
     $fees_changed = $this->has_column_changed( 'fee_schedule_id' );
 
+    // update the paid status when overriding the fee
+    if( $this->has_column_changed( 'override_fee' ) )
+    {
+      if( is_null( $this->paid ) && 0 < $this->override_fee ) $this->paid = false;
+      else if(
+        !is_null( $this->paid ) &&
+        ( is_null( $this->override_fee ) || 0 >= $this->override_fee )
+      ) $this->paid = NULL;
+    }
+
     parent::save();
 
     if( $fees_changed )
@@ -259,6 +269,14 @@ class amendment extends \cenozo\database\record
     $total_fee = current( static::select( $amendment_sel, $amendment_mod ) )['total_fee'];
 
     $this->fee = $fee - $total_fee;
+
+    // check if the paid status has to be updated
+    if( is_null( $this->override_fee ) )
+    {
+      if( is_null( $this->paid ) && 0 < $this->fee ) $this->paid = false;
+      else if( !is_null( $this->paid ) && 0 >= $this->fee ) $this->paid = NULL;
+    }
+
     $this->save();
   }
 

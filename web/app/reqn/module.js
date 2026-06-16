@@ -555,11 +555,8 @@ cenozoApp.defineModule({
       phase: { column: "stage_type.phase", type: "string", isExcluded: true },
       status: { column: "stage_type.status", type: "string", isExcluded: true },
       lang: { type: "string", column: "language.code", isExcluded: true },
-      deadline: {
-        type: "datetime",
-        column: "deadline.datetime",
-        isExcluded: true,
-      },
+      deadline: { type: "datetime", column: "deadline.datetime", isExcluded: true },
+      unpaid: { type: "boolean", isExcluded: true },
     });
 
     module.addExtraOperationGroup("view", {
@@ -1379,6 +1376,13 @@ cenozoApp.defineModule({
               }
 
               if ("Data Release" == this.record.next_stage_type) {
+                if (true == this.record.unpaid) {
+                  message +=
+                    "\n\nWARNING: This " +
+                    this.parentModel.module.name.singular +
+                    " has one or more unpaid amendments.";
+                }
+
                 if (this.record.has_ethics_approval_list) {
                   if (null == this.record.ethics_date) {
                     message +=

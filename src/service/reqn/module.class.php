@@ -454,7 +454,15 @@ class module extends \cenozo\service\module
           'reqn_version.id',
         );
         $amendment_mod->where( 'reqn_version.agreement_filename', '!=', NULL );
-        $select->add_constant( 0 < $db_reqn->get_amendment_count( $amendment_mod ), 'has_agreements' );
+        $select->add_constant( 0 < $db_reqn->get_amendment_count( $amendment_mod ), 'has_agreements', 'boolean' );
+      }
+
+      if( $select->has_column( 'unpaid' ) )
+      {
+        // check for any unpaid amendments
+        $amendment_mod = lib::create( 'database\modifier' );
+        $amendment_mod->where( 'amendment.paid', '=', false );
+        $select->add_constant( 0 < $db_reqn->get_amendment_count( $amendment_mod ), 'unpaid', 'boolean' );
       }
     }
   }

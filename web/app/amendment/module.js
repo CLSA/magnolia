@@ -19,6 +19,7 @@ cenozoApp.defineModule({
         fee_schedule: { column: "fee_schedule.name", title: "Fee Schedule" },
         fee: { title: "Fee Change", type: "number", filter: "currency:$:0" },
         override_fee: { title: "Override Fee Change", type: "number", filter: "currency:$:0" },
+        paid: { title: "Paid", type: "boolean" },
         has_agreement: { title: "Has Agreement", type: "boolean" },
         agreement_end_date: { column: "reqn_version.agreement_end_date", title: "Agreement End", type: "date" },
         datetime: { column: "first_reqn_version.datetime", title: "Datetime", type: "datetime" },
@@ -35,6 +36,7 @@ cenozoApp.defineModule({
       fee_schedule_id: { title: "Fee Schedule", type: "enum" },
       fee: { title: "Fee Change ($)", type: "string", format: "integer", isConstant: true },
       override_fee: { title: "Override Fee Change ($)", type: "string", format: "integer" },
+      paid: { title: "Paid", type: "boolean" },
       has_agreement: { title: "Has Agreement", type: "boolean", isConstant: true },
       datetime: {
         column: "first_reqn_version.datetime",
@@ -56,8 +58,9 @@ cenozoApp.defineModule({
             onPatch: async function (data) {
               await this.$$onPatch(data);
 
-              // if the fee schedule changed then reload the record to update the fee
-              if (angular.isDefined(data.fee_schedule_id)) await this.onView();
+              // if the fee schedule or override fee changed then reload the record to update the fee
+              if (angular.isDefined(data.fee_schedule_id) || angular.isDefined(data.override_fee))
+                await this.onView();
             },
           });
 

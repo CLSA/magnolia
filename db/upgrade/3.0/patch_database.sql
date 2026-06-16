@@ -3,6 +3,7 @@
 SET AUTOCOMMIT=0;
 
 SOURCE reqn.sql
+SOURCE amendment.sql
 
 SOURCE update_version_number.sql
 

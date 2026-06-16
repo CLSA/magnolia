@@ -8,6 +8,7 @@ CREATE TABLE amendment (
   fee_schedule_id int(10) unsigned NOT NULL,
   fee int(10) DEFAULT NULL,
   override_fee int(10) DEFAULT NULL,
+  paid tinyint(1) DEFAULT NULL,
   note text DEFAULT NULL,
   PRIMARY KEY (id),
   UNIQUE KEY uq_reqn_id_name (reqn_id,name),
