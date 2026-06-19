@@ -185,7 +185,9 @@ class reqn extends \cenozo\database\record
 
     $modifier = lib::create( 'database\modifier' );
     $modifier->join( 'stage_type', 'stage.stage_type_id', 'stage_type.id' );
+    $modifier->join( 'amendment', 'stage.amendment_id', 'amendment.id' );
     $modifier->where( 'stage_type.name', '=', 'Active' );
+    $modifier->where( 'amendment.reqn_id', '=', $this->id );
     return (
       'yes' == $this->get_current_reqn_version()->ethics &&
       0 < $stage_class_name::count( $modifier )
