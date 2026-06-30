@@ -142,7 +142,15 @@
               model="model">
             </cn-view-input-with-differences>
           </div>
-          <div class="container-fluid vertical-spacer" ng-if="'graduate' == model.viewModel.record.waiver">
+          <div
+            class="container-fluid vertical-spacer"
+            ng-if="
+              model.viewModel.record.waiver && (
+                'masters' == model.viewModel.record.trainee_level ||
+                'phd' == model.viewModel.record.trainee_level
+              )
+            "
+          >
             <h4 ng-bind-html="t( 'part_1.b.question' )"></h4>
             <p class="text-primary" ng-bind-html="t( 'part_1.b.text' )"></p>
             <cn-view-input-with-differences

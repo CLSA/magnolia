@@ -1093,6 +1093,10 @@ cenozo.service("CnLocalization", [
                 en: "Degree and Program of Study",
                 fr: "Grade et programme d’étude",
               },
+              trainee_level: {
+                en: "Level of trainee program",
+                fr: "Level of trainee program", // TODO: TRANSLATE
+              },
               trainee_institution: {
                 en: "Institution of Enrollment",
                 fr: "Établissement d’étude",
@@ -1120,8 +1124,8 @@ cenozo.service("CnLocalization", [
                 fr: 'Les étudiantes et étudiants aux deuxième et troisième cycles (maîtrise ou doctorat) inscrits dans un établissement canadien qui destinent les données de l’ÉLCV à l’usage exclusif de leur thèse, de leur mémoire ou de leur projet de recherche postdoctoral ou clinique peuvent demander une exonération des droits (limite d’une par stage de perfectionnement). Les stagiaires canadiens qui travaillent hors du Canada, mais qui sont financés par une source canadienne, sont également admissibles à une exonération des droits (ils doivent alors écrire à <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>). Les recherches réalisées dans le cadre d’une subvention Catalyseur des IRSC ne sont pas admissibles à l’exonération des droits d’accès aux données de l’ÉLCV.',
               },
               waiver: {
-                en: "Fee Waiver Type",
-                fr: "Type d’exemption de frais",
+                en: "Fee Waiver",
+                fr: "Exemption de frais",
               },
             },
             project_team: {
@@ -1700,50 +1704,20 @@ cenozo.service("CnLocalization", [
               en: "You must provide an institutional email. Public email accounts such as @gmail.com are not allowed.",
               fr: "Vous devez fournir un courriel institutionnel. Les comptes de messagerie publics tels que @gmail.com ne sont pas autorisés.",
             },
-            duration2Years: {
-              en: "2 Years",
-              fr: "2 ans",
-            },
-            duration3Years: {
-              en: "3 Years",
-              fr: "3 années",
-            },
-            duration2p1Years: {
-              en: "2 Years + 1 Additional Year",
-              fr: "2 ans + 1 année supplémentaire",
-            },
-            duration2p2Years: {
-              en: "2 Years + 2 Additional Years",
-              fr: "2 ans + 2 années supplémentaires",
-            },
-            duration2p3Years: {
-              en: "2 Years + 3 Additional Years",
-              fr: "2 ans + 3 années supplémentaires",
-            },
-            duration3p1Years: {
-              en: "3 Years + 1 Additional Year",
-              fr: "3 ans + 1 année supplémentaire",
-            },
-            duration3p2Years: {
-              en: "3 Years + 2 Additional Years",
-              fr: "3 ans + 2 années supplémentaires",
-            },
-            duration3p3Years: {
-              en: "3 Years + 3 Additional Years",
-              fr: "3 ans + 3 années supplémentaires",
-            },
-            traineeFeeWaiver: {
-              en: "Fee waiver for graduate student (Master’s or PhD) for thesis only",
-              fr: "Exonération pour un étudiant des cycles supérieurs (Maîtrise ou Ph. D.) pour la thèse seulement",
-            },
-            postdocFeeWaiver: {
-              en: "Fee waiver for postdoctoral fellow (limit 1 waiver for postdoctoral studies)",
-              fr: "Exonération pour un boursier postdoctoral (limite d’une exonération pour les études postdoctorales)",
-            },
-            clinicalFeeWaiver: {
-              en: "Clinical fellow with protected time for research (limit 1 waiver)",
-              fr: "Chercheur-boursier clinicien avec temps réservé à la recherche (limite 1 exonération)",
-            },
+            levelUndergraduate: { en: "Undergraduate", fr: "Premier cycle universitaire" },
+            levelMasters: { en: "Master’s", fr: "Maîtrise" },
+            levelPhd: { en: "PhD", fr: "Doctorat" },
+            levelPostdoc: { en: "Postdoctoral Fellow", fr: "Stage postdoctoral" },
+            levelClinical: { en: "Clinical Fellow", fr: "Stage clinique" },
+            levelOther: { en: "Other", fr: "Autre" },
+            duration2Years: { en: "2 Years", fr: "2 ans" },
+            duration3Years: { en: "3 Years", fr: "3 années" },
+            duration2p1Years: { en: "2 Years + 1 Additional Year", fr: "2 ans + 1 année supplémentaire" },
+            duration2p2Years: { en: "2 Years + 2 Additional Years", fr: "2 ans + 2 années supplémentaires" },
+            duration2p3Years: { en: "2 Years + 3 Additional Years", fr: "2 ans + 3 années supplémentaires" },
+            duration3p1Years: { en: "3 Years + 1 Additional Year", fr: "3 ans + 1 année supplémentaire" },
+            duration3p2Years: { en: "3 Years + 2 Additional Years", fr: "3 ans + 2 années supplémentaires" },
+            duration3p3Years: { en: "3 Years + 3 Additional Years", fr: "3 ans + 3 années supplémentaires" },
             clickToSelect: {
               en: "(click to select)",
               fr: "(cliquez pour sélectionner)",
@@ -1780,7 +1754,7 @@ cenozo.service("CnLocalization", [
           },
           part_1: {
             tab: { en: "Part 1", fr: "1<sup>em</sup> partie" },
-            title: { en: "Manuscript Attachments", fr: "Pièces jointes du manuscrit", },
+            title: { en: "Manuscript Attachments", fr: "Pièces jointes du manuscrit" },
             description: {
               en: "Please upload the manuscript along with any other relevant files.",
               fr: "Veuillez télécharger le manuscrit et tous les autres fichiers pertinents.",
@@ -1808,7 +1782,7 @@ cenozo.service("CnLocalization", [
           },
           part_2: {
             tab: { en: "Part 2", fr: "2<sup>e</sup> partie" },
-            title: { en: "Manuscript Overview", fr: "Aperçu du manuscrit", },
+            title: { en: "Manuscript Overview", fr: "Aperçu du manuscrit" },
             authors: { en: "Authors", fr: "Auteurs" },
             authors_check: {
               en: "Confirm requirement has been met",

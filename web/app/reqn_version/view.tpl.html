@@ -402,6 +402,17 @@
                 </cn-view-input-with-differences>
                 <cn-view-input-with-differences
                   input="{
+                    key: 'trainee_level',
+                    title: t( 'part1.applicant.trainee_level' ),
+                    type: model.inputList.trainee_level.type,
+                    enumList: model.metadata.columnList.trainee_level.enumList[model.viewModel.record.lang],
+                    constant: !model.viewModel.record.trainee_name
+                  }"
+                  difference="model.viewModel.compareRecord.differences.part1.applicant.trainee_level"
+                  model="model">
+                </cn-view-input-with-differences>
+                <cn-view-input-with-differences
+                  input="{
                     key: 'trainee_institution',
                     title: t( 'part1.applicant.trainee_institution' ),
                     type: 'string',
@@ -475,8 +486,8 @@
                   input="{
                     key: 'waiver',
                     title: t( 'part1.applicant.waiver' ),
-                    type: 'enum',
-                    enumList: model.metadata.columnList.waiver.enumList[model.viewModel.record.lang],
+                    type: 'boolean',
+                    enumList: model.metadata.traineeAndAccessEnumList[model.viewModel.record.lang],
                     constant: !model.viewModel.isWaiverAllowed() || !model.viewModel.isWaiverMutable(),
                   }"
                   difference="model.viewModel.compareRecord.differences.part1.applicant.waiver"

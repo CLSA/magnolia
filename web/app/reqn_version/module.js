@@ -95,6 +95,7 @@ cenozoApp.defineModule({
       applicant_email: { type: "string" },
       trainee_name: { type: "string" },
       trainee_program: { type: "string" },
+      trainee_level: { type: "enum" },
       trainee_institution: { type: "string" },
       trainee_address: { type: "string" },
       trainee_country_id: {
@@ -121,7 +122,7 @@ cenozoApp.defineModule({
       ethics: { type: "enum" },
       ethics_date: { type: "date" },
       trainee_project: { type: "enum" },
-      waiver: { type: "enum" },
+      waiver: { type: "boolean" },
       comprehensive: { type: "boolean" },
       tracking: { type: "boolean" },
       longitudinal: { type: "boolean" },
@@ -1150,6 +1151,7 @@ cenozoApp.defineModule({
                     applicant_country_id: false,
                     applicant_phone: false,
                     trainee_program: false,
+                    trainee_level: false,
                     trainee_institution: false,
                     trainee_address: false,
                     trainee_country_id: false,
@@ -2190,6 +2192,7 @@ cenozoApp.defineModule({
                   "applicant_country_id",
                   "applicant_phone",
                   "trainee_program",
+                  "trainee_level",
                   "trainee_institution",
                   "trainee_address",
                   "trainee_country_id",
@@ -3121,8 +3124,30 @@ cenozoApp.defineModule({
                   ],
                 };
 
+                // create trainee_level enums
+                this.metadata.columnList.trainee_level.enumList = {
+                  en: [
+                    { value: "", name: misc.choose.en },
+                    { value: "undergraduate", name: misc.levelUndergraduate.en },
+                    { value: "masters", name: misc.levelMasters.en },
+                    { value: "phd", name: misc.levelPhd.en },
+                    { value: "postdoc", name: misc.levelPostdoc.en },
+                    { value: "clinical", name: misc.levelClinical.en },
+                    { value: "other", name: misc.levelOther.en },
+                  ],
+                  fr: [
+                    { value: "", name: misc.choose.fr },
+                    { value: "undergraduate", name: misc.levelUndergraduate.fr },
+                    { value: "masters", name: misc.levelMasters.fr },
+                    { value: "phd", name: misc.levelPhd.fr },
+                    { value: "postdoc", name: misc.levelPostdoc.fr },
+                    { value: "clinical", name: misc.levelClinical.fr },
+                    { value: "other", name: misc.levelOther.fr },
+                  ],
+                };
+
                 // create duration enums
-                this.metadata.columnList.duration.standardEnumList = {
+                this.metadata.columnList.duration.enumList = {
                   en: [
                     { value: "", name: misc.choose.en },
                     { value: "2 years", name: misc.duration2Years.en },
@@ -3188,23 +3213,6 @@ cenozoApp.defineModule({
 
                 this.metadata.columnList.ethics.enumList.en.unshift({ value: "", name: misc.choose.en });
                 this.metadata.columnList.ethics.enumList.fr.unshift({ value: "", name: misc.choose.fr });
-
-                // translate waiver enum
-                this.metadata.columnList.waiver.enumList = {
-                  en: this.metadata.columnList.waiver.enumList,
-                  fr: angular.copy(this.metadata.columnList.waiver.enumList),
-                };
-                this.metadata.columnList.waiver.enumList.en[0].name = misc.traineeFeeWaiver.en;
-                this.metadata.columnList.waiver.enumList.en[1].name = misc.postdocFeeWaiver.en;
-                this.metadata.columnList.waiver.enumList.en[2].name = misc.clinicalFeeWaiver.en;
-                this.metadata.columnList.waiver.enumList.en[3].name = misc.none.en;
-                this.metadata.columnList.waiver.enumList.fr[0].name = misc.traineeFeeWaiver.fr;
-                this.metadata.columnList.waiver.enumList.fr[1].name = misc.postdocFeeWaiver.fr;
-                this.metadata.columnList.waiver.enumList.fr[2].name = misc.clinicalFeeWaiver.fr;
-                this.metadata.columnList.waiver.enumList.fr[3].name = misc.none.fr;
-
-                this.metadata.columnList.waiver.enumList.en.unshift({ value: "", name: misc.choose.en });
-                this.metadata.columnList.waiver.enumList.fr.unshift({ value: "", name: misc.choose.fr });
               }
 
               // only do the following for the root instance

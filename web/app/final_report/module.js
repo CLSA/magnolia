@@ -54,7 +54,8 @@ cenozoApp.defineModule({
       impact: { type: "text" },
       opportunities: { type: "text" },
       dissemination: { type: "text" },
-      waiver: { column: "reqn_version.waiver", type: "string" },
+      trainee_level: { column: "reqn_version.trainee_level", type: "string" },
+      waiver: { column: "reqn_version.waiver", type: "boolean" },
       current_destruction_report_id: { column: "destruction_report.id", type: "string" },
     });
 
@@ -300,7 +301,10 @@ cenozoApp.defineModule({
                   part_3: ["impact", "opportunities", "dissemination"],
                 };
 
-                if( "graduate" == this.record.waiver ) {
+                if (
+                  this.record.waiver &&
+                  ["masters", "phd"].includes(this.record.trainee_level)
+                ) {
                   requiredTabList.part_1.push("thesis_title");
                   requiredTabList.part_1.push("thesis_status");
                 }
