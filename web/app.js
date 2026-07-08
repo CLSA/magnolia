@@ -1095,7 +1095,7 @@ cenozo.service("CnLocalization", [
               },
               trainee_level: {
                 en: "Level of trainee program",
-                fr: "Level of trainee program", // TODO: TRANSLATE
+                fr: "Niveau du programme de stage",
               },
               trainee_institution: {
                 en: "Institution of Enrollment",
