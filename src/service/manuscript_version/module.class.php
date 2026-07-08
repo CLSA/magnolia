@@ -151,9 +151,7 @@ class module extends \cenozo\service\module
       {
         // determine if the current reqn_version has a trainee with a waiver
         $select->add_constant(
-          !is_null( $db_reqn->trainee_user_id ) &&
-          !is_null( $db_reqn_version->waiver ) &&
-          'none' != $db_reqn_version->waiver,
+          !is_null( $db_reqn->trainee_user_id ) && $db_reqn_version->waiver,
           'has_trainee_with_waiver',
           'boolean'
         );

@@ -936,12 +936,14 @@ cenozoApp.defineModule({
                 }
 
                 if ("trainee_project" == property) {
-                  if (!data.trainee_project) this.record.waiver = "";
+                  if (!data.trainee_project) {
+                    this.record.waiver = false;
+                  }
                 } else if (["applicant_country_id", "trainee_country_id"].includes(property)) {
                   // set the trainee_project and waiver type to empty if the waiver isn't allowed
                   if (!this.isWaiverAllowed()) {
-                    this.record.trainee_project = "";
-                    this.record.waiver = "";
+                    this.record.trainee_project = false;
+                    this.record.waiver = false;
                   }
                 } else if (["comprehensive", "tracking"].includes(property)) {
                   if (this.record.comprehensive && this.record.tracking) {

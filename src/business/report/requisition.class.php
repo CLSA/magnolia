@@ -196,11 +196,12 @@ class requisition extends \cenozo\business\report\base_report
       false
     );
     $select->add_column( 'reqn_version.trainee_program', 'Trainee Program', false );
+    $select->add_column( 'reqn_version.trainee_level', 'Trainee Level', false );
     $select->add_column( 'reqn_version.trainee_institution', 'Trainee Institution', false );
     $select->add_column( 'trainee_country.name', 'Trainee Country', false );
     $select->add_column( 'trainee_user.email', 'Trainee Email', false );
     $select->add_column( 'IF(reqn_version.trainee_project, "Yes", "No")', 'Trainee Project', false );
-    $select->add_column( 'reqn_version.waiver', 'Fee Waiver Type', false );
+    $select->add_column( 'IF(reqn_version.waiver, "Yes", "No")', 'Fee Waiver', false );
     $select->add_column( 'IF( reqn.show_prices, fees.total_fee, "N/A" )', 'Total Fee', false );
 
     $select->add_column( 'reqn_version.title', 'Title', false );

@@ -84,7 +84,7 @@ class amendment extends \cenozo\database\record
       $fee = $db_base_fee_schedule->fee_national;
       if( !is_null( $db_reqn_version ) )
       {
-        $waive_fee = !is_null( $db_reqn_version->waiver ) && 'none' != $db_reqn_version->waiver;
+        $waive_fee = $db_reqn_version->waiver;
         $international = $db_reqn_version->is_international();
         $fee = (
           $international ?

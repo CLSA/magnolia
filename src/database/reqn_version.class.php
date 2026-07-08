@@ -41,9 +41,7 @@ class reqn_version extends \cenozo\database\record
       $this->trainee_project = NULL;
     }
 
-    if( !$this->trainee_project ) {
-      $this->waiver = NULL;
-    }
+    if( !$this->trainee_project ) $this->waiver = NULL;
 
     if( !$this->indigenous_first_nation && !$this->indigenous_metis && !$this->indigenous_inuit )
     {
@@ -670,6 +668,15 @@ class reqn_version extends \cenozo\database\record
     {
       $data['graduate_name'] = sprintf( '%s %s', $db_trainee_user->first_name, $db_trainee_user->last_name );
       if( !is_null( $this->trainee_program ) ) $data['graduate_program'] = $this->trainee_program;
+      if( !is_null( $this->trainee_level ) )
+      {
+        if( 'undergraduate' == $this->trainee_level ) $data['trainee_level_undergraduate'] = 'Yes';
+        else if( 'masters' == $this->trainee_level ) $data['trainee_level_masters'] = 'Yes';
+        else if( 'phd' == $this->trainee_level ) $data['trainee_level_phd'] = 'Yes';
+        else if( 'postdoc' == $this->trainee_level ) $data['trainee_level_postdoc'] = 'Yes';
+        else if( 'clinical' == $this->trainee_level ) $data['trainee_level_clinical'] = 'Yes';
+        else if( 'other' == $this->trainee_level ) $data['trainee_level_other'] = 'Yes';
+      }
       if( !is_null( $this->trainee_institution ) ) $data['graduate_institution'] = $this->trainee_institution;
       if( !is_null( $this->trainee_address ) ) $data['graduate_address'] = $this->trainee_address;
       if( !is_null( $this->trainee_phone ) ) $data['graduate_phone'] = $this->trainee_phone;
@@ -681,9 +688,8 @@ class reqn_version extends \cenozo\database\record
       }
       if( !is_null( $this->waiver ) )
       {
-        if( 'graduate' == $this->waiver ) $data['waiver_graduate'] = 'Yes';
-        else if( 'postdoc' == $this->waiver ) $data['waiver_postdoc'] = 'Yes';
-        else if( 'clinical' == $this->waiver ) $data['waiver_clinical'] = 'Yes';
+        if( $this->waiver ) $data['waiver_yes'] = 'Yes';
+        else $data['waiver_no'] = 'Yes';
       }
     }
     if( !is_null( $this->start_date ) ) $data['start_date'] = $this->start_date->format( 'Y-m-d' );

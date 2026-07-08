@@ -57,6 +57,7 @@ class reqn extends \cenozo\database\record
       // do not allow trainee details or a fee waiver if there is no trainee selected
       $db_current_reqn_version = $this->get_current_reqn_version();
       $db_current_reqn_version->trainee_program = NULL;
+      $db_current_reqn_version->trainee_level = NULL;
       $db_current_reqn_version->trainee_institution = NULL;
       $db_current_reqn_version->trainee_address = NULL;
       $db_current_reqn_version->trainee_phone = NULL;
@@ -1040,13 +1041,13 @@ class reqn extends \cenozo\database\record
         // ...and mark the version datetime
         $db_reqn_version->datetime = util::get_datetime_object();
 
-        // ...and set the waiver to none if the reqn is not eligible
+        // ...and set the waiver to false if the reqn is not eligible
         if( is_null( $this->trainee_user_id ) || (
           !is_null( $db_reqn_version->applicant_country_id ) &&
           $db_application->country_id != $db_reqn_version->applicant_country_id &&
           !is_null( $db_reqn_version->trainee_country_id ) &&
           $db_application->country_id != $db_reqn_version->trainee_country_id
-        ) ) $db_reqn_version->waiver = 'none';
+        ) ) $db_reqn_version->waiver = false;
 
         $db_reqn_version->save();
       }
@@ -2232,6 +2233,7 @@ class reqn extends \cenozo\database\record
 
     // trainee details
     $modifier->or_where( 'reqn_version.trainee_program', 'RLIKE', $search );
+    $modifier->or_where( 'reqn_version.trainee_level', 'RLIKE', $search );
     $modifier->or_where( 'reqn_version.trainee_institution', 'RLIKE', $search );
     $modifier->or_where( 'reqn_version.trainee_address', 'RLIKE', $search );
     $modifier->or_where( 'trainee_country.name', 'RLIKE', $search );

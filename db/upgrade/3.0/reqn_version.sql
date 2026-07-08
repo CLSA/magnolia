@@ -23,7 +23,7 @@ CREATE PROCEDURE patch_reqn_version()
       SET reqn_version.trainee_level = IF(
         "postdoc" = reqn_version.waiver OR "clinical" = reqn_version.waiver,
         reqn_version.waiver,
-        IF("graduate", "phd", "other")
+        IF("graduate" = reqn_version.waiver, "phd", "other")
       )
       WHERE reqn.trainee_user_id IS NOT NULL
       AND reqn.id IN (
