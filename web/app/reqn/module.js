@@ -1375,7 +1375,7 @@ cenozoApp.defineModule({
                   "\n\nWARNING: There are deferral notes present, you may wish to remove them before proceeding.";
               }
 
-              if ("Data Release" == this.record.next_stage_type) {
+              if ("Data Release" == stageType) {
                 if (true == this.record.unpaid) {
                   message +=
                     "\n\nWARNING: This " +
