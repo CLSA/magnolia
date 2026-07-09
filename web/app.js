@@ -1084,7 +1084,7 @@ cenozo.service("CnLocalization", [
               },
               applicant_phone: { en: "Phone", fr: "Téléphone" },
               applicant_email: { en: "E-mail", fr: "Courriel" },
-              text3: {
+              text4: {
                 en: "Complete this section if this is a Trainee application (Master’s, PhD and Postdoctoral Fellow).",
                 fr: "Remplissez cette section si la demande est pour un étudiant (Maîtrise, Ph. D.) ou un chercheur postdoctoral.",
               },
@@ -1111,7 +1111,7 @@ cenozo.service("CnLocalization", [
               },
               trainee_phone: { en: "Phone", fr: "Téléphone" },
               trainee_email: { en: "E-mail", fr: "Courriel" },
-              text4: {
+              text5: {
                 en: "Confirm whether the CLSA dataset requested will be for the sole use of the trainee project, i.e., the graduate student’s thesis research or the postdoctoral or clinical fellow’s research project.",
                 fr: "Veuillez confirmer si l’ensemble de données de l’ÉLCV réclamé est destiné à l’usage exclusif de la thèse, du mémoire ou du projet de recherche postdoctoral ou clinique du stagiaire.",
               },
@@ -1119,7 +1119,7 @@ cenozo.service("CnLocalization", [
                 en: "Trainee Project Only",
                 fr: "Projet réservé aux stagiaires",
               },
-              text5: {
+              text6: {
                 en: 'Graduate students (Masters or PhD) who wish to obtain the CLSA data for the sole purpose of their thesis, and postdoctoral or clinical fellows (limit 1 waiver per fellowship) who wish to obtain the CLSA data for the sole purpose of their postdoctoral or clinical fellowship project, who are enrolled at Canadian institutions for their graduate degree, postdoc, or clinical fellowship, can apply for a fee waiver. Canadian trainees working outside Canada but funded through a Canadian source are also eligible for a fee waiver (if applicable, please e-mail <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>). Research conducted as part of a CIHR Catalyst Grant is not eligible for a CLSA Data Access Trainee Fee Waiver.',
                 fr: 'Les étudiantes et étudiants aux deuxième et troisième cycles (maîtrise ou doctorat) inscrits dans un établissement canadien qui destinent les données de l’ÉLCV à l’usage exclusif de leur thèse, de leur mémoire ou de leur projet de recherche postdoctoral ou clinique peuvent demander une exonération des droits (limite d’une par stage de perfectionnement). Les stagiaires canadiens qui travaillent hors du Canada, mais qui sont financés par une source canadienne, sont également admissibles à une exonération des droits (ils doivent alors écrire à <a href="mailto:access@clsa-elcv.ca">access@clsa-elcv.ca</a>). Les recherches réalisées dans le cadre d’une subvention Catalyseur des IRSC ne sont pas admissibles à l’exonération des droits d’accès aux données de l’ÉLCV.',
               },
