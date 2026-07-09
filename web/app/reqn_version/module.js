@@ -3149,7 +3149,7 @@ cenozoApp.defineModule({
                 };
 
                 // create duration enums
-                this.metadata.columnList.duration.enumList = {
+                this.metadata.columnList.duration.standardEnumList = {
                   en: [
                     { value: "", name: misc.choose.en },
                     { value: "2 years", name: misc.duration2Years.en },
