@@ -37,6 +37,7 @@ class query extends \cenozo\service\query
     $modifier->join_current_reqn_version( 'reqn.id', 'reqn_version', true );
     $modifier->where( 'reqn_version.data_agreement_id', '=', $db_data_agreement->id );
     $modifier->group( 'reqn.id' );
+    $this->select->apply_aliases_to_modifier( $modifier );
 
     return $reqn_class_name::count( $modifier );
   }
@@ -54,6 +55,7 @@ class query extends \cenozo\service\query
     $modifier->join_current_reqn_version( 'reqn.id', 'reqn_version', true );
     $modifier->where( 'reqn_version.data_agreement_id', '=', $db_data_agreement->id );
     $modifier->group( 'reqn.id' );
+    $this->select->apply_aliases_to_modifier( $modifier );
 
     return $reqn_class_name::select( $this->select, $modifier );
   }

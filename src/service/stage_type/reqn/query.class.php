@@ -34,6 +34,7 @@ class query extends \cenozo\service\query
     $db_stage_type = $this->get_parent_record();
     $modifier = clone $this->modifier;
     $modifier->where( 'stage_type.id', '=', $db_stage_type->id );
+    $this->select->apply_aliases_to_modifier( $modifier );
     return $reqn_class_name::count( $modifier );
   }
 
@@ -47,6 +48,7 @@ class query extends \cenozo\service\query
     $db_stage_type = $this->get_parent_record();
     $modifier = clone $this->modifier;
     $modifier->where( 'stage_type.id', '=', $db_stage_type->id );
+    $this->select->apply_aliases_to_modifier( $modifier );
     return $reqn_class_name::select( $this->select, $modifier );
   }
 }
