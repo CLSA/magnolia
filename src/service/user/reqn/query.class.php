@@ -30,6 +30,8 @@ class query extends \cenozo\service\query
     $modifier->or_where( 'reqn.trainee_user_id', '=', $db_user->id );
     $modifier->or_where( 'reqn.designate_user_id', '=', $db_user->id );
     $modifier->where_bracket( false );
+    $this->select->apply_aliases_to_modifier( $modifier );
+
     return $reqn_class_name::count( $modifier );
   }
 
@@ -50,6 +52,8 @@ class query extends \cenozo\service\query
     $modifier->or_where( 'reqn.trainee_user_id', '=', $db_user->id );
     $modifier->or_where( 'reqn.designate_user_id', '=', $db_user->id );
     $modifier->where_bracket( false );
+    $this->select->apply_aliases_to_modifier( $modifier );
+
     return $reqn_class_name::select( $this->select, $modifier );
   }
 }
