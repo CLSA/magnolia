@@ -207,6 +207,32 @@ class reqn_version extends \cenozo\database\record
   }
 
   /**
+   * Returns the applicant's country
+   * @return database\country
+   */
+  public function get_applicant_country()
+  {
+    return (
+      is_null( $this->applicant_country_id ) ?
+      NULL :
+      lib::create( 'database\country', $this->applicant_country_id )
+    );
+  }
+
+  /**
+   * Returns the trainee's country
+   * @return database\country
+   */
+  public function get_trainee_country()
+  {
+    return (
+      is_null( $this->trainee_country_id ) ?
+      NULL :
+      lib::create( 'database\country', $this->trainee_country_id )
+    );
+  }
+
+  /**
    * Determines whether there is any difference between this version and the last
    */
   public function has_changed()
@@ -661,26 +687,35 @@ class reqn_version extends \cenozo\database\record
     }
     if( !is_null( $this->applicant_affiliation ) ) $data['applicant_affiliation'] = $this->applicant_affiliation;
     if( !is_null( $this->applicant_address ) ) $data['applicant_address'] = $this->applicant_address;
+    if( !is_null( $this->applicant_country_id ) )
+      $data['applicant_country'] = $this->get_applicant_country()->name;
     if( !is_null( $this->applicant_phone ) ) $data['applicant_phone'] = $this->applicant_phone;
     $data['applicant_email'] = $db_user->email;
     // only show trainee details if there is a trainee user
     if( !is_null( $db_trainee_user ) )
     {
-      $data['graduate_name'] = sprintf( '%s %s', $db_trainee_user->first_name, $db_trainee_user->last_name );
-      if( !is_null( $this->trainee_program ) ) $data['graduate_program'] = $this->trainee_program;
+      $data['trainee_name'] = sprintf( '%s %s', $db_trainee_user->first_name, $db_trainee_user->last_name );
+      if( !is_null( $this->trainee_program ) ) $data['trainee_program'] = $this->trainee_program;
       if( !is_null( $this->trainee_level ) )
       {
-        if( 'undergraduate' == $this->trainee_level ) $data['trainee_level_undergraduate'] = 'Yes';
-        else if( 'masters' == $this->trainee_level ) $data['trainee_level_masters'] = 'Yes';
-        else if( 'phd' == $this->trainee_level ) $data['trainee_level_phd'] = 'Yes';
-        else if( 'postdoc' == $this->trainee_level ) $data['trainee_level_postdoc'] = 'Yes';
-        else if( 'clinical' == $this->trainee_level ) $data['trainee_level_clinical'] = 'Yes';
-        else if( 'other' == $this->trainee_level ) $data['trainee_level_other'] = 'Yes';
+        if( 'undergraduate' == $this->trainee_level )
+          $data['trainee_level'] = 'Undergraduate / Premier cycle universitaire';
+        else if( 'masters' == $this->trainee_level )
+          $data['trainee_level'] = 'Master’s / Maîtrise';
+        else if( 'phd' == $this->trainee_level )
+          $data['trainee_level'] = 'PhD / Doctorat';
+        else if( 'postdoc' == $this->trainee_level )
+          $data['trainee_level'] = 'Postdoctoral Fellow / Stage postdoctoral';
+        else if( 'clinical' == $this->trainee_level )
+          $data['trainee_level'] = 'Clinical Fellow / Stage clinique';
+        else if( 'other' == $this->trainee_level )
+          $data['trainee_level'] = 'Other / Autre';
       }
-      if( !is_null( $this->trainee_institution ) ) $data['graduate_institution'] = $this->trainee_institution;
-      if( !is_null( $this->trainee_address ) ) $data['graduate_address'] = $this->trainee_address;
-      if( !is_null( $this->trainee_phone ) ) $data['graduate_phone'] = $this->trainee_phone;
-      if( !is_null( $db_trainee_user ) ) $data['graduate_email'] = $db_trainee_user->email;
+      if( !is_null( $this->trainee_institution ) ) $data['trainee_institution'] = $this->trainee_institution;
+      if( !is_null( $this->trainee_address ) ) $data['trainee_address'] = $this->trainee_address;
+      if( !is_null( $this->trainee_country_id ) ) $data['trainee_country'] = $this->get_trainee_country()->name;
+      if( !is_null( $this->trainee_phone ) ) $data['trainee_phone'] = $this->trainee_phone;
+      if( !is_null( $db_trainee_user ) ) $data['trainee_email'] = $db_trainee_user->email;
       if( !is_null( $this->trainee_project ) )
       {
         if( $this->trainee_project ) $data['trainee_project_yes'] = 'Yes';

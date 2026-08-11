@@ -1358,9 +1358,7 @@ cenozoApp.defineModule({
                 "Are you sure you wish to move this " +
                 this.parentModel.module.name.singular +
                 ' to the "' +
-                (angular.isDefined(stageType)
-                  ? stageType
-                  : this.record.next_stage_type) +
+                (angular.isDefined(stageType) ? stageType : this.record.next_stage_type) +
                 '" stage?';
 
               // check to see if there are any active deferral notes for the active form
@@ -1375,7 +1373,7 @@ cenozoApp.defineModule({
                   "\n\nWARNING: There are deferral notes present, you may wish to remove them before proceeding.";
               }
 
-              if ("Data Release" == stageType) {
+              if ("Data Release" == (angular.isDefined(stageType) ? stageType : this.record.next_stage_type)) {
                 if (true == this.record.unpaid) {
                   message +=
                     "\n\nWARNING: This " +
@@ -1443,8 +1441,7 @@ cenozoApp.defineModule({
 
               if (response) {
                 var queryString = "?action=next_stage";
-                if (angular.isDefined(stageType))
-                  queryString += "&stage_type=" + stageType;
+                if (angular.isDefined(stageType)) queryString += "&stage_type=" + stageType;
                 await CnHttpFactory.instance({
                   path: this.parentModel.getServiceResourcePath() + queryString,
                 }).patch();
