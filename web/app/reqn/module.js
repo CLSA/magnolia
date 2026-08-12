@@ -1370,40 +1370,55 @@ cenozoApp.defineModule({
 
               if (this.parentModel.isRole("administrator", "communication", "dao") && 0 < deferralNotes ) {
                 message +=
-                  "\n\nWARNING: There are deferral notes present, you may wish to remove them before proceeding.";
+                  "<br/>\n<br/>\n" +
+                  '<strong class="text-danger">' +
+                    "WARNING: There are deferral notes present, you may wish to remove them before proceeding." +
+                  "</strong>";
               }
 
               if ("Data Release" == (angular.isDefined(stageType) ? stageType : this.record.next_stage_type)) {
                 if (true == this.record.unpaid) {
                   message +=
-                    "\n\nWARNING: This " +
-                    this.parentModel.module.name.singular +
-                    " has one or more unpaid amendments.";
+                    "<br/>\n<br/>\n" +
+                    '<strong class="text-danger">' +
+                      "WARNING: This " +
+                      this.parentModel.module.name.singular +
+                      " has one or more unpaid amendments." +
+                    "</strong>";
                 }
 
                 if (this.record.has_ethics_approval_list) {
                   if (null == this.record.ethics_date) {
                     message +=
-                      "\n\nWARNING: This " +
-                      this.parentModel.module.name.singular +
-                      " has no ethics agreement, " +
-                      "you may not wish to proceed until one has been uploaded.";
+                      "<br/>\n<br/>\n" +
+                      '<strong class="text-danger">' +
+                        "WARNING: This " +
+                        this.parentModel.module.name.singular +
+                        " has no ethics agreement, " +
+                        "you may not wish to proceed until one has been uploaded." +
+                      "</strong>";
                   } else if (moment().isAfter(this.record.ethics_date, "day")) {
                     message +=
-                      "\n\nWARNING: This " +
-                      this.parentModel.module.name.possessive +
-                      " ethics expired on " +
-                      moment(this.record.ethics_date).format("MMMM D, YYYY") +
-                      ", " +
-                      "you may not wish to proceed until a new ethics agreement has been uploaded.";
+                      "<br/>\n<br/>\n" +
+                      '<strong class="text-danger">' +
+                        "WARNING: This " +
+                        this.parentModel.module.name.possessive +
+                        " ethics expired on " +
+                        moment(this.record.ethics_date).format("MMMM D, YYYY") +
+                        ", " +
+                        "you may not wish to proceed until a new ethics agreement has been uploaded." +
+                      "</strong>";
                   }
                 } else {
                   if (!this.record.ethics_filename) {
                     message +=
-                      "\n\nWARNING: This " +
-                      this.parentModel.module.name.singular +
-                      " has no ethics agreement, " +
-                      "you may not wish to proceed until one has been uploaded.";
+                      "<br/>\n<br/>\n" +
+                      '<strong class="text-danger">' +
+                        "WARNING: This " +
+                        this.parentModel.module.name.singular +
+                        " has no ethics agreement, " +
+                        "you may not wish to proceed until one has been uploaded." +
+                      "</strong>";
                   }
                 }
               } else if ("Pre Data Destruction" == this.record.stage_type) {
@@ -1419,7 +1434,10 @@ cenozoApp.defineModule({
                   ' to the "' + response.data.next_stage_type + '" stage?';
                 if ("Complete" == response.data.next_stage_type) {
                   message +=
-                    "\n\nWARNING: There is no data to destroy, so the Data Destruction stage will be skipped.";
+                    "<br/>\n<br/>\n" +
+                    '<strong class="text-danger">' +
+                      "WARNING: There is no data to destroy, so the Data Destruction stage will be skipped." +
+                    "</strong>";
                 }
               } else if ("Data Destruction" == this.record.stage_type) {
                 // warn if there are any data-destroy records without a date
@@ -1431,15 +1449,14 @@ cenozoApp.defineModule({
                 const count = parseInt(response.headers("X-Total"));
                 if(0 < count) {
                   message +=
-                    "\n\nWARNING: There are " + count + " data versions that do not have a date of destruction.";
+                    "<br/>\n<br/>\n" +
+                    '<strong class="text-danger">' +
+                      "WARNING: There are " + count + " data versions that do not have a date of destruction." +
+                    "</strong>";
                 }
               }
 
-              var response = await CnModalConfirmFactory.instance({
-                message: message,
-              }).show();
-
-              if (response) {
+              if (await CnModalConfirmFactory.instance({ message: message, html: true }).show()) {
                 var queryString = "?action=next_stage";
                 if (angular.isDefined(stageType)) queryString += "&stage_type=" + stageType;
                 await CnHttpFactory.instance({
@@ -1450,12 +1467,8 @@ cenozoApp.defineModule({
             },
 
             reject: async function () {
-              var message =
-                "Are you sure you wish to reject the " +
-                this.parentModel.module.name.singular +
-                "?";
               var response = await CnModalConfirmFactory.instance({
-                message: message,
+                message: "Are you sure you wish to reject the " + this.parentModel.module.name.singular + "?",
               }).show();
 
               if (response) {
@@ -1481,14 +1494,14 @@ cenozoApp.defineModule({
                 "A notification will be sent indicating that an action is required by the applicant.";
               if (0 == deferralNotes) {
                 message +=
-                  "\n\nWARNING: there are currently no deferral notes to instruct the applicant why " +
-                  "their attention is required.";
+                  "<br/>\n<br/>\n" +
+                  '<strong class="text-danger">' +
+                    "WARNING: there are currently no deferral notes to instruct " +
+                    "the applicant why their attention is required." +
+                  "</strong>";
               }
 
-              var response = await CnModalConfirmFactory.instance({
-                message: message,
-              }).show();
-              if (response) {
+              if (await CnModalConfirmFactory.instance({ message: message, html: true }).show()) {
                 await CnHttpFactory.instance({
                   path:
                     this.parentModel.getServiceResourcePath() + "?action=defer",
