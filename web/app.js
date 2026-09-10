@@ -1529,6 +1529,7 @@ cenozo.service("CnLocalization", [
                 en: "COVID-19, Brain",
                 fr: "COVID-19, cerveau",
               },
+              weston_hbha: { en: "HBHA", fr: "HBHA" },
             },
             studyPhase: {
               bl: { en: "Baseline", fr: "départ" },

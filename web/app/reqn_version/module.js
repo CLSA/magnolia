@@ -1017,6 +1017,7 @@ cenozoApp.defineModule({
               "geographic_indicators",
               "covid_19_data",
               "mortality_data",
+              "hbha_data",
               "amendments",
               "manuscripts",
               "agreement",
@@ -1028,7 +1029,7 @@ cenozoApp.defineModule({
               part1Tabs = ["applicant", "project_team", "timeline", "description", "scientific_review", "ethics"];
               part2Tabs = [
                 "notes", "cohort", "indigenous", "core_clsa_data", "linked_data", "images_and_raw_data",
-                "geographic_indicators", "covid_19_data", "mortality_data"
+                "geographic_indicators", "covid_19_data", "mortality_data", "hbha_data"
               ];
               amendmentsTabs = ["amendments"];
               manuscriptsTabs = ["manuscripts"];
@@ -1048,7 +1049,7 @@ cenozoApp.defineModule({
             },
 
             canMoveNextTab: function() {
-              return "mortality_data" != this.formTab;
+              return "hbha_data" != this.formTab;
             },
 
             isInternational: function() {
@@ -1250,6 +1251,12 @@ cenozoApp.defineModule({
                     comment: false,
                   },
                   mortality_data: {
+                    diff: false,
+                    selectionList: [],
+                    optionJustificationList: [],
+                    comment: false,
+                  },
+                  hbha_data: {
                     diff: false,
                     selectionList: [],
                     optionJustificationList: [],
@@ -1509,6 +1516,7 @@ cenozoApp.defineModule({
                 data: { modifier: {
                   where: { column: "reqn.id", operator: "=", value: this.record.reqn_id },
                   order: [{"amendment.name": true}, {"reqn_version.version": true}] },
+                  limit: 10000,
                 },
               }).query();
 
@@ -1638,11 +1646,14 @@ cenozoApp.defineModule({
             getAmendmentList: async function () {
               const response = await CnHttpFactory.instance({
                 path: ["reqn", this.record.reqn_id, "amendment"].join("/"),
-                data: { select: { column: [
-                  "id",
-                  "name",
-                  { column: "IFNULL( override_fee, fee )", alias: "fee", table_prefix: false },
-                ] } },
+                data: {
+                  select: { column: [
+                    "id",
+                    "name",
+                    { column: "IFNULL( override_fee, fee )", alias: "fee", table_prefix: false },
+                  ] },
+                  modifier: { limit: 10000 },
+                },
               }).query();
 
               this.amendmentList = response.data;
@@ -1665,7 +1676,7 @@ cenozoApp.defineModule({
                 path: basePath + "/amendment_type",
                 data: {
                   select: { column: ["id"] },
-                  modifier: { order: "id", limit: 1000 },
+                  modifier: { order: "id", limit: 10000 },
                 },
               }).query();
 
@@ -1759,7 +1770,7 @@ cenozoApp.defineModule({
                 path: "reqn/" + this.record.reqn_id + "/manuscript",
                 data: {
                   select: { column: ["id", "title", { table: "manuscript_stage_type", column: "status" }] },
-                  modifier: { order: "id", limit: 1000 },
+                  modifier: { order: "id", limit: 10000 },
                 },
               }).query();
 
@@ -1781,7 +1792,7 @@ cenozoApp.defineModule({
                     { table: "country", column: "name", alias: "country" },
                     "email", "role", "trainee", "access"
                   ] },
-                  modifier: { order: "id", limit: 1000 },
+                  modifier: { order: "id", limit: 10000 },
                 },
               }).query();
 
@@ -1836,7 +1847,7 @@ cenozoApp.defineModule({
                 path: basePath + "/reference",
                 data: {
                   select: { column: ["id", "rank", "reference"] },
-                  modifier: { order: "rank", limit: 1000 },
+                  modifier: { order: "rank", limit: 10000 },
                 },
               }).query();
 
@@ -1867,7 +1878,7 @@ cenozoApp.defineModule({
                 path: ["reqn", this.record.reqn_id, "ethics_approval"].join("/"),
                 data: {
                   select: { column: ["id", "filename", "date", "one_day_old"] },
-                  modifier: { order: { date: true }, limit: 1000 },
+                  modifier: { order: { date: true }, limit: 10000 },
                 },
               }).query();
 
@@ -1906,22 +1917,34 @@ cenozoApp.defineModule({
               ] = await Promise.all([
                 CnHttpFactory.instance({
                   path: basePath + "/data_selection?full=true",
-                  data: { select: { column: "id" } },
+                  data: {
+                    select: { column: "id" },
+                    modifier: { limit: 10000 },
+                  },
                 }).query(),
 
                 CnHttpFactory.instance({
                   path: basePath + "/reqn_version_comment",
-                  data: { select: { column: ["data_category_id", "description"] } },
+                  data: {
+                    select: { column: ["data_category_id", "description"] },
+                    modifier: { limit: 10000 },
+                  },
                 }).query(),
 
                 CnHttpFactory.instance({
                   path: basePath + "/data_justification",
-                  data: { select: { column: ["data_option_id", "description"] } },
+                  data: {
+                    select: { column: ["data_option_id", "description"] },
+                    modifier: { limit: 10000 },
+                  },
                 }).query(),
 
                 CnHttpFactory.instance({
                   path: basePath + "/amendment_justification",
-                  data: { select: { column: ["amendment_type_id", "description"] } },
+                  data: {
+                    select: { column: ["amendment_type_id", "description"] },
+                    modifier: { limit: 10000 },
+                  },
                 }).query(),
               ]);
 
@@ -2739,7 +2762,7 @@ cenozoApp.defineModule({
             displayNotices: async function () {
               var response = await CnHttpFactory.instance({
                 path: "reqn/" + this.record.reqn_id + "/notice",
-                data: { modifier: { order: { datetime: true } } },
+                data: { modifier: { order: { datetime: true }, limit: 10000 } },
               }).query();
 
               await CnModalNoticeListFactory.instance({
@@ -2953,7 +2976,7 @@ cenozoApp.defineModule({
                       },
                       modifier: {
                         order: "rank",
-                        limit: 1000,
+                        limit: 10000,
                       },
                     },
                   }).query(),
@@ -2977,7 +3000,7 @@ cenozoApp.defineModule({
                       },
                       modifier: {
                         order: ["data_category.rank", "data_option.rank"],
-                        limit: 1000,
+                        limit: 10000,
                       },
                     },
                   }).query(),
@@ -3001,7 +3024,7 @@ cenozoApp.defineModule({
                           "data_option.rank",
                           "study_phase.rank",
                         ],
-                        limit: 1000,
+                        limit: 10000,
                       },
                     },
                   }).query(),
@@ -3023,7 +3046,7 @@ cenozoApp.defineModule({
                       },
                       modifier: {
                         order: ["data_option.id", "study_phase.rank", "data_detail.rank"],
-                        limit: 1000,
+                        limit: 10000,
                       },
                     },
                   }).query(),
@@ -3037,7 +3060,7 @@ cenozoApp.defineModule({
                         },
                         modifier: {
                           order: ["institution", {"start_date":true} ],
-                          limit: 1000,
+                          limit: 10000,
                         },
                       },
                     }).query() : null
