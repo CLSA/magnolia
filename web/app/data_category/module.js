@@ -1,6 +1,7 @@
 cenozoApp.defineModule({
   name: "data_category",
   models: ["list", "view"],
+  defaultTab: "data_option",
   create: (module) => {
     angular.extend(module, {
       identifier: { column: "name_en" },

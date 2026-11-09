@@ -143,6 +143,7 @@ class amendment extends \cenozo\database\record
       {
         // Go through each data selection and create a list of the following for each:
         // - which amendment first added it
+        // - is the category's cost combined
         // - is the option's cost combined
         // - the fee for the selection
         $amendment_list = [];
@@ -178,14 +179,20 @@ class amendment extends \cenozo\database\record
             $first_mod->get_sql()
           ) );
           $db_first_amendment = static::get_unique_record( ['reqn_id', 'name'], [$db_reqn->id, $name] );
-          if( !array_key_exists( $db_first_amendment->id, $amendment_list ) )
-            $amendment_list[$db_first_amendment->id] = [];
+          $aid = $db_first_amendment->id;
+          if( !array_key_exists( $aid, $amendment_list ) ) $amendment_list[$aid] = [];
 
           $data_selection_sel = lib::create( 'database\select' );
           $data_selection_sel->from( 'data_selection_fee_schedule' );
-          $data_selection_sel->add_table_column( 'data_option', 'id', 'data_option_id' );
-          $data_selection_sel->add_table_column( 'data_option', 'name_en' );
-          $data_selection_sel->add_table_column( 'data_option', 'cost_combined' );
+          $data_selection_sel->add_table_column( 'data_option', 'data_category_id' );
+          $data_selection_sel->add_table_column( 'data_selection', 'study_phase_id', 'sp_id' );
+          $data_selection_sel->add_table_column( 'data_option', 'id', 'do_id' );
+          $data_selection_sel->add_table_column(
+            'data_category_study_phase',
+            'cost_combined',
+            'do_combined'
+          );
+          $data_selection_sel->add_table_column( 'data_option', 'cost_combined', 'sp_combined' );
           $data_selection_sel->add_table_column( 'data_selection_fee_schedule', 'fee' );
           $data_selection_mod = lib::create( 'database\modifier' );
           $data_selection_mod->join(
@@ -194,42 +201,95 @@ class amendment extends \cenozo\database\record
             'data_selection.id'
           );
           $data_selection_mod->join( 'data_option', 'data_selection.data_option_id', 'data_option.id' );
+
+          $join_mod = lib::create( 'database\modifier' );
+          $join_mod->where(
+            'data_option.data_category_id',
+            '=',
+            'data_category_study_phase.data_category_id',
+            false
+          );
+          $join_mod->where(
+            'data_selection.study_phase_id',
+            '=',
+            'data_category_study_phase.study_phase_id',
+            false
+          );
+          $data_selection_mod->join_modifier( 'data_category_study_phase', $join_mod );
+
           $data_selection_mod->where(
             'data_selection_fee_schedule.fee_schedule_id',
             '=',
             $db_first_amendment->fee_schedule_id
           );
           $data_selection_mod->where( 'data_selection.id', '=', $data_selection['id'] );
-          $row = static::db()->get_row( sprintf(
+          $sel = static::db()->get_row( sprintf(
             '%s %s',
             $data_selection_sel->get_sql(),
             $data_selection_mod->get_sql()
           ) );
 
-          if( 0 != $row['fee'] )
+          if( 0 != $sel['fee'] )
           {
-            if( !array_key_exists( $row['data_option_id'], $amendment_list[$db_first_amendment->id] ) )
-              $amendment_list[$db_first_amendment->id][$row['data_option_id']] = 0;
+            $dc_id = $sel['data_category_id'];
+            if( !array_key_exists( $dc_id, $amendment_list[$aid] ) ) $amendment_list[$aid][$dc_id] = [];
+            $amendment_list[$aid][$dc_id][] = $sel;
+          }
+        }
 
-            if( 1 == $row['cost_combined'] )
+        // Put selections into cost-combined groups (or alone if they are not combined)
+        $group_list = [];
+        foreach( $amendment_list as $aid => $data_category )
+        {
+          $group_list[$aid] = [];
+          foreach( $data_category as $dc_id => $selection_list )
+          {
+            $group_list[$aid][$dc_id] = [];
+            foreach( $selection_list as $sel )
             {
-              // use the max fee
-              $amendment_list[$db_first_amendment->id][$row['data_option_id']] = max(
-                $row['fee'],
-                $amendment_list[$db_first_amendment->id][$row['data_option_id']]
-              );
-            }
-            else
-            {
-              // sum all of the fees
-              $amendment_list[$db_first_amendment->id][$row['data_option_id']] += $row['fee'];
+              if( $sel['do_combined'] || $sel['sp_combined'] )
+              {
+                // create a new group setting the fee and adding any combined data-option or study-phase
+                $group = ['do_list' => [], 'sp_list' => [], 'fee' => $sel['fee']];
+                if( $sel['sp_combined'] ) $group['do_list'][] = $sel['do_id'];
+                if( $sel['do_combined'] ) $group['sp_list'][] = $sel['sp_id'];
 
+                // now merge any existing groups that overlap, removing them as we go
+                foreach( $group_list[$aid][$dc_id] as $index => $g )
+                {
+                  if(
+                    ( $sel['sp_combined'] && in_array( $sel['do_id'], $g['do_list'] ) ) ||
+                    ( $sel['do_combined'] && in_array( $sel['sp_id'], $g['sp_list'] ) )
+                  )
+                  {
+                    $group['do_list'] = array_unique( array_merge( $g['do_list'], $group['do_list'] ) );
+                    $group['sp_list'] = array_unique( array_merge( $g['sp_list'], $group['sp_list'] ) );
+                    $group['fee'] = max( $sel['fee'], $g['fee'] );
+                    unset( $group_list[$aid][$dc_id][$index] );
+                  }
+                }
+
+                $group_list[$aid][$dc_id][] = $group;
+              }
+              else
+              {
+                $group_list[$aid][$dc_id][] = ['do_list' => [], 'sp_list' => [], 'fee' => $sel['fee']];
+              }
             }
           }
         }
 
-        // Now add the fee for each amendment
-        foreach( $amendment_list as $data_option ) foreach( $data_option as $combined_fee ) $fee += $combined_fee;
+        // Now add the fee for all groups
+        foreach( $group_list as $data_category )
+        {
+          foreach( $data_category as $groups )
+          {
+            foreach( $groups as $group )
+            {
+              $fee += $group['fee'];
+            }
+          }
+        }
       }
 
       // add any additional fees

@@ -24,19 +24,19 @@ class module extends \cenozo\service\module
     if( $select->has_column( 'study_phase_list' ) )
     {
       $modifier->join(
-        'data_category_has_study_phase',
+        'data_category_study_phase',
         'data_category.id',
-        'data_category_has_study_phase.data_category_id'
+        'data_category_study_phase.data_category_id'
       );
       $modifier->join(
         'study_phase',
-        'data_category_has_study_phase.study_phase_id',
+        'data_category_study_phase.study_phase_id',
         'study_phase.id'
       );
       $modifier->join( 'study', 'study_phase.study_id', 'study.id' );
       $modifier->group( 'data_category.id' );
 
-      // provide the list of all study phases delimited by a ";", with the study and study-phase names delimited by a "`"
+      // provide the list of all study phases delimited by ;, with the study/study-phase names delimited by `
       $select->add_column(
         'GROUP_CONCAT( CONCAT( '.
           'REPLACE( REPLACE( LOWER( study.name ), " ", "_" ), "-", "_" ), '.

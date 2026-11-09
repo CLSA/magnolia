@@ -49,7 +49,7 @@ cenozoApp.defineModule({
       cost_combined: {
         title: "Fee Combined",
         type: "boolean",
-        help: "Determines whether the fee for this option's selections are combined (only counted once).",
+        help: "Determines whether the fee for this option's selections are combined (only counted once for all selected study phases).",
       },
       justification: {
         title: "Justification",

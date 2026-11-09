@@ -48,7 +48,7 @@ class ui extends \cenozo\ui\ui
     $module = $this->get_module( 'data_category' );
     if( !is_null( $module ) )
     {
-      $module->add_choose( 'study_phase' );
+      $module->add_child( 'data_category_study_phase' );
       $module->add_child( 'data_option' );
     }
 

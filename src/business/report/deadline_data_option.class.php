@@ -43,13 +43,13 @@ class deadline_data_option extends \cenozo\business\report\base_report
     $modifier->where( 'study_phase.id', 'IN', $study_phase_id_list );
 
     $modifier->join(
-      'data_category_has_study_phase',
+      'data_category_study_phase',
       'study_phase.id',
-      'data_category_has_study_phase.study_phase_id'
+      'data_category_study_phase.study_phase_id'
     );
     $modifier->join(
       'data_category',
-      'data_category_has_study_phase.data_category_id',
+      'data_category_study_phase.data_category_id',
       'data_category.id'
     );
     $modifier->join( 'data_option', 'data_category.id', 'data_option.data_category_id' );
