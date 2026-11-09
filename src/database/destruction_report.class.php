@@ -95,7 +95,7 @@ class destruction_report extends \cenozo\database\record
       if( !is_null( $datetime_obj ) )
       {
         $datetime_obj->setTimezone( $db_user->get_timezone_object() );
-        $data[sprintf( 'datetime_%d', $index+1 )] = $datetime_obj->format( 'Y-m-d H:i T' );
+        $data[sprintf( 'datetime_%d', $index+1 )] = $datetime_obj->format( 'Y-m-d H:i (P)' );
       }
     }
 
